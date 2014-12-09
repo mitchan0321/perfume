@@ -1,0 +1,55 @@
+# $Id:$
+
+class SysQueue;
+
+SysQueue method init () {
+    sets queue ();
+    sets queue_add_req ();
+    sets queue_remove_req ();
+};
+
+SysQueue method add-queue (
+    o 			# object
+    e 			# event block
+    once: once		# if event once none nil
+) {
+    if {set? once} else: {set once 0};
+    $queue_add_req + ($o $e $once);
+};
+
+SysQueue method remove-queue (o) {
+    $queue_remove_req + $o;
+};
+
+SysQueue method enter-loop () {
+    if [sets? __in_loop__] then: {return};
+    sets __in_loop__ t;
+
+    try {
+	enter-loop-sub;
+    } catch: {retry};
+
+    unsets __in_loop__;
+};
+
+SysQueue method enter-loop-sub () {
+    while {true} do: {
+	sleep 1;
+
+	$queue concat $queue_add_req;
+	sets queue_add_req ();
+
+	$queue each do: {| f |
+	    set o $f,0;
+	    set e $f,1;
+	    set once $f,2;
+
+	    if {$o ready?}
+	    then: {
+	        try {
+		    set sts [$e eval];
+		} catch: {};
+	    };
+	};
+    };
+};

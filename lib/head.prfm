@@ -1,0 +1,14 @@
+# $Id:$
+
+# like the UNIX head command.
+
+defun head (n file) {
+    {
+	1 each to: $n do: {
+	    if {read a}
+	    then: {print $a}
+	    else: {break};
+	};
+	println;
+    } << $file;
+};

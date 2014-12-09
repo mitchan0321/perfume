@@ -1,0 +1,22 @@
+# case
+
+try {
+    throw (a . "abc");
+}
+catch: {| i |
+    case [$i car]
+	* {println x}
+	a {println $i};
+}
+fin: {true};		# => x
+
+
+try {
+    throw (a . "abc");
+}
+catch: {| i |
+    case [$i car]
+	a {println $i}
+	* {println x};
+}
+fin: {true};		# => (a . abc)

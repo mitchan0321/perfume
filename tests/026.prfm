@@ -1,0 +1,77 @@
+# func closure / block closure test
+
+# functions closure
+defun foo (i) {
+    return [
+	fun () {
+	    set i [$i + 1];
+	};
+    ];
+};
+
+set x [foo 1];
+println [$x]; # => 2
+println [$x]; # => 2
+
+defun foo (i) {
+    return [
+	fun () {
+	    $i ++;
+	};
+    ];
+};
+
+set x [foo 10];
+println [$x]; # => 11
+println [$x]; # => 12
+
+defun foo () {
+    set i 20;
+    return [
+	fun () {
+	    $i ++;
+	};
+    ];
+};
+
+set x [foo];
+println [$x]; # => 21
+println [$x]; # => 22
+
+# block closure
+defun bar (i) {
+    return {$i ++};
+};
+
+set x [bar 100];
+println [$x eval]; # => 101
+println [$x eval]; # => 102
+
+# show env variable
+defun foo (i) {
+    return [
+	fun (x) {
+	    set y 0;
+	    println [info local];
+	    println [info closure];
+	}
+    ];
+};
+
+set x [foo 100];
+$x 200; # => (x y ?)
+        # => (i ? x ?)
+
+# method closure
+class a;
+defun foo (i) {
+    set x [new a];
+    $x method bar () {
+	$i ++;
+    };
+    return $x;
+};
+
+set x [foo 300];
+println [$x bar]; # => 301
+println [$x bar]; # => 302

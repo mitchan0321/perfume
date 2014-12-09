@@ -1,0 +1,11 @@
+# show stack test
+
+{[show-stack] each do: {| i | println $i}} eval;
+
+defun foo (a) {
+    [$a] each do: {| i |
+	println $i;
+    }
+};
+
+foo show-stack;

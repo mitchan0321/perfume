@@ -1,0 +1,18 @@
+# alias test
+
+set i 100;
+
+defun foo (i) {
+    alias up: 1 $i x;
+    println $x;
+};
+
+defun bar (i) {
+    alias up: 1 $i x;
+    $x ++;
+};
+
+foo i;
+bar i;
+println $i;
+

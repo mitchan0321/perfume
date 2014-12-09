@@ -1,0 +1,34 @@
+# $Id:$
+
+#
+# flat - output all available methods.
+# syntax: flat object | class-name
+#
+
+defun flat (o) {
+    set h [dict];
+    flat-sub $o $h;
+
+    set l ();
+    $h each do: {| m c |
+        $l append! ["" . $c "::" $m];
+    };
+    [lsort $l] each do: {| p | println $p};
+};
+
+defun flat-sub (o h) {
+    [$o vars] each do: {| m |
+
+	case [type? [$o var? $m]]
+	NATIVE {
+	    if {$h set? $m} else: {$h set $m $o};
+	}
+	FUNC {
+	    if {$h set? $m} else: {$h set $m $o};
+	};
+    };
+
+    [$o delegate?] each do: {| c |
+	flat-sub $c $h;
+    };
+};

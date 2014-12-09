@@ -1,0 +1,19 @@
+# init test
+
+class a;
+a method init () {
+    println "a::init";
+    sets init-flag t;
+};
+
+set x [new a];	# => "a::init"
+println [$x vars];
+
+class b a;	# => "a::init"
+println [b vars];
+
+
+set x [new b];	# => "a::init"
+println [$x vars];
+
+class-tree $x;

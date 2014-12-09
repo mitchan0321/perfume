@@ -1,0 +1,18 @@
+# $Id:$
+
+# like wc -l
+
+defun wc (file) {
+    set f `File($file mode: i);
+    try {
+	set i -1;
+	$f each do: {
+	    $i ++;
+	};
+    }
+    fin: {
+	$f close;
+    };
+
+    return $i;
+};

@@ -1,0 +1,13 @@
+# switch arg test
+
+println ["abc" =~ 'a'];
+
+set s "abc ABC";
+println [$s =~ 'a'];
+println [$s =~ :all 'a'];
+println [$s =~ :all :nocase 'a'];
+println [$s =~ :nocase 'A.'];
+println [$s =~ :nocase 'a*'];
+println [$s =~ :nocase 'b*'];
+println [$s =~ :nocase '\w(\w)'];
+println [$s =~ :all :nocase '\w(\w)'];

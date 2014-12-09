@@ -1,0 +1,29 @@
+# stack-trace test
+
+defun a (x) {
+    println "may be ok.";
+    throw $x "err";
+};
+
+defun b (x) {
+    a $x;
+    println "may be bug.";
+};
+
+defun c (x) {
+    b $x;
+    println "may be bug.";
+};
+
+defun d (x) {
+    c $x;
+    println "may be bug.";
+};
+
+try {
+    d MyErr;
+    println "may be bug.";
+}
+catch: {
+    println $@stack-trace;
+};

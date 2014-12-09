@@ -1,0 +1,15 @@
+# $Id: tarai-slow.toy,v 1.1 2011/11/02 14:55:23 mit-sato Exp $
+
+# tarai function
+
+defun tarai-slow (x y z) {
+    set x $x;
+    set y $y;
+    set z $z;
+
+    if [$x <= $y] then: {return $y};
+
+    tarai-slow [tarai-slow [$x - 1] $y $z]
+	       [tarai-slow [$y - 1] $z $x]
+	       [tarai-slow [$z - 1] $x $y];
+};

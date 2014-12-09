@@ -1,0 +1,471 @@
+2014/12/09	PRFM_20141209	0.4.0
+2012/07/16	TOY_20120716	0.3.0
+2012/06/10	TOY_20120610	0.2.0
+2011/08/28	TOY_20110828	0.1.3
+2009/11/01	TOY_20091101	0.1.2
+2009/09/23	TOY_20090923	0.1.1
+2009/09/05	TOY_20090905	0.1.0
+2009/07/27	TOY_20090727	0.0.28
+2009/07/06	TOY_20090706	0.0.27
+2009/05/17	TOY_20090517	0.0.26
+2009/05/10	TOY_20090510	0.0.25
+2009/03/28	TOY_20090328	0.0.24
+2009/03/08	TOY_20090308	0.0.23
+2009/03/01	TOY_20090301	0.0.22
+2009/02/22	TOY_20090222	0.0.21
+2009/02/21	TOY_20090221	0.0.20
+2009/02/19	TOY_20090219	0.0.19
+2009/02/15	TOY_20090215	0.0.18
+2008/12/10	TOY_20081210	0.0.17
+2008/11/01	TOY_20081101	0.0.16
+2008/10/04	TOY_20081004	0.0.15
+2008/09/04	TOY_20080904	0.0.14
+2008/08/31	TOY_20080830	0.0.13
+2008/08/30	TOY_20080830	0.0.12
+2008/08/24	TOY_20080824	0.0.11
+2008/08/23	TOY_20080823	0.0.10
+2008/08/22	TOY_20080822	0.0.9
+2008/08/19	TOY_20080819	0.0.8
+2008/08/16	TOY_20080816	0.0.7
+2008/08/13	TOY_20080813	0.0.6
+2008/08/08	TOY_20080808	0.0.5
+2008/08/05	TOY_20080805	0.0.4
+2008/07/27	TOY_20080727	0.0.3
+2008/07/26	TOY_20080726	0.0.2
+2008/07/25	TOY_20080725	0.0.1
+--
+$Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
+
+2008/07/25:	
+	initial CVS repository imported.
+2008/07/26:
+	eval.c:
+		rewrite toy_eval, to non recurcive function call.
+	commands.c:
+		set?/sets?/unset/unsets added.
+	methods.c:
+		String::=/String::!=/Object::string added.
+		Integer::-- added.
+	add setup.toy script.
+	add config.h file.
+2008/07/27:
+	object constructor implimentation. 'init' method at object creation.
+	Hash class implimentation.
+	setup.toy:
+		add apply-constructor script.
+2008/08/05:
+	eval.c:
+		bind_args, change algorithm.
+	array.c:
+		add array type.
+	methods.c:
+		add File class, Array class and modify Hash for using any type in key value.
+	get macro implimentation, for example: $object,$key meaning [$object get $key].
+2008/08/08:
+	commands.c:
+		print / println change, use $@out, $stdout File object.
+	eval.c:
+		add toy_call C function, for using from C native function.
+	Variable 'argv' move to global slot, and change name to 'ARGV'.
+	methods.c:
+		add mth_file_set as File::set! for set file descriptor.
+	parser.c:
+		parse get macro extention bug fix.
+	setup.toy:
+		add stdin / stdout / stderr variables setup.
+2008/08/13:
+	output global variable '@stack-trace' if generated exception.
+2008/08/16:
+	commands.c:
+		add stack-trace command.
+		add trap command for UNIX signal handling.
+	eval.c: add siglan handling.
+		fix LIST extend bug.
+	methods.c:
+		add List::join method.
+		change List::+ method.
+		add String::eval method.
+		add String::+ method.
+	Closure variable is able to reference in function and method.
+2008/08/19:
+	commands.c:
+		add ! / and / not command.
+		add load command.
+		add sid command.
+	eval.c:
+		change to stack-trace / load support.
+		add to omit stack-trace output flag.
+	hash.c:
+		change no use to 'strlen'.
+	interp.c:
+		change get_stack_trace for print script file name.
+	parse.c:
+		fix to symbol parse.
+	types.c:
+		add TAG_NAMED_MASK into SYMBOL.
+2008/08/22:
+	commands.c:
+		fix sid command for specified FUNC object.
+		add sdir command.
+	methods.c:
+		fix List::append degrade, return last item cons cell.
+		add Array::last method.
+2008/08/23:
+	Makefile:
+		add install script.
+		add config.h.in configuration.
+		add VERSION indicate.
+	commands.c:
+		add pwd, cd command.
+		add alias command.
+	hash.c:
+		add ALIAS type procedure.
+	interp.c:
+		add VERSION indicate.
+		add ENV variable setup.
+	parser.c:
+		fix '..' symbol parse, but adhockly.
+	type.[ch]:
+		add ALIAS type.
+2008/08/24:
+	Makefile:
+		add onigruma library added.
+		mearge Makefile.nogc, Makefile.prof into Makefile.
+	type.[ch]:
+		add type RQote for Regexp string.
+	methods.c:
+		add String::match/String::=~ method.
+	parser.c:
+		add RQuote parse.
+2008/08/30:
+	cell.c:
+		add cell_sub for sub-string return.
+	methods.c:
+		fix String::=~ and add switch 'all:' and 'case:'.
+		add String::sub command.
+2008/08/31:
+	methods.c, eval.c:
+		change for init method parameter useful.
+	eval.c:
+		add to_string_call for Object::string.
+2008/09/04:
+	eval.c:
+		add switch argument, ":XXX" meaning same as named arg "XXX: 1".
+	*:
+		add INITMACRO.
+		ex)
+			set o [new Hash arg: (((a . 1) (b . 2)))];
+		     same as:
+			set o `Hash((a . 1) (b . 2));
+	methods.c:
+		change String::=~ option case: => nocase:
+		add Hash::init
+		add Array::init
+
+2008/10/04:
+	methods.c:
+		when dividing by zero, ErrZeroDivide is generated.
+
+2008/11/01:
+	eval.c:
+		to signal block execute under closure environment.
+
+2008/12/07:
+	methods.c:
+		add List::eval
+	cell.c:
+		change GC_MALLOC to GC_MALLOC_ATOMIC for allocate cells data.
+
+2009/01/17:
+	commands.c
+		add sleep command.
+		fix self command.
+	setup.toy
+		add method Block::>> for command outpu redirect file method.
+
+2009/01/21:
+	commands.c
+		change defvar and add setvar.
+
+2009/01/24:
+	Makefile
+		setup.toy install directory change to /usr/local/lib/toy.
+
+	commands.c
+		add internal function 'println'.
+		change 'defvar' to define global once.
+		add 'setvar' can set to global when variable already defined.
+		add 'defvar?' check global variable existing.
+		bug fix 'self' return to legal object.
+		bug fix load nested case.
+		add file command.
+		add exists? command.
+
+	methods.c
+		add List::add like List::append but returns self object.
+		add String::. like the String::+ but safely.
+		add File::ready? for event occurrence check.
+
+	interp.c
+		change "setup.toy" load by "load" command.
+
+	setup.toy
+		add global variable INTERACTIVE for shell mode indicator.
+		$HOME/.toyrc load if file existing.
+2009/02/15:
+	methods.c
+		add method List::filter, List::map
+2009/02/17:
+	*
+		syntax change: var: X -> in: X
+2009/02/19:
+	Makefile
+		install lib directory to $PREFIX/toy/lib.
+	eval.c,	setup.toy
+		add 'unknown' feature.
+	lib/*
+		add grep.toy, wc.toy.
+	Syntax change
+	       all iterator var: keyword change to in:.
+	commands.c
+		cmd_print bug fix.
+		sid return nil if no func match.
+		add type? command.
+2009/02/21:
+	commands.c
+		'if' command syntax extend, if cond-block is value then eval value.
+		add command rand.
+	methods.c
+		add method List::flat
+		add method String::<, >, <=, >=
+		add method Array::list
+		add method Integer::..
+	setup.toy
+		load $LIB_PATH/util.toy.
+	$LIB_PATH/
+		some command separate into this directory.
+	toysh.c
+		print result length limit to 512 bytes.
+2009/02/22:
+	eval.c
+		to_string_call bug fix.
+2009/03/01:
+	methods.c
+		add method List::>> (shift), List::<< (unshift),
+			List::->> (pop), List::<<- (push)
+		add method List::seek
+	msort.toy
+		new added sample script merge sort program.
+2009/03/07:
+	commands.c, eval.c
+		add trace command.
+2009/03/08:
+	commands.c
+		trace syntax added for body tracing.
+		add exit command.
+	interp.toy
+		add feature toy script for command interpriter.
+		for using: interp
+2009/03/28:
+	Makefile
+		gcc flag '-Wall' add.
+	commands.c
+		set command fix, make hash link if variable into closure.
+		add fork command.
+	eval.c
+		fix search method faild when self method call.
+	methods.c
+		File::gets bug fix when EOF return "".
+		Array::init bug fix.
+	SysQueue.toy
+		add error handling.
+2009/03/30:
+	commands.c
+		bug fix String constructor mangled.
+	commands.c, methods.c
+		in progress add callcc.
+2009/05/10:
+	*
+		Any iterator syntax change.
+		    old style) List::each in: i do: {block}
+		    new style) List::each do: {| i | block}
+2009/05/17:
+	*
+		add lazy feature.
+2009/07/06:
+	commands.c
+		change case syntax.
+		       old) case var (val {body} ...)
+		       new) case var val {body} ...
+		add new command cond, like the lisp cond function.
+		add lazy command.
+	eval.c
+		bug fix Object::string.
+	methods.c
+		add method Object::method? as search object method.
+	setup.toy
+		buf fix unknown.
+	lib/ls.toy
+		add option :all for recurcive list.
+	lib/util.toy
+		add Hash::each method.
+2009/07/27:
+	*
+		add memory allocate error detect code.
+		fix interpriter stack operation bug.
+		change Object::init method spec, arg: (val ...) -> init: (val ...)
+		change default interpriter stack size.
+	commands.c
+		try command fix, if occurd exception in fin: block then return exception.
+2009/09/05:
+	hash.c, eval.c
+		add global cache feature. If this feauture turn on, specify HAS_GCACHE in Makefile.
+	commands.c
+		delete 'echo' command.
+		call command syntax added, call object (params ...).
+		add cache-info if determin HAS_GCACHE.
+	methods.c
+		add constructor to File class.
+	lib/wc.toy, grep.toy, cat.toy
+		change code,  use File constructor.
+	lib/util.toy
+		add Object::_ method.
+		add File::each method.
+	tests/*
+		fix results file.
+	*
+		if parameters less than 6, optimizing parameter bind process.
+		change stack trace design and optimizing.
+2009/09/23:
+	commands.c
+		'new' command recognize variable $LIB_PATH, if not defined class auto loading.
+		fix print/println error message.
+		add begin command for local environment isolate.
+		add exec command for external file execution.
+		add read command for read line from $stdin/@in or specified file-object.
+	interp.c
+		bug fix in toy_add_method.
+	lib/*
+		fix grep command.
+		fix interp.toy by new command auto load feature and command line evaluate
+		in local stack.
+		add new command flat for display all of the object/class methods.
+	lib/util.toy
+		add Block::<< method.
+2009/11/01:
+	*
+		symbolized keyword parameter (e.g. then:, else:, do: ...)
+	eval.c, commands.c
+		add goto feature.
+	types.[ch]
+		add type DICT.
+	commands.c
+		add dict.
+	methods.c
+		add object Dict.
+		add method String::split.
+2009/11/21:
+	types.[ch]
+		add type VECTOR.
+		add type COROUTINE.
+	lib/*
+		add memoiz.toy for auto create memoization function.
+		add resolv-host command for IPv4 feature.
+	commands.c
+		add dict-local, dict-object, dict-func, dict-global, dict-class commands.
+		add vector.
+		add eq? command.
+		add connect, resolv-in-addr command for IPv4 client feature.
+		add coro, pause for coroutine support.
+		add gc command.
+		add loop command.
+	methods.c
+		add List::inject.
+		add method DICT::xxx, VECTOR::xxx.
+		delete Object::eq.
+		add String::int, String::real, String::number, String::rquote.
+		add Integer::real, Real::int.
+		add Integer::<<,>>,||,&&,^^,~~ for bit operation.
+		File::??? add mode: to 'io' for input/output mode.
+		add Coro::next method for coroutine support.
+	*
+		long long int to int64_t.
+
+2011/08/28:
+	array.[ch]
+		change internal implimentation.
+		change initial size 8 to 256.
+	eval.c
+		method select bug fix.
+		change lazy call default.
+	hash.c
+		bug fix that deferent variable reference on union.
+	method.c
+		add String::fmt method.
+		add native Vector::each method.
+	lib/*
+		a few changes.
+
+2011/12/09:
+	cstack.c
+		add feature C machine stack management mechanizm.
+	commands.c
+		add command symbol?, nil?, list?, integer?, real?,
+		string?, rquote?, block?/closure?, func?, object?,
+		dict? and vector?.
+	eval.c
+		to_string bug fix when type is dict and vector.
+	methods.c
+		add method Object::apply
+	parser.c
+		add macro ':' continuas separator macro.
+	util.toy
+		add method List:insert!, List:: delete!, List::find,
+		List::find* and List::reverse.
+
+2012/03/01:
+	cstack.c
+		C native stack divid used mechanizm from co-routine.
+		C native stack barriered by mmap(2).
+	eval.c
+		Function parameter number set order changed.
+	toysh.c
+		Interpriter restart when if main C native stack overflowed.
+	types.c
+		add co-routine handler.
+	lib/slist.toy
+		add command for show stack.
+	lib/Y.toy,fact-Ycombi.toy,feb.toy,start-interp.toy
+		add thease commands.
+
+2012/03/06:
+	eval.c, commands.c, interp.c, types.h
+		Lexical scope changed.
+	Y.toy, fact-Ycombi.toy
+	        Sample for Y-combinator.
+
+2012/06/10:
+	cstack.[ch]
+		Support 32bit/64bit environment.
+		(Use __PTRFIFF_TYPE__ macro)
+
+2012/07/05:
+	lib/util.toy
+		List::find, List::find* bug fix.
+	parser.h
+		Fix symbol parse end condition, add "'" character.
+	lib/fib.toy
+		Bug fix.
+
+2012/07/10:
+	commands.c
+		Add multiple variable set feature to 'set' command.
+
+2012/07/16:
+	types.[ch], interp.c, methods.c, commands.c
+		Add bit integer implimentation.
+
+2014/12/09:
+	A programming langage 'perfume' rename from 'toy-lang'.
+
+#eof

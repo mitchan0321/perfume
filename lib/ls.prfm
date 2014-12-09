@@ -1,0 +1,33 @@
+# $Id:$
+
+# like ls -1
+
+defun ls (all: all ind: ind args: dir) {
+    if [$dir null?] then: {set d "."} else: {set d [$dir item]};
+    if [set? ind] else: {set ind 0};
+
+    [msort [file list $d]] each do: {| f |
+	if [$ind > 0] then: {1 each to: $ind do: {print " "}};
+	print $f;
+	if [file dir? [$d . "/" $f]] then: {print "/"};
+	println "";
+
+	if [set? all]
+    	then: {
+	    if {or [$f = "."] [$f = ".."]} else: {
+	        if [file dir? [$d . "/" $f]]
+	        then: {
+	            try {
+	                ls all: $all ind: [$ind + 4] [$d . "/" $f];
+		    } catch: {| e |
+		        case [$e car]
+			ErrFileAccess {
+			    println "# no access permission, \"" $f "\"";
+			}
+			* {throw $e};
+		    };
+	        };
+	    };
+	};
+    };
+};

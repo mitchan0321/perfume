@@ -1,0 +1,13 @@
+# return test
+
+defun a (i) {
+  return {$i ++};
+};
+
+defun b () {
+  set x [a 1];
+  $x eval;
+};
+
+println [b];
+println [b];

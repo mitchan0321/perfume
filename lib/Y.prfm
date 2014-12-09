@@ -1,0 +1,14 @@
+# $Id:$
+
+# Y Combinator
+defun Y(f) {
+    [fun (g) {
+	fun (m) {
+	    [$f [$g $g]] $m;
+	}
+    }] [fun (g) {
+	fun (m) {
+	    [$f [$g $g]] $m;
+        }
+    }];
+};

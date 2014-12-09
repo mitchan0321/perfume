@@ -1,0 +1,25 @@
+# named arg and args
+
+defun foo (a b c a: x b: y args: z) {
+    println "a: " $a;
+    println "b: " $b;
+    println "c: " $c;
+    println "x: " $x;
+    println "y: " $y;
+    set c 0;
+    $z each do: {| i |
+	println "args(" $c "): " $i;
+	$c ++;
+    };
+};
+
+defun bar (args: a) {
+    $a each do: {| i |
+	println $i;
+    }
+};
+
+foo "A" "B" "C" a: "X" b: "Y" 1 2 3 a b c;
+bar;
+bar "a";
+bar "a" "b";

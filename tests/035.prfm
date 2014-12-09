@@ -1,0 +1,47 @@
+# goto test
+
+defun fact-recur (n) {
+    fact-recur-sub $n 1;
+};
+
+defun fact-recur-sub (n a) {
+    if {$n < 1} then: {return $a};
+    goto fact-recur-sub [$n - 1] [$n * $a];
+};
+
+println [fact-recur 5];		# -> 120
+println [fact-recur 5.];	# -> 120.000000000000000
+
+defun x () {
+      goto x-sub;
+};
+
+defun x-sub (x) {
+	println $x;
+};
+
+try {
+	x;
+} catch: {| e |
+	println $e;
+};
+
+defun x () {
+	goto x-sub 123;
+};
+
+try {
+	x;
+} catch: {| e |
+	println $e;
+};
+
+defun x () {
+	goto y-sub;
+};
+
+try {
+	x;
+} catch: {| e |
+	println $e;
+};

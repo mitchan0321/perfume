@@ -1,0 +1,22 @@
+# pi calculate
+
+defun pi () {
+    set (k a b a1 b1) (2 4 1 12 4);
+
+    loop {
+	set (p q k)
+	    ([$k * $k] [[2 * $k] + 1] [$k + 1]);
+	set (a b a1 b1)
+	    ($a1 $b1 [[$p * $a] + [$q * $a1]] [[$p * $b] + [$q * $b1]]);
+
+	set (d d1) ([$a / $b] [$a1 / $b1]);
+
+	while {$d = $d1} do: {
+	    print file: $stdout $d;
+	    $stdout flush;
+
+	    set (a a1) ([10 * [$a % $b]] [10 * [$a1 % $b1]]);
+	    set (d d1) ([$a / $b] [$a1 / $b1]);
+	};
+    };
+};

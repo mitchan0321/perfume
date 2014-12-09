@@ -1,0 +1,44 @@
+# $Id:$
+
+# mearge sort list
+#
+# Usage: msort (list) [order: > | <]
+#    1) msort list           ... sort by ascending
+#    2) msort list order: >  ... same as 1)
+#    3) msort list order: <  ... sort by descending
+#
+
+defun msort (l order: cmp) {
+    if [set? cmp] else: {set cmp >};
+
+    set len [$l len];
+    if [$len <= 1] then: {return $l};
+    if [$len = 2] then: {
+	set l1 [$l >>];
+	set l2 [$l >>];
+	if [$l1 $cmp $l2] then: {return ($l2 $l1)} else: {return ($l1 $l2)};
+    };
+
+    set x [$l split [$len / 2]];
+    set l1 [msort [$x >>] order: $cmp];
+    set l2 [msort [$x >>] order: $cmp];
+    set r ();
+    set lr [$r last];
+    while {and [! [$l1 null?]] [! [$l2 null?]]} do: {
+	if [[$l1 get 0] $cmp [$l2 get 0]]
+	then: {
+	    set lr [$lr append! [$l2 >>]];
+	}
+	else: {
+	    set lr [$lr append! [$l1 >>]];
+	};
+    };
+    if [$l1 null?] else: {
+	$lr concat $l1;
+    };
+    if [$l2 null?] else: {
+	$lr concat $l2;
+    };
+
+    return $r;
+};

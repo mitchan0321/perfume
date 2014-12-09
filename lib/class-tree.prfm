@@ -1,0 +1,18 @@
+# $Id:$
+
+#
+# show class delegation tree
+#
+defun class-tree (class indent: ind) {
+    if {set? ind} else: {set ind 0};
+
+    # print indent
+    if {$ind > 0} then: {1 each to: $ind do: {print "  "}};
+
+    println $class;
+    if {"Object" = $class} then: {return;};
+
+    [$class delegate?] each do: {| i |
+	class-tree $i indent: [$ind + 1];
+    };
+};

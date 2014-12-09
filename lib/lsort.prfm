@@ -1,0 +1,23 @@
+# $Id:$
+
+# sort list
+#
+# Usage: lsort (list) [order: > | <]
+#    1) lsort list           ... sort by ascending
+#    2) lsort list order: >  ... same as 1)
+#    3) lsort list order: <  ... sort by descending
+#
+
+defun lsort (l order: cmp) {
+    if [set? cmp] else: {set cmp >};
+    lsort-sub $l $cmp;
+};
+
+defun lsort-sub(l cmp) {
+    if {[$l len] <= 1} then: {return $l};
+    set pivot [$l >>];
+
+    [lsort-sub [$l filter {| i | $pivot $cmp $i}] $cmp] 
+    concat $pivot
+    [lsort-sub [$l filter {| i | ! [$pivot $cmp $i]}] $cmp];
+};

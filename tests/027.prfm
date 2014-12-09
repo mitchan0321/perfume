@@ -1,0 +1,6 @@
+# script-id and stack-trace
+
+load "./027_d.t";
+
+foo 10;
+bazz;

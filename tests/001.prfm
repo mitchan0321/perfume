@@ -1,0 +1,20 @@
+# return test
+
+defun a () {
+  if {true} then: {
+    println "OK at a";
+    return;
+    println "may be bug 1";
+  };
+  println "may be bug 2";
+};
+
+a;
+
+defun b () {
+  println "OK at b";
+  return [a];
+  println "may be bug 3";
+};
+
+b;

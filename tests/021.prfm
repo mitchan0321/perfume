@@ -1,0 +1,27 @@
+# file test
+
+set f [new File];
+$f open mode: o "./test";
+println [$f stat];
+println [$f eof?]; # => nil
+
+$f puts "abc\n";
+$f puts "def\n";
+
+$f close;
+$f open "./test";
+println [$f eof?]; # => nil
+print [$f gets]; # => abc\n
+print [$f gets]; # => def\n
+println [$f eof?]; # => nil
+println [$f gets]; # => nil
+println [$f eof?]; # => t
+
+$f close;
+$f open mode: a "./test";
+$f puts "ZZZ\n";
+$f close;
+$f open "./test";
+while {set r [$f gets]} do: {print $r}; # => abc\n def\n ZZZ\n
+println;
+$f close;

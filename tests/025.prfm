@@ -1,0 +1,28 @@
+# stack-trace command
+
+defun a() {b};
+defun b() {c};
+defun c() {d};
+defun d() {e};
+defun e() {f};
+defun f() {g};
+defun g() {println [stack-trace]};
+
+a;
+
+class A;
+class B;
+class C;
+A method m () {
+    set x [new B];
+    B method m () {
+	set x [new C];
+	C method m () {
+	    println [stack-trace];
+	};
+	$x m;
+    };
+    $x m;
+};
+set x [new A];
+$x m;

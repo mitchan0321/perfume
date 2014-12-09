@@ -1,0 +1,26 @@
+# $Id:$
+# show co-routin stack list
+
+defun slist () {
+    set l [stack-list];
+    println "Number of slot: " [$l car];
+    println "Stack list:";
+    set i 0;
+
+    println ["%3v %-4!v %-16v %-16v %-16v %-16v %-1v" fmt
+	     "#" "Stat" "Top" "Bari" "Safe" "Bot" "E"];
+    println ["%3v %-4!v %-16v %-16v %-16v %-16v %-1v" fmt
+	     "===" "====" "========" "========" "========" "========" "="];
+
+    $l,1 each do: {| f |
+	println ["%3d %-4!v %016x %016x %016x %016x %1d" fmt
+		 $i $f,0
+		 [$f,1 && 0xffffffff]
+		 [$f,2 && 0xffffffff]
+		 [$f,3 && 0xffffffff]
+		 [$f,4 && 0xffffffff]
+		 $f,5
+		];
+	$i ++;
+    };
+};

@@ -1,0 +1,9 @@
+# String::sub test
+
+set s "abc";
+println [$s sub 0 0]; # => "abc"
+println [$s sub 0]; # => "abc"
+println [$s sub 0 999]; # => "abc"
+println [$s sub 0 1]; # => "a"
+println [$s sub 1]; # => "bc"
+println [$s sub 1 2]; # => "b"

@@ -1,0 +1,17 @@
+# $Id:$
+
+# calc fibonacci number by memoization
+
+defun fib-memo (n) {
+    set a [dict];
+    fib-memo-sub $n $a;
+};
+
+defun fib-memo-sub (n a) {
+    if {$n <= 2} then: {return 1};
+    set a1 [$n - 1];
+    set a2 [$n - 2];
+    set n1 [if [$a set? $a1] then: $a,$a1 else: {fib-memo-sub $a1 $a}];
+    set n2 [if [$a set? $a2] then: $a,$a2 else: {fib-memo-sub $a2 $a}];
+    return [$a set $n [$n1 + $n2]];
+};

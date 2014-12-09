@@ -1,0 +1,50 @@
+# number test
+
+println "*** Integer test";
+println "1 +  1: 2 ..." [1 + 1];
+println "1 -  1: 0 ..." [1 - 1];
+println "2 *  3: 6 ..." [2 * 3];
+println "5 /  2: 2 ..." [5 / 2];
+println "5 %  2: 1 ..." [5 % 2];
+println "5 %  2: 1 ..." [5 % 2];
+println "1 =  1: 1 ..." [1 = 1];
+println "1 =  0: nil ..." [1 = 0];
+println "1 != 0: 1 ..." [1 != 0];
+println "1 != 1: nil ..." [1 != 1];
+println "1 >  1: nil ..." [1 > 1];
+println "1 >= 1: 1 ..." [1 >= 1];
+println "2 >  1: 2 ..." [2 > 1];
+println "1 >  2: nil ..." [1 > 2];
+println "1 >=  2: nil ..." [1 >= 2];
+println "2 >=  2: 2 ..." [2 >= 2];
+println "1 <  1: nil ..." [1 < 1];
+println "1 <= 1: 1 ..." [1 <= 1];
+println "2 <  1: nil ..." [2 < 1];
+println "1 <  2: 1 ..." [1 < 2];
+println "1 <=  2: 1 ..." [1 <= 2];
+println "2 <=  2: 2 ..." [2 <= 2];
+println "2 ++ : 3 ..." [2 ++];
+println "2 ++ 2: 4 ..." [2 ++ 2];
+
+println "*** Real test";
+println "1. +  1.: 2. ..." [1. + 1.];
+println "1. -  1.: 0. ..." [1. - 1.];
+println "2. *  3.: 6. ..." [2. * 3.];
+println "5. /  2.: 2.5 ..." [5. / 2.];
+println "1. =  1.: 1. ..." [1. = 1.];
+println "1. =  0.: nil ..." [1. = 0.];
+println "1. != 0.: 1. ..." [1. != 0.];
+println "1. != 1.: nil ..." [1. != 1.];
+println "1. >  1.: nil ..." [1. > 1.];
+println "1. >= 1.: 1. ..." [1. >= 1.];
+println "2. >  1.: 2. ..." [2. > 1.];
+println "1. >  2.: nil ..." [1. > 2.];
+println "1. >=  2.: nil ..." [1. >= 2.];
+println "2. >=  2.: 2. ..." [2. >= 2.];
+println "1. <  1.: nil ..." [1. < 1.];
+println "1. <= 1.: 1. ..." [1. <= 1.];
+println "2. <  1.: nil ..." [2. < 1.];
+println "1. <  2.: 1. ..." [1. < 2.];
+println "1. <=  2.: 1. ..." [1. <= 2.];
+println "2. <=  2.: 2. ..." [2. <= 2.];
+

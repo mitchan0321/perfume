@@ -1,0 +1,16 @@
+# $Id:$
+
+# calc fibonacci number by loop
+
+defun fib-loop (n) {
+    if {$n <= 2} then: {return 1};
+
+    set a2 1;
+    set a1 1;
+    3 each to: $n do: {
+	set a [$a1 + $a2];
+	set a2 $a1;
+	set a1 $a;
+    };
+    return $a;
+};

@@ -1,0 +1,9 @@
+# get macro test
+
+set h [new Hash];
+$h set a "abc";
+println $h,a; # => "abc"
+
+set a [new Array];
+$a append 1;
+println $a,0; # => 1

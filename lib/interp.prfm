@@ -1,0 +1,70 @@
+# $Id:$
+
+if [defvar? SYSQUEUE] else: {
+    defvar SYSQUEUE [new SysQueue];
+};
+
+defun interp () {
+    set __local_var [dict];	# for eval local environment
+
+    $SYSQUEUE add-queue $stdin {
+        if [set? __cont__] then: {
+	    set __cbuff [$stdin gets];
+	    $__buff + $__cbuff;
+        } else: {
+	    set __buff [$stdin gets];
+        };
+
+        try {
+	    set __result [
+		    begin {
+			    if {! [exists? __buff]}
+			    then: {
+				    alias up: 1 __buff __buff;
+			    };
+			    $__buff eval;
+		    } local: $__local_var :nocascade;
+	    ];
+
+	    println "result[" [type? $__result] "]=> "
+		[if [[["" . $__result] len] > 512]
+		 then: {[["" . $__result] sub 0 512] . " ..."}
+		 else: {"" . $__result}];
+	    unset __cont__;
+
+        } catch: {| __exp |
+            case [$__exp car]
+	        WarnParseClose {
+		    set __cont__ t;
+	        }
+		WarnParseString {
+		    set __cont__ t;
+	        }
+	        * {
+		    println "EXCEPTION: <" [$__exp car] "># " [$__exp cdr];
+		    unset __cont__;
+	        };
+        };
+
+        if [set? __cont__] then: {interp-prompt prompt: "...> "} else: {interp-prompt};
+
+        if [$stdin eof?] then: {println ""; exit 0};
+    };
+
+    interp-prompt;
+    $SYSQUEUE enter-loop;
+};
+
+defun interp-prompt (prompt: p) {
+    if [set? p] else: {
+	if [defvar? PROMPT]
+        then: {
+	    set p $PROMPT;
+        }
+	else: {
+	    set p "$> ";
+	};
+    };
+    print file: $stderr $p;
+    $stderr flush;
+};

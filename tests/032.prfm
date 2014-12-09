@@ -1,0 +1,26 @@
+# alias test 2
+
+defun a (i) {
+    set j 100;
+    b;
+};
+
+defun b () {
+    alias up: 1 i a;
+    alias up: 1 j b;
+    println $a;
+    println $b;
+    println [set? a];
+    println [set? b];
+
+    alias up: 1 k c;
+    println [set? c];
+    if {set? c} then: {println $c};
+    set c 300;
+    if {set? c} then: {println $c};
+};
+
+a 200; # => 200 100 t t nil 300;
+
+true;
+

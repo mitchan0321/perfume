@@ -1,0 +1,23 @@
+# Integer::each
+
+defun foo () {
+    1 each to: 100 do: {| i |
+	println $i;
+	if {$i > 5} then: {return "OK"};
+    };
+    println "may be bug";
+};
+
+foo;
+
+defun foo () {
+    1 each to: 100 do: {| i |
+	println $i;
+	if {$i > 5} then: {break "OK"};
+    };
+    set x $?;
+    println "OK";
+    return $x
+};
+
+foo;

@@ -1,0 +1,1 @@
+result[INTEGER]=> 3

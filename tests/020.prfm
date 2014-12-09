@@ -1,0 +1,20 @@
+# apply-constructor test
+
+class a;
+class b a;
+class x;
+class y x;
+
+class c b delegate: y;
+
+a method init () {println "a::init"; sets a 10};
+b method init () {println "b::init"; sets b 20};
+c method init () {apply-constructor; println "c::init"; sets c 30};
+
+x method init () {println "x::init"; sets x 40};
+y method init () {println "y::init"; sets y 50};
+
+
+set o [new c];
+
+object-member $o;

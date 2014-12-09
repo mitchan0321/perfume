@@ -1,0 +1,22 @@
+# while break test
+
+set i 0;
+while {$i < 1000} do: {
+    if {$i >= 10} then: {break};
+    $i ++;
+    println $i;
+};
+
+println $?;
+
+set i 0;
+while {$i < 10} do: {
+    set j 0;
+    while {$j < 10} do: {
+	if {$j >= 5} then: {break};
+	println "i=" $i ", j=" $j;
+	$j ++;
+    };
+    if {$i >= 3} then: {break};
+    $i ++;
+};

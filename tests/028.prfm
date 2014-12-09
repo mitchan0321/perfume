@@ -1,0 +1,25 @@
+# closure test
+
+defun foo (i) {
+    return [fun (j) {
+	set k 300;
+	println $i;
+	println $j;
+	println $k;
+	if {true} then: {
+	    println $i;
+	    println $j;
+	    println $k;
+	};
+    }];
+};
+
+defun bar (x) {
+    return [foo $x];
+};
+
+set x [foo 100];
+$x 200;
+
+set y [bar 1000];
+$y 2000;

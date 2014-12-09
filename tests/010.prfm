@@ -1,0 +1,12 @@
+# closure test
+
+defun foo (i) {
+    return {$i ++};
+};
+
+set x [foo 10];
+println [$x eval];
+println [$x eval];
+println [$x eval];
+
+println [info local];

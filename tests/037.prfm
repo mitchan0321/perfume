@@ -1,0 +1,17 @@
+# vector test
+
+set a [vector];
+println [$a len]; # => 0
+$a + 0;
+$a + 1;
+$a append 2;
+$a append 3;
+println [$a len]; # => 4
+
+println [$a get 0]; # => 0
+println [$a get 3]; # => 3
+
+$a set 3 XXX;
+println [$a get 3]; # => XXX
+
+$a each do: {| i | println $i}; # => 0 1 2 ZZZ

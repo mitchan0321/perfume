@@ -1,0 +1,11 @@
+# each break test
+
+defun a () {
+    (1 2 3 4 5) each do: {| i |
+	if {$i >= 3} then: {break};
+	println $i;
+    };
+};
+
+a;
+println $?;

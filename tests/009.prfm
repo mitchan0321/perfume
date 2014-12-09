@@ -1,0 +1,14 @@
+# named args
+
+defun foo (a args: z) {
+    println $a;
+    println $z;
+};
+
+defun bar (args: a) {
+    println $a;
+};
+
+foo a b c d e f g;
+foo a;
+bar;

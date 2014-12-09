@@ -1,0 +1,26 @@
+# list test
+
+set x "a";
+set y 1;
+set z Z;
+set a ($x $y $z);
+
+println [$a car]; # => "a"
+println [$a cdr]; # => (1 Z)
+println [$a len]; # => 3
+
+set a (1 . 2);
+println [$a len]; # => 2
+println [$a car]; # => 1
+println [$a cdr]; # => 2
+
+println [$a append! "abc"]; # => (1 "abc")
+println $a;
+println [$a append! abc];   # => (1 "abc" abc)
+println $a;
+println [$a last] ", " [$a type?];          # => (abc), LIST
+println $a;
+
+$a each do: {| i |
+    println $i; # 1 "abc" abc
+};

@@ -1,0 +1,22 @@
+# $Id:$
+
+# calc prime
+
+defun primea (n) {
+    set prime [vector (3 5)];
+    set cand 5;
+    set c 0;
+
+    while {true} do: {
+	if {$c > $n} then: {return $prime};
+
+	$cand ++ 2;
+	$prime each do: {| i |
+	    if {[$i * 2] > $cand} then: {break};
+	    if {[$cand % $i] = 0} then: {$cand ++ 2; retry};
+	};
+        #found prime
+	$prime + $cand;
+	$c ++;
+    };
+};

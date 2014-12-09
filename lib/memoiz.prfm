@@ -1,0 +1,34 @@
+# $Id:$
+
+# Create a memoization function.
+# Usage: memoiz func-name => func
+
+defun memoiz (fun) {
+    set fundict [dict-func];
+    set fname_orig [symbol ["*" . $fun "_orig*"]];
+
+    if [$fundict set? $fun]
+    else: {
+	throw (ErrNoSuchFunction . ["No Such Function, \"" . $fun "\""]);
+    };
+
+    if {["" . [type? $fundict,$fun]] != "FUNC"}
+    then: {
+	throw (ErrNoFunction . ["Not a function, \"" . $fun "\""]);
+    };
+
+    $fundict set $fname_orig $fundict,$fun;
+
+    set d [dict];
+    defun $fun (args: arg) {
+	if [$d set? $arg]
+	then: {
+	    return $d,$arg;
+	}
+	else: {
+	    set result [call $fname_orig $arg];
+	    $d set $arg $result;
+	    return $result;
+	};
+    };
+};

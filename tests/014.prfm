@@ -1,0 +1,23 @@
+# class and method search
+
+class a2;
+class a1 a2;
+class a0 a1;
+
+class b2;
+class b1 b2;
+class b0 b1;
+
+a2 method seta (i) {sets a $i};
+b2 method setb (i) {sets b $i};
+
+set x [new a0];
+try {$x seta 100;} catch: {println "if print this, may be bug"};
+println [$x vars];
+try {$x setb 200;} catch: {println "catch no such method"};
+println [$x vars];
+
+set x [new a0 delegate: b0];
+$x seta 1000;
+$x setb 2000;
+println [$x vars];

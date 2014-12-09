@@ -1,0 +1,20 @@
+# closure / Y combinatore test
+
+println [[
+[fun (f) {
+    [fun (g) {
+	fun (m) {
+	    [$f [$g $g]] $m;
+	}
+    }] [fun (g) {
+	fun (m) {
+	    [$f [$g $g]] $m;
+        }
+    }];
+}] [fun (f) {
+        fun (x) {
+            if {$x <= 1} then: {return 1};
+		$x * [$f [$x - 1]];
+	}
+    }
+]] 10];

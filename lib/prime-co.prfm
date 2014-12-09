@@ -1,0 +1,20 @@
+# $Id:$
+
+set co [
+    coro {
+	set prime 3;
+	while {true} do: {
+	    $prime ++ 2;
+	    set i 3;
+	    while {$i < [$prime / 2]} do: {
+		if {[$prime % $i] = 0} then: {
+		    $prime ++ 2;
+		    set i 3;
+		    retry;
+		};
+		$i ++ 2;
+	    };
+	    pause $prime;
+	};
+    };
+];

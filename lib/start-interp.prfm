@@ -1,0 +1,16 @@
+# $Id:$
+
+# Sample startup file.
+# To put name as "$HOME/.perfume" this file.
+
+if {defvar? INTERACTIVE}
+then: {
+    trap SIGINT {throw ReceiveSignal "Receive SIGINT"};
+    interp;
+    trap SIGINT;
+};
+
+defun start-interp () {
+    [dict-func] unset start-interp;
+    return t;
+};

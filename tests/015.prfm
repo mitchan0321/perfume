@@ -1,0 +1,67 @@
+# try / throw
+
+set c 0;
+try {
+    println "abc";
+}
+catch: {| i |
+    println $i;
+    $c ++;
+    if {$c < 2} then: {retry};
+}
+fin: {
+    println "fin 1";
+};
+
+
+set c 0;
+try {
+    xxx; # error
+}
+catch: {| i |
+    println $i;
+    $c ++;
+    if {$c < 2} then: {retry};
+    break;
+}
+fin: {
+    println "fin 2";
+};
+
+set c 0;
+try {
+    println "abc";
+    throw MyException "occured exception myself";
+    println "may be bug";
+}
+catch: {| i |
+    println $i;
+    $c ++;
+    if {$c < 2} then: {retry};
+    break "xyz";
+}
+fin: {
+    println "fin 3";
+};
+
+defun foo () {
+    set c 0;
+    try {
+	println "abc";
+	throw MyException "occured exception myself";
+	println "may be bug";
+    }
+    catch: {| i |
+	println $i;
+	$c ++;
+	if {$c < 2} then: {retry};
+	return "xyz";
+    }
+    fin: {
+	println "fin 4";
+    };
+};
+
+println "foo result: " [foo];
+try {xxx} catch: {| i | println "XXX: " $i};
+try {xxx} catch: {| i | println "XXX: " $i; throw [$i car] "YYY"};

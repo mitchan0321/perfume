@@ -1,0 +1,69 @@
+# $Id:$
+
+if {and [file exists? "./setup.toy"] [! [defvar? _ONCE_]]}
+then: {
+    defvar _ONCE_ t;
+    load "./setup.toy";
+    return;
+};
+
+#
+# set interactive mode indicator.
+#
+if {[$ARGV len] <= 1}
+then: {
+    defvar INTERACTIVE t;
+};
+
+#
+# setup standard I/O File objects, stdin/stdout/stderr
+#
+defvar stdin [new File];
+$stdin set! 0 mode: i;
+
+defvar stdout [new File];
+$stdout set! 1 mode: o;
+
+defvar stderr [new File];
+$stderr set! 2 mode: o;
+
+#
+# show start message
+#
+if {defvar? INTERACTIVE}
+then: {
+    println "*** Start perfume-lang interpreter version " $VERSION ".";
+};
+
+load [[$LIB_PATH item] . "/util.prfm"];
+
+defun unknown (args: __unknown_args__) {
+    set __unknown_cmd__ [$__unknown_args__ item];
+    set __unknown_param__ [$__unknown_args__ next];
+
+    $LIB_PATH each do: {| __unknown_d__ |
+        set __unknown_f__ [$__unknown_d__ . "/" $__unknown_cmd__ ".prfm"];
+	if {and [file exists? $__unknown_f__] [file read? $__unknown_f__]}
+	then: {
+	    load $__unknown_f__;
+	    if {! [sid $__unknown_cmd__]} then: {
+		continue;
+	    };
+	    return [call $__unknown_cmd__ $__unknown_param__];
+	};
+    };
+    throw ErrNoFunction ["No such function, '" . $__unknown_cmd__ "'."];
+};
+
+#
+# users customize file $HOME/.perfume read.
+#
+if {file exists? [$ENV,"HOME" . "/.perfume"]}
+then: {
+    try {load [$ENV,"HOME" . "/.perfume"];} 
+    catch: {| e | println "Error at read '$HOME/.perfume', " [$e cdr] "."};
+};
+
+true;
+
+#eof
