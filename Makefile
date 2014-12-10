@@ -1,4 +1,7 @@
-# $Id:$
+############################################################################
+###
+###   FIX ME
+###
 
 PREFIX		= /usr/local
 CC		= gcc
@@ -18,6 +21,11 @@ LIB		= -L/usr/local/lib -lgc -lpthread -lonig -lpcl -lgmp
 #CFLAGS		= -c -g -pg -DPROF -DHAS_GCACHE
 #INCLUDE		= -I/usr/local/include -I.
 #LIB		= -pg -L/usr/local/lib -lonig -lpcl -lgmp
+
+###
+###   DONE
+###
+############################################################################
 
 HDRS		= bulk.h cell.h array.h error.h hash.h interp.h parser.h \
 		  toy.h types.h config.h global.h cstack.h
