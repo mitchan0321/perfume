@@ -5,7 +5,7 @@
 #include "toy.h"
 
 #define BUFFSIZE	(4096)
-#define COMMAND		"toysh"
+#define COMMAND		"perfumesh"
 
 int main(int argc, char **argv, char **envp) {
     char buff[BUFFSIZE];

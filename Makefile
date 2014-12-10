@@ -35,11 +35,11 @@ install:
 	install -m 644 setup.prfm $(PREFIX)/lib/perfume
 	install -m 644 lib/*.prfm $(PREFIX)/lib/perfume/lib
 
-perfumesh:	$(OBJS) toysh.o
-	$(CC) $(OBJS) toysh.o $(LIB) -o perfumesh
+perfumesh:	$(OBJS) perfumesh.o
+	$(CC) $(OBJS) perfumesh.o $(LIB) -o perfumesh
 
-toysh.o:	$(SRCS) $(HDRS) toysh.c
-	$(CC) $(CFLAGS) $(INCLUDE) toysh.c -o toysh.o
+perfumesh.o:	$(SRCS) $(HDRS) perfumesh.c
+	$(CC) $(CFLAGS) $(INCLUDE) perfumesh.c -o perfumesh.o
 
 cell.o:		cell.c $(HDRS)
 	$(CC) $(CFLAGS) $(INCLUDE) cell.c -o cell.o

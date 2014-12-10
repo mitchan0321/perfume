@@ -558,7 +558,6 @@ static char *toy_type_char[] = {
     "ALIAS",
     "RQUOTE",
     "INITMACRO",
-    "CALLCC",
     "BIND",
     "DICT",
     "VECTOR",

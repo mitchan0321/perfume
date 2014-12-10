@@ -21,6 +21,5 @@ defun bazz() {
     if {true} then: {
 	println [stack-trace];
 	defun bazzz() {};
-	println "'bazzz' id: " [sid bazzz];
     };
 };

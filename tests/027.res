@@ -35,5 +35,4 @@
 ./027_d.t:22: stack-trace; in self::bazz
 -:6: bazz; in Toplevel::Main
 
-'bazzz' id: 5
-result[NIL]=> nil
+result[FUNC]=> () {}
