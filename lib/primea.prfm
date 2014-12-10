@@ -16,7 +16,7 @@ defun primea (n) {
 	    if {[$cand % $i] = 0} then: {$cand ++ 2; retry};
 	};
         #found prime
-	$prime + $cand;
+	$prime + [$cand + 0];
 	$c ++;
     };
 };
