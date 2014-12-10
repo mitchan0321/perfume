@@ -834,9 +834,6 @@ to_string(Toy_Type *obj) {
 	return cell_get_addr(c);
     }
 
-    case CALLCC:
-	return "CALL/CC";
-
     case BIND:
     {
 	Cell *c;
@@ -1163,9 +1160,6 @@ to_print(Toy_Type *obj) {
 	}
 	return cell_get_addr(c);
     }
-
-    case CALLCC:
-	return "CALL/CC";
 
     case BIND:
 	return to_string(obj);

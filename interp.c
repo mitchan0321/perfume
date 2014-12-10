@@ -191,9 +191,7 @@ interp_setup(Toy_Interp* interp, int argc, char **argv, char **envp) {
     toy_add_class(interp, "Block", NULL, delegate);
     toy_add_class(interp, "RQuote", NULL, delegate);
     toy_add_class(interp, "Object", NULL, NULL);
-    toy_add_class(interp, "Hash", NULL, delegate);
     toy_add_class(interp, "File", NULL, delegate);
-    toy_add_class(interp, "Array", NULL, delegate);
     toy_add_class(interp, "Dict", NULL, delegate);
     toy_add_class(interp, "Vector", NULL, delegate);
     toy_add_class(interp, "Coro", NULL, delegate);

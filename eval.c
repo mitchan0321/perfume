@@ -15,8 +15,10 @@ static Toy_Type* bind_args(Toy_Interp*, Toy_Type* arglist, struct _toy_argspec* 
 static Toy_Type* eval_sig_handl(Toy_Interp *interp, int code);
 static Toy_Type* toy_yield_bind(Toy_Interp *interp, Toy_Type *bind_var);
 
+/*
 #define SET_RESULT(interp,obj) \
 	hash_set_t(interp->func_stack[interp->cur_func_stack]->localvar,const_Question,obj)
+*/
 
 #define SIG_ACTION() 							\
 	if (sig_flag && (! interp->co_calling)) {			\
@@ -345,7 +347,8 @@ exit_eval:
 	}
     }
 
-    SET_RESULT(interp, ret);
+    /* SET_RESULT(interp, ret); */
+
     if (GET_TAG(ret) == EXCEPTION) {
 	hash_set_t(interp->globals, const_atstacktrace,
 		   list_get_item(list_next(ret->u.exception.msg_list)));

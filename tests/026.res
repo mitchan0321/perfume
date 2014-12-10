@@ -6,8 +6,8 @@
 22
 101
 102
-(x y ?)
-(i ? x ?)
+(x y)
+(i x)
 301
 302
 result[NIL]=> nil

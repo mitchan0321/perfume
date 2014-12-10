@@ -1,5 +1,5 @@
 11
 12
 13
-(x ?)
+(x)
 result[NIL]=> nil

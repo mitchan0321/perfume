@@ -16,7 +16,7 @@
 
 static Toy_Type* toy_parse_getmacro(Toy_Type *statement);
 static Toy_Type* toy_parse_initmacro(Toy_Type *statement);
-static Toy_Type* toy_parse_continuas_separator(Toy_Type *statement, int line);
+static Toy_Type* toy_parse_join_statement(Toy_Type *statement, int line);
 static Toy_Type* toy_parse_set_paramno(Toy_Type *statement);
 
 Toy_Type*
@@ -77,7 +77,7 @@ toy_parse_script(Bulk *src, char endc) {
 
 	statement->u.statement_list = toy_parse_initmacro(statement->u.statement_list);
 	statement->u.statement_list = toy_parse_getmacro(statement->u.statement_list);
-	statement->u.statement_list = toy_parse_continuas_separator(statement->u.statement_list,
+	statement->u.statement_list = toy_parse_join_statement(statement->u.statement_list,
 								    bulk_get_line(src));
 	toy_parse_set_paramno(statement);
 
@@ -908,22 +908,54 @@ toy_parse_set_paramno(Toy_Type *o) {
 }
 
 static Toy_Type*
-toy_parse_continuas_separator(Toy_Type *statement, int line) {
-    Toy_Type *result, *cur;
+toy_parse_join_statement(Toy_Type *statement, int line) {
+    Toy_Type *result, *src, *cur;
 
     result = new_list(NULL);
+    src = new_list(NULL);
 
     while (statement) {
 	cur = list_get_item(statement);
 
 	if ((GET_TAG(cur) == SYMBOL) &&
+	    strcmp(cell_get_addr(cur->u.symbol.cell), "\\") == 0) {
+
+	    if (IS_LIST_NULL(result)) {
+		result = src;
+
+	    } else {
+
+		result = new_eval(new_script(new_list(new_statement(result, line))));
+		list_append(src, result);
+		result = src;
+	    }
+
+	    src = new_list(NULL);
+
+	} else if ((GET_TAG(cur) == SYMBOL) &&
 	    strcmp(cell_get_addr(cur->u.symbol.cell), ":") == 0) {
-	    result = new_list(new_eval(new_script(new_list(new_statement(result, line)))));
+
+	    src = new_list(new_eval(new_script(new_list(new_statement(src, line)))));
+
 	} else {
-	    list_append(result, cur);
+
+	    list_append(src, cur);
 	}
 
 	statement = list_next(statement);
+    }
+
+    if (! IS_LIST_NULL(src)) {
+	if (IS_LIST_NULL(result)) {
+
+	    return src;
+
+	} else {
+
+	    result = new_eval(new_script(new_list(new_statement(result, line))));
+	    list_append(src, result);
+	    result = src;
+	}
     }
 
     return result;

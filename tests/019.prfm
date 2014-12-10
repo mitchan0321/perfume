@@ -1,17 +1,1 @@
-# hash test
-
-set x [new Hash];
-
-println [$x keys];
-println [$x pairs];
-
-println [$x set a "abc"];	# => "abc"
-println [$x get a];		# => "abc"
-println [$x get b];		# => nil
-println [$x set? a];		# => t
-println [$x set? b];		# => nil
-$x set a nil;
-println [$x set? a];		# => t
-println [$x set? b];		# => nil
-println [$x keys];
-println [$x pairs];
+# nil

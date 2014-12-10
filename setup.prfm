@@ -32,7 +32,8 @@ $stderr set! 2 mode: o;
 #
 if {defvar? INTERACTIVE}
 then: {
-    println "*** Start perfume-lang interpreter version " $VERSION ".";
+    println "Welcome to Perfume World!!";
+    println "perfume language interpreter version " $VERSION ".";
 };
 
 load [[$LIB_PATH item] . "/util.prfm"];

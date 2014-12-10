@@ -86,6 +86,6 @@ config.h:	config.h.in
 		< config.h.in > config.h
 
 clean:
-	rm -f *.o perfumesh *~ lib/*~ *core* *.gmon config.h tests/setup.prfm
+	rm -f *.o perfumesh *~ lib/*~ tests/*~ *core* *.gmon config.h tests/setup.prfm
 
 #eof

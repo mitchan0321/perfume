@@ -119,53 +119,23 @@ List method find* (obj) {
 };
 
 List method reverse () {
+    set a [vector [self]];
     set result ();
-    [self] each do: {| i |
-	set result [($i) concat $result];
+    set r $result;
+    
+    if [[$a len] = 0] then: {return $result};
+
+    [[$a len] - 1] .. 0 : each do: {| i |
+        set r [$r + $a,$i];
     };
+
     return $result;
 };
 
 #
-# string method
+# Object::?
 #
-Hash method string () {
-    "`Hash" . [pairs];
-};
-
-Array method string () {
-    "`Array" . [list];
-};
-
-#
-# Hash::each
-#
-Hash method each (do: body) {
-    if {set? body} else: {throw ErrNoBlock "No specified block."};
-    [keys] each do: {| k | yield $body $k [self],$k};
-};
-
-#
-# Object::_
-#
-Object method _ (args: a) {
-    if [[$a len] = 0] then: {return [self]};
-
-    set o [self];
-    set l ();
-    $a each do: {| p |
-	if {["" . $p] = "_"}
-	then: {
-	    set o [call $o $l];
-            set l ();
-	}
-	else: {
-	    $l append! $p;
-        };
-    };
-
-    call $o $l;
-};
+Object method ? () {self};
 
 #
 # File::each

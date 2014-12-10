@@ -1,4 +1,4 @@
-2014/12/09	PRFM_20141209	0.4.0
+2014/12/09	PRFM_201412XX	0.4.0
 2012/07/16	TOY_20120716	0.3.0
 2012/06/10	TOY_20120610	0.2.0
 2011/08/28	TOY_20110828	0.1.3
@@ -465,7 +465,17 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 	types.[ch], interp.c, methods.c, commands.c
 		Add bit integer implimentation.
 
-2014/12/09:
+2014/12/XX:
 	A programming langage 'perfume' rename from 'toy-lang'.
+	eval.c
+		Delete command result variable '?'.
+	*
+		Delete class Hash, Array and CALL/CC.
+	lib
+		Update lsort.prfm and msort.prfm for use getter block.
+	parser.c
+		Add '\' macro. (e.g. A B \ C D -> C D [A B])
+	doc
+		Update docment.
 
 #eof

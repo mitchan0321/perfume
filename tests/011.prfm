@@ -7,8 +7,6 @@ while {$i < 1000} do: {
     println $i;
 };
 
-println $?;
-
 set i 0;
 while {$i < 10} do: {
     set j 0;

@@ -1,9 +1,9 @@
 # get macro test
 
-set h [new Hash];
+set h [dict];
 $h set a "abc";
 println $h,a; # => "abc"
 
-set a [new Array];
+set a [vector];
 $a append 1;
 println $a,0; # => 1

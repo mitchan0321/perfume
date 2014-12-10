@@ -2,22 +2,25 @@
 
 # sort list
 #
-# Usage: lsort (list) [order: > | <]
+# Usage: lsort (list) [order: > | <] [getter: {get comparable block}]
 #    1) lsort list           ... sort by ascending
 #    2) lsort list order: >  ... same as 1)
 #    3) lsort list order: <  ... sort by descending
 #
 
-defun lsort (l order: cmp) {
+defun lsort (l order: cmp getter: gtr) {
     if [set? cmp] else: {set cmp >};
-    lsort-sub $l $cmp;
+    if [set? gtr] else: {set gtr {| s | result $s}};
+
+    lsort-sub $l $cmp $gtr;
 };
 
-defun lsort-sub(l cmp) {
+defun lsort-sub(l cmp gtr) {
     if {[$l len] <= 1} then: {return $l};
     set pivot [$l >>];
+    set p [yield $gtr $pivot];
 
-    [lsort-sub [$l filter {| i | $pivot $cmp $i}] $cmp] 
-    concat $pivot
-    [lsort-sub [$l filter {| i | ! [$pivot $cmp $i]}] $cmp];
+    [lsort-sub [$l filter {| i | $p $cmp [yield $gtr $i]}] $cmp $gtr]
+    concat ($pivot)
+    [lsort-sub [$l filter {| i | ! [$p $cmp [yield $gtr $i]]}] $cmp $gtr];
 };

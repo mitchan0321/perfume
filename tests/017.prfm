@@ -15,7 +15,7 @@ defun foo () {
 	println $i;
 	if {$i > 5} then: {break "OK"};
     };
-    set x $?;
+    set x "OK";
     println "OK";
     return $x
 };

@@ -37,12 +37,11 @@
 #define    ALIAS		19	/* variable alias */
 #define    RQUOTE		20	/* reguler expresion string (e.g. '...') */
 #define	   INITMACRO		21	/* INIT Macro */
-#define	   CALLCC		22	/* call/cc */
-#define	   BIND			23	/* bind var list (e.g. | ... |) */
-#define	   DICT			24	/* dictionary (as primitive hash) */
-#define	   VECTOR		25	/* vector (as primitive array) */
-#define	   COROUTINE		26	/* coroutine */
-#define    __TYPE_LAST__	27
+#define	   BIND			22	/* bind var list (e.g. | ... |) */
+#define	   DICT			23	/* dictionary (as primitive hash) */
+#define	   VECTOR		24	/* vector (as primitive array) */
+#define	   COROUTINE		25	/* coroutine */
+#define    __TYPE_LAST__	26
 
 
 #define S_NIL	"nil"

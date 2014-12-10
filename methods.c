@@ -4197,15 +4197,6 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, "String", "rquote", mth_string_torquote, NULL);
     toy_add_method(interp, "String", "fmt", mth_string_format, NULL);
 
-    toy_add_method(interp, "Hash", "init", mth_hash_init, NULL);
-    toy_add_method(interp, "Hash", "set", mth_hash_set, NULL);
-    toy_add_method(interp, "Hash", "get", mth_hash_get, NULL);
-    toy_add_method(interp, "Hash", "set?", mth_hash_isset, NULL);
-    toy_add_method(interp, "Hash", "keys", mth_hash_keys, NULL);
-    toy_add_method(interp, "Hash", "pairs", mth_hash_pairs, NULL);
-    toy_add_method(interp, "Hash", "len", mth_hash_len, NULL);
-    toy_add_method(interp, "Hash", "unset", mth_hash_unset, NULL);
-
     toy_add_method(interp, "File", "init", mth_file_init, NULL);
     toy_add_method(interp, "File", "open", mth_file_open, NULL);
     toy_add_method(interp, "File", "close", mth_file_close, NULL);
@@ -4217,20 +4208,7 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, "File", "set!", mth_file_set, NULL);
     toy_add_method(interp, "File", "ready?", mth_file_isready, NULL);
 
-    toy_add_method(interp, "Array", "init", mth_array_init, NULL);
-    toy_add_method(interp, "Array", "+", mth_array_append, NULL);
-    toy_add_method(interp, "Array", "append", mth_array_append, NULL);
-    toy_add_method(interp, "Array", "set", mth_array_set, NULL);
-    toy_add_method(interp, "Array", "get", mth_array_get, NULL);
-    toy_add_method(interp, "Array", "len", mth_array_len, NULL);
-    toy_add_method(interp, "Array", "each", mth_array_each, NULL);
-    toy_add_method(interp, "Array", "last", mth_array_last, NULL);
-    toy_add_method(interp, "Array", "list", mth_array_list, NULL);
-
     toy_add_method(interp, "Block", "eval", mth_block_eval, NULL);
-
-    // not yet
-    // toy_add_method(interp, "CallCC", "call", mth_callcc_call, NULL);
 
     toy_add_method(interp, "Dict", "set", mth_dict_set, NULL);
     toy_add_method(interp, "Dict", "get", mth_dict_get, NULL);
