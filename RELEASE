@@ -471,6 +471,7 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 		Delete command result variable '?'.
 	*
 		Delete class Hash, Array and CALL/CC.
+		begin command option name change, nocascade -> rebase.
 	lib
 		Update lsort.prfm and msort.prfm for use getter block.
 	parser.c

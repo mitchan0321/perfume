@@ -23,7 +23,7 @@ defun interp () {
 				    alias up: 1 __buff __buff;
 			    };
 			    $__buff eval;
-		    } local: $__local_var :nocascade;
+		    } local: $__local_var :rebase;
 	    ];
 
 	    println "result[" [type? $__result] "]=> "

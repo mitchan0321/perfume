@@ -2145,7 +2145,7 @@ cmd_begin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	local_hash = local->u.dict;
     }
 
-    if (hash_get_and_unset_t(nameargs, const_nocascade)) {
+    if (hash_get_and_unset_t(nameargs, const_rebase)) {
 	closure_env = NULL;
     } else {
 	closure_env = body->u.closure.env->func_env;
@@ -2167,7 +2167,7 @@ cmd_begin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     return result;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error, syntax: begin {block} [local: hash-object] [:nocascade]", interp);
+    return new_exception(TE_SYNTAX, "Syntax error, syntax: begin {block} [local: hash-object] [:rebase]", interp);
 }
 
 Toy_Type*

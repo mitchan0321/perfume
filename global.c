@@ -67,7 +67,7 @@ void def_global() {
     const_unknown = new_symbol("unknown");
     const_out = new_symbol("out:");
     const_local = new_symbol("local:");
-    const_nocascade = new_symbol("nocascade:");
+    const_rebase = new_symbol("rebase:");
     const_NotImpliment = new_exception(TE_NOTIMPLIMENT, "Not Impliment.", NULL);
     const_then = new_symbol("then:");
     const_else = new_symbol("else:");
