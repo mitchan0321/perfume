@@ -1,0 +1,35 @@
+# sort vector
+#
+# Usage: asort [vector(data)] [order: > | <] [getter: {get comparable block}]
+#    1) asort list           ... sort by ascending
+#    2) asort list order: >  ... same as 1)
+#    3) asort list order: <  ... sort by descending
+#
+
+defun asort (a order: cmp getter: gtr) {
+    if [set? cmp] else: {set cmp >};
+    if [set? gtr] else: {set gtr {| s | result $s}};
+
+    quick-asort $a 0 [$a len : - 1] $cmp $gtr;
+    return $a;
+};
+
+defun quick-asort (a left right cmp gtr) {
+    set i $left;
+    set j $right;
+    set pivot [yield $gtr $a,[[$i + $j] / 2]];
+
+    loop {
+	while {$pivot $cmp [yield $gtr $a,$i]} do: {$i ++};
+	while {[yield $gtr $a,$j] $cmp $pivot} do: {$j --};
+	if {$i >= $j} then: {break};
+
+	$a swap $i $j;
+
+	$i ++;
+	$j --;
+    };
+
+    if {$left < [$i - 1]}  then: {quick-asort $a $left [$i - 1] $cmp $gtr};
+    if {[$j + 1] < $right} then: {quick-asort $a [$j + 1] $right $cmp $gtr};
+};

@@ -1225,7 +1225,7 @@ cmd_trap(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *block;
     char *psig;
     int isig;
-    Toy_Type *trapdic, *hold;
+    Toy_Type *trapdic;
 
     if (hash_get_length(nameargs) > 0) goto error;
     if (arglen > 2) goto error;
@@ -1260,18 +1260,15 @@ cmd_trap(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     posargs = list_next(posargs);
     block = list_get_item(posargs);
 
-    /* create new Hash instance : XXX */
+    /* create new dict instance : XXX */
     trapdic = hash_get_t(interp->globals, const_attrap);
     if (NULL == trapdic) {
-	trapdic = new_object("Hash", new_hash(), new_list(const_Hash));
-	hash_set_t(trapdic->u.object.slots, const_Holder, new_container(new_hash()));
+	trapdic = new_dict(new_hash());
 	hash_set_t(interp->globals, const_attrap, trapdic);
     }
 
-    hold = hash_get_t(trapdic->u.object.slots, const_Holder);
-
     if (block == NULL) {
-	block = hash_get_and_unset_t((Hash*)hold->u.container, sig);
+	block = hash_get_and_unset_t(trapdic->u.dict, sig);
 	signal(isig, SIG_DFL);
 
 	if (NULL == block) return const_Nil;
@@ -1280,7 +1277,7 @@ cmd_trap(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 
     if (GET_TAG(block) != CLOSURE) goto error;
 
-    if (NULL != hash_set_t((Hash*)hold->u.container, sig, block)) {
+    if (NULL != hash_set_t(trapdic->u.dict, sig, block)) {
 
 	signal(isig, sig_func);
     }

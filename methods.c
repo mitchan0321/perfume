@@ -2696,232 +2696,6 @@ error2:
     return new_exception(TE_TYPE, "Type error.", interp);
 }
 
-Toy_Type*
-mth_hash_init(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
-    Hash *self, *obj;
-
-    self = SELF_HASH(interp);
-    obj = new_hash();
-    hash_set_t(self, const_Holder, new_container(obj));
-
-    if (arglen >= 1) {
-	Toy_Type *arg, *item, *key, *val;
-	arg = list_get_item(posargs);
-
-	if (GET_TAG(arg) == LIST) {
-	    while (arg) {
-		item = list_get_item(arg);
-		if (GET_TAG(item) != LIST) break;
-
-		key = list_get_item(item);
-		val = list_next(item);
-
-		hash_set(obj, to_string_call(interp, key), val);
-
-		arg = list_next(arg);
-	    }
-	}
-    }
-
-    return const_T;
-}
-
-Toy_Type*
-mth_hash_set(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
-    Hash *self;
-    Toy_Type *container;
-    Hash *hash;
-    Toy_Type *var, *val;
-
-    if (arglen != 2) goto error;
-    if (hash_get_length(nameargs) > 0) goto error;
-
-    var = list_get_item(posargs);
-    posargs = list_next(posargs);
-    val = list_get_item(posargs);
-
-    self = SELF_HASH(interp);
-    container = hash_get_t(self, const_Holder);
-    if (NULL == container) goto error2;
-    hash = container->u.container;
-
-    if (GET_TAG(var) == SYMBOL) {
-	hash_set_t(hash, var, val);
-    } else {
-	hash_set(hash, to_string_call(interp, var), val);
-    }
-
-    return val;
-
-error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'set', syntax: Hash set var val", interp);
-error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
-}
-
-Toy_Type*
-mth_hash_get(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
-    Hash *self;
-    Toy_Type *container;
-    Hash *hash;
-    Toy_Type *var, *val;
-
-    if (arglen != 1) goto error;
-    if (hash_get_length(nameargs) > 0) goto error;
-
-    var = list_get_item(posargs);
-
-    self = SELF_HASH(interp);
-    container = hash_get_t(self, const_Holder);
-    if (NULL == container) goto error2;
-    hash = container->u.container;
-
-    if (GET_TAG(var) == SYMBOL) {
-	val = hash_get_t(hash, var);
-    } else {
-	val = hash_get(hash, to_string_call(interp, var));
-    }
-
-    if (NULL == val) return const_Nil;
-    return val;
-
-error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'get', syntax: Hash get var", interp);
-error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
-}
-
-Toy_Type*
-mth_hash_isset(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
-    Hash *self;
-    Toy_Type *container;
-    Hash *hash;
-    Toy_Type *var, *val;
-
-    if (arglen != 1) goto error;
-    if (hash_get_length(nameargs) > 0) goto error;
-
-    var = list_get_item(posargs);
-
-    self = SELF_HASH(interp);
-    container = hash_get_t(self, const_Holder);
-    if (NULL == container) goto error2;
-    hash = container->u.container;
-
-    if (GET_TAG(var) == SYMBOL) {
-	val = hash_get_t(hash, var);
-    } else {
-	val = hash_get(hash, to_string_call(interp, var));
-    }
-
-    if (NULL == val) return const_Nil;
-    return const_T;
-
-error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'set?', syntax: Hash set? var", interp);
-error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
-}
-
-Toy_Type*
-mth_hash_keys(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
-    Hash *self;
-    Toy_Type *container;
-    Hash *hash;
-
-    if (arglen != 0) goto error;
-    if (hash_get_length(nameargs) > 0) goto error;
-
-    self = SELF_HASH(interp);
-    container = hash_get_t(self, const_Holder);
-    if (NULL == container) goto error2;
-    hash = container->u.container;
-
-    return hash_get_keys(hash);
-
-error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'keys', syntax: Hash keys", interp);
-error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
-}
-
-Toy_Type*
-mth_hash_pairs(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
-    Hash *self;
-    Toy_Type *container;
-    Hash *hash;
-
-    if (arglen != 0) goto error;
-    if (hash_get_length(nameargs) > 0) goto error;
-
-    self = SELF_HASH(interp);
-    container = hash_get_t(self, const_Holder);
-    if (NULL == container) goto error2;
-    hash = container->u.container;
-
-    return hash_get_pairs(hash);
-
-error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'pairs', syntax: Hash pairs", interp);
-error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
-}
-
-Toy_Type*
-mth_hash_len(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
-    Hash *self;
-    Toy_Type *container;
-    Hash *hash;
-
-    if (arglen != 0) goto error;
-    if (hash_get_length(nameargs) > 0) goto error;
-
-    self = SELF_HASH(interp);
-    container = hash_get_t(self, const_Holder);
-    if (NULL == container) goto error2;
-    hash = container->u.container;
-
-    return new_integer_si(hash_get_length(hash));
-
-error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'len', syntax: Hash len", interp);
-error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
-}
-
-Toy_Type*
-mth_hash_unset(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
-    Hash *self;
-    Toy_Type *container;
-    Hash *hash;
-    Toy_Type *var, *val;
-
-    if (arglen != 1) goto error;
-    if (hash_get_length(nameargs) > 0) goto error;
-
-    var = list_get_item(posargs);
-
-    self = SELF_HASH(interp);
-    container = hash_get_t(self, const_Holder);
-    if (NULL == container) goto error2;
-    hash = container->u.container;
-
-    if (GET_TAG(var) == SYMBOL) {
-	val = hash_get_and_unset_t(hash, var);
-    } else {
-	val = hash_get_and_unset(hash, to_string_call(interp, var));
-    }
-
-    if (NULL == val) return const_Nil;
-    return val;
-
-error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'unset', syntax: Hash unset var", interp);
-error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
-}
-
-
 #define FMODE_INPUT	(1)
 #define FMODE_OUTPUT	(2)
 #define FMODE_APPEND	(3)
@@ -3378,299 +3152,6 @@ error2:
     return new_exception(TE_TYPE, "Type error.", interp);
 }
 
-
-Toy_Type*
-mth_array_init(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
-    Hash *self;
-    Array *obj;
-
-    self = SELF_HASH(interp);
-    obj = new_array();
-    hash_set_t(self, const_Holder, new_container(obj));
-
-    if (arglen >= 1) {
-	Toy_Type *arg, *item;
-	arg = list_get_item(posargs);
-
-	if (GET_TAG(arg) == LIST) {
-	    while (arg) {
-		item = list_get_item(arg);
-		if (NULL == item) break;
-
-		array_append(obj, item);
-
-		arg = list_next(arg);
-	    }
-	}
-    }
-
-    return const_T;
-}
-
-Toy_Type*
-mth_array_append(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
-    Hash *self;
-    Toy_Type *container;
-    Array *array;
-    Toy_Type *val;
-
-    if (arglen != 1) goto error;
-    if (hash_get_length(nameargs) > 0) goto error;
-
-    val = list_get_item(posargs);
-
-    self = SELF_HASH(interp);
-    container = hash_get_t(self, const_Holder);
-    if (NULL == container) goto error2;
-    array = container->u.container;
-
-    array_append(array, val);
-
-    return val;
-
-error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'append', syntax: Array append | + val", interp);
-error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
-}
-
-Toy_Type*
-mth_array_set(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
-    Hash *self;
-    Toy_Type *container;
-    Array *array;
-    Toy_Type *val, *pos;
-
-    if (arglen != 2) goto error;
-    if (hash_get_length(nameargs) > 0) goto error;
-
-    pos = list_get_item(posargs);
-    if (GET_TAG(pos) != INTEGER) goto error;
-    posargs = list_next(posargs);
-    val = list_get_item(posargs);
-
-    self = SELF_HASH(interp);
-    container = hash_get_t(self, const_Holder);
-    if (NULL == container) goto error2;
-    array = container->u.container;
-
-    if (! array_set(array, val, mpz_get_si(pos->u.biginteger))) {
-	return new_exception(TE_ARRAYBOUNDARY, "Array boudary error.", interp);
-    }
-
-    return val;
-
-error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'set', syntax: Array set pos val", interp);
-error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
-}
-
-Toy_Type*
-mth_array_get(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
-    Hash *self;
-    Toy_Type *container;
-    Array *array;
-    Toy_Type *val, *pos;
-
-    if (arglen != 1) goto error;
-    if (hash_get_length(nameargs) > 0) goto error;
-
-    pos = list_get_item(posargs);
-    if (GET_TAG(pos) != INTEGER) goto error;
-
-    self = SELF_HASH(interp);
-    container = hash_get_t(self, const_Holder);
-    if (NULL == container) goto error2;
-    array = container->u.container;
-
-    val = array_get(array, mpz_get_si(pos->u.biginteger));
-    
-    if (! val) {
-	return new_exception(TE_ARRAYBOUNDARY, "Array boudary error.", interp);
-    }
-
-    return val;
-
-error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'get', syntax: Array get pos", interp);
-error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
-}
-
-Toy_Type*
-mth_array_len(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
-    Hash *self;
-    Toy_Type *container;
-    Array *array;
-
-    if (arglen > 0) goto error;
-    if (hash_get_length(nameargs) > 0) goto error;
-
-    self = SELF_HASH(interp);
-    container = hash_get_t(self, const_Holder);
-    if (NULL == container) goto error2;
-    array = container->u.container;
-
-    return new_integer_si(array_get_size(array));
-
-error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'len', syntax: Array len", interp);
-error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
-}
-
-Toy_Type*
-mth_array_each(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
-    Hash *self;
-    Toy_Type *container;
-    Array *array;
-    Toy_Type *block;
-    Toy_Type *result;
-    int t;
-    int pos;
-
-    if (arglen > 0) goto error;
-    if (hash_get_length(nameargs) > 1) goto error;
-
-    self = SELF_HASH(interp);
-    container = hash_get_t(self, const_Holder);
-    if (NULL == container) goto error2;
-    array = container->u.container;
-
-    block = hash_get_and_unset_t(nameargs, const_do);
-    if (hash_get_length(nameargs) > 0) goto error;
-
-    if ((block == NULL) || (GET_TAG(block) != CLOSURE)) goto error;
-
-loop_retry:
-    pos = 0;
-    result = const_Nil;
-
-loop:
-    if (pos >= array_get_size(array)) goto fin;
-    result = toy_yield(interp, block, new_list(array_get(array, pos)));
-    t = GET_TAG(result);
-    if (t == EXCEPTION) return result;
-    if (t == CONTROL) {
-	switch (result->u.control.code) {
-	case CTRL_RETURN: case CTRL_GOTO:
-	    return result;
-	    break;
-	case CTRL_BREAK:
-	    return result->u.control.ret_value;
-	    break;
-	case CTRL_CONTINUE:
-	    goto loop_continue;
-	    break;
-	case CTRL_REDO:
-	    goto loop;
-	    break;
-	case CTRL_RETRY:
-	    goto loop_retry;
-	    break;
-	}
-    }
-
-loop_continue:
-    pos++;
-    goto loop;
-
-fin:
-    return result;
-
-error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'each', syntax: Array each do: {| var | block}", interp);
-error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
-}
-
-Toy_Type*
-mth_array_last(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
-    Hash *self;
-    Toy_Type *container;
-    Array *array;
-    int i;
-
-    if (arglen > 0) goto error;
-    if (hash_get_length(nameargs) > 0) goto error;
-
-    self = SELF_HASH(interp);
-    container = hash_get_t(self, const_Holder);
-    if (NULL == container) goto error2;
-    array = container->u.container;
-    i = array_get_size(array);
-    if (0 == i) return const_Nil;
-    return array_get(array, i - 1);
-
-error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'last', syntax: Array last", interp);
-error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
-}
-
-Toy_Type*
-mth_array_list(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
-    Hash *self;
-    Toy_Type *container;
-    Array *array;
-    int size, i;
-    Toy_Type *l, *result;
-
-    if (arglen > 0) goto error;
-    if (hash_get_length(nameargs) > 0) goto error;
-
-    self = SELF_HASH(interp);
-    container = hash_get_t(self, const_Holder);
-    if (NULL == container) goto error2;
-
-    array = container->u.container;
-    size = array_get_size(array);
-    l = result = new_list(NULL);
-    for (i=0; i<size; i++) {
-	l = list_append(l, array_get(array, i));
-    }
-
-    return result;
-
-error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'list', syntax: Array list", interp);
-error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
-}
-
-#if 0
-Toy_Type*
-mth_callcc_call(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
-    volatile static Toy_Type *callcc;
-    volatile static int i;
-    volatile static int *src, *dest;
-    volatile static jmp_buf jmpbuff;
-
-    callcc = SELF(interp);
-    if (GET_TAG(callcc) != CALLCC) goto error2;
-
-    if (arglen > 0) {
-	callcc->u.callcc_buff->value = posargs;
-    } else {
-	callcc->u.callcc_buff->value = const_Nil;
-    }
-
-    memcpy(&jmpbuff, &callcc->u.callcc_buff->jmpbuf, sizeof(jmpbuff));
-
-    src = callcc->u.callcc_buff->cstack;
-    dest = callcc->u.callcc_buff->interp->stack_top;
-    for (i=0; i<callcc->u.callcc_buff->cstack_size; i++) {
-	dest[i] = src[i];
-    }
-
-    longjmp(jmpbuff, 1);
-
-error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
-}
-#endif
-
 Toy_Type*
 mth_dict_set(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *o, *val;
@@ -4036,6 +3517,42 @@ error2:
 }
 
 Toy_Type*
+mth_vector_swap(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *index1, *index2;
+    Toy_Type *o;
+    int idx1, idx2;
+
+    if (arglen != 2) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    index1  = list_get_item(posargs);
+    if (GET_TAG(index1) != INTEGER) goto error;
+    posargs = list_next(posargs);
+
+    index2  = list_get_item(posargs);
+    if (GET_TAG(index2) != INTEGER) goto error;
+
+    o = SELF(interp);
+    if (GET_TAG(o) != VECTOR) goto error2;
+
+
+    idx1 = mpz_get_si(index1->u.biginteger);
+    idx2 = mpz_get_si(index2->u.biginteger);
+    
+    if (! array_swap(o->u.vector, idx1, idx2)) {
+	return new_exception(TE_ARRAYBOUNDARY, "Array boudary error.", interp);
+    }
+
+    return const_T;
+
+error:
+    return new_exception(TE_SYNTAX, "Syntax error at 'swap', syntax: Vector swap pos1 pos2", interp);
+
+error2:
+    return new_exception(TE_TYPE, "Type error.", interp);
+}
+
+Toy_Type*
 mth_coro_next(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *self;
     Toy_Coroutine *co;
@@ -4226,6 +3743,7 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, "Vector", "last", mth_vector_last, NULL);
     toy_add_method(interp, "Vector", "list", mth_vector_list, NULL);
     toy_add_method(interp, "Vector", "each", mth_vector_each, NULL);
+    toy_add_method(interp, "Vector", "swap", mth_vector_swap, NULL);
 
     toy_add_method(interp, "Coro", "next", mth_coro_next, NULL);
     toy_add_method(interp, "Coro", "release", mth_coro_release, NULL);

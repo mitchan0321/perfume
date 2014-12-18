@@ -65,6 +65,23 @@ array_get_size(Array *array) {
     return array->cur_size;
 }
 
+int
+array_swap(Array *array, int pos1, int pos2) {
+    Toy_Type t;
+
+    if (NULL == array) return 0;
+
+    if ((pos1 < 0) || (pos1 >= array->cur_size)) return 0;
+    if ((pos2 < 0) || (pos2 >= array->cur_size)) return 0;
+
+    t = array->array[pos1];
+    array->array[pos1] = array->array[pos2];
+    array->array[pos2] = t;
+
+    return 1;
+}
+
+
 static Array*
 array_realloc(Array* array) {
     Toy_Type *orig_array, *new_array;

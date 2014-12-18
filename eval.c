@@ -944,7 +944,6 @@ toy_call(Toy_Interp *interp, Toy_Type *list) {
 static Toy_Type*
 eval_sig_handl(Toy_Interp *interp, int code) {
     Toy_Type *trapdic;
-    Toy_Type *hold;
     Hash *hash;
     Toy_Type *sig;
     Toy_Type *block;
@@ -952,10 +951,7 @@ eval_sig_handl(Toy_Interp *interp, int code) {
     trapdic = hash_get_t(interp->globals, const_attrap);
     if (NULL == trapdic) return NULL;
 
-    hold = hash_get_t(trapdic->u.object.slots, const_Holder);
-    if (NULL == hold) return NULL;
-
-    hash = (Hash*)hold->u.container;
+    hash = (Hash*)trapdic->u.dict;
     switch (code) {
     case SIGHUP:
 	sig = const_SIGHUP;
