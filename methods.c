@@ -8,6 +8,7 @@
 #include <ctype.h>
 #include <sys/select.h>
 #include <oniguruma.h>
+#include <math.h>
 #include "toy.h"
 #include "interp.h"
 #include "types.h"
@@ -1202,6 +1203,20 @@ mth_real_tointeger(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int ar
     
 error:
     return new_exception(TE_SYNTAX, "Syntax error at 'int', syntax: Real int", interp);
+error2:
+    return new_exception(TE_TYPE, "Type error.", interp);
+}
+
+Toy_Type*
+mth_real_sqrt(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    if (arglen != 0) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (GET_TAG(SELF(interp)) != REAL) goto error2;
+
+    return new_real(sqrt(SELF(interp)->u.real));
+    
+error:
+    return new_exception(TE_SYNTAX, "Syntax error at 'int', syntax: Real sqrt", interp);
 error2:
     return new_exception(TE_TYPE, "Type error.", interp);
 }
@@ -3668,6 +3683,7 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, "Real", ">=", mth_real_ge, NULL);
     toy_add_method(interp, "Real", "<=", mth_real_le, NULL);
     toy_add_method(interp, "Real", "int", mth_real_tointeger, NULL);
+    toy_add_method(interp, "Real", "sqrt", mth_real_sqrt, NULL);
 
     toy_add_method(interp, "List", "last", mth_list_last, NULL);
     toy_add_method(interp, "List", "item", mth_list_item, NULL);

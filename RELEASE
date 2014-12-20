@@ -479,6 +479,7 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 		Add '\' macro. (e.g. A B \ C D -> C D [A B])
 	method.c
 		Add vector::swap.
+		Add Real::sqrt.
 	array.c
 		Add array_swap.
 	doc

@@ -3,20 +3,21 @@
 # calc prime
 
 defun primea (n) {
-    set prime [vector (3 5)];
+    set prime [vector (2 3 5)];
     set cand 5;
-    set c 0;
+    set c [$prime len];
 
     while {true} do: {
-	if {$c > $n} then: {return $prime};
+	if {[$prime last] > $n} then: {return $prime};
 
-	$cand ++ 2;
+	set cand [$cand + 2];
 	$prime each do: {| i |
 	    if {[$i * 2] > $cand} then: {break};
-	    if {[$cand % $i] = 0} then: {$cand ++ 2; retry};
+	    if {[$cand % $i] = 0} then: {set cand [$cand + 2]; retry};
 	};
+
         #found prime
-	$prime + [$cand + 0];
+	$prime + $cand;
 	$c ++;
     };
 };
