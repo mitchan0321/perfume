@@ -55,7 +55,7 @@ array_get(Array *array, int pos) {
 
     if ((pos < 0) || (pos >= array->cur_size)) return NULL;
 
-    return &(array->array[pos]);
+    return toy_clone(&(array->array[pos]));
 }
 
 int
