@@ -10,10 +10,10 @@ defun primea (n) {
     while {true} do: {
 	if {[$prime last] > $n} then: {return $prime};
 
-	set cand [$cand + 2];
+	$cand ++ 2;
 	$prime each do: {| i |
 	    if {[$i * 2] > $cand} then: {break};
-	    if {[$cand % $i] = 0} then: {set cand [$cand + 2]; retry};
+	    if {[$cand % $i] = 0} then: {$cand ++ 2; retry};
 	};
 
         #found prime

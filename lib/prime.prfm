@@ -6,10 +6,11 @@ defun prime (n) {
   set prime (3 5);
   set last [$prime last];
   set cand [$last item];
-  set c 0;
+  set c [$prime len];
 
   while {true} do: {
-    if {$c > $n} then: {return $prime};
+    if {[$last item] > $n} then: {return $prime};
+
 
     $cand ++ 2;
     $prime each do: {| i |
