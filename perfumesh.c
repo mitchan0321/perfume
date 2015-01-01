@@ -15,18 +15,24 @@ int main(int argc, char **argv, char **envp) {
     Bulk *b;
     Cell *c;
     Toy_Interp *interp;
+#if 0
     jmp_buf jmp_env;
+#endif
 
+#if 0
 error_reset:
+#endif
     interp = new_interp("main", STACKSIZE, NULL, argc, argv, envp);
     b = new_bulk();
 
+#if 0
     if (0 == setjmp(jmp_env)) {
 	cstack_set_jmpbuff(0, &jmp_env);
     } else {
 	fprintf(stderr, "Catch the main co-routine stack overflow, to be restarted.\n");
 	goto error_reset;
     }
+#endif
 
     if (argv[1] && (strcmp(argv[1], "-") != 0)) {
 	if (0 == bulk_load_file(b, argv[1])) {

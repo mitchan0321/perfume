@@ -1,3 +1,4 @@
+2015/01/XX	PRFM_201501XX		0.4.1
 2014/12/09	PRFM_20141223_K26	0.4.0
 2012/07/16	TOY_20120716		0.3.0
 2012/06/10	TOY_20120610		0.2.0
@@ -484,5 +485,30 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 		Add array_swap.
 	doc
 		Update docment.
+
+2015/01/XX:
+	util.prfm
+		Add global variable PI, E.
+	methods.c
+		Integer::^
+		Real::sin
+		Real::cos
+		Real::tan
+		Real::asin
+		Real::acos
+		Real::atan
+		Real::log
+		Real::log10
+		Real::exp
+		Real::exp10
+		Real::pow
+	cstack.[ch] / types.c / methods.c / eval.c / perfumesh.c
+		Co-routine stack overflow handling robustness.
+	interp.prfm
+		Interpriter using co-routine.
+	Makefile
+		Add -lm link option.
+	commands.c
+		Add cstack-release command for force release cstack slot.
 
 #eof

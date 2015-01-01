@@ -1,6 +1,12 @@
 # $Id:$
 
 #
+# constant value define
+#
+defvar PI 3.14159265358979323846;
+defvar E 2.7182818284590452354;
+
+#
 # utilitie functions and methods
 #
 

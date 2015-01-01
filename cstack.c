@@ -73,6 +73,7 @@ init_cstack() {
 
     /* init current coroutine */
     Current_coroutine = 0;
+    CStack_in_baria = 0;
 
     /* running signal install */
     ss.ss_sp = GC_MALLOC(SIGASTKSZ);
@@ -133,8 +134,9 @@ alloc_slot(int slot) {
     }
     CStack.stack_slot[slot].safe_addr = (__PTRDIFF_TYPE__*)
 	((void*)(CStack.stack_slot[slot].barrier_addr) + MP_PAGESIZE);
-    mprotect((void*)CStack.stack_slot[slot].barrier_addr, MP_PAGESIZE, PROT_READ);
-    
+
+    cstack_protect(slot);
+
     /* indicate garbage collection address block to BoehmGC */
     GC_add_roots((void*)CStack.stack_slot[slot].safe_addr,
 		 (void*)CStack.stack_slot[slot].end_addr);
@@ -144,6 +146,16 @@ alloc_slot(int slot) {
     return alloc_slot(slot);
 }
 
+void
+cstack_protect(int slot) {
+    mprotect((void*)CStack.stack_slot[slot].barrier_addr, MP_PAGESIZE, PROT_READ);
+}
+
+void
+cstack_unprotect(int slot) {
+    mprotect((void*)CStack.stack_slot[slot].barrier_addr, MP_PAGESIZE, PROT_READ | PROT_WRITE);
+}
+
 static void
 sig_cstack(int flag, siginfo_t* siginfo, void* ptr) {
     longjmp(jmp_env, 1);
@@ -151,12 +163,27 @@ sig_cstack(int flag, siginfo_t* siginfo, void* ptr) {
 
 static void
 sig_cstack_running_handler(int flag, siginfo_t* siginfo, void* ptr) {
+    CStack_in_baria = 1;
     if (CStack.stack_slot[Current_coroutine].jmp_buff_enable) {
-	longjmp(CStack.stack_slot[Current_coroutine].jmp_buff, 1);
+	/* +++ */
+	fprintf(stderr, "sig_cstack_running_handler: detect SOVF at %d\n", Current_coroutine);
+	cstack_unprotect(Current_coroutine);
+	return;
     }
 
     fprintf(stderr, "Overflow handler is not installed, at %d.\n", Current_coroutine);
     exit(1);
+}
+
+void cstack_return() {
+    CStack_in_baria = 0;
+    cstack_protect(Current_coroutine);
+    /* +++ */
+    fprintf(stderr, "cstack_return: detect SOVF at %d\n", Current_coroutine);
+
+#if 0
+    longjmp(CStack.stack_slot[Current_coroutine].jmp_buff, 1);
+#endif
 }
 
 int
@@ -291,6 +318,7 @@ cstack_enter(int new_slot) {
 
     old_slot = Current_coroutine;
     Current_coroutine = new_slot;
+    CStack_in_baria = 0;
 
     return old_slot;
 }
@@ -298,4 +326,12 @@ cstack_enter(int new_slot) {
 void
 cstack_leave(int old_slot) {
     Current_coroutine = old_slot;
+}
+
+int  cstack_isalive(int slot) {
+    if (SS_USE == CStack.stack_slot[slot].state) {
+	return 1;
+    } else {
+	return 0;
+    }
 }

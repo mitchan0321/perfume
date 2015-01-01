@@ -9,6 +9,7 @@
 #include "types.h"
 #include "global.h"
 #include "hash.h"
+#include "cstack.h"
 
 static Toy_Type* bind_args(Toy_Interp*, Toy_Type* arglist, struct _toy_argspec* argspec,
 			   Toy_Env**, Hash* args, int fun_paramno, int call_paramno);
@@ -38,7 +39,7 @@ toy_eval_script(Toy_Interp* interp, Toy_Type *script) {
     Toy_Type* result;
     int t;
     int script_id;
-
+    extern int volatile CStack_in_baria;
     result = const_Nil;
 
     SIG_ACTION();
@@ -53,6 +54,13 @@ toy_eval_script(Toy_Interp* interp, Toy_Type *script) {
 
     while (l) {
 	result = toy_eval(interp, list_get_item(l), &env);
+
+	if (CStack_in_baria) {
+	    /* +++ */
+	    fprintf(stderr, "toy_eval_script: detect SOVF\n");
+	    cstack_return();
+	    return new_exception(TE_STACKOVERFLOW, "C stack overflow.", interp);
+	}
 
 	SIG_ACTION();
 

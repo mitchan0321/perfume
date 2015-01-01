@@ -18,6 +18,10 @@ int  cstack_get_size();
 void cstack_set_jmpbuff(int slot, jmp_buf *buff);
 int  cstack_enter(int new_slot);
 void cstack_leave(int old_slot);
+void cstack_protect(int slot);
+void cstack_unprotect(int slot);
+void cstack_return();
+int  cstack_isalive(int slot);
 
 #define SS_INVAL	(-1)
 #define SS_FREE		(0)
@@ -42,5 +46,6 @@ static struct _cstack {
 } CStack;
 
 static int Current_coroutine;
+volatile int CStack_in_baria;
 
 #endif /* __CSTACK_DEF__ */

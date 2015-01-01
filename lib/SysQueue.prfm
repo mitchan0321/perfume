@@ -53,3 +53,7 @@ SysQueue method enter-loop-sub () {
 	};
     };
 };
+
+SysQueue method clean () {
+    unsets __in_loop__;
+};

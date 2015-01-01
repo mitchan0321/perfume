@@ -449,9 +449,14 @@ coroutine_handl(void *context) {
 	result = toy_eval_script(co->u.coroutine->interp,
 				 co->u.coroutine->script->u.closure.block_body);
 	co->u.coroutine->interp->co_parent->co_value = result;
+#if 0
     } else {
+	/* +++ */
+	fprintf(stderr, "coroutine_handl: detect SOVF\n");
 	co->u.coroutine->interp->co_parent->co_value =
 	    new_exception(TE_STACKOVERFLOW, "C stack overflow.", co->u.coroutine->interp);
+#endif
+	
     }
     co->u.coroutine->state = CO_STS_DONE;
 
@@ -477,8 +482,10 @@ Toy_Type*
 new_coroutine(Toy_Interp *interp, Toy_Type* script) {
     Toy_Type *o;
     int cstack_id;
+#if 0
     void *ocd;
     GC_finalization_proc ofun;
+#endif
 
     o = GC_MALLOC(sizeof(Toy_Type));
     ALLOC_SAFE(o);
@@ -506,11 +513,13 @@ new_coroutine(Toy_Interp *interp, Toy_Type* script) {
     o->u.coroutine->interp->coroid = o->u.coroutine->coro_id;
     o->u.coroutine->state = CO_STS_INIT;
 
+#if 0
     GC_register_finalizer((void*)o,
 			  coro_finalizer,
 			  (void*)o,
 			  &ofun,
 			  &ocd);
+#endif
 
     if (NULL == o->u.coroutine->coro_id) {
 	return NULL;

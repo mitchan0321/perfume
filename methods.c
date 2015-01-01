@@ -905,6 +905,30 @@ error2:
     return new_exception(TE_TYPE, "Type error.", interp);
 }
 
+Toy_Type*
+mth_integer_power(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *arg;
+    mpz_t s;
+
+    if (arglen > 1) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (GET_TAG(SELF(interp)) != INTEGER) goto error2;
+
+    arg = list_get_item(posargs);
+    if (INTEGER != GET_TAG(arg)) goto error;
+
+    mpz_init(s);
+    mpz_set(s, SELF(interp)->u.biginteger);
+    if (mpz_get_si(arg->u.biginteger) < 0) goto error;
+    mpz_pow_ui(s, s, mpz_get_si(arg->u.biginteger));
+    return new_integer(s);
+
+error:
+    return new_exception(TE_SYNTAX, "Syntax error at '^', syntax: Integer ^ number-val(>=0)", interp);
+
+error2:
+    return new_exception(TE_TYPE, "Type error.", interp);
+}
 
 Toy_Type*
 mth_real_plus(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
@@ -1216,10 +1240,170 @@ mth_real_sqrt(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     return new_real(sqrt(SELF(interp)->u.real));
     
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'int', syntax: Real sqrt", interp);
+    return new_exception(TE_SYNTAX, "Syntax error at 'sqrt', syntax: Real sqrt", interp);
 error2:
     return new_exception(TE_TYPE, "Type error.", interp);
 }
+
+Toy_Type*
+mth_real_sin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    if (arglen != 0) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (GET_TAG(SELF(interp)) != REAL) goto error2;
+
+    return new_real(sin(SELF(interp)->u.real));
+    
+error:
+    return new_exception(TE_SYNTAX, "Syntax error at 'sin', syntax: Real sin", interp);
+error2:
+    return new_exception(TE_TYPE, "Type error.", interp);
+}
+
+Toy_Type*
+mth_real_cos(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    if (arglen != 0) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (GET_TAG(SELF(interp)) != REAL) goto error2;
+
+    return new_real(cos(SELF(interp)->u.real));
+    
+error:
+    return new_exception(TE_SYNTAX, "Syntax error at 'cos', syntax: Real cos", interp);
+error2:
+    return new_exception(TE_TYPE, "Type error.", interp);
+}
+
+Toy_Type*
+mth_real_tan(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    if (arglen != 0) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (GET_TAG(SELF(interp)) != REAL) goto error2;
+
+    return new_real(tan(SELF(interp)->u.real));
+    
+error:
+    return new_exception(TE_SYNTAX, "Syntax error at 'tan', syntax: Real tan", interp);
+error2:
+    return new_exception(TE_TYPE, "Type error.", interp);
+}
+
+Toy_Type*
+mth_real_asin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    if (arglen != 0) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (GET_TAG(SELF(interp)) != REAL) goto error2;
+
+    return new_real(asin(SELF(interp)->u.real));
+    
+error:
+    return new_exception(TE_SYNTAX, "Syntax error at 'asin', syntax: Real asin", interp);
+error2:
+    return new_exception(TE_TYPE, "Type error.", interp);
+}
+
+Toy_Type*
+mth_real_acos(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    if (arglen != 0) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (GET_TAG(SELF(interp)) != REAL) goto error2;
+
+    return new_real(acos(SELF(interp)->u.real));
+    
+error:
+    return new_exception(TE_SYNTAX, "Syntax error at 'acos', syntax: Real acos", interp);
+error2:
+    return new_exception(TE_TYPE, "Type error.", interp);
+}
+
+Toy_Type*
+mth_real_atan(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    if (arglen != 0) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (GET_TAG(SELF(interp)) != REAL) goto error2;
+
+    return new_real(atan(SELF(interp)->u.real));
+    
+error:
+    return new_exception(TE_SYNTAX, "Syntax error at 'atan', syntax: Real atan", interp);
+error2:
+    return new_exception(TE_TYPE, "Type error.", interp);
+}
+
+Toy_Type*
+mth_real_log(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    if (arglen != 0) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (GET_TAG(SELF(interp)) != REAL) goto error2;
+
+    return new_real(log(SELF(interp)->u.real));
+    
+error:
+    return new_exception(TE_SYNTAX, "Syntax error at 'log', syntax: Real log", interp);
+error2:
+    return new_exception(TE_TYPE, "Type error.", interp);
+}
+
+Toy_Type*
+mth_real_log10(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    if (arglen != 0) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (GET_TAG(SELF(interp)) != REAL) goto error2;
+
+    return new_real(log10(SELF(interp)->u.real));
+    
+error:
+    return new_exception(TE_SYNTAX, "Syntax error at 'log10', syntax: Real log10", interp);
+error2:
+    return new_exception(TE_TYPE, "Type error.", interp);
+}
+
+Toy_Type*
+mth_real_exp(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    if (arglen != 0) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (GET_TAG(SELF(interp)) != REAL) goto error2;
+
+    return new_real(exp(SELF(interp)->u.real));
+    
+error:
+    return new_exception(TE_SYNTAX, "Syntax error at 'exp', syntax: Real exp", interp);
+error2:
+    return new_exception(TE_TYPE, "Type error.", interp);
+}
+
+Toy_Type*
+mth_real_exp10(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    if (arglen != 0) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (GET_TAG(SELF(interp)) != REAL) goto error2;
+
+    return new_real(exp10(SELF(interp)->u.real));
+    
+error:
+    return new_exception(TE_SYNTAX, "Syntax error at 'exp10', syntax: Real exp10", interp);
+error2:
+    return new_exception(TE_TYPE, "Type error.", interp);
+}
+
+Toy_Type*
+mth_real_pow(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *exp;
+
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (GET_TAG(SELF(interp)) != REAL) goto error2;
+
+    exp = list_get_item(posargs);
+    if (REAL != GET_TAG(exp)) goto error;
+
+    return new_real(pow(SELF(interp)->u.real, exp->u.real));
+    
+error:
+    return new_exception(TE_SYNTAX, "Syntax error at 'pow', syntax: Real pow real-value", interp);
+error2:
+    return new_exception(TE_TYPE, "Type error.", interp);
+}
+
 
 Toy_Type*
 mth_list_last(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
@@ -3578,6 +3762,10 @@ mth_coro_next(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     if (hash_get_length(nameargs) > 0) goto error;
 
     co = self->u.coroutine;
+    if (! cstack_isalive(co->interp->cstack_id)) {
+	return new_exception(TE_COOUTOFLIFE, "Co-routine out of life.", interp);
+    };
+
     switch (co->state) {
     case CO_STS_INIT:
 	co->state = CO_STS_RUN;
@@ -3618,7 +3806,7 @@ mth_coro_release(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     co = self->u.coroutine;
     co->state = CO_STS_DONE;
 
-    co_delete(co->coro_id);
+    //co_delete(co->coro_id);
     cstack_release(co->interp->cstack_id);
     co->interp->cstack_id = 0;
     co->interp->cstack = NULL;
@@ -3631,7 +3819,6 @@ error:
 error2:
     return new_exception(TE_TYPE, "Type error.", interp);
 }
-
 
 int
 toy_add_methods(Toy_Interp* interp) {
@@ -3671,6 +3858,7 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, "Integer", "&&", mth_integer_and, NULL);
     toy_add_method(interp, "Integer", "^^", mth_integer_xor, NULL);
     toy_add_method(interp, "Integer", "~~", mth_integer_not, NULL);
+    toy_add_method(interp, "Integer", "^", mth_integer_power, NULL);
 
     toy_add_method(interp, "Real", "+", mth_real_plus, NULL);
     toy_add_method(interp, "Real", "-", mth_real_minus, NULL);
@@ -3684,6 +3872,17 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, "Real", "<=", mth_real_le, NULL);
     toy_add_method(interp, "Real", "int", mth_real_tointeger, NULL);
     toy_add_method(interp, "Real", "sqrt", mth_real_sqrt, NULL);
+    toy_add_method(interp, "Real", "sin", mth_real_sin, NULL);
+    toy_add_method(interp, "Real", "cos", mth_real_cos, NULL);
+    toy_add_method(interp, "Real", "tan", mth_real_tan, NULL);
+    toy_add_method(interp, "Real", "asin", mth_real_asin, NULL);
+    toy_add_method(interp, "Real", "acos", mth_real_acos, NULL);
+    toy_add_method(interp, "Real", "atan", mth_real_atan, NULL);
+    toy_add_method(interp, "Real", "log", mth_real_log, NULL);
+    toy_add_method(interp, "Real", "log10", mth_real_log10, NULL);
+    toy_add_method(interp, "Real", "exp", mth_real_exp, NULL);
+    toy_add_method(interp, "Real", "exp10", mth_real_exp10, NULL);
+    toy_add_method(interp, "Real", "pow", mth_real_pow, NULL);
 
     toy_add_method(interp, "List", "last", mth_list_last, NULL);
     toy_add_method(interp, "List", "item", mth_list_item, NULL);

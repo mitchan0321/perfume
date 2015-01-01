@@ -1954,117 +1954,6 @@ error:
     return new_exception(TE_SYNTAX, "Syntax error, syntax: fork", interp);
 }
 
-#if 0
-static void cmd_callcc_getstacktop(Toy_Interp *interp);
-Toy_Type*
-cmd_callcc(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
-    volatile Toy_Type *callcc;
-    volatile Toy_Type *var, *block;
-    volatile Hash *local;
-    volatile int *src, *dest;
-    volatile static int i;
-
-    if (NULL == interp->stack_base) goto error2;
-    if (arglen != 2) goto error;
-    var = list_get_item(posargs);
-    posargs = list_next(posargs);
-    block = list_get_item(posargs);
-
-    if (GET_TAG(var) != SYMBOL) goto error;
-    if (GET_TAG(block) != CLOSURE) goto error;
-
-    callcc = new_callcc();
-
-    callcc->u.callcc_buff->interp = GC_MALLOC(sizeof(Toy_Interp));
-    memcpy(callcc->u.callcc_buff->interp, interp, sizeof(Toy_Interp));
-    cmd_callcc_getstacktop(callcc->u.callcc_buff->interp);
-    callcc->u.callcc_buff->cstack_size =
-	callcc->u.callcc_buff->interp->stack_base
-	- callcc->u.callcc_buff->interp->stack_top;
-    callcc->u.callcc_buff->cstack = GC_MALLOC((callcc->u.callcc_buff->cstack_size + 1)
-					      * sizeof(int));
-    callcc->u.callcc_buff->value = NULL;
-
-    callcc->u.callcc_buff->interp->func_stack =
-	GC_MALLOC(sizeof(Toy_Func_Env*) * interp->stack_size);
-    for (i=0 ; i<=interp->cur_func_stack ; i++) {
-	callcc->u.callcc_buff->interp->func_stack[i] =
-	    interp->func_stack[i];
-    }
-
-    callcc->u.callcc_buff->interp->obj_stack =
-	GC_MALLOC(sizeof(Toy_Obj_Env*) * interp->stack_size);
-    for (i=0 ; i<=interp->cur_obj_stack ; i++) {
-	callcc->u.callcc_buff->interp->obj_stack[i] =
-	    interp->obj_stack[i];
-    }
-
-    local = block->u.closure.env->localvar;
-    hash_set_t(local, var, callcc);
-
-    src = callcc->u.callcc_buff->interp->stack_top;
-    dest = callcc->u.callcc_buff->cstack;
-    for (i=0; i<callcc->u.callcc_buff->cstack_size; i++) {
-	dest[i] = src[i];
-    }
-
-    if (0 == setjmp(callcc->u.callcc_buff->jmpbuf)) {
-
-	return callcc->u.callcc_buff->value = eval_closure(interp, block);
-							   
-    } else {
-
-	interp->name = callcc->u.callcc_buff->interp->name;
-	interp->stack_size = callcc->u.callcc_buff->interp->stack_size;
-	interp->cur_func_stack = callcc->u.callcc_buff->interp->cur_func_stack;
-	interp->func_stack = callcc->u.callcc_buff->interp->func_stack;
-	interp->cur_obj_stack = callcc->u.callcc_buff->interp->cur_obj_stack;
-	interp->obj_stack = callcc->u.callcc_buff->interp->obj_stack;
-	interp->funcs = callcc->u.callcc_buff->interp->funcs;
-	interp->classes = callcc->u.callcc_buff->interp->classes;
-	interp->globals = callcc->u.callcc_buff->interp->globals;
-	interp->scripts = callcc->u.callcc_buff->interp->scripts;
-	interp->line = callcc->u.callcc_buff->interp->line;
-	interp->statement = callcc->u.callcc_buff->interp->statement;
-	interp->script_id = callcc->u.callcc_buff->interp->script_id;
-	interp->object_name = callcc->u.callcc_buff->interp->object_name;
-	interp->func_name = callcc->u.callcc_buff->interp->func_name;
-	interp->trace = callcc->u.callcc_buff->interp->trace;
-	interp->trace_fd = callcc->u.callcc_buff->interp->trace_fd;
-	interp->stack_base = callcc->u.callcc_buff->interp->stack_base;
-
-	/*
-	for (i=0 ; i<=callcc->u.callcc_buff->interp->cur_obj_stack ; i++) {
-	    interp->obj_stack[i] =
-		callcc->u.callcc_buff->interp->obj_stack[i];
-	}
-	for (i=0 ; i<=callcc->u.callcc_buff->interp->cur_func_stack ; i++) {
-	    interp->func_stack[i] =
-		callcc->u.callcc_buff->interp->func_stack[i];
-	}
-	*/
-
-	if (callcc->u.callcc_buff->value) {
-	    return callcc->u.callcc_buff->value;
-	} else {
-	    return const_Nil;
-	}
-    }
-
-    return const_Nil;
-    
-error:
-    return new_exception(TE_SYNTAX, "Syntax error, syntax: callcc var {block}", interp);
-error2:
-    return new_exception(TE_BADBASE, "C stack base error.", interp);
-}
-
-static void cmd_callcc_getstacktop(Toy_Interp *interp) {
-    int stack_top;
-    interp->stack_top = ((int*)&stack_top);
-}
-#endif
-
 Toy_Type*
 cmd_yield(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *closure;
@@ -2855,6 +2744,25 @@ error:
 			 "Syntax error at 'vector?', syntax: vector? val", interp);
 }
 
+Toy_Type*
+cmd_cstack_release(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *t;
+    int slot;
+
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) != 0) goto error;
+
+    t = list_get_item(posargs);
+    if (INTEGER != GET_TAG(t)) goto error;
+
+    slot = mpz_get_si(t->u.biginteger);
+    cstack_release(slot);
+    return const_Nil;
+
+error:
+    return new_exception(TE_SYNTAX,
+			 "Syntax error at 'cstack-release', syntax: cstack-release slot-id", interp);
+}
 
 int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, "false", cmd_false, NULL);
@@ -2950,6 +2858,7 @@ int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, "object?", cmd_isobject, NULL);
     toy_add_func(interp, "dict?", cmd_isdict, NULL);
     toy_add_func(interp, "vector?", cmd_isvector, NULL);
+    toy_add_func(interp, "cstack-release", cmd_cstack_release, NULL);
 
     return 0;
 }

@@ -5,6 +5,12 @@ if [defvar? SYSQUEUE] else: {
 };
 
 defun interp () {
+    $SYSQUEUE clean;
+    set c [coro {interp-co}];
+    $c next;
+};
+
+defun interp-co () {
     set __local_var [dict];	# for eval local environment
 
     $SYSQUEUE add-queue $stdin {

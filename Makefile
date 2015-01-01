@@ -10,7 +10,7 @@ CC		= gcc
 CFLAGS		= -Wall -O3 -c -g -DHAS_GCACHE
 #CFLAGS		= -Wall -c -g -DHAS_GCACHE
 INCLUDE		= -I/usr/local/include -I.
-LIB		= -L/usr/local/lib -lgc -lpthread -lonig -lpcl -lgmp
+LIB		= -L/usr/lib -L/lib -L/usr/local/lib -lm -lgc -lpthread -lonig -lpcl -lgmp
 
 # for memory debuging build.
 #CFLAGS		= -c -g -DPROF -DHAS_GCACHE
