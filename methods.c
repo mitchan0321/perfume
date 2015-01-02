@@ -1377,7 +1377,7 @@ mth_real_exp10(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     if (hash_get_length(nameargs) > 0) goto error;
     if (GET_TAG(SELF(interp)) != REAL) goto error2;
 
-    return new_real(exp10(SELF(interp)->u.real));
+    return new_real(pow(10.0, SELF(interp)->u.real));
     
 error:
     return new_exception(TE_SYNTAX, "Syntax error at 'exp10', syntax: Real exp10", interp);
@@ -3806,7 +3806,7 @@ mth_coro_release(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     co = self->u.coroutine;
     co->state = CO_STS_DONE;
 
-    //co_delete(co->coro_id);
+    co_delete(co->coro_id);
     cstack_release(co->interp->cstack_id);
     co->interp->cstack_id = 0;
     co->interp->cstack = NULL;
