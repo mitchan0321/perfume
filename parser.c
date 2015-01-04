@@ -5,6 +5,7 @@
 #include <assert.h>
 #include <global.h>
 #include <string.h>
+#include <sys/types.h>
 #include "parser.h"
 #include "error.h"
 #include "global.h"

@@ -64,7 +64,7 @@ void	  def_global();
 
 /* define mprotect page size */
 #define MP_ALIGN		(0x0fff)
-#define MP_PAGESIZE		(0x1000)
-#define MP_SPARE		(1024)
+#define MP_PAGESIZE		(0x4000)
+#define MP_SPARE		(4096)
 
 #endif /* __TOY__ */

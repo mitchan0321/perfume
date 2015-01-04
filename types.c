@@ -437,31 +437,25 @@ static void
 coroutine_handl(void *context) {
     Toy_Type *co;
     Toy_Type *result;
-    int restore_co_id = 0;
-    jmp_buf jmp_env;
+    sigjmp_buf jmp_env;
 
     co = (Toy_Type*)context;
 
-    if (0 == setjmp(jmp_env)) {
+    if (0 == sigsetjmp(jmp_env, 1)) {
 	cstack_set_jmpbuff(co->u.coroutine->interp->cstack_id, &jmp_env);
 	
-	restore_co_id = cstack_enter(co->u.coroutine->interp->cstack_id);
 	result = toy_eval_script(co->u.coroutine->interp,
 				 co->u.coroutine->script->u.closure.block_body);
 	co->u.coroutine->interp->co_parent->co_value = result;
-#if 0
     } else {
 	/* +++ */
 	fprintf(stderr, "coroutine_handl: detect SOVF\n");
 	co->u.coroutine->interp->co_parent->co_value =
 	    new_exception(TE_STACKOVERFLOW, "C stack overflow.", co->u.coroutine->interp);
-#endif
-	
     }
     co->u.coroutine->state = CO_STS_DONE;
 
     cstack_release(co->u.coroutine->interp->cstack_id);
-    cstack_leave(restore_co_id);
     co->u.coroutine->interp->cstack_id = 0;
     co->u.coroutine->interp->cstack = NULL;
     //co_delete(co->u.coroutine->coro_id);

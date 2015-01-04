@@ -163,12 +163,28 @@ sig_cstack(int flag, siginfo_t* siginfo, void* ptr) {
 
 static void
 sig_cstack_running_handler(int flag, siginfo_t* siginfo, void* ptr) {
+    fprintf(stderr, "*** receive SIGSEGV by sig_cstack_running_handler.\n");
+    fprintf(stderr, "flag: %d\n", flag);
+    fprintf(stderr, "si_signo: %d\n", siginfo->si_signo);
+    fprintf(stderr, "si_errno: %d\n", siginfo->si_errno);
+    fprintf(stderr, "si_code: %d\n", siginfo->si_code);
+    fprintf(stderr, "si_pid: %d\n", siginfo->si_pid);
+    fprintf(stderr, "si_uid: %d\n", siginfo->si_uid);
+    fprintf(stderr, "si_status: %d\n", siginfo->si_status);
+    fprintf(stderr, "si_addr: %016x\n", siginfo->si_addr);
+    fprintf(stderr, "si_value: %d\n", siginfo->si_value);
+    fprintf(stderr, "si_reason: %d\n", siginfo->_reason._fault._trapno);
+    if (CStack_in_baria) {
+	fprintf(stderr, "SOVF Double fault detect.\n");
+	exit(1);
+    }
     CStack_in_baria = 1;
     if (CStack.stack_slot[Current_coroutine].jmp_buff_enable) {
-	/* +++ */
-	fprintf(stderr, "sig_cstack_running_handler: detect SOVF at %d\n", Current_coroutine);
 	cstack_unprotect(Current_coroutine);
-	return;
+	sigreturn(ptr);
+#if 0
+	siglongjmp(CStack.stack_slot[Current_coroutine].jmp_buff, 1);
+#endif
     }
 
     fprintf(stderr, "Overflow handler is not installed, at %d.\n", Current_coroutine);
@@ -178,12 +194,7 @@ sig_cstack_running_handler(int flag, siginfo_t* siginfo, void* ptr) {
 void cstack_return() {
     CStack_in_baria = 0;
     cstack_protect(Current_coroutine);
-    /* +++ */
-    fprintf(stderr, "cstack_return: detect SOVF at %d\n", Current_coroutine);
-
-#if 0
-    longjmp(CStack.stack_slot[Current_coroutine].jmp_buff, 1);
-#endif
+    siglongjmp(CStack.stack_slot[Current_coroutine].jmp_buff, 1);
 }
 
 int
@@ -306,8 +317,13 @@ cstack_get_size() {
     return CStack.slot_size;
 }
 
+int
+cstack_get_coroid() {
+    return Current_coroutine;
+}
+
 void
-cstack_set_jmpbuff(int slot, jmp_buf *buff) {
+cstack_set_jmpbuff(int slot, sigjmp_buf *buff) {
     memcpy(&(CStack.stack_slot[slot].jmp_buff), buff, sizeof(jmp_buf));
     CStack.stack_slot[slot].jmp_buff_enable = 1;
 }

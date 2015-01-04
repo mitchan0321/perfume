@@ -3,6 +3,8 @@
 #ifndef _GLOBAL_
 #define _GLOBAL_
 
+#include <signal.h>
+#include <sys/types.h>
 #include "toy.h"
 #include "types.h"
 
@@ -81,7 +83,7 @@ extern Toy_Type *const_mode;
 extern void *GC_stackbottom;
 #endif /* PROF */
 
-extern volatile int sig_flag;
+extern volatile sig_atomic_t sig_flag;
 extern int PageSize;
 
 #else
@@ -161,7 +163,7 @@ int PageSize;
 void *GC_stackbottom;
 #endif /* PROF */
 
-volatile int sig_flag;
+volatile sig_atomic_t sig_flag;
 
 #endif /* _DEF_GLOBAL_ */
 

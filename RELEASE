@@ -510,5 +510,8 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 		Add -lm link option.
 	commands.c
 		Add cstack-release command for force release cstack slot.
+		Add coro-id command.
+	*
+		C stack overflow signal handling change.
 
 #eof

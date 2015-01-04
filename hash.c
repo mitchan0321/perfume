@@ -2,6 +2,7 @@
 
 #include <string.h>
 #include <assert.h>
+#include <sys/types.h>
 #include "types.h"
 #include "cell.h"
 #include "global.h"

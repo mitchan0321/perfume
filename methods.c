@@ -3755,6 +3755,7 @@ Toy_Type*
 mth_coro_next(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *self;
     Toy_Coroutine *co;
+    int restore_co_id = 0;
 
     self = SELF(interp);
     if (GET_TAG(self) != COROUTINE) goto error2;
@@ -3769,10 +3770,12 @@ mth_coro_next(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     switch (co->state) {
     case CO_STS_INIT:
 	co->state = CO_STS_RUN;
-	interp->co_calling = 1;
 	/* fall thru */
     case CO_STS_RUN:
+	interp->co_calling = 1;
+	restore_co_id = cstack_enter(co->interp->cstack_id);
 	co_call(co->coro_id);
+	cstack_leave(restore_co_id);
 	interp->co_calling = 0;
 	break;
 

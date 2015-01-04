@@ -1216,7 +1216,7 @@ error:
 
 static void
 sig_func(int code) {
-    sig_flag = code;
+    sig_flag = (sig_atomic_t)code;
 }
 
 Toy_Type*
@@ -2764,6 +2764,21 @@ error:
 			 "Syntax error at 'cstack-release', syntax: cstack-release slot-id", interp);
 }
 
+Toy_Type*
+cmd_coroid(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    int id;
+
+    if (arglen != 0) goto error;
+    if (hash_get_length(nameargs) != 0) goto error;
+
+    id = cstack_get_coroid();
+    return new_integer_si(id);
+
+error:
+    return new_exception(TE_SYNTAX,
+			 "Syntax error at 'coro-id', syntax: coro-id", interp);
+}
+
 int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, "false", cmd_false, NULL);
     toy_add_func(interp, "true", cmd_true, NULL);
@@ -2859,6 +2874,7 @@ int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, "dict?", cmd_isdict, NULL);
     toy_add_func(interp, "vector?", cmd_isvector, NULL);
     toy_add_func(interp, "cstack-release", cmd_cstack_release, NULL);
+    toy_add_func(interp, "coro-id", cmd_coroid, NULL);
 
     return 0;
 }

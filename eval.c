@@ -39,7 +39,7 @@ toy_eval_script(Toy_Interp* interp, Toy_Type *script) {
     Toy_Type* result;
     int t;
     int script_id;
-    extern int volatile CStack_in_baria;
+    extern volatile sig_atomic_t CStack_in_baria;
     result = const_Nil;
 
     SIG_ACTION();
@@ -52,14 +52,22 @@ toy_eval_script(Toy_Interp* interp, Toy_Type *script) {
 	interp->script_id = GET_SCRIPT_ID(script);
     }
 
+    if (CStack_in_baria) {
+	/* +++ */
+	fprintf(stderr, "toy_eval_script: detect SOVF(1)\n");
+	result = new_exception(TE_STACKOVERFLOW, "C stack overflow.", interp);
+	interp->script_id = script_id;
+	cstack_return();
+	return result;
+    }
+
     while (l) {
 	result = toy_eval(interp, list_get_item(l), &env);
 
 	if (CStack_in_baria) {
 	    /* +++ */
-	    fprintf(stderr, "toy_eval_script: detect SOVF\n");
-	    cstack_return();
-	    return new_exception(TE_STACKOVERFLOW, "C stack overflow.", interp);
+	    fprintf(stderr, "toy_eval_script: detect SOVF(2)\n");
+	    result = new_exception(TE_STACKOVERFLOW, "C stack overflow.", interp);
 	}
 
 	SIG_ACTION();
@@ -82,6 +90,7 @@ toy_eval_script(Toy_Interp* interp, Toy_Type *script) {
 	    }
 
 	    interp->script_id = script_id;
+	    if (CStack_in_baria) cstack_return();
 	    return result;
 	}
 
