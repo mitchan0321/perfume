@@ -202,17 +202,15 @@ mth_object_apply(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     Toy_Type *block;
 
     if (hash_get_length(nameargs) > 0) goto error;
-    if (arglen < 1) goto error;
+    if (arglen != 1) goto error;
 
     block = list_get_item(posargs);
     if (GET_TAG(block) != CLOSURE) goto error;
 
-    posargs = list_next(posargs);
-    
-    return toy_yield(interp, block, posargs);
+    return toy_eval_script(interp, block->u.closure.block_body);
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'apply', syntax: Object apply {| var ... | block} val ...", interp);
+    return new_exception(TE_SYNTAX, "Syntax error at 'apply', syntax: Object apply {block}", interp);
 }
 
 Toy_Type*

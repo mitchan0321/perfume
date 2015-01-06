@@ -490,18 +490,19 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 	util.prfm
 		Add global variable PI, E.
 	methods.c
-		Integer::^
-		Real::sin
-		Real::cos
-		Real::tan
-		Real::asin
-		Real::acos
-		Real::atan
-		Real::log
-		Real::log10
-		Real::exp
-		Real::exp10
-		Real::pow
+		Add Integer::^
+		Add Real::sin
+		Add Real::cos
+		Add Real::tan
+		Add Real::asin
+		Add Real::acos
+		Add Real::atan
+		Add Real::log
+		Add Real::log10
+		Add Real::exp
+		Add Real::exp10
+		Add Real::pow
+		Fix Object::apply
 	cstack.[ch] / types.c / methods.c / eval.c / perfumesh.c
 		Co-routine stack overflow handling robustness.
 	interp.prfm
