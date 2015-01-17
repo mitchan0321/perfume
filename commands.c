@@ -1974,14 +1974,22 @@ error:
 
 Toy_Type*
 cmd_result(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *t;
 
-    if (hash_get_length(nameargs) != 0) goto error;
+    if (hash_get_length(nameargs) == 1) {
+	if (NULL == (t = hash_get_and_unset_t(nameargs, const_last))) goto error;
+	if (NIL == GET_TAG(t)) return const_Nil;
+	return interp->last_status;
+    } else if (hash_get_length(nameargs) > 1) {
+	goto error;
+    }
+
     if (arglen == 0) return const_Nil;
     if (arglen != 1) goto error;
     return list_get_item(posargs);
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error, syntax: result value", interp);
+    return new_exception(TE_SYNTAX, "Syntax error, syntax: result [value | :last]", interp);
 }
 
 Toy_Type*
@@ -2779,6 +2787,11 @@ error:
 			 "Syntax error at 'coro-id', syntax: coro-id", interp);
 }
 
+Toy_Type*
+cmd_remark(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    return interp->last_status;
+}
+
 int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, "false", cmd_false, NULL);
     toy_add_func(interp, "true", cmd_true, NULL);
@@ -2875,6 +2888,7 @@ int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, "vector?", cmd_isvector, NULL);
     toy_add_func(interp, "cstack-release", cmd_cstack_release, NULL);
     toy_add_func(interp, "coro-id", cmd_coroid, NULL);
+    toy_add_func(interp, "REM", cmd_remark, NULL);
 
     return 0;
 }

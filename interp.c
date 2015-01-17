@@ -118,6 +118,7 @@ new_interp(char* name, int stack_size, Toy_Interp* parent,
 	interp->co_parent = 0;
 	interp->co_value = 0;
 	interp->co_calling = 0;
+	interp->last_status = const_Nil;
 
 	sig_flag = 0;
 
@@ -160,6 +161,7 @@ new_interp(char* name, int stack_size, Toy_Interp* parent,
 	interp->co_parent = 0;
 	interp->co_value = 0;
 	interp->co_calling = 0;
+	interp->last_status = const_Nil;
     }
 
     return interp;

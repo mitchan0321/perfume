@@ -158,6 +158,8 @@ typedef struct _toy_interp {
     struct _toy_type *co_value;
     int co_calling;
 
+    /* last command status */
+    struct _toy_type *last_status;
 } Toy_Interp;
 
 #if 0

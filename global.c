@@ -77,6 +77,7 @@ void def_global() {
     const_to = new_symbol("to:");
     const_sep = new_symbol("sep:");
     const_mode = new_symbol("mode:");
+    const_last = new_symbol("last:");
     PageSize = sysconf(_SC_PAGESIZE);
 #ifdef PROF
     void *GC_stackbottom = 0;

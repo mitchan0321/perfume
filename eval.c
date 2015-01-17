@@ -63,6 +63,7 @@ toy_eval_script(Toy_Interp* interp, Toy_Type *script) {
 
     while (l) {
 	result = toy_eval(interp, list_get_item(l), &env);
+	interp->last_status = result;
 
 	if (CStack_in_baria) {
 	    /* +++ */
@@ -86,6 +87,7 @@ toy_eval_script(Toy_Interp* interp, Toy_Type *script) {
 		    result = toy_eval(interp,
 				      new_statement(body, interp->trace_info->line),
 				      &env);
+		    interp->last_status = result;
 		}
 	    }
 
