@@ -21,6 +21,10 @@ defun apply-constructor () {
 };
 
 defun apply-constructor-sub (o) {
+    set s [symbol ["__init__" . $o]];
+    if [sets? $s] then: {return};
+    sets $s t;
+
     set l [$o delegate?];
     if {$l null?} then: {return};
 
