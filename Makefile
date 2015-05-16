@@ -4,7 +4,7 @@
 ###
 
 PREFIX		= /usr/local
-CC		= gcc
+CC		= cc
 
 # for product build. (use BoehmGC)
 CFLAGS		= -Wall -O3 -c -g -DHAS_GCACHE

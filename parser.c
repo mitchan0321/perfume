@@ -76,8 +76,8 @@ toy_parse_script(Bulk *src, char endc) {
 
 	if (GET_TAG(statement) != STATEMENT) goto parse_error;
 
-	statement->u.statement_list = toy_parse_initmacro(statement->u.statement_list);
 	statement->u.statement_list = toy_parse_getmacro(statement->u.statement_list);
+	statement->u.statement_list = toy_parse_initmacro(statement->u.statement_list);
 	statement->u.statement_list = toy_parse_join_statement(statement->u.statement_list,
 								    bulk_get_line(src));
 	toy_parse_set_paramno(statement);
