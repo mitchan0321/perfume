@@ -15,7 +15,7 @@ defun lsort (l order: cmp getter: gtr) {
     lsort-sub $l $cmp $gtr;
 };
 
-defun lsort-sub(l cmp gtr) {
+defun lsort-sub (l cmp gtr) {
     if {[$l len] <= 1} then: {return $l};
     set pivot [$l >>];
     set p [yield $gtr $pivot];
