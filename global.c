@@ -78,6 +78,8 @@ void def_global() {
     const_sep = new_symbol("sep:");
     const_mode = new_symbol("mode:");
     const_last = new_symbol("last:");
+    const_nonewline = new_symbol("nonewline:");
+    const_nocontrol = new_symbol("nocontrol:");
     PageSize = sysconf(_SC_PAGESIZE);
 #ifdef PROF
     void *GC_stackbottom = 0;

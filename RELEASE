@@ -1,3 +1,4 @@
+2015/07/29	PRFM_20150729		0.5.1
 2015/02/15	PRFM_20150215_A26	0.5.0
 2014/12/09	PRFM_20141223_K26	0.4.0
 2012/07/16	TOY_20120716		0.3.0
@@ -517,5 +518,10 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 		Add REM command.
 	*
 		C stack overflow signal handling change.
+
+2015/07/29:
+	methods.c / commands.c / global.[ch]
+		Add option :nonewline and :nocontrol at File::gets.
+		Add option :nonewline and :nocontrol at read.
 
 #eof

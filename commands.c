@@ -2107,8 +2107,15 @@ cmd_read(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *l, *body;
     Toy_Type *file, *result;
     Toy_Type *var;
+    int flag_nonewline=0, flag_nocontrol=0;
 
     file = hash_get_and_unset_t(nameargs, const_filec);
+    if (hash_get_and_unset_t(nameargs, const_nonewline)) {
+	flag_nonewline = 1;
+    }
+    if (hash_get_and_unset_t(nameargs, const_nocontrol)) {
+	flag_nocontrol = 1;
+    }
     if (hash_get_length(nameargs) > 0) goto error;
 
     if (arglen > 1) goto error;
@@ -2132,6 +2139,12 @@ cmd_read(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     
     l = body = new_list(file);
     l = list_append(l, const_gets);
+    if (flag_nonewline) {
+	l = list_append(l, new_symbol(":nonewline"));
+    }
+    if (flag_nocontrol) {
+	l = list_append(l, new_symbol(":nocontrol"));
+    }
 
     result = toy_call(interp, body);
 

@@ -3038,8 +3038,16 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     Toy_Type *container;
     Cell *cbuff;
     int c;
+    int flag_nonewline=0, flag_nocontrol=0;
 
     if (arglen > 0) goto error;
+
+    if (hash_get_and_unset_t(nameargs, const_nonewline)) {
+	flag_nonewline = 1;
+    }
+    if (hash_get_and_unset_t(nameargs, const_nocontrol)) {
+	flag_nocontrol = 1;
+    }
     if (hash_get_length(nameargs) > 0) goto error;
 
     self = SELF_HASH(interp);
@@ -3066,7 +3074,22 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 		return new_string_cell(cbuff);
 	    }
 	}
-	cell_add_char(cbuff, c);
+	if (('\n' == c) || ('\r' == c)) {
+	    if (! flag_nonewline) {
+		if (! flag_nocontrol) {
+		    cell_add_char(cbuff, c);
+		}
+	    }
+	} else {
+	    if (isprint(c) || (c >= 0x80)) {
+		cell_add_char(cbuff, c);
+	    } else {
+		if (! flag_nocontrol) {
+		    cell_add_char(cbuff, c);
+		}
+	    }
+	}
+	
 	if ('\n' == c) {
 	    return new_string_cell(cbuff);
 	}
@@ -3074,7 +3097,7 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'gets', syntax: File gets", interp);
+    return new_exception(TE_SYNTAX, "Syntax error at 'gets', syntax: File gets [:nonewline] [:nocontrol]", interp);
 error2:
     return new_exception(TE_TYPE, "Type error.", interp);
 }
