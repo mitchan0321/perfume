@@ -1,0 +1,11 @@
+# closure set and check
+
+set a 1;
+fun () {set b 2; fun () {info closure} : } : \ println;
+fun () {set b 2; fun () {setc? a} : } : \ println;
+fun () {set b 2; fun () {setc? b} : } : \ println;
+fun () {set b 2; fun () {setc? c} : } : \ println;
+fun () {set b 2; fun () {setc a} : } : \ println;
+fun () {set b 2; fun () {setc a 100} : } : \ println;
+println $a;
+fun () {set b 2; fun () {setc c 100} : } : \ println;
