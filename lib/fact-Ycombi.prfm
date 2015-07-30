@@ -3,8 +3,9 @@
 # factorical calc with Y combinatore.
 # [Y [fun (f) {fun (x) {if {$x <= 1} then: {return 1}; $x * [$f [$x - 1]]}}]] X
 
-print "input feb number => ";
-read x;
+print file: $stdout "input feb number => ";
+$stdout flush;
+read x :nonewline;
 println [
     [Y [
 	fun (f) {
@@ -13,5 +14,5 @@ println [
 		$x * [$f [$x - 1]];
 	    }
 	}
-    ]] [[$x split],0 int];
+    ]] [$x int];
 ];

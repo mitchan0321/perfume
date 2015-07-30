@@ -179,6 +179,62 @@ error:
 }
 
 Toy_Type*
+cmd_setc(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *var, *val;
+    int len;
+    Toy_Type *res;
+
+    if (hash_get_length(nameargs) > 0) goto error;
+    len = arglen;
+
+    if ((len > 2) || (len < 1)) goto error;
+
+    var = list_get_item(posargs);
+    if (GET_TAG(var) != SYMBOL) goto error;
+
+    if (len == 1) {
+
+	res = set_closure_var(interp, var, NULL);
+	if (NULL == res) {
+	    Cell *msg;
+	    msg = new_cell("No such variable '");
+	    cell_add_str(msg, to_string(var));
+	    cell_add_str(msg, "'.");
+	    return new_exception(TE_NOVAR, cell_get_addr(msg), interp);
+	}
+	return res;
+
+    } else {
+
+	posargs = list_next(posargs);
+	val = list_get_item(posargs);
+	switch (GET_TAG(val)) {
+	case INTEGER: case REAL:
+	    res = set_closure_var(interp, var, toy_clone(val));
+	    break;
+	case STRING:
+	    res = set_closure_var(interp, var, new_string_str(cell_get_addr(val->u.string)));
+	    break;
+	default:
+	    res = set_closure_var(interp, var, val);
+	}
+
+	if (NULL == res) {
+	    Cell *msg;
+	    msg = new_cell("No such variable '");
+	    cell_add_str(msg, to_string(var));
+	    cell_add_str(msg, "'.");
+	    return new_exception(TE_NOVAR, cell_get_addr(msg), interp);
+	}
+	
+	return val;
+    }
+
+error:
+    return new_exception(TE_SYNTAX, "Syntax error, syntax: setc var [val]", interp);
+}
+
+Toy_Type*
 cmd_defvar(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *var, *val;
     Hash *h;
@@ -1136,6 +1192,27 @@ cmd_issets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 
 error:
     return new_exception(TE_SYNTAX, "Syntax error, syntax: sets? var", interp);
+}
+
+Toy_Type*
+cmd_issetc(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *var, *res;
+
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (arglen != 1) goto error;
+
+    var = list_get_item(posargs);
+    if (GET_TAG(var) != SYMBOL) goto error;
+
+    res = set_closure_var(interp, var, NULL);
+    if (NULL == res) {
+	return const_Nil;
+    } else {
+	return const_T;
+    }
+
+error:
+    return new_exception(TE_SYNTAX, "Syntax error, syntax: setc? var", interp);
 }
 
 Toy_Type*
@@ -2158,7 +2235,7 @@ cmd_read(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 
 error:
     return new_exception(TE_SYNTAX,
-			 "Syntax error at 'read', syntax: read [var] [file: file-object]", interp);
+			 "Syntax error at 'read', syntax: read [var] [file: file-object] [:nonewline] [:nocontrol]", interp);
 }
 
 Toy_Type*
@@ -2810,6 +2887,7 @@ int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, "true", cmd_true, NULL);
     toy_add_func(interp, "set", cmd_set, NULL);
     toy_add_func(interp, "sets", cmd_sets, NULL);
+    toy_add_func(interp, "setc", cmd_setc, NULL);
     toy_add_func(interp, "defvar", cmd_defvar, NULL);
     toy_add_func(interp, "fun", cmd_fun, NULL);
     toy_add_func(interp, "defun", cmd_defun, NULL);
@@ -2833,6 +2911,7 @@ int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, "cond", cmd_cond, NULL);
     toy_add_func(interp, "set?", cmd_isset, NULL);
     toy_add_func(interp, "sets?", cmd_issets, NULL);
+    toy_add_func(interp, "setc?", cmd_issetc, NULL);
     toy_add_func(interp, "unset", cmd_unset, NULL);
     toy_add_func(interp, "unsets", cmd_unsets, NULL);
     toy_add_func(interp, "self", cmd_self, NULL);

@@ -19,6 +19,7 @@ Toy_Type *toy_eval(Toy_Interp* interp, Toy_Type *statement, Toy_Env** env);
 Toy_Type *toy_expand(Toy_Interp* interp, Toy_Type* obj, Toy_Env** env);
 Toy_Type *toy_expand_list(Toy_Interp* interp, Toy_Type* list, Toy_Env** env);
 Toy_Type *toy_resolv_var(Toy_Interp* interp, Toy_Type* var, int stack_trace);
+Toy_Type *set_closure_var(Toy_Interp *interp, Toy_Type *var, Toy_Type *val);
 Toy_Type *toy_resolv_function(Toy_Interp* interp, Toy_Type* obj);
 Toy_Type *toy_resolv_object(Toy_Interp* interp, Toy_Type* obj);
 Toy_Type *toy_apply_func(Toy_Interp* interp, Toy_Type* func, Toy_Type* posargs, Hash* nameargs, int arglen);

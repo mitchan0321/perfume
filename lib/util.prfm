@@ -171,13 +171,16 @@ Dict method string () {
 #
 # Vector util method
 #
-###Vector method each (do: body) {
-###    if {set? body} else: {throw ErrNoBlock "No specified block."};
-###    [list] each do: {| i | yield $body $i};
-###};
 
 Vector method string () {
     "[vector " . [list] "]";
+};
+
+#
+# Integer util method
+#
+Integer method ! () {
+    1 .. [self] : inject 1 do: {| s i | $s * $i}
 };
 
 #

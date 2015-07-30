@@ -6,7 +6,8 @@ defun Y(f) {
 	fun (m) {
 	    [$f [$g $g]] $m;
 	}
-    }] [fun (g) {
+    }]
+    [fun (g) {
 	fun (m) {
 	    [$f [$g $g]] $m;
         }

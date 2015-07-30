@@ -550,6 +550,32 @@ toy_resolv_var(Toy_Interp* interp, Toy_Type* var, int stack_trace) {
 }
 
 Toy_Type*
+set_closure_var(Toy_Interp *interp, Toy_Type *var, Toy_Type *val) {
+    Hash *h;
+    Toy_Func_Env *upenv;
+    Toy_Type *v;
+
+    upenv = interp->func_stack[interp->cur_func_stack]->upstack;
+    while (upenv) {
+	h = upenv->localvar;
+	if (h) {
+	    v = hash_get_t(h, var);
+	    if (NULL != v) {
+		if (NULL != val) {
+		    hash_set_t(h, var, val);
+		    return val;
+		} else {
+		    return v;
+		}
+	    }
+	}
+	upenv = upenv->upstack;
+    }
+
+    return NULL;
+}
+
+Toy_Type*
 search_method(Toy_Interp *interp, Toy_Type *object, Toy_Type *method) {
     Hash *h;
     Toy_Type *ho;
