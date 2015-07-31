@@ -213,6 +213,33 @@ error:
     return new_exception(TE_SYNTAX, "Syntax error at 'apply', syntax: Object apply {block}", interp);
 }
 
+static Toy_Type*
+to_int(Toy_Interp *interp, Toy_Type *v) {
+    Toy_Type *l, *cmd;
+    
+    l = cmd = new_list(v);
+    l = list_append(l, new_symbol("int"));
+
+    v = toy_call(interp, cmd);
+    if (INTEGER == GET_TAG(v)) return v;
+    if (EXCEPTION == GET_TAG(v)) return v;
+    return new_exception(TE_TYPE, "Type error.", interp);
+}
+
+static Toy_Type*
+to_real(Toy_Interp *interp, Toy_Type *v) {
+    Toy_Type *l, *cmd;
+    
+    l = cmd = new_list(v);
+    l = list_append(l, new_symbol("real"));
+
+    v = toy_call(interp, cmd);
+    if (REAL == GET_TAG(v)) return v;
+    if (EXCEPTION == GET_TAG(v)) return v;
+    return new_exception(TE_TYPE, "Type error.", interp);
+}
+
+
 Toy_Type*
 mth_integer_plus(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *arg;
@@ -223,17 +250,16 @@ mth_integer_plus(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     if (GET_TAG(SELF(interp)) != INTEGER) goto error2;
 
     arg = list_get_item(posargs);
-    switch (GET_TAG(arg)) {
-    case INTEGER:
-	mpz_init(s);
-	mpz_set(s, SELF(interp)->u.biginteger);
-	mpz_add(s, s, arg->u.biginteger);
-	return new_integer(s);
-	
-    case REAL:
-	return new_real(mpz_get_d(SELF(interp)->u.biginteger)
-			+ arg->u.real);
+
+    if (INTEGER != GET_TAG(arg)) {
+	arg = to_int(interp, arg);
+	if (INTEGER != GET_TAG(arg)) return arg;
     }
+
+    mpz_init(s);
+    mpz_set(s, SELF(interp)->u.biginteger);
+    mpz_add(s, s, arg->u.biginteger);
+    return new_integer(s);
 
 error:
     return new_exception(TE_SYNTAX, "Syntax error at '+', syntax: Integer + number-val", interp);
@@ -253,18 +279,17 @@ mth_integer_minus(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     if (GET_TAG(SELF(interp)) != INTEGER) goto error2;
 
     arg = list_get_item(posargs);
-    switch (GET_TAG(arg)) {
-    case INTEGER:
-	mpz_init(s);
-	mpz_set(s, SELF(interp)->u.biginteger);
-	mpz_sub(s, s, arg->u.biginteger);
-	return new_integer(s);
-	
-    case REAL:
-	return new_real(mpz_get_d(SELF(interp)->u.biginteger)
-			- arg->u.real);
+
+    if (INTEGER != GET_TAG(arg)) {
+	arg = to_int(interp, arg);
+	if (INTEGER != GET_TAG(arg)) return arg;
     }
 
+    mpz_init(s);
+    mpz_set(s, SELF(interp)->u.biginteger);
+    mpz_sub(s, s, arg->u.biginteger);
+    return new_integer(s);
+    
 error:
     return new_exception(TE_SYNTAX, "Syntax error at '-', syntax: Integer - number-val", interp);
 
@@ -282,17 +307,16 @@ mth_integer_mul(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     if (GET_TAG(SELF(interp)) != INTEGER) goto error2;
 
     arg = list_get_item(posargs);
-    switch (GET_TAG(arg)) {
-    case INTEGER:
-	mpz_init(s);
-	mpz_set(s, SELF(interp)->u.biginteger);
-	mpz_mul(s, s, arg->u.biginteger);
-	return new_integer(s);
-	
-    case REAL:
-	return new_real(mpz_get_d(SELF(interp)->u.biginteger)
-			* arg->u.real);
+
+    if (INTEGER != GET_TAG(arg)) {
+	arg = to_int(interp, arg);
+	if (INTEGER != GET_TAG(arg)) return arg;
     }
+
+    mpz_init(s);
+    mpz_set(s, SELF(interp)->u.biginteger);
+    mpz_mul(s, s, arg->u.biginteger);
+    return new_integer(s);
 
 error:
     return new_exception(TE_SYNTAX, "Syntax error at '*', syntax: Integer * number-val", interp);
@@ -311,24 +335,20 @@ mth_integer_div(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     if (GET_TAG(SELF(interp)) != INTEGER) goto error2;
 
     arg = list_get_item(posargs);
-    switch (GET_TAG(arg)) {
-    case INTEGER:
-	if (0 == mpz_cmp_si(arg->u.biginteger, 0)) {
-	    return new_exception(TE_ZERODIV, "Zero divide.", interp);
-	}
-	mpz_init(s);
-	mpz_set(s, SELF(interp)->u.biginteger);
-	mpz_div(s, s, arg->u.biginteger);
-	return new_integer(s);
-	
-    case REAL:
-	if (arg->u.real == 0.0) {
-	    return new_exception(TE_ZERODIV, "Zero divide.", interp);
-	}
-	return new_real(mpz_get_d((SELF(interp)->u.biginteger))
-			/ arg->u.real);
+
+    if (INTEGER != GET_TAG(arg)) {
+	arg = to_int(interp, arg);
+	if (INTEGER != GET_TAG(arg)) return arg;
     }
 
+    if (0 == mpz_cmp_si(arg->u.biginteger, 0)) {
+	return new_exception(TE_ZERODIV, "Zero divide.", interp);
+    }
+    mpz_init(s);
+    mpz_set(s, SELF(interp)->u.biginteger);
+    mpz_div(s, s, arg->u.biginteger);
+    return new_integer(s);
+    
 error:
     return new_exception(TE_SYNTAX, "Syntax error at '/', syntax: Integer / number-val", interp);
 
@@ -346,13 +366,16 @@ mth_integer_mod(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     if (GET_TAG(SELF(interp)) != INTEGER) goto error2;
 
     arg = list_get_item(posargs);
-    switch (GET_TAG(arg)) {
-    case INTEGER:
-	mpz_init(s);
-	mpz_set(s, SELF(interp)->u.biginteger);
-	mpz_mod(s, s, arg->u.biginteger);
-	return new_integer(s);
+
+    if (INTEGER != GET_TAG(arg)) {
+	arg = to_int(interp, arg);
+	if (INTEGER != GET_TAG(arg)) return arg;
     }
+
+    mpz_init(s);
+    mpz_set(s, SELF(interp)->u.biginteger);
+    mpz_mod(s, s, arg->u.biginteger);
+    return new_integer(s);
 
 error:
     return new_exception(TE_SYNTAX, "Syntax error at '%', syntax: Integer % integer-val", interp);
@@ -371,21 +394,18 @@ mth_integer_eq(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     if (GET_TAG(SELF(interp)) != INTEGER) goto error2;
 
     arg = list_get_item(posargs);
-    switch (GET_TAG(arg)) {
-    case INTEGER:
-	if (0 == (mpz_cmp(SELF(interp)->u.biginteger,
-			  arg->u.biginteger))) {
-	    return SELF(interp);
-	}
-	return const_Nil;
-	
-    case REAL:
-	if (mpz_get_d(SELF(interp)->u.biginteger) == arg->u.real) {
-	    return SELF(interp);
-	}
-	return const_Nil;
+
+    if (INTEGER != GET_TAG(arg)) {
+	arg = to_int(interp, arg);
+	if (INTEGER != GET_TAG(arg)) return arg;
     }
 
+    if (0 == (mpz_cmp(SELF(interp)->u.biginteger,
+		      arg->u.biginteger))) {
+	return SELF(interp);
+    }
+    return const_Nil;
+    
 error:
     return new_exception(TE_SYNTAX, "Syntax error at '=', syntax: Integer = number-val", interp);
 
@@ -402,20 +422,17 @@ mth_integer_neq(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     if (GET_TAG(SELF(interp)) != INTEGER) goto error2;
 
     arg = list_get_item(posargs);
-    switch (GET_TAG(arg)) {
-    case INTEGER:
-	if (0 != (mpz_cmp(SELF(interp)->u.biginteger,
-			  arg->u.biginteger))) {
-	    return SELF(interp);
-	}
-	return const_Nil;
-	
-    case REAL:
-	if (mpz_get_d(SELF(interp)->u.biginteger) != arg->u.real) {
-	    return SELF(interp);
-	}
-	return const_Nil;
+
+    if (INTEGER != GET_TAG(arg)) {
+	arg = to_int(interp, arg);
+	if (INTEGER != GET_TAG(arg)) return arg;
     }
+
+    if (0 != (mpz_cmp(SELF(interp)->u.biginteger,
+		      arg->u.biginteger))) {
+	return SELF(interp);
+    }
+    return const_Nil;
 
 error:
     return new_exception(TE_SYNTAX, "Syntax error at '!=', syntax: Integer != number-val", interp);
@@ -433,20 +450,17 @@ mth_integer_gt(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     if (GET_TAG(SELF(interp)) != INTEGER) goto error2;
 
     arg = list_get_item(posargs);
-    switch (GET_TAG(arg)) {
-    case INTEGER:
-	if (mpz_cmp(SELF(interp)->u.biginteger, arg->u.biginteger) > 0) {
-	    return SELF(interp);
-	}
-	return const_Nil;
-	
-    case REAL:
-	if (mpz_get_d(SELF(interp)->u.biginteger) > arg->u.real) {
-	    return SELF(interp);
-	}
-	return const_Nil;
+
+    if (INTEGER != GET_TAG(arg)) {
+	arg = to_int(interp, arg);
+	if (INTEGER != GET_TAG(arg)) return arg;
     }
 
+    if (mpz_cmp(SELF(interp)->u.biginteger, arg->u.biginteger) > 0) {
+	return SELF(interp);
+    }
+    return const_Nil;
+	
 error:
     return new_exception(TE_SYNTAX, "Syntax error at '>', syntax: Integer > number-val", interp);
 
@@ -463,20 +477,17 @@ mth_integer_lt(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     if (GET_TAG(SELF(interp)) != INTEGER) goto error2;
 
     arg = list_get_item(posargs);
-    switch (GET_TAG(arg)) {
-    case INTEGER:
-	if (mpz_cmp(SELF(interp)->u.biginteger, arg->u.biginteger) < 0) {
-	    return SELF(interp);
-	}
-	return const_Nil;
-	
-    case REAL:
-	if (mpz_get_d(SELF(interp)->u.biginteger) < arg->u.real) {
-	    return SELF(interp);
-	}
-	return const_Nil;
+
+    if (INTEGER != GET_TAG(arg)) {
+	arg = to_int(interp, arg);
+	if (INTEGER != GET_TAG(arg)) return arg;
     }
 
+    if (mpz_cmp(SELF(interp)->u.biginteger, arg->u.biginteger) < 0) {
+	return SELF(interp);
+    }
+    return const_Nil;
+    
 error:
     return new_exception(TE_SYNTAX, "Syntax error at '<', syntax: Integer < number-val", interp);
 
@@ -493,19 +504,16 @@ mth_integer_ge(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     if (GET_TAG(SELF(interp)) != INTEGER) goto error2;
 
     arg = list_get_item(posargs);
-    switch (GET_TAG(arg)) {
-    case INTEGER:
-	if (mpz_cmp(SELF(interp)->u.biginteger, arg->u.biginteger) >=0) {
-	    return SELF(interp);
-	}
-	return const_Nil;
-	
-    case REAL:
-	if (mpz_get_d(SELF(interp)->u.biginteger) >= arg->u.real) {
-	    return SELF(interp);
-	}
-	return const_Nil;
+
+    if (INTEGER != GET_TAG(arg)) {
+	arg = to_int(interp, arg);
+	if (INTEGER != GET_TAG(arg)) return arg;
     }
+
+    if (mpz_cmp(SELF(interp)->u.biginteger, arg->u.biginteger) >=0) {
+	return SELF(interp);
+    }
+    return const_Nil;
 
 error:
     return new_exception(TE_SYNTAX, "Syntax error at '>=', syntax: Integer >= number-val", interp);
@@ -523,19 +531,16 @@ mth_integer_le(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     if (GET_TAG(SELF(interp)) != INTEGER) goto error2;
 
     arg = list_get_item(posargs);
-    switch (GET_TAG(arg)) {
-    case INTEGER:
-	if (mpz_cmp(SELF(interp)->u.biginteger, arg->u.biginteger) <= 0) {
-	    return SELF(interp);
-	}
-	return const_Nil;
-	
-    case REAL:
-	if (mpz_get_d(SELF(interp)->u.biginteger) <= arg->u.real) {
-	    return SELF(interp);
-	}
-	return const_Nil;
+
+    if (INTEGER != GET_TAG(arg)) {
+	arg = to_int(interp, arg);
+	if (INTEGER != GET_TAG(arg)) return arg;
     }
+
+    if (mpz_cmp(SELF(interp)->u.biginteger, arg->u.biginteger) <= 0) {
+	return SELF(interp);
+    }
+    return const_Nil;
 
 error:
     return new_exception(TE_SYNTAX, "Syntax error at '<=', syntax: Integer <= number-val", interp);
@@ -569,7 +574,7 @@ mth_integer_inc(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     }
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '++', syntax: Integer ++ [number-val]", interp);
+    return new_exception(TE_SYNTAX, "Syntax error at '++', syntax: Integer ++ [int-val]", interp);
 
 error2:
     return new_exception(TE_TYPE, "Type error.", interp);
@@ -600,7 +605,7 @@ mth_integer_dec(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     }
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '--', syntax: Integer -- [number-val]", interp);
+    return new_exception(TE_SYNTAX, "Syntax error at '--', syntax: Integer -- [int-val]", interp);
 
 error2:
     return new_exception(TE_TYPE, "Type error.", interp);
@@ -922,7 +927,7 @@ mth_integer_power(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     return new_integer(s);
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '^', syntax: Integer ^ number-val(>=0)", interp);
+    return new_exception(TE_SYNTAX, "Syntax error at '^', syntax: Integer ^ integer-val(>=0)", interp);
 
 error2:
     return new_exception(TE_TYPE, "Type error.", interp);
@@ -937,14 +942,12 @@ mth_real_plus(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     if (GET_TAG(SELF(interp)) != REAL) goto error2;
 
     arg = list_get_item(posargs);
-    switch (GET_TAG(arg)) {
-    case REAL:
-	return new_real(SELF(interp)->u.real + arg->u.real);
-
-    case INTEGER:
-	return new_real(SELF(interp)->u.real
-			+ mpz_get_d(arg->u.biginteger));
+    if (REAL != GET_TAG(arg)) {
+	arg = to_real(interp, arg);
+	if (REAL != GET_TAG(arg)) return arg;
     }
+
+    return new_real(SELF(interp)->u.real + arg->u.real);
 
 error:
     return new_exception(TE_SYNTAX, "Syntax error at '+', syntax: Real + number-val", interp);
@@ -963,14 +966,12 @@ mth_real_minus(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     if (GET_TAG(SELF(interp)) != REAL) goto error2;
 
     arg = list_get_item(posargs);
-    switch (GET_TAG(arg)) {
-    case REAL:
-	return new_real(SELF(interp)->u.real - arg->u.real);
-
-    case INTEGER:
-	return new_real(SELF(interp)->u.real
-			- mpz_get_d(arg->u.biginteger));
+    if (REAL != GET_TAG(arg)) {
+	arg = to_real(interp, arg);
+	if (REAL != GET_TAG(arg)) return arg;
     }
+
+    return new_real(SELF(interp)->u.real - arg->u.real);
 
 error:
     return new_exception(TE_SYNTAX, "Syntax error at '-', syntax: Real - number-val", interp);
@@ -988,14 +989,12 @@ mth_real_mul(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
     if (GET_TAG(SELF(interp)) != REAL) goto error2;
 
     arg = list_get_item(posargs);
-    switch (GET_TAG(arg)) {
-    case REAL:
-	return new_real(SELF(interp)->u.real * arg->u.real);
-
-    case INTEGER:
-	return new_real(SELF(interp)->u.real
-			* mpz_get_d(arg->u.biginteger));
+    if (REAL != GET_TAG(arg)) {
+	arg = to_real(interp, arg);
+	if (REAL != GET_TAG(arg)) return arg;
     }
+
+    return new_real(SELF(interp)->u.real * arg->u.real);
 
 error:
     return new_exception(TE_SYNTAX, "Syntax error at '*', syntax: Real * number-val", interp);
@@ -1013,20 +1012,15 @@ mth_real_div(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
     if (GET_TAG(SELF(interp)) != REAL) goto error2;
 
     arg = list_get_item(posargs);
-    switch (GET_TAG(arg)) {
-    case REAL:
-	if (arg->u.real == 0.0) {
-	    return new_exception(TE_ZERODIV, "Zero divide.", interp);
-	}
-	return new_real(SELF(interp)->u.real / arg->u.real);
-
-    case INTEGER:
-	if (0 == (mpz_cmp_si(arg->u.biginteger, 0))) {
-	    return new_exception(TE_ZERODIV, "Zero divide.", interp);
-	}
-	return new_real(SELF(interp)->u.real
-			/ mpz_get_d(arg->u.biginteger));
+    if (REAL != GET_TAG(arg)) {
+	arg = to_real(interp, arg);
+	if (REAL != GET_TAG(arg)) return arg;
     }
+
+    if (arg->u.real == 0.0) {
+	return new_exception(TE_ZERODIV, "Zero divide.", interp);
+    }
+    return new_real(SELF(interp)->u.real / arg->u.real);
 
 error:
     return new_exception(TE_SYNTAX, "Syntax error at '/', syntax: Real / number-val", interp);
@@ -1044,19 +1038,15 @@ mth_real_eq(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     if (GET_TAG(SELF(interp)) != REAL) goto error2;
 
     arg = list_get_item(posargs);
-    switch (GET_TAG(arg)) {
-    case REAL:
-	if (SELF(interp)->u.real == arg->u.real) {
-	    return SELF(interp);
-	}
-	return const_Nil;
-
-    case INTEGER:
-	if (SELF(interp)->u.real == mpz_get_d(arg->u.biginteger)) {
-	    return SELF(interp);
-	}
-	return const_Nil;
+    if (REAL != GET_TAG(arg)) {
+	arg = to_real(interp, arg);
+	if (REAL != GET_TAG(arg)) return arg;
     }
+
+    if (SELF(interp)->u.real == arg->u.real) {
+	return SELF(interp);
+    }
+    return const_Nil;
 
 error:
     return new_exception(TE_SYNTAX, "Syntax error at '=', syntax: Real = number-val", interp);
@@ -1074,19 +1064,15 @@ mth_real_neq(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
     if (GET_TAG(SELF(interp)) != REAL) goto error2;
 
     arg = list_get_item(posargs);
-    switch (GET_TAG(arg)) {
-    case REAL:
-	if (SELF(interp)->u.real != arg->u.real) {
-	    return SELF(interp);
-	}
-	return const_Nil;
-
-    case INTEGER:
-	if (SELF(interp)->u.real != mpz_get_d(arg->u.biginteger)) {
-	    return SELF(interp);
-	}
-	return const_Nil;
+    if (REAL != GET_TAG(arg)) {
+	arg = to_real(interp, arg);
+	if (REAL != GET_TAG(arg)) return arg;
     }
+
+    if (SELF(interp)->u.real != arg->u.real) {
+	return SELF(interp);
+    }
+    return const_Nil;
 
 error:
     return new_exception(TE_SYNTAX, "Syntax error at '!=', syntax: Real != number-val", interp);
@@ -1104,19 +1090,15 @@ mth_real_gt(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     if (GET_TAG(SELF(interp)) != REAL) goto error2;
 
     arg = list_get_item(posargs);
-    switch (GET_TAG(arg)) {
-    case REAL:
-	if (SELF(interp)->u.real > arg->u.real) {
-	    return SELF(interp);
-	}
-	return const_Nil;
-
-    case INTEGER:
-	if (SELF(interp)->u.real > mpz_get_d(arg->u.biginteger)) {
-	    return SELF(interp);
-	}
-	return const_Nil;
+    if (REAL != GET_TAG(arg)) {
+	arg = to_real(interp, arg);
+	if (REAL != GET_TAG(arg)) return arg;
     }
+
+    if (SELF(interp)->u.real > arg->u.real) {
+	return SELF(interp);
+    }
+    return const_Nil;
 
 error:
     return new_exception(TE_SYNTAX, "Syntax error at '>', syntax: Real > number-val", interp);
@@ -1134,19 +1116,15 @@ mth_real_lt(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     if (GET_TAG(SELF(interp)) != REAL) goto error2;
 
     arg = list_get_item(posargs);
-    switch (GET_TAG(arg)) {
-    case REAL:
-	if (SELF(interp)->u.real < arg->u.real) {
-	    return SELF(interp);
-	}
-	return const_Nil;
-
-    case INTEGER:
-	if (SELF(interp)->u.real < mpz_get_d(arg->u.biginteger)) {
-	    return SELF(interp);
-	}
-	return const_Nil;
+    if (REAL != GET_TAG(arg)) {
+	arg = to_real(interp, arg);
+	if (REAL != GET_TAG(arg)) return arg;
     }
+
+    if (SELF(interp)->u.real < arg->u.real) {
+	return SELF(interp);
+    }
+    return const_Nil;
 
 error:
     return new_exception(TE_SYNTAX, "Syntax error at '<', syntax: Real < number-val", interp);
@@ -1164,19 +1142,15 @@ mth_real_ge(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     if (GET_TAG(SELF(interp)) != REAL) goto error2;
 
     arg = list_get_item(posargs);
-    switch (GET_TAG(arg)) {
-    case REAL:
-	if (SELF(interp)->u.real >= arg->u.real) {
-	    return SELF(interp);
-	}
-	return const_Nil;
-
-    case INTEGER:
-	if (SELF(interp)->u.real >= mpz_get_d(arg->u.biginteger)) {
-	    return SELF(interp);
-	}
-	return const_Nil;
+    if (REAL != GET_TAG(arg)) {
+	arg = to_real(interp, arg);
+	if (REAL != GET_TAG(arg)) return arg;
     }
+
+    if (SELF(interp)->u.real >= arg->u.real) {
+	return SELF(interp);
+    }
+    return const_Nil;
 
 error:
     return new_exception(TE_SYNTAX, "Syntax error at '>=', syntax: Real >= number-val", interp);
@@ -1194,19 +1168,15 @@ mth_real_le(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     if (GET_TAG(SELF(interp)) != REAL) goto error2;
 
     arg = list_get_item(posargs);
-    switch (GET_TAG(arg)) {
-    case REAL:
-	if (SELF(interp)->u.real <= arg->u.real) {
-	    return SELF(interp);
-	}
-	return const_Nil;
-
-    case INTEGER:
-	if (SELF(interp)->u.real <= mpz_get_d(arg->u.biginteger)) {
-	    return SELF(interp);
-	}
-	return const_Nil;
+    if (REAL != GET_TAG(arg)) {
+	arg = to_real(interp, arg);
+	if (REAL != GET_TAG(arg)) return arg;
     }
+
+    if (SELF(interp)->u.real <= arg->u.real) {
+	return SELF(interp);
+    }
+    return const_Nil;
 
 error:
     return new_exception(TE_SYNTAX, "Syntax error at '<=', syntax: Real <= number-val", interp);
@@ -2634,8 +2604,11 @@ mth_string_toint(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     if (GET_TAG(SELF(interp)) != STRING) goto error2;
 
     result = toy_symbol_conv(new_symbol(cell_get_addr(SELF(interp)->u.string)));
-    if (GET_TAG(result) != INTEGER) return const_Nil;
-    return result;
+    if (GET_TAG(result) == EXCEPTION) return result;
+    if (GET_TAG(result) == INTEGER) return result;
+    result = to_int(interp, result);
+    if (GET_TAG(result) == INTEGER) return result;
+    goto error2;
 
 error:
     return new_exception(TE_SYNTAX, "Syntax error at 'int', syntax: String int", interp);
@@ -2655,9 +2628,12 @@ mth_string_toreal(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     if (GET_TAG(result) == INTEGER) {
 	return new_real(mpz_get_d(result->u.biginteger));
     }
-    if (GET_TAG(result) != REAL) return const_Nil;
-    return result;
-
+    if (GET_TAG(result) == EXCEPTION) return result;
+    if (GET_TAG(result) == REAL) return result;    
+    result =  to_real(interp, result);
+    if (GET_TAG(result) == REAL) return result;
+    goto error2;
+    
 error:
     return new_exception(TE_SYNTAX, "Syntax error at 'real', syntax: String real", interp);
 error2:
