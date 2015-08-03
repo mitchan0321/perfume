@@ -534,4 +534,8 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 		Real::+,-,*,/,=,!=,>,>=,<,<=
 		Calculation of numerical value between different types became possible.
 
+2015/08/03:
+	methods.c
+		Fix String::fmt that %d and %f indicate accept different type.
+
 #eof
