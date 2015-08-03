@@ -2719,7 +2719,7 @@ mth_string_format_C(Toy_Type *item, Cell *fmt) {
 
     switch (GET_TAG(item)) {
     case INTEGER:
-	/* XXX: fix it for bit integer */
+	/* XXX: fix it for big integer */
 	snprintf(buff, 64, cell_get_addr(fmt),
 		 mpz_get_si(item->u.biginteger));
 	break;
@@ -2738,7 +2738,7 @@ Toy_Type*
 mth_string_format(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     char *p, *f;
     int acc, neg, trim;
-    int done;
+    int done, indicate_int;
     Toy_Type *result, *item;
     Cell *c, *sacc;
 
@@ -2757,6 +2757,7 @@ mth_string_format(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 	    trim = 0;
 	    done = 0;
 	    sacc = new_cell("%");
+	    indicate_int = 0;
 	    p++;
 	    if (! *p) {
 		return result;
@@ -2801,6 +2802,7 @@ mth_string_format(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 
 		case 'd':
 		case 'o': case 'u': case 'x': case 'X':
+		    indicate_int = 1;
 		    cell_add_char(sacc, 'l');
 		    cell_add_char(sacc, 'l');
 		    /* fall thru */
@@ -2815,6 +2817,12 @@ mth_string_format(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 			item = const_Nil;
 		    } else {
 			posargs = list_next(posargs);
+		    }
+		    if ((GET_TAG(item) == INTEGER) && (! indicate_int)) {
+			return new_exception(TE_TYPE, "Format indicator type error.", interp);
+		    }
+		    if ((GET_TAG(item) == REAL) && indicate_int) {
+			return new_exception(TE_TYPE, "Format indicator type error.", interp);
 		    }
 		    f = mth_string_format_C(item, sacc);
 		    if (f) {
