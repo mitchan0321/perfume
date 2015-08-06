@@ -2792,7 +2792,7 @@ mth_string_format(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 		case 'v':
 		    item = list_get_item(posargs);
 		    if (NULL == item) {
-			item = const_Nil;
+			item = const_nullstring;
 		    } else {
 			posargs = list_next(posargs);
 		    }
@@ -2814,7 +2814,7 @@ mth_string_format(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 
 		    item = list_get_item(posargs);
 		    if (NULL == item) {
-			item = const_Nil;
+			item = const_nullstring;
 		    } else {
 			posargs = list_next(posargs);
 		    }

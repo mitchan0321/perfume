@@ -82,6 +82,7 @@ extern Toy_Type *const_mode;
 extern Toy_Type *const_last;
 extern Toy_Type *const_nonewline;
 extern Toy_Type *const_nocontrol;
+extern Toy_Type *const_nullstring;
 #ifdef PROF
 extern void *GC_stackbottom;
 #endif /* PROF */
@@ -164,6 +165,7 @@ Toy_Type *const_mode;
 Toy_Type *const_last;
 Toy_Type *const_nonewline;
 Toy_Type *const_nocontrol;
+Toy_Type *const_nullstring;
 int PageSize;
 #ifdef PROF
 void *GC_stackbottom;
