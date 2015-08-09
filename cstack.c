@@ -22,7 +22,7 @@ init_cstack() {
     int i, fin;
     stack_t ss;
     struct sigaction newsig, oldsig;
-    
+
     CStack.slot_size = STACK_SLOT_SIZE * sizeof(__PTRDIFF_TYPE__);
     for (i = 0 ; i < STACK_SLOT_MAX ; i++) {
 	CStack.stack_slot[i].state = SS_INVAL;
