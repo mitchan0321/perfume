@@ -171,9 +171,9 @@ sig_cstack_running_handler(int flag, siginfo_t* siginfo, void* ptr) {
     fprintf(stderr, "si_pid: %d\n", siginfo->si_pid);
     fprintf(stderr, "si_uid: %d\n", siginfo->si_uid);
     fprintf(stderr, "si_status: %d\n", siginfo->si_status);
-/*    fprintf(stderr, "si_addr: %016x\n", siginfo->si_addr); */
-/*    fprintf(stderr, "si_value: %d\n", siginfo->si_value); */
-/*    fprintf(stderr, "si_reason: %d\n", siginfo->_reason._fault._trapno); */
+    fprintf(stderr, "si_addr: %016lx\n", (long int)siginfo->si_addr);
+    fprintf(stderr, "si_value: %d\n", siginfo->si_value.sival_int);
+    fprintf(stderr, "si_reason: %d\n", siginfo->_reason._fault._trapno);
     if (CStack_in_baria) {
 	fprintf(stderr, "SOVF Double fault detect.\n");
 	exit(1);

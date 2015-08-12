@@ -92,7 +92,7 @@ new_integer(mpz_t integer) {
 }
 
 Toy_Type*
-new_integer_si(int integer) {
+new_integer_si(long int integer) {
     mpz_t s;
 
     mpz_init(s);

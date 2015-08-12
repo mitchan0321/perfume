@@ -542,4 +542,10 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 	methods.c / global.[ch]
 		Fix String::fmt if some arguments are omitted, replace to null string ("").
 
+2015/08/12:
+	type.c
+		Fix signed integer into big integer type bug.
+	lib/slist.prfm
+		Fix display address bug.
+
 #eof

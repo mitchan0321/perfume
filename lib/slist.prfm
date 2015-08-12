@@ -15,10 +15,10 @@ defun slist () {
     $l,1 each do: {| f |
 	println ["%3d %-4!v %016x %016x %016x %016x %1d" fmt
 		 $i $f,0
-		 [$f,1 && 0xffffffff]
-		 [$f,2 && 0xffffffff]
-		 [$f,3 && 0xffffffff]
-		 [$f,4 && 0xffffffff]
+		 $f,1
+		 $f,2
+		 $f,3
+		 $f,4
 		 $f,5
 		];
 	$i ++;
