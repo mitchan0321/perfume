@@ -1,3 +1,4 @@
+2015/09/12	PRFM_20150912		0.6.1
 2015/08/09	PRFM_20150809		0.6.0
 2015/02/15	PRFM_20150215_A26	0.5.0
 2014/12/09	PRFM_20141223_K26	0.4.0
@@ -547,5 +548,17 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 		Fix signed integer into big integer type bug.
 	lib/slist.prfm
 		Fix display address bug.
+
+2015/09/12:
+	config.h.in
+		Co-routine stack slot number change to 128.
+	cstack.c
+		Change allocate stack implimentation.
+	lib/interp.prfm
+		Add message at exiting intepriter.
+	commands.c
+		File object auto GC implimentation.
+	type.c
+		Coro object auto GC implimentation.
 
 #eof
