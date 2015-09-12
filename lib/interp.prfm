@@ -8,6 +8,8 @@ defun interp () {
     $SYSQUEUE clean;
     set c [coro {interp-co}];
     $c next;
+    println "Exit interpriter.";
+    $c release;
 };
 
 defun interp-co () {
@@ -20,6 +22,8 @@ defun interp-co () {
         } else: {
 	    set __buff [$stdin gets];
         };
+
+##	if {[[$__buff split] get 0] = "return"} then: {pause};
 
         try {
 	    set __result [
