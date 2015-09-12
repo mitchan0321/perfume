@@ -464,10 +464,13 @@ coroutine_handl(void *context) {
 
 void
 coro_finalizer(void *obj, void *client_data) {
-    Toy_Type *p;
+    Toy_Type *o;
+    Toy_Interp *interp;
+    
+    o = (Toy_Type*)obj;
+    interp = (Toy_Interp*)client_data;
 
-    p = (Toy_Type*)obj;
-    cstack_release(p->u.coroutine->interp->cstack_id);
+    cstack_release(o->u.coroutine->interp->cstack_id);
 
     return;
 }
@@ -476,10 +479,6 @@ Toy_Type*
 new_coroutine(Toy_Interp *interp, Toy_Type* script) {
     Toy_Type *o;
     int cstack_id;
-#if 0
-    void *ocd;
-    GC_finalization_proc ofun;
-#endif
 
     o = GC_MALLOC(sizeof(Toy_Type));
     ALLOC_SAFE(o);
@@ -507,13 +506,11 @@ new_coroutine(Toy_Interp *interp, Toy_Type* script) {
     o->u.coroutine->interp->coroid = o->u.coroutine->coro_id;
     o->u.coroutine->state = CO_STS_INIT;
 
-#if 0
     GC_register_finalizer((void*)o,
 			  coro_finalizer,
-			  (void*)o,
-			  &ofun,
-			  &ocd);
-#endif
+			  (void*)interp,
+			  NULL,
+			  NULL);
 
     if (NULL == o->u.coroutine->coro_id) {
 	return NULL;
