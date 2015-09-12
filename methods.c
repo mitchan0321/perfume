@@ -2888,6 +2888,19 @@ typedef struct _toy_file {
     Toy_Type *path;
 } Toy_File;
 
+void
+file_finalizer(void *obj, void *client_data) {
+    Toy_File *o;
+    
+    o = (Toy_File*)obj;
+
+    if (o->fd) {
+	fclose(o->fd);
+    }
+
+    return;
+}
+
 static Toy_File*
 new_file() {
     Toy_File *o;
@@ -2895,6 +2908,12 @@ new_file() {
     o = GC_MALLOC(sizeof(Toy_File));
     ALLOC_SAFE(o);
     memset(o, 0, sizeof(Toy_File));
+
+    GC_register_finalizer((void*)o,
+			  file_finalizer,
+			  NULL,
+			  NULL,
+			  NULL);
 
     return o;
 }
