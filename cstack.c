@@ -180,7 +180,9 @@ sig_cstack_running_handler(int flag, siginfo_t* siginfo, void* ptr) {
     fprintf(stderr, "si_status: %d\n", siginfo->si_status);
     fprintf(stderr, "si_addr: %016lx\n", (long int)siginfo->si_addr);
     fprintf(stderr, "si_value: %d\n", siginfo->si_value.sival_int);
+#ifdef __FreeBSD__
     fprintf(stderr, "si_reason: %d\n", siginfo->_reason._fault._trapno);
+#endif
     if (CStack_in_baria) {
 	fprintf(stderr, "SOVF Double fault detect.\n");
 	exit(1);
