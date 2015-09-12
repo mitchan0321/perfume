@@ -15,7 +15,7 @@
 static void sig_cstack(int flag, siginfo_t* siginfo, void* ptr);
 static void sig_cstack_running_handler(int flag, siginfo_t* siginfo, void* ptr);
 static int alloc_slot(int slot);
-static jmp_buf jmp_env;
+static sigjmp_buf jmp_env;
 
 void
 init_cstack() {
@@ -61,6 +61,7 @@ init_cstack() {
     }
 
     fin = alloc_slot(0);
+    
     CStack.number_of_slot = fin;
 
     if (-1 == sigaction(SIGSEGV, &oldsig, NULL)) {
@@ -105,16 +106,15 @@ init_cstack() {
 
 static int
 alloc_slot(int slot) {
-    volatile int i;
-    volatile __PTRDIFF_TYPE__ *stack_frame;
+    __PTRDIFF_TYPE__ stack_frame[STACK_SLOT_SIZE];
 
-    stack_frame = alloca(STACK_SLOT_SIZE * sizeof(__PTRDIFF_TYPE__));
-
-    if (0 == setjmp(jmp_env)) {
-	for (i = (STACK_SLOT_SIZE - 1) ; i >= 0 ; i--) {
-	    stack_frame[i] = 0;
-	}
+    if (0 == sigsetjmp(jmp_env, 1)) {
+	memset((void*)stack_frame, 0, STACK_SLOT_SIZE * sizeof(__PTRDIFF_TYPE__));
     } else {
+	if (slot <= 1) {
+	    fprintf(stderr, "Can\'t allocate stack slot, going to exit.\n");
+	    exit(1);
+	}
 	return slot;
     }
 
@@ -158,7 +158,14 @@ cstack_unprotect(int slot) {
 
 static void
 sig_cstack(int flag, siginfo_t* siginfo, void* ptr) {
-    longjmp(jmp_env, 1);
+/*
+    fprintf(stderr, "sig: %d\n", siginfo->si_signo);
+    if (siginfo->si_code == SEGV_MAPERR) {
+	fprintf(stderr, "MAPERROR, exit\n");
+	exit(1);
+    }
+*/
+    siglongjmp(jmp_env, 1);
 }
 
 static void
