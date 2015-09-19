@@ -18,7 +18,7 @@ defun interp-co () {
     $SYSQUEUE add-queue $stdin {
         if [set? __cont__] then: {
 	    set __cbuff [$stdin gets];
-	    $__buff + $__cbuff;
+	    $__buff append! $__cbuff;
         } else: {
 	    set __buff [$stdin gets];
         };

@@ -14,11 +14,11 @@ SysQueue method add-queue (
     once: once		# if event once none nil
 ) {
     if {set? once} else: {set once 0};
-    $queue_add_req + ($o $e $once);
+    $queue_add_req append! ($o $e $once);
 };
 
 SysQueue method remove-queue (o) {
-    $queue_remove_req + $o;
+    $queue_remove_req append! $o;
 };
 
 SysQueue method enter-loop () {
