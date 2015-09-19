@@ -5,5 +5,5 @@ $h set a "abc";
 println $h,a; # => "abc"
 
 set a [vector];
-$a append 1;
+$a append! 1;
 println $a,0; # => 1
