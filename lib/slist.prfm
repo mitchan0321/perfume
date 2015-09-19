@@ -1,26 +1,31 @@
 # $Id:$
 # show co-routin stack list
 
-defun slist () {
+defun slist (all: all wide: wide) {
     set l [stack-list];
     println "Number of slot: " [$l car];
-    println "Stack list:";
-    set i 0;
 
-    println ["%3v %-4!v %-16v %-16v %-16v %-16v %-1v" fmt
-	     "#" "Stat" "Top" "Bari" "Safe" "Bot" "E"];
-    println ["%3v %-4!v %-16v %-16v %-16v %-16v %-1v" fmt
-	     "===" "====" "========" "========" "========" "========" "="];
+    println ["%3v %-1!v %-12v %-12v %-12v %-12v %-1v %-v" fmt
+	     "#" "S" "Top" "Barrier" "Safe" "Bottom" "E" "Script"];
+    println ["%3v %-1!v %-12v %-12v %-12v %-12v %-1v %-v" fmt
+	     "===" "==" "============" "============" "============" "============" "=" "======"];
 
-    $l,1 each do: {| f |
-	println ["%3d %-4!v %016x %016x %016x %016x %1d" fmt
-		 $i $f,0
+    if {! [set? all]} then: {
+	set ll [$l,1 filter {| i | eq? $i,1 USE}];
+    } else: {
+        set ll $l,1;
+    };
+
+    $ll each do: {| f |
+	println ["%3d %-1!v %012x %012x %012x %012x %1d %-v" fmt
+		 $f,0
 		 $f,1
 		 $f,2
 		 $f,3
 		 $f,4
 		 $f,5
+		 $f,6
+		 [if [set? wide] then: $f,7 else: [$f,7 sub 0 18]]
 		];
-	$i ++;
     };
 };
