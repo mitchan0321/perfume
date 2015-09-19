@@ -489,8 +489,13 @@ new_coroutine(Toy_Interp *interp, Toy_Type* script) {
 
     o->u.coroutine->interp = new_interp(0, CO_STACKSIZE, interp, 0, 0, 0);
     o->u.coroutine->script = script;
+
+    if (GET_TAG(script) == CLOSURE) {
+	cstack_id = cstack_get(to_string(script->u.closure.block_body));
+    } else {
+	cstack_id = cstack_get("");
+    }
     
-    cstack_id = cstack_get();
     if (-1 == cstack_id) {
 	return new_exception(TE_NOSLOT, "No stack slot space.", interp);
     }
