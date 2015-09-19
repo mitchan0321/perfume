@@ -9,7 +9,7 @@
 #define __CSTACK__
 
 void init_cstack();
-int  cstack_get();
+int  cstack_get(char *memo);
 void cstack_release(int);
 Toy_Type* cstack_list();
 void* cstack_get_start_addr(int);
@@ -43,6 +43,7 @@ static struct _cstack {
 	__PTRDIFF_TYPE__ *end_addr;
 	int jmp_buff_enable;
 	sigjmp_buf jmp_buff;
+	char *memo;
     } stack_slot[STACK_SLOT_MAX];
 } CStack;
 

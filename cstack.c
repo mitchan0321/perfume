@@ -32,6 +32,7 @@ init_cstack() {
 	CStack.stack_slot[i].end_addr = 0;
 	CStack.stack_slot[i].jmp_buff_enable = 0;
 	memset(CStack.stack_slot[i].jmp_buff, 0, sizeof(jmp_buf));
+	CStack.stack_slot[i].memo = 0;
     }
 
     ss.ss_sp = GC_MALLOC(SIGASTKSZ);
@@ -71,6 +72,7 @@ init_cstack() {
 
     /* for main interp stack to use */
     CStack.stack_slot[0].state = SS_USE;
+    CStack.stack_slot[0].memo = "(main stack)";
 
     /* init current coroutine */
     Current_coroutine = 0;
@@ -207,7 +209,7 @@ void cstack_return() {
 }
 
 int
-cstack_get() {
+cstack_get(char *memo) {
     int i;
 
     for (i = 0 ; i < CStack.number_of_slot ; i++) {
@@ -215,6 +217,7 @@ cstack_get() {
 	    CStack.stack_slot[i].state = SS_USE;
 	    memset((void*)CStack.stack_slot[i].safe_addr, 0,
 		   CStack.stack_slot[i].end_addr - CStack.stack_slot[i].safe_addr);
+	    CStack.stack_slot[i].memo = memo;
 	    return i;
 	}
     }
@@ -231,6 +234,7 @@ cstack_release(int slot_id) {
     
     CStack.stack_slot[slot_id].state = SS_FREE;
     CStack.stack_slot[slot_id].jmp_buff_enable = 0;
+    CStack.stack_slot[slot_id].memo = 0;
 }
 
 Toy_Type*
@@ -246,6 +250,7 @@ cstack_list() {
 	elist = new_list(NULL);
 	switch (CStack.stack_slot[i].state) {
 	case SS_FREE:
+	    list_append(elist, new_integer_si(i));
 	    list_append(elist, new_symbol("FREE"));
 	    list_append(elist,
 			new_integer_si((__PTRDIFF_TYPE__)
@@ -267,8 +272,12 @@ cstack_list() {
 			new_integer_si((__PTRDIFF_TYPE__)
 				       (__PTRDIFF_TYPE__)
 				       CStack.stack_slot[i].jmp_buff_enable));
+	    list_append(elist, new_string_str(""));
+
 	    break;
+
 	case SS_USE:
+	    list_append(elist, new_integer_si(i));
 	    list_append(elist, new_symbol("USE"));
 	    list_append(elist,
 			new_integer_si((__PTRDIFF_TYPE__)
@@ -290,6 +299,8 @@ cstack_list() {
 			new_integer_si((__PTRDIFF_TYPE__)
 				       (__PTRDIFF_TYPE__)
 				       CStack.stack_slot[i].jmp_buff_enable));
+	    list_append(elist, new_string_str(CStack.stack_slot[i].memo));
+
 	    break;
 	}
 	list_append(slist, elist);
