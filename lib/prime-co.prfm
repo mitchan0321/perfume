@@ -1,6 +1,6 @@
 # $Id:$
 
-set co [
+defun prime-co () {
     coro {
 	set prime 3;
 	while {true} do: {
@@ -17,4 +17,4 @@ set co [
 	    pause $prime;
 	};
     };
-];
+};

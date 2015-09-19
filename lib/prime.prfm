@@ -18,7 +18,7 @@ defun prime (n) {
       if {[$cand % $i] = 0} then: {$cand ++ 2; retry};
     };
     #found prime
-    set last [$last + $cand];
+    set last [$last append! $cand];
     set cand [$last item];
     $c ++;
   };

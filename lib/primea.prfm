@@ -17,7 +17,7 @@ defun primea (n) {
 	};
 
         #found prime
-	$prime + $cand;
+	$prime append! $cand;
 	$c ++;
     };
 };
