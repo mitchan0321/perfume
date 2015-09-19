@@ -2338,7 +2338,7 @@ mth_string_match(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     Toy_Type *self, *tpattern;
     int r;
     unsigned char *start, *range, *end;
-    regex_t *reg;
+    regex_t *reg = NULL;
     OnigErrorInfo einfo;
     OnigRegion *region;
     unsigned char *pattern;
@@ -2348,6 +2348,10 @@ mth_string_match(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     int option, soption;
     Toy_Type *t_case = NULL;
     Toy_Type *t_all = NULL;
+    Toy_Type *t_grep = NULL;
+    static Hash *regex_hash = NULL;
+    Cell *key_str;
+    Toy_Type *container;
 
     if (arglen > 1) goto error;
 
@@ -2360,13 +2364,53 @@ mth_string_match(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
 	return new_exception(TE_REGEX, "Null regex pattern.", interp);
     }
 
+    /* parse option */
     t_case = hash_get_and_unset_t(nameargs, const_nocase);
-    if (GET_TAG(t_case) == NIL) t_case = NULL;
-    t_all = hash_get_and_unset_t(nameargs, const_all);
-    if (GET_TAG(t_all) == NIL) t_all = NULL;
+    if ((t_case == NULL) || (GET_TAG(t_case) == NIL)) t_case = NULL;
 
+    t_all = hash_get_and_unset_t(nameargs, const_all);
+    if ((t_all == NULL) || (GET_TAG(t_all) == NIL)) t_all = NULL;
+
+    t_grep = hash_get_and_unset_t(nameargs, const_grep);
+    if ((t_grep == NULL) || (GET_TAG(t_grep) == NIL)) t_grep = NULL;
+    
     if (hash_get_length(nameargs) > 0) goto error;
 
+    /* onece create regex cache and set to global dict */
+    if (NULL == regex_hash) {
+	regex_hash = new_hash();
+	hash_set(interp->globals, "REGEX_CACHE", new_dict(regex_hash));
+    }
+
+    /* make regex key, string format is: 'regex',[case|nocase],[default|grep] */
+    key_str = new_cell("");
+    cell_add_str(key_str, "\'");
+    cell_add_str(key_str, to_string(tpattern));
+    cell_add_str(key_str, "\'");
+    cell_add_str(key_str, ",");
+    if (t_case) {
+	cell_add_str(key_str, "nocase");
+    } else {
+	cell_add_str(key_str, "case");
+    }
+    cell_add_str(key_str, ",");
+    if (t_grep) {
+	cell_add_str(key_str, "grep");
+    } else {
+	cell_add_str(key_str, "default");
+    }
+
+    /* regex cache search */
+    container = hash_get_t(regex_hash, new_symbol(cell_get_addr(key_str)));
+    if (NULL == container) {
+	reg = NULL;
+    } else if (GET_TAG(container) != CONTAINER) {
+	reg = NULL;
+    } else {
+	/* cache hit! */
+	reg = (regex_t*)container->u.container;
+    }
+    
     str = (unsigned char*)cell_get_addr(self->u.string);
     pattern = (unsigned char*)cell_get_addr(tpattern->u.rquote);
 
@@ -2374,17 +2418,26 @@ mth_string_match(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     if (t_case) {
 	option |= ONIG_OPTION_IGNORECASE;
     }
-    r = onig_new(&reg, pattern, pattern + cell_get_length(tpattern->u.rquote),
-		 option, ONIG_ENCODING_EUC_JP, ONIG_SYNTAX_DEFAULT, &einfo);
-    /*
-      ONIG_OPTION_NONE, ONIG_ENCODING_EUC_JP, ONIG_SYNTAX_DEFAULT, &einfo);
-      ONIG_OPTION_NONE, ONIG_ENCODING_EUC_JP, ONIG_SYNTAX_GREP, &einfo);
-      ONIG_OPTION_CAPTURE_GROUP, ONIG_ENCODING_EUC_JP, ONIG_SYNTAX_DEFAULT, &einfo);
-    */
-    if (r != ONIG_NORMAL) {
-	char s[ONIG_MAX_ERROR_MESSAGE_LEN];
-	onig_error_code_to_str(s, r, &einfo);
-	return new_exception(TE_REGEX, s, interp);
+
+    if (NULL == reg) {
+	/* no cache then create regex object */
+	r = onig_new(&reg,
+		     pattern,
+		     pattern + cell_get_length(tpattern->u.rquote),
+		     option,
+		     ONIG_ENCODING_UTF8,
+		     (t_grep == NULL) ? ONIG_SYNTAX_DEFAULT : ONIG_SYNTAX_GREP,
+		     &einfo
+	    );
+
+	if (r != ONIG_NORMAL) {
+	    char s[ONIG_MAX_ERROR_MESSAGE_LEN];
+	    onig_error_code_to_str(s, r, &einfo);
+	    return new_exception(TE_REGEX, s, interp);
+	}
+
+	/* and regex object set to cache */
+	hash_set_t(regex_hash, new_symbol(cell_get_addr(key_str)), new_container(reg));
     }
 
     region = onig_region_new();
@@ -2441,14 +2494,15 @@ next_search:
     }
 
     onig_region_free(region, 1);
-    onig_free(reg);
+    /* omit onig regex object free by regex cache impliment */
+    // onig_free(reg);
     onig_end();
 
     return result;
 
 error:
     return new_exception(TE_SYNTAX,
-	 "Syntax error at '=~', syntax: String =~ [:nocase] [:all] 'pattern'", interp);
+	 "Syntax error at '=~', syntax: String =~ [:nocase] [:all] [:grep] 'pattern'", interp);
 error2:
     return new_exception(TE_TYPE, "Type error.", interp);
 }
@@ -3916,9 +3970,9 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, "List", "car", mth_list_item, NULL);
     toy_add_method(interp, "List", "cdr", mth_list_cdr, NULL);
     toy_add_method(interp, "List", "next", mth_list_cdr, NULL);
+//    toy_add_method(interp, "List", "+", mth_list_append, NULL);
     toy_add_method(interp, "List", "append!", mth_list_append, NULL);
     toy_add_method(interp, "List", "add", mth_list_add, NULL);
-    toy_add_method(interp, "List", "+", mth_list_append, NULL);
     toy_add_method(interp, "List", "each", mth_list_each, NULL);
     toy_add_method(interp, "List", "len", mth_list_len, NULL);
     toy_add_method(interp, "List", "null?", mth_list_isnull, NULL);
@@ -3941,7 +3995,8 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, "String", "=", mth_string_equal, NULL);
     toy_add_method(interp, "String", "!=", mth_string_nequal, NULL);
     toy_add_method(interp, "String", "eval", mth_string_eval, NULL);
-    toy_add_method(interp, "String", "+", mth_string_append, NULL);
+//    toy_add_method(interp, "String", "+", mth_string_append, NULL);
+    toy_add_method(interp, "String", "append!", mth_string_append, NULL);
     toy_add_method(interp, "String", ".", mth_string_concat, NULL);
     toy_add_method(interp, "String", "=~", mth_string_match, NULL);
     toy_add_method(interp, "String", "sub", mth_string_sub, NULL);
@@ -3977,8 +4032,8 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, "Dict", "keys", mth_dict_keys, NULL);    
     toy_add_method(interp, "Dict", "pairs", mth_dict_pairs, NULL);    
 
-    toy_add_method(interp, "Vector", "+", mth_vector_append, NULL);
-    toy_add_method(interp, "Vector", "append", mth_vector_append, NULL);
+//    toy_add_method(interp, "Vector", "+", mth_vector_append, NULL);
+    toy_add_method(interp, "Vector", "append!", mth_vector_append, NULL);
     toy_add_method(interp, "Vector", "set", mth_vector_set, NULL);
     toy_add_method(interp, "Vector", "get", mth_vector_get, NULL);
     toy_add_method(interp, "Vector", "len", mth_vector_len, NULL);
