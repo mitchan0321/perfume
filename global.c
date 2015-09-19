@@ -58,6 +58,7 @@ void def_global() {
     const_up = new_symbol("up:");
     const_VERSION = new_symbol("VERSION");
     const_nocase = new_symbol("nocase:");
+    const_grep = new_symbol("grep:");
     const_all = new_symbol("all:");
     const_string = new_symbol("string");
     const_delegate = new_symbol("delegate:");
