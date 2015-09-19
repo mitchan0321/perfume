@@ -55,6 +55,7 @@ int main(int argc, char **argv, char **envp) {
     }
 
     while (! feof(stdin)) {
+    next_loop:
 	fputs("> ", stderr);
 	if (NULL == fgets(buff, BUFFSIZE, stdin)) break;
 	buff[BUFFSIZE-1] = 0;
@@ -128,9 +129,6 @@ int main(int argc, char **argv, char **envp) {
 		
 	    }
 	}
-    next_loop:
-	/* dummy */
-	0;
     }
 exit_loop:
 
