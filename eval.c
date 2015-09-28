@@ -398,16 +398,11 @@ toy_expand(Toy_Interp* interp, Toy_Type* obj, Toy_Env** env) {
 
     case GETMACRO:
     {
-	Toy_Type *o, *p, *st, *stl, *result;
+	Toy_Type *st, *stl, *result;
 
-	o = toy_expand(interp, obj->u.getmacro.obj, env);
-	if (GET_TAG(o) == EXCEPTION) return o;
-	p = toy_expand(interp, obj->u.getmacro.para, env);
-	if (GET_TAG(p) == EXCEPTION) return p;
-
-	stl = st = new_list(o);
+	stl = st = new_list(obj->u.getmacro.obj);
 	st = list_append(st, const_Get);
-	st = list_append(st, p);
+	st = list_append(st, obj->u.getmacro.para);
 
 	result = toy_eval(interp, new_statement(stl, interp->trace_info->line), env);
 	return result;
@@ -415,17 +410,12 @@ toy_expand(Toy_Interp* interp, Toy_Type* obj, Toy_Env** env) {
 
     case INITMACRO:
     {
-	Toy_Type *o, *p, *st, *stl, *result;
-
-	o = toy_expand(interp, obj->u.initmacro.class, env);
-	if (GET_TAG(o) == EXCEPTION) return o;
-	p = toy_expand(interp, obj->u.initmacro.param, env);
-	if (GET_TAG(p) == EXCEPTION) return p;
+	Toy_Type *st, *stl, *result;
 
 	stl = st = new_list(const_new);
-	st = list_append(st, o);
+	st = list_append(st, obj->u.initmacro.class);
 	st = list_append(st, const_init);
-	st = list_append(st, new_list(p));
+	st = list_append(st, new_list(obj->u.initmacro.param));
 
 	result = toy_eval(interp, new_statement(stl, interp->trace_info->line), env);
 	return result;
