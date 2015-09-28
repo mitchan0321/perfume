@@ -1,0 +1,64 @@
+# Class name: Stream
+#
+# Description:
+#   This class is internal input/output object like the File class object.
+#
+#   Impliment methods are:
+#     Stream::eof?   --- is eof?
+#     Stream::close  --- close stream object.
+#     Stream::ready? --- if available internal buffer then return t.
+#     Stream::puts   --- put string.
+#     Stream::gets   --- get string.
+#     Stream::flush  --- flush internal buffer.
+#     Stream::stat   --- return status list.
+#     Stream::each   --- each all queue;
+#   Thease methods specific are same as File class.
+#
+
+class Stream;
+
+Stream method init (args: a) {
+    sets queue ();
+    sets eof nil;
+    sets name "";
+    if [and [set? a] [! [$a null?]]] then: {sets name [$a item]};
+};
+
+Stream method eof? () {
+    if [! [$queue null?]] then: {return nil};
+    return $eof;
+};
+
+Stream method close () {
+    sets eof t;
+};
+
+Stream method ready? () {
+    if [$queue null?] then: nil else: t;
+};
+
+Stream method puts (i) {
+    if [eof?] then: {throw ErrFileAccess "Stream is closed."};
+    $queue <<- ["" . $i];
+    return t;
+};
+
+Stream method gets () {
+    if [eof?] then: {throw ErrFileAccess "Stream is closed."};
+    if [$queue null?] then: {throw ErrFileAccess "No data in stream."};
+    $queue >>;
+};
+
+Stream method flush () {
+    return t;
+};
+
+Stream method stat () {
+    return ((fd . nil) (mode . io) (path . $name) (eof . $eof));
+};
+
+Stream method each (do: body) {
+    while {! [eof?]} do: {
+	yield $body [gets];
+    };
+};

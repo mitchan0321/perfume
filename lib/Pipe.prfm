@@ -1,0 +1,12 @@
+# Class name: Pipe
+#
+# Description:
+#    This class is pipe drivered class.
+#
+#    Impliment methods are:
+#      Pipe::init
+#      Pipe::setInput  --- set input channel.
+#      Pipe::setOutput --- set output channel.
+#      
+
+class Pipe;
