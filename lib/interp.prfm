@@ -8,14 +8,16 @@ defun interp () {
     $SYSQUEUE clean;
     set c [coro {interp-co}];
     $c next;
-    println "Exit interpriter.";
     $c release;
+    println "Exit interpriter.";
 };
 
 defun interp-co () {
     set __local_var [dict];	# for eval local environment
 
+    $stdin clear;
     $SYSQUEUE add-queue $stdin {
+	
         if [set? __cont__] then: {
 	    set __cbuff [$stdin gets];
 	    $__buff append! $__cbuff;
@@ -23,7 +25,7 @@ defun interp-co () {
 	    set __buff [$stdin gets];
         };
 
-##	if {[[$__buff split] get 0] = "return"} then: {pause};
+	if {$stdin eof?} then: {$stdin clear};
 
         try {
 	    set __result [
@@ -35,6 +37,7 @@ defun interp-co () {
 			    $__buff eval;
 		    } local: $__local_var :rebase;
 	    ];
+	    $stdin clear;
 
 	    println "result[" [type? $__result] "]=> "
 		[if [[["" . $__result] len] > 512]
@@ -57,8 +60,6 @@ defun interp-co () {
         };
 
         if [set? __cont__] then: {interp-prompt prompt: "...> "} else: {interp-prompt};
-
-        if [$stdin eof?] then: {println ""; exit 0};
     };
 
     interp-prompt;
