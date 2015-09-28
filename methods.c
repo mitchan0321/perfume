@@ -2950,6 +2950,8 @@ file_finalizer(void *obj, void *client_data) {
 
     if (o->fd) {
 	fclose(o->fd);
+	o->fd = NULL;
+	o->path = NULL;
     }
 
     return;
@@ -2959,10 +2961,17 @@ static Toy_File*
 new_file() {
     Toy_File *o;
 
-    o = GC_MALLOC(sizeof(Toy_File));
+    o = GC_MALLOC_ATOMIC(sizeof(Toy_File));
     ALLOC_SAFE(o);
     memset(o, 0, sizeof(Toy_File));
 
+/*
+    GC_register_finalizer_ignore_self((void*)o,
+				      file_finalizer,
+				      NULL,
+				      NULL,
+				      NULL);
+*/
     GC_register_finalizer((void*)o,
 			  file_finalizer,
 			  NULL,
@@ -2971,8 +2980,6 @@ new_file() {
 
     return o;
 }
-
-Toy_Type* mth_file_open(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen);
 
 Toy_Type*
 mth_file_init(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
@@ -3038,6 +3045,7 @@ mth_file_open(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 
     if (f->fd) {
 	fclose(f->fd);
+	f->fd = NULL;
     }
 
     f->fd = fopen(cell_get_addr(f->path->u.string),
@@ -3424,6 +3432,34 @@ mth_file_isready(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
 
 error:
     return new_exception(TE_SYNTAX, "Syntax error at 'ready?', syntax: File ready?", interp);
+
+error2:
+    return new_exception(TE_TYPE, "Type error.", interp);
+}
+
+Toy_Type*
+mth_file_clear(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Hash *self;
+    Toy_Type *container;
+    Toy_File *f;
+    FILE *fd;
+
+    if (arglen > 0) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    self = SELF_HASH(interp);
+    container = hash_get_t(self, const_Holder);
+    if (NULL == container) goto error2;
+    f = container->u.container;
+
+    fd = f->fd;
+    if (NULL == fd) goto error2;
+
+    clearerr(fd);
+    return const_T;
+
+error:
+    return new_exception(TE_SYNTAX, "Syntax error at 'clear', syntax: File clear", interp);
 
 error2:
     return new_exception(TE_TYPE, "Type error.", interp);
@@ -4021,6 +4057,7 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, "File", "eof?", mth_file_iseof, NULL);
     toy_add_method(interp, "File", "set!", mth_file_set, NULL);
     toy_add_method(interp, "File", "ready?", mth_file_isready, NULL);
+    toy_add_method(interp, "File", "clear", mth_file_clear, NULL);
 
     toy_add_method(interp, "Block", "eval", mth_block_eval, NULL);
 
