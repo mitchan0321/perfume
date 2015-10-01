@@ -11,6 +11,7 @@
 void init_cstack();
 int  cstack_get(char *memo);
 void cstack_release(int);
+void cstack_release_clear(int);
 Toy_Type* cstack_list();
 void* cstack_get_start_addr(int);
 void* cstack_get_end_addr(int);
