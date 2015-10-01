@@ -1,3 +1,4 @@
+2015/10/01	PRFM_20151001		0.7.2
 2015/09/25	PRFM_20150925		0.7.1
 2015/09/20	PRFM_20150920_N27	0.7.0
 2015/08/09	PRFM_20150809		0.6.0
@@ -404,7 +405,7 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 		change lazy call default.
 	hash.c
 		bug fix that deferent variable reference on union.
-	method.c
+	methods.c
 		add String::fmt method.
 		add native Vector::each method.
 	lib/*
@@ -481,7 +482,7 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 		Add asort.prfm for vector quick sort.
 	parser.c
 		Add '\' macro. (e.g. A B \ C D -> C D [A B])
-	method.c
+	methods.c
 		Add vector::swap.
 		Add Real::sqrt.
 	array.c
@@ -584,5 +585,18 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 		Add File::clear for clear eof state method.
 	lib/Stream.prfm
 		New class Stream like as File object that process internal input/output.
+
+2015/10/1:
+	commands.c / global.[ch]
+		Add :silent option to unset and unsets for suppress return original value.
+		Fix cstack-release command to release co-routine object.
+	cstack.c
+		Add stack clear function, cstack_clear and cstack_clear_all.
+		Add stack release and clear function, cstack_release_clear.
+	methods.c / type.c / commands.c
+		Fix auto GC mechanism Coro::next, Coro::release, pause,
+		coroutine_handl(internal) and coro_finalizer(internal).
+	methods.c
+		Add method Coro::stat.
 
 #eof
