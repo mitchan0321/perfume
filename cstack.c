@@ -208,6 +208,19 @@ void cstack_return() {
     siglongjmp(CStack.stack_slot[Current_coroutine].jmp_buff, 1);
 }
 
+static void
+cstack_clear(int slot_id) {
+    memset((void*)CStack.stack_slot[slot_id].barrier_addr, 0,
+	   CStack.stack_slot[slot_id].end_addr - CStack.stack_slot[slot_id].barrier_addr);
+}
+
+
+static void
+cstack_clear_all(int slot_id) {
+    memset((void*)CStack.stack_slot[slot_id].start_addr, 0,
+	   CStack.stack_slot[slot_id].end_addr - CStack.stack_slot[slot_id].start_addr);
+}
+
 int
 cstack_get(char *memo) {
     int i;
@@ -215,9 +228,11 @@ cstack_get(char *memo) {
     for (i = 0 ; i < CStack.number_of_slot ; i++) {
 	if (SS_FREE == CStack.stack_slot[i].state) {
 	    CStack.stack_slot[i].state = SS_USE;
-	    memset((void*)CStack.stack_slot[i].safe_addr, 0,
-		   CStack.stack_slot[i].end_addr - CStack.stack_slot[i].safe_addr);
 	    CStack.stack_slot[i].memo = memo;
+	    cstack_unprotect(i);
+	    cstack_clear_all(i);
+	    cstack_protect(i);    
+	    
 	    return i;
 	}
     }
@@ -235,6 +250,18 @@ cstack_release(int slot_id) {
     CStack.stack_slot[slot_id].state = SS_FREE;
     CStack.stack_slot[slot_id].jmp_buff_enable = 0;
     CStack.stack_slot[slot_id].memo = 0;
+}
+
+void cstack_release_clear(int slot_id) {
+    if ((slot_id >= CStack.number_of_slot) ||
+	(slot_id < 1)) {
+	return;
+    }
+    
+    cstack_release(slot_id);
+    cstack_unprotect(slot_id);
+    cstack_clear(slot_id);
+    cstack_protect(slot_id);    
 }
 
 Toy_Type*
