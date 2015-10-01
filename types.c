@@ -59,21 +59,9 @@ new_ref(char *ref) {
     return o;
 }
 
-void
-integer_finalizer(void *obj, void *client_data) {
-    Toy_Type *p;
-
-    p = (Toy_Type*)obj;
-    mpz_clear(p->u.biginteger);
-
-    return;
-}
-
 Toy_Type*
 new_integer(mpz_t integer) {
     Toy_Type *o;
-//    void *ocd;
-//    GC_finalization_proc ofun;
 
     o = GC_MALLOC(sizeof(Toy_Type));
     ALLOC_SAFE(o);
@@ -81,12 +69,6 @@ new_integer(mpz_t integer) {
     o->tag = INTEGER;
     mpz_init(o->u.biginteger);
     mpz_set(o->u.biginteger, integer);
-
-//    GC_register_finalizer((void*)o,
-//			  integer_finalizer,
-//			  (void*)o,
-//			  &ofun,
-//			  &ocd);
 
     return o;
 }
@@ -438,6 +420,7 @@ coroutine_handl(void *context) {
     Toy_Type *co;
     Toy_Type *result;
     sigjmp_buf jmp_env;
+    int id;
 
     co = (Toy_Type*)context;
 
@@ -453,24 +436,32 @@ coroutine_handl(void *context) {
 	co->u.coroutine->interp->co_parent->co_value =
 	    new_exception(TE_STACKOVERFLOW, "C stack overflow.", co->u.coroutine->interp);
     }
-    co->u.coroutine->state = CO_STS_DONE;
 
-    cstack_release(co->u.coroutine->interp->cstack_id);
+    id = co->u.coroutine->interp->cstack_id;
     co->u.coroutine->interp->cstack_id = 0;
-    co->u.coroutine->interp->cstack = NULL;
-    //co_delete(co->u.coroutine->coro_id);
+    co->u.coroutine->interp->co_parent->co_value = result;
+    co->u.coroutine->state = CO_STS_DONE;
+    cstack_release(id);
+ 
     co_exit();
 }
 
 void
 coro_finalizer(void *obj, void *client_data) {
     Toy_Type *o;
-    Toy_Interp *interp;
     
     o = (Toy_Type*)obj;
-    interp = (Toy_Interp*)client_data;
+    if (NULL == o) return;
+    if (NULL == o->u.coroutine) return;
 
-    cstack_release(o->u.coroutine->interp->cstack_id);
+    if (0 != o->u.coroutine->coro_id) {
+	co_delete(o->u.coroutine->coro_id);
+	o->u.coroutine->coro_id = 0;
+    }
+    if (NULL != o->u.coroutine->interp) {
+	cstack_release_clear(o->u.coroutine->interp->cstack_id);
+	o->u.coroutine->interp = NULL;
+    }
 
     return;
 }
@@ -511,14 +502,14 @@ new_coroutine(Toy_Interp *interp, Toy_Type* script) {
     o->u.coroutine->interp->coroid = o->u.coroutine->coro_id;
     o->u.coroutine->state = CO_STS_INIT;
 
-    GC_register_finalizer((void*)o,
-			  coro_finalizer,
-			  (void*)interp,
-			  NULL,
-			  NULL);
+    GC_register_finalizer_ignore_self((void*)o,
+				      coro_finalizer,
+				      (void*)interp,
+				      NULL,
+				      NULL);
 
     if (NULL == o->u.coroutine->coro_id) {
-	return NULL;
+	return new_exception(TE_NOSLOT, "Can\'t create co-routine.", interp);
     }
 
     return o;

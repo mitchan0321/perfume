@@ -2965,18 +2965,18 @@ new_file() {
     ALLOC_SAFE(o);
     memset(o, 0, sizeof(Toy_File));
 
-/*
     GC_register_finalizer_ignore_self((void*)o,
 				      file_finalizer,
 				      NULL,
 				      NULL,
 				      NULL);
-*/
+/*
     GC_register_finalizer((void*)o,
 			  file_finalizer,
 			  NULL,
 			  NULL,
 			  NULL);
+*/
 
     return o;
 }
@@ -3877,10 +3877,14 @@ mth_coro_next(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     if (hash_get_length(nameargs) > 0) goto error;
 
     co = self->u.coroutine;
+    if (0 == co->coro_id) {
+	return new_exception(TE_COOUTOFLIFE, "Co-routine out of life.", interp);
+    }
     if (! cstack_isalive(co->interp->cstack_id)) {
 	return new_exception(TE_COOUTOFLIFE, "Co-routine out of life.", interp);
     };
 
+    interp->co_value = const_Nil;
     switch (co->state) {
     case CO_STS_INIT:
 	co->state = CO_STS_RUN;
@@ -3923,15 +3927,49 @@ mth_coro_release(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     co = self->u.coroutine;
     co->state = CO_STS_DONE;
 
+    if (0 == co->coro_id) {
+	return new_exception(TE_COOUTOFLIFE, "Co-routine already done.", interp);
+    }
     co_delete(co->coro_id);
-    cstack_release(co->interp->cstack_id);
+    co->coro_id = 0;
+    cstack_release_clear(co->interp->cstack_id);
     co->interp->cstack_id = 0;
     co->interp->cstack = NULL;
-
+    co->interp = NULL;
+    co->script = NULL;
+    
     return const_Nil;
     
 error:
     return new_exception(TE_SYNTAX, "Syntax error at 'release', syntax: Coro release", interp);
+
+error2:
+    return new_exception(TE_TYPE, "Type error.", interp);
+}
+
+Toy_Type*
+mth_coro_stat(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *self;
+    Toy_Coroutine *co;
+
+    self = SELF(interp);
+    if (GET_TAG(self) != COROUTINE) goto error2;
+    if (arglen != 0) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    co = self->u.coroutine;
+    
+    switch (co->state) {
+    case CO_STS_INIT:
+	return new_symbol("INIT");
+    case CO_STS_RUN:
+	return new_symbol("RUN");
+    default:
+	return new_symbol("DONE");
+    }
+    
+error:
+    return new_exception(TE_SYNTAX, "Syntax error at 'stat', syntax: Coro stat", interp);
 
 error2:
     return new_exception(TE_TYPE, "Type error.", interp);
@@ -4081,6 +4119,7 @@ toy_add_methods(Toy_Interp* interp) {
 
     toy_add_method(interp, "Coro", "next", mth_coro_next, NULL);
     toy_add_method(interp, "Coro", "release", mth_coro_release, NULL);
+    toy_add_method(interp, "Coro", "stat", mth_coro_stat, NULL);
 
     return 0;
 }
