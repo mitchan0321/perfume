@@ -162,16 +162,6 @@ typedef struct _toy_interp {
     struct _toy_type *last_status;
 } Toy_Interp;
 
-#if 0
-typedef struct _callcc {
-    Toy_Interp *interp;
-    int *cstack;
-    size_t cstack_size;
-    struct _toy_type *value;
-    jmp_buf jmpbuf;
-} CallCC;
-#endif
-
 typedef struct _toy_coroutine {
     Toy_Interp *interp;
     struct _toy_type *script;
