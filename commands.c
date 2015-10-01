@@ -1220,6 +1220,9 @@ cmd_unset(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *var;
     Hash *h;
     Toy_Type *res;
+    Toy_Type *silent;
+    
+    silent = hash_get_and_unset_t(nameargs, const_silent);
 
     if (hash_get_length(nameargs) > 0) goto error;
     if (arglen != 1) goto error;
@@ -1233,11 +1236,15 @@ cmd_unset(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     if (NULL == res) {
 	return const_Nil;
     } else {
-	return res;
+	if (NULL == silent) {
+	    return res;
+	} else {
+	    return const_Nil;
+	}
     }
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error, syntax: unset var", interp);
+    return new_exception(TE_SYNTAX, "Syntax error, syntax: unset [:silent] var", interp);
 }
 
 Toy_Type*
@@ -1245,6 +1252,9 @@ cmd_unsets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *var;
     Hash *h;
     Toy_Type *res;
+    Toy_Type *silent;
+    
+    silent = hash_get_and_unset_t(nameargs, const_silent);
 
     if (hash_get_length(nameargs) > 0) goto error;
     if (arglen != 1) goto error;
@@ -1258,11 +1268,15 @@ cmd_unsets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     if (NULL == res) {
 	return const_Nil;
     } else {
-	return res;
+	if (NULL == silent) {
+	    return res;
+	} else {
+	    return const_Nil;
+	}
     }
 
 error:
-    return new_exception(TE_SYNTAX, "syntax error, syntax: unsets var", interp);
+    return new_exception(TE_SYNTAX, "syntax error, syntax: unsets [:silent] var", interp);
 }
 
 Toy_Type*
@@ -2854,7 +2868,10 @@ cmd_cstack_release(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int ar
     if (INTEGER != GET_TAG(t)) goto error;
 
     slot = mpz_get_si(t->u.biginteger);
-    cstack_release(slot);
+    if (NULL != cstack_get_start_addr(slot)) {
+	co_delete((coroutine_t)cstack_get_start_addr(slot));
+    }
+    cstack_release_clear(slot);
     return const_Nil;
 
 error:

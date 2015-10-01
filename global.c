@@ -82,6 +82,7 @@ void def_global() {
     const_nonewline = new_symbol("nonewline:");
     const_nocontrol = new_symbol("nocontrol:");
     const_nullstring = new_string_str("");
+    const_silent = new_symbol("silent:");
     PageSize = sysconf(_SC_PAGESIZE);
 #ifdef PROF
     void *GC_stackbottom = 0;
