@@ -11,8 +11,15 @@
 #     Stream::gets   --- get string.
 #     Stream::flush  --- flush internal buffer.
 #     Stream::stat   --- return status list.
-#     Stream::each   --- each all queue;
-#   Thease methods specific are same as File class.
+#     Stream::each   --- each all queue.
+#     Stream::clear  --- clear error.
+#     -- Thease methods are File clases same name methods specification.
+#
+#     Stream::set-comode --- set co-routine mode.
+#     Stream::set-limit ---- set buffer length limit.
+#     Stream::set-nolimit -- set buffer length nolimit.
+#     Stream::get-count ---- get buffer length.
+#     -- Thease methods are Stream clases special methods.
 #
 
 class Stream;
@@ -20,8 +27,11 @@ class Stream;
 Stream method init (args: a) {
     sets queue ();
     sets eof nil;
+    sets co nil;
     sets name "";
     if [and [set? a] [! [$a null?]]] then: {sets name [$a item]};
+    sets limit 128;
+    sets count 0;
 };
 
 Stream method eof? () {
@@ -33,19 +43,42 @@ Stream method close () {
     sets eof t;
 };
 
+Stream method clear () {
+    sets eof nil;
+};
+
 Stream method ready? () {
     if [$queue null?] then: nil else: t;
 };
 
 Stream method puts (i) {
     if [eof?] then: {throw ErrFileAccess "Stream is closed."};
-    $queue <<- ["" . $i];
+
+    if {$count >= $limit} then: {
+	if $co then: {
+	    pause @WRITE;
+        } else: {
+	    throw ErrFileAccess "Stream full.";
+        };
+    };
+    
+    $queue <<- $i;
+    $count ++;
+
     return t;
 };
 
 Stream method gets () {
     if [eof?] then: {throw ErrFileAccess "Stream is closed."};
-    if [$queue null?] then: {throw ErrFileAccess "No data in stream."};
+    if [$queue null?] then: {
+	if $co then: {
+	    pause @READ;
+	} else: {
+	    throw ErrFileAccess "Stream no data.";
+        };
+    };
+    
+    $count --;
     $queue >>;
 };
 
@@ -54,11 +87,31 @@ Stream method flush () {
 };
 
 Stream method stat () {
-    return ((fd . nil) (mode . io) (path . $name) (eof . $eof));
+    return ((fd . nil) (mode . io) (path . $name) (eof . $eof) (limit . $limit) (count . $count));
 };
 
 Stream method each (do: body) {
     while {! [eof?]} do: {
 	yield $body [gets];
     };
+};
+
+Stream method set-comode () {
+    sets co t;
+};
+
+Stream method set-limit (l) {
+    sets limit $l;
+};
+
+Stream method set-nolimit () {
+    sets limit [2 ^ 32 : - 1];
+};
+
+Stream method get-count () {
+    return $count;
+};
+
+Stream method string () {
+    "Stream::" . $name "#" [stat];
 };

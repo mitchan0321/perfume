@@ -1,0 +1,159 @@
+#
+# pipe command
+#
+
+load-class :force Pipe;
+load-class :force Stream;
+
+defun pipe (in: in out: out args: blocks) {
+    syntax := "Syntax: pipe [in: input-stream | path] [out: output-stream | path] {block} ... ";
+    flist := (); # open file list
+    
+    #
+    # setup stdin channel
+    #
+    infile := "-";
+    if {set? in}
+    then: {
+	case [type? $in]
+	    OBJECT {
+	        if {or [eq? $in,@name Stream] [eq? $in,@name File]} else: {
+		    throw ErrPipeSyntax $syntax;
+		};
+	    }
+	    STRING {
+		in := `File($in mode: i);
+		$flist append! $in;
+	    }
+	    * {throw ErrPipeSyntax $syntax};
+	d ::= dict [$in stat];
+        n := $d,path;
+	if [nil? $n] then: {n := "-"};
+        infile := $n;
+    }
+    else: {
+	set in $stdin;
+    };
+
+    #
+    # setup stdout channel
+    #
+    outfile := "-";
+    if {set? out}
+    then: {
+	case [type? $out]
+	    OBJECT {
+	        if {or [eq? $out,@name Stream] [eq? $out,@name File]} else: {
+		    throw ErrPipeSyntax $syntax;
+		};
+		if {eq? $out,@name Stream} then: {
+		    $out set-nolimit;
+		}
+	    }
+	    STRING {
+		out := `File($out mode: o);
+		$flist append! $out;
+	    }
+	    * {throw ErrPipeSyntax $syntax};
+	d ::= dict [$out stat];
+        n := $d,path;
+	if [nil? $n] then: {n := "-"};
+        outfile := $n;
+    }
+    else: {
+	set out $stdout;
+    };
+
+
+    #
+    # setup procedure list
+    #
+    $blocks each do: {| b |
+        if {! [block? $b]} then: {
+	    throw ErrPipeSyntax $syntax;
+	}
+    };
+    
+    len ::= $blocks len;
+    if {$len = 0} then: {
+	throw ErrPipeSyntax $syntax;
+    };
+    
+    barray := ();
+    i := 1;
+
+    $in clear;
+    $blocks each do: {| b |
+	if {$i = $len}
+	then: {
+	    pipe := $out;
+	}
+	else: {
+	    pipe ::= new Stream init: (["pipe#" . $i]);
+	    $pipe set-comode;
+	};
+        p ::= new Pipe init: ($in $pipe $b);
+	$p set-infile  $infile;
+	$p set-outfile $outfile;
+	$barray append! $p;
+	$i ++;
+	in := $pipe;
+    };
+    
+    #
+    # do pipe
+    #
+    try {
+        pipe-dispatch $barray;
+    }
+    catch: {| e |
+	throw $e;
+    }
+
+    #
+    # after process
+    #
+    fin: {
+        pipe-release $barray $flist;
+	$stdin clear;
+	$stdout flush; $stdout clear;
+    };
+};
+
+defun pipe-dispatch (barray) {
+    $barray each do: {| b |
+	if {pipe-check-done-cond $barray} then: {return};
+
+	s ::= $b stat?;
+	if {eq? $s DONE} then: {continue};
+
+	$b run;
+	
+	s ::= $b stat?;
+	if {eq? $s @READ } then: {retry};
+	if {eq? $s @WRITE} then: {continue};	
+    };
+
+    goto pipe-dispatch $barray;
+};
+
+defun pipe-check-done-cond (barray) {
+    $barray each do: {| b |
+	if {eq? [$b stat?] ERROR} then: {throw ErrPipeBody ["" . [$b get-body]]};
+    };
+    $barray each do: {| b |
+	if {eq? [$b stat?] DONE}  else: {return nil};
+    };
+
+    # all co-routine done
+    return t;
+};
+
+defun pipe-release (barray flist) {
+    $barray each do: {| b |
+	$b release;
+    };
+    $flist each do: {| f |
+	$f close;
+    };
+};

@@ -5,8 +5,71 @@
 #
 #    Impliment methods are:
 #      Pipe::init
-#      Pipe::setInput  --- set input channel.
-#      Pipe::setOutput --- set output channel.
 #      
 
 class Pipe;
+
+Pipe method init (in out body) {
+    sets in $in;
+    sets out $out;
+    sets body $body;
+    sets stat INIT;
+    sets INFILE "";
+    sets OUTFILE "";
+};
+
+Pipe method stat? () {
+    return $stat;
+};
+
+Pipe method run () {
+    if {sets? coro} else: {
+	sets stdin $in;
+	sets stdout $out;
+	sets coro [coro $body];
+    };
+
+    sets stat RUN;
+    try {
+	sets stat [$coro next];
+	if {eq? [$coro stat] DONE} then: {
+	    sets stat DONE;
+	};
+    }
+    catch: {
+	sets stat ERROR;
+    };
+    
+    if {or [eq? $stat DONE] [eq? $stat ERROR]} then: {
+	$out flush;
+	if {eq? $out,@name Stream} then: {$out close};
+    };
+};
+
+Pipe method debug_out () {
+    println $in;
+    println $body;
+    println $out;
+};
+
+Pipe method string () {
+    "Pipe::" . $body " | " $in " | " $out;
+};
+
+Pipe method release () {
+    if {sets? coro} then: {
+	$coro release;
+    };
+};
+
+Pipe method set-infile (f) {
+    sets INFILE $f;
+};
+
+Pipe method set-outfile (f) {
+    sets OUTFILE $f;
+};
+
+Pipe method get-body () {
+    return $body;
+};
