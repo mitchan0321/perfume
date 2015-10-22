@@ -437,7 +437,6 @@ toy_push_func_env(Toy_Interp* interp, Hash *localvar, Toy_Func_Env *upenv, Toy_T
 
     env->localvar = localvar;
     env->upstack = upenv;
-
     env->trace_info = interp->trace_info;
     env->script_id = interp->script_id;
     env->tobe_bind_val = tobe_bind_val;
@@ -452,6 +451,8 @@ Toy_Func_Env*
 toy_pop_func_env(Toy_Interp* interp) {
     Toy_Func_Env *env;
 
+    if (0 == interp->cur_func_stack) return NULL;
+    
     env = interp->func_stack[interp->cur_func_stack];
     interp->func_stack[interp->cur_func_stack] = NULL;
     interp->cur_func_stack--;
