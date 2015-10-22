@@ -111,7 +111,8 @@ alloc_slot(int slot) {
     __PTRDIFF_TYPE__ stack_frame[STACK_SLOT_SIZE];
 
     if (0 == sigsetjmp(jmp_env, 1)) {
-	memset((void*)stack_frame, 0, STACK_SLOT_SIZE * sizeof(__PTRDIFF_TYPE__));
+	// memset((void*)stack_frame, 0, STACK_SLOT_SIZE * sizeof(__PTRDIFF_TYPE__));
+	memset((void*)stack_frame, 0, MP_PAGESIZE);
     } else {
 	if (slot <= 1) {
 	    fprintf(stderr, "Can\'t allocate stack slot, going to exit.\n");
