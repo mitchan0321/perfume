@@ -8,14 +8,13 @@ CC		= cc
 
 # for product build. (use BoehmGC)
 CFLAGS		= -Wall -O3 -c -g -DHAS_GCACHE
-#CFLAGS		= -Wall -c -g -DHAS_GCACHE
 INCLUDE		= -I/usr/local/include -I.
 LIB		= -L/usr/lib -L/lib -L/usr/local/lib -lm -lgc -lpthread -lonig -lpcl -lgmp
 
 # for memory debuging build.
 #CFLAGS		= -c -g -DPROF -DHAS_GCACHE
 #INCLUDE		= -I/usr/local/include -I.
-#LIB		= -L/usr/local/lib -lonig -lpcl -lgmp
+#LIB		= -L/usr/local/lib -lm -lonig -lpcl -lgmp
 
 # for profiling build.
 #CFLAGS		= -c -g -pg -DPROF -DHAS_GCACHE
@@ -94,6 +93,6 @@ config.h:	config.h.in
 		< config.h.in > config.h
 
 clean:
-	rm -f *.o perfumesh *~ lib/*~ tests/*~ *core* *.gmon config.h tests/setup.prfm
+	rm -f *.o perfumesh *~ lib/*~ tests/*~ *core* *.gmon config.h tests/setup.prfm a.out
 
 #eof
