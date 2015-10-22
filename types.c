@@ -429,7 +429,16 @@ coroutine_handl(void *context) {
 	
 	result = toy_eval_script(co->u.coroutine->interp,
 				 co->u.coroutine->script->u.closure.block_body);
-	co->u.coroutine->interp->co_parent->co_value = result;
+
+	if (GET_TAG(result) == CONTROL) {
+	    if ((result->u.control.code == CTRL_RETURN) || 
+		(result->u.control.code == CTRL_BREAK)) {
+		result = result->u.control.ret_value;
+	    } else {
+		result = const_Nil;
+	    }
+	}
+
     } else {
 	/* +++ */
 	fprintf(stderr, "coroutine_handl: detect SOVF\n");
