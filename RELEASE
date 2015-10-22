@@ -1,3 +1,4 @@
+2015/10/22	PRFM_20151022		0.8.0_PRE_1
 2015/10/01	PRFM_20151001		0.7.2
 2015/09/25	PRFM_20150925		0.7.1
 2015/09/20	PRFM_20150920_N27	0.7.0
@@ -43,6 +44,7 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 
 2008/07/25:	
 	initial CVS repository imported.
+
 2008/07/26:
 	eval.c:
 		rewrite toy_eval, to non recurcive function call.
@@ -53,11 +55,13 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 		Integer::-- added.
 	add setup.toy script.
 	add config.h file.
+
 2008/07/27:
 	object constructor implimentation. 'init' method at object creation.
 	Hash class implimentation.
 	setup.toy:
 		add apply-constructor script.
+
 2008/08/05:
 	eval.c:
 		bind_args, change algorithm.
@@ -66,6 +70,7 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 	methods.c:
 		add File class, Array class and modify Hash for using any type in key value.
 	get macro implimentation, for example: $object,$key meaning [$object get $key].
+
 2008/08/08:
 	commands.c:
 		print / println change, use $@out, $stdout File object.
@@ -78,8 +83,10 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 		parse get macro extention bug fix.
 	setup.toy:
 		add stdin / stdout / stderr variables setup.
+
 2008/08/13:
 	output global variable '@stack-trace' if generated exception.
+
 2008/08/16:
 	commands.c:
 		add stack-trace command.
@@ -92,6 +99,7 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 		add String::eval method.
 		add String::+ method.
 	Closure variable is able to reference in function and method.
+
 2008/08/19:
 	commands.c:
 		add ! / and / not command.
@@ -108,6 +116,7 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 		fix to symbol parse.
 	types.c:
 		add TAG_NAMED_MASK into SYMBOL.
+
 2008/08/22:
 	commands.c:
 		fix sid command for specified FUNC object.
@@ -115,6 +124,7 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 	methods.c:
 		fix List::append degrade, return last item cons cell.
 		add Array::last method.
+
 2008/08/23:
 	Makefile:
 		add install script.
@@ -132,6 +142,7 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 		fix '..' symbol parse, but adhockly.
 	type.[ch]:
 		add ALIAS type.
+
 2008/08/24:
 	Makefile:
 		add onigruma library added.
@@ -142,17 +153,20 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 		add String::match/String::=~ method.
 	parser.c:
 		add RQuote parse.
+
 2008/08/30:
 	cell.c:
 		add cell_sub for sub-string return.
 	methods.c:
 		fix String::=~ and add switch 'all:' and 'case:'.
 		add String::sub command.
+
 2008/08/31:
 	methods.c, eval.c:
 		change for init method parameter useful.
 	eval.c:
 		add to_string_call for Object::string.
+
 2008/09/04:
 	eval.c:
 		add switch argument, ":XXX" meaning same as named arg "XXX: 1".
@@ -217,12 +231,15 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 	setup.toy
 		add global variable INTERACTIVE for shell mode indicator.
 		$HOME/.toyrc load if file existing.
+
 2009/02/15:
 	methods.c
 		add method List::filter, List::map
+
 2009/02/17:
 	*
 		syntax change: var: X -> in: X
+
 2009/02/19:
 	Makefile
 		install lib directory to $PREFIX/toy/lib.
@@ -236,6 +253,7 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 		cmd_print bug fix.
 		sid return nil if no func match.
 		add type? command.
+
 2009/02/21:
 	commands.c
 		'if' command syntax extend, if cond-block is value then eval value.
@@ -251,9 +269,11 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 		some command separate into this directory.
 	toysh.c
 		print result length limit to 512 bytes.
+
 2009/02/22:
 	eval.c
 		to_string_call bug fix.
+
 2009/03/01:
 	methods.c
 		add method List::>> (shift), List::<< (unshift),
@@ -261,9 +281,11 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 		add method List::seek
 	msort.toy
 		new added sample script merge sort program.
+
 2009/03/07:
 	commands.c, eval.c
 		add trace command.
+
 2009/03/08:
 	commands.c
 		trace syntax added for body tracing.
@@ -271,6 +293,7 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 	interp.toy
 		add feature toy script for command interpriter.
 		for using: interp
+
 2009/03/28:
 	Makefile
 		gcc flag '-Wall' add.
@@ -284,19 +307,23 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 		Array::init bug fix.
 	SysQueue.toy
 		add error handling.
+
 2009/03/30:
 	commands.c
 		bug fix String constructor mangled.
 	commands.c, methods.c
 		in progress add callcc.
+
 2009/05/10:
 	*
 		Any iterator syntax change.
 		    old style) List::each in: i do: {block}
 		    new style) List::each do: {| i | block}
+
 2009/05/17:
 	*
 		add lazy feature.
+
 2009/07/06:
 	commands.c
 		change case syntax.
@@ -314,6 +341,7 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 		add option :all for recurcive list.
 	lib/util.toy
 		add Hash::each method.
+
 2009/07/27:
 	*
 		add memory allocate error detect code.
@@ -322,6 +350,7 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 		change default interpriter stack size.
 	commands.c
 		try command fix, if occurd exception in fin: block then return exception.
+
 2009/09/05:
 	hash.c, eval.c
 		add global cache feature. If this feauture turn on, specify HAS_GCACHE in Makefile.
@@ -341,6 +370,7 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 	*
 		if parameters less than 6, optimizing parameter bind process.
 		change stack trace design and optimizing.
+
 2009/09/23:
 	commands.c
 		'new' command recognize variable $LIB_PATH, if not defined class auto loading.
@@ -357,6 +387,7 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 		add new command flat for display all of the object/class methods.
 	lib/util.toy
 		add Block::<< method.
+
 2009/11/01:
 	*
 		symbolized keyword parameter (e.g. then:, else:, do: ...)
@@ -369,6 +400,7 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 	methods.c
 		add object Dict.
 		add method String::split.
+
 2009/11/21:
 	types.[ch]
 		add type VECTOR.
@@ -599,5 +631,29 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 	methods.c
 		Add method Coro::stat.
 
+2015/10/22:
+	Makefile
+		Add -lm option in $(LIB) for memory debuging.
+	commands.c
+		Fix set command bug that error occured at multipul set.
+		Change pause command save previous status.
+		Add command uplevel.
+	config.h.in
+		Fix STACK_SLOT_SIZE comment. (32bit size -> 64bit size)
+	lib/pipe.prfm, Pipe.prfm, Stream.prfm
+		New feature for command pipe execution.
+	lib/cat.prfm, grep.prfm, ls.prfm, util.prfm, ncat.prfm
+		pipe command depending.
+		Add new command load-func and load-class.
+	parse.c
+		Add new macro := and ::=.
+	setup.prfm
+		Change use uplevel command in unknown hook.
+	t_gc.h
+		Add dummy macro GC_register_finalizer_ignore_self and GC_add_roots.
+	types.c
+		Add co-routine exception handl.
+	methods.c
+		Delete file finalizer.
 
 #eof
