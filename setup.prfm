@@ -43,10 +43,11 @@ defun unknown (args: __unknown_args__) {
     set __unknown_param__ [$__unknown_args__ next];
 
     $LIB_PATH each do: {| __unknown_d__ |
-        set __unknown_f__ [$__unknown_d__ . "/" $__unknown_cmd__ ".prfm"];
+	try {unset __unknown_f__; alias up: 1 __fname__ __unknown_f__};
+	set __unknown_f__ [$__unknown_d__ . "/" $__unknown_cmd__ ".prfm"];
 	if {and [file exists? $__unknown_f__] [file read? $__unknown_f__]}
 	then: {
-	    load $__unknown_f__;
+	    uplevel {load $__fname__; unset __fname__};
 	    if {! [sid $__unknown_cmd__]} then: {
 		continue;
 	    };
