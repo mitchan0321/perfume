@@ -4,9 +4,11 @@
 #define __T_GC__
 
 #ifdef PROF
-#	define GC_INIT()		0
-#	define GC_MALLOC(s)		malloc(s)
-#	define GC_MALLOC_ATOMIC(s)	malloc(s)
+#	define GC_INIT()					0
+#	define GC_MALLOC(s)					malloc(s)
+#	define GC_MALLOC_ATOMIC(s)				malloc(s)
+#	define GC_register_finalizer_ignore_self(o,f,c,x,y)	0
+#	define GC_add_roots(s,e)				0
 #else
 #	include <gc.h>
 #endif /* PROF */
