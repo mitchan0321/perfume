@@ -18,6 +18,7 @@
 static Toy_Type* toy_parse_getmacro(Toy_Type *statement);
 static Toy_Type* toy_parse_initmacro(Toy_Type *statement);
 static Toy_Type* toy_parse_join_statement(Toy_Type *statement, int line);
+static Toy_Type* toy_parse_setmacro(Toy_Type *statement, int line);
 static Toy_Type* toy_parse_set_paramno(Toy_Type *statement);
 
 Toy_Type*
@@ -76,16 +77,26 @@ toy_parse_script(Bulk *src, char endc) {
 
 	if (GET_TAG(statement) != STATEMENT) goto parse_error;
 
-	statement->u.statement_list = toy_parse_getmacro(statement->u.statement_list);
-	statement->u.statement_list = toy_parse_initmacro(statement->u.statement_list);
-	statement->u.statement_list = toy_parse_join_statement(statement->u.statement_list,
-								    bulk_get_line(src));
+	/* apply macros */
+	statement->u.statement_list = 
+	    toy_parse_getmacro(statement->u.statement_list);
+
+	statement->u.statement_list = 
+	    toy_parse_initmacro(statement->u.statement_list);
+
+	statement->u.statement_list = 
+	    toy_parse_setmacro(statement->u.statement_list, bulk_get_line(src));
+	
+	statement->u.statement_list = 
+	    toy_parse_join_statement(statement->u.statement_list, bulk_get_line(src));
+
+	/* apply parameters number */
 	toy_parse_set_paramno(statement);
+
 
 	if (list_length(statement->u.statement_list) > 0) {
 	    l = list_append(l, statement);
 	}
-
     }
 
     return script; 
@@ -880,35 +891,6 @@ toy_parse_initmacro(Toy_Type *statement) {
 }
 
 static Toy_Type*
-toy_parse_set_paramno(Toy_Type *o) {
-    int n = 0;
-    Toy_Type *l;
-    Toy_Type *i;
-
-    l = list_next(o->u.statement.item_list);
-    while (l) {
-	i = list_get_item(l);
-	if (GET_TAG(i) == SYMBOL) {
-	    if (IS_NAMED_SYM(i) || IS_SWITCH_SYM(i)) {
-		n = TAG_MAX_PARAMNO;
-		break;
-	    }
-	}
-	n ++;
-	l = list_next(l);
-    }
-
-    if (n < TAG_MAX_PARAMNO) {
-	CLEAR_PARAMNO(o);
-	SET_PARAMNO(o, n);
-    } else {
-	SET_PARAMNO(o, TAG_MAX_PARAMNO);
-    }
-
-    return o;
-}
-
-static Toy_Type*
 toy_parse_join_statement(Toy_Type *statement, int line) {
     Toy_Type *result, *src, *cur;
 
@@ -960,4 +942,70 @@ toy_parse_join_statement(Toy_Type *statement, int line) {
     }
 
     return result;
+}
+
+static Toy_Type*
+toy_parse_setmacro(Toy_Type *statement, int line) {
+    Toy_Type *result, *orig, *var, *op, *val;
+
+    if (list_length(statement) < 3) return statement;
+
+    result = new_list(NULL);
+    
+    orig = statement;
+    var = list_get_item(statement);
+    statement = list_next(statement);
+    op = list_get_item(statement);
+    val = list_next(statement);
+
+    if (GET_TAG(op) != SYMBOL) return orig;
+
+    if (strcmp(cell_get_addr(op->u.symbol.cell), ":=") == 0) {
+	list_append(result, new_symbol("set"));
+	list_append(result, var);
+	while (val) {
+	    list_append(result, list_get_item(val));
+	    val = list_next(val);
+	}
+	return result;
+		    
+    } else if (strcmp(cell_get_addr(op->u.symbol.cell), "::=") == 0) {
+	list_append(result, new_symbol("set"));
+	list_append(result, var);
+	list_append(result, 
+		    new_eval(new_script(new_list(new_statement(toy_parse_join_statement(val, line),
+							       line)))));
+	return result;
+    }
+
+    return orig;
+}
+
+static Toy_Type*
+toy_parse_set_paramno(Toy_Type *o) {
+    int n = 0;
+    Toy_Type *l;
+    Toy_Type *i;
+
+    l = list_next(o->u.statement.item_list);
+    while (l) {
+	i = list_get_item(l);
+	if (GET_TAG(i) == SYMBOL) {
+	    if (IS_NAMED_SYM(i) || IS_SWITCH_SYM(i)) {
+		n = TAG_MAX_PARAMNO;
+		break;
+	    }
+	}
+	n ++;
+	l = list_next(l);
+    }
+
+    if (n < TAG_MAX_PARAMNO) {
+	CLEAR_PARAMNO(o);
+	SET_PARAMNO(o, n);
+    } else {
+	SET_PARAMNO(o, TAG_MAX_PARAMNO);
+    }
+
+    return o;
 }
