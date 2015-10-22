@@ -1,12 +1,12 @@
 # FizzBuzz by perfume-lang
 
-println [
-1 .. 100 do:
-  {| i |
-     cond
-       {[$i % 15] = 0}	{break "FizzBuzz"}
-       {[$i % 3] = 0} 	{break "Fizz"}
-       {[$i % 5] = 0} 	{break "Buzz"}
-       t 	       	$i
-  };
-];
+defun fizzbuzz () {
+    1 .. 100 do: {
+	| i |
+        cond
+            {[$i % 15] = 0} {break "FizzBuzz"}
+            {[$i % 3] = 0}  {break "Fizz"}
+            {[$i % 5] = 0}  {break "Buzz"}
+            t               $i
+    };
+};
