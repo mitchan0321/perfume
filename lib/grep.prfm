@@ -1,21 +1,15 @@
 # $Id:$
 # grep
 
-defun grep (pat file) {
-    set f `File(mode: i $file);
+defun grep (pat) {
     try {
 	set n 1;
-	$f each do: {| r |
+	$stdin each do: {| r |
 	    if {$r =~ $pat} then: {
-		print $file ":" $n ": " $r;
+		print $INFILE ":" $n ": " $r;
 	    };
 	    $n ++;
 	};
-    }
-    fin: {
-	$f close;
     };
     println;
-
-    true;
 };

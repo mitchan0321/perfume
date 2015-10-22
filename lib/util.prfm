@@ -152,8 +152,17 @@ Object method ? () {self};
 #
 File method each (do: body) {
     while {! [eof?]} do: {
-	yield $body [gets];
+	s ::= gets;
+	if {and [[$s len] = 0] [eof?]} then: {break};
+	yield $body $s;
     };
+};
+
+File method string () {
+    x ::= dict [stat];
+    name := $x,path;
+    if {nil? $name} then: {name := ""};
+    "File::" . $name "#" [stat];
 };
 
 #
@@ -300,3 +309,33 @@ String method log () {
     [[self] real] log;
 };
 
+#
+# for load function / class by symbol name
+#
+defun load-func (s force: force) {
+    if {! [set? force]} then: {
+	if [dict-func : set? $s] then: {return nil};
+    };
+    
+    $LIB_PATH each do: {| f |
+	try {unset p; alias up: 1 __fname__ p};
+	set p [$f . "/" $s ".prfm"];
+	uplevel {load $__fname__; unset __fname__};
+	if [dict-func : set? $s] then: {return t};
+    };
+    throw ErrNoFunction ["No such function, '" . $s "'."];
+};
+
+defun load-class (s force: force) {
+    if {! [set? force]} then: {
+	if [dict-class : set? $s] then: {return nil};
+    };
+    
+    $LIB_PATH each do: {| f |
+	try {unset p; alias up: 1 __fname__ p};
+	set p [$f . "/" $s ".prfm"];
+	uplevel {load $__fname__; unset __fname__};
+	if [dict-class : set? $s] then: {return t};
+    };
+    throw ErrNoClass ["No such class, '" . $s "'."];
+};

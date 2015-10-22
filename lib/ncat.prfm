@@ -1,0 +1,12 @@
+# $Id:$
+
+defun ncat () {
+    set i 1;
+    try {
+	$stdin each do: {| r |
+	    print $i ": " $r;
+	    $stdout flush;
+	    $i ++;
+	};
+    };
+};

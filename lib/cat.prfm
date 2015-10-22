@@ -1,17 +1,10 @@
 # $Id:$
 
-defun cat (file) {
-    set f `File($file mode: i);
-
+defun cat () {
     try {
-	$f each do: {| r |
+	$stdin each do: {| r |
 	    print $r;
 	};
 	$stdout flush;
-    }
-    fin: {
-	$f close;
     };
-
-    true;
 };

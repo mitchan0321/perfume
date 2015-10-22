@@ -7,10 +7,11 @@ defun ls (all: all ind: ind args: dir) {
     if [set? ind] else: {set ind 0};
 
     [msort [file list $d]] each do: {| f |
-	if [$ind > 0] then: {1 each to: $ind do: {print " "}};
-	print $f;
-	if [file dir? [$d . "/" $f]] then: {print "/"};
-	println "";
+	out := "";
+	if [$ind > 0] then: {1 each to: $ind do: {$out append! " "}};
+	$out append! $f;
+	if [file dir? [$d . "/" $f]] then: {$out append! "/"};
+	println $out;
 
 	if [set? all]
     	then: {
