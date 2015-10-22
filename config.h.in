@@ -21,15 +21,15 @@
 
 /*
  * This number is co-routines native C stack size.
- * Real allocate size is STACK_SLOT_SIZE * sizeof(u_int32_t) (may be 4)
+ * Real allocate size is STACK_SLOT_SIZE * sizeof(u_int64_t) (may be 8)
  */
-// about 128K bytes
+// about 256K bytes
 #define STACK_SLOT_SIZE		(32*1024)
 
-// about 256K bytes
+// about 512K bytes
 // #define STACK_SLOT_SIZE		(64*1024)
 
-// about 512K bytes
+// about 1024K bytes
 // #define STACK_SLOT_SIZE		(128*1024)
 
 /* for SIGSEGV signal handler */
