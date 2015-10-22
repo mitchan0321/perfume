@@ -59,7 +59,7 @@ cmd_set(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	(hash_get_length(nameargs) > 0)) goto error;
 
     var = list_get_item(posargs);
-    if (GET_TAG(var) != SYMBOL) {
+    if (GET_TAG(var) == LIST) {
 	
 	if (len != 2) goto error;
 
@@ -69,6 +69,8 @@ cmd_set(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	val = list_get_item(posargs);
 
 	if (GET_TAG(val) == LIST) {
+	    if (list_length(var) != list_length(val)) goto error;
+	    
 	    res2 = new_list(NULL);
 
 	    while (var && val) {
@@ -77,8 +79,10 @@ cmd_set(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 		newargs = new_list(var2);
 		list_append(newargs, val2);
 
-		list_append(res2, cmd_set(interp, newargs,
-					  nameargs, 2));
+		res = cmd_set(interp, newargs, nameargs, 2);
+		if (GET_TAG(res) == EXCEPTION) return res;
+		
+		list_append(res2, res);
 
 		var = list_next(var);
 		val = list_next(val);
@@ -89,6 +93,8 @@ cmd_set(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 
 	goto error;
     }
+
+    if (GET_TAG(var) != SYMBOL) goto error;
 
     h = interp->func_stack[interp->cur_func_stack]->localvar;
 
@@ -108,6 +114,7 @@ cmd_set(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 
 	posargs = list_next(posargs);
 	val = list_get_item(posargs);
+	if (NULL == val) goto error;
 
 	switch (GET_TAG(val)) {
 	case INTEGER: case REAL:
@@ -115,6 +122,7 @@ cmd_set(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	    break;
 	case STRING:
 	    val = new_string_str(cell_get_addr(val->u.string));
+	    break;
 	}
 
 	hash_set_t(h, var, val);
@@ -2624,7 +2632,7 @@ cmd_pause(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 
     co_resume();
 
-    return val;
+    return interp->last_status;
 
 error:
     return new_exception(TE_SYNTAX, "Syntax error at 'pause', syntax: pause [val]", interp);
@@ -2899,6 +2907,32 @@ cmd_remark(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     return interp->last_status;
 }
 
+Toy_Type*
+cmd_uplevel(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Func_Env *env;
+    Toy_Type *body, *result;
+
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) != 0) goto error;
+
+    body = list_get_item(posargs);
+    if (GET_TAG(body) != CLOSURE) goto error;
+    
+    env = toy_pop_func_env(interp);
+    if (NULL == env) {
+	return new_exception(TE_STACKUNDERFLOW,
+			     "Stack underflow.", interp);
+    }
+    result = toy_eval_script(interp, body->u.closure.block_body);
+    toy_push_func_env(interp, env->localvar, env->upstack, env->tobe_bind_val);
+
+    return result;
+    
+error:
+    return new_exception(TE_SYNTAX,
+			 "Syntax error at 'uplevel', syntax: uplevel {body}", interp);
+}
+
 int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, "false", cmd_false, NULL);
     toy_add_func(interp, "true", cmd_true, NULL);
@@ -2998,6 +3032,7 @@ int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, "cstack-release", cmd_cstack_release, NULL);
     toy_add_func(interp, "coro-id", cmd_coroid, NULL);
     toy_add_func(interp, "REM", cmd_remark, NULL);
+    toy_add_func(interp, "uplevel", cmd_uplevel, NULL);
 
     return 0;
 }
