@@ -86,7 +86,6 @@ defun pipe (in: in out: out args: blocks) {
     barray := ();
     i := 1;
 
-    $in clear;
     $blocks each do: {| b |
 	if {$i = $len}
 	then: {
@@ -120,7 +119,7 @@ defun pipe (in: in out: out args: blocks) {
     fin: {
         pipe-release $barray $flist;
 	$stdin clear;
-	$stdout flush; $stdout clear;
+	$stdout flush;
     };
 };
 
