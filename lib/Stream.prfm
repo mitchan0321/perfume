@@ -13,6 +13,7 @@
 #     Stream::stat   --- return status list.
 #     Stream::each   --- each all queue.
 #     Stream::clear  --- clear error.
+#     Stream::set-newline  --- set newline mode.
 #     -- Thease methods are File clases same name methods specification.
 #
 #     Stream::set-comode --- set co-routine mode.
@@ -32,6 +33,7 @@ Stream method init (args: a) {
     if [and [set? a] [! [$a null?]]] then: {sets name [$a item]};
     sets limit 128;
     sets count 0;
+    sets newline nil;
 };
 
 Stream method eof? () {
@@ -51,7 +53,7 @@ Stream method ready? () {
     if [$queue null?] then: nil else: t;
 };
 
-Stream method puts (i) {
+Stream method puts (i nonewline: nonewline) {
     if [eof?] then: {throw ErrFileAccess "Stream is closed."};
 
     if {$count >= $limit} then: {
@@ -72,7 +74,7 @@ Stream method puts (i) {
     return t;
 };
 
-Stream method gets () {
+Stream method gets (nonewline: nonewline) {
     if [eof?] then: {throw ErrFileAccess "Stream is closed."};
     if [$queue null?] then: {
 	if $co then: {
@@ -92,7 +94,8 @@ Stream method flush () {
 };
 
 Stream method stat () {
-    return ((fd . nil) (mode . io) (path . $name) (eof . $eof) (limit . $limit) (count . $count));
+    return ((fd . nil) (mode . io) (path . $name) (eof . $eof)
+	    (limit . $limit) (count . $count) (newline . $newline));
 };
 
 Stream method each (do: body) {
@@ -119,4 +122,9 @@ Stream method get-count () {
 
 Stream method string () {
     "Stream::" . $name "#" [stat];
+};
+
+Stream method set-newline (m) {
+    sets newline $m;
+    return $m;
 };
