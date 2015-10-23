@@ -16,6 +16,7 @@ Pipe method init (in out body) {
     sets stat INIT;
     sets INFILE "";
     sets OUTFILE "";
+    sets error "";
 };
 
 Pipe method stat? () {
@@ -36,8 +37,9 @@ Pipe method run () {
 	    sets stat DONE;
 	};
     }
-    catch: {
+    catch: {| e |
 	sets stat ERROR;
+	sets error ["<" . [$e car] "># " [$e cdr]];
     };
     
     if {or [eq? $stat DONE] [eq? $stat ERROR]} then: {
@@ -72,4 +74,8 @@ Pipe method set-outfile (f) {
 
 Pipe method get-body () {
     return $body;
+};
+
+Pipe method get-error () {
+    return $error;
 };

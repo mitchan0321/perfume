@@ -142,7 +142,7 @@ defun pipe-dispatch (barray) {
 
 defun pipe-check-done-cond (barray) {
     $barray each do: {| b |
-	if {eq? [$b stat?] ERROR} then: {throw ErrPipeBody ["" . [$b get-body]]};
+	if {eq? [$b stat?] ERROR} then: {throw ErrPipeBody ["" . [$b get-body] "-> " [$b get-error]]};
     };
     $barray each do: {| b |
 	if {eq? [$b stat?] DONE}  else: {return nil};
