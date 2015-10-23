@@ -101,6 +101,7 @@ new_interp(char* name, int stack_size, Toy_Interp* parent,
 	interp->trace_info->object_name = new_symbol("Toplevel");
 	interp->trace_info->func_name = new_symbol("Main");
 	interp->trace_info->statement = new_statement(new_list(new_symbol("(toysh)")), 0);
+	interp->script_id = 0;
 	
 	interp->trace = 0;
 	interp->trace_fd = 2;
