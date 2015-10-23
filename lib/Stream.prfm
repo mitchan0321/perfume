@@ -62,7 +62,11 @@ Stream method puts (i) {
         };
     };
     
-    $queue <<- $i;
+    if {sets? shortcut} then: {
+	sets shortcut [$shortcut append! $i];
+    } else: {
+	sets shortcut [$queue append! $i];
+    };
     $count ++;
 
     return t;
@@ -79,6 +83,7 @@ Stream method gets () {
     };
     
     $count --;
+    if {$count = 0} then: {unsets shortcut};
     $queue >>;
 };
 
