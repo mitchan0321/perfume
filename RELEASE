@@ -1,3 +1,4 @@
+2015/10/23	PRFM_20151023		0.8.0_PRE_2
 2015/10/22	PRFM_20151022		0.8.0_PRE_1
 2015/10/01	PRFM_20151001		0.7.2
 2015/09/25	PRFM_20150925		0.7.1
@@ -655,5 +656,18 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 		Add co-routine exception handl.
 	methods.c
 		Delete file finalizer.
+
+2015/10/23:
+	Makefile
+		Delete HAS_GCACHE flag for bug fix.
+	lib/Stream.prfm
+		Process optimize Stream::puts by list operation.
+		Fix Compatibility File class.
+	lib/*
+		pipe command depending.
+	cstack.c
+		Initialize stack head 4096 bytes only at allocate stack.
+	setup.prfm, methods.c, commands.c
+		Change File I/O newline meaning.
 
 #eof
