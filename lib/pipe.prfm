@@ -25,7 +25,9 @@ defun pipe (in: in out: out args: blocks) {
 		in := `File($in mode: i);
 		$flist append! $in;
 	    }
-	    * {throw ErrPipeSyntax $syntax};
+	    * {throw ErrPipeSyntax $syntax}
+	;
+	 
 	d ::= dict [$in stat];
         n := $d,path;
 	if [nil? $n] then: {n := "-"};
@@ -54,7 +56,9 @@ defun pipe (in: in out: out args: blocks) {
 		out := `File($out mode: o);
 		$flist append! $out;
 	    }
-	    * {throw ErrPipeSyntax $syntax};
+	    * {throw ErrPipeSyntax $syntax}
+	;
+	
 	d ::= dict [$out stat];
         n := $d,path;
 	if [nil? $n] then: {n := "-"};
