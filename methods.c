@@ -2939,6 +2939,7 @@ error2:
 typedef struct _toy_file {
     FILE *fd;
     int mode;
+    int newline;
     Toy_Type *path;
 } Toy_File;
 
@@ -3031,12 +3032,16 @@ mth_file_open(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 	pmode = cell_get_addr(mode->u.symbol.cell);
 	if (strcmp(pmode, "i") == 0) {
 	    f->mode = FMODE_INPUT;
+	    f->newline = 0;
 	} else if (strcmp(pmode, "o") == 0) {
 	    f->mode = FMODE_OUTPUT;
+	    f->newline = 1;
 	} else if (strcmp(pmode, "a") == 0) {
 	    f->mode = FMODE_APPEND;
+	    f->newline = 1;
 	} else if (strcmp(pmode, "io") == 0) {
 	    f->mode = FMODE_INOUT;
+	    f->newline = 1;
 	} else goto error;
     }
 
@@ -3122,6 +3127,10 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     if (NULL == container) goto error2;
     f = container->u.container;
 
+    if (0 == f->newline) {
+	flag_nonewline = 1;
+    }
+
     if (NULL == f->fd) {
 	return new_exception(TE_FILEACCESS, "File not open.", interp);
     }
@@ -3162,7 +3171,6 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 	}
     }
 
-
 error:
     return new_exception(TE_SYNTAX, "Syntax error at 'gets', syntax: File gets [:nonewline] [:nocontrol]", interp);
 error2:
@@ -3175,14 +3183,25 @@ mth_file_puts(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     Toy_File *f;
     Toy_Type *container;
     int c;
+    int flag_nonewline = 0;
 
     if (arglen == 0) goto error;
+
+    if (hash_get_and_unset_t(nameargs, const_nonewline)) {
+	flag_nonewline = 1;
+    }
     if (hash_get_length(nameargs) > 0) goto error;
 
     self = SELF_HASH(interp);
     container = hash_get_t(self, const_Holder);
     if (NULL == container) goto error2;
     f = container->u.container;
+
+    if ((f->newline == 1) && (flag_nonewline == 0)) {
+	flag_nonewline = 0;
+    } else {
+	flag_nonewline = 1;
+    }
 
     if (NULL == f->fd) {
 	return new_exception(TE_FILEACCESS, "File not open.", interp);
@@ -3196,6 +3215,11 @@ mth_file_puts(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 
 	p = to_string_call(interp, list_get_item(posargs));
 	c = fputs(p, f->fd);
+	if (flag_nonewline == 0) {
+	    c = fputs("\n", f->fd);
+	}
+	fflush(f->fd);
+
 	if (EOF == c) {
 	    return new_exception(TE_FILEACCESS, strerror(errno), interp);
 	}
@@ -3206,7 +3230,7 @@ mth_file_puts(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     return const_T;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'puts', syntax: File puts val ...", interp);
+    return new_exception(TE_SYNTAX, "Syntax error at 'puts', syntax: File puts [:nonewline] val ...", interp);
 error2:
     return new_exception(TE_TYPE, "Type error.", interp);
 }
@@ -3238,6 +3262,35 @@ mth_file_flush(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
 
 error:
     return new_exception(TE_SYNTAX, "Syntax error at 'flush', syntax: File flush", interp);
+error2:
+    return new_exception(TE_TYPE, "Type error.", interp);
+}
+
+Toy_Type*
+mth_file_setnewline(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Hash *self;
+    Toy_File *f;
+    Toy_Type *container, *flag;
+
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    self = SELF_HASH(interp);
+    container = hash_get_t(self, const_Holder);
+    if (NULL == container) goto error2;
+    f = container->u.container;
+
+    flag = list_get_item(posargs);
+    if (GET_TAG(flag) == NIL) {
+	f->newline = 0;
+	return const_Nil;
+    } else {
+	f->newline = 1;
+	return const_T;
+    }
+	
+error:
+    return new_exception(TE_SYNTAX, "Syntax error at 'set-newline', syntax: File set-newline [t | nil]", interp);
 error2:
     return new_exception(TE_TYPE, "Type error.", interp);
 }
@@ -3278,7 +3331,7 @@ mth_file_stat(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 	mode = const_Nil;
     }
     list_append(l, new_cons(new_symbol("mode"), mode));
-    list_append(l, new_cons(new_symbol("path"), f->path?f->path:const_Nil));
+    list_append(l, new_cons(new_symbol("path"), f->path ? f->path : const_Nil));
     if (f->fd) {
 	if (feof(f->fd)) {
 	    list_append(l, new_cons(new_symbol("eof"), const_T));
@@ -3288,6 +3341,7 @@ mth_file_stat(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     } else {
 	list_append(l, new_cons(new_symbol("eof"), const_Nil));
     }
+    list_append(l, new_cons(new_symbol("newline"), f->newline ? const_T : const_Nil));
 
     return l;
 
@@ -4094,6 +4148,7 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, "File", "puts", mth_file_puts, NULL);
     toy_add_method(interp, "File", "flush", mth_file_flush, NULL);
     toy_add_method(interp, "File", "stat", mth_file_stat, NULL);
+    toy_add_method(interp, "File", "set-newline", mth_file_setnewline, NULL);
     toy_add_method(interp, "File", "eof?", mth_file_iseof, NULL);
     toy_add_method(interp, "File", "set!", mth_file_set, NULL);
     toy_add_method(interp, "File", "ready?", mth_file_isready, NULL);

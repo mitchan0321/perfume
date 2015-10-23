@@ -856,6 +856,7 @@ cmd_print(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     }
 
     l = list_append(l, const_puts);
+    l = list_append(l, new_symbol(":nonewline"));
     l = list_append(l, new_string_cell(s));
 
     result = toy_call(interp, body);
@@ -866,21 +867,20 @@ cmd_print(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 
 error:
     return new_exception(TE_SYNTAX,
-			 "Syntax error at \'print/println\', syntax: print/println [file: file-object] item ...",
+			 "Syntax error at \'print\', syntax: print [file: file-object] item ...",
 			 interp);
 }
 
 Toy_Type*
 cmd_println(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
-    Toy_Type *result;
     Toy_Type *l, *body;
-    Toy_Type *file;
+    Cell *s;
+    Toy_Type *file, *result;
 
-    file = hash_get_t(nameargs, const_filec);
-    list_append(posargs, new_string_str("\n"));
-    arglen++;
-    result = cmd_print(interp, posargs, nameargs, arglen);
-    if (GET_TAG(result) == EXCEPTION) return result;
+    if (hash_get_length(nameargs) > 1) goto error;
+
+    file = hash_get_and_unset_t(nameargs, const_filec);
+    if (hash_get_length(nameargs) > 0) goto error;
 
     if (NULL == file) {
 	file = toy_resolv_var(interp, const_atout, 0);
@@ -892,13 +892,28 @@ cmd_println(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	    }
 	}
     }
-
-    l = body = new_list(file);
-    l = list_append(l, new_symbol("flush"));
-
-    toy_call(interp, body);
     
-    return result;
+    l = body = new_list(file);
+
+    s = new_cell("");
+    while (! IS_LIST_NULL(posargs)) {
+	cell_add_str(s, to_string_call(interp, list_get_item(posargs)));
+	posargs = list_next(posargs);
+    }
+
+    l = list_append(l, const_puts);
+    l = list_append(l, new_string_cell(s));
+
+    result = toy_call(interp, body);
+
+    if (GET_TAG(result) == EXCEPTION) return result;
+
+    return const_Nil;
+
+error:
+    return new_exception(TE_SYNTAX,
+			 "Syntax error at \'println\', syntax: println [file: file-object] item ...",
+			 interp);
 }
 
 Toy_Type*
