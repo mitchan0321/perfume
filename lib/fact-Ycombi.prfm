@@ -3,16 +3,15 @@
 # factorical calc with Y combinatore.
 # [Y [fun (f) {fun (x) {if {$x <= 1} then: {return 1}; $x * [$f [$x - 1]]}}]] X
 
-print file: $stdout "input feb number => ";
-$stdout flush;
-read x :nonewline;
-println [
-    [Y [
-	fun (f) {
-	    fun (x) {
-	        if {$x <= 1} then: {return 1};
-		$x * [$f [$x - 1]];
+defun fact-Ycombi (x) {
+    println [
+        [Y [
+	    fun (f) {
+	        fun (x) {
+	            if {$x <= 1} then: {return 1};
+		    $x * [$f [$x - 1]];
+	        }
 	    }
-	}
-    ]] [$x int];
-];
+        ]] $x;
+    ];
+};

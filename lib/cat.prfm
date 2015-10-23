@@ -1,10 +1,7 @@
 # $Id:$
 
 defun cat () {
-    try {
-	$stdin each do: {| r |
-	    print $r;
-	};
-	$stdout flush;
+    $stdin each do: {| r |
+        println $r;
     };
 };

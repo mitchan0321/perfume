@@ -7,9 +7,11 @@ defun class-tree (class indent: ind) {
     if {set? ind} else: {set ind 0};
 
     # print indent
-    if {$ind > 0} then: {1 each to: $ind do: {print "  "}};
+    s := "";
+    if {$ind > 0} then: {1 each to: $ind do: {$s append! "  "}};
 
-    println $class;
+    $s append! $class;
+    println $s;
     if {"Object" = $class} then: {return;};
 
     [$class delegate?] each do: {| i |

@@ -2,14 +2,11 @@
 # grep
 
 defun grep (pat) {
-    try {
-	set n 1;
-	$stdin each do: {| r |
-	    if {$r =~ $pat} then: {
-		print $INFILE ":" $n ": " $r;
-	    };
-	    $n ++;
+    set n 1;
+    $stdin each do: {| r |
+        if {$r =~ $pat} then: {
+	    println $INFILE ":" $n ": " $r;
 	};
+	$n ++;
     };
-    println;
 };
