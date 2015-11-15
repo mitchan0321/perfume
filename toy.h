@@ -16,9 +16,9 @@
 
 Toy_Type *toy_eval_script(Toy_Interp* interp, Toy_Type *script);
 Toy_Type *toy_eval(Toy_Interp* interp, Toy_Type *statement, Toy_Env** env);
-Toy_Type *toy_expand(Toy_Interp* interp, Toy_Type* obj, Toy_Env** env);
-Toy_Type *toy_expand_list(Toy_Interp* interp, Toy_Type* list, Toy_Env** env);
-Toy_Type *toy_resolv_var(Toy_Interp* interp, Toy_Type* var, int stack_trace);
+Toy_Type *toy_expand(Toy_Interp* interp, Toy_Type* obj, Toy_Env** env, Toy_Func_Trace_Info *trace_info);
+Toy_Type *toy_expand_list(Toy_Interp* interp, Toy_Type* list, Toy_Env** env, Toy_Func_Trace_Info *trace_info);
+Toy_Type *toy_resolv_var(Toy_Interp* interp, Toy_Type* var, int stack_trace, Toy_Func_Trace_Info *trace_info);
 Toy_Type *set_closure_var(Toy_Interp *interp, Toy_Type *var, Toy_Type *val);
 Toy_Type *toy_resolv_function(Toy_Interp* interp, Toy_Type* obj);
 Toy_Type *toy_resolv_object(Toy_Interp* interp, Toy_Type* obj);
@@ -26,7 +26,7 @@ Toy_Type *toy_apply_func(Toy_Interp* interp, Toy_Type* func, Toy_Type* posargs, 
 Toy_Type *toy_call_function(Toy_Interp* interp, Toy_Type *script,
 		  Toy_Type *posargs, Hash *nameargs, Toy_Type *argspec_list, int arglen);
 Toy_Type *toy_resolv_object(Toy_Interp *interp, Toy_Type *object);
-Toy_Type *eval_closure(Toy_Interp *interp, Toy_Type *closure);
+Toy_Type *eval_closure(Toy_Interp *interp, Toy_Type *closure, Toy_Func_Trace_Info *trace_info);
 Toy_Type *toy_call_init(Toy_Interp *interp, Toy_Type *object, Toy_Type *args);
 Toy_Type *toy_call(Toy_Interp *interp, Toy_Type *list);
 Toy_Type *toy_yield(Toy_Interp *interp, Toy_Type *closure, Toy_Type *args);
