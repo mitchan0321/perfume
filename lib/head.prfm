@@ -3,9 +3,9 @@
 # like the UNIX head command.
 
 defun head (n) {
-    1 each to: $n do: {
-        if {read a}
-        then: {println $a}
-        else: {break};
+    0 each to: [$n - 1] do: {
+	read a;
+	if [nil? $a] then: {break};
+	println $a;
     };
 };
