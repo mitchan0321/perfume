@@ -17,6 +17,7 @@ Pipe method init (in out body) {
     sets INFILE "";
     sets OUTFILE "";
     sets error "";
+    sets CO-MODE t;
 };
 
 Pipe method stat? () {
