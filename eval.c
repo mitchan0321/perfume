@@ -12,7 +12,8 @@
 #include "cstack.h"
 
 static Toy_Type* bind_args(Toy_Interp*, Toy_Type* arglist, struct _toy_argspec* argspec,
-			   Toy_Env**, Hash* args, int fun_paramno, int call_paramno);
+			   Toy_Env**, Hash* args, int fun_paramno, int call_paramno, 
+			   Toy_Func_Trace_Info *trace_info);
 static Toy_Type* eval_sig_handl(Toy_Interp *interp, int code);
 static Toy_Type* toy_yield_bind(Toy_Interp *interp, Toy_Type *bind_var);
 
@@ -84,16 +85,15 @@ toy_eval_script(Toy_Interp* interp, Toy_Type *script) {
 		    body = new_list(const_unknown);
 		    list_set_cdr(body, list_get_item(l)->u.statement.item_list);
 
-		    result = toy_eval(interp,
-				      new_statement(body, interp->trace_info->line),
-				      &env);
+		    result = toy_call(interp, body);
 		    interp->last_status = result;
 		}
-	    }
 
-	    interp->script_id = script_id;
-	    if (CStack_in_baria) cstack_return();
-	    return result;
+	    } else {
+		interp->script_id = script_id;	    
+		if (CStack_in_baria) cstack_return();
+		return result;
+	    }
 	}
 
 	l = list_next(l);
@@ -118,7 +118,8 @@ toy_eval(Toy_Interp* interp, Toy_Type *statement, Toy_Env** env) {
     Hash *local_var;
     int script_id;
     int paramno_hint;
-
+    Toy_Func_Trace_Info *trace_info;
+    
     local_var = NULL;
 
 control_goto:
@@ -131,8 +132,13 @@ control_goto:
 
     l = statement->u.statement.item_list;
 
-    interp->trace_info = statement->u.statement.trace_info;
-    interp->trace_info->statement = statement;
+    trace_info = GC_MALLOC(sizeof(Toy_Func_Trace_Info));
+    ALLOC_SAFE(trace_info);
+    trace_info->line = statement->u.statement.trace_info->line;
+    trace_info->func_name = list_get_item(l);
+    trace_info->object_name = const_Nil;
+    trace_info->statement = statement;
+
     paramno_hint = GET_PARAMNO(statement);
 
     if (interp->trace) {
@@ -143,7 +149,7 @@ control_goto:
 	ALLOC_SAFE(buff);
 	snprintf(buff, 512, "%s:%d: %s\n",
 		 get_script_path(interp, interp->script_id),
-		 interp->trace_info->line,
+		 trace_info->line,
 		 to_string(statement));
 	buff[511] = 0;
 	sts = write(interp->trace_fd, buff, strlen(buff));
@@ -156,18 +162,18 @@ control_goto:
 
     first_org = first = list_get_item(l);
     if (GET_TAG(first) == REF) {
-	first = toy_resolv_var(interp, first, 1);
+	first = toy_resolv_var(interp, first, 1, trace_info);
 	if (GET_TAG(first) == EXCEPTION) {
 	    ret = first;
 	    goto exit_eval;
 	}
     } else if (GET_TAG(first) == LIST) {
-	first = toy_expand(interp, first, env);
+	first = toy_expand(interp, first, env, trace_info);
     }
     self = first;
 
     if (GET_TAG(first) != SYMBOL && GET_TAG(first) != LIST) {
-	first = toy_expand(interp, first, env);
+	first = toy_expand(interp, first, env, trace_info);
 	if (GET_TAG(first) == EXCEPTION) {
 	    ret = first;
 	    goto exit_eval;
@@ -181,7 +187,7 @@ control_goto:
 
     switch (GET_TAG(first)) {
     case SYMBOL:
-	interp->trace_info->func_name = first;
+	trace_info->func_name = first;
 	tfirst = toy_resolv_function(interp, first);
 
 	if (NULL == tfirst) {
@@ -218,7 +224,7 @@ control_goto:
 	    goto exit_eval;
 	}
 	if (GET_TAG(method) != SYMBOL) {
-	    method = toy_expand(interp, method, env);
+	    method = toy_expand(interp, method, env, trace_info);
 	    if (GET_TAG(method) == EXCEPTION) {
 		ret = first;
 		goto exit_eval;
@@ -231,14 +237,14 @@ control_goto:
 	    ret = new_exception(TE_BADMETHOD, cell_get_addr(msg), interp);
 	    goto exit_eval;
 	}
-	interp->trace_info->func_name = method;
+	trace_info->func_name = method;
 	method = search_method(interp, first, method);
 	if (GET_TAG(method) == EXCEPTION) {
 	    ret = method;
 	    goto exit_eval;
 	}
 	obj_env = toy_new_obj_env(interp, first, self);
-	interp->trace_info->object_name = first;
+	trace_info->object_name = first;
 	first = method;
 
 	if (paramno_hint != TAG_MAX_PARAMNO) {
@@ -246,6 +252,42 @@ control_goto:
 	}
     }
 
+    if (interp->debug && (! interp->debug_in)) {
+	Toy_Type *cmd;
+
+	interp->debug_in = 1;
+
+	cmd = new_list(const_debug_hook);
+
+	list_append(cmd, new_integer_si(trace_info->line));
+
+	if (trace_info->object_name) {
+	    list_append(cmd, trace_info->object_name);
+	} else {
+	    list_append(cmd, const_Nil);
+	}
+	
+	if (trace_info->func_name) {
+	    list_append(cmd, trace_info->func_name);
+	} else {
+	    list_append(cmd, const_Nil);
+	}
+
+	if (trace_info->statement) {
+	    list_append(cmd, trace_info->statement);
+	} else {
+	    list_append(cmd, const_Nil);
+	}
+	list_append(cmd, new_string_str((get_script_path(interp, interp->script_id))));
+	list_append(cmd, new_dict(interp->func_stack[interp->cur_func_stack]->localvar));
+	list_append(cmd, new_integer_si(interp->cur_func_stack + 1));
+	list_append(cmd, interp->func_stack[interp->cur_func_stack]->trace_info->func_name);
+
+	toy_eval_script(interp, new_script(new_list(new_statement(cmd, trace_info->line))));
+	
+	interp->debug_in = 0;
+    }
+    
     switch (GET_TAG(first)) {
     case NATIVE:
 	l = list_next(l);
@@ -270,7 +312,7 @@ control_goto:
 			ret = new_exception(TE_NONAMEARG, cell_get_addr(msg), interp);
 			goto exit_eval;
 		    }
-		    arg = toy_expand(interp, list_get_item(l), env);
+		    arg = toy_expand(interp, list_get_item(l), env, trace_info);
 		    if (GET_TAG(arg) == EXCEPTION) {
 			ret = arg;
 			goto exit_eval;
@@ -281,7 +323,7 @@ control_goto:
 		    arglen++;
 		}
 	    } else {
-		arg = toy_expand(interp, arg, env);
+		arg = toy_expand(interp, arg, env, trace_info);
 		if (GET_TAG(arg) == EXCEPTION) {
 		    ret = arg;
 		    goto exit_eval;
@@ -299,7 +341,15 @@ control_goto:
 	    }
 	    ostack_use = 1;
 	}
-	ret = (first->u.native.cfunc)(interp, posargsl, namedargs, arglen);
+
+	/* for save trace_info for command functions */
+	{
+	    Toy_Func_Trace_Info *orig_trace_info;
+	    orig_trace_info = interp->trace_info;
+	    interp->trace_info = trace_info;
+	    ret = (first->u.native.cfunc)(interp, posargsl, namedargs, arglen);
+	    interp->trace_info = orig_trace_info;
+	}
 	goto exit_eval;
 
     case FUNC:
@@ -308,7 +358,7 @@ control_goto:
 	}
 
 	ret = bind_args(interp, list_next(l), first->u.func.argspec, env, local_var,
-			   GET_PARAMNO(first), paramno_hint);
+			GET_PARAMNO(first), paramno_hint, trace_info);
 	if (GET_TAG(ret) == EXCEPTION) {
 	    goto exit_eval;
 	}
@@ -324,7 +374,7 @@ control_goto:
 	script_id = interp->script_id;
 	interp->script_id = GET_SCRIPT_ID(first->u.func.closure->u.closure.block_body);
 	if (0 == toy_push_func_env(interp, local_var,
-				   first->u.func.closure->u.closure.env->func_env, NULL)) {
+				   first->u.func.closure->u.closure.env->func_env, NULL, trace_info)) {
 
 	    ret = new_exception(TE_STACKOVERFLOW, "Function satck overflow.", interp);
 	    goto exit_eval;
@@ -360,7 +410,7 @@ exit_eval:
 	    local_var = list_get_item(ctrl_ret)->u.dict;
 
 	    ctrl_ret = list_next(ctrl_ret);
-	    statement = new_statement(list_get_item(ctrl_ret), interp->trace_info->line);
+	    statement = new_statement(list_get_item(ctrl_ret), trace_info->line);
 
 	    goto control_goto;
 	}
@@ -378,14 +428,14 @@ exit_eval:
 }
 
 Toy_Type*
-toy_expand(Toy_Interp* interp, Toy_Type* obj, Toy_Env** env) {
+toy_expand(Toy_Interp* interp, Toy_Type* obj, Toy_Env** env, Toy_Func_Trace_Info *trace_info) {
 
     switch (GET_TAG(obj)) {
     case REF:
-	return toy_resolv_var(interp, obj, 1);
+	return toy_resolv_var(interp, obj, 1, trace_info);
 
     case LIST:
-	return toy_expand_list(interp, obj, env);
+	return toy_expand_list(interp, obj, env, trace_info);
 
     case BLOCK:
 	if (*env == NULL) {
@@ -404,7 +454,7 @@ toy_expand(Toy_Interp* interp, Toy_Type* obj, Toy_Env** env) {
 	st = list_append(st, const_Get);
 	st = list_append(st, obj->u.getmacro.para);
 
-	result = toy_eval(interp, new_statement(stl, interp->trace_info->line), env);
+	result = toy_eval(interp, new_statement(stl, trace_info->line), env);
 	return result;
     }
 
@@ -417,7 +467,7 @@ toy_expand(Toy_Interp* interp, Toy_Type* obj, Toy_Env** env) {
 	st = list_append(st, const_init);
 	st = list_append(st, new_list(obj->u.initmacro.param));
 
-	result = toy_eval(interp, new_statement(stl, interp->trace_info->line), env);
+	result = toy_eval(interp, new_statement(stl, trace_info->line), env);
 	return result;
     }
 
@@ -427,7 +477,7 @@ toy_expand(Toy_Interp* interp, Toy_Type* obj, Toy_Env** env) {
 }
 
 Toy_Type*
-toy_expand_list(Toy_Interp* interp, Toy_Type* list, Toy_Env** env) {
+toy_expand_list(Toy_Interp* interp, Toy_Type* list, Toy_Env** env, Toy_Func_Trace_Info *trace_info) {
     Toy_Type *nlist, *l, *sl;
     Toy_Type *a;
 
@@ -440,13 +490,13 @@ toy_expand_list(Toy_Interp* interp, Toy_Type* list, Toy_Env** env) {
 	    if (GET_TAG(sl) == SYMBOL) {
 		a = sl;
 	    } else {
-		a = toy_expand(interp, sl, env);
+		a = toy_expand(interp, sl, env, trace_info);
 	    }
 	    list_set_cdr(nlist, a);
 	    break;
 	}
 
-	a = toy_expand(interp, list_get_item(sl), env);
+	a = toy_expand(interp, list_get_item(sl), env, trace_info);
 	if (GET_TAG(a) == EXCEPTION) return a;
 
 	nlist = list_append(nlist, a);
@@ -476,7 +526,7 @@ toy_resolv_function(Toy_Interp* interp, Toy_Type* obj) {
 }
 
 Toy_Type*
-toy_resolv_var(Toy_Interp* interp, Toy_Type* var, int stack_trace) {
+toy_resolv_var(Toy_Interp* interp, Toy_Type* var, int stack_trace, Toy_Func_Trace_Info *trace_info) {
     Hash *h;
     Toy_Type *val;
     Cell *c;
@@ -486,7 +536,7 @@ toy_resolv_var(Toy_Interp* interp, Toy_Type* var, int stack_trace) {
     val = hash_get_t(h, var);
     if (NULL != val) {
 	if (IS_LAZY(val) && (GET_TAG(val) == CLOSURE)) {
-	    val = eval_closure(interp, val);
+	    val = eval_closure(interp, val, trace_info);
 	    hash_set_t(h, var, val);
 	}
 	return val;
@@ -499,7 +549,7 @@ toy_resolv_var(Toy_Interp* interp, Toy_Type* var, int stack_trace) {
 	    val = hash_get_t(h, var);
 	    if (NULL != val) {
 		if (IS_LAZY(val) && (GET_TAG(val) == CLOSURE)) {
-		    val = eval_closure(interp, val);
+		    val = eval_closure(interp, val, trace_info);
 		    hash_set_t(h, var, val);
 		}
 		return val;
@@ -512,7 +562,7 @@ toy_resolv_var(Toy_Interp* interp, Toy_Type* var, int stack_trace) {
     val = hash_get_t(h, var);
     if (NULL != val) {
 	if (IS_LAZY(val) && (GET_TAG(val) == CLOSURE)) {
-	    val = eval_closure(interp, val);
+	    val = eval_closure(interp, val, trace_info);
 	    hash_set_t(h, var, val);
 	}
 	return val;
@@ -522,7 +572,7 @@ toy_resolv_var(Toy_Interp* interp, Toy_Type* var, int stack_trace) {
     val = hash_get_t(h, var);
     if (NULL != val) {
 	if (IS_LAZY(val) && (GET_TAG(val) == CLOSURE)) {
-	    val = eval_closure(interp, val);
+	    val = eval_closure(interp, val, trace_info);
 	    hash_set_t(h, var, val);
 	}
 	return val;
@@ -715,7 +765,7 @@ error:
 	    if (GET_TAG(val) == EXCEPTION) {return val;}		\
 	    SET_LAZY(val);						\
 	} else {							\
-	    val = toy_expand(interp, val, env);				\
+	    val = toy_expand(interp, val, env, trace_info);		\
 	    if (GET_TAG(val) == EXCEPTION) {return val;}		\
 	    if (IS_LAZY(var)) {SET_LAZY(val);}				\
 	}								\
@@ -725,7 +775,7 @@ error:
 
 static Toy_Type*
 bind_args(Toy_Interp *interp, Toy_Type *arglist, struct _toy_argspec *aspec,
-	  Toy_Env **env, Hash *args, int fun_paramno, int call_paramno) {
+	  Toy_Env **env, Hash *args, int fun_paramno, int call_paramno, Toy_Func_Trace_Info *trace_info) {
 
     int argpos, i;
     Toy_Type *l, *val, *var;
@@ -775,7 +825,7 @@ bind_args(Toy_Interp *interp, Toy_Type *arglist, struct _toy_argspec *aspec,
 	    if (NULL == l) goto error4;
 
 	    val = list_get_item(l);
-	    val = toy_expand(interp, val, env);
+	    val = toy_expand(interp, val, env, trace_info);
 	    if (GET_TAG(val) == EXCEPTION) return val;
 	    if (IS_LAZY(var)) {
 		SET_LAZY(val);
@@ -798,7 +848,7 @@ bind_args(Toy_Interp *interp, Toy_Type *arglist, struct _toy_argspec *aspec,
 
 	    var = array_get(aspec->posarg_array, argpos);
 
-	    val = toy_expand(interp, val, env);
+	    val = toy_expand(interp, val, env, trace_info);
 	    if (GET_TAG(val) == EXCEPTION) return val;
 	    if (var && IS_LAZY(var)) {
 		SET_LAZY(val);
@@ -813,7 +863,7 @@ bind_args(Toy_Interp *interp, Toy_Type *arglist, struct _toy_argspec *aspec,
 		    hash_set_t(args, var, new_list(NULL));
 		} else {
 		    
-		    val = toy_expand(interp, l, env);
+		    val = toy_expand(interp, l, env, trace_info);
 		    if (GET_TAG(val) == EXCEPTION) return val;
 
 		    hash_set_t(args, var, val);
@@ -866,7 +916,7 @@ error4:
 }
 
 Toy_Type*
-eval_closure(Toy_Interp *interp, Toy_Type *closure) {
+eval_closure(Toy_Interp *interp, Toy_Type *closure, Toy_Func_Trace_Info *trace_info) {
     Toy_Env *env;
     Cell *c;
     Toy_Type *result;
@@ -889,7 +939,7 @@ eval_closure(Toy_Interp *interp, Toy_Type *closure) {
 	obj_flag = 1;
     }
     if (interp->func_stack[interp->cur_func_stack]->localvar != env->func_env->localvar) {
-	if (0 == toy_push_func_env(interp, env->func_env->localvar, env->func_env, env->tobe_bind_val)) {
+	if (0 == toy_push_func_env(interp, env->func_env->localvar, env->func_env, env->tobe_bind_val, trace_info)) {
 	    result = new_exception(TE_STACKOVERFLOW, "Function satck overflow.", interp);
 	    goto error_exit;
 	}
@@ -942,7 +992,7 @@ toy_call_init(Toy_Interp *interp, Toy_Type *object, Toy_Type *args) {
 	
 	    local_var = new_hash();
 	    r = bind_args(interp, posargs, method->u.func.argspec, &env, local_var,
-			  TAG_MAX_PARAMNO, TAG_MAX_PARAMNO);
+			  TAG_MAX_PARAMNO, TAG_MAX_PARAMNO, interp->trace_info);
 	    if (GET_TAG(r) == EXCEPTION) return r;
 
 	    if (0 == toy_push_obj_env(interp, obj_env)) {
@@ -950,7 +1000,7 @@ toy_call_init(Toy_Interp *interp, Toy_Type *object, Toy_Type *args) {
 		break;
 	    }
 	    if (0 == toy_push_func_env(interp, local_var,
-				       method->u.func.closure->u.closure.env->func_env, NULL)) {
+				       method->u.func.closure->u.closure.env->func_env, NULL, interp->trace_info)) {
 		toy_pop_obj_env(interp);
 		result = new_exception(TE_STACKOVERFLOW, "Function satck overflow.", interp);
 		break;
@@ -964,7 +1014,7 @@ toy_call_init(Toy_Interp *interp, Toy_Type *object, Toy_Type *args) {
 
     return result;
 }
-
+/*
 Toy_Type*
 toy_call(Toy_Interp *interp, Toy_Type *list) {
     Toy_Env *env;
@@ -972,7 +1022,22 @@ toy_call(Toy_Interp *interp, Toy_Type *list) {
 
     env = new_closure_env(interp);
 
-    result = toy_eval(interp, new_statement(list, interp->trace_info->line), &env);
+    result = toy_eval(interp, new_statement(list,
+					    interp->func_stack[interp->cur_func_stack]->trace_info->line),
+		      &env);
+    return result;
+}
+*/
+
+Toy_Type*
+toy_call(Toy_Interp *interp, Toy_Type *list) {
+    Toy_Type *result;
+
+    result = toy_eval_script(interp, 
+			     new_script(new_list(new_statement(list, 
+							       interp->trace_info ? 
+							         interp->trace_info->line
+							       : 0))));
     return result;
 }
 
@@ -1025,7 +1090,7 @@ eval_sig_handl(Toy_Interp *interp, int code) {
     block = hash_get_t(hash, sig);
     if (NULL == block) return NULL;
 
-    return eval_closure(interp, block);
+    return eval_closure(interp, block, NULL);
 }
 
 char*
@@ -1043,7 +1108,9 @@ to_string_call(Toy_Interp *interp, Toy_Type *obj) {
     l = list = new_list(obj);
     l = list_append(l, const_string);
 
-    result = toy_eval(interp, new_statement(list, interp->trace_info->line), &env);
+    result = toy_eval(interp, new_statement(list,
+					    interp->func_stack[interp->cur_func_stack]->trace_info->line),
+		      &env);
     if (GET_TAG(result) != STRING) return to_string(obj);
 
     return cell_get_addr(result->u.string);
@@ -1085,6 +1152,8 @@ error:
 
 Toy_Type*
 toy_yield(Toy_Interp *interp, Toy_Type *closure, Toy_Type *args) {
+    /* this utility function used only command functions */
+    
     Toy_Env *env;
     Cell *c;
 
@@ -1098,5 +1167,5 @@ toy_yield(Toy_Interp *interp, Toy_Type *closure, Toy_Type *args) {
     env = closure->u.closure.env;
     env->tobe_bind_val = args;
 
-    return eval_closure(interp, closure);
+    return eval_closure(interp, closure, interp->trace_info);
 }
