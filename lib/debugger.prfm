@@ -1,0 +1,409 @@
+# perfume interpriter debugger command suite.
+
+if {defvar? @BREAKPOINT} else: {defvar @BREAKPOINT [dict]};
+if {defvar? @BREAKINFO}  else: {defvar @BREAKINFO  [dict]};
+if {defvar? @DEBUGOUT}   else: {defvar @DEBUGOUT   $stderr};
+if {defvar? @DEBUGIN}    else: {defvar @DEBUGIN    $stdin};
+if {defvar? @DEBUGSTEP}  else: {defvar @DEBUGSTEP  nil};
+if {defvar? @DEBUGNAME}  else: {defvar @DEBUGNAME  nil};
+if {defvar? @DEBUGSTACK} else: {defvar @DEBUGSTACK [vector]};
+if {defvar? @DEBUGNEXTP} else: {defvar @DEBUGNEXTP nil};
+if {defvar? @DEBUGNEXTL} else: {defvar @DEBUGNEXTL -1};
+if {defvar? @DEBUGNEXTS} else: {defvar @DEBUGNEXTS -1};
+if {defvar? @DEBUGTRAP}  else: {defvar @DEBUGTRAP  nil};
+
+defun debugger (off: off) {
+    if {set? off} then: {
+	debug 0;
+	if {block? $@DEBUGTRAP}
+            then: {trap SIGINT $@DEBUGTRAP; setvar @DEBUGTRAP nil}
+	;
+    } else: {
+	debug 1;
+	println file: $stderr "Debugger turned on, help for enter \".h\".";
+	if {nil? $@DEBUGTRAP}
+	    then: {setvar @DEBUGTRAP [trap SIGINT];  trap SIGINT {setvar @DEBUGSTEP t}}
+	;
+    };
+
+    debug;
+};
+
+defun .h () {
+    println file: $@DEBUGOUT "[Debugger on/off]";
+    println file: $@DEBUGOUT "  debugger         - Turn on debugger.";
+    println file: $@DEBUGOUT "  debugger :off    - Turn off debugger.";    
+    println file: $@DEBUGOUT "[List]";
+    println file: $@DEBUGOUT "  .ls <name>       - List <name> module. <name> is the function or class name.";
+    println file: $@DEBUGOUT "                     This command sets a current module.";
+    println file: $@DEBUGOUT "  .ls              - List the current module.";
+    println file: $@DEBUGOUT "  .l               - List the current module and program counter.";
+    println file: $@DEBUGOUT "[Breakpoint]";
+    println file: $@DEBUGOUT "  .b <name> <line> - Set break point in <name> module at <line>.";
+    println file: $@DEBUGOUT "  .b <line>        - Set break point in current module at <line>.";
+    println file: $@DEBUGOUT "  .c <name> <line> - Clear break point in <name> module at <line>.";
+    println file: $@DEBUGOUT "  .c <line>        - Clear break point in current module at <line>.";
+    println file: $@DEBUGOUT "  .ca              - Clear all break points.";
+    println file: $@DEBUGOUT "  .bl              - List break points.";
+    println file: $@DEBUGOUT "[Stack]";
+    println file: $@DEBUGOUT "  .u               - Up stack and list module.";
+    println file: $@DEBUGOUT "  .d               - Down stack and list module.";
+    println file: $@DEBUGOUT "  .w               - List stack and current stack position.";
+    println file: $@DEBUGOUT "[Execution]";
+    println file: $@DEBUGOUT "  .n               - Stop at next line in current module.";
+    println file: $@DEBUGOUT "  (enter)          - Step execution and break.";
+    println file: $@DEBUGOUT "  (ctrl-d)         - Continue execution.";
+    println file: $@DEBUGOUT "  (ctrl-c)         - Enter debugger when program is running.";
+    println file: $@DEBUGOUT "[Variable]";
+    println file: $@DEBUGOUT "  .o               - Return current object, may be self.";
+    println file: $@DEBUGOUT "  .o <n>           - Return indexed <n> stack object.";
+    println file: $@DEBUGOUT "[Other]";
+    println file: $@DEBUGOUT "  - any -          - Execute any perfume commands.";
+    println file: $@DEBUGOUT "                     (e.g. \"info local\", \"$var ?\", \"set var val\" ...)";
+    println file: $@DEBUGOUT "  .h               - Help for debugger.";
+};
+
+defun .b (args: args) {
+    if {[$args len] = 1} then: {
+	if {nil? $@DEBUGNAME} then: {println file: $@DEBUGOUT "DEBUG: syntax: .b name line | line"; return};
+	set name $@DEBUGNAME;
+	set line $args,0;
+    } else: {
+	if {[$args len] = 2} then: {
+	    set name $args,0;
+	    set line $args,1;
+	} else: {
+	    println file: $@DEBUGOUT "DEBUG: syntax: .b name line | line";
+	    return;
+	};
+    };
+    
+    path ::= __debug-name-to-path $name;
+    $@BREAKPOINT set [__debug-make-key $path $line] t;
+};
+
+defun .c (args: args) {
+    if {[$args len] = 1} then: {
+	if {nil? $@DEBUGNAME} then: {println file: $@DEBUGOUT "DEBUG: syntax: .c name line | line"; return};
+	set name $@DEBUGNAME;
+	set line $args,0;
+    } else: {
+	if {[$args len] = 2} then: {
+	    set name $args,0;
+	    set line $args,1;
+	} else: {
+	    println file: $@DEBUGOUT "DEBUG: syntax: .c name line | line";
+	    return;
+	};
+    };
+    
+    path ::= __debug-name-to-path $name;
+    $@BREAKPOINT unset [__debug-make-key $path $line];
+};
+
+defun .ca () {
+    setvar @BREAKPOINT [dict];
+};
+
+defun .bl () {
+    x ::= $@BREAKPOINT keys : map {| i | "" . $i};
+    x ::= lsort $x;
+    $x each do: {| i | println file: $@DEBUGOUT $i};
+};
+
+defun .ls (args: args) {
+    if {[$args len] = 0} then: {
+	if {nil? $@DEBUGNAME} then: {println file: $@DEBUGOUT "DEBUG: syntax: .ls [name]"; return};
+	set name $@DEBUGNAME;
+    } else: {
+	if {[$args len] = 1} then: {
+	    set name $args,0;
+	} else: {
+	    println file: $@DEBUGOUT "DEBUG: syntax: .ls [name]";
+	    return;
+	};
+    };
+    
+    path ::= __debug-name-to-path $name;
+    x := `File($path mode: i);
+    $x set-newline nil;
+
+    i := 0;
+    $x each do: {| r |
+	$i ++;
+	if {$@BREAKPOINT set? [__debug-make-key $path $i]} then: {set b "@"} else: {set b " "};
+	println file: $@DEBUGOUT [" %1v%4d: %v" fmt $b $i $r];
+    };
+
+    $x close;
+    setvar @DEBUGNAME $name;
+};
+
+defun .l () {
+    path := $@BREAKINFO,path;
+    x := `File($path mode: i);
+    $x set-newline nil;
+
+    n := $@BREAKINFO,line;
+    f ::= $n - 8;
+    t ::= $n + 12;
+    i := 0;
+    $x each do: {| r |
+	$i ++;
+	if {$@BREAKPOINT set? [__debug-make-key $path $i]} then: {set b "@"} else: {set b " "};
+	if {$i = $n} then: {
+	    println file: $@DEBUGOUT [">%1v%4d: %v" fmt $b $i $r];
+	} else: {
+	    if {and [$i >= $f] [$i <= $t]} then: {
+		println file: $@DEBUGOUT [" %1v%4d: %v" fmt $b $i $r];
+	    };
+	};
+    };
+
+    $x close;
+    setvar @DEBUGNAME [
+	[$@BREAKINFO,path split sep: "/" : last : get 0] split sep: "." : get 0];
+};
+
+defun .w () {
+    [$@DEBUGSTACK list : reverse] each do: {| d |
+	index := $d,index;
+	line := $d,line;
+	object := $d,object;
+	function := $d,function;
+	statement := $d,statement;
+	local := $d,local;
+	path ::= $d,path split sep: "/" : last : item : split sep: "." : get 0;
+	
+	println file: $@DEBUGOUT ["%1v%3d#%3d %!-16v %!-18v %!-20v %!-14v" fmt
+				  [if [$index = $@BREAKINFO,stack] then: "*" else: " "]
+				  $index $line $function $object $statement $path];
+    };
+};
+
+defun .u () {
+    i := $@BREAKINFO,stack;
+    if {$i = 0} then: {println file: $@DEBUGOUT "DEBUG: Already stack top."; return};
+    $i --;
+    d ::= $@DEBUGSTACK get $i;
+    if {$i > 0} then: {d2 ::= $@DEBUGSTACK get [$i - 1]} else: {d2 := nil};
+    $@BREAKINFO set line      $d,line;
+    $@BREAKINFO set object    $d,object;
+    $@BREAKINFO set function  $d,function;
+    $@BREAKINFO set statement $d,statement;
+    $@BREAKINFO set path      $d,path;
+    $@BREAKINFO set stack     $d,index;
+    $@BREAKINFO set local     $d,local;
+    if {nil? $d2}
+      then: {$@BREAKINFO set where "-";}
+      else: {$@BREAKINFO set where $d2,function}
+    ;
+    
+    .l
+};
+
+defun .d () {
+    i := $@BREAKINFO,stack;
+    if {$i >= [[$@DEBUGSTACK len] - 1]} then: {println file: $@DEBUGOUT "DEBUG: Already stack bottom."; return};
+    $i ++;
+    d ::= $@DEBUGSTACK get $i;
+    if {$i > 0} then: {d2 ::= $@DEBUGSTACK get [$i - 1]} else: {d2 := nil};
+    $@BREAKINFO set line      $d,line;
+    $@BREAKINFO set object    $d,object;
+    $@BREAKINFO set function  $d,function;
+    $@BREAKINFO set statement $d,statement;
+    $@BREAKINFO set path      $d,path;
+    $@BREAKINFO set stack     $d,index;
+    $@BREAKINFO set local     $d,local;
+    if {nil? $d2}
+      then: {$@BREAKINFO set where "-";}
+      else: {$@BREAKINFO set where $d2,function}
+    ;
+    
+    .l
+};
+
+defun .n () {
+    setvar @DEBUGNEXTP $@BREAKINFO,path;
+    setvar @DEBUGNEXTL $@BREAKINFO,line;
+    setvar @DEBUGNEXTS $@BREAKINFO,stack;
+
+    throw NEXT;
+};
+
+defun .o (args: n) {
+    if {$n null?} then: {
+	if {$@BREAKINFO,stack <= 0} then: {return nil};
+	[$@BREAKINFO,stack - 1] each to: 0 do: {| i |
+	    d := $@DEBUGSTACK,$i;
+	    if {nil? $d,object} else: {return $d,object};
+	};
+	return nil;
+    };
+
+    d := $@DEBUGSTACK,[$n get 0];
+    return $d,object;
+};
+
+defun __debug-name-to-path (name) {
+    if {["" . $name] =~ '\.' } then: {throw DEBUGGER "Bad function or class name."};
+    
+    reg ::= ["/" . $name "\\.prfm$"] rquote;
+    path ::= sdir : filter {| i | $i,1 =~ $reg} : map {| i | result $i,1} : reverse : get 0;
+    if {string? $path} then: {return $path};
+
+    sid ::= sid $name;
+    if {nil? $sid} then: {throw DEBUGGER "No such function or class."};
+    
+    path ::= sdir : filter {| i | if {$i,0 = $sid} then: t} : map {| i | result $i,1} : get 0;
+    if {nil? $path} then: {throw DEBUGGER "No such function or class."};
+
+    return $path;
+};
+
+defun __debug-make-key (path line) {
+    return ["" . $path ":" ["%3d" fmt $line]];
+};
+
+defun __debug-interp (local) {
+    tty ::= new File init: (("/dev/tty" mode: io));
+    $tty set-newline t;
+    setvar @DEBUGOUT $tty;
+    setvar @DEBUGIN  $tty;
+
+    try {
+	println file: $tty "DEBUG: break at \"" $@BREAKINFO,path "\":" $@BREAKINFO,line
+	    ", in " $@BREAKINFO,function ", where " $@BREAKINFO,where ".";
+	.l;
+	__debug-main-loop;
+    }
+    
+    catch: {| e |
+	println file: $tty "DEBUG: ERROR <" [$e car] "># " [$e cdr];
+	return;
+    }
+    
+    fin: {
+	$tty close;
+	setvar @DEBUGOUT $stderr;
+	setvar @DEBUGIN  $stdin;
+    }
+    ;
+};
+
+defun __debug-main-loop () {
+    loop {
+	print file: $@DEBUGOUT "DEBUG> ";
+	__debug-r__ ::= $@DEBUGIN gets :nonewline;
+
+	if {nil? $__debug-r__} then: {
+	    println file: $@DEBUGOUT "";
+	    setvar @DEBUGSTEP nil;
+	    setvar @DEBUGNEXTP nil;
+	    setvar @DEBUGNEXTL -1;
+	    setvar @DEBUGNEXTS -1;
+	    return;
+	};
+	if {"" = $__debug-r__} then: {
+	    setvar @DEBUGSTEP t;
+	    return;
+	};
+
+	set __debug-local__ [[$@DEBUGSTACK get [$@BREAKINFO get stack]] get local];
+	try {
+	    begin local: $__debug-local__ {
+		println file: $@DEBUGOUT "DEBUG: " [$__debug-r__ eval];
+	    };
+	}
+	catch: {| __debug-error__ |
+	    if {eq? NEXT [$__debug-error__ car]} then: {return};
+	    println file: $@DEBUGOUT "DEBUG: ERROR <" [$__debug-error__ car] "># "
+		[$__debug-error__ cdr];
+	};
+    };
+};
+
+defun debug-hook (line object function statement path dict stack_index
+		  where_func) {
+
+    if {$stack_index < $@DEBUGNEXTS}
+    then: {
+
+	# enter debugger by out-of-scope by next line (return detect).
+						    
+	setvar @DEBUGNEXTP nil;
+	setvar @DEBUGNEXTL -1;
+	setvar @DEBUGNEXTS -1;
+
+	debug-hook-sub $line $object $function $statement
+	    $path $dict $stack_index $where_func [where : reverse];
+	return;
+    }
+
+    else: {
+
+	# enter debugger by next line.
+
+        if {and [$path = $@DEBUGNEXTP] 
+		[! [eq? $line $@DEBUGNEXTL]]}
+	then: {
+	    setvar @DEBUGNEXTP nil;
+	    setvar @DEBUGNEXTL -1;
+	    setvar @DEBUGNEXTS -1;
+
+	    debug-hook-sub $line $object $function $statement
+		$path $dict $stack_index $where_func [where : reverse];
+	    return;
+	}
+    }
+    ;
+
+
+    # enter debugger by step execution.
+
+    if {eq? t $@DEBUGSTEP}
+    then: {
+	setvar @DEBUGSTEP nil;
+
+	debug-hook-sub $line $object $function $statement
+	    $path $dict $stack_index $where_func [where : reverse];
+	return;
+    }
+    ;
+
+    
+    # enter debugger by breakpoint.
+
+    if {$@BREAKPOINT set? [__debug-make-key $path $line]}
+    then: {
+
+	debug-hook-sub $line $object $function $statement
+	    $path $dict $stack_index $where_func [where : reverse];
+	return;
+    }
+    ;
+};
+
+defun debug-hook-sub (line object function statement path dict
+		      stack_index where_func where) {
+
+    $@BREAKINFO set line      $line;
+    $@BREAKINFO set object    $object;
+    $@BREAKINFO set function  $function;
+    $@BREAKINFO set statement $statement;
+    $@BREAKINFO set path      $path;
+    $@BREAKINFO set stack     $stack_index;
+    $@BREAKINFO set where     $where_func;
+
+    v ::= vector;
+    $where each do: {| r |
+	d ::= dict $r;
+	$v append! $d;
+    };
+    $v append! [dict ((index . $stack_index) (line . $line) (object . $object) 
+		      (function . $function) (statement . $statement) (local . $dict) 
+		      (path . $path))];
+    setvar @DEBUGSTACK $v;
+	
+    __debug-interp $dict;
+};
