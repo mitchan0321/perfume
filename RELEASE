@@ -1,3 +1,4 @@
+2015/11/15	PRFM_20151115		0.8.0_PRE_3
 2015/10/23	PRFM_20151023		0.8.0_PRE_2
 2015/10/22	PRFM_20151022		0.8.0_PRE_1
 2015/10/01	PRFM_20151001		0.7.2
@@ -669,5 +670,35 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 		Initialize stack head 4096 bytes only at allocate stack.
 	setup.prfm, methods.c, commands.c
 		Change File I/O newline meaning.
+
+2015/11/15:
+	eval.c, commands.c, methods.c, interp.c, types.[ch]
+		Fix stack trace information collection.
+		Fixed functions are:
+		  eval_closure(), toy_resolv_var(), toy_push_func_env(),
+		  toy_call(), toy_expand(), bind_args(),
+		  script_apply_trace_info(), tobe_bind_val().
+		Fix script execution bug at apply unknown hook calling.
+		Add debug hook calling for debugging suite.
+	commands.c
+		Add command fork-exec and wait.
+	methods.c, commands.c
+		Add newline property to File class.
+		  At gets() / read:
+		  If set-newline is t, newline code is reading.
+		  set-newline is nil, newline code is omitted.
+		  At puts() / print / println:
+		  If set-newline is t, newline code is writing.
+		  set-newline is nil, newline code is omitted.
+		Add debug command for debugger on/off.
+		Add where command for stack getting I/F.
+		Fix List::get bug when list is null.
+		Fix File class eof condition compativility.
+	parser.c
+		Fix line detect accuracy.
+	lib/exec.prfm
+		Add command external process execution.
+	lib/debugger.prfm
+		Add debugger suite.
 
 #eof
