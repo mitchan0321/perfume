@@ -637,7 +637,7 @@ cmd_new(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 		list_append(loadl, new_string_cell(spath));
 		result = toy_eval_script(interp,
 					 new_script(new_list(new_statement(loadl,
-									   interp->trace_info->line))));
+						    interp->func_stack[interp->cur_func_stack]->trace_info->line))));
 		if ((GET_TAG(result) == EXCEPTION) &&
 		    (0 != strcmp(cell_get_addr(result->u.exception.code), TE_FILENOTOPEN))) {
 		    return result;
@@ -738,7 +738,7 @@ cmd_if(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     if (hash_get_length(nameargs) > 0) goto error;
 
     if (GET_TAG(cond_block) == CLOSURE) {
-	cond = eval_closure(interp, cond_block);
+	cond = eval_closure(interp, cond_block, interp->trace_info);
 	t = GET_TAG(cond);
 	if (t == EXCEPTION) return cond;
 	if (t == CONTROL) {
@@ -752,11 +752,11 @@ cmd_if(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     if (t == NIL) {
 	if (else_block == NULL) return const_Nil;
 	if (GET_TAG(else_block) != CLOSURE) return else_block;
-	result = eval_closure(interp, else_block);
+	result = eval_closure(interp, else_block, interp->trace_info);
     } else {
 	if (then_block == NULL) return const_Nil;
 	if (GET_TAG(then_block) != CLOSURE) return then_block;
-	result = eval_closure(interp, then_block);
+	result = eval_closure(interp, then_block, interp->trace_info);
     }
 
     return result;
@@ -788,7 +788,7 @@ cmd_while(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     result = const_Nil;
 
 loop:
-    cond = eval_closure(interp, cond_block);
+    cond = eval_closure(interp, cond_block, interp->trace_info);
     t = GET_TAG(cond);
     if (t == EXCEPTION) return cond;
     if (t == CONTROL) {
@@ -798,7 +798,7 @@ loop:
 
     if (t != NIL) {
     loop2:
-	result = eval_closure(interp, do_block);
+	result = eval_closure(interp, do_block, interp->trace_info);
 	r = GET_TAG(result);
 	if (r == EXCEPTION) return result;
 	if (r == CONTROL) {
@@ -837,9 +837,9 @@ cmd_print(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     if (hash_get_length(nameargs) > 0) goto error;
 
     if (NULL == file) {
-	file = toy_resolv_var(interp, const_atout, 0);
+	file = toy_resolv_var(interp, const_atout, 0, interp->trace_info);
 	if (GET_TAG(file) == EXCEPTION) {
-	    file = toy_resolv_var(interp, const_stdout, 0);
+	    file = toy_resolv_var(interp, const_stdout, 0, interp->trace_info);
 	    if (GET_TAG(file) == EXCEPTION) {
 		return new_exception(TE_NOVAR,
 				     "No such file object '@out' and 'stdout'.", interp);
@@ -883,9 +883,9 @@ cmd_println(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     if (hash_get_length(nameargs) > 0) goto error;
 
     if (NULL == file) {
-	file = toy_resolv_var(interp, const_atout, 0);
+	file = toy_resolv_var(interp, const_atout, 0, interp->trace_info);
 	if (GET_TAG(file) == EXCEPTION) {
-	    file = toy_resolv_var(interp, const_stdout, 0);
+	    file = toy_resolv_var(interp, const_stdout, 0, interp->trace_info);
 	    if (GET_TAG(file) == EXCEPTION) {
 		return new_exception(TE_NOVAR,
 				     "No such file object '@out' and 'stdout'.", interp);
@@ -937,7 +937,7 @@ cmd_time(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     gettimeofday(&s, NULL);
     rs = (double)s.tv_sec + ((double)s.tv_usec)/1000000.0;
 
-    result = eval_closure(interp, script);
+    result = eval_closure(interp, script, interp->trace_info);
 
     gettimeofday(&e, NULL);
     re = (double)e.tv_sec + ((double)e.tv_usec)/1000000.0;
@@ -997,7 +997,7 @@ cmd_try(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     if (hash_get_length(nameargs) > 0) goto error;
 
 retry:
-    result = eval_closure(interp, body);
+    result = eval_closure(interp, body, interp->trace_info);
 
     if (GET_TAG(result) == EXCEPTION) {
 	if (catch_body) {
@@ -1015,7 +1015,7 @@ retry:
     }
 
     if (fin_body) {
-	result_fin = eval_closure(interp, fin_body);
+	result_fin = eval_closure(interp, fin_body, interp->trace_info);
 	if (GET_TAG(result_fin) == EXCEPTION) {
 	    return result_fin;
 	}
@@ -1095,7 +1095,7 @@ cmd_case(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 
 	if (strcmp(to_string_call(interp, val), "*") == 0) {
 	    if (GET_TAG(body) == CLOSURE) {
-		result = eval_closure(interp, body);
+		result = eval_closure(interp, body, interp->trace_info);
 	    } else {
 		result = body;
 	    }
@@ -1103,7 +1103,7 @@ cmd_case(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 
 	} else if (strcmp(pvar, to_string_call(interp, val)) == 0) {
 	    if (GET_TAG(body) == CLOSURE) {
-		result = eval_closure(interp, body);
+		result = eval_closure(interp, body, interp->trace_info);
 	    } else {
 		result = body;
 	    }
@@ -1137,7 +1137,7 @@ cmd_cond(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	l = list_next(l);
 
 	if (GET_TAG(exp) == CLOSURE) {
-	    cond = eval_closure(interp, exp);
+	    cond = eval_closure(interp, exp, interp->trace_info);
 	} else {
 	    cond = exp;
 	}
@@ -1888,7 +1888,7 @@ cmd_exists(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     sym = list_get_item(posargs);
     if (GET_TAG(sym) != SYMBOL) goto error;
 
-    val = toy_resolv_var(interp, sym, 0);
+    val = toy_resolv_var(interp, sym, 0, interp->trace_info);
     if (GET_TAG(val) == EXCEPTION) return const_Nil;
 
     return const_T;
@@ -1936,7 +1936,7 @@ error:
 
 Toy_Type*
 cmd_call(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
-    Toy_Type *cmd, *eval, *l;
+    Toy_Type *cmd, *eval, *l, *result;
 
     if (arglen != 2) goto error;
     if (hash_get_length(nameargs) > 0) goto error;
@@ -1956,7 +1956,9 @@ cmd_call(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	if (posargs != NULL) goto error;
     }
 
-    return toy_call(interp, eval);
+    result = toy_call(interp, eval);
+
+    return result;
 
 error:
     return new_exception(TE_SYNTAX, "Syntax error, syntax: call func (args ...) | object (method args ...)", interp);
@@ -2015,7 +2017,7 @@ cmd_trace(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	    int otrace;
 	    otrace = interp->trace;
 	    interp->trace = 1;
-	    result = eval_closure(interp, level);
+	    result = eval_closure(interp, level, interp->trace_info);
 	    interp->trace = otrace;
 	    return result;
 	} else {
@@ -2163,7 +2165,7 @@ cmd_begin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 
     if (0 ==
 	toy_push_func_env(interp, local_hash, closure_env,
-			  interp->func_stack[interp->cur_func_stack]->tobe_bind_val)) {
+			  interp->func_stack[interp->cur_func_stack]->tobe_bind_val, interp->trace_info)) {
 
 	return new_exception(TE_STACKOVERFLOW, "Function satck overflow.", interp);
     }
@@ -2179,10 +2181,12 @@ error:
 }
 
 Toy_Type*
-cmd_exec(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+cmd_forkandexec(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     char *command;
     char **argv;
-    int i, sts, wsts;
+    int i, pid;
+    int left_ch[2], right_ch[2];
+    Toy_Type *result;
 
     if (hash_get_length(nameargs) > 0) goto error;
     if (arglen < 1) goto error;
@@ -2193,6 +2197,11 @@ cmd_exec(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     ALLOC_SAFE(argv);
 
     posargs = list_next(posargs);
+    if ((GET_TAG(list_get_item(posargs)) == LIST) && (list_length(posargs) == 1)) {
+	posargs = list_get_item(posargs);
+	arglen = list_length(posargs) + 1;
+    }
+    
     argv[0] = command;
     for (i = 1; i<arglen; i++) {
 	argv[i] = to_string_call(interp, list_get_item(posargs));
@@ -2200,21 +2209,74 @@ cmd_exec(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     }
     argv[i] = NULL;
 
-    sts = fork();
-    if (0 == sts) {
-	execvp(command, argv);
-	exit(255);
-    } else if (-1 == sts) {
+    if (-1 == pipe(left_ch)) {
 	return new_exception(TE_SYSCALL, strerror(errno), interp);
-    } else {
-	wait(&wsts);
+    }
+    if (-1 == pipe(right_ch)) {
+	return new_exception(TE_SYSCALL, strerror(errno), interp);
+    }
+    
+    pid = fork();
+    
+    if (-1 == pid) {
+	return new_exception(TE_SYSCALL, strerror(errno), interp);
     }
 
+    if (0 == pid) {
+	/* I am a child */
+	close(left_ch[1]);
+	close(right_ch[0]);
+
+	close(0);
+	dup(left_ch[0]);
+	close(left_ch[0]);
+
+	close(1);
+	dup(right_ch[1]);
+	close(right_ch[1]);
+
+	execvp(command, argv);
+	exit(255);
+    }
+
+    /* I am a parent */
+    close(left_ch[0]);
+    close(right_ch[1]);
+
+    result = new_list(NULL);
+    list_append(result, new_cons(new_symbol("pid"), new_integer_si(pid)));
+    list_append(result, new_cons(new_symbol("left"), new_integer_si(left_ch[1])));
+    list_append(result, new_cons(new_symbol("right"), new_integer_si(right_ch[0])));
+    
+    return result;
+
+error:
+    return new_exception(TE_SYNTAX, "Syntax error, syntax: fork-exec command [arg ...] | [(arg ...)]", interp);
+}
+
+Toy_Type*
+cmd_wait(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    int wsts, pid, ssts;
+    Toy_Type *tpid;
+
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+    
+    tpid = list_get_item(posargs);
+    if (GET_TAG(tpid) != INTEGER) goto error;
+
+    pid = mpz_get_si(tpid->u.biginteger);
+    ssts = waitpid(pid, &wsts, 0);
+    if (-1 == ssts) {
+	return new_exception(TE_SYSCALL, strerror(errno), interp);
+    }
+	
     return new_integer_si(WEXITSTATUS(wsts));
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error, syntax: exec command [arg ...]", interp);
+    return new_exception(TE_SYNTAX, "Syntax error, syntax: wait pid", interp);
 }
+
 
 Toy_Type*
 cmd_read(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
@@ -2241,9 +2303,9 @@ cmd_read(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     }
 
     if (NULL == file) {
-	file = toy_resolv_var(interp, const_atin, 0);
+	file = toy_resolv_var(interp, const_atin, 0, interp->trace_info);
 	if (GET_TAG(file) == EXCEPTION) {
-	    file = toy_resolv_var(interp, const_stdin, 0);
+	    file = toy_resolv_var(interp, const_stdin, 0, interp->trace_info);
 	    if (GET_TAG(file) == EXCEPTION) {
 		return new_exception(TE_NOVAR,
 				     "No such file object '@in' and 'stdin'.", interp);
@@ -2679,7 +2741,7 @@ cmd_loop(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 loop:
     if (1) {
     loop2:
-	result = eval_closure(interp, do_block);
+	result = eval_closure(interp, do_block, interp->trace_info);
 	r = GET_TAG(result);
 	if (r == EXCEPTION) return result;
 	if (r == CONTROL) {
@@ -2939,13 +3001,92 @@ cmd_uplevel(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 			     "Stack underflow.", interp);
     }
     result = toy_eval_script(interp, body->u.closure.block_body);
-    toy_push_func_env(interp, env->localvar, env->upstack, env->tobe_bind_val);
+    toy_push_func_env(interp, env->localvar, env->upstack, env->tobe_bind_val, interp->trace_info);
 
     return result;
     
 error:
     return new_exception(TE_SYNTAX,
 			 "Syntax error at 'uplevel', syntax: uplevel {body}", interp);
+}
+
+Toy_Type*
+cmd_debug(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    int olevel;
+    Toy_Type *tlevel;
+
+    if (arglen == 0) {
+	return new_integer_si(interp->debug);
+    }
+    
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) != 0) goto error;
+
+    tlevel = list_get_item(posargs);
+    if (GET_TAG(tlevel) != INTEGER) goto error;
+    olevel = interp->debug;
+    interp->debug = mpz_get_si(tlevel->u.biginteger);
+    
+    return new_integer_si(olevel);
+    
+error:
+    return new_exception(TE_SYNTAX,
+			 "Syntax error at 'debug', syntax: debug [level]", interp);
+}
+
+Toy_Type*
+cmd_where(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *result;
+    Toy_Type *elem;
+    int i;
+
+    if (arglen != 0) goto error;
+    if (hash_get_length(nameargs) != 0) goto error;
+
+    result = new_list(NULL);
+    for (i=interp->cur_func_stack-1; i>=0; i--) {
+	elem = new_list(NULL);
+
+	list_append(elem, new_cons(new_symbol("index"), 
+				   new_integer_si(i)));
+	list_append(elem, new_cons(new_symbol("line"),
+				   new_integer_si(interp->func_stack[i]->trace_info->line)));
+	list_append(elem, new_cons(new_symbol("object"),
+				   interp->func_stack[i]->trace_info->object_name));
+	list_append(elem, new_cons(new_symbol("function"),
+				   interp->func_stack[i]->trace_info->func_name));
+	list_append(elem, new_cons(new_symbol("statement"),
+				   interp->func_stack[i]->trace_info->statement));
+	list_append(elem, new_cons(new_symbol("local"),
+				   i>=1 ? new_dict(interp->func_stack[i-1]->localvar)
+				        : new_dict(new_hash())));
+	list_append(elem, new_cons(new_symbol("path"),
+				   i>=1 ? new_string_str(get_script_path(interp, interp->func_stack[i-1]->script_id)) 
+				        : new_string_str("-")));
+
+/*	
+	list_append(elem, new_cons(new_symbol("index"), 
+				   new_integer_si(i)));
+	list_append(elem, new_cons(new_symbol("line"),
+				   new_integer_si(interp->func_stack[i]->trace_info->line)));
+	list_append(elem, new_cons(new_symbol("object"),
+				   interp->func_stack[i]->trace_info->object_name));
+	list_append(elem, new_cons(new_symbol("function"),
+				   interp->func_stack[i]->trace_info->func_name));
+	list_append(elem, new_cons(new_symbol("statement"),
+				   interp->func_stack[i]->trace_info->statement));
+	list_append(elem, new_cons(new_symbol("local"), new_dict(interp->func_stack[i]->localvar)));
+	list_append(elem, new_cons(new_symbol("path"), new_string_str(get_script_path(interp, interp->func_stack[i]->script_id))));
+*/
+
+	list_append(result, elem);
+    }
+
+    return result;
+    
+error:
+    return new_exception(TE_SYNTAX,
+			 "Syntax error at 'where', syntax: where", interp);
 }
 
 int toy_add_commands(Toy_Interp *interp) {
@@ -3011,7 +3152,8 @@ int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, "cache-info", cmd_cacheinfo, NULL);
 #endif
     toy_add_func(interp, "begin", cmd_begin, NULL);
-    toy_add_func(interp, "exec", cmd_exec, NULL);
+    toy_add_func(interp, "fork-exec", cmd_forkandexec, NULL);
+    toy_add_func(interp, "wait", cmd_wait, NULL);
     toy_add_func(interp, "read", cmd_read, NULL);
 
     toy_add_func(interp, "goto", cmd_goto, NULL);
@@ -3048,6 +3190,8 @@ int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, "coro-id", cmd_coroid, NULL);
     toy_add_func(interp, "REM", cmd_remark, NULL);
     toy_add_func(interp, "uplevel", cmd_uplevel, NULL);
+    toy_add_func(interp, "debug", cmd_debug, NULL);
+    toy_add_func(interp, "where", cmd_where, NULL);
 
     return 0;
 }
