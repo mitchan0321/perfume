@@ -1632,7 +1632,8 @@ mth_list_eval(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 
     if (arglen > 0) goto error;
 
-    result = toy_eval(interp, new_statement(SELF(interp), interp->trace_info->line), &env);
+    result = toy_eval(interp, new_statement(SELF(interp), 
+					    interp->func_stack[interp->cur_func_stack]->trace_info->line), &env);
     return result;
 
 error:
@@ -1691,7 +1692,7 @@ mth_list_get(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
 
     if (NULL == src) return const_Nil;
 
-    return (GET_TAG(src)==LIST) ? list_get_item(src) : src;
+    return (GET_TAG(src)==LIST) ? (list_get_item(src) ? list_get_item(src) : const_Nil) : src;
 
 error:
     return new_exception(TE_SYNTAX, "Syntax error at 'get', syntax: List get index", interp);
@@ -2267,6 +2268,8 @@ mth_string_eval(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     script = toy_parse_start(b);
     if (GET_TAG(script) != SCRIPT) return script;
 
+    SET_SCRIPT_ID(script, interp->script_id);
+    script_apply_trace_info(script, interp->trace_info);
     result = toy_eval_script(interp, script);
 
     return result;
@@ -2379,7 +2382,7 @@ mth_string_match(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     /* onece create regex cache and set to global dict */
     if (NULL == regex_hash) {
 	regex_hash = new_hash();
-	hash_set(interp->globals, "REGEX_CACHE", new_dict(regex_hash));
+	hash_set(interp->globals, const_regex_cache, new_dict(regex_hash));
     }
 
     /* make regex key, string format is: 'regex',[case|nocase],[default|grep] */
@@ -2922,7 +2925,7 @@ mth_block_eval(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     if (GET_TAG(SELF(interp)) != CLOSURE) goto error2;
 
     closure = SELF(interp);
-    result = eval_closure(interp, closure);
+    result = eval_closure(interp, closure, interp->trace_info);
     return result;
 
 error:
@@ -3145,7 +3148,7 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 	c = fgetc(f->fd);
 	if (EOF == c) {
 	    if (cell_get_length(cbuff) == 0) {
-		return new_string_str("");
+		return const_Nil;
 	    } else {
 		return new_string_cell(cbuff);
 	    }
@@ -3457,10 +3460,12 @@ mth_file_isready(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     f = container->u.container;
 
     fd = f->fd;
-    if (NULL == fd) goto error2;
+    if (NULL == fd) return const_Nil;
 
+    if (feof(f->fd)) return const_Nil;
+    
     fdesc = fileno(fd);
-    if (fdesc < 0) goto error2;
+    if (fdesc < 0) return const_Nil;
 
     FD_ZERO(&fds);
     FD_SET(fdesc, &fds);
