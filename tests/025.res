@@ -5,11 +5,11 @@
 -:5: d; in self::c
 -:4: c; in self::b
 -:3: b; in self::a
--:11: a; in Toplevel::Main
+-:11: a; in (object)Main::Main
 
 -:21: stack-trace; in (object)C::m
 -:23: $x m; in (object)B::m
 -:25: $x m; in (object)A::m
--:28: $x m; in Toplevel::Main
+-:28: $x m; in (object)Main::Main
 
 result[NIL]=> nil

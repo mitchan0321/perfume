@@ -2,24 +2,25 @@
 
 set f [new File];
 $f open mode: o "./test";
+$f set-newline t;
 println [$f stat];
 println [$f eof?]; # => nil
 
-$f puts "abc\n";
-$f puts "def\n";
+$f puts "abc";
+$f puts "def";
 
 $f close;
 $f open "./test";
 println [$f eof?]; # => nil
-print [$f gets]; # => abc\n
-print [$f gets]; # => def\n
+print [$f gets]; # => abc
+print [$f gets]; # => def
 println [$f eof?]; # => nil
 println [$f gets]; # => nil
 println [$f eof?]; # => t
 
 $f close;
 $f open mode: a "./test";
-$f puts "ZZZ\n";
+$f puts "ZZZ";
 $f close;
 $f open "./test";
 while {set r [$f gets]} do: {print $r}; # => abc\n def\n ZZZ\n
