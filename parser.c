@@ -117,6 +117,7 @@ toy_parse_statement(Bulk *src, char endc) {
     Toy_Type *l;
     char *buff;
     Cell *msg;
+    int line=0;
 
     buff = GC_MALLOC(256);
     ALLOC_SAFE(buff);
@@ -124,15 +125,27 @@ toy_parse_statement(Bulk *src, char endc) {
     l = new_list(NULL);
     if (NULL == l) goto assert;
 
-    newstatement = new_statement(l, bulk_get_line(src));
+    newstatement = new_statement(l, 0);
     if (NULL == newstatement) goto assert;
 
     while (EOF != (c = bulk_getchar(src))) {
 	if (endc == c) {
 	    bulk_ungetchar(src);
+	    if (line == 0) {
+		newstatement->u.statement.trace_info->line = bulk_get_line(src);
+	    } else {
+		newstatement->u.statement.trace_info->line = line;
+	    }
 	    return newstatement;
 	}
-	if (';' == c) return newstatement;
+	if (';' == c) {
+	    if (line == 0) {
+		newstatement->u.statement.trace_info->line = bulk_get_line(src);
+	    } else {
+		newstatement->u.statement.trace_info->line = line;
+	    }
+	    return newstatement;
+	}
 
 	switch (c) {
 	case ' ': case '\t': case '\r':	case '\n':
@@ -158,6 +171,7 @@ toy_parse_statement(Bulk *src, char endc) {
 	    goto parse_error;
 
 	case '(':
+	    if (line == 0) {line = bulk_get_line(src);}
 	    any = toy_parse_list(src, ')');
 	    if (NULL == any) goto assert;
 	    if (GET_TAG(any) != LIST) goto parse_error;
@@ -165,6 +179,7 @@ toy_parse_statement(Bulk *src, char endc) {
 	    break;
 
 	case '{':
+	    if (line == 0) {line = bulk_get_line(src);}
 	    any = toy_parse_block(src, '}');
 	    if (NULL == any) goto assert;
 	    if (GET_TAG(any) != BLOCK) goto parse_error;
@@ -172,6 +187,7 @@ toy_parse_statement(Bulk *src, char endc) {
 	    break;
 	    
 	case '[':
+	    if (line == 0) {line = bulk_get_line(src);}
 	    any = toy_parse_eval(src, ']');
 	    if (NULL == any) goto assert;
 	    if (GET_TAG(any) != EVAL) goto parse_error;
@@ -179,6 +195,7 @@ toy_parse_statement(Bulk *src, char endc) {
 	    break;
 	    
 	case '\"':
+	    if (line == 0) {line = bulk_get_line(src);}
 	    any = toy_parse_string(src, '\"');
 	    if (NULL == any) goto assert;
 	    if (GET_TAG(any) != STRING) goto parse_error;
@@ -186,6 +203,7 @@ toy_parse_statement(Bulk *src, char endc) {
 	    break;
 
 	case '\'':
+	    if (line == 0) {line = bulk_get_line(src);}
 	    any = toy_parse_rquote(src, '\'');
 	    if (NULL == any) goto assert;
 	    if (GET_TAG(any) != RQUOTE) goto parse_error;
@@ -193,22 +211,36 @@ toy_parse_statement(Bulk *src, char endc) {
 	    break;
 
 	case ';':
+	    if (line == 0) {line = bulk_get_line(src);}
+	    if (line == 0) {
+		newstatement->u.statement.trace_info->line = bulk_get_line(src);
+	    } else {
+		newstatement->u.statement.trace_info->line = line;
+	    }
 	    return newstatement;
 
 	case ',':
+	    if (line == 0) {line = bulk_get_line(src);}
 	    l = list_append(l, new_symbol(","));
 	    break;
 
 	case '`':
+	    if (line == 0) {line = bulk_get_line(src);}
 	    l = list_append(l, new_symbol("`"));
 	    break;
 
 	case '|':
+	    if (line == 0) {line = bulk_get_line(src);}
 	    c_tmp = bulk_getchar(src);
 	    if (index(ENDCHAR, c_tmp) != NULL) {
 		any = toy_parse_list(src, '|');
 		if (GET_TAG(any) != LIST) goto parse_error;
 		l = list_append(l, new_bind(any));
+		if (line == 0) {
+		    newstatement->u.statement.trace_info->line = bulk_get_line(src);
+		} else {
+		    newstatement->u.statement.trace_info->line = line;
+		}
 		return newstatement;
 	    }
 	    bulk_ungetchar(src);
@@ -216,20 +248,24 @@ toy_parse_statement(Bulk *src, char endc) {
 	    /* FALL THRU */
 
 	default:
-	    /* parse symbol */
+	    if (line == 0) {line = bulk_get_line(src);}
 
+	    /* parse symbol */
 	    bulk_ungetchar(src);
 	    any = toy_parse_symbol(src, ENDCHAR);
 	    if (NULL == any) goto assert;
 	    if (GET_TAG(any) != SYMBOL) goto parse_error;
 	    l = list_append(l, toy_symbol_conv(any));
 	}
-
-	newstatement->u.statement.trace_info->line = bulk_get_line(src);
     }
 
 parse_end:
-    newstatement->u.statement.trace_info->line = bulk_get_line(src);
+    if (line == 0) {
+	newstatement->u.statement.trace_info->line = bulk_get_line(src);
+    } else {
+	newstatement->u.statement.trace_info->line = line;
+    }
+    
     if (0 == endc) {
 	return newstatement;
     } else {
@@ -1009,3 +1045,4 @@ toy_parse_set_paramno(Toy_Type *o) {
 
     return o;
 }
+
