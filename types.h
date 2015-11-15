@@ -134,9 +134,12 @@ typedef struct _toy_interp {
     struct _hash *globals;
     struct _hash *scripts;
 
-    /* trace info */
-    struct _toy_func_trace_info *trace_info;
+    /* running script id */
     int script_id;
+
+    /* trace info for command function, this member only use in
+       command functions (in commands.c and methods.c). */
+    Toy_Func_Trace_Info *trace_info;
 
 #ifdef HAS_GCACHE
     /* global cache */
@@ -148,6 +151,10 @@ typedef struct _toy_interp {
     /* trace flag */
     int trace;
     int trace_fd;
+
+    /* debug flag */
+    int debug;
+    int debug_in;
 
     /* coroutine */
     int cstack_id;
