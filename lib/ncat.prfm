@@ -1,9 +1,10 @@
 # $Id:$
 
-defun ncat () {
+defun ncat (fmt: fmt) {
+    if {set? fmt} else: {fmt := "%5d"};
     set i 1;
     $stdin each do: {| r |
-        println $i ": " $r;
+        println [$fmt fmt $i] ": " $r;
 	$i ++;
     };
 };
