@@ -94,17 +94,11 @@ new_interp(char* name, int stack_size, Toy_Interp* parent,
 	interp->stack_size = stack_size;
 	interp->cur_obj_stack = -1;
 	interp->cur_func_stack = -1;
-
-	interp->trace_info = GC_MALLOC(sizeof(struct _toy_func_trace_info));
-	ALLOC_SAFE(interp->trace_info);
-	interp->trace_info->line = 0;
-	interp->trace_info->object_name = new_symbol("Toplevel");
-	interp->trace_info->func_name = new_symbol("Main");
-	interp->trace_info->statement = new_statement(new_list(new_symbol("(toysh)")), 0);
 	interp->script_id = 0;
-	
 	interp->trace = 0;
 	interp->trace_fd = 2;
+	interp->debug = 0;
+	interp->debug_in = 0;
 #ifdef HAS_GCACHE
 	interp->gcache = new_hash();
 	interp->cache_hit = 0;
@@ -120,7 +114,8 @@ new_interp(char* name, int stack_size, Toy_Interp* parent,
 	interp->co_value = 0;
 	interp->co_calling = 0;
 	interp->last_status = const_Nil;
-
+	interp->trace_info = NULL;
+	
 	sig_flag = 0;
 
 	if (argv && envp) {
@@ -148,7 +143,6 @@ new_interp(char* name, int stack_size, Toy_Interp* parent,
 	interp->classes = parent->classes;
 	interp->globals = parent->globals;
 	interp->scripts = parent->scripts;
-	interp->trace_info = parent->trace_info;
 	interp->script_id = parent->script_id;
 #ifdef HAS_GCACHE
 	interp->gcache = parent->gcache;
@@ -156,6 +150,9 @@ new_interp(char* name, int stack_size, Toy_Interp* parent,
 	interp->cache_missing = parent->cache_missing;
 #endif /* HAS_GCACHE */
 	interp->trace = parent->trace;
+	interp->trace_fd = parent->trace_fd;
+	interp->debug = parent->debug;
+	interp->debug_in = parent->debug_in;
 	interp->cstack = 0;
 	interp->cstack_size = 0;
 	interp->coroid = 0;
@@ -163,6 +160,7 @@ new_interp(char* name, int stack_size, Toy_Interp* parent,
 	interp->co_value = 0;
 	interp->co_calling = 0;
 	interp->last_status = const_Nil;
+	interp->trace_info = NULL;
     }
 
     return interp;
@@ -177,11 +175,20 @@ interp_setup(Toy_Interp* interp, int argc, char **argv, char **envp) {
     Toy_Type *any;
     Toy_Type *env, *envl, *envv;
     Toy_Type *setupl;
+    Toy_Type *obj;
+    Toy_Func_Trace_Info *trace_info;
 
     delegate = new_list(const_Object);
 
-    toy_push_new_obj_env(interp, "Toplevel", new_object("Main", new_hash(), delegate));
-    toy_push_func_env(interp, new_hash(), NULL, NULL);
+    obj = new_object("Main", new_hash(), delegate);
+    toy_push_new_obj_env(interp, "Toplevel", obj);
+    trace_info = GC_MALLOC(sizeof(Toy_Func_Trace_Info));
+    ALLOC_SAFE(trace_info);
+    trace_info->line = 0;
+    trace_info->object_name = obj;
+    trace_info->func_name = new_symbol("Main");
+    trace_info->statement = new_statement(new_list(new_symbol("(perfumesh)")), 0);
+    toy_push_func_env(interp, new_hash(), NULL, NULL, trace_info);
 
     /* make world */
 
@@ -234,11 +241,11 @@ interp_setup(Toy_Interp* interp, int argc, char **argv, char **envp) {
     /* load initial setup file "setup.prfm" */
     setupl = new_list(new_symbol("load"));
     list_append(setupl, new_string_str(SETUP_FILE));
-    any = toy_eval_script(interp, new_script(new_list(new_statement(setupl, 0))));
+    any = toy_eval_script(interp, script_apply_trace_info(new_script(new_list(new_statement(setupl, 0))), trace_info));
     if (GET_TAG(any) == EXCEPTION) {
 	setupl = new_list(new_symbol("load"));
 	list_append(setupl, new_string_str(SETUP_FILE2));
-	any = toy_eval_script(interp, new_script(new_list(new_statement(setupl, 0))));
+	any = toy_eval_script(interp, script_apply_trace_info(new_script(new_list(new_statement(setupl, 0))), trace_info));
 
 	if (GET_TAG(any) == EXCEPTION) {
 
@@ -428,7 +435,7 @@ toy_pop_obj_env(Toy_Interp* interp) {
 }
 
 int
-toy_push_func_env(Toy_Interp* interp, Hash *localvar, Toy_Func_Env *upenv, Toy_Type *tobe_bind_val) {
+toy_push_func_env(Toy_Interp* interp, Hash *localvar, Toy_Func_Env *upenv, Toy_Type *tobe_bind_val, Toy_Func_Trace_Info *trace_info) {
     Toy_Func_Env *env;
 
     if ((interp->cur_func_stack+1) >= interp->stack_size) return 0;
@@ -438,7 +445,11 @@ toy_push_func_env(Toy_Interp* interp, Hash *localvar, Toy_Func_Env *upenv, Toy_T
 
     env->localvar = localvar;
     env->upstack = upenv;
-    env->trace_info = interp->trace_info;
+    if (trace_info) {
+	env->trace_info = trace_info;
+    } else {
+	env->trace_info = interp->func_stack[interp->cur_func_stack]->trace_info;
+    }
     env->script_id = interp->script_id;
     env->tobe_bind_val = tobe_bind_val;
 
@@ -484,23 +495,25 @@ get_stack_trace(Toy_Interp *interp, Cell *stack) {
     buff = GC_MALLOC(256);
     ALLOC_SAFE(buff);
 
-    snprintf(buff, 256, "%s:%d: %s in %s::%s\n",
-	     get_script_path(interp, interp->func_stack[interp->cur_func_stack]->script_id),
-	     interp->trace_info->line,
-	     to_print(interp->trace_info->statement),
-	     (interp->func_stack[interp->cur_func_stack]->trace_info->object_name ?
-	      		to_string(interp->func_stack[interp->cur_func_stack]->trace_info->object_name) : "self"),
-	     (interp->func_stack[interp->cur_func_stack]->trace_info->func_name ?
-	      		to_string(interp->func_stack[interp->cur_func_stack]->trace_info->func_name) : "???"));
-    buff[255] = 0;
-    cell_add_str(stack, buff);
+    if (interp->trace_info) {
+	snprintf(buff, 256, "%s:%d: %s in %s::%s\n",
+		 get_script_path(interp, interp->func_stack[interp->cur_func_stack]->script_id),
+		 interp->trace_info->line,
+		 to_print(interp->trace_info->statement),
+		 (GET_TAG(interp->func_stack[interp->cur_func_stack]->trace_info->object_name) != NIL ?
+		  to_string(interp->func_stack[interp->cur_func_stack]->trace_info->object_name) : "self"),
+		 (interp->func_stack[interp->cur_func_stack]->trace_info->func_name ?
+		  to_string(interp->func_stack[interp->cur_func_stack]->trace_info->func_name) : "???"));
+	buff[255] = 0;
+	cell_add_str(stack, buff);
+    }
 
     for (i=interp->cur_func_stack; i>0; i--) {
 	snprintf(buff, 256, "%s:%d: %s in %s::%s\n",
 		 get_script_path(interp, interp->func_stack[i-1]->script_id),
 		 interp->func_stack[i]->trace_info->line,
 		 to_print(interp->func_stack[i]->trace_info->statement),
-		 (interp->func_stack[i-1]->trace_info->object_name ?
+		 (GET_TAG(interp->func_stack[i-1]->trace_info->object_name) != NIL ?
 		  		to_string(interp->func_stack[i-1]->trace_info->object_name) : "self"),
 		 (interp->func_stack[i-1]->trace_info->func_name ?
 		  		to_string(interp->func_stack[i-1]->trace_info->func_name) : "???"));
@@ -525,6 +538,23 @@ get_script_path(Toy_Interp* interp, int script_id) {
 
     s = (Toy_Script*)cont->u.container;
     return cell_get_addr(s->path->u.string);
+}
+
+Toy_Type*
+script_apply_trace_info(Toy_Type *script, Toy_Func_Trace_Info *trace_info) {
+    Toy_Type *l, *item;
+    
+    l = script->u.statement_list;
+    while (l && (item = list_get_item(l))) {
+	item->u.statement.trace_info->line = trace_info->line;
+	item->u.statement.trace_info->object_name = trace_info->object_name;
+	item->u.statement.trace_info->func_name = trace_info->func_name;
+	item->u.statement.trace_info->statement = trace_info->statement;
+	
+	l = list_next(l);
+    }
+
+    return script;
 }
 
 #ifdef HAS_GCACHE
