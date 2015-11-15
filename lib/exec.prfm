@@ -1,0 +1,67 @@
+# exec external process
+
+defun exec (args: args) {
+    args ::= $args map {| i | "" . $i};
+    command ::= $args >>;
+
+    d ::= dict [fork-exec $command $args];
+
+    pid := $d,pid;
+
+    out := $d,left;
+    OUT ::= new File;
+    $OUT set! $out mode: o;
+    $OUT set-newline t;
+
+    in := $d,right;
+    IN ::= new File;
+    $IN set! $in mode: i;
+    $IN set-newline nil;
+
+    try {
+	loop {
+	    if {$stdin ready?} then: {
+		if {$OUT ready?} then: {
+		    r ::= $stdin gets;
+		    if [nil? $r] then: {break};
+		    println file: $OUT $r;
+		};
+	    };
+	    if {$stdin eof?} then: {break};
+	
+	    if {$IN ready?} then: {
+		r ::= $IN gets;
+		if [nil? $r] then: {break};
+		println $r;
+	    };
+	    if {$IN eof?} then: {break};
+	
+	    if {or [$stdin ready?] [$IN ready?]} else: {
+		if {sets? CO-MODE} then: {pause @WRITE};
+	    };
+	};
+	$OUT close;
+
+	if {$IN eof?} else: {
+	    loop {
+		if {$IN ready?} then: {
+		    r ::= $IN gets;
+		    if [nil? $r] then: {break};
+		    println $r;
+		};
+		if {$IN eof?} then: {break};
+
+		if {$IN ready?} else: {
+		    if {sets? CO-MODE} then: {pause @WRITE};
+		};
+	    };
+	};
+	$IN close;
+    }
+
+    fin: {
+	$OUT close;
+	$IN close;
+        wait $pid;
+    };
+};
