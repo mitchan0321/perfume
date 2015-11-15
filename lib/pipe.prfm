@@ -83,7 +83,7 @@ defun pipe (in: in out: out args: blocks) {
 	throw ErrPipeSyntax $syntax;
     };
     
-    barray := ();
+    blist := ();
     i := 1;
 
     $blocks each do: {| b |
@@ -98,7 +98,7 @@ defun pipe (in: in out: out args: blocks) {
         p ::= new Pipe init: ($in $pipe $b);
 	$p set-infile  $infile;
 	$p set-outfile $outfile;
-	$barray append! $p;
+	$blist append! $p;
 	$i ++;
 	in := $pipe;
     };
@@ -106,8 +106,11 @@ defun pipe (in: in out: out args: blocks) {
     #
     # do pipe
     #
+    old-trap ::= trap SIGPIPE;
+    trap SIGPIPE {throw ReceivePipe "Broken pipe"};
+
     try {
-        pipe-dispatch $barray;
+        pipe-dispatch $blist;
     }
     catch: {| e |
 	throw $e;
@@ -117,34 +120,43 @@ defun pipe (in: in out: out args: blocks) {
     # after process
     #
     fin: {
-        pipe-release $barray $flist;
+        pipe-release $blist $flist;
 	$stdin clear;
 	$stdout flush;
+
+	try {loop {s ::= wait -1}} catch: {};
+	if {block? $old-trap}
+	    then: {trap SIGPIPE $old-trap}
+	    else: {trap SIGPIPE}
+	;
     };
 };
 
-defun pipe-dispatch (barray) {
-    $barray each do: {| b |
-	if {pipe-check-done-cond $barray} then: {return};
+defun pipe-dispatch (blist) {
+    loop {
+	$blist each do: {| b |
+	    if {pipe-check-done-cond $blist} then: {return};
 
-	s ::= $b stat?;
-	if {eq? $s DONE} then: {continue};
+	    s ::= $b stat?;
+	    if {eq? $s DONE} then: {continue};
 
-	$b run;
+	    ###### println file: $stderr "*** " $b;
+	    $b run;
 	
-	s ::= $b stat?;
-	if {eq? $s @READ } then: {retry};
-	if {eq? $s @WRITE} then: {continue};	
+	    s ::= $b stat?;
+	    if {eq? $s @READ } then: {retry};
+	    if {eq? $s @WRITE} then: {continue};
+        };
     };
-
-    goto pipe-dispatch $barray;
 };
 
-defun pipe-check-done-cond (barray) {
-    $barray each do: {| b |
-	if {eq? [$b stat?] ERROR} then: {throw ErrPipeBody ["" . [$b get-body] "-> " [$b get-error]]};
+defun pipe-check-done-cond (blist) {
+    $blist each do: {| b |
+	if {eq? [$b stat?] ERROR} then: {
+	    throw ErrPipeBody ["" . [$b get-body] "-> " [$b get-error]]
+	};
     };
-    $barray each do: {| b |
+    $blist each do: {| b |
 	if {eq? [$b stat?] DONE}  else: {return nil};
     };
 
@@ -152,8 +164,8 @@ defun pipe-check-done-cond (barray) {
     return t;
 };
 
-defun pipe-release (barray flist) {
-    $barray each do: {| b |
+defun pipe-release (blist flist) {
+    $blist each do: {| b |
 	$b release;
     };
     $flist each do: {| f |
