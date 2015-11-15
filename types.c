@@ -168,6 +168,7 @@ new_statement(Toy_Type *item_list, int line) {
     o->u.statement.trace_info->line = line;
     o->u.statement.trace_info->object_name = NULL;
     o->u.statement.trace_info->func_name = NULL;
+    o->u.statement.trace_info->statement = NULL;
     SET_PARAMNO(o, TAG_MAX_PARAMNO);
     return o;
 }
