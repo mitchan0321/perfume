@@ -1,3 +1,4 @@
+2015/11/23	PRFM_20151123		0.8.0_PRE_4
 2015/11/15	PRFM_20151115		0.8.0_PRE_3
 2015/10/23	PRFM_20151023		0.8.0_PRE_2
 2015/10/22	PRFM_20151022		0.8.0_PRE_1
@@ -700,5 +701,30 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 		Add command external process execution.
 	lib/debugger.prfm
 		Add debugger suite.
+
+2015/11/23:
+	Makefile
+		Delete HAS_GCACHE option.
+	commands.c
+		Fix fork-exec command, close all file descripter otherwise 0-2.
+		Add commands 'true?', 'false?'.
+		  'true?' command return if variable is exists and non-nil value true.
+		  'false?' command return if variable is not exists or nil value true.
+	methods.c
+		Add force: option to File::close.
+		Add timeout: option to File::ready?.
+		Add method File::set-nobuffer.
+	eval.c
+		Trace output omitted if debug mode is on.
+	interp.c
+		Add function script_apply_trace_info for String::eval.
+	lib/Stream.prfm
+		Fix co-routin switch logic.
+	lib/debugger.prfm
+		Change .n (next) and .s (step) commands to keep mode.
+	lib/exec.prfm
+		Fix some bugs.
+	lib/pipe.prfm
+		Fix some bugs.
 
 #eof
