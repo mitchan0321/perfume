@@ -542,7 +542,7 @@ get_script_path(Toy_Interp* interp, int script_id) {
 
 Toy_Type*
 script_apply_trace_info(Toy_Type *script, Toy_Func_Trace_Info *trace_info) {
-    Toy_Type *l, *item;
+    Toy_Type *l, *item, *e, *elem;
     
     l = script->u.statement_list;
     while (l && (item = list_get_item(l))) {
@@ -550,6 +550,14 @@ script_apply_trace_info(Toy_Type *script, Toy_Func_Trace_Info *trace_info) {
 	item->u.statement.trace_info->object_name = trace_info->object_name;
 	item->u.statement.trace_info->func_name = trace_info->func_name;
 	item->u.statement.trace_info->statement = trace_info->statement;
+
+	e = item->u.statement.item_list;
+	while (e && (elem = list_get_item(e))) {
+	    if (GET_TAG(elem) == SCRIPT) {
+		script_apply_trace_info(elem, trace_info);
+	    }
+	    e = list_next(e);
+	}
 	
 	l = list_next(l);
     }
