@@ -134,18 +134,17 @@ defun pipe (in: in out: out args: blocks) {
 
 defun pipe-dispatch (blist) {
     loop {
+	if {pipe-check-done-cond $blist} then: {return};
+	
 	$blist each do: {| b |
-	    if {pipe-check-done-cond $blist} then: {return};
-
 	    s ::= $b stat?;
 	    if {eq? $s DONE} then: {continue};
 
-	    ###### println file: $stderr "*** " $b;
+	    if {true? PIPEDEBUG} then: {println file: $stderr "*** " $b};
 	    $b run;
 	
 	    s ::= $b stat?;
 	    if {eq? $s @READ } then: {retry};
-	    if {eq? $s @WRITE} then: {continue};
         };
     };
 };

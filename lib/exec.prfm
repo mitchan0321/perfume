@@ -12,56 +12,74 @@ defun exec (args: args) {
     OUT ::= new File;
     $OUT set! $out mode: o;
     $OUT set-newline t;
+    $OUT set-nobuffer;
 
     in := $d,right;
     IN ::= new File;
     $IN set! $in mode: i;
     $IN set-newline nil;
+    $IN set-nobuffer;
 
     try {
 	loop {
-	    if {$stdin ready?} then: {
-		if {$OUT ready?} then: {
-		    r ::= $stdin gets;
-		    if [nil? $r] then: {break};
-		    println file: $OUT $r;
-		};
-	    };
-	    if {$stdin eof?} then: {break};
-	
-	    if {$IN ready?} then: {
-		r ::= $IN gets;
-		if [nil? $r] then: {break};
-		println $r;
-	    };
-	    if {$IN eof?} then: {break};
-	
-	    if {or [$stdin ready?] [$IN ready?]} else: {
-		if {sets? CO-MODE} then: {pause @WRITE};
-	    };
-	};
-	$OUT close;
-
-	if {$IN eof?} else: {
 	    loop {
-		if {$IN ready?} then: {
+		if {$stdin ready? timeout: 50} then: {
+		    r ::= $stdin gets;
+		    if [nil? $r] else: {
+			println file: $OUT $r;
+			$OUT flush;
+		    };
+		} else: {
+		    break;
+		};
+		if {$stdin eof?} then: {$OUT close :force; break};
+	    };
+
+	    loop {
+		if {$IN ready? timeout: 50} then: {
 		    r ::= $IN gets;
-		    if [nil? $r] then: {break};
-		    println $r;
+		    if [nil? $r] else: {
+			println $r;
+			$stdout flush;
+		    };
+		} else: {
+		    break;
 		};
 		if {$IN eof?} then: {break};
+	    };
 
-		if {$IN ready?} else: {
+	    if {$IN eof?} then: {break};
+	    if {sets? CO-MODE} then: {pause @WRITE};
+	};
+	
+        $OUT close :force;
+
+	REM { #------
+	if {$IN eof?} else: {
+	    set i 0;
+ 	    loop {
+		if {$IN ready? timeout: 50} then: {
+		    r ::= $IN gets;
+		    if [nil? $r] else: {
+			println $r;
+			$stdout flush;
+		    };
+		} else: {
+		    $i ++;
+		    if {$i >= 3} then: {break};
+		    if {$IN eof?} then: {break};
 		    if {sets? CO-MODE} then: {pause @WRITE};
 		};
+		if {$IN eof?} then: {break};
 	    };
 	};
-	$IN close;
+	}; #------
     }
-
+    
     fin: {
-	$OUT close;
-	$IN close;
-        wait $pid;
-    };
+	$OUT close :force;
+	$IN close :force;
+	if {[wait $pid] = 255} then: {throw ErrExecProgram "can\'t execute program."};
+    }
+    ;
 };
