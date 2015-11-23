@@ -141,7 +141,7 @@ control_goto:
 
     paramno_hint = GET_PARAMNO(statement);
 
-    if (interp->trace) {
+    if (interp->trace && (! interp->debug_in)) {
 	char *buff;
 	int sts;
 
