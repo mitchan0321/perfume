@@ -31,8 +31,8 @@ Stream method init (args: a) {
     sets co nil;
     sets name "";
     if [and [set? a] [! [$a null?]]] then: {sets name [$a item]};
-    sets limit 256;
-#    sets limit 1;	# for debug
+    sets limit 512;
+#    sets limit 5;	# for debug
     sets count 0;
     sets newline nil;
 };
@@ -50,19 +50,20 @@ Stream method clear () {
     sets eof nil;
 };
 
-Stream method ready? () {
+Stream method ready? (timeout: timeout) {
     if [$queue null?] then: nil else: t;
 };
 
 Stream method puts (i nonewline: nonewline) {
     if [eof?] then: {throw ErrFileAccess "Stream is closed."};
 
-    if {$count >= $limit} then: {
+    while {$count >= $limit} do: {
 	if $co then: {
 	    pause @WRITE;
         } else: {
 	    throw ErrFileAccess "Stream is full.";
         };
+	if [eof?] then: {throw ErrFileAccess "Stream is closed."};
     };
    
     if {sets? shortcut} then: {
@@ -70,7 +71,6 @@ Stream method puts (i nonewline: nonewline) {
     } else: {
 	sets shortcut [$queue append! $i];
     };
-    # $queue append! $i;
     $count ++;
 
     return t;
@@ -79,12 +79,13 @@ Stream method puts (i nonewline: nonewline) {
 Stream method gets (nonewline: nonewline) {
     if [eof?] then: {return nil};
     
-    if [$queue null?] then: {
+    while {$queue null?} do: {
 	if $co then: {
 	    pause @READ;
 	} else: {
 	    throw ErrFileAccess "Stream is no data.";
         };
+	if [eof?] then: {return nil};
     };
     
     $count --;
