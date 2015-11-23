@@ -11,6 +11,7 @@ if {defvar? @DEBUGNEXTP} else: {defvar @DEBUGNEXTP nil};
 if {defvar? @DEBUGNEXTL} else: {defvar @DEBUGNEXTL -1};
 if {defvar? @DEBUGNEXTS} else: {defvar @DEBUGNEXTS -1};
 if {defvar? @DEBUGTRAP}  else: {defvar @DEBUGTRAP  nil};
+if {defvar? @DEBUGMODE}  else: {defvar @DEBUGMODE  step};
 
 defun debugger (off: off) {
     if {set? off} then: {
@@ -50,8 +51,10 @@ defun .h () {
     println file: $@DEBUGOUT "  .d               - Down stack and list module.";
     println file: $@DEBUGOUT "  .w               - List stack and current stack position.";
     println file: $@DEBUGOUT "[Execution]";
-    println file: $@DEBUGOUT "  .n               - Stop at next line in current module.";
-    println file: $@DEBUGOUT "  (enter)          - Step execution and break.";
+    println file: $@DEBUGOUT "  .n               - Enter line mode, stop at next line in current module.";
+    println file: $@DEBUGOUT "  .s               - Enter step mode, stop at next step.";
+    println file: $@DEBUGOUT "  (enter)          - Step mode: Step execution and break.";
+    println file: $@DEBUGOUT "                     Line mode: Line execution and break.";
     println file: $@DEBUGOUT "  (ctrl-d)         - Continue execution.";
     println file: $@DEBUGOUT "  (ctrl-c)         - Enter debugger when program is running.";
     println file: $@DEBUGOUT "[Variable]";
@@ -223,7 +226,23 @@ defun .d () {
     .l
 };
 
+defun .s () {
+    setvar @DEBUGMODE step;
+    .s-sub;
+};
+
+defun .s-sub () {
+    setvar @DEBUGSTEP t;
+
+    throw NEXT;
+};
+
 defun .n () {
+    setvar @DEBUGMODE line;
+    .n-sub;
+};
+
+defun .n-sub () {
     setvar @DEBUGNEXTP $@BREAKINFO,path;
     setvar @DEBUGNEXTL $@BREAKINFO,line;
     setvar @DEBUGNEXTS $@BREAKINFO,stack;
@@ -274,6 +293,9 @@ defun __debug-interp (local) {
     try {
 	println file: $tty "DEBUG: break at \"" $@BREAKINFO,path "\":" $@BREAKINFO,line
 	    ", in " $@BREAKINFO,function ", where " $@BREAKINFO,where ".";
+	set __debug-local__ [[$@DEBUGSTACK get [$@BREAKINFO get stack]] get local];
+	println file: $tty "DEBUG: local= " $__debug-local__;
+	println file: $tty "DEBUG: object= " [.o : get @name] ", vars= " [.o : apply {dict-object}];
 	.l;
 	__debug-main-loop;
     }
@@ -293,7 +315,7 @@ defun __debug-interp (local) {
 
 defun __debug-main-loop () {
     loop {
-	print file: $@DEBUGOUT "DEBUG> ";
+	print file: $@DEBUGOUT "DEBUG(" $@DEBUGMODE ")> ";
 	__debug-r__ ::= $@DEBUGIN gets :nonewline;
 
 	if {nil? $__debug-r__} then: {
@@ -305,8 +327,11 @@ defun __debug-main-loop () {
 	    return;
 	};
 	if {"" = $__debug-r__} then: {
-	    setvar @DEBUGSTEP t;
-	    return;
+	    if {eq? $@DEBUGMODE step} then: {
+		set __debug-r__ ".s-sub";
+	    } else: {
+		set __debug-r__ ".n-sub";
+	    };
 	};
 
 	set __debug-local__ [[$@DEBUGSTACK get [$@BREAKINFO get stack]] get local];
