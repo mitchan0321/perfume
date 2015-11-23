@@ -1707,7 +1707,7 @@ cmd_sleep(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     return new_integer_si(imsec);
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error, syntax: sleep [msec]", interp);
+    return new_exception(TE_SYNTAX, "Syntax error, syntax: sleep msec", interp);
 }
 
 Toy_Type*
@@ -2187,6 +2187,7 @@ cmd_forkandexec(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     int i, pid;
     int left_ch[2], right_ch[2];
     Toy_Type *result;
+    int f;
 
     if (hash_get_length(nameargs) > 0) goto error;
     if (arglen < 1) goto error;
@@ -2234,6 +2235,10 @@ cmd_forkandexec(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
 	close(1);
 	dup(right_ch[1]);
 	close(right_ch[1]);
+
+	for (f=3; f<1024; f++) {
+	    close(f);
+	}
 
 	execvp(command, argv);
 	exit(255);
@@ -3089,6 +3094,48 @@ error:
 			 "Syntax error at 'where', syntax: where", interp);
 }
 
+Toy_Type*
+cmd_istrue(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *var, *val;
+    
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    var = list_get_item(posargs);
+    if (GET_TAG(var) != SYMBOL) goto error;
+    
+    val = toy_resolv_var(interp, var, 1, interp->trace_info);
+    if (GET_TAG(val) == EXCEPTION) return const_Nil;
+    if (GET_TAG(val) == NIL) return const_Nil;
+
+    return const_T;
+
+error:
+    return new_exception(TE_SYNTAX,
+			 "Syntax error at 'true?', syntax: true? var", interp);
+}
+
+Toy_Type*
+cmd_isfalse(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *var, *val;
+    
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    var = list_get_item(posargs);
+    if (GET_TAG(var) != SYMBOL) goto error;
+    
+    val = toy_resolv_var(interp, var, 1, interp->trace_info);
+    if (GET_TAG(val) == EXCEPTION) return const_T;
+    if (GET_TAG(val) == NIL) return const_T;
+
+    return const_Nil;
+
+error:
+    return new_exception(TE_SYNTAX,
+			 "Syntax error at 'false?', syntax: false? var", interp);
+}
+
 int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, "false", cmd_false, NULL);
     toy_add_func(interp, "true", cmd_true, NULL);
@@ -3192,6 +3239,8 @@ int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, "uplevel", cmd_uplevel, NULL);
     toy_add_func(interp, "debug", cmd_debug, NULL);
     toy_add_func(interp, "where", cmd_where, NULL);
+    toy_add_func(interp, "true?", cmd_istrue, NULL);
+    toy_add_func(interp, "false?", cmd_isfalse, NULL);
 
     return 0;
 }
