@@ -1,5 +1,6 @@
 /* $Id: methods.c,v 1.68 2011/12/09 12:54:40 mit-sato Exp $ */
 
+#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -3081,8 +3082,11 @@ mth_file_close(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     Hash *self;
     Toy_File *f;
     Toy_Type *container;
+    Toy_Type *force;
+    int sts;
 
     if (arglen > 0) goto error;
+    force = hash_get_and_unset_t(nameargs, new_symbol("force:"));
     if (hash_get_length(nameargs) > 0) goto error;
 
     self = SELF_HASH(interp);
@@ -3091,14 +3095,17 @@ mth_file_close(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     f = container->u.container;
 
     if (f->fd) {
-	fclose(f->fd);
+	if (force) {
+	    sts = close(fileno(f->fd));
+	} else {
+	    sts = fclose(f->fd);
+	}
 	f->fd = NULL;
 	f->path = NULL;
 	f->mode = 0;
     }
 
     return const_T;
-
 
 error:
     return new_exception(TE_SYNTAX, "Syntax error at 'close', syntax: File close", interp);
@@ -3316,7 +3323,7 @@ mth_file_stat(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     l = new_list(NULL);
 
     list_append(l, new_cons(new_symbol("fd"),
-			    f->fd?new_integer_si(fileno(f->fd)):const_Nil));
+			    f->fd ? new_integer_si(fileno(f->fd)) : const_Nil));
     switch (f->mode) {
     case FMODE_INPUT:
 	mode = new_symbol("i");
@@ -3450,8 +3457,15 @@ mth_file_isready(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     int sts;
     fd_set fds;
     struct timeval timeout;
+    int itimeout = 0;
+    Toy_Type *ttimeout;
 
     if (arglen > 0) goto error;
+    ttimeout = hash_get_and_unset_t(nameargs, new_symbol("timeout:"));
+    if (ttimeout) {
+	if (GET_TAG(ttimeout) != INTEGER) goto error;
+	itimeout = mpz_get_si(ttimeout->u.biginteger);
+    }
     if (hash_get_length(nameargs) > 0) goto error;
 
     self = SELF_HASH(interp);
@@ -3469,8 +3483,8 @@ mth_file_isready(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
 
     FD_ZERO(&fds);
     FD_SET(fdesc, &fds);
-    timeout.tv_sec = 0;
-    timeout.tv_usec = 0;
+    timeout.tv_sec = itimeout / 1000;
+    timeout.tv_usec = (itimeout % 1000) * 1000;
 
     switch (f->mode) {
     case FMODE_INPUT:
@@ -3492,7 +3506,7 @@ mth_file_isready(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     return const_Nil;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'ready?', syntax: File ready?", interp);
+    return new_exception(TE_SYNTAX, "Syntax error at 'ready?', syntax: File ready? [timeout: msec]", interp);
 
 error2:
     return new_exception(TE_TYPE, "Type error.", interp);
@@ -3522,6 +3536,33 @@ mth_file_clear(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
 error:
     return new_exception(TE_SYNTAX, "Syntax error at 'clear', syntax: File clear", interp);
 
+error2:
+    return new_exception(TE_TYPE, "Type error.", interp);
+}
+
+Toy_Type*
+mth_file_setnobuffer(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Hash *self;
+    Toy_Type *container;
+    Toy_File *f;
+    FILE *fd;
+
+    if (arglen != 0) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    self = SELF_HASH(interp);
+    container = hash_get_t(self, const_Holder);
+    if (NULL == container) goto error2;
+    f = container->u.container;
+    fd = f->fd;
+    if (EOF == setvbuf(fd, 0, _IONBF, 0)) {
+	return new_exception(TE_FILEACCESS, "Buffering mode change error.", interp);
+    };
+
+    return const_T;
+    
+error:
+    return new_exception(TE_SYNTAX, "Syntax error at 'set-nobuffer', syntax: File set-nobuffer", interp);
 error2:
     return new_exception(TE_TYPE, "Type error.", interp);
 }
@@ -4158,6 +4199,7 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, "File", "set!", mth_file_set, NULL);
     toy_add_method(interp, "File", "ready?", mth_file_isready, NULL);
     toy_add_method(interp, "File", "clear", mth_file_clear, NULL);
+    toy_add_method(interp, "File", "set-nobuffer", mth_file_setnobuffer, NULL);
 
     toy_add_method(interp, "Block", "eval", mth_block_eval, NULL);
 
