@@ -1,6 +1,7 @@
 /* $Id: methods.c,v 1.68 2011/12/09 12:54:40 mit-sato Exp $ */
 
 #include <unistd.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -2970,13 +2971,11 @@ new_file() {
     ALLOC_SAFE(o);
     memset(o, 0, sizeof(Toy_File));
 
-/*
     GC_register_finalizer_ignore_self((void*)o,
 				      file_finalizer,
 				      NULL,
 				      NULL,
 				      NULL);
-*/
 /*
     GC_register_finalizer((void*)o,
 			  file_finalizer,
@@ -3017,6 +3016,7 @@ mth_file_open(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     Toy_Type *container;
     Toy_Type *mode, *path;
     char *pmode;
+    int flag;
 
     self = SELF_HASH(interp);
     container = hash_get_t(self, const_Holder);
@@ -3067,6 +3067,12 @@ mth_file_open(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 
     if (NULL == f->fd) {
 	return new_exception(TE_FILENOTOPEN, strerror(errno), interp);
+    }
+
+    flag = fcntl(fileno(f->fd), F_GETFD, 0);
+    if (flag >= 0) {
+	flag |= FD_CLOEXEC;
+	fcntl(fileno(f->fd), F_SETFD, flag);
     }
 
     return const_T;
