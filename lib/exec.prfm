@@ -34,7 +34,8 @@ defun exec (args: args) {
 		};
 		if {$stdin eof?} then: {$OUT close :force; break};
 	    };
-
+	    if {$stdin eof?} then: {$OUT close :force};
+	    
 	    loop {
 		if {$IN ready? timeout: 50} then: {
 		    r ::= $IN gets;
