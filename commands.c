@@ -5,6 +5,7 @@
 #include <string.h>
 #include <signal.h>
 #include <unistd.h>
+#include <fcntl.h>
 #include <errno.h>
 #include <dirent.h>
 #include <setjmp.h>
@@ -2187,7 +2188,7 @@ cmd_forkandexec(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     int i, pid;
     int left_ch[2], right_ch[2];
     Toy_Type *result;
-    int f;
+    int flag;
 
     if (hash_get_length(nameargs) > 0) goto error;
     if (arglen < 1) goto error;
@@ -2236,10 +2237,6 @@ cmd_forkandexec(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
 	dup(right_ch[1]);
 	close(right_ch[1]);
 
-	for (f=3; f<1024; f++) {
-	    close(f);
-	}
-
 	execvp(command, argv);
 	exit(255);
     }
@@ -2247,6 +2244,18 @@ cmd_forkandexec(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     /* I am a parent */
     close(left_ch[0]);
     close(right_ch[1]);
+
+    flag = fcntl(left_ch[1], F_GETFD, 0);
+    if (flag >= 0) {
+	flag |= FD_CLOEXEC;
+	fcntl(left_ch[1], F_SETFD, flag);
+    }
+
+    flag = fcntl(right_ch[0], F_GETFD, 0);
+    if (flag >= 0) {
+	flag |= FD_CLOEXEC;
+	fcntl(right_ch[0], F_SETFD, flag);
+    }
 
     result = new_list(NULL);
     list_append(result, new_cons(new_symbol("pid"), new_integer_si(pid)));
