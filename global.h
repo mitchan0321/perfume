@@ -86,6 +86,7 @@ extern Toy_Type *const_nocontrol;
 extern Toy_Type *const_nullstring;
 extern Toy_Type *const_silent;
 extern Toy_Type *const_debug_hook;
+extern Toy_Type *const_ast;
 extern char     *const_regex_cache;
 #ifdef PROF
 extern void *GC_stackbottom;
@@ -173,6 +174,7 @@ Toy_Type *const_nocontrol;
 Toy_Type *const_nullstring;
 Toy_Type *const_silent;
 Toy_Type *const_debug_hook;
+Toy_Type *const_ast;
 char     *const_regex_cache;
 int PageSize;
 #ifdef PROF

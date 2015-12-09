@@ -40,5 +40,6 @@
 #define TE_COOUTOFLIFE		"ErrCoroutineOutOfLife"
 #define TE_NOCOROUTINE		"ErrNotCoroutine"
 #define TE_NOSLOT		"ErrNoStackSlot"
+#define TE_IOAGAIN		"ErrIOAgain"
 
 #endif /* __ERROR__ */

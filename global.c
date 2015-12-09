@@ -84,6 +84,7 @@ void def_global() {
     const_nullstring = new_string_str("");
     const_silent = new_symbol("silent:");
     const_debug_hook = new_symbol("debug-hook");
+    const_ast = new_symbol("*");
     const_regex_cache = "@REGEX_CACHE";
     PageSize = sysconf(_SC_PAGESIZE);
 #ifdef PROF
