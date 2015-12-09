@@ -1,3 +1,4 @@
+2015/12/09	PRFM_20151209		0.8.0_PRE_6
 2015/11/24	PRFM_20151124		0.8.0_PRE_5
 2015/11/23	PRFM_20151123		0.8.0_PRE_4
 2015/11/15	PRFM_20151115		0.8.0_PRE_3
@@ -737,4 +738,39 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 	lib/exec.prfm
 		Fix $stdin eof conditiion.
 
+2015/12/09:
+	error.h
+		Add error 'ErrIOAgain'.
+	eval.c
+		Add parameter form '(*)' that meaning accept all parameter into variable '$*'.
+	lib/Pipe.prfm
+		Add terminate hook.
+		Add output stream hooking entry 'set-term-hook (h)'.
+	lib/Stream.prfm
+		Change Stream::puts interface, accept some output arguments.
+	lib/debugger.prfm
+		Change header print local and object instance variable format.
+	lib/exec.prfm
+		Add exec sub-process terminate hook.
+		Change $OUT(process input) writable watching.
+		Change $IN(process output) reading timeout proceed.
+	lib/ls.prfm
+		Change accept argument otherwise string variable.
+	lib/make-proxy.prfm
+		Add new utility make-proxy (o) is create a proxy object path throw the $o object.
+	lib/pipe.prfm
+		Add result returned that last pipe body's last output.
+	lib/util.prfm
+		Change impliment Block::<< and Block::>> using pipe.prfm utility.
+	methods.c
+		Fix List::item value if item is NULL.
+		Fix List::inject.
+		Add List::set-car! and List::set-cdr!.
+		Add File::set-noblock method and non-blocking I/O option.
+		  Return exception ErrIOAgain when if no data stream read.
+	setup.prfm
+		Add global variable $INFILE and $OUTFILE.
+	types.c
+		Fix List::string, suppress display '(null address)'.
+		
 #eof
