@@ -29,6 +29,9 @@ defvar stderr [new File];
 $stderr set! 2 mode: o;
 $stderr set-newline t;
 
+defvar INFILE "-";
+defvar OUTFILE "-";
+
 #
 # show start message
 #
