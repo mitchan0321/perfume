@@ -19,6 +19,11 @@ defun exec (args: args) {
     $IN set! $in mode: i;
     $IN set-newline nil;
     $IN set-nobuffer;
+    if {sets? CO-MODE} then: {$IN set-noblock t};
+
+    if {true? PipeObject} then: {
+	$PipeObject set-term-hook [fun () {$IN close; $OUT close}];
+    };
 
     try {
 	loop {
@@ -26,19 +31,32 @@ defun exec (args: args) {
 		if {$stdin ready? timeout: 50} then: {
 		    r ::= $stdin gets;
 		    if [nil? $r] else: {
-			println file: $OUT $r;
-			$OUT flush;
+			if {$OUT ready? timeout: 50} then: {
+			    println file: $OUT $r;
+			    $OUT flush;
+			} else: {
+			    break;
+			};
 		    };
 		} else: {
 		    break;
 		};
-		if {$stdin eof?} then: {$OUT close :force; break};
+		if {$stdin eof?} then: {$OUT close; break};
 	    };
-	    if {$stdin eof?} then: {$OUT close :force};
+	    if {$stdin eof?} then: {$OUT close};
 	    
 	    loop {
 		if {$IN ready? timeout: 50} then: {
-		    r ::= $IN gets;
+		    try {
+			r ::= $IN gets;
+		    } catch: {| e |
+			if {eq? [$e car] ErrIOAgain}
+		        then: {
+			    pause @WRITE; 
+			    continue;
+			}
+			else: {throw $e};
+		    };
 		    if [nil? $r] else: {
 			println $r;
 			$stdout flush;
@@ -53,7 +71,7 @@ defun exec (args: args) {
 	    if {sets? CO-MODE} then: {pause @WRITE};
 	};
 	
-        $OUT close :force;
+        $OUT close;
 
 	REM { #------
 	if {$IN eof?} else: {
@@ -78,8 +96,8 @@ defun exec (args: args) {
     }
     
     fin: {
-	$OUT close :force;
-	$IN close :force;
+	$OUT close;
+	$IN close;
 	if {[wait $pid] = 255} then: {throw ErrExecProgram "can\'t execute program."};
     }
     ;
