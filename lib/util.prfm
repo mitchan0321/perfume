@@ -41,6 +41,9 @@ defun apply-constructor-sub (o) {
 # block eval and input/output redirect from/to specified file.
 #
 Block method >> (file) {
+    pipe out: $file [self];
+
+    REM { #----------
     try {
         set orig_stdout $stdout;
         setvar stdout [new File];
@@ -54,9 +57,13 @@ Block method >> (file) {
         try {$stdout close;} catch: {};
         setvar stdout $orig_stdout;
     };
+    }; #----------
 };
 
 Block method << (file) {
+    pipe in: $file [self];
+    
+    REM { #----------
     try {
         set orig_stdin $stdin;
         setvar stdin [new File];
@@ -70,6 +77,7 @@ Block method << (file) {
         try {$stdin close;} catch: {};
         setvar stdin $orig_stdin;
     };
+    }; #----------
 };
 
 #
