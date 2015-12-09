@@ -294,8 +294,8 @@ defun __debug-interp (local) {
 	println file: $tty "DEBUG: break at \"" $@BREAKINFO,path "\":" $@BREAKINFO,line
 	    ", in " $@BREAKINFO,function ", where " $@BREAKINFO,where ".";
 	set __debug-local__ [[$@DEBUGSTACK get [$@BREAKINFO get stack]] get local];
-	println file: $tty "DEBUG: local= " $__debug-local__;
-	println file: $tty "DEBUG: object= " [.o : get @name] ", vars= " [.o : apply {dict-object}];
+	println file: $tty "DEBUG: local: " [__debug-prity-print $__debug-local__];
+	println file: $tty "DEBUG: object: " [.o : get @name] ", vars: " [__debug-prity-print [.o : apply {dict-object}]];
 	.l;
 	__debug-main-loop;
     }
@@ -346,6 +346,19 @@ defun __debug-main-loop () {
 		[$__debug-error__ cdr];
 	};
     };
+};
+
+defun __debug-prity-print (d) {
+    result := "";
+    $d each do: {| k v |
+	$result append! $k "=";
+	if {[["" . $v] len] > 24} then: {
+	    $result append! [["" . $v] sub 0 24] "..., ";
+	} else: {
+		$result append! $v ", ";
+	};
+    };
+    return $result;
 };
 
 defun debug-hook (line object function statement path dict stack_index
