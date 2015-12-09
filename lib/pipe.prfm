@@ -109,6 +109,8 @@ defun pipe (in: in out: out args: blocks) {
     old-trap ::= trap SIGPIPE;
     trap SIGPIPE {throw ReceivePipe "Broken pipe"};
 
+    $blist last : item : out-setup;
+
     try {
         pipe-dispatch $blist;
     }
@@ -130,6 +132,8 @@ defun pipe (in: in out: out args: blocks) {
 	    else: {trap SIGPIPE}
 	;
     };
+
+    return [$blist last : item : get-result];
 };
 
 defun pipe-dispatch (blist) {
@@ -144,7 +148,7 @@ defun pipe-dispatch (blist) {
 	    $b run;
 	
 	    s ::= $b stat?;
-	    if {eq? $s @READ } then: {retry};
+	    if {eq? $s @READ} then: {retry};
         };
     };
 };
