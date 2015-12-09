@@ -18,6 +18,9 @@ Pipe method init (in out body) {
     sets OUTFILE "";
     sets error "";
     sets CO-MODE t;
+    sets result nil;
+    sets PipeObject [self];
+    sets @term-hook nil;
 };
 
 Pipe method stat? () {
@@ -63,6 +66,7 @@ Pipe method release () {
     if {sets? coro} then: {
 	$coro release;
     };
+    if [true? @term-hook] then: {$@term-hook};
 };
 
 Pipe method set-infile (f) {
@@ -79,4 +83,36 @@ Pipe method get-body () {
 
 Pipe method get-error () {
     return $error;
+};
+
+Pipe method get-result () {
+    return $result;
+};
+
+Pipe method set-result (r) {
+    sets result $r;
+};
+
+Pipe method out-setup () {
+    o ::= make-proxy $out;
+    f ::= $o method? puts;
+    s ::= self;
+    
+    $o method puts (*) {
+	r ::= call $f $*;
+
+	if {[$* len] = 1} then: {
+	    $s set-result [$* item];
+	} else: {
+	    $s set-result $*;
+        };
+
+	return $r;
+    };
+
+    sets out $o;
+};
+
+Pipe method set-term-hook (h) {
+    sets @term-hook $h;
 };
