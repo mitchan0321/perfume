@@ -1409,8 +1409,10 @@ mth_list_item(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     l = SELF(interp);
     if (GET_TAG(l) != LIST) goto error;
 
-    if (NULL == list_get_item(l)) return new_list(NULL);
-    return list_get_item(l);
+    return ((l->u.list.item==NULL)?const_Nil:(l->u.list.item));
+
+//    if (NULL == list_get_item(l)) return new_list(NULL);
+//    return list_get_item(l);
 
 error:
     return new_exception(TE_SYNTAX, "Syntax error at 'car', syntax: List car | item", interp);
@@ -2029,16 +2031,13 @@ mth_list_inject(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
 loop_retry:
     result = sum_val;
     l = SELF(interp);
+    if (GET_TAG(l) != LIST) goto error2;
 
 loop:
     if (! l) goto fin;
     if (IS_LIST_NULL(l)) goto fin;
     
-    if (GET_TAG(l) == LIST) {
-	item = list_get_item(l);
-    } else {
-	item = l;
-    }
+    item = list_get_item(l);
 
     yval = new_list(result);
     list_append(yval, item);
@@ -2077,6 +2076,48 @@ fin:
 error:
     return new_exception(TE_SYNTAX,
 	"Syntax error at 'inject', syntax: List inject init-val do: {| sum-var each-var | block}", interp);
+error2:
+    return new_exception(TE_TYPE, "Type error.", interp);
+}
+
+Toy_Type*
+mth_list_setcar(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *l, *v;
+
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (list_length(posargs) != 1) goto error;
+
+    l = SELF(interp);
+    if (GET_TAG(l) != LIST) goto error2;
+    v = list_get_item(posargs);
+    
+    l->u.list.item = v;
+
+    return l;
+
+error:
+    return new_exception(TE_SYNTAX, "Syntax error at 'set-car!', syntax: List set-car! val", interp);
+error2:
+    return new_exception(TE_TYPE, "Type error.", interp);
+}
+
+Toy_Type*
+mth_list_setcdr(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *l, *v;
+
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (list_length(posargs) != 1) goto error;
+
+    l = SELF(interp);
+    if (GET_TAG(l) != LIST) goto error2;
+    v = list_get_item(posargs);
+    
+    l->u.list.nextp = v;
+
+    return l;
+
+error:
+    return new_exception(TE_SYNTAX, "Syntax error at 'set-car!', syntax: List set-cdr! val", interp);
 error2:
     return new_exception(TE_TYPE, "Type error.", interp);
 }
@@ -2946,6 +2987,7 @@ typedef struct _toy_file {
     int mode;
     int newline;
     Toy_Type *path;
+    Cell *r_pending;
 } Toy_File;
 
 void
@@ -2958,6 +3000,7 @@ file_finalizer(void *obj, void *client_data) {
 	fclose(o->fd);
 	o->fd = NULL;
 	o->path = NULL;
+	o->r_pending = NULL;
     }
 
     return;
@@ -3101,11 +3144,12 @@ mth_file_close(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     f = container->u.container;
 
     if (f->fd) {
-	if (force) {
-	    sts = close(fileno(f->fd));
-	} else {
-	    sts = fclose(f->fd);
-	}
+//      diactivate :force option.
+//	if (force) {
+//	    sts = close(fileno(f->fd));
+//	} else {
+	sts = fclose(f->fd);
+//	}
 	f->fd = NULL;
 	f->path = NULL;
 	f->mode = 0;
@@ -3156,16 +3200,30 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 
     if (feof(f->fd)) return const_Nil;
 
-    cbuff = new_cell("");
+    if (f->r_pending) {
+	cbuff = new_cell(cell_get_addr(f->r_pending));
+	f->r_pending = NULL;
+    } else {
+	cbuff = new_cell("");
+    }
+    
     while (1) {
 	c = fgetc(f->fd);
 	if (EOF == c) {
+	    if ((errno == EAGAIN) && (! feof(f->fd))) {
+		clearerr(f->fd);
+		f->r_pending = cbuff;
+		return new_exception(TE_IOAGAIN, "No data available at File::gets, try again.", interp);
+	    }
+	    
+	    f->r_pending = NULL;
 	    if (cell_get_length(cbuff) == 0) {
 		return const_Nil;
 	    } else {
 		return new_string_cell(cbuff);
 	    }
 	}
+	
 	if (('\n' == c) || ('\r' == c)) {
 	    if (! flag_nonewline) {
 		if (! flag_nocontrol) {
@@ -3569,6 +3627,57 @@ mth_file_setnobuffer(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int 
     
 error:
     return new_exception(TE_SYNTAX, "Syntax error at 'set-nobuffer', syntax: File set-nobuffer", interp);
+error2:
+    return new_exception(TE_TYPE, "Type error.", interp);
+}
+
+Toy_Type*
+mth_file_setnoblock(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Hash *self;
+    Toy_Type *container, *flag;
+    Toy_File *f;
+    FILE *fd;
+    int iflag = 0, val;
+
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    flag = list_get_item(posargs);
+    if (GET_TAG(flag) == NIL) {
+	iflag = 0;	// mark normal (read block)
+    } else {
+	iflag = 1;	// mark non-block (read non-block)
+    }
+
+    self = SELF_HASH(interp);
+    container = hash_get_t(self, const_Holder);
+    if (NULL == container) goto error2;
+    f = container->u.container;
+    fd = f->fd;
+
+    val = fcntl(fileno(fd), F_GETFL, 0);
+    if (-1 == val) {
+	return new_exception(TE_FILEACCESS, "fcntl error at F_GETFL.", interp);
+    }
+    if (iflag) {
+	// set non-block
+	val |= O_NONBLOCK;
+    } else {
+	// set block (normal)
+	val &= ~O_NONBLOCK;
+    }
+    if (fcntl(fileno(fd), F_SETFL, val) == -1) {
+	return new_exception(TE_FILEACCESS, "fcntl error at F_SETFL.", interp);
+    }
+    
+    if (iflag) {
+	return const_T;
+    } else {
+	return const_Nil;
+    }
+    
+error:
+    return new_exception(TE_SYNTAX, "Syntax error at 'set-noblock', syntax: File set-noblock t | nil", interp);
 error2:
     return new_exception(TE_TYPE, "Type error.", interp);
 }
@@ -4172,6 +4281,8 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, "List", "<<-", mth_list_push, NULL);
     toy_add_method(interp, "List", "->>", mth_list_pop, NULL);
     toy_add_method(interp, "List", "inject", mth_list_inject, NULL);
+    toy_add_method(interp, "List", "set-car!", mth_list_setcar, NULL);
+    toy_add_method(interp, "List", "set-cdr!", mth_list_setcdr, NULL);
 
     toy_add_method(interp, "String", "len", mth_string_len, NULL);
     toy_add_method(interp, "String", "=", mth_string_equal, NULL);
@@ -4206,6 +4317,7 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, "File", "ready?", mth_file_isready, NULL);
     toy_add_method(interp, "File", "clear", mth_file_clear, NULL);
     toy_add_method(interp, "File", "set-nobuffer", mth_file_setnobuffer, NULL);
+    toy_add_method(interp, "File", "set-noblock", mth_file_setnoblock, NULL);
 
     toy_add_method(interp, "Block", "eval", mth_block_eval, NULL);
 
