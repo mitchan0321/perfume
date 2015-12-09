@@ -54,7 +54,12 @@ Stream method ready? (timeout: timeout) {
     if [$queue null?] then: nil else: t;
 };
 
-Stream method puts (i nonewline: nonewline) {
+Stream method puts (nonewline: nonewline args: r) {
+    if {[$r len] = 0} then: {throw ErrSyntax "Syntax error at 'puts', syntax: Stream puts [:nonewline] val ..."};
+    $r each do: {| i | puts-sub $i};
+};
+
+Stream method puts-sub (i) {
     if [eof?] then: {throw ErrFileAccess "Stream is closed."};
 
     while {$count >= $limit} do: {
