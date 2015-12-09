@@ -783,6 +783,22 @@ bind_args(Toy_Interp *interp, Toy_Type *arglist, struct _toy_argspec *aspec,
 
     l = arglist;
 
+    if ((aspec->posarg_len == 1) && (hash_get_length(aspec->namedarg) == 0)) {
+	var = array_get(aspec->posarg_array, 0);
+	if (strcmp(cell_get_addr(var->u.symbol.cell), "*") == 0) {
+	    Toy_Type *result, *last;
+	    last = result = new_list(NULL);
+	    while (l) {
+		val = toy_expand(interp, list_get_item(l), env, trace_info);
+		if (GET_TAG(val) == EXCEPTION) return val;
+		last = list_append(last, val);
+		l = list_next(l);
+	    }
+	    hash_set_t(args, const_ast, result);
+	    return const_Nil;
+	}
+    }
+
     if ((fun_paramno < TAG_MAX_PARAMNO) && (call_paramno < TAG_MAX_PARAMNO)
 	&& (fun_paramno == call_paramno)) {
 
