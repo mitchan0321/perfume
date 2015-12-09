@@ -683,7 +683,11 @@ to_string(Toy_Type *obj) {
 		cell_add_str(c, to_print(obj));
 		break;
 	    } else {
-		cell_add_str(c, to_print(list_get_item(obj)));
+		if (IS_LIST_NULL(obj)) {
+		    cell_add_str(c, ". ()");
+		} else {
+		    cell_add_str(c, to_print(list_get_item(obj)));
+		}
 		if (list_length(obj) > 1) cell_add_char(c, ' ');
 	    }
 
@@ -992,7 +996,11 @@ to_print(Toy_Type *obj) {
 		cell_add_str(c, to_print(obj));
 		break;
 	    } else {
-		cell_add_str(c, to_print(list_get_item(obj)));
+		if (IS_LIST_NULL(obj)) {
+		    cell_add_str(c, ". ()");
+		} else {
+		    cell_add_str(c, to_print(list_get_item(obj)));
+		}
 		if (list_length(obj) > 1) cell_add_char(c, ' ');
 	    }
 
