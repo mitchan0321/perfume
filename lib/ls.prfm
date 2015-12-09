@@ -3,7 +3,7 @@
 # like ls -1
 
 defun ls (all: all ind: ind args: dir) {
-    if [$dir null?] then: {set d "."} else: {set d [$dir item]};
+    if [$dir null?] then: {set d "."} else: {set d ["" . [$dir item]]};
     if [set? ind] else: {set ind 0};
 
     [msort [file list $d]] each do: {| f |
