@@ -2988,6 +2988,7 @@ typedef struct _toy_file {
     int newline;
     Toy_Type *path;
     Cell *r_pending;
+    int noblock;
 } Toy_File;
 
 void
@@ -3416,6 +3417,7 @@ mth_file_stat(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 	list_append(l, new_cons(new_symbol("eof"), const_Nil));
     }
     list_append(l, new_cons(new_symbol("newline"), f->newline ? const_T : const_Nil));
+    list_append(l, new_cons(new_symbol("noblock"), f->noblock ? const_T : const_Nil));
 
     return l;
 
@@ -3619,7 +3621,7 @@ mth_file_setnobuffer(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int 
     if (NULL == container) goto error2;
     f = container->u.container;
     fd = f->fd;
-    if (EOF == setvbuf(fd, 0, _IONBF, 0)) {
+    if (EOF == setvbuf(fd, 0, _IOLBF, 0)) {
 	return new_exception(TE_FILEACCESS, "Buffering mode change error.", interp);
     };
 
@@ -3671,8 +3673,10 @@ mth_file_setnoblock(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int a
     }
     
     if (iflag) {
+	f->noblock = 1;
 	return const_T;
     } else {
+	f->noblock = 0;
 	return const_Nil;
     }
     
