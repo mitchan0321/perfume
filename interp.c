@@ -65,6 +65,7 @@ new_interp(char* name, int stack_size, Toy_Interp* parent,
 
     interp = GC_MALLOC(sizeof(Toy_Interp));
     ALLOC_SAFE(interp);
+    memset(interp, 0, sizeof(Toy_Interp));
 
     if (NULL == parent) {
 
@@ -188,6 +189,8 @@ interp_setup(Toy_Interp* interp, int argc, char **argv, char **envp) {
     trace_info->object_name = obj;
     trace_info->func_name = new_symbol("Main");
     trace_info->statement = new_statement(new_list(new_symbol("(perfumesh)")), 0);
+    interp->trace_info = trace_info;
+
     toy_push_func_env(interp, new_hash(), NULL, NULL, trace_info);
 
     /* make world */
