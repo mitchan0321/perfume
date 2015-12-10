@@ -13,12 +13,12 @@ INCLUDE		= -I/usr/local/include -I.
 LIB		= -L/usr/lib -L/lib -L/usr/local/lib -lm -lgc -lpthread -lonig -lpcl -lgmp
 
 # for memory debuging build.
-#CFLAGS		= -c -g -DPROF -DHAS_GCACHE
+#CFLAGS		= -c -g -DPROF
 #INCLUDE		= -I/usr/local/include -I.
 #LIB		= -L/usr/local/lib -lm -lonig -lpcl -lgmp
 
 # for profiling build.
-#CFLAGS		= -c -g -pg -DPROF -DHAS_GCACHE
+#CFLAGS		= -c -g -pg -DPROF
 #INCLUDE		= -I/usr/local/include -I.
 #LIB		= -pg -L/usr/local/lib -lonig -lpcl -lgmp
 
