@@ -1,0 +1,40 @@
+defun w (wide: wide) {
+    if {true? wide} then: {
+	println ["%3v %-18v %v" fmt "Idx" "Path" "Statement/Local"];
+	println ["%3v %-18v %v" fmt "---" "----" "---------------"];
+    } else: {
+	println ["%3v %-18v %!-20v %v" fmt "Idx" "Path" "Statement" "Local"];
+	println ["%3v %-18v %!-20v %v" fmt "---" "----" "---------" "-----"];
+    };
+    where : each do: {| i |
+	d ::= dict $i;
+	if {true? wide} then: {
+	    println ["%3d %-18v %v" fmt 
+		     $d,index 
+		     ["" . [$d,path split sep: "/" : last : item] ":" $d,line]
+		     $d,statement];
+	    println ["%22v %v" fmt
+		     ""
+		     [w-prity-print $d,local]];
+	} else: {
+	    println ["%3d %-18v %!-20v %!-36v" fmt 
+		     $d,index 
+		     ["" . [$d,path split sep: "/" : last : item] ":" $d,line]
+		     $d,statement
+		     [w-prity-print $d,local]];
+	};
+    };
+};
+
+defun w-prity-print (d) {
+    result := "";
+    $d each do: {| k v |
+	$result append! $k "=";
+	if {[["" . $v] len] > 24} then: {
+	    $result append! [["" . $v] sub 0 24] "..., ";
+	} else: {
+		$result append! $v ", ";
+	};
+    };
+    return $result;
+}
