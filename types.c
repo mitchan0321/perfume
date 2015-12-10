@@ -419,7 +419,7 @@ new_vector(struct _array *vector) {
 static void
 coroutine_handl(void *context) {
     Toy_Type *co;
-    Toy_Type *result;
+    Toy_Type *result = const_Nil;
     sigjmp_buf jmp_env;
     int id;
 
