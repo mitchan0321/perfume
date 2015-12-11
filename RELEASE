@@ -772,5 +772,14 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 		Add global variable $INFILE and $OUTFILE.
 	types.c
 		Fix List::string, suppress display '(null address)'.
-		
+
+2015/12/11:
+	lib/pipe.prfm
+		Change syntax error symbol.
+	lib/w.prfm
+		Add new utility 'w.prfm' that display stack and local variable command.
+	methods.c
+		Add noblock status to container member.
+		Change noblock option _IONBF --> _IOLBF, FreeBSD libs bug?
+
 #eof
