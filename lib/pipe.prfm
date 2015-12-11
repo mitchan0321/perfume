@@ -18,14 +18,14 @@ defun pipe (in: in out: out args: blocks) {
 	case [type? $in]
 	    OBJECT {
 	        if {or [eq? $in,@name Stream] [eq? $in,@name File]} else: {
-		    throw ErrPipeSyntax $syntax;
+		    throw ErrSyntax $syntax;
 		};
 	    }
 	    STRING {
 		in := `File($in mode: i);
 		$flist append! $in;
 	    }
-	    * {throw ErrPipeSyntax $syntax}
+	    * {throw ErrSyntax $syntax}
 	;
 	 
 	d ::= dict [$in stat];
@@ -46,7 +46,7 @@ defun pipe (in: in out: out args: blocks) {
 	case [type? $out]
 	    OBJECT {
 	        if {or [eq? $out,@name Stream] [eq? $out,@name File]} else: {
-		    throw ErrPipeSyntax $syntax;
+		    throw ErrSyntax $syntax;
 		};
 		if {eq? $out,@name Stream} then: {
 		    $out set-nolimit;
@@ -56,7 +56,7 @@ defun pipe (in: in out: out args: blocks) {
 		out := `File($out mode: o);
 		$flist append! $out;
 	    }
-	    * {throw ErrPipeSyntax $syntax}
+	    * {throw ErrSyntax $syntax}
 	;
 	
 	d ::= dict [$out stat];
@@ -74,13 +74,13 @@ defun pipe (in: in out: out args: blocks) {
     #
     $blocks each do: {| b |
         if {! [block? $b]} then: {
-	    throw ErrPipeSyntax $syntax;
+	    throw ErrSyntax $syntax;
 	}
     };
     
     len ::= $blocks len;
     if {$len = 0} then: {
-	throw ErrPipeSyntax $syntax;
+	throw ErrSyntax $syntax;
     };
     
     blist := ();
