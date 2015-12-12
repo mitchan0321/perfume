@@ -1,4 +1,4 @@
-((fd . 3) (mode . o) (path . "./test") (eof . nil) (newline . t))
+((fd . 3) (mode . o) (path . "./test") (eof . nil) (newline . t) (noblock . nil))
 nil
 nil
 abc
