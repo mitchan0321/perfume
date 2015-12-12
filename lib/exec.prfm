@@ -72,27 +72,6 @@ defun exec (args: args) {
 	};
 	
         $OUT close;
-
-	REM { #------
-	if {$IN eof?} else: {
-	    set i 0;
- 	    loop {
-		if {$IN ready? timeout: 50} then: {
-		    r ::= $IN gets;
-		    if [nil? $r] else: {
-			println $r;
-			$stdout flush;
-		    };
-		} else: {
-		    $i ++;
-		    if {$i >= 3} then: {break};
-		    if {$IN eof?} then: {break};
-		    if {sets? CO-MODE} then: {pause @WRITE};
-		};
-		if {$IN eof?} then: {break};
-	    };
-	};
-	}; #------
     }
     
     fin: {
