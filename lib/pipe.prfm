@@ -126,7 +126,7 @@ defun pipe (in: in out: out args: blocks) {
 	$stdin clear;
 	$stdout flush;
 
-	try {loop {s ::= wait -1}} catch: {};
+	if {false? CO-MODE} then: {try {loop {s ::= wait -1}} catch: {}};
 	if {block? $old-trap}
 	    then: {trap SIGPIPE $old-trap}
 	    else: {trap SIGPIPE}

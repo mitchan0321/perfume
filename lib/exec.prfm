@@ -28,22 +28,24 @@ defun exec (args: args) {
     try {
 	loop {
 	    loop {
-		if {$stdin ready? timeout: 50} then: {
+		if {and [$stdin ready? timeout: 50] 
+			[$OUT   ready? timeout: 50]} then: {
 		    r ::= $stdin gets;
 		    if [nil? $r] else: {
-			if {$OUT ready? timeout: 50} then: {
-			    println file: $OUT $r;
-			    $OUT flush;
-			} else: {
-			    break;
-			};
+			println file: $OUT $r;
+			$OUT flush;
 		    };
 		} else: {
 		    break;
 		};
-		if {$stdin eof?} then: {$OUT close; break};
+		if {$stdin eof?} then: {
+		    $OUT close;
+		    break;
+		};
 	    };
-	    if {$stdin eof?} then: {$OUT close};
+	    if {$stdin eof?} then: {
+		$OUT close
+	    };
 	    
 	    loop {
 		if {$IN ready? timeout: 50} then: {
@@ -55,7 +57,9 @@ defun exec (args: args) {
 			    pause @WRITE; 
 			    continue;
 			}
-			else: {throw $e};
+			else: {
+			    throw $e
+			};
 		    };
 		    if [nil? $r] else: {
 			println $r;
@@ -68,7 +72,9 @@ defun exec (args: args) {
 	    };
 
 	    if {$IN eof?} then: {break};
-	    if {sets? CO-MODE} then: {pause @WRITE};
+	    if {sets? CO-MODE} then: {
+		pause @WRITE
+	    };
 	};
 	
         $OUT close;
@@ -77,7 +83,8 @@ defun exec (args: args) {
     fin: {
 	$OUT close;
 	$IN close;
-	if {[wait $pid] = 255} then: {throw ErrExecProgram "can\'t execute program."};
-    }
-    ;
+	if {[wait $pid] = 255} then: {
+	    throw ErrExecProgram "Can\'t execute program."
+	};
+    };
 };
