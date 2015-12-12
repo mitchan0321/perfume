@@ -42,42 +42,10 @@ defun apply-constructor-sub (o) {
 #
 Block method >> (file) {
     pipe out: $file [self];
-
-    REM { #----------
-    try {
-        set orig_stdout $stdout;
-        setvar stdout [new File];
-        $stdout open $file mode: o;
-	[self] eval;
-    }
-    catch: {| e |
-        throw $e;
-    }
-    fin: {
-        try {$stdout close;} catch: {};
-        setvar stdout $orig_stdout;
-    };
-    }; #----------
 };
 
 Block method << (file) {
     pipe in: $file [self];
-    
-    REM { #----------
-    try {
-        set orig_stdin $stdin;
-        setvar stdin [new File];
-        $stdin open $file mode: i;
-	[self] eval;
-    }
-    catch: {| e |
-        throw $e;
-    }
-    fin: {
-        try {$stdin close;} catch: {};
-        setvar stdin $orig_stdin;
-    };
-    }; #----------
 };
 
 #
