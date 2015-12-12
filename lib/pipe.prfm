@@ -148,6 +148,7 @@ defun pipe-dispatch (blist) {
 	    $b run;
 	
 	    s ::= $b stat?;
+	    if {and [or [eq? $s @READ] [eq? $s @WRITE]] [sets? CO-MODE]} then: {pause @WRITE};
 	    if {eq? $s @READ} then: {retry};
         };
     };
@@ -163,7 +164,7 @@ defun pipe-check-done-cond (blist) {
 	if {eq? [$b stat?] DONE}  else: {return nil};
     };
 
-    # all co-routine done
+    # all co-routines are done.
     return t;
 };
 
