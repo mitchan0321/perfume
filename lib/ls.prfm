@@ -23,7 +23,7 @@ defun ls (all: all ind: ind args: dir) {
 		    } catch: {| e |
 		        case [$e car]
 			ErrFileAccess {
-			    println "# no access permission, \"" $f "\"";
+			    println file: $stderr "No access permission, \"" $f "\"";
 			}
 			* {throw $e};
 		    };
