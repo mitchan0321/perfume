@@ -3053,12 +3053,17 @@ cmd_where(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *result;
     Toy_Type *elem;
     int i;
+    int top;
 
     if (arglen != 0) goto error;
+    top = interp->cur_func_stack-1;
+    if (hash_get_and_unset_t(nameargs, new_symbol("top:"))) {
+	top = interp->cur_func_stack;
+    }
     if (hash_get_length(nameargs) != 0) goto error;
 
     result = new_list(NULL);
-    for (i=interp->cur_func_stack-1; i>=0; i--) {
+    for (i=top; i>=0; i--) {
 	elem = new_list(NULL);
 
 	list_append(elem, new_cons(new_symbol("index"), 
@@ -3100,7 +3105,7 @@ cmd_where(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     
 error:
     return new_exception(TE_SYNTAX,
-			 "Syntax error at 'where', syntax: where", interp);
+			 "Syntax error at 'where', syntax: where [:top]", interp);
 }
 
 Toy_Type*
