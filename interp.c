@@ -50,6 +50,8 @@ new_interp(char* name, int stack_size, Toy_Interp* parent,
 	   int argc, char **argv, char **envp) {
 
     Toy_Interp *interp;
+    Toy_Type *l, *t;
+    
     static int gc_init_once = 0;
 
     if (0 == gc_init_once) {
@@ -142,7 +144,17 @@ new_interp(char* name, int stack_size, Toy_Interp* parent,
 	interp->obj_stack[interp->cur_obj_stack] = parent->obj_stack[parent->cur_obj_stack];
 	interp->funcs = parent->funcs;
 	interp->classes = parent->classes;
-	interp->globals = parent->globals;
+
+	interp->globals = new_hash();
+	if (NULL == interp->globals) return NULL;
+	/* global dict mirroring */
+	l = hash_get_pairs(parent->globals);
+	while (l) {
+	    t = list_get_item(l);
+	    hash_set_t(interp->globals, list_get_item(t), list_next(t));
+	    l = list_next(l);
+	}
+	
 	interp->scripts = parent->scripts;
 	interp->script_id = parent->script_id;
 #ifdef HAS_GCACHE

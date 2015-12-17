@@ -489,6 +489,7 @@ new_coroutine(Toy_Interp *interp, Toy_Type* script) {
     ALLOC_SAFE(o->u.coroutine);
 
     o->u.coroutine->interp = new_interp(0, CO_STACKSIZE, interp, 0, 0, 0);
+    ALLOC_SAFE(o->u.coroutine->interp);
     o->u.coroutine->script = script;
 
     if (GET_TAG(script) == CLOSURE) {
