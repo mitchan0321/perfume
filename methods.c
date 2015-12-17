@@ -4196,6 +4196,30 @@ error2:
     return new_exception(TE_TYPE, "Type error.", interp);
 }
 
+Toy_Type*
+mth_coro_eval(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *self, *body;
+    Toy_Coroutine *co;
+
+    self = SELF(interp);
+    if (GET_TAG(self) != COROUTINE) goto error2;
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    co = self->u.coroutine;
+    
+    body = list_get_item(posargs);
+    if (GET_TAG(body) != CLOSURE) goto error;
+
+    return toy_eval_script(co->interp, body->u.closure.block_body);
+    
+error:
+    return new_exception(TE_SYNTAX, "Syntax error at 'eval', syntax: Coro eval {body}", interp);
+
+error2:
+    return new_exception(TE_TYPE, "Type error.", interp);
+}
+
 int
 toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, "Object", "vars", mth_object_vars, NULL);
@@ -4346,6 +4370,7 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, "Coro", "next", mth_coro_next, NULL);
     toy_add_method(interp, "Coro", "release", mth_coro_release, NULL);
     toy_add_method(interp, "Coro", "stat", mth_coro_stat, NULL);
+    toy_add_method(interp, "Coro", "eval", mth_coro_eval, NULL);
 
     return 0;
 }

@@ -1,3 +1,4 @@
+2015/12/17	PRFM_20151217		0.8.0_RC_2
 2015/12/13	PRFM_20151213		0.8.0_RC_1
 2015/12/09	PRFM_20151209		0.8.0_PRE_6
 2015/11/24	PRFM_20151124		0.8.0_PRE_5
@@ -790,5 +791,15 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 		Fix calling where command with option :top.
 	doc/manual.*
 		Version 0.8.0.
+
+2015/12/07:
+	methods.c
+		Add Coro::eval.
+	interp.c
+		Change child interpriter global dictionary is mirrored from
+		parent interpriter at new_interp.
+	lib/Pipe.prfm
+		Change stdin and stdout storege class from instance variable
+		to global variable.
 
 #eof

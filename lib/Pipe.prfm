@@ -29,13 +29,11 @@ Pipe method stat? () {
 
 Pipe method run () {
     if {sets? coro} else: {
-	sets coro [
-	    coro {
-		setvar stdin $in;
-		setvar stdout $out;
-		$body eval;
-	    };
-	];
+	sets coro [coro $body];
+	$coro eval {
+	    setvar stdin $in;
+	    setvar stdout $out;
+	};
     };
 
     sets stat RUN;
