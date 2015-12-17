@@ -792,7 +792,7 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 	doc/manual.*
 		Version 0.8.0.
 
-2015/12/07:
+2015/12/17:
 	methods.c
 		Add Coro::eval.
 	interp.c
@@ -801,5 +801,11 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 	lib/Pipe.prfm
 		Change stdin and stdout storege class from instance variable
 		to global variable.
+	lib/pipe.prfm
+		Add parameter variation, if in: is list then do recurcive.
+	methods.c
+		Fix String::=~ is use global dict '@REGEX_CACHE'.
+	setup.prfm
+		Add create '@REGEX_CACHE'.
 
 #eof

@@ -2395,6 +2395,7 @@ mth_string_match(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     Toy_Type *t_case = NULL;
     Toy_Type *t_all = NULL;
     Toy_Type *t_grep = NULL;
+    Toy_Type *regex_hash_t;
     static Hash *regex_hash = NULL;
     Cell *key_str;
     Toy_Type *container;
@@ -2422,10 +2423,14 @@ mth_string_match(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     
     if (hash_get_length(nameargs) > 0) goto error;
 
-    /* onece create regex cache and set to global dict */
-    if (NULL == regex_hash) {
-	regex_hash = new_hash();
-	hash_set(interp->globals, const_regex_cache, new_dict(regex_hash));
+    regex_hash_t = hash_get(interp->globals, const_regex_cache);
+    if (NULL == regex_hash_t) {
+	/* onece create regex cache */
+	if (NULL == regex_hash) {
+	    regex_hash = new_hash();
+	}
+    } else {
+	regex_hash = regex_hash_t->u.dict;
     }
 
     /* make regex key, string format is: 'regex',[case|nocase],[default|grep] */

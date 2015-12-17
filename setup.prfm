@@ -33,6 +33,11 @@ defvar INFILE "-";
 defvar OUTFILE "-";
 
 #
+# create regex cache
+#
+defvar @REGEX_CACHE [dict];
+
+#
 # show start message
 #
 if {defvar? INTERACTIVE}

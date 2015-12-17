@@ -1030,20 +1030,6 @@ toy_call_init(Toy_Interp *interp, Toy_Type *object, Toy_Type *args) {
 
     return result;
 }
-/*
-Toy_Type*
-toy_call(Toy_Interp *interp, Toy_Type *list) {
-    Toy_Env *env;
-    Toy_Type *result;
-
-    env = new_closure_env(interp);
-
-    result = toy_eval(interp, new_statement(list,
-					    interp->func_stack[interp->cur_func_stack]->trace_info->line),
-		      &env);
-    return result;
-}
-*/
 
 Toy_Type*
 toy_call(Toy_Interp *interp, Toy_Type *list) {
@@ -1051,9 +1037,8 @@ toy_call(Toy_Interp *interp, Toy_Type *list) {
 
     result = toy_eval_script(interp, 
 			     new_script(new_list(new_statement(list, 
-							       interp->trace_info ? 
-							         interp->trace_info->line
-							       : 0))));
+				interp->trace_info ? 
+				interp->trace_info->line : 0))));
     return result;
 }
 

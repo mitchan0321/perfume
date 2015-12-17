@@ -6,8 +6,23 @@ load-class :force Pipe;
 load-class :force Stream;
 
 defun pipe (in: in out: out args: blocks) {
-    syntax := "Syntax: pipe [in: input-stream | path] [out: output-stream | path] {block} ... ";
+    syntax := "Syntax: pipe [in: input-stream | path | (path-list)] [out: output-stream | path] {block} ... ";
     flist := (); # open file list
+
+    #
+    # if in: is list, recurcive call
+    #
+    if {and [set? in] [list? $in]} then: {
+	$in each do: {| i |
+	    l := (in: $i);
+	    if {set? out} then: {
+		$l concat (out: $out);
+	    };
+	    $l concat $blocks;
+	    s ::= call pipe $l;
+	};
+	return $s;
+    };
     
     #
     # setup stdin channel
