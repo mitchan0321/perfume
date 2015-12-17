@@ -1,0 +1,23 @@
+defun glob (args: p) {
+    syntax := "Syntax error: glob [\"path/pat\"]";
+
+    if {[$p len] = 0} then: {
+        dir := "./";
+        pat := '.*';
+    } else: {
+	if {[$p len] != 1} then: {
+	    throw ErrSyntax $syntax;
+	} else: {
+	    l ::= "" . $p,0 : split sep: "/";
+	    pat ::= $l ->> : rquote;
+	    if {[$l len] = 0} then: {
+	        dir := "./";
+	    } else: {
+		dir ::= $l join sep: "/" : . "/";
+	    };
+	};
+    };
+
+    d ::= file list $dir;
+    $d filter {| i | $i =~ :grep $pat};
+};
