@@ -12,16 +12,18 @@ defun pipe (in: in out: out args: blocks) {
     #
     # if in: is list, recurcive call
     #
-    if {and [set? in] [list? $in]} then: {
-	$in each do: {| i |
-	    l := (in: $i);
-	    if {set? out} then: {
-		$l concat (out: $out);
+    if {set? in} then: {
+	if {list? $in} then: {
+	    $in each do: {| i |
+		l := (in: $i);
+		if {set? out} then: {
+		    $l concat (out: $out);
+		};
+		$l concat $blocks;
+		s ::= call pipe $l;
 	    };
-	    $l concat $blocks;
-	    s ::= call pipe $l;
+	    return $s;
 	};
-	return $s;
     };
     
     #

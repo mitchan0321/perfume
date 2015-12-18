@@ -2601,7 +2601,7 @@ mth_string_split(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     Toy_Type *self, *result, *l;
     char *p, *csep;
     Cell *word;
-    int seplen;
+    int seplen, end_f;
 
     if (arglen > 0) goto error;
 
@@ -2657,10 +2657,12 @@ mth_string_split(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
 	    word = new_cell("");
 
 	    /* collect word, until separator */
+	    end_f = 0;
 	    while (*p) {
 		if (! is_sub_eq(p, csep)) {
 		    cell_add_char(word, *p);
 		} else {
+		    end_f = 1;
 		    if (0 == seplen) {
 			cell_add_char(word, *p);
 		    }
@@ -2676,6 +2678,9 @@ mth_string_split(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
 	    }
 
 	    p += ((seplen == 0) ? 1 : seplen);
+	}
+	if ((end_f == 1) && (seplen != 0)) {
+	    l = list_append(l, new_string_str(""));
 	}
     }
 

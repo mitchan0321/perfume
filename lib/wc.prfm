@@ -5,5 +5,5 @@ defun wc () {
     $stdin each do: {
         $i ++;
     };
-    println $i;
+    println ["%6d: %v" fmt $i $INFILE];
 };

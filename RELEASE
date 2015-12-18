@@ -1,3 +1,4 @@
+2015/12/18	PRFM_20151218		0.8.0_RC_3
 2015/12/17	PRFM_20151217		0.8.0_RC_2
 2015/12/13	PRFM_20151213		0.8.0_RC_1
 2015/12/09	PRFM_20151209		0.8.0_PRE_6
@@ -807,5 +808,17 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 		Fix String::=~ is use global dict '@REGEX_CACHE'.
 	setup.prfm
 		Add create '@REGEX_CACHE'.
+	lib/glob.prfm
+		Add glob.prfm like unix glob command.
+
+2015/12/18:
+	lib/glob.prfm
+		Fix some bugs.
+	lib/pipe.prfm
+		Fix bug when input is list.
+	lib/wc.prfm
+		Add print INFILE.
+	methods.c
+		Fix String:split when last character is seperater character bihavior.
 
 #eof

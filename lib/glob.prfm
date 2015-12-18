@@ -9,9 +9,16 @@ defun glob (args: p) {
 	    throw ErrSyntax $syntax;
 	} else: {
 	    l ::= "" . $p,0 : split sep: "/";
-	    pat ::= $l ->> : rquote;
+	    pat ::= $l ->>;
+	    if {$pat = ""}
+	      then: {pat := '.*'}
+	      else: {pat ::= $pat rquote}
+	    ;
 	    if {[$l len] = 0} then: {
-	        dir := "./";
+	        if {["" . $p,0] = "/"}
+		  then: {dir := "/"}
+		  else: {dir := "./"}
+		;
 	    } else: {
 		dir ::= $l join sep: "/" : . "/";
 	    };
@@ -19,5 +26,5 @@ defun glob (args: p) {
     };
 
     d ::= file list $dir;
-    $d filter {| i | $i =~ :grep $pat};
+    $d filter {| i | $i =~ :grep $pat} : map {| i | $dir . $i};
 };
