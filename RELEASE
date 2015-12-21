@@ -1,3 +1,4 @@
+2015/12/21	PRFM_20151221		0.8.0_RC_4
 2015/12/18	PRFM_20151218		0.8.0_RC_3
 2015/12/17	PRFM_20151217		0.8.0_RC_2
 2015/12/13	PRFM_20151213		0.8.0_RC_1
@@ -820,5 +821,17 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 		Add print INFILE.
 	methods.c
 		Fix String:split when last character is seperater character bihavior.
+
+2015/12/21:
+	commands.c
+		Change where command returned stack clone object.
+	cstack.c
+		Change co-routine slot add to GC when allocate time and remove from GC
+		when release time.
+	methods.c
+		Fix Coro::eval exception occured when calling co-routine is done.
+		Fix Coro::release exception message.
+	doc/*
+		Fix 0.8.0_RC3.
 
 #eof

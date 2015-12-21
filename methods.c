@@ -4159,7 +4159,7 @@ mth_coro_release(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     co->state = CO_STS_DONE;
 
     if (0 == co->coro_id) {
-	return new_exception(TE_COOUTOFLIFE, "Co-routine already done.", interp);
+	return new_exception(TE_COOUTOFLIFE, "Co-routine is already done.", interp);
     }
     co_delete(co->coro_id);
     co->coro_id = 0;
@@ -4221,6 +4221,10 @@ mth_coro_eval(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     body = list_get_item(posargs);
     if (GET_TAG(body) != CLOSURE) goto error;
 
+    if (CO_STS_DONE == co->state) {
+	return new_exception(TE_COOUTOFLIFE, "Co-routine out of life.", interp);
+    }
+    
     return toy_eval_script(co->interp, body->u.closure.block_body);
     
 error:

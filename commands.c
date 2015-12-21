@@ -3071,11 +3071,11 @@ cmd_where(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	list_append(elem, new_cons(new_symbol("line"),
 				   new_integer_si(interp->func_stack[i]->trace_info->line)));
 	list_append(elem, new_cons(new_symbol("object"),
-				   interp->func_stack[i]->trace_info->object_name));
+				   toy_clone(interp->func_stack[i]->trace_info->object_name)));
 	list_append(elem, new_cons(new_symbol("function"),
-				   interp->func_stack[i]->trace_info->func_name));
+				   toy_clone(interp->func_stack[i]->trace_info->func_name)));
 	list_append(elem, new_cons(new_symbol("statement"),
-				   interp->func_stack[i]->trace_info->statement));
+				   toy_clone(interp->func_stack[i]->trace_info->statement)));
 	list_append(elem, new_cons(new_symbol("local"),
 				   i>=1 ? new_dict(interp->func_stack[i-1]->localvar)
 				        : new_dict(new_hash())));

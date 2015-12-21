@@ -74,6 +74,10 @@ init_cstack() {
     CStack.stack_slot[0].state = SS_USE;
     CStack.stack_slot[0].memo = "(main stack)";
 
+    /* main stack add root to GC */
+    GC_add_roots((void*)CStack.stack_slot[0].safe_addr,
+		 (void*)CStack.stack_slot[0].end_addr);
+
     /* init current coroutine */
     Current_coroutine = 0;
     CStack_in_baria = 0;
@@ -141,9 +145,10 @@ alloc_slot(int slot) {
     cstack_protect(slot);
 
     /* indicate garbage collection address block to BoehmGC */
+/*
     GC_add_roots((void*)CStack.stack_slot[slot].safe_addr,
 		 (void*)CStack.stack_slot[slot].end_addr);
-
+*/
     slot ++;
     if (slot > STACK_SLOT_MAX) return (slot-1);
     return alloc_slot(slot);
@@ -233,6 +238,10 @@ cstack_get(char *memo) {
 	    cstack_unprotect(i);
 	    cstack_clear_all(i);
 	    cstack_protect(i);    
+
+	    /* indicate garbage collection address block to BoehmGC */
+	    GC_add_roots((void*)CStack.stack_slot[i].safe_addr,
+			 (void*)CStack.stack_slot[i].end_addr);
 	    
 	    return i;
 	}
@@ -251,6 +260,10 @@ cstack_release(int slot_id) {
     CStack.stack_slot[slot_id].state = SS_FREE;
     CStack.stack_slot[slot_id].jmp_buff_enable = 0;
     CStack.stack_slot[slot_id].memo = 0;
+
+    /* indicate garbage collection address block to BoehmGC */
+    GC_remove_roots((void*)CStack.stack_slot[slot_id].safe_addr,
+		    (void*)CStack.stack_slot[slot_id].end_addr);
 }
 
 void cstack_release_clear(int slot_id) {
@@ -262,7 +275,11 @@ void cstack_release_clear(int slot_id) {
     cstack_release(slot_id);
     cstack_unprotect(slot_id);
     cstack_clear(slot_id);
-    cstack_protect(slot_id);    
+    cstack_protect(slot_id);
+    
+    /* indicate garbage collection address block to BoehmGC */
+    GC_remove_roots((void*)CStack.stack_slot[slot_id].safe_addr,
+		    (void*)CStack.stack_slot[slot_id].end_addr);
 }
 
 Toy_Type*
