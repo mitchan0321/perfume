@@ -1,0 +1,8 @@
+defun simple-sort (l) {
+    if {[$l len] <= 1} then: {return $l};
+    pivot ::= $l >>;
+
+    [simple-sort [$l filter {| i | $i < $pivot}]]
+        concat ($pivot)
+    [simple-sort [$l filter {| i | $i >= $pivot}]];
+};

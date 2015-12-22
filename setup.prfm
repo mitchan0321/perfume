@@ -48,9 +48,9 @@ then: {
 
 load [[$LIB_PATH item] . "/util.prfm"];
 
-defun unknown (args: __unknown_args__) {
-    set __unknown_cmd__ [$__unknown_args__ item];
-    set __unknown_param__ [$__unknown_args__ next];
+defun unknown (*) {
+    set __unknown_cmd__ [$* item];
+    set __unknown_param__ [$* next];
 
     $LIB_PATH each do: {| __unknown_d__ |
 	try {unset __unknown_f__; alias up: 1 __fname__ __unknown_f__};

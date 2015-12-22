@@ -450,6 +450,10 @@ toy_expand(Toy_Interp* interp, Toy_Type* obj, Toy_Env** env, Toy_Func_Trace_Info
     {
 	Toy_Type *st, *stl, *result;
 
+	if (GET_TAG(obj->u.getmacro.obj) == SYMBOL) {
+	    return new_exception(TE_SYNTAX, "Bad left item at GETMACRO.", interp);
+	}
+	
 	stl = st = new_list(obj->u.getmacro.obj);
 	st = list_append(st, const_Get);
 	st = list_append(st, obj->u.getmacro.para);

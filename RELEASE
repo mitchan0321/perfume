@@ -1,3 +1,4 @@
+2015/12/23	PRFM_20151223		0.8.0
 2015/12/21	PRFM_20151221		0.8.0_RC_4
 2015/12/18	PRFM_20151218		0.8.0_RC_3
 2015/12/17	PRFM_20151217		0.8.0_RC_2
@@ -833,5 +834,11 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 		Fix Coro::release exception message.
 	doc/*
 		Fix 0.8.0_RC3.
+
+2015/12/23:
+	eval.c
+		Fix GETMACRO's left item is SYMBOL.
+	lib/util.prfm
+		Change unknown receive parameter 'args:' to '*'.
 
 #eof
