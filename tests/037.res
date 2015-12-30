@@ -7,4 +7,3 @@ XXX
 1
 2
 XXX
-result[NIL]=> nil

@@ -28,4 +28,3 @@ i=3, j=1
 i=3, j=2
 i=3, j=3
 i=3, j=4
-result[NIL]=> nil

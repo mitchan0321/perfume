@@ -12,4 +12,3 @@
 -:25: $x m; in (object)A::m
 -:28: $x m; in (object)Main::Main
 
-result[NIL]=> nil

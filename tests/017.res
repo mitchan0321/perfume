@@ -11,4 +11,3 @@
 5
 6
 OK
-result[STRING]=> "OK"

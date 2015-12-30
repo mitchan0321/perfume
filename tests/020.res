@@ -15,4 +15,3 @@ b: 20
 c: 30
 x: 40
 y: 50
-result[NIL]=> nil

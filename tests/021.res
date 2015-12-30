@@ -10,4 +10,3 @@ abc
 def
 ZZZ
 
-result[SYMBOL]=> t

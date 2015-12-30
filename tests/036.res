@@ -9,4 +9,3 @@ t
 nil
 (a)
 ((a . nil))
-result[NIL]=> nil

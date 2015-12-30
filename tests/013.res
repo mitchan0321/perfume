@@ -13,4 +13,3 @@ a
 1
 abc
 abc
-result[NIL]=> nil

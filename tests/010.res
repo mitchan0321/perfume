@@ -2,4 +2,3 @@
 12
 13
 (x)
-result[NIL]=> nil

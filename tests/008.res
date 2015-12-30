@@ -12,4 +12,3 @@ args(5): c
 a
 a
 b
-result[NIL]=> nil

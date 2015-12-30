@@ -1,1 +1,2 @@
-result[INTEGER]=> 3
+2
+3

@@ -35,4 +35,3 @@
 ./027_d.t:22: stack-trace; in self::bazz
 -:6: bazz; in (object)Main::Main
 
-result[FUNC]=> () {}

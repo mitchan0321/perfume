@@ -8,4 +8,3 @@ a::init
   b
     a
       Object
-result[NIL]=> nil

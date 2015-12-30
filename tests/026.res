@@ -10,4 +10,3 @@
 (i x)
 301
 302
-result[NIL]=> nil

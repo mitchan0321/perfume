@@ -3,4 +3,3 @@ a
 a
 ()
 ()
-result[NIL]=> nil

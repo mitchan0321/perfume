@@ -6,4 +6,3 @@ may be ok.
 -:19: c $x; in self::d
 -:24: d MyErr; in (object)Main::Main
 
-result[NIL]=> nil
