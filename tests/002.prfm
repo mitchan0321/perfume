@@ -5,6 +5,5 @@ defun a (i) {
 };
 
 set x [a 1];
-if {true} then: $x;
-if {true} then: $x;
-
+println [if {true} then: $x];
+println [if {true} then: $x];
