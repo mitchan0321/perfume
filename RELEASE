@@ -845,6 +845,7 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 2015/12/30:
 	lib/Pipe.prfm
 		Change variable move to global INFILE, OUTFILE and CO-MODE.
+		Fix refer uninitialized variable.
 	lib/exec.prfm, pipe.prfm
 		Change check variable CO-MODE value to use true?/false?.
 	lib/interp.prfm
