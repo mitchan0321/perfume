@@ -13,6 +13,7 @@ defun interp () {
 };
 
 defun interp-co () {
+    if {defvar? INTERACTIVE} else: {defvar INTERACTIVE t};
     set __local_var [dict];	# for eval local environment
 
     $stdin clear;
@@ -45,8 +46,8 @@ defun interp-co () {
 
 	    println "result[" [type? $__result] "]=> "
 		[if [[["" . $__result] len] > 512]
-		 then: {[["" . $__result] sub 0 512] . " ..."}
-		 else: {"" . $__result}];
+		     then: {[["" . $__result] sub 0 512] . " ..."}
+		     else: {"" . $__result}];
 	    unset __cont__;
 
         } catch: {| __exp |
