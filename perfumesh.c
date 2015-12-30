@@ -19,10 +19,16 @@ int main(int argc, char **argv, char **envp) {
     interp = new_interp("main", STACKSIZE, NULL, argc, argv, envp);
     b = new_bulk();
 
-    if (argv[1] && (strcmp(argv[1], "-") != 0)) {
-	if (0 == bulk_load_file(b, argv[1])) {
-	    fprintf(stderr, "file not open: %s\n", argv[1]);
-	    exit(1);
+    if ((argc >= 2) && (strcmp(argv[1], "-") != 0)) {
+	/* batch mode */
+
+	if ((strcmp(argv[1], "-c") == 0) && (argc == 3)) {
+	    bulk_set_string(b, argv[2]);
+	} else {
+	    if (0 == bulk_load_file(b, argv[1])) {
+		fprintf(stderr, "file not open: %s\n", argv[1]);
+		exit(1);
+	    }
 	}
 	any = toy_parse_start(b);
 	if (NULL == any) {
@@ -41,8 +47,11 @@ int main(int argc, char **argv, char **envp) {
 	    result = toy_eval_script(interp, script);
 
 	    if (GET_TAG(result) != EXCEPTION) {
+		/* Do not print result at batch mode */
+/*		
 		fprintf(stdout, "result[%s]=> ", toy_get_type_str(result));
 		fprintf(stdout, "%s\n", to_print(result));
+*/
 	    } else {
 		fprintf(stdout, "EXCEPTION: %s\n", to_string(result));
 	    }
@@ -54,6 +63,7 @@ int main(int argc, char **argv, char **envp) {
 	}
     }
 
+    /* interpriter mode */
     while (! feof(stdin)) {
     next_loop:
 	fputs("> ", stderr);
