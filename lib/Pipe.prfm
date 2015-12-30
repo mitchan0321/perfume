@@ -14,10 +14,9 @@ Pipe method init (in out body) {
     sets out $out;
     sets body $body;
     sets stat INIT;
-    sets INFILE "";
-    sets OUTFILE "";
+    sets infile "";
+    sets outfile "";
     sets error "";
-    sets CO-MODE t;
     sets result nil;
     sets PipeObject [self];
     sets @term-hook nil;
@@ -33,6 +32,9 @@ Pipe method run () {
 	$coro eval {
 	    setvar stdin $in;
 	    setvar stdout $out;
+	    setvar INFILE $infile;
+	    setvar OUTFILE $outfile;
+	    if {defvar? CO-MODE} else: {defvar CO-MODE t};
 	};
     };
 
@@ -72,11 +74,11 @@ Pipe method release () {
 };
 
 Pipe method set-infile (f) {
-    sets INFILE $f;
+    sets infile $f;
 };
 
 Pipe method set-outfile (f) {
-    sets OUTFILE $f;
+    sets outfile $f;
 };
 
 Pipe method get-body () {
