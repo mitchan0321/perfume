@@ -1,9 +1,9 @@
 # $Id:$
 
-if {and [file exists? "./setup.toy"] [! [defvar? _ONCE_]]}
+if {and [file exists? "./setup.prfm"] [! [defvar? _ONCE_]]}
 then: {
     defvar _ONCE_ t;
-    load "./setup.toy";
+    load "./setup.prfm";
     return;
 };
 
