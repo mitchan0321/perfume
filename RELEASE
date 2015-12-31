@@ -1,3 +1,4 @@
+2015/12/31	PRFM_20151231		0.8.1_p1
 2015/12/30	PRFM_20151230		0.8.1
 2015/12/23	PRFM_20151223_K27	0.8.0
 2015/12/21	PRFM_20151221		0.8.0_RC_4
@@ -857,5 +858,9 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 		Fix initial read file name 'setup.toy' to 'setup.prfm'.
 	tests/*.res
 		Fix no output result by new perfumesh.
+
+2015/12/31:
+	lib/pipe.prfm, Pipe.prfm
+		Fix don't terminate when last block exited.
 
 #eof
