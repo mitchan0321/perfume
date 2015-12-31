@@ -178,8 +178,11 @@ defun pipe-check-done-cond (blist) {
 	    throw ErrPipeBody ["" . [$b get-body] "-> " [$b get-error]]
 	};
     };
+
+    if {eq? [$blist last : item : stat?] DONE} then: {return t};
+    
     $blist each do: {| b |
-	if {eq? [$b stat?] DONE}  else: {return nil};
+	if {eq? [$b stat?] DONE} else: {return nil};
     };
 
     # all co-routines are done.

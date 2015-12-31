@@ -52,7 +52,8 @@ Pipe method run () {
     
     if {or [eq? $stat DONE] [eq? $stat ERROR]} then: {
 	$out flush;
-	if {eq? $out,@name Stream} then: {$out close};
+	if {eq? $out,@name Stream} then: {$out close;};
+	if {eq? $in,@name  Stream} then: {$in  close;};
     };
 };
 
