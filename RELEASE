@@ -1,3 +1,4 @@
+2016/01/07	PRFM_20160107		0.8.1_p2
 2015/12/31	PRFM_20151231		0.8.1_p1
 2015/12/30	PRFM_20151230		0.8.1
 2015/12/23	PRFM_20151223_K27	0.8.0
@@ -862,5 +863,11 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 2015/12/31:
 	lib/pipe.prfm, Pipe.prfm
 		Fix don't terminate when last block exited.
+
+2016/01/07:
+	doc/*
+		Add perfumesh command option '-c'.
+	setup.prfm, lib/util.prfm
+		Add try when load scripts at unknown, load-func and load-class.
 
 #eof
