@@ -292,11 +292,12 @@ defun load-func (s force: force) {
     if {! [set? force]} then: {
 	if [dict-func : set? $s] then: {return nil};
     };
-    
+
+    dict-func : unset $s;
     $LIB_PATH each do: {| f |
 	try {unset p; alias up: 1 __fname__ p};
 	set p [$f . "/" $s ".prfm"];
-	uplevel {load $__fname__; unset __fname__};
+	uplevel {try {load $__fname__} catch: {}; unset __fname__};
 	if [dict-func : set? $s] then: {return t};
     };
     throw ErrNoFunction ["No such function, '" . $s "'."];
@@ -307,10 +308,11 @@ defun load-class (s force: force) {
 	if [dict-class : set? $s] then: {return nil};
     };
     
+    dict-class : unset $s;
     $LIB_PATH each do: {| f |
 	try {unset p; alias up: 1 __fname__ p};
 	set p [$f . "/" $s ".prfm"];
-	uplevel {load $__fname__; unset __fname__};
+	uplevel {try {load $__fname__} catch: {}; unset __fname__};
 	if [dict-class : set? $s] then: {return t};
     };
     throw ErrNoClass ["No such class, '" . $s "'."];

@@ -57,7 +57,7 @@ defun unknown (*) {
 	set __unknown_f__ [$__unknown_d__ . "/" $__unknown_cmd__ ".prfm"];
 	if {and [file exists? $__unknown_f__] [file read? $__unknown_f__]}
 	then: {
-	    uplevel {load $__fname__; unset __fname__};
+	    uplevel {try {load $__fname__} catch: {}; unset __fname__};
 	    if {! [sid $__unknown_cmd__]} then: {
 		continue;
 	    };
