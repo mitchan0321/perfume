@@ -1,15 +1,15 @@
-# Class name: Pipe
+# Class name: PipeWrapper
 #
 # Description:
 #    This class is pipe drivered class.
 #
 #    Impliment methods are:
-#      Pipe::init
+#      PipeWrapper::init
 #      
 
-class Pipe;
+class PipeWrapper;
 
-Pipe method init (in out body) {
+PipeWrapper method init (in out body) {
     sets in $in;
     sets out $out;
     sets body $body;
@@ -22,11 +22,11 @@ Pipe method init (in out body) {
     sets @term-hook nil;
 };
 
-Pipe method stat? () {
+PipeWrapper method stat? () {
     return $stat;
 };
 
-Pipe method run () {
+PipeWrapper method run () {
     if {sets? coro} else: {
 	sets coro [coro $body];
 	$coro eval {
@@ -57,48 +57,48 @@ Pipe method run () {
     };
 };
 
-Pipe method debug_out () {
+PipeWrapper method debug_out () {
     println $in;
     println $body;
     println $out;
 };
 
-Pipe method string () {
-    "Pipe::" . $body " | " $in " | " $out;
+PipeWrapper method string () {
+    "PipeWrapper::" . $body " | " $in " | " $out;
 };
 
-Pipe method release () {
+PipeWrapper method release () {
     if {sets? coro} then: {
 	$coro release;
     };
     if [true? @term-hook] then: {$@term-hook};
 };
 
-Pipe method set-infile (f) {
+PipeWrapper method set-infile (f) {
     sets infile $f;
 };
 
-Pipe method set-outfile (f) {
+PipeWrapper method set-outfile (f) {
     sets outfile $f;
 };
 
-Pipe method get-body () {
+PipeWrapper method get-body () {
     return $body;
 };
 
-Pipe method get-error () {
+PipeWrapper method get-error () {
     return $error;
 };
 
-Pipe method get-result () {
+PipeWrapper method get-result () {
     return $result;
 };
 
-Pipe method set-result (r) {
+PipeWrapper method set-result (r) {
     sets result $r;
 };
 
-Pipe method out-setup () {
+PipeWrapper method out-setup () {
     o ::= make-proxy $out;
     f ::= $o method? puts;
     s ::= self;
@@ -118,6 +118,6 @@ Pipe method out-setup () {
     sets out $o;
 };
 
-Pipe method set-term-hook (h) {
+PipeWrapper method set-term-hook (h) {
     sets @term-hook $h;
 };

@@ -2,7 +2,7 @@
 # pipe command
 #
 
-load-class :force Pipe;
+load-class :force PipeWrapper;
 load-class :force Stream;
 
 defun pipe (in: in out: out args: blocks) {
@@ -113,7 +113,7 @@ defun pipe (in: in out: out args: blocks) {
 	    pipe ::= new Stream init: (["pipe#" . $i]);
 	    $pipe set-comode;
 	};
-        p ::= new Pipe init: ($in $pipe $b);
+        p ::= new PipeWrapper init: ($in $pipe $b);
 	$p set-infile  $infile;
 	$p set-outfile $outfile;
 	$blist append! $p;

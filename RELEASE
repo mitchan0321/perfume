@@ -870,4 +870,8 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 	setup.prfm, lib/util.prfm
 		Add try when load scripts at unknown, load-func and load-class.
 
+2016/01/14:
+	lib/Pipe.prfm -> lib/PipeWrapper.prfm, lib/pipe.prfm
+		Rename class Pipe to PipeWrapper.
+
 #eof
