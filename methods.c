@@ -2601,7 +2601,7 @@ mth_string_split(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     Toy_Type *self, *result, *l;
     char *p, *csep;
     Cell *word;
-    int seplen, end_f;
+    int seplen, end_f=0;
 
     if (arglen > 0) goto error;
 
