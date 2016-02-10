@@ -22,11 +22,16 @@ int main(int argc, char **argv, char **envp) {
     if ((argc >= 2) && (strcmp(argv[1], "-") != 0)) {
 	/* batch mode */
 
-	if ((strcmp(argv[1], "-c") == 0) && (argc == 3)) {
-	    bulk_set_string(b, argv[2]);
+	if (strcmp(argv[1], "-c") == 0) {
+	    if (argc == 3) {
+		bulk_set_string(b, argv[2]);
+	    } else {
+		fprintf(stderr, "no specified command.\n");
+		exit(1);
+	    }
 	} else {
 	    if (0 == bulk_load_file(b, argv[1])) {
-		fprintf(stderr, "file not open: %s\n", argv[1]);
+		fprintf(stderr, "file not open \"%s\".\n", argv[1]);
 		exit(1);
 	    }
 	}
