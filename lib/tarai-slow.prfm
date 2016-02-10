@@ -3,9 +3,7 @@
 # tarai function
 
 defun tarai-slow (x y z) {
-    set x $x;
-    set y $y;
-    set z $z;
+    and $x $y $z;
 
     if [$x <= $y] then: {return $y};
 
