@@ -1,0 +1,82 @@
+defun http-get (host location port: port) {
+
+    if {set? port} else: {set port 80};
+    status_code := 0;
+    header ::= dict;
+
+    fd ::= connect [resolv-host $host] $port;
+
+    try {
+	in ::= new File;
+	$in set! $fd mode: i;
+	$in set-nobuffer;
+	$in set-newline t;
+
+	out ::= new File;
+	$out set! $fd mode: o;
+	$out set-nobuffer;
+	$out set-newline t;
+	
+	#
+	# send request
+	#
+	$out puts ["GET " . $location " HTTP/1.0"];
+	$out puts "";
+
+	if [$in ready? timeout: 5000] then: {
+	    #
+	    # get status line
+	    #
+	    status ::= [$in gets] clean;
+	    println [$status clean];
+	    status_code ::= [[$status split] get 1] int;
+	    
+	    #
+	    # get header
+	    #
+	    $in each do: {| r |
+		println [$r clean];
+		if {[$r split : len] = 0} then: {break};
+		l ::= $r split sep: ":";
+		$header set [[$l >>] lower] [[$l join sep: ":"] clean];
+	    };
+	    len := $header,"content-length";
+
+	    #
+	    # get body
+	    #
+	    if $len
+	    then: {
+		# get body when Content-Length specified
+	        count := 0;
+		len ::= $len int;
+		$in each do:{| r |
+		    $count ++ [$r len];
+		    println [$r clean];
+		    if [$count >= $len] then: {break};
+		};
+	    }
+
+	    else: {
+		# get body when Content-Length not specified
+		$in each do:{| r |
+		    println [$r clean];
+		};
+	    }
+	    ;
+	    
+	};
+    }
+
+    fin: {
+	if {set? in} then: {$in close};
+	if {set? out} then: {$out close};
+    }
+    
+    catch: {| e |
+	throw $e;
+    }
+    ;
+
+    return ($status_code $header);
+};
