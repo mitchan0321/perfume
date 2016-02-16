@@ -2783,7 +2783,6 @@ error2:
     return new_exception(TE_TYPE, "Type error.", interp);
 }
 
-
 static char*
 mth_string_format_fill(char* item, int fill, int trim) {
     Cell *result, *result2;
@@ -2965,6 +2964,109 @@ mth_string_format(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 
 error:
     return new_exception(TE_SYNTAX, "Syntax error at 'fmt', syntax: String fmt var ...", interp);
+error2:
+    return new_exception(TE_TYPE, "Type error.", interp);
+}
+
+Toy_Type*
+mth_string_clean(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    char *p;
+    Cell *c;
+    int len, i;
+    
+    if (GET_TAG(SELF(interp)) != STRING) goto error2;
+    if (arglen != 0) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    c = new_cell("");
+    p = cell_get_addr(SELF(interp)->u.string);
+
+    while (*p) {
+	if (isspace(*p)) {
+	    p++;
+	} else {
+	    break;
+	}
+    }
+
+    len = strlen(p);
+    for (i=len-1; i>=0; i--) {
+	if (isspace(p[i])) {
+	    p[i]=0;
+	} else {
+	    break;
+	}
+    }
+    
+    while (*p) {
+	if ((*p == ' ') || (! isspace(*p))) {
+	    if (isprint(*p)) {
+		cell_add_char(c, *p);
+	    }
+	}
+	p++;
+    }
+
+    return new_string_cell(c);
+    
+error:
+    return new_exception(TE_SYNTAX, "Syntax error at 'clean', syntax: String clean", interp);
+error2:
+    return new_exception(TE_TYPE, "Type error.", interp);
+}
+
+Toy_Type*
+mth_string_upper(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    char *p;
+    Cell *c;
+    
+    if (GET_TAG(SELF(interp)) != STRING) goto error2;
+    if (arglen != 0) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    c = new_cell("");
+    p = cell_get_addr(SELF(interp)->u.string);
+    while (*p) {
+	if (islower(*p)) {
+	    cell_add_char(c, toupper(*p));
+	} else {
+	    cell_add_char(c, *p);
+	}
+	p++;
+    }
+
+    return new_string_cell(c);
+    
+error:
+    return new_exception(TE_SYNTAX, "Syntax error at 'upper', syntax: String upper", interp);
+error2:
+    return new_exception(TE_TYPE, "Type error.", interp);
+}
+
+Toy_Type*
+mth_string_lower(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    char *p;
+    Cell *c;
+    
+    if (GET_TAG(SELF(interp)) != STRING) goto error2;
+    if (arglen != 0) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    c = new_cell("");
+    p = cell_get_addr(SELF(interp)->u.string);
+    while (*p) {
+	if (isupper(*p)) {
+	    cell_add_char(c, tolower(*p));
+	} else {
+	    cell_add_char(c, *p);
+	}
+	p++;
+    }
+
+    return new_string_cell(c);
+    
+error:
+    return new_exception(TE_SYNTAX, "Syntax error at 'lower', syntax: String lower", interp);
 error2:
     return new_exception(TE_TYPE, "Type error.", interp);
 }
@@ -4345,6 +4447,9 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, "String", "number", mth_string_tonumber, NULL);
     toy_add_method(interp, "String", "rquote", mth_string_torquote, NULL);
     toy_add_method(interp, "String", "fmt", mth_string_format, NULL);
+    toy_add_method(interp, "String", "clean", mth_string_clean, NULL);
+    toy_add_method(interp, "String", "upper", mth_string_upper, NULL);
+    toy_add_method(interp, "String", "lower", mth_string_lower, NULL);
 
     toy_add_method(interp, "File", "init", mth_file_init, NULL);
     toy_add_method(interp, "File", "open", mth_file_open, NULL);
