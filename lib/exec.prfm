@@ -25,6 +25,7 @@ defun exec (args: args) {
 	$PipeObject set-term-hook [fun () {$IN close; $OUT close}];
     };
 
+    status := 255;
     try {
 	loop {
 	    loop {
@@ -83,8 +84,11 @@ defun exec (args: args) {
     fin: {
 	$OUT close;
 	$IN close;
-	if {[wait $pid] = 255} then: {
+	status ::= wait $pid;
+	if {$status = 255} then: {
 	    throw ErrExecProgram "Can\'t execute program."
 	};
     };
+
+    return $status;
 };
