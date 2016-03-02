@@ -1,3 +1,4 @@
+2016/03/02	PRFM_20160302		0.9.1
 2016/02/15	PRFM_20160215_A27	0.9.0
 2016/02/02	PRFM_20160202		0.8.1_p4
 2016/01/14	PRFM_20160114		0.8.1_p3
@@ -888,5 +889,14 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 		Add String::clean, String::upper, String::lower methods.
 	lib/http-get.prfm
 		Add utility function for simple http access.
+
+2016/03/02:
+	lib/exec.prfm
+		Fix external process was not runnable condition when return 
+		exit status 255.
+	lib/http-get.prfm
+		Change request URI string.
+	lib/lsort.prfm
+		Fix list::>> sub-effect bug.
 
 #eof
