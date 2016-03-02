@@ -1,5 +1,3 @@
-# $Id:$
-
 # sort list
 #
 # Usage: lsort (list) [order: > | <] [getter: {get comparable block}]
@@ -17,7 +15,8 @@ defun lsort (l order: cmp getter: gtr) {
 
 defun lsort-sub (l cmp gtr) {
     if {[$l len] <= 1} then: {return $l};
-    set pivot [$l >>];
+    set pivot [$l car];
+    set l [$l cdr];
     set p [yield $gtr $pivot];
 
     [lsort-sub [$l filter {| i | $p $cmp [yield $gtr $i]}] $cmp $gtr]
