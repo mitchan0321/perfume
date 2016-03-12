@@ -8,7 +8,7 @@ defun fib-memo (n) {
 };
 
 defun fib-memo-sub (n a) {
-    if {$n <= 2} then: {return 1};
+    if {$n < 2} then: {return $n};
     set a1 [$n - 1];
     set a2 [$n - 2];
     set n1 [if [$a set? $a1] then: $a,$a1 else: {fib-memo-sub $a1 $a}];

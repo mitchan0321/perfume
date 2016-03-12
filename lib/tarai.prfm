@@ -3,7 +3,7 @@
 # tarai function
 
 defun tarai (x y z) {
-    if [$x <= $y] then: {return $y};
+    if [$x <= $y] {return $y};
 
     tarai [tarai [$x - 1] $y $z]
           [tarai [$y - 1] $z $x]

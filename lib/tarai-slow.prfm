@@ -5,7 +5,7 @@
 defun tarai-slow (x y z) {
     and $x $y $z;
 
-    if [$x <= $y] then: {return $y};
+    if [$x <= $y] {return $y};
 
     tarai-slow [tarai-slow [$x - 1] $y $z]
 	       [tarai-slow [$y - 1] $z $x]
