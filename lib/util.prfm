@@ -1,5 +1,3 @@
-# $Id:$
-
 #
 # constant value define
 #
@@ -316,4 +314,11 @@ defun load-class (s force: force) {
 	if [dict-class : set? $s] then: {return t};
     };
     throw ErrNoClass ["No such class, '" . $s "'."];
+};
+
+#
+# Wrap tag? command.
+#
+defun tag (*) {
+    tag? [$* car];
 };
