@@ -9,6 +9,7 @@
 #include <errno.h>
 #include <dirent.h>
 #include <setjmp.h>
+#include <float.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -730,13 +731,30 @@ cmd_if(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *cond, *result;
     int t;
     
-    if (arglen != 1) goto error;
-    if (hash_get_length(nameargs) > 2) goto error;
+    if (hash_get_length(nameargs) == 0) {
+	if (! ((arglen >= 1) && (arglen <= 3))) goto error;
+	cond_block = list_get_item(posargs);
+	posargs = list_next(posargs);
 
-    cond_block = list_get_item(posargs);
-    then_block = hash_get_and_unset_t(nameargs, const_then);
-    else_block = hash_get_and_unset_t(nameargs, const_else);
-    if (hash_get_length(nameargs) > 0) goto error;
+	then_block = const_Nil;
+	else_block = const_Nil;
+	if (! IS_LIST_NULL(posargs)) {
+	    then_block = list_get_item(posargs);
+	    posargs = list_next(posargs);
+	}
+	if (! IS_LIST_NULL(posargs)) {
+	    else_block = list_get_item(posargs);
+	}
+	
+    } else {
+	if (arglen != 1) goto error;
+	if (hash_get_length(nameargs) > 2) goto error;
+
+	cond_block = list_get_item(posargs);
+	then_block = hash_get_and_unset_t(nameargs, const_then);
+	else_block = hash_get_and_unset_t(nameargs, const_else);
+	if (hash_get_length(nameargs) > 0) goto error;
+    }
 
     if (GET_TAG(cond_block) == CLOSURE) {
 	cond = eval_closure(interp, cond_block, interp->trace_info);
@@ -764,7 +782,9 @@ cmd_if(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     
 error:
     return new_exception(TE_SYNTAX,
-"Syntax error at 'if', syntax: if cond [then: then-body] [else: else-body]\n\
+"Syntax error at 'if', \n\
+syntax(1): if cond [then: then-body] [else: else-body]\n\
+syntax(2): if cond [then-body] [else-body]\n\
 	cond:		{cond-block} or value\n\
 	then-body:	{then-block} or value\n\
 	else-body:	{else-block} or value",
@@ -922,39 +942,98 @@ cmd_time(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *script;
     Toy_Type *result;
     struct timeval s, e;
-    double rs, re;
+    double rs, re, rt;
     char *buff;
-    Toy_Type *l;
+    Toy_Type *l, *v;
+    int count = 1, i;
+    double min = DBL_MAX, max = 0.0, avg = 0.0, sum = 0.0;
 
     buff = GC_MALLOC(256);
     ALLOC_SAFE(buff);
 
     if (arglen > 1) goto error;
+    v = hash_get_and_unset_t(nameargs, new_symbol("count:"));
+    if (v) {
+	if (GET_TAG(v) != INTEGER) goto error;
+	count = mpz_get_si(v->u.biginteger);
+	if (count <= 0) count = 1;
+    }
     if (hash_get_length(nameargs) > 0) goto error;
 
-    script = list_get_item(posargs);
-    if (GET_TAG(script) != CLOSURE) goto error;
+    for (i=1; i<=count; i++) {
+	script = list_get_item(posargs);
+	if (GET_TAG(script) != CLOSURE) goto error;
 
-    gettimeofday(&s, NULL);
-    rs = (double)s.tv_sec + ((double)s.tv_usec)/1000000.0;
+	gettimeofday(&s, NULL);
+	rs = (double)s.tv_sec + ((double)s.tv_usec)/1000000.0;
 
-    result = eval_closure(interp, script, interp->trace_info);
+	result = eval_closure(interp, script, interp->trace_info);
+	if (GET_TAG(result) == EXCEPTION) return result;
+	
+	gettimeofday(&e, NULL);
+	re = (double)e.tv_sec + ((double)e.tv_usec)/1000000.0;
 
-    gettimeofday(&e, NULL);
-    re = (double)e.tv_sec + ((double)e.tv_usec)/1000000.0;
+	rt = re - rs;
+	sum += rt;
+	if (rt < min) min = rt;
+	if (rt > max) max = rt;
 
-    snprintf(buff, 256, "Elapsed time: %f", re - rs);
-    buff[255] = 0;
+	/* print Elapsed time */
+	if (count == 1) {
+	    snprintf(buff, 256, "Elapsed time: %f", rt);
+	} else {
+	    snprintf(buff, 256, "Elapsed time #%d: %f", i, rt);
+	}
+	buff[255] = 0;
+	l = new_list(new_symbol("println"));
+	list_append(l, new_string_str(buff));
+	toy_call(interp, l);
+    }
 
-    l = new_list(new_symbol("println"));
-    list_append(l, new_string_str(buff));
-    toy_call(interp, l);
+    if (count > 1) {
+	avg = sum / count;
+
+	/* print separator time */
+	snprintf(buff, 256, "--");
+	buff[255] = 0;
+	l = new_list(new_symbol("println"));
+	list_append(l, new_string_str(buff));
+	toy_call(interp, l);
+
+	/* print min time */
+	snprintf(buff, 256, "Min time: %f", min);
+	buff[255] = 0;
+	l = new_list(new_symbol("println"));
+	list_append(l, new_string_str(buff));
+	toy_call(interp, l);
+
+	/* print Max time */
+	snprintf(buff, 256, "Max time: %f", max);
+	buff[255] = 0;
+	l = new_list(new_symbol("println"));
+	list_append(l, new_string_str(buff));
+	toy_call(interp, l);
+
+	/* print Total time */
+	snprintf(buff, 256, "Total time: %f", sum);
+	buff[255] = 0;
+	l = new_list(new_symbol("println"));
+	list_append(l, new_string_str(buff));
+	toy_call(interp, l);
+
+	/* print Avg time */
+	snprintf(buff, 256, "Average time: %f", avg);
+	buff[255] = 0;
+	l = new_list(new_symbol("println"));
+	list_append(l, new_string_str(buff));
+	toy_call(interp, l);
+    }
     
     return result;
 
 error:
     return new_exception(TE_SYNTAX,
-			 "Syntax error at 'time', syntax: time {block}", interp);
+			 "Syntax error at 'time', syntax: time [count: n] {block}", interp);
 }
 
 Toy_Type*
@@ -2739,16 +2818,25 @@ cmd_gc(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 
 Toy_Type*
 cmd_loop(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
-    Toy_Type *do_block;
+    Toy_Type *do_block = NULL;
     Toy_Type *result;
     int r;
 
-    if (arglen != 1) goto error;
-    if (hash_get_length(nameargs) != 0) goto error;
+    if (hash_get_length(nameargs) == 1) {
+	if (arglen != 0) goto error;
+	do_block = hash_get_and_unset_t(nameargs, const_do);
+	if ((do_block == NULL) ||
+	    (GET_TAG(do_block) != CLOSURE)) goto error;
+	if (hash_get_length(nameargs) != 0) goto error;
+	
+    } else {
+	if (arglen != 1) goto error;
+	if (hash_get_length(nameargs) != 0) goto error;
 
-    do_block = list_get_item(posargs);
-    if ((do_block == NULL) ||
-	(GET_TAG(do_block) != CLOSURE)) goto error;
+	do_block = list_get_item(posargs);
+	if ((do_block == NULL) ||
+	    (GET_TAG(do_block) != CLOSURE)) goto error;
+    }
 
     result = const_Nil;
 
@@ -2779,7 +2867,9 @@ loop:
 
 error:
     return new_exception(TE_SYNTAX,
-			 "Syntax error at 'loop', syntax: loop {do-block}", interp);
+			 "Syntax error at 'loop', \n\
+syntax(1): loop {do-block}\n\
+syntax(2): loop do: {do-block}", interp);
 }
 
 Toy_Type*
@@ -3150,6 +3240,44 @@ error:
 			 "Syntax error at 'false?', syntax: false? var", interp);
 }
 
+Toy_Type*
+cmd_tag(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *var, *result, *attr;
+    
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    var = list_get_item(posargs);
+    result = new_list(NULL);
+    attr = new_list(NULL);
+    
+    list_append(result, new_cons(new_symbol("TAG"),
+				 new_symbol(toy_get_type_str(var))));
+    list_append(result, new_cons(new_symbol("SCRIPT_ID"), 
+				 new_integer_si(GET_SCRIPT_ID(var))));
+    list_append(result, new_cons(new_symbol("PARAM_NO"), 
+				 new_integer_si(GET_PARAMNO(var))));
+    if (IS_NAMED_SYM(var)) {
+	list_append(attr, new_symbol("KEYWORD"));
+    }
+    if (IS_SWITCH_SYM(var)) {
+	list_append(attr, new_symbol("SWITCH"));
+    }
+    if (IS_LAZY(var)) {
+	list_append(attr, new_symbol("LAZY"));
+    }
+    if (IS_NOPRINTABLE(var)) {
+	list_append(attr, new_symbol("NO_PRINT"));
+    }
+    list_append(result, new_cons(new_symbol("ATTR"), attr));
+    
+    return result;
+
+error:
+    return new_exception(TE_SYNTAX,
+			 "Syntax error at 'tag?', syntax: tag? var", interp);
+}
+
 int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, "false", cmd_false, NULL);
     toy_add_func(interp, "true", cmd_true, NULL);
@@ -3255,6 +3383,7 @@ int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, "where", cmd_where, NULL);
     toy_add_func(interp, "true?", cmd_istrue, NULL);
     toy_add_func(interp, "false?", cmd_isfalse, NULL);
+    toy_add_func(interp, "tag?", cmd_tag, NULL);
 
     return 0;
 }
