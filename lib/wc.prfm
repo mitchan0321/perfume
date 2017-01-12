@@ -1,9 +1,44 @@
 # like wc -l
 
-defun wc () {
+defun wc (native-value: nv
+	  args: files) {
+
+    if [set? nv] {set nv t} {set nv nil};
+
+    if [$files null?] 
+    then: {
+	wc-sub $stdin $nv $INFILE;
+    }
+    else: {
+	$files each do: {| n |
+	    try {
+		f := `File($n mode: i);
+		wc-sub $f $nv $n;
+	    }
+	    catch: {| e |
+		println file: $stderr [$e cdr];
+	    }
+	    fin: {
+		if [set? f] then: {
+		    $f close;
+		    unset f;
+		};
+	    };
+	};
+    };
+};
+
+defun wc-sub (file nv name) {
     set i 0;
-    $stdin each do: {
+    $file each do: {
         $i ++;
     };
-    println ["%6d: %v" fmt $i $INFILE];
+
+    if $nv then: {
+	$stdout puts $i;
+    } else: {
+	println ["%6d: %v" fmt $i $name];
+    };
+
+    return $i;
 };

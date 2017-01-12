@@ -1,9 +1,36 @@
-# $Id:$
+defun ncat (fmt: fmt
+	    native-value: nv
+	    args: files) {
 
-defun ncat (fmt: fmt) {
     if {set? fmt} else: {fmt := "%5d"};
+
+    if [$files null?] 
+    then: {
+	ncat-sub $stdin $fmt;
+    }
+    else: {
+	$files each do: {| n |
+	    try {
+		f := `File($n mode: i);
+		ncat-sub $f $fmt;
+	    }
+	    catch: {| e |
+		println file: $stderr [$e cdr];
+	    }
+	    fin: {
+		if [set? f] then: {
+		    $f close;
+		    unset f;
+		};
+	    };
+	};
+    };
+};
+
+defun ncat-sub (file fmt) {
+
     set i 1;
-    $stdin each do: {| r |
+    $file each do: {| r |
         println [$fmt fmt $i] ": " $r;
 	$i ++;
     };

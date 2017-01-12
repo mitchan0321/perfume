@@ -1,12 +1,42 @@
-# $Id:$
 # grep
 
-defun grep (pat) {
+defun grep (pat
+	    native-value: nv
+	    args: files) {
+
+    if [$files null?] 
+    then: {
+	grep-sub $stdin $INFILE $pat;
+    }
+    else: {
+	$files each do: {| n |
+	    try {
+		f := `File($n mode: i);
+		grep-sub $f $n $pat;
+	    }
+	    catch: {| e |
+		println file: $stderr [$e cdr];
+	    }
+	    fin: {
+		if [set? f] then: {
+		    $f close;
+		    unset f;
+		};
+	    };
+	};
+    };
+};
+
+defun grep-sub (file name pat) {
     set n 1;
-    $stdin each do: {| r |
+    set i 0;
+    $file each do: {| r |
         if {$r =~ $pat} then: {
-	    println $INFILE ":" $n ": " $r;
+	    println $name ":" $n ": " $r;
+	    $i ++;
 	};
 	$n ++;
     };
+
+    return $i;
 };

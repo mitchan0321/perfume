@@ -1,10 +1,35 @@
-# $Id:$
-
 # like the UNIX head command.
 
-defun head (n) {
+defun head (num
+	    native-value: nv
+	    args: files) {
+
+    if [$files null?] 
+    then: {
+	head-sub $stdin $num;
+    }
+    else: {
+	$files each do: {| n |
+	    try {
+		f := `File($n mode: i);
+		head-sub $f $num;
+	    }
+	    catch: {| e |
+		println file: $stderr [$e cdr];
+	    }
+	    fin: {
+		if [set? f] then: {
+		    $f close;
+		    unset f;
+		};
+	    };
+	};
+    };
+};
+
+defun head-sub (file n) {
     0 each to: [$n - 1] do: {
-	read a;
+	read file: $file a;
 	if [nil? $a] then: {break};
 	println $a;
     };
