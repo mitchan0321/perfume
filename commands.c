@@ -471,13 +471,12 @@ argspec: [arg ...] [keyword: arg ...] [args: variable-args ...]", interp);
 
 Toy_Type*
 cmd_info(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
-    Hash *h, *h2;
+    Hash *h2;
     Toy_Type *option;
     char *options;
 
     if (hash_get_length(nameargs) > 0) goto error;
 
-    h = interp->func_stack[interp->cur_func_stack]->localvar;
     option = list_get_item(posargs);
     if (NULL == option) goto error;
     if (GET_TAG(option) != SYMBOL) goto error;
@@ -3390,12 +3389,12 @@ int toy_add_commands(Toy_Interp *interp) {
 
 static void
 println(Toy_Interp *interp, char *msg) {
-    Toy_Type *l, *result;
+    Toy_Type *l;
 
     l = new_list(new_symbol("println"));
     list_append(l, new_string_str(msg));
 
-    result = toy_call(interp, l);
+    toy_call(interp, l);
 
     return;
 }

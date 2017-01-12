@@ -106,7 +106,7 @@ toy_eval_script(Toy_Interp* interp, Toy_Type *script) {
 Toy_Type*
 toy_eval(Toy_Interp* interp, Toy_Type *statement, Toy_Env** env) {
     Toy_Type *l;
-    Toy_Type *first, *tfirst, *first_org, *method, *self;
+    Toy_Type *first, *tfirst, *method, *self;
     Cell *msg;
     Toy_Obj_Env *obj_env;
     int ostack_use, lstack_use;
@@ -153,6 +153,9 @@ control_goto:
 		 to_string(statement));
 	buff[511] = 0;
 	sts = write(interp->trace_fd, buff, strlen(buff));
+	if (-1 == sts) {
+	    fprintf(stderr, "Error occured at trace write.\n");
+	}
     }
 
     if (IS_LIST_NULL(l)) {
@@ -160,7 +163,7 @@ control_goto:
 	goto exit_eval;
     }
 
-    first_org = first = list_get_item(l);
+    first = list_get_item(l);
     if (GET_TAG(first) == REF) {
 	first = toy_resolv_var(interp, first, 1, trace_info);
 	if (GET_TAG(first) == EXCEPTION) {

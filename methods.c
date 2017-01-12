@@ -1707,7 +1707,6 @@ error2:
 Toy_Type*
 mth_list_filter(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *block, *self, *result, *l, *ret;
-    Toy_Env *env;
 
     if (arglen != 1) goto error;
     if (hash_get_length(nameargs) != 0) goto error;
@@ -1719,7 +1718,6 @@ mth_list_filter(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     if (GET_TAG(self) != LIST) goto error2;
 
     l = result = new_list(NULL);
-    env = block->u.closure.env;
 
     while (! IS_LIST_NULL(self)) {
 	if (GET_TAG(self) == LIST) {
@@ -2508,14 +2506,12 @@ next_search:
 	int i, n;
 	Toy_Type *l, *ll;
 	int max;
-	Cell *s;
 
 	max = -1;
 	for (i=0; i<region->num_regs; i++) {
 	    if (! ((region->beg[i] >= 0) && (region->end[i] >= 0))) continue;
 
 	    ll = l = new_list(NULL);
-	    s = new_cell("");
 	    l = list_append(l, new_integer_si(region->beg[i] + offs));
 	    l = list_append(l, new_integer_si(region->end[i] + offs));
 	    l = list_append(l, new_string_cell(cell_sub(self->u.string,
@@ -3244,11 +3240,8 @@ mth_file_close(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     Hash *self;
     Toy_File *f;
     Toy_Type *container;
-    Toy_Type *force;
-    int sts;
 
     if (arglen > 0) goto error;
-    force = hash_get_and_unset_t(nameargs, new_symbol("force:"));
     if (hash_get_length(nameargs) > 0) goto error;
 
     self = SELF_HASH(interp);
@@ -3257,12 +3250,7 @@ mth_file_close(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     f = container->u.container;
 
     if (f->fd) {
-//      diactivate :force option.
-//	if (force) {
-//	    sts = close(fileno(f->fd));
-//	} else {
-	sts = fclose(f->fd);
-//	}
+	fclose(f->fd);
 	f->fd = NULL;
 	f->path = NULL;
 	f->mode = 0;
