@@ -5,7 +5,7 @@
 
 #include <t_gc.h>
 
-#define CELL_INIT_ALLOC	(8)
+#define CELL_INIT_ALLOC	(16)
 
 typedef struct _cell {
     int length;

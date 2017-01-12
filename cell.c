@@ -100,10 +100,9 @@ cell_realloc(Cell *p, int dest_s) {
     char *data;
 
     i = cell_get_alloc_size(p->allocsize, dest_s);
-    data = GC_MALLOC_ATOMIC(i);
+    data = GC_REALLOC(p->data, i);
     ALLOC_SAFE(data);
 
-    memcpy(data, p->data, p->length+1);
     p->data = data;
     p->allocsize = i;
 

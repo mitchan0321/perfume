@@ -689,7 +689,7 @@ to_string(Toy_Type *obj) {
 		} else {
 		    cell_add_str(c, to_print(list_get_item(obj)));
 		}
-		if (list_length(obj) > 1) cell_add_char(c, ' ');
+		if (obj->u.list.nextp) cell_add_char(c, ' ');
 	    }
 
 	    obj = list_next(obj);
@@ -1002,7 +1002,7 @@ to_print(Toy_Type *obj) {
 		} else {
 		    cell_add_str(c, to_print(list_get_item(obj)));
 		}
-		if (list_length(obj) > 1) cell_add_char(c, ' ');
+		if (obj->u.list.nextp) cell_add_char(c, ' ');
 	    }
 
 	    obj = list_next(obj);
