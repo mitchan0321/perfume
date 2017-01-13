@@ -18,6 +18,7 @@
 #include "global.h"
 #include "array.h"
 #include "cstack.h"
+#include "util.h"
 
 Toy_Type* cmd_fun(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen);
 
@@ -33,7 +34,7 @@ mth_object_vars(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     return hash_get_keys(selfh);
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'vars', syntax: Object vars", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'vars', syntax: Object vars", interp);
 }
 
 Toy_Type*
@@ -70,7 +71,7 @@ mth_object_method(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     return res;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'method', syntax: Object method name (argspec) {block}\n\t\
+    return new_exception(TE_SYNTAX, L"Syntax error at 'method', syntax: Object method name (argspec) {block}\n\t\
 argspec: [arg ...] [keyword: arg ...] [args: variable-args ...]", interp);
 }
 
@@ -89,15 +90,15 @@ mth_object_get(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     h = SELF_HASH(interp);
     o = hash_get_t(h, var);
     if (NULL == o) {
-	c = new_cell("No such variable in slot, '");
+	c = new_cell(L"No such variable in slot, '");
 	cell_add_str(c, cell_get_addr(var->u.symbol.cell));
-	cell_add_str(c, "'.");
+	cell_add_str(c, L"'.");
 	return new_exception(TE_NOVAR, cell_get_addr(c), interp);
     }
     return o;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'var?', syntax: Object var? | get name", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'var?', syntax: Object var? | get name", interp);
 }
 
 Toy_Type*
@@ -120,7 +121,7 @@ mth_object_set(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     return val;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'set', syntax: Object set name value", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'set', syntax: Object set name value", interp);
 }
 
 Toy_Type*
@@ -132,7 +133,7 @@ mth_object_type(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     return new_symbol(toy_get_type_str(SELF(interp)));
     
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'type?', syntax: Object type?", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'type?', syntax: Object type?", interp);
 }
 
 Toy_Type*
@@ -150,7 +151,7 @@ mth_object_delegate(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int a
     }
     
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'delegate?', syntax: Object delegate?", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'delegate?', syntax: Object delegate?", interp);
 }
 
 #if 0
@@ -164,7 +165,7 @@ mth_object_eq(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     return const_Nil;
     
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'eq', syntax: Object eq object", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'eq', syntax: Object eq object", interp);
 }
 #endif
 
@@ -177,7 +178,7 @@ mth_object_tostring(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int a
     return new_string_str(to_string(SELF(interp)));
     
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'string', syntax: Object string", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'string', syntax: Object string", interp);
 }
 
 Toy_Type*
@@ -196,7 +197,7 @@ mth_object_getmethod(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int 
     return result;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'method?', syntax: Object method? symbol", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'method?', syntax: Object method? symbol", interp);
 }
 
 Toy_Type*
@@ -212,7 +213,7 @@ mth_object_apply(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     return toy_eval_script(interp, block->u.closure.block_body);
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'apply', syntax: Object apply {block}", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'apply', syntax: Object apply {block}", interp);
 }
 
 static Toy_Type*
@@ -220,12 +221,12 @@ to_int(Toy_Interp *interp, Toy_Type *v) {
     Toy_Type *l, *cmd;
     
     l = cmd = new_list(v);
-    l = list_append(l, new_symbol("int"));
+    l = list_append(l, new_symbol(L"int"));
 
     v = toy_call(interp, cmd);
     if (INTEGER == GET_TAG(v)) return v;
     if (EXCEPTION == GET_TAG(v)) return v;
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 static Toy_Type*
@@ -233,12 +234,12 @@ to_real(Toy_Interp *interp, Toy_Type *v) {
     Toy_Type *l, *cmd;
     
     l = cmd = new_list(v);
-    l = list_append(l, new_symbol("real"));
+    l = list_append(l, new_symbol(L"real"));
 
     v = toy_call(interp, cmd);
     if (REAL == GET_TAG(v)) return v;
     if (EXCEPTION == GET_TAG(v)) return v;
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 
@@ -264,10 +265,10 @@ mth_integer_plus(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     return new_integer(s);
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '+', syntax: Integer + number-val", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '+', syntax: Integer + number-val", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 
@@ -293,10 +294,10 @@ mth_integer_minus(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     return new_integer(s);
     
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '-', syntax: Integer - number-val", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '-', syntax: Integer - number-val", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -321,10 +322,10 @@ mth_integer_mul(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     return new_integer(s);
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '*', syntax: Integer * number-val", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '*', syntax: Integer * number-val", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -344,7 +345,7 @@ mth_integer_div(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     }
 
     if (0 == mpz_cmp_si(arg->u.biginteger, 0)) {
-	return new_exception(TE_ZERODIV, "Zero divide.", interp);
+	return new_exception(TE_ZERODIV, L"Zero divide.", interp);
     }
     mpz_init(s);
     mpz_set(s, SELF(interp)->u.biginteger);
@@ -352,10 +353,10 @@ mth_integer_div(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     return new_integer(s);
     
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '/', syntax: Integer / number-val", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '/', syntax: Integer / number-val", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -380,10 +381,10 @@ mth_integer_mod(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     return new_integer(s);
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '%', syntax: Integer % integer-val", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '%', syntax: Integer % integer-val", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 
@@ -409,10 +410,10 @@ mth_integer_eq(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     return const_Nil;
     
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '=', syntax: Integer = number-val", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '=', syntax: Integer = number-val", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -437,10 +438,10 @@ mth_integer_neq(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     return const_Nil;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '!=', syntax: Integer != number-val", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '!=', syntax: Integer != number-val", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -464,10 +465,10 @@ mth_integer_gt(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     return const_Nil;
 	
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '>', syntax: Integer > number-val", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '>', syntax: Integer > number-val", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -491,10 +492,10 @@ mth_integer_lt(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     return const_Nil;
     
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '<', syntax: Integer < number-val", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '<', syntax: Integer < number-val", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -518,10 +519,10 @@ mth_integer_ge(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     return const_Nil;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '>=', syntax: Integer >= number-val", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '>=', syntax: Integer >= number-val", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -545,10 +546,10 @@ mth_integer_le(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     return const_Nil;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '<=', syntax: Integer <= number-val", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '<=', syntax: Integer <= number-val", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -576,10 +577,10 @@ mth_integer_inc(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     }
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '++', syntax: Integer ++ [int-val]", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '++', syntax: Integer ++ [int-val]", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -607,10 +608,10 @@ mth_integer_dec(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     }
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '--', syntax: Integer -- [int-val]", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '--', syntax: Integer -- [int-val]", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -680,11 +681,11 @@ done:
     return result;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'each', syntax: Integer each to: number do: {| var | block}",
+    return new_exception(TE_SYNTAX, L"Syntax error at 'each', syntax: Integer each to: number do: {| var | block}",
 			 interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -763,11 +764,11 @@ done:
     return lresult;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '..', syntax: Integer .. last [do: {| var | block}]",
+    return new_exception(TE_SYNTAX, L"Syntax error at '..', syntax: Integer .. last [do: {| var | block}]",
 			 interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -779,9 +780,9 @@ mth_integer_toreal(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int ar
     return new_real(mpz_get_d(SELF(interp)->u.biginteger));
     
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'real', syntax: Integer real", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'real', syntax: Integer real", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -799,9 +800,9 @@ mth_integer_rol(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
 			  << mpz_get_si(arg->u.biginteger));
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '<<', syntax: Integer << bit", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '<<', syntax: Integer << bit", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -819,9 +820,9 @@ mth_integer_ror(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
 			  >> mpz_get_si(arg->u.biginteger));
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '>>', syntax: Integer >> bit", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '>>', syntax: Integer >> bit", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -842,9 +843,9 @@ mth_integer_or(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     return new_integer(s);
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '||', syntax: Integer || val", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '||', syntax: Integer || val", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -865,9 +866,9 @@ mth_integer_and(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     return new_integer(s);
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '&&', syntax: Integer && val", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '&&', syntax: Integer && val", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -888,9 +889,9 @@ mth_integer_xor(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     return new_integer(s);
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '^^', syntax: Integer ^^ val", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '^^', syntax: Integer ^^ val", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -905,9 +906,9 @@ mth_integer_not(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     return new_integer_si(~mpz_get_si(self->u.biginteger));
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '~~', syntax: Integer ~~ val", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '~~', syntax: Integer ~~ val", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -929,10 +930,10 @@ mth_integer_power(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     return new_integer(s);
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '^', syntax: Integer ^ integer-val(>=0)", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '^', syntax: Integer ^ integer-val(>=0)", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -952,10 +953,10 @@ mth_real_plus(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     return new_real(SELF(interp)->u.real + arg->u.real);
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '+', syntax: Real + number-val", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '+', syntax: Real + number-val", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 
@@ -976,10 +977,10 @@ mth_real_minus(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     return new_real(SELF(interp)->u.real - arg->u.real);
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '-', syntax: Real - number-val", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '-', syntax: Real - number-val", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -999,10 +1000,10 @@ mth_real_mul(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
     return new_real(SELF(interp)->u.real * arg->u.real);
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '*', syntax: Real * number-val", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '*', syntax: Real * number-val", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -1020,15 +1021,15 @@ mth_real_div(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
     }
 
     if (arg->u.real == 0.0) {
-	return new_exception(TE_ZERODIV, "Zero divide.", interp);
+	return new_exception(TE_ZERODIV, L"Zero divide.", interp);
     }
     return new_real(SELF(interp)->u.real / arg->u.real);
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '/', syntax: Real / number-val", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '/', syntax: Real / number-val", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -1051,10 +1052,10 @@ mth_real_eq(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     return const_Nil;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '=', syntax: Real = number-val", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '=', syntax: Real = number-val", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -1077,10 +1078,10 @@ mth_real_neq(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
     return const_Nil;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '!=', syntax: Real != number-val", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '!=', syntax: Real != number-val", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -1103,10 +1104,10 @@ mth_real_gt(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     return const_Nil;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '>', syntax: Real > number-val", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '>', syntax: Real > number-val", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -1129,10 +1130,10 @@ mth_real_lt(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     return const_Nil;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '<', syntax: Real < number-val", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '<', syntax: Real < number-val", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -1155,10 +1156,10 @@ mth_real_ge(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     return const_Nil;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '>=', syntax: Real >= number-val", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '>=', syntax: Real >= number-val", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -1181,10 +1182,10 @@ mth_real_le(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     return const_Nil;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '<=', syntax: Real <= number-val", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '<=', syntax: Real <= number-val", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -1196,9 +1197,9 @@ mth_real_tointeger(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int ar
     return new_integer_d(SELF(interp)->u.real);
     
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'int', syntax: Real int", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'int', syntax: Real int", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -1210,9 +1211,9 @@ mth_real_sqrt(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     return new_real(sqrt(SELF(interp)->u.real));
     
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'sqrt', syntax: Real sqrt", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'sqrt', syntax: Real sqrt", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -1224,9 +1225,9 @@ mth_real_sin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
     return new_real(sin(SELF(interp)->u.real));
     
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'sin', syntax: Real sin", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'sin', syntax: Real sin", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -1238,9 +1239,9 @@ mth_real_cos(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
     return new_real(cos(SELF(interp)->u.real));
     
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'cos', syntax: Real cos", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'cos', syntax: Real cos", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -1252,9 +1253,9 @@ mth_real_tan(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
     return new_real(tan(SELF(interp)->u.real));
     
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'tan', syntax: Real tan", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'tan', syntax: Real tan", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -1266,9 +1267,9 @@ mth_real_asin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     return new_real(asin(SELF(interp)->u.real));
     
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'asin', syntax: Real asin", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'asin', syntax: Real asin", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -1280,9 +1281,9 @@ mth_real_acos(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     return new_real(acos(SELF(interp)->u.real));
     
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'acos', syntax: Real acos", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'acos', syntax: Real acos", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -1294,9 +1295,9 @@ mth_real_atan(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     return new_real(atan(SELF(interp)->u.real));
     
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'atan', syntax: Real atan", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'atan', syntax: Real atan", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -1308,9 +1309,9 @@ mth_real_log(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
     return new_real(log(SELF(interp)->u.real));
     
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'log', syntax: Real log", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'log', syntax: Real log", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -1322,9 +1323,9 @@ mth_real_log10(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     return new_real(log10(SELF(interp)->u.real));
     
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'log10', syntax: Real log10", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'log10', syntax: Real log10", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -1336,9 +1337,9 @@ mth_real_exp(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
     return new_real(exp(SELF(interp)->u.real));
     
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'exp', syntax: Real exp", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'exp', syntax: Real exp", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -1350,9 +1351,9 @@ mth_real_exp10(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     return new_real(pow(10.0, SELF(interp)->u.real));
     
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'exp10', syntax: Real exp10", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'exp10', syntax: Real exp10", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -1369,9 +1370,9 @@ mth_real_pow(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
     return new_real(pow(SELF(interp)->u.real, exp->u.real));
     
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'pow', syntax: Real pow real-value", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'pow', syntax: Real pow real-value", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 
@@ -1393,9 +1394,9 @@ mth_list_last(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     return l;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'last', syntax: List last", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'last', syntax: List last", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -1415,9 +1416,9 @@ mth_list_item(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 //    return list_get_item(l);
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'car', syntax: List car | item", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'car', syntax: List car | item", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -1434,9 +1435,9 @@ mth_list_cdr(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
     return ((l->u.list.nextp==NULL)?const_Nil:(l->u.list.nextp));
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'cdr', syntax: List cdr | next", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'cdr', syntax: List cdr | next", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -1457,9 +1458,9 @@ mth_list_append(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     return l;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'append', syntax: List append! | + [val ...]", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'append', syntax: List append! | + [val ...]", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -1480,9 +1481,9 @@ mth_list_add(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
     return result;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'add', syntax: List add [val ...]", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'add', syntax: List add [val ...]", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -1545,9 +1546,9 @@ fin:
     return result;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'each', syntax: List each do: {| var | block}", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'each', syntax: List each do: {| var | block}", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -1562,9 +1563,9 @@ mth_list_len(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
     return new_integer_si(list_length(l));
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'len', syntax: List len", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'len', syntax: List len", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -1583,16 +1584,16 @@ mth_list_isnull(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     }
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'null?', syntax: List null?", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'null?', syntax: List null?", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
 mth_list_join(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *sep, *self;
     Cell *result;
-    char *psep;
+    wchar_t *psep;
 
     if (arglen > 0) goto error;
     if (hash_get_length(nameargs) > 1) goto error;
@@ -1600,13 +1601,13 @@ mth_list_join(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     if (GET_TAG(self) != LIST) goto error2;
     sep = hash_get_and_unset_t(nameargs, const_sep);
     if (sep == NULL) {
-	sep = new_string_str("");
+	sep = new_string_str(L"");
     } else {
 	sep = new_string_str(to_string(sep));
     }
     psep = cell_get_addr(sep->u.string);
 
-    result = new_cell("");
+    result = new_cell(L"");
 
     while (! IS_LIST_NULL(self)) {
 	cell_add_str(result, to_string_call(interp, list_get_item(self)));
@@ -1624,9 +1625,9 @@ mth_list_join(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     return new_string_cell(result);
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'join', syntax: List join [sep: separator]", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'join', syntax: List join [sep: separator]", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -1641,7 +1642,7 @@ mth_list_eval(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     return result;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'eval', syntax: List eval", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'eval', syntax: List eval", interp);
 }
 
 Toy_Type*
@@ -1668,9 +1669,9 @@ mth_list_new_append(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int a
     return result;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '.', syntax: List . [val ...]", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '.', syntax: List . [val ...]", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -1699,9 +1700,9 @@ mth_list_get(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
     return (GET_TAG(src)==LIST) ? (list_get_item(src) ? list_get_item(src) : const_Nil) : src;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'get', syntax: List get index", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'get', syntax: List get index", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -1736,9 +1737,9 @@ mth_list_filter(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     return result;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'filter', syntax: List filter {| var | block}", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'filter', syntax: List filter {| var | block}", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -1776,9 +1777,9 @@ mth_list_map(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
     return result;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'map', syntax: List map {| var | block}", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'map', syntax: List map {| var | block}", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -1810,9 +1811,9 @@ mth_list_concat(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     return self;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'concat', syntax: List concat (list) | var ...", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'concat', syntax: List concat (list) | var ...", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -1841,9 +1842,9 @@ mth_list_seek(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     return self;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'seek', syntax: List seek index", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'seek', syntax: List seek index", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -1893,9 +1894,9 @@ mth_list_split(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     return result;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'split', syntax: List split index", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'split', syntax: List split index", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -1921,9 +1922,9 @@ mth_list_unshift(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     return SELF(interp);
     
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '<<', syntax: List << val", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '<<', syntax: List << val", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -1943,9 +1944,9 @@ mth_list_shift(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     return const_Nil;
     
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '>>', syntax: List >>", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '>>', syntax: List >>", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -1972,9 +1973,9 @@ mth_list_push(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     return SELF(interp);
     
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '<<-', syntax: List <<- val", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '<<-', syntax: List <<- val", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -2005,9 +2006,9 @@ mth_list_pop(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
     return const_Nil;
     
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '->>', syntax: List ->>", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '->>', syntax: List ->>", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -2073,9 +2074,9 @@ fin:
 
 error:
     return new_exception(TE_SYNTAX,
-	"Syntax error at 'inject', syntax: List inject init-val do: {| sum-var each-var | block}", interp);
+	L"Syntax error at 'inject', syntax: List inject init-val do: {| sum-var each-var | block}", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -2094,9 +2095,9 @@ mth_list_setcar(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     return l;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'set-car!', syntax: List set-car! val", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'set-car!', syntax: List set-car! val", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -2115,9 +2116,9 @@ mth_list_setcdr(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     return l;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'set-car!', syntax: List set-cdr! val", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'set-car!', syntax: List set-cdr! val", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -2132,9 +2133,9 @@ mth_string_len(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     return new_integer_si(cell_get_length(s->u.string));
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'len', syntax: String len", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'len', syntax: String len", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -2154,9 +2155,9 @@ mth_string_plus(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     return new_string_cell(s);
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '+', syntax: String + val ...", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '+', syntax: String + val ...", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -2168,7 +2169,7 @@ mth_string_equal(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     self = SELF(interp);
     if (GET_TAG(self) != STRING) goto error2;
 
-    if (strcmp(cell_get_addr(self->u.string),
+    if (wcscmp(cell_get_addr(self->u.string),
 	       to_string_call(interp, list_get_item(posargs))) == 0) {
 	return const_T;
     } else {
@@ -2176,9 +2177,9 @@ mth_string_equal(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     }
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '=', syntax: String = object", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '=', syntax: String = object", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -2190,7 +2191,7 @@ mth_string_gt(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     self = SELF(interp);
     if (GET_TAG(self) != STRING) goto error2;
 
-    if (strcmp(cell_get_addr(self->u.string),
+    if (wcscmp(cell_get_addr(self->u.string),
 	       to_string_call(interp, list_get_item(posargs))) > 0) {
 	return const_T;
     } else {
@@ -2198,9 +2199,9 @@ mth_string_gt(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     }
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '>', syntax: String > object", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '>', syntax: String > object", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -2212,7 +2213,7 @@ mth_string_lt(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     self = SELF(interp);
     if (GET_TAG(self) != STRING) goto error2;
 
-    if (strcmp(cell_get_addr(self->u.string),
+    if (wcscmp(cell_get_addr(self->u.string),
 	       to_string_call(interp, list_get_item(posargs))) < 0) {
 	return const_T;
     } else {
@@ -2220,9 +2221,9 @@ mth_string_lt(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     }
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '<', syntax: String < object", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '<', syntax: String < object", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -2234,7 +2235,7 @@ mth_string_ge(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     self = SELF(interp);
     if (GET_TAG(self) != STRING) goto error2;
 
-    if (strcmp(cell_get_addr(self->u.string),
+    if (wcscmp(cell_get_addr(self->u.string),
 	       to_string_call(interp, list_get_item(posargs))) >= 0) {
 	return const_T;
     } else {
@@ -2242,9 +2243,9 @@ mth_string_ge(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     }
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '>=', syntax: String >= object", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '>=', syntax: String >= object", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -2256,7 +2257,7 @@ mth_string_le(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     self = SELF(interp);
     if (GET_TAG(self) != STRING) goto error2;
 
-    if (strcmp(cell_get_addr(self->u.string),
+    if (wcscmp(cell_get_addr(self->u.string),
 	       to_string_call(interp, list_get_item(posargs))) <= 0) {
 	return const_T;
     } else {
@@ -2264,9 +2265,9 @@ mth_string_le(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     }
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '<=', syntax: String <= object", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '<=', syntax: String <= object", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -2278,7 +2279,7 @@ mth_string_nequal(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     self = SELF(interp);
     if (GET_TAG(self) != STRING) goto error2;
 
-    if (strcmp(cell_get_addr(self->u.string),
+    if (wcscmp(cell_get_addr(self->u.string),
 	       to_string_call(interp, list_get_item(posargs))) != 0) {
 	return const_T;
     } else {
@@ -2286,9 +2287,9 @@ mth_string_nequal(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     }
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '!=', syntax: String != object", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '!=', syntax: String != object", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -2316,9 +2317,9 @@ mth_string_eval(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     return result;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'eval', syntax: String eval", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'eval', syntax: String eval", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -2344,9 +2345,9 @@ mth_string_append(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     return self;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '+', syntax: String + [val ...]", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '+', syntax: String + [val ...]", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -2372,9 +2373,9 @@ mth_string_concat(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     return new_string_cell(o);
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at '.', syntax: String . [val ...]", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at '.', syntax: String . [val ...]", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -2406,7 +2407,7 @@ mth_string_match(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     tpattern = list_get_item(posargs);
     if (GET_TAG(tpattern) != RQUOTE) goto error;
     if (cell_get_length(tpattern->u.rquote) <= 0) {
-	return new_exception(TE_REGEX, "Null regex pattern.", interp);
+	return new_exception(TE_REGEX, L"Null regex pattern.", interp);
     }
 
     /* parse option */
@@ -2432,21 +2433,21 @@ mth_string_match(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     }
 
     /* make regex key, string format is: 'regex',[case|nocase],[default|grep] */
-    key_str = new_cell("");
-    cell_add_str(key_str, "\'");
+    key_str = new_cell(L"");
+    cell_add_str(key_str, L"\'");
     cell_add_str(key_str, to_string(tpattern));
-    cell_add_str(key_str, "\'");
-    cell_add_str(key_str, ",");
+    cell_add_str(key_str, L"\'");
+    cell_add_str(key_str, L",");
     if (t_case) {
-	cell_add_str(key_str, "nocase");
+	cell_add_str(key_str, L"nocase");
     } else {
-	cell_add_str(key_str, "case");
+	cell_add_str(key_str, L"case");
     }
-    cell_add_str(key_str, ",");
+    cell_add_str(key_str, L",");
     if (t_grep) {
-	cell_add_str(key_str, "grep");
+	cell_add_str(key_str, L"grep");
     } else {
-	cell_add_str(key_str, "default");
+	cell_add_str(key_str, L"default");
     }
 
     /* regex cache search */
@@ -2482,7 +2483,7 @@ mth_string_match(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
 	if (r != ONIG_NORMAL) {
 	    char s[ONIG_MAX_ERROR_MESSAGE_LEN];
 	    onig_error_code_to_str(s, r, &einfo);
-	    return new_exception(TE_REGEX, s, interp);
+	    return new_exception(TE_REGEX, to_wchar(s), interp);
 	}
 
 	/* and regex object set to cache */
@@ -2537,7 +2538,7 @@ next_search:
     } else {
 	char s[ONIG_MAX_ERROR_MESSAGE_LEN];
 	onig_error_code_to_str(s, r, &einfo);
-	result = new_exception(TE_REGEX, s, interp);
+	result = new_exception(TE_REGEX, to_wchar(s), interp);
     }
 
     onig_region_free(region, 1);
@@ -2549,9 +2550,9 @@ next_search:
 
 error:
     return new_exception(TE_SYNTAX,
-	 "Syntax error at '=~', syntax: String =~ [:nocase] [:all] [:grep] 'pattern'", interp);
+	 L"Syntax error at '=~', syntax: String =~ [:nocase] [:all] [:grep] 'pattern'", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -2583,19 +2584,19 @@ mth_string_sub(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     return new_string_cell(cell_sub(o, start, end));
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'sub', syntax: String sub start [end]", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'sub', syntax: String sub start [end]", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 static int
-is_sub_eq(char *src, char *dest);
+is_sub_eq(wchar_t *src, wchar_t *dest);
 
 Toy_Type*
 mth_string_split(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *sep = NULL;
     Toy_Type *self, *result, *l;
-    char *p, *csep;
+    wchar_t *p, *csep;
     Cell *word;
     int seplen, end_f=0;
 
@@ -2614,7 +2615,7 @@ mth_string_split(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     if (NULL == sep) {
 
 	while (*p) {
-	    word = new_cell("");
+	    word = new_cell(L"");
 
 	    /* skip white space */
 	    while (*p && isspace(*p)) {
@@ -2647,10 +2648,10 @@ mth_string_split(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     } else {
 
 	csep = cell_get_addr(sep->u.string);
-	seplen = strlen(csep);
+	seplen = wcslen(csep);
 	
 	while (*p) {
-	    word = new_cell("");
+	    word = new_cell(L"");
 
 	    /* collect word, until separator */
 	    end_f = 0;
@@ -2676,20 +2677,20 @@ mth_string_split(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
 	    p += ((seplen == 0) ? 1 : seplen);
 	}
 	if ((end_f == 1) && (seplen != 0)) {
-	    l = list_append(l, new_string_str(""));
+	    l = list_append(l, new_string_str(L""));
 	}
     }
 
     return result;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'split', syntax: String split [sep: separator]", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'split', syntax: String split [sep: separator]", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 static int
-is_sub_eq(char *src, char *dest) {
+is_sub_eq(wchar_t *src, wchar_t *dest) {
     if (! *dest) return 1;
     
     while (*dest) {
@@ -2717,9 +2718,9 @@ mth_string_toint(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     goto error2;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'int', syntax: String int", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'int', syntax: String int", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -2741,9 +2742,9 @@ mth_string_toreal(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     goto error2;
     
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'real', syntax: String real", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'real', syntax: String real", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -2760,9 +2761,9 @@ mth_string_tonumber(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int a
     return const_Nil;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'number', syntax: String number", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'number', syntax: String number", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -2774,19 +2775,19 @@ mth_string_torquote(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int a
     return new_rquote(cell_get_addr(SELF(interp)->u.string));
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'rquote', syntax: String rquote", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'rquote', syntax: String rquote", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
-static char*
-mth_string_format_fill(char* item, int fill, int trim) {
+static wchar_t*
+mth_string_format_fill(wchar_t* item, int fill, int trim) {
     Cell *result, *result2;
     int i, slen;
 
-    slen = strlen(item);
+    slen = wcslen(item);
 
-    result = new_cell("");
+    result = new_cell(L"");
     if ((fill == 0) || (slen >= abs(fill))) {
 	cell_add_str(result, item);
     } else if (fill < 0) {
@@ -2815,21 +2816,21 @@ mth_string_format_fill(char* item, int fill, int trim) {
     return cell_get_addr(result);
 }
 
-static char*
+static wchar_t*
 mth_string_format_C(Toy_Type *item, Cell *fmt) {
-    char *buff;
+    wchar_t *buff;
 
-    buff = GC_MALLOC(64);
+    buff = GC_MALLOC(64*sizeof(wchar_t));
     ALLOC_SAFE(buff);
 
     switch (GET_TAG(item)) {
     case INTEGER:
 	/* XXX: fix it for big integer */
-	snprintf(buff, 64, cell_get_addr(fmt),
+	swprintf(buff, 64, cell_get_addr(fmt),
 		 mpz_get_si(item->u.biginteger));
 	break;
     case REAL:
-	snprintf(buff, 64, cell_get_addr(fmt),
+	swprintf(buff, 64, cell_get_addr(fmt),
 		 item->u.real);
 	break;
     default:
@@ -2841,7 +2842,7 @@ mth_string_format_C(Toy_Type *item, Cell *fmt) {
 
 Toy_Type*
 mth_string_format(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
-    char *p, *f;
+    wchar_t *p, *f;
     int acc, neg, trim;
     int done, indicate_int;
     Toy_Type *result, *item;
@@ -2852,16 +2853,16 @@ mth_string_format(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 
     p = cell_get_addr(SELF(interp)->u.string);
 
-    result = new_string_str("");
+    result = new_string_str(L"");
     c = result->u.string;
     while (*p) {
 	switch (*p) {
-	case '%':
+	case L'%':
 	    acc = 0;
 	    neg = 1;
 	    trim = 0;
 	    done = 0;
-	    sacc = new_cell("%");
+	    sacc = new_cell(L"%");
 	    indicate_int = 0;
 	    p++;
 	    if (! *p) {
@@ -2869,32 +2870,32 @@ mth_string_format(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 	    }
 	    while (*p) {
 		switch (*p) {
-		case '%':
-		    cell_add_char(c, '%');
+		case L'%':
+		    cell_add_char(c, L'%');
 		    done = 1;
 		    break;
 
-		case '-':
+		case L'-':
 		    neg = -1;
 		    cell_add_char(sacc, *p);
 		    break;
 
-		case '!':
+		case L'!':
 		    trim = 1;
 		    break;
-
-		case '0': case '1': case '2': case '3': case '4':
-		case '5': case '6': case '7': case '8': case '9':
-		    acc = acc*10 + (*p-'0');
+		    
+		case L'0': case L'1': case L'2': case L'3': case L'4':
+		case L'5': case L'6': case L'7': case L'8': case L'9':
+		    acc = acc*10 + (*p-L'0');
 		    cell_add_char(sacc, *p);
 		    break;
 
-		case '.':
+		case L'.':
 		    cell_add_char(sacc, *p);
 		    acc = 0;
 		    break;
 
-		case 'v':
+		case L'v':
 		    item = list_get_item(posargs);
 		    if (NULL == item) {
 			item = const_nullstring;
@@ -2905,16 +2906,16 @@ mth_string_format(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 		    done = 1;
 		    break;
 
-		case 'd':
-		case 'o': case 'u': case 'x': case 'X':
+		case L'd':
+		case L'o': case L'u': case L'x': case L'X':
 		    indicate_int = 1;
-		    cell_add_char(sacc, 'l');
-		    cell_add_char(sacc, 'l');
+		    cell_add_char(sacc, L'l');
+		    cell_add_char(sacc, L'l');
 		    /* fall thru */
 
-		case 'f': case 'F':
-		case 'e': case 'E':
-		case 'g': case 'G':
+		case L'f': case L'F':
+		case L'e': case L'E':
+		case L'g': case L'G':
 		    cell_add_char(sacc, *p);
 
 		    item = list_get_item(posargs);
@@ -2924,22 +2925,22 @@ mth_string_format(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 			posargs = list_next(posargs);
 		    }
 		    if ((GET_TAG(item) == INTEGER) && (! indicate_int)) {
-			return new_exception(TE_TYPE, "Format indicator type error.", interp);
+			return new_exception(TE_TYPE, L"Format indicator type error.", interp);
 		    }
 		    if ((GET_TAG(item) == REAL) && indicate_int) {
-			return new_exception(TE_TYPE, "Format indicator type error.", interp);
+			return new_exception(TE_TYPE, L"Format indicator type error.", interp);
 		    }
 		    f = mth_string_format_C(item, sacc);
 		    if (f) {
 			cell_add_str(c, f);
 		    } else {
-			return new_exception(TE_TYPE, "Format indicator type error.", interp);
+			return new_exception(TE_TYPE, L"Format indicator type error.", interp);
 		    }
 		    done = 1;
 		    break;
 
 		default:
-		    return new_exception(TE_SYNTAX, "Bad format indicator.", interp);
+		    return new_exception(TE_SYNTAX, L"Bad format indicator.", interp);
 		}
 
 		if (done) break;
@@ -2959,14 +2960,14 @@ mth_string_format(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     return result;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'fmt', syntax: String fmt var ...", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'fmt', syntax: String fmt var ...", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
 mth_string_clean(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
-    char *p;
+    wchar_t *p;
     Cell *c;
     int len, i;
     
@@ -2974,7 +2975,7 @@ mth_string_clean(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     if (arglen != 0) goto error;
     if (hash_get_length(nameargs) > 0) goto error;
 
-    c = new_cell("");
+    c = new_cell(L"");
     p = cell_get_addr(SELF(interp)->u.string);
 
     while (*p) {
@@ -2985,7 +2986,7 @@ mth_string_clean(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
 	}
     }
 
-    len = strlen(p);
+    len = wcslen(p);
     for (i=len-1; i>=0; i--) {
 	if (isspace(p[i])) {
 	    p[i]=0;
@@ -2995,7 +2996,7 @@ mth_string_clean(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     }
     
     while (*p) {
-	if ((*p == ' ') || (! isspace(*p))) {
+	if ((*p == L' ') || (! isspace(*p))) {
 	    if (isprint(*p)) {
 		cell_add_char(c, *p);
 	    }
@@ -3006,21 +3007,21 @@ mth_string_clean(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     return new_string_cell(c);
     
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'clean', syntax: String clean", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'clean', syntax: String clean", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
 mth_string_upper(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
-    char *p;
+    wchar_t *p;
     Cell *c;
     
     if (GET_TAG(SELF(interp)) != STRING) goto error2;
     if (arglen != 0) goto error;
     if (hash_get_length(nameargs) > 0) goto error;
 
-    c = new_cell("");
+    c = new_cell(L"");
     p = cell_get_addr(SELF(interp)->u.string);
     while (*p) {
 	if (islower(*p)) {
@@ -3034,21 +3035,21 @@ mth_string_upper(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     return new_string_cell(c);
     
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'upper', syntax: String upper", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'upper', syntax: String upper", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
 mth_string_lower(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
-    char *p;
+    wchar_t *p;
     Cell *c;
     
     if (GET_TAG(SELF(interp)) != STRING) goto error2;
     if (arglen != 0) goto error;
     if (hash_get_length(nameargs) > 0) goto error;
 
-    c = new_cell("");
+    c = new_cell(L"");
     p = cell_get_addr(SELF(interp)->u.string);
     while (*p) {
 	if (isupper(*p)) {
@@ -3062,9 +3063,9 @@ mth_string_lower(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     return new_string_cell(c);
     
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'lower', syntax: String lower", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'lower', syntax: String lower", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -3080,9 +3081,9 @@ mth_block_eval(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     return result;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'eval', syntax: Block eval", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'eval', syntax: Block eval", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 #define FMODE_INPUT	(1)
@@ -3149,7 +3150,7 @@ mth_file_init(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     if (arglen > 0) {
 	Toy_Type *cmd, *l;
 
-	l = cmd = new_list(new_symbol("open"));
+	l = cmd = new_list(new_symbol(L"open"));
 	posargs = list_get_item(posargs);
 	while (posargs) {
 	    list_append(l, list_get_item(posargs));
@@ -3167,7 +3168,7 @@ mth_file_open(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     Toy_File *f;
     Toy_Type *container;
     Toy_Type *mode, *path;
-    char *pmode;
+    wchar_t *pmode;
     int flag;
 
     self = SELF_HASH(interp);
@@ -3186,16 +3187,16 @@ mth_file_open(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 	if (GET_TAG(mode) != SYMBOL) goto error;
 
 	pmode = cell_get_addr(mode->u.symbol.cell);
-	if (strcmp(pmode, "i") == 0) {
+	if (wcscmp(pmode, L"i") == 0) {
 	    f->mode = FMODE_INPUT;
 	    f->newline = 0;
-	} else if (strcmp(pmode, "o") == 0) {
+	} else if (wcscmp(pmode, L"o") == 0) {
 	    f->mode = FMODE_OUTPUT;
 	    f->newline = 1;
-	} else if (strcmp(pmode, "a") == 0) {
+	} else if (wcscmp(pmode, L"a") == 0) {
 	    f->mode = FMODE_APPEND;
 	    f->newline = 1;
-	} else if (strcmp(pmode, "io") == 0) {
+	} else if (wcscmp(pmode, L"io") == 0) {
 	    f->mode = FMODE_INOUT;
 	    f->newline = 1;
 	} else goto error;
@@ -3211,14 +3212,14 @@ mth_file_open(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 	f->fd = NULL;
     }
 
-    f->fd = fopen(cell_get_addr(f->path->u.string),
+    f->fd = fopen(to_char(cell_get_addr(f->path->u.string)),
 		  (f->mode==FMODE_INPUT)  ? "r"  :
 		  (f->mode==FMODE_OUTPUT) ? "w"  :
 		  (f->mode==FMODE_INOUT)  ? "r+" :
 		   "a");
 
     if (NULL == f->fd) {
-	return new_exception(TE_FILENOTOPEN, strerror(errno), interp);
+	return new_exception(TE_FILENOTOPEN, to_wchar(strerror(errno)), interp);
     }
 
     flag = fcntl(fileno(f->fd), F_GETFD, 0);
@@ -3230,9 +3231,9 @@ mth_file_open(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     return const_T;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'open', syntax: File oepn [mode: i | o | a | io] \"path\"", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'open', syntax: File oepn [mode: i | o | a | io] \"path\"", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -3259,9 +3260,9 @@ mth_file_close(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     return const_T;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'close', syntax: File close", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'close', syntax: File close", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -3293,10 +3294,10 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     }
 
     if (NULL == f->fd) {
-	return new_exception(TE_FILEACCESS, "File not open.", interp);
+	return new_exception(TE_FILEACCESS, L"File not open.", interp);
     }
     if ((FMODE_INPUT != f->mode) && (FMODE_INOUT != f->mode)) {
-	return new_exception(TE_FILEACCESS, "Bad file access mode.", interp);
+	return new_exception(TE_FILEACCESS, L"Bad file access mode.", interp);
     }
 
     if (feof(f->fd)) return const_Nil;
@@ -3305,7 +3306,7 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 	cbuff = new_cell(cell_get_addr(f->r_pending));
 	f->r_pending = NULL;
     } else {
-	cbuff = new_cell("");
+	cbuff = new_cell(L"");
     }
     
     while (1) {
@@ -3314,7 +3315,7 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 	    if ((errno == EAGAIN) && (! feof(f->fd))) {
 		clearerr(f->fd);
 		f->r_pending = cbuff;
-		return new_exception(TE_IOAGAIN, "No data available at File::gets, try again.", interp);
+		return new_exception(TE_IOAGAIN, L"No data available at File::gets, try again.", interp);
 	    }
 	    
 	    f->r_pending = NULL;
@@ -3347,9 +3348,9 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     }
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'gets', syntax: File gets [:nonewline] [:nocontrol]", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'gets', syntax: File gets [:nonewline] [:nocontrol]", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -3379,24 +3380,24 @@ mth_file_puts(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     }
 
     if (NULL == f->fd) {
-	return new_exception(TE_FILEACCESS, "File not open.", interp);
+	return new_exception(TE_FILEACCESS, L"File not open.", interp);
     }
     if ((FMODE_OUTPUT != f->mode) && (FMODE_APPEND != f->mode) && (FMODE_INOUT != f->mode)) {
-	return new_exception(TE_FILEACCESS, "Bad file access mode.", interp);
+	return new_exception(TE_FILEACCESS, L"Bad file access mode.", interp);
     }
 
     while (posargs) {
-	char *p;
+	wchar_t *p;
 
 	p = to_string_call(interp, list_get_item(posargs));
-	c = fputs(p, f->fd);
+	c = fputs(to_char(p), f->fd);
 	if (flag_nonewline == 0) {
 	    c = fputs("\n", f->fd);
 	}
 	fflush(f->fd);
 
 	if (EOF == c) {
-	    return new_exception(TE_FILEACCESS, strerror(errno), interp);
+	    return new_exception(TE_FILEACCESS, to_wchar(strerror(errno)), interp);
 	}
 
 	posargs = list_next(posargs);
@@ -3405,9 +3406,9 @@ mth_file_puts(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     return const_T;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'puts', syntax: File puts [:nonewline] val ...", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'puts', syntax: File puts [:nonewline] val ...", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -3425,10 +3426,10 @@ mth_file_flush(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     f = container->u.container;
 
     if (NULL == f->fd) {
-	return new_exception(TE_FILEACCESS, "File not open.", interp);
+	return new_exception(TE_FILEACCESS, L"File not open.", interp);
     }
     if ((FMODE_OUTPUT != f->mode) && (FMODE_APPEND != f->mode) && (FMODE_INOUT != f->mode)) {
-	return new_exception(TE_FILEACCESS, "Bad file access mode.", interp);
+	return new_exception(TE_FILEACCESS, L"Bad file access mode.", interp);
     }
 
     fflush(f->fd);
@@ -3436,9 +3437,9 @@ mth_file_flush(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     return const_T;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'flush', syntax: File flush", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'flush', syntax: File flush", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -3465,9 +3466,9 @@ mth_file_setnewline(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int a
     }
 	
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'set-newline', syntax: File set-newline [t | nil]", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'set-newline', syntax: File set-newline [t | nil]", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -3487,44 +3488,44 @@ mth_file_stat(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 
     l = new_list(NULL);
 
-    list_append(l, new_cons(new_symbol("fd"),
+    list_append(l, new_cons(new_symbol(L"fd"),
 			    f->fd ? new_integer_si(fileno(f->fd)) : const_Nil));
     switch (f->mode) {
     case FMODE_INPUT:
-	mode = new_symbol("i");
+	mode = new_symbol(L"i");
 	break;
     case FMODE_OUTPUT:
-	mode = new_symbol("o");
+	mode = new_symbol(L"o");
 	break;
     case FMODE_APPEND:
-	mode = new_symbol("a");
+	mode = new_symbol(L"a");
 	break;
     case FMODE_INOUT:
-	mode = new_symbol("io");
+	mode = new_symbol(L"io");
 	break;
     default:
 	mode = const_Nil;
     }
-    list_append(l, new_cons(new_symbol("mode"), mode));
-    list_append(l, new_cons(new_symbol("path"), f->path ? f->path : const_Nil));
+    list_append(l, new_cons(new_symbol(L"mode"), mode));
+    list_append(l, new_cons(new_symbol(L"path"), f->path ? f->path : const_Nil));
     if (f->fd) {
 	if (feof(f->fd)) {
-	    list_append(l, new_cons(new_symbol("eof"), const_T));
+	    list_append(l, new_cons(new_symbol(L"eof"), const_T));
 	} else {
-	    list_append(l, new_cons(new_symbol("eof"), const_Nil));
+	    list_append(l, new_cons(new_symbol(L"eof"), const_Nil));
 	}
     } else {
-	list_append(l, new_cons(new_symbol("eof"), const_Nil));
+	list_append(l, new_cons(new_symbol(L"eof"), const_Nil));
     }
-    list_append(l, new_cons(new_symbol("newline"), f->newline ? const_T : const_Nil));
-    list_append(l, new_cons(new_symbol("noblock"), f->noblock ? const_T : const_Nil));
+    list_append(l, new_cons(new_symbol(L"newline"), f->newline ? const_T : const_Nil));
+    list_append(l, new_cons(new_symbol(L"noblock"), f->noblock ? const_T : const_Nil));
 
     return l;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'stat', syntax: File stat", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'stat', syntax: File stat", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -3542,7 +3543,7 @@ mth_file_iseof(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     f = container->u.container;
 
     if (NULL == f->fd) {
-	return new_exception(TE_FILEACCESS, "File not open.", interp);
+	return new_exception(TE_FILEACCESS, L"File not open.", interp);
     }
 
     if (feof(f->fd)) {
@@ -3553,9 +3554,9 @@ mth_file_iseof(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
 
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'eof?', syntax: File eof?", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'eof?', syntax: File eof?", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -3584,16 +3585,16 @@ mth_file_set(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
 	f->mode = FMODE_INPUT;
     } else if (GET_TAG(mode) != SYMBOL) {
 	goto error;
-    } else if (strcmp(cell_get_addr(mode->u.symbol.cell), "i") == 0) {
+    } else if (wcscmp(cell_get_addr(mode->u.symbol.cell), L"i") == 0) {
 	imode = "r";
 	f->mode = FMODE_INPUT;
-    } else if (strcmp(cell_get_addr(mode->u.symbol.cell), "o") == 0) {
+    } else if (wcscmp(cell_get_addr(mode->u.symbol.cell), L"o") == 0) {
 	imode = "w";
 	f->mode = FMODE_OUTPUT;
-    } else if (strcmp(cell_get_addr(mode->u.symbol.cell), "a") == 0) {
+    } else if (wcscmp(cell_get_addr(mode->u.symbol.cell), L"a") == 0) {
 	imode = "a";
 	f->mode = FMODE_APPEND;
-    } else if (strcmp(cell_get_addr(mode->u.symbol.cell), "io") == 0) {
+    } else if (wcscmp(cell_get_addr(mode->u.symbol.cell), L"io") == 0) {
 	imode = "r+";
 	f->mode = FMODE_INOUT;
     } else goto error;
@@ -3602,15 +3603,15 @@ mth_file_set(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
     f->path = const_Nil;
 
     if (NULL == f->fd) {
-	return new_exception(TE_FILENOTOPEN, strerror(errno), interp);
+	return new_exception(TE_FILENOTOPEN, to_wchar(strerror(errno)), interp);
     }
 
     return const_T;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'set!', syntax: File set! [mode: iomode] integer-fd", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'set!', syntax: File set! [mode: iomode] integer-fd", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -3627,7 +3628,7 @@ mth_file_isready(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     Toy_Type *ttimeout;
 
     if (arglen > 0) goto error;
-    ttimeout = hash_get_and_unset_t(nameargs, new_symbol("timeout:"));
+    ttimeout = hash_get_and_unset_t(nameargs, new_symbol(L"timeout:"));
     if (ttimeout) {
 	if (GET_TAG(ttimeout) != INTEGER) goto error;
 	itimeout = mpz_get_si(ttimeout->u.biginteger);
@@ -3672,10 +3673,10 @@ mth_file_isready(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     return const_Nil;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'ready?', syntax: File ready? [timeout: msec]", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'ready?', syntax: File ready? [timeout: msec]", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -3700,10 +3701,10 @@ mth_file_clear(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     return const_T;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'clear', syntax: File clear", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'clear', syntax: File clear", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -3722,15 +3723,15 @@ mth_file_setnobuffer(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int 
     f = container->u.container;
     fd = f->fd;
     if (EOF == setvbuf(fd, 0, _IOLBF, 0)) {
-	return new_exception(TE_FILEACCESS, "Buffering mode change error.", interp);
+	return new_exception(TE_FILEACCESS, L"Buffering mode change error.", interp);
     };
 
     return const_T;
     
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'set-nobuffer', syntax: File set-nobuffer", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'set-nobuffer', syntax: File set-nobuffer", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -3759,7 +3760,7 @@ mth_file_setnoblock(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int a
 
     val = fcntl(fileno(fd), F_GETFL, 0);
     if (-1 == val) {
-	return new_exception(TE_FILEACCESS, "fcntl error at F_GETFL.", interp);
+	return new_exception(TE_FILEACCESS, L"fcntl error at F_GETFL.", interp);
     }
     if (iflag) {
 	// set non-block
@@ -3769,7 +3770,7 @@ mth_file_setnoblock(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int a
 	val &= ~O_NONBLOCK;
     }
     if (fcntl(fileno(fd), F_SETFL, val) == -1) {
-	return new_exception(TE_FILEACCESS, "fcntl error at F_SETFL.", interp);
+	return new_exception(TE_FILEACCESS, L"fcntl error at F_SETFL.", interp);
     }
     
     if (iflag) {
@@ -3781,15 +3782,15 @@ mth_file_setnoblock(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int a
     }
     
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'set-noblock', syntax: File set-noblock t | nil", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'set-noblock', syntax: File set-noblock t | nil", interp);
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
 mth_dict_set(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *o, *val;
-    char *key;
+    wchar_t *key;
 
     if (arglen != 2) goto error;
 
@@ -3804,16 +3805,16 @@ mth_dict_set(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
     return val;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'set', syntax: Dict set key value", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'set', syntax: Dict set key value", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
 mth_dict_get(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *o, *result;
-    char *key;
+    wchar_t *key;
 
     if (arglen != 1) goto error;
 
@@ -3830,16 +3831,16 @@ mth_dict_get(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
     return const_Nil;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'get', syntax: Dict get key", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'get', syntax: Dict get key", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
 mth_dict_isset(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *o, *result;
-    char *key;
+    wchar_t *key;
 
     if (arglen != 1) goto error;
 
@@ -3856,10 +3857,10 @@ mth_dict_isset(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     return const_Nil;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'set?', syntax: Dict set? key", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'set?', syntax: Dict set? key", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -3874,16 +3875,16 @@ mth_dict_len(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
     return new_integer_si(hash_get_length(o->u.dict));
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'len', syntax: Dict len", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'len', syntax: Dict len", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
 mth_dict_unset(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *o, *result;
-    char *key;
+    wchar_t *key;
 
     if (arglen != 1) goto error;
 
@@ -3900,10 +3901,10 @@ mth_dict_unset(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     return const_Nil;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'unset', syntax: Dict unset key", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'unset', syntax: Dict unset key", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -3918,10 +3919,10 @@ mth_dict_keys(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     return hash_get_keys(o->u.dict);
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'keys', syntax: Dict keys", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'keys', syntax: Dict keys", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -3936,10 +3937,10 @@ mth_dict_pairs(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     return hash_get_pairs(o->u.dict);
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'pairs', syntax: Dict keys", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'pairs', syntax: Dict keys", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -3958,10 +3959,10 @@ mth_vector_append(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     return item;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'append', syntax: Vector append val", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'append', syntax: Vector append val", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -3981,16 +3982,16 @@ mth_vector_set(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     if (GET_TAG(o) != VECTOR) goto error2;
 
     if (! array_set(o->u.vector, item, mpz_get_si(index->u.biginteger))) {
-	return new_exception(TE_ARRAYBOUNDARY, "Array boudary error.", interp);
+	return new_exception(TE_ARRAYBOUNDARY, L"Array boudary error.", interp);
     }
 
     return item;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'set', syntax: Vector set pos val", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'set', syntax: Vector set pos val", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -4009,16 +4010,16 @@ mth_vector_get(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
 
     item = array_get(o->u.vector, mpz_get_si(index->u.biginteger));
     if (! item) {
-	return new_exception(TE_ARRAYBOUNDARY, "Array boudary error.", interp);
+	return new_exception(TE_ARRAYBOUNDARY, L"Array boudary error.", interp);
     }
 
     return item;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'get', syntax: Vector get pos", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'get', syntax: Vector get pos", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -4034,10 +4035,10 @@ mth_vector_len(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     return new_integer_si(array_get_size(o->u.vector));
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'len', syntax: Vector len", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'len', syntax: Vector len", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -4056,10 +4057,10 @@ mth_vector_last(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     return array_get(o->u.vector, index - 1);
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'last', syntax: Vector last", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'last', syntax: Vector last", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -4083,10 +4084,10 @@ mth_vector_list(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     return result;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'list', syntax: Vector list", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'list', syntax: Vector list", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -4144,10 +4145,10 @@ fin:
     return result;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'list', syntax: Vector each do: {| var | block}", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'list', syntax: Vector each do: {| var | block}", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -4174,16 +4175,16 @@ mth_vector_swap(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     idx2 = mpz_get_si(index2->u.biginteger);
     
     if (! array_swap(o->u.vector, idx1, idx2)) {
-	return new_exception(TE_ARRAYBOUNDARY, "Array boudary error.", interp);
+	return new_exception(TE_ARRAYBOUNDARY, L"Array boudary error.", interp);
     }
 
     return const_T;
 
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'swap', syntax: Vector swap pos1 pos2", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'swap', syntax: Vector swap pos1 pos2", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -4199,10 +4200,10 @@ mth_coro_next(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 
     co = self->u.coroutine;
     if (0 == co->coro_id) {
-	return new_exception(TE_COOUTOFLIFE, "Co-routine out of life.", interp);
+	return new_exception(TE_COOUTOFLIFE, L"Co-routine out of life.", interp);
     }
     if (! cstack_isalive(co->interp->cstack_id)) {
-	return new_exception(TE_COOUTOFLIFE, "Co-routine out of life.", interp);
+	return new_exception(TE_COOUTOFLIFE, L"Co-routine out of life.", interp);
     };
 
     interp->co_value = const_Nil;
@@ -4219,7 +4220,7 @@ mth_coro_next(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 	break;
 
     default:
-	return new_exception(TE_COOUTOFLIFE, "Co-routine out of life.", interp);
+	return new_exception(TE_COOUTOFLIFE, L"Co-routine out of life.", interp);
     }
 
     if (interp->co_value) {
@@ -4229,10 +4230,10 @@ mth_coro_next(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     return const_Nil;
     
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'next', syntax: Coro next", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'next', syntax: Coro next", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -4249,7 +4250,7 @@ mth_coro_release(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     co->state = CO_STS_DONE;
 
     if (0 == co->coro_id) {
-	return new_exception(TE_COOUTOFLIFE, "Co-routine is already done.", interp);
+	return new_exception(TE_COOUTOFLIFE, L"Co-routine is already done.", interp);
     }
     co_delete(co->coro_id);
     co->coro_id = 0;
@@ -4262,10 +4263,10 @@ mth_coro_release(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     return const_Nil;
     
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'release', syntax: Coro release", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'release', syntax: Coro release", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -4282,18 +4283,18 @@ mth_coro_stat(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     
     switch (co->state) {
     case CO_STS_INIT:
-	return new_symbol("INIT");
+	return new_symbol(L"INIT");
     case CO_STS_RUN:
-	return new_symbol("RUN");
+	return new_symbol(L"RUN");
     default:
-	return new_symbol("DONE");
+	return new_symbol(L"DONE");
     }
     
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'stat', syntax: Coro stat", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'stat', syntax: Coro stat", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
@@ -4312,172 +4313,169 @@ mth_coro_eval(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     if (GET_TAG(body) != CLOSURE) goto error;
 
     if (CO_STS_DONE == co->state) {
-	return new_exception(TE_COOUTOFLIFE, "Co-routine out of life.", interp);
+	return new_exception(TE_COOUTOFLIFE, L"Co-routine out of life.", interp);
     }
     
     return toy_eval_script(co->interp, body->u.closure.block_body);
     
 error:
-    return new_exception(TE_SYNTAX, "Syntax error at 'eval', syntax: Coro eval {body}", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'eval', syntax: Coro eval {body}", interp);
 
 error2:
-    return new_exception(TE_TYPE, "Type error.", interp);
+    return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 int
 toy_add_methods(Toy_Interp* interp) {
-    toy_add_method(interp, "Object", "vars", mth_object_vars, NULL);
-    toy_add_method(interp, "Object", "method", mth_object_method, NULL);
-    toy_add_method(interp, "Object", "var?", mth_object_get, NULL);
-    toy_add_method(interp, "Object", "get", mth_object_get, NULL);
-    toy_add_method(interp, "Object", "set!", mth_object_set, NULL);
-    toy_add_method(interp, "Object", "type?", mth_object_type, NULL);
-    toy_add_method(interp, "Object", "delegate?", mth_object_delegate, NULL);
+    toy_add_method(interp, L"Object", L"vars", mth_object_vars, NULL);
+    toy_add_method(interp, L"Object", L"method", mth_object_method, NULL);
+    toy_add_method(interp, L"Object", L"var?", mth_object_get, NULL);
+    toy_add_method(interp, L"Object", L"get", mth_object_get, NULL);
+    toy_add_method(interp, L"Object", L"set!", mth_object_set, NULL);
+    toy_add_method(interp, L"Object", L"type?", mth_object_type, NULL);
+    toy_add_method(interp, L"Object", L"delegate?", mth_object_delegate, NULL);
 #if 0 // replace to command eq?
-    toy_add_method(interp, "Object", "eq", mth_object_eq, NULL);
+    toy_add_method(interp, L"Object", L"eq", mth_object_eq, NULL);
 #endif
-    toy_add_method(interp, "Object", "string", mth_object_tostring, NULL);
-    toy_add_method(interp, "Object", "method?", mth_object_getmethod, NULL);
-    toy_add_method(interp, "Object", "apply", mth_object_apply, NULL);
+    toy_add_method(interp, L"Object", L"string", mth_object_tostring, NULL);
+    toy_add_method(interp, L"Object", L"method?", mth_object_getmethod, NULL);
+    toy_add_method(interp, L"Object", L"apply", mth_object_apply, NULL);
 
-    toy_add_method(interp, "Integer", "+", mth_integer_plus, NULL);
-    toy_add_method(interp, "Integer", "-", mth_integer_minus, NULL);
-    toy_add_method(interp, "Integer", "*", mth_integer_mul, NULL);
-    toy_add_method(interp, "Integer", "/", mth_integer_div, NULL);
-    toy_add_method(interp, "Integer", "%", mth_integer_mod, NULL);
-    toy_add_method(interp, "Integer", "=", mth_integer_eq, NULL);
-    toy_add_method(interp, "Integer", "!=", mth_integer_neq, NULL);
-    toy_add_method(interp, "Integer", ">", mth_integer_gt, NULL);
-    toy_add_method(interp, "Integer", "<", mth_integer_lt, NULL);
-    toy_add_method(interp, "Integer", ">=", mth_integer_ge, NULL);
-    toy_add_method(interp, "Integer", "<=", mth_integer_le, NULL);
-    toy_add_method(interp, "Integer", "++", mth_integer_inc, NULL);
-    toy_add_method(interp, "Integer", "--", mth_integer_dec, NULL);
-    toy_add_method(interp, "Integer", "each", mth_integer_each, NULL);
-    toy_add_method(interp, "Integer", "..", mth_integer_list, NULL);
-    toy_add_method(interp, "Integer", "real", mth_integer_toreal, NULL);
-    toy_add_method(interp, "Integer", "<<", mth_integer_rol, NULL);
-    toy_add_method(interp, "Integer", ">>", mth_integer_ror, NULL);
-    toy_add_method(interp, "Integer", "||", mth_integer_or, NULL);
-    toy_add_method(interp, "Integer", "&&", mth_integer_and, NULL);
-    toy_add_method(interp, "Integer", "^^", mth_integer_xor, NULL);
-    toy_add_method(interp, "Integer", "~~", mth_integer_not, NULL);
-    toy_add_method(interp, "Integer", "^", mth_integer_power, NULL);
+    toy_add_method(interp, L"Integer", L"+", mth_integer_plus, NULL);
+    toy_add_method(interp, L"Integer", L"-", mth_integer_minus, NULL);
+    toy_add_method(interp, L"Integer", L"*", mth_integer_mul, NULL);
+    toy_add_method(interp, L"Integer", L"/", mth_integer_div, NULL);
+    toy_add_method(interp, L"Integer", L"%", mth_integer_mod, NULL);
+    toy_add_method(interp, L"Integer", L"=", mth_integer_eq, NULL);
+    toy_add_method(interp, L"Integer", L"!=", mth_integer_neq, NULL);
+    toy_add_method(interp, L"Integer", L">", mth_integer_gt, NULL);
+    toy_add_method(interp, L"Integer", L"<", mth_integer_lt, NULL);
+    toy_add_method(interp, L"Integer", L">=", mth_integer_ge, NULL);
+    toy_add_method(interp, L"Integer", L"<=", mth_integer_le, NULL);
+    toy_add_method(interp, L"Integer", L"++", mth_integer_inc, NULL);
+    toy_add_method(interp, L"Integer", L"--", mth_integer_dec, NULL);
+    toy_add_method(interp, L"Integer", L"each", mth_integer_each, NULL);
+    toy_add_method(interp, L"Integer", L"..", mth_integer_list, NULL);
+    toy_add_method(interp, L"Integer", L"real", mth_integer_toreal, NULL);
+    toy_add_method(interp, L"Integer", L"<<", mth_integer_rol, NULL);
+    toy_add_method(interp, L"Integer", L">>", mth_integer_ror, NULL);
+    toy_add_method(interp, L"Integer", L"||", mth_integer_or, NULL);
+    toy_add_method(interp, L"Integer", L"&&", mth_integer_and, NULL);
+    toy_add_method(interp, L"Integer", L"^^", mth_integer_xor, NULL);
+    toy_add_method(interp, L"Integer", L"~~", mth_integer_not, NULL);
+    toy_add_method(interp, L"Integer", L"^", mth_integer_power, NULL);
 
-    toy_add_method(interp, "Real", "+", mth_real_plus, NULL);
-    toy_add_method(interp, "Real", "-", mth_real_minus, NULL);
-    toy_add_method(interp, "Real", "*", mth_real_mul, NULL);
-    toy_add_method(interp, "Real", "/", mth_real_div, NULL);
-    toy_add_method(interp, "Real", "=", mth_real_eq, NULL);
-    toy_add_method(interp, "Real", "!=", mth_real_neq, NULL);
-    toy_add_method(interp, "Real", ">", mth_real_gt, NULL);
-    toy_add_method(interp, "Real", "<", mth_real_lt, NULL);
-    toy_add_method(interp, "Real", ">=", mth_real_ge, NULL);
-    toy_add_method(interp, "Real", "<=", mth_real_le, NULL);
-    toy_add_method(interp, "Real", "int", mth_real_tointeger, NULL);
-    toy_add_method(interp, "Real", "sqrt", mth_real_sqrt, NULL);
-    toy_add_method(interp, "Real", "sin", mth_real_sin, NULL);
-    toy_add_method(interp, "Real", "cos", mth_real_cos, NULL);
-    toy_add_method(interp, "Real", "tan", mth_real_tan, NULL);
-    toy_add_method(interp, "Real", "asin", mth_real_asin, NULL);
-    toy_add_method(interp, "Real", "acos", mth_real_acos, NULL);
-    toy_add_method(interp, "Real", "atan", mth_real_atan, NULL);
-    toy_add_method(interp, "Real", "log", mth_real_log, NULL);
-    toy_add_method(interp, "Real", "log10", mth_real_log10, NULL);
-    toy_add_method(interp, "Real", "exp", mth_real_exp, NULL);
-    toy_add_method(interp, "Real", "exp10", mth_real_exp10, NULL);
-    toy_add_method(interp, "Real", "pow", mth_real_pow, NULL);
+    toy_add_method(interp, L"Real", L"+", mth_real_plus, NULL);
+    toy_add_method(interp, L"Real", L"-", mth_real_minus, NULL);
+    toy_add_method(interp, L"Real", L"*", mth_real_mul, NULL);
+    toy_add_method(interp, L"Real", L"/", mth_real_div, NULL);
+    toy_add_method(interp, L"Real", L"=", mth_real_eq, NULL);
+    toy_add_method(interp, L"Real", L"!=", mth_real_neq, NULL);
+    toy_add_method(interp, L"Real", L">", mth_real_gt, NULL);
+    toy_add_method(interp, L"Real", L"<", mth_real_lt, NULL);
+    toy_add_method(interp, L"Real", L">=", mth_real_ge, NULL);
+    toy_add_method(interp, L"Real", L"<=", mth_real_le, NULL);
+    toy_add_method(interp, L"Real", L"int", mth_real_tointeger, NULL);
+    toy_add_method(interp, L"Real", L"sqrt", mth_real_sqrt, NULL);
+    toy_add_method(interp, L"Real", L"sin", mth_real_sin, NULL);
+    toy_add_method(interp, L"Real", L"cos", mth_real_cos, NULL);
+    toy_add_method(interp, L"Real", L"tan", mth_real_tan, NULL);
+    toy_add_method(interp, L"Real", L"asin", mth_real_asin, NULL);
+    toy_add_method(interp, L"Real", L"acos", mth_real_acos, NULL);
+    toy_add_method(interp, L"Real", L"atan", mth_real_atan, NULL);
+    toy_add_method(interp, L"Real", L"log", mth_real_log, NULL);
+    toy_add_method(interp, L"Real", L"log10", mth_real_log10, NULL);
+    toy_add_method(interp, L"Real", L"exp", mth_real_exp, NULL);
+    toy_add_method(interp, L"Real", L"exp10", mth_real_exp10, NULL);
+    toy_add_method(interp, L"Real", L"pow", mth_real_pow, NULL);
 
-    toy_add_method(interp, "List", "last", mth_list_last, NULL);
-    toy_add_method(interp, "List", "item", mth_list_item, NULL);
-    toy_add_method(interp, "List", "car", mth_list_item, NULL);
-    toy_add_method(interp, "List", "cdr", mth_list_cdr, NULL);
-    toy_add_method(interp, "List", "next", mth_list_cdr, NULL);
-//    toy_add_method(interp, "List", "+", mth_list_append, NULL);
-    toy_add_method(interp, "List", "append!", mth_list_append, NULL);
-    toy_add_method(interp, "List", "add", mth_list_add, NULL);
-    toy_add_method(interp, "List", "each", mth_list_each, NULL);
-    toy_add_method(interp, "List", "len", mth_list_len, NULL);
-    toy_add_method(interp, "List", "null?", mth_list_isnull, NULL);
-    toy_add_method(interp, "List", "join", mth_list_join, NULL);
-    toy_add_method(interp, "List", "eval", mth_list_eval, NULL);
-    toy_add_method(interp, "List", ".", mth_list_new_append, NULL);
-    toy_add_method(interp, "List", "get", mth_list_get, NULL);
-    toy_add_method(interp, "List", "filter", mth_list_filter, NULL);
-    toy_add_method(interp, "List", "map", mth_list_map, NULL);
-    toy_add_method(interp, "List", "concat", mth_list_concat, NULL);
-    toy_add_method(interp, "List", "seek", mth_list_seek, NULL);
-    toy_add_method(interp, "List", "split", mth_list_split, NULL);
-    toy_add_method(interp, "List", "<<", mth_list_unshift, NULL);
-    toy_add_method(interp, "List", ">>", mth_list_shift, NULL);
-    toy_add_method(interp, "List", "<<-", mth_list_push, NULL);
-    toy_add_method(interp, "List", "->>", mth_list_pop, NULL);
-    toy_add_method(interp, "List", "inject", mth_list_inject, NULL);
-    toy_add_method(interp, "List", "set-car!", mth_list_setcar, NULL);
-    toy_add_method(interp, "List", "set-cdr!", mth_list_setcdr, NULL);
+    toy_add_method(interp, L"List", L"last", mth_list_last, NULL);
+    toy_add_method(interp, L"List", L"item", mth_list_item, NULL);
+    toy_add_method(interp, L"List", L"car", mth_list_item, NULL);
+    toy_add_method(interp, L"List", L"cdr", mth_list_cdr, NULL);
+    toy_add_method(interp, L"List", L"next", mth_list_cdr, NULL);
+    toy_add_method(interp, L"List", L"append!", mth_list_append, NULL);
+    toy_add_method(interp, L"List", L"add", mth_list_add, NULL);
+    toy_add_method(interp, L"List", L"each", mth_list_each, NULL);
+    toy_add_method(interp, L"List", L"len", mth_list_len, NULL);
+    toy_add_method(interp, L"List", L"null?", mth_list_isnull, NULL);
+    toy_add_method(interp, L"List", L"join", mth_list_join, NULL);
+    toy_add_method(interp, L"List", L"eval", mth_list_eval, NULL);
+    toy_add_method(interp, L"List", L".", mth_list_new_append, NULL);
+    toy_add_method(interp, L"List", L"get", mth_list_get, NULL);
+    toy_add_method(interp, L"List", L"filter", mth_list_filter, NULL);
+    toy_add_method(interp, L"List", L"map", mth_list_map, NULL);
+    toy_add_method(interp, L"List", L"concat", mth_list_concat, NULL);
+    toy_add_method(interp, L"List", L"seek", mth_list_seek, NULL);
+    toy_add_method(interp, L"List", L"split", mth_list_split, NULL);
+    toy_add_method(interp, L"List", L"<<", mth_list_unshift, NULL);
+    toy_add_method(interp, L"List", L">>", mth_list_shift, NULL);
+    toy_add_method(interp, L"List", L"<<-", mth_list_push, NULL);
+    toy_add_method(interp, L"List", L"->>", mth_list_pop, NULL);
+    toy_add_method(interp, L"List", L"inject", mth_list_inject, NULL);
+    toy_add_method(interp, L"List", L"set-car!", mth_list_setcar, NULL);
+    toy_add_method(interp, L"List", L"set-cdr!", mth_list_setcdr, NULL);
 
-    toy_add_method(interp, "String", "len", mth_string_len, NULL);
-    toy_add_method(interp, "String", "=", mth_string_equal, NULL);
-    toy_add_method(interp, "String", "!=", mth_string_nequal, NULL);
-    toy_add_method(interp, "String", "eval", mth_string_eval, NULL);
-//    toy_add_method(interp, "String", "+", mth_string_append, NULL);
-    toy_add_method(interp, "String", "append!", mth_string_append, NULL);
-    toy_add_method(interp, "String", ".", mth_string_concat, NULL);
-    toy_add_method(interp, "String", "=~", mth_string_match, NULL);
-    toy_add_method(interp, "String", "sub", mth_string_sub, NULL);
-    toy_add_method(interp, "String", ">", mth_string_gt, NULL);
-    toy_add_method(interp, "String", "<", mth_string_lt, NULL);
-    toy_add_method(interp, "String", ">=", mth_string_ge, NULL);
-    toy_add_method(interp, "String", "<=", mth_string_le, NULL);
-    toy_add_method(interp, "String", "split", mth_string_split, NULL);
-    toy_add_method(interp, "String", "int", mth_string_toint, NULL);
-    toy_add_method(interp, "String", "real", mth_string_toreal, NULL);
-    toy_add_method(interp, "String", "number", mth_string_tonumber, NULL);
-    toy_add_method(interp, "String", "rquote", mth_string_torquote, NULL);
-    toy_add_method(interp, "String", "fmt", mth_string_format, NULL);
-    toy_add_method(interp, "String", "clean", mth_string_clean, NULL);
-    toy_add_method(interp, "String", "upper", mth_string_upper, NULL);
-    toy_add_method(interp, "String", "lower", mth_string_lower, NULL);
+    toy_add_method(interp, L"String", L"len", mth_string_len, NULL);
+    toy_add_method(interp, L"String", L"=", mth_string_equal, NULL);
+    toy_add_method(interp, L"String", L"!=", mth_string_nequal, NULL);
+    toy_add_method(interp, L"String", L"eval", mth_string_eval, NULL);
+    toy_add_method(interp, L"String", L"append!", mth_string_append, NULL);
+    toy_add_method(interp, L"String", L".", mth_string_concat, NULL);
+    toy_add_method(interp, L"String", L"=~", mth_string_match, NULL);
+    toy_add_method(interp, L"String", L"sub", mth_string_sub, NULL);
+    toy_add_method(interp, L"String", L">", mth_string_gt, NULL);
+    toy_add_method(interp, L"String", L"<", mth_string_lt, NULL);
+    toy_add_method(interp, L"String", L">=", mth_string_ge, NULL);
+    toy_add_method(interp, L"String", L"<=", mth_string_le, NULL);
+    toy_add_method(interp, L"String", L"split", mth_string_split, NULL);
+    toy_add_method(interp, L"String", L"int", mth_string_toint, NULL);
+    toy_add_method(interp, L"String", L"real", mth_string_toreal, NULL);
+    toy_add_method(interp, L"String", L"number", mth_string_tonumber, NULL);
+    toy_add_method(interp, L"String", L"rquote", mth_string_torquote, NULL);
+    toy_add_method(interp, L"String", L"fmt", mth_string_format, NULL);
+    toy_add_method(interp, L"String", L"clean", mth_string_clean, NULL);
+    toy_add_method(interp, L"String", L"upper", mth_string_upper, NULL);
+    toy_add_method(interp, L"String", L"lower", mth_string_lower, NULL);
 
-    toy_add_method(interp, "File", "init", mth_file_init, NULL);
-    toy_add_method(interp, "File", "open", mth_file_open, NULL);
-    toy_add_method(interp, "File", "close", mth_file_close, NULL);
-    toy_add_method(interp, "File", "gets", mth_file_gets, NULL);
-    toy_add_method(interp, "File", "puts", mth_file_puts, NULL);
-    toy_add_method(interp, "File", "flush", mth_file_flush, NULL);
-    toy_add_method(interp, "File", "stat", mth_file_stat, NULL);
-    toy_add_method(interp, "File", "set-newline", mth_file_setnewline, NULL);
-    toy_add_method(interp, "File", "eof?", mth_file_iseof, NULL);
-    toy_add_method(interp, "File", "set!", mth_file_set, NULL);
-    toy_add_method(interp, "File", "ready?", mth_file_isready, NULL);
-    toy_add_method(interp, "File", "clear", mth_file_clear, NULL);
-    toy_add_method(interp, "File", "set-nobuffer", mth_file_setnobuffer, NULL);
-    toy_add_method(interp, "File", "set-noblock", mth_file_setnoblock, NULL);
+    toy_add_method(interp, L"File", L"init", mth_file_init, NULL);
+    toy_add_method(interp, L"File", L"open", mth_file_open, NULL);
+    toy_add_method(interp, L"File", L"close", mth_file_close, NULL);
+    toy_add_method(interp, L"File", L"gets", mth_file_gets, NULL);
+    toy_add_method(interp, L"File", L"puts", mth_file_puts, NULL);
+    toy_add_method(interp, L"File", L"flush", mth_file_flush, NULL);
+    toy_add_method(interp, L"File", L"stat", mth_file_stat, NULL);
+    toy_add_method(interp, L"File", L"set-newline", mth_file_setnewline, NULL);
+    toy_add_method(interp, L"File", L"eof?", mth_file_iseof, NULL);
+    toy_add_method(interp, L"File", L"set!", mth_file_set, NULL);
+    toy_add_method(interp, L"File", L"ready?", mth_file_isready, NULL);
+    toy_add_method(interp, L"File", L"clear", mth_file_clear, NULL);
+    toy_add_method(interp, L"File", L"set-nobuffer", mth_file_setnobuffer, NULL);
+    toy_add_method(interp, L"File", L"set-noblock", mth_file_setnoblock, NULL);
 
-    toy_add_method(interp, "Block", "eval", mth_block_eval, NULL);
+    toy_add_method(interp, L"Block", L"eval", mth_block_eval, NULL);
 
-    toy_add_method(interp, "Dict", "set", mth_dict_set, NULL);
-    toy_add_method(interp, "Dict", "get", mth_dict_get, NULL);
-    toy_add_method(interp, "Dict", "set?", mth_dict_isset, NULL);
-    toy_add_method(interp, "Dict", "len", mth_dict_len, NULL);
-    toy_add_method(interp, "Dict", "unset", mth_dict_unset, NULL);
-    toy_add_method(interp, "Dict", "keys", mth_dict_keys, NULL);    
-    toy_add_method(interp, "Dict", "pairs", mth_dict_pairs, NULL);    
+    toy_add_method(interp, L"Dict", L"set", mth_dict_set, NULL);
+    toy_add_method(interp, L"Dict", L"get", mth_dict_get, NULL);
+    toy_add_method(interp, L"Dict", L"set?", mth_dict_isset, NULL);
+    toy_add_method(interp, L"Dict", L"len", mth_dict_len, NULL);
+    toy_add_method(interp, L"Dict", L"unset", mth_dict_unset, NULL);
+    toy_add_method(interp, L"Dict", L"keys", mth_dict_keys, NULL);    
+    toy_add_method(interp, L"Dict", L"pairs", mth_dict_pairs, NULL);    
 
-//    toy_add_method(interp, "Vector", "+", mth_vector_append, NULL);
-    toy_add_method(interp, "Vector", "append!", mth_vector_append, NULL);
-    toy_add_method(interp, "Vector", "set", mth_vector_set, NULL);
-    toy_add_method(interp, "Vector", "get", mth_vector_get, NULL);
-    toy_add_method(interp, "Vector", "len", mth_vector_len, NULL);
-    toy_add_method(interp, "Vector", "last", mth_vector_last, NULL);
-    toy_add_method(interp, "Vector", "list", mth_vector_list, NULL);
-    toy_add_method(interp, "Vector", "each", mth_vector_each, NULL);
-    toy_add_method(interp, "Vector", "swap", mth_vector_swap, NULL);
+    toy_add_method(interp, L"Vector", L"append!", mth_vector_append, NULL);
+    toy_add_method(interp, L"Vector", L"set", mth_vector_set, NULL);
+    toy_add_method(interp, L"Vector", L"get", mth_vector_get, NULL);
+    toy_add_method(interp, L"Vector", L"len", mth_vector_len, NULL);
+    toy_add_method(interp, L"Vector", L"last", mth_vector_last, NULL);
+    toy_add_method(interp, L"Vector", L"list", mth_vector_list, NULL);
+    toy_add_method(interp, L"Vector", L"each", mth_vector_each, NULL);
+    toy_add_method(interp, L"Vector", L"swap", mth_vector_swap, NULL);
 
-    toy_add_method(interp, "Coro", "next", mth_coro_next, NULL);
-    toy_add_method(interp, "Coro", "release", mth_coro_release, NULL);
-    toy_add_method(interp, "Coro", "stat", mth_coro_stat, NULL);
-    toy_add_method(interp, "Coro", "eval", mth_coro_eval, NULL);
+    toy_add_method(interp, L"Coro", L"next", mth_coro_next, NULL);
+    toy_add_method(interp, L"Coro", L"release", mth_coro_release, NULL);
+    toy_add_method(interp, L"Coro", L"stat", mth_coro_stat, NULL);
+    toy_add_method(interp, L"Coro", L"eval", mth_coro_eval, NULL);
 
     return 0;
 }

@@ -55,8 +55,8 @@ toy_eval_script(Toy_Interp* interp, Toy_Type *script) {
 
     if (CStack_in_baria) {
 	/* +++ */
-	fprintf(stderr, "toy_eval_script: detect SOVF(1)\n");
-	result = new_exception(TE_STACKOVERFLOW, "C stack overflow.", interp);
+	fwprintf(stderr, L"toy_eval_script: detect SOVF(1)\n");
+	result = new_exception(TE_STACKOVERFLOW, L"C stack overflow.", interp);
 	interp->script_id = script_id;
 	cstack_return();
 	return result;
@@ -68,8 +68,8 @@ toy_eval_script(Toy_Interp* interp, Toy_Type *script) {
 
 	if (CStack_in_baria) {
 	    /* +++ */
-	    fprintf(stderr, "toy_eval_script: detect SOVF(2)\n");
-	    result = new_exception(TE_STACKOVERFLOW, "C stack overflow.", interp);
+	    fwprintf(stderr, L"toy_eval_script: detect SOVF(2)\n");
+	    result = new_exception(TE_STACKOVERFLOW, L"C stack overflow.", interp);
 	}
 
 	SIG_ACTION();
@@ -77,7 +77,7 @@ toy_eval_script(Toy_Interp* interp, Toy_Type *script) {
 	t = GET_TAG(result);
 	if ((t == CONTROL) || (t == EXCEPTION)) {
 	    if ((t == EXCEPTION) &&
-		(strcmp(TE_NOFUNC, cell_get_addr(result->u.exception.code)) == 0)) {
+		(wcscmp(TE_NOFUNC, cell_get_addr(result->u.exception.code)) == 0)) {
 		Toy_Type *body;
 
 		if (NULL != hash_get_t(interp->funcs, const_unknown)) {
@@ -148,9 +148,9 @@ control_goto:
 	buff = GC_MALLOC(512);
 	ALLOC_SAFE(buff);
 	snprintf(buff, 512, "%s:%d: %s\n",
-		 get_script_path(interp, interp->script_id),
+		 to_char(get_script_path(interp, interp->script_id)),
 		 trace_info->line,
-		 to_string(statement));
+		 to_char(to_string(statement)));
 	buff[511] = 0;
 	sts = write(interp->trace_fd, buff, strlen(buff));
 	if (-1 == sts) {
@@ -196,9 +196,9 @@ control_goto:
 	if (NULL == tfirst) {
 	    Cell *msg;
 
-	    msg = new_cell("No such function, '");
+	    msg = new_cell(L"No such function, '");
 	    cell_add_str(msg, to_string(first));
-	    cell_add_str(msg, "'.");
+	    cell_add_str(msg, L"'.");
 
 	    ret = new_exception(TE_NOFUNC, cell_get_addr(msg), interp);
 	    goto exit_eval;
@@ -222,7 +222,7 @@ control_goto:
 	l = list_next(l);
 	method = list_get_item(l);
 	if (method == NULL) {
-	    msg = new_cell("No specified method");
+	    msg = new_cell(L"No specified method");
 	    ret = new_exception(TE_NOMETHOD, cell_get_addr(msg), interp);
 	    goto exit_eval;
 	}
@@ -234,9 +234,9 @@ control_goto:
 	    }
 	}
 	if (GET_TAG(method) != SYMBOL) {
-	    msg = new_cell("Method is not a symbol, '");
+	    msg = new_cell(L"Method is not a symbol, '");
 	    cell_add_str(msg, to_string(method));
-	    cell_add_str(msg, "'.");
+	    cell_add_str(msg, L"'.");
 	    ret = new_exception(TE_BADMETHOD, cell_get_addr(msg), interp);
 	    goto exit_eval;
 	}
@@ -303,15 +303,15 @@ control_goto:
 		if (IS_SWITCH_SYM(arg)) {
 		    Cell *ckey;
 		    ckey = new_cell(&(cell_get_addr(arg->u.symbol.cell)[1]));
-		    cell_add_str(ckey, ":");
+		    cell_add_str(ckey, L":");
 		    hash_set(namedargs, cell_get_addr(ckey), const_int1);
 		} else if (IS_NAMED_SYM(arg)) {
 		    name = arg;
 		    l = list_next(l);
 		    if (NULL == l) {
-			msg = new_cell("No given named argument variable, name: '");
+			msg = new_cell(L"No given named argument variable, name: '");
 			cell_add_str(msg, cell_get_addr(name->u.symbol.cell));
-			cell_add_str(msg, "'.");
+			cell_add_str(msg, L"'.");
 			ret = new_exception(TE_NONAMEARG, cell_get_addr(msg), interp);
 			goto exit_eval;
 		    }
@@ -339,7 +339,7 @@ control_goto:
 	}
 	if (NULL != obj_env) {
 	    if (0 == toy_push_obj_env(interp, obj_env)) {
-		ret = new_exception(TE_STACKOVERFLOW, "Object satck overflow.", interp);
+		ret = new_exception(TE_STACKOVERFLOW, L"Object satck overflow.", interp);
 		goto exit_eval;
 	    }
 	    ostack_use = 1;
@@ -368,7 +368,7 @@ control_goto:
 
 	if (NULL != obj_env) {
 	    if (0 == toy_push_obj_env(interp, obj_env)) {
-		ret = new_exception(TE_STACKOVERFLOW, "Object satck overflow.", interp);
+		ret = new_exception(TE_STACKOVERFLOW, L"Object satck overflow.", interp);
 		goto exit_eval;
 	    }
 	    ostack_use = 1;
@@ -379,7 +379,7 @@ control_goto:
 	if (0 == toy_push_func_env(interp, local_var,
 				   first->u.func.closure->u.closure.env->func_env, NULL, trace_info)) {
 
-	    ret = new_exception(TE_STACKOVERFLOW, "Function satck overflow.", interp);
+	    ret = new_exception(TE_STACKOVERFLOW, L"Function satck overflow.", interp);
 	    goto exit_eval;
 	}
 	lstack_use = 1;
@@ -391,9 +391,9 @@ control_goto:
 	goto exit_eval;
 
     default:
-	msg = new_cell("No runnable object, '");
+	msg = new_cell(L"No runnable object, '");
 	cell_add_str(msg, to_string(first));
-	cell_add_str(msg, "'.");
+	cell_add_str(msg, L"'.");
 	ret = new_exception(TE_NORUNNABLE, cell_get_addr(msg), interp);
     }
 
@@ -454,7 +454,7 @@ toy_expand(Toy_Interp* interp, Toy_Type* obj, Toy_Env** env, Toy_Func_Trace_Info
 	Toy_Type *st, *stl, *result;
 
 	if (GET_TAG(obj->u.getmacro.obj) == SYMBOL) {
-	    return new_exception(TE_SYNTAX, "Bad left item at GETMACRO.", interp);
+	    return new_exception(TE_SYNTAX, L"Bad left item at GETMACRO.", interp);
 	}
 	
 	stl = st = new_list(obj->u.getmacro.obj);
@@ -585,9 +585,9 @@ toy_resolv_var(Toy_Interp* interp, Toy_Type* var, int stack_trace, Toy_Func_Trac
 	return val;
     }
 
-    c = new_cell("No such variable, '");
+    c = new_cell(L"No such variable, '");
     cell_add_str(c, cell_get_addr(var->u.ref.cell));
-    cell_add_str(c, "'.");
+    cell_add_str(c, L"'.");
 
     if (stack_trace) {
 	return new_exception(TE_NOVAR, cell_get_addr(c), interp);
@@ -686,16 +686,16 @@ search_method(Toy_Interp *interp, Toy_Type *object, Toy_Type *method) {
     }
 
 error:
-    msg = new_cell("No such method, '");
+    msg = new_cell(L"No such method, '");
     cell_add_str(msg, to_string(method));
-    cell_add_str(msg, "'.");
+    cell_add_str(msg, L"'.");
 
     return new_exception(TE_NOMETHOD, cell_get_addr(msg), interp);
 
 error2:
-    msg = new_cell("No such delegate class, '");
+    msg = new_cell(L"No such delegate class, '");
     cell_add_str(msg, cell_get_addr(a->u.symbol.cell));
-    cell_add_str(msg, "'.");
+    cell_add_str(msg, L"'.");
 
     return new_exception(TE_NODELEGATE, cell_get_addr(msg), interp);
 }
@@ -754,9 +754,9 @@ toy_resolv_object(Toy_Interp *interp, Toy_Type *object) {
     return val;
 
 error:
-    msg = new_cell("No such class, '");
+    msg = new_cell(L"No such class, '");
     cell_add_str(msg, toy_get_type_str(object));
-    cell_add_str(msg, "'.");
+    cell_add_str(msg, L"'.");
 
     return new_exception(TE_NOOBJECT, cell_get_addr(msg), interp);
 }
@@ -792,7 +792,7 @@ bind_args(Toy_Interp *interp, Toy_Type *arglist, struct _toy_argspec *aspec,
 
     if ((aspec->posarg_len == 1) && (hash_get_length(aspec->namedarg) == 0)) {
 	var = array_get(aspec->posarg_array, 0);
-	if (strcmp(cell_get_addr(var->u.symbol.cell), "*") == 0) {
+	if (wcscmp(cell_get_addr(var->u.symbol.cell), L"*") == 0) {
 	    Toy_Type *result, *last;
 	    last = result = new_list(NULL);
 	    while (l) {
@@ -860,7 +860,7 @@ bind_args(Toy_Interp *interp, Toy_Type *arglist, struct _toy_argspec *aspec,
 	    Cell *cval;
 
 	    cval = new_cell(&(cell_get_addr(val->u.symbol.cell))[1]);
-	    cell_add_str(cval, ":");
+	    cell_add_str(cval, L":");
 	    var = hash_get(aspec->namedarg, cell_get_addr(cval));
 
 	    if (NULL == var) goto error3;
@@ -914,27 +914,27 @@ bind_args(Toy_Interp *interp, Toy_Type *arglist, struct _toy_argspec *aspec,
     
 
 error1:
-    msg = new_cell("Too many arguments, required: '");
+    msg = new_cell(L"Too many arguments, required: '");
     cell_add_str(msg, to_string(aspec->list));
-    cell_add_str(msg, "'.");
+    cell_add_str(msg, L"'.");
     return new_exception(TE_MANYARGS, cell_get_addr(msg), interp);
 
 error2:
-    msg = new_cell("Few arguments, required: '");
+    msg = new_cell(L"Few arguments, required: '");
     cell_add_str(msg, to_string(aspec->list));
-    cell_add_str(msg, "'.");
+    cell_add_str(msg, L"'.");
     return new_exception(TE_FEWARGS, cell_get_addr(msg), interp);
 
 error3:
-    msg = new_cell("No specified named argument, '");
+    msg = new_cell(L"No specified named argument, '");
     cell_add_str(msg, to_string(val));
-    cell_add_str(msg, "'.");
+    cell_add_str(msg, L"'.");
     return new_exception(TE_NOSPECARGS, cell_get_addr(msg), interp);
 
 error4:
-    msg = new_cell("No given named argument variable, name: '");
+    msg = new_cell(L"No given named argument variable, name: '");
     cell_add_str(msg, to_string(val));
-    cell_add_str(msg, "'.");
+    cell_add_str(msg, L"'.");
     return new_exception(TE_NONAMEARG, cell_get_addr(msg), interp);
 }
 
@@ -946,9 +946,9 @@ eval_closure(Toy_Interp *interp, Toy_Type *closure, Toy_Func_Trace_Info *trace_i
     int func_flag = 0, obj_flag = 0;
 
     if (GET_TAG(closure) != CLOSURE) {
-	c = new_cell("Not a closure, '");
+	c = new_cell(L"Not a closure, '");
 	cell_add_str(c, to_string(closure));
-	c = new_cell("'.");
+	c = new_cell(L"'.");
 	return new_exception(TE_NORUNNABLE, cell_get_addr(c), interp);
     }
 
@@ -956,14 +956,14 @@ eval_closure(Toy_Interp *interp, Toy_Type *closure, Toy_Func_Trace_Info *trace_i
 
     if (interp->obj_stack[interp->cur_obj_stack] != env->object_env) {
 	if (0 == toy_push_obj_env(interp, env->object_env)) {
-	    result = new_exception(TE_STACKOVERFLOW, "Object satck overflow.", interp);
+	    result = new_exception(TE_STACKOVERFLOW, L"Object satck overflow.", interp);
 	    goto error_exit;
 	}
 	obj_flag = 1;
     }
     if (interp->func_stack[interp->cur_func_stack]->localvar != env->func_env->localvar) {
 	if (0 == toy_push_func_env(interp, env->func_env->localvar, env->func_env, env->tobe_bind_val, trace_info)) {
-	    result = new_exception(TE_STACKOVERFLOW, "Function satck overflow.", interp);
+	    result = new_exception(TE_STACKOVERFLOW, L"Function satck overflow.", interp);
 	    goto error_exit;
 	}
 	func_flag = 1;
@@ -990,7 +990,7 @@ toy_call_init(Toy_Interp *interp, Toy_Type *object, Toy_Type *args) {
 
     method = search_method(interp, object, const_Init);
     if (GET_TAG(method) == EXCEPTION) {
-	if (strcmp(cell_get_addr(method->u.exception.code), TE_NOMETHOD) == 0) {
+	if (wcscmp(cell_get_addr(method->u.exception.code), TE_NOMETHOD) == 0) {
 	    return const_Nil;
 	}
 	return method;
@@ -1019,13 +1019,13 @@ toy_call_init(Toy_Interp *interp, Toy_Type *object, Toy_Type *args) {
 	    if (GET_TAG(r) == EXCEPTION) return r;
 
 	    if (0 == toy_push_obj_env(interp, obj_env)) {
-		result = new_exception(TE_STACKOVERFLOW, "Object satck overflow.", interp);
+		result = new_exception(TE_STACKOVERFLOW, L"Object satck overflow.", interp);
 		break;
 	    }
 	    if (0 == toy_push_func_env(interp, local_var,
 				       method->u.func.closure->u.closure.env->func_env, NULL, interp->trace_info)) {
 		toy_pop_obj_env(interp);
-		result = new_exception(TE_STACKOVERFLOW, "Function satck overflow.", interp);
+		result = new_exception(TE_STACKOVERFLOW, L"Function satck overflow.", interp);
 		break;
 	    }
 	    result = toy_eval_script(interp, method->u.func.closure->u.closure.block_body);
@@ -1101,7 +1101,7 @@ eval_sig_handl(Toy_Interp *interp, int code) {
     return eval_closure(interp, block, NULL);
 }
 
-char*
+wchar_t*
 to_string_call(Toy_Interp *interp, Toy_Type *obj) {
     Toy_Env *env;
     Toy_Type *result;
@@ -1155,7 +1155,7 @@ toy_yield_bind(Toy_Interp *interp, Toy_Type *bind_var) {
     return result;
 
 error:
-    return new_exception(TE_BADBINDSPEC, "Bad bind spec.", interp);
+    return new_exception(TE_BADBINDSPEC, L"Bad bind spec.", interp);
 }
 
 Toy_Type*
@@ -1166,9 +1166,9 @@ toy_yield(Toy_Interp *interp, Toy_Type *closure, Toy_Type *args) {
     Cell *c;
 
     if (GET_TAG(closure) != CLOSURE) {
-	c = new_cell("Not a closure, '");
+	c = new_cell(L"Not a closure, '");
 	cell_add_str(c, to_string(closure));
-	c = new_cell("'.");
+	c = new_cell(L"'.");
 	return new_exception(TE_NORUNNABLE, cell_get_addr(c), interp);
     }
     

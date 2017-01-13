@@ -3,6 +3,7 @@
 #ifndef __CELL__
 #define __CELL__
 
+#include <wchar.h>
 #include <t_gc.h>
 
 #define CELL_INIT_ALLOC	(16)
@@ -10,15 +11,15 @@
 typedef struct _cell {
     int length;
     int allocsize;
-    char *data;
+    wchar_t *data;
 } Cell;
 
-Cell*	new_cell(const char *src);
-Cell*	cell_add_str(Cell *p, const char *src);
-Cell*	cell_add_char(Cell *p, const char src);
-char*	cell_get_addr(Cell *p);
+Cell*	new_cell(const wchar_t *src);
+Cell*	cell_add_str(Cell *p, const wchar_t *src);
+Cell*	cell_add_char(Cell *p, const wchar_t src);
+wchar_t* cell_get_addr(Cell *p);
 int	cell_get_length(Cell *p);
-int     cell_eq_str(Cell *s, char *d);
+int     cell_eq_str(Cell *s, wchar_t *d);
 Cell*	cell_sub(Cell *c, int start, int end);
 
 #define cell_get_addr(p)	(p->data)

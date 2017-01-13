@@ -12,6 +12,7 @@
 #include "interp.h"
 #include "error.h"
 #include "cstack.h"
+#include "util.h"
 #include "t_gc.h"
 
 Toy_Type *toy_eval_script(Toy_Interp* interp, Toy_Type *script);
@@ -32,7 +33,7 @@ Toy_Type *toy_call(Toy_Interp *interp, Toy_Type *list);
 Toy_Type *toy_yield(Toy_Interp *interp, Toy_Type *closure, Toy_Type *args);
 Toy_Type *search_method(Toy_Interp *interp, Toy_Type *object, Toy_Type *method);
 Toy_Type *toy_symbol_conv(Toy_Type *atom);
-char	 *to_string_call(Toy_Interp *interp, Toy_Type *obj);
+wchar_t	 *to_string_call(Toy_Interp *interp, Toy_Type *obj);
 void	  def_global();
 
 #define ALLOC_SAFE(x)	if (!x) {printf("alloc failed.\n"); exit(255);}

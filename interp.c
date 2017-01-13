@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <string.h>
 #include <signal.h>
+#include <wchar.h>
 #include "types.h"
 #include "cell.h"
 #include "interp.h"
@@ -46,7 +47,7 @@ free_wrapper(void* ptr, size_t old) {
 #endif /* PROF */
 
 Toy_Interp*
-new_interp(char* name, int stack_size, Toy_Interp* parent,
+new_interp(wchar_t* name, int stack_size, Toy_Interp* parent,
 	   int argc, char **argv, char **envp) {
 
     Toy_Interp *interp;
@@ -193,33 +194,33 @@ interp_setup(Toy_Interp* interp, int argc, char **argv, char **envp) {
 
     delegate = new_list(const_Object);
 
-    obj = new_object("Main", new_hash(), delegate);
-    toy_push_new_obj_env(interp, "Toplevel", obj);
+    obj = new_object(L"Main", new_hash(), delegate);
+    toy_push_new_obj_env(interp, L"Toplevel", obj);
     trace_info = GC_MALLOC(sizeof(Toy_Func_Trace_Info));
     ALLOC_SAFE(trace_info);
     trace_info->line = 0;
     trace_info->object_name = obj;
-    trace_info->func_name = new_symbol("Main");
-    trace_info->statement = new_statement(new_list(new_symbol("(perfumesh)")), 0);
+    trace_info->func_name = new_symbol(L"Main");
+    trace_info->statement = new_statement(new_list(new_symbol(L"(perfumesh)")), 0);
     interp->trace_info = trace_info;
 
     toy_push_func_env(interp, new_hash(), NULL, NULL, trace_info);
 
     /* make world */
 
-    toy_add_class(interp, "Functions", interp->funcs, delegate);
-    toy_add_class(interp, "Nil", NULL, delegate);
-    toy_add_class(interp, "Integer", NULL, delegate);
-    toy_add_class(interp, "Real", NULL, delegate);
-    toy_add_class(interp, "String", NULL, delegate);
-    toy_add_class(interp, "List", NULL, delegate);
-    toy_add_class(interp, "Block", NULL, delegate);
-    toy_add_class(interp, "RQuote", NULL, delegate);
-    toy_add_class(interp, "Object", NULL, NULL);
-    toy_add_class(interp, "File", NULL, delegate);
-    toy_add_class(interp, "Dict", NULL, delegate);
-    toy_add_class(interp, "Vector", NULL, delegate);
-    toy_add_class(interp, "Coro", NULL, delegate);
+    toy_add_class(interp, L"Functions", interp->funcs, delegate);
+    toy_add_class(interp, L"Nil", NULL, delegate);
+    toy_add_class(interp, L"Integer", NULL, delegate);
+    toy_add_class(interp, L"Real", NULL, delegate);
+    toy_add_class(interp, L"String", NULL, delegate);
+    toy_add_class(interp, L"List", NULL, delegate);
+    toy_add_class(interp, L"Block", NULL, delegate);
+    toy_add_class(interp, L"RQuote", NULL, delegate);
+    toy_add_class(interp, L"Object", NULL, NULL);
+    toy_add_class(interp, L"File", NULL, delegate);
+    toy_add_class(interp, L"Dict", NULL, delegate);
+    toy_add_class(interp, L"Vector", NULL, delegate);
+    toy_add_class(interp, L"Coro", NULL, delegate);
 
     toy_add_commands(interp);
     toy_add_methods(interp);
@@ -230,20 +231,20 @@ interp_setup(Toy_Interp* interp, int argc, char **argv, char **envp) {
     /* set ARGV */
     l = argl = new_list(NULL);
     for (i=0; i<argc; i++) {
-	l = list_append(l, new_string_str(argv[i]));
+	l = list_append(l, new_string_str(to_wchar(argv[i])));
     }
     gdict = interp->globals;
-    hash_set(gdict, "ARGV", argl);
-    hash_set(gdict, "LIB_PATH", new_list(new_string_str(LIB_PATH)));
+    hash_set(gdict, L"ARGV", argl);
+    hash_set(gdict, L"LIB_PATH", new_list(new_string_str(LIB_PATH)));
 
     /* set ENV */
-    l = envl = new_list(new_symbol("dict"));
+    l = envl = new_list(new_symbol(L"dict"));
     env = toy_call(interp, envl);
     if (GET_TAG(env) == DICT) {
 	for (; *envp; envp++) {
 	    envv = parse_env(*envp, '=');
 	    l = envl = new_list(env);
-	    l = list_append(l, new_symbol("set"));
+	    l = list_append(l, new_symbol(L"set"));
 	    l = list_append(l, list_get_item(envv));
 	    l = list_append(l, list_get_item(list_next(envv)));
 	    toy_call(interp, envl);
@@ -254,18 +255,18 @@ interp_setup(Toy_Interp* interp, int argc, char **argv, char **envp) {
     cmd_pwd(interp, new_list(NULL), new_hash(), 0);
 
     /* load initial setup file "setup.prfm" */
-    setupl = new_list(new_symbol("load"));
+    setupl = new_list(new_symbol(L"load"));
     list_append(setupl, new_string_str(SETUP_FILE));
     any = toy_eval_script(interp, script_apply_trace_info(new_script(new_list(new_statement(setupl, 0))), trace_info));
     if (GET_TAG(any) == EXCEPTION) {
-	setupl = new_list(new_symbol("load"));
+	setupl = new_list(new_symbol(L"load"));
 	list_append(setupl, new_string_str(SETUP_FILE2));
 	any = toy_eval_script(interp, script_apply_trace_info(new_script(new_list(new_statement(setupl, 0))), trace_info));
 
 	if (GET_TAG(any) == EXCEPTION) {
 
-	    fprintf(stderr, "Exception occurd in setup script file at load '%s', %s.\n",
-		    SETUP_FILE2, to_string(any));
+	    fwprintf(stderr, L"Exception occurd in setup script file at load '%s', %s.\n",
+		     SETUP_FILE2, to_string(any));
 	}
     }
 
@@ -273,7 +274,7 @@ interp_setup(Toy_Interp* interp, int argc, char **argv, char **envp) {
 }
 
 int
-toy_add_class(Toy_Interp* interp, char* name, Hash* slot, Toy_Type *delegate) {
+toy_add_class(Toy_Interp* interp, wchar_t* name, Hash* slot, Toy_Type *delegate) {
     Toy_Type *obj;
     Hash *h;
 
@@ -289,13 +290,13 @@ toy_add_class(Toy_Interp* interp, char* name, Hash* slot, Toy_Type *delegate) {
     return 1;
 }
 
-static Toy_Type* parse_argspec(char* argspec);
+static Toy_Type* parse_argspec(wchar_t* argspec);
 
 void
 toy_add_func(Toy_Interp* interp,
-	     char* name,
+	     wchar_t* name,
 	     Toy_Type* native(Toy_Interp*, Toy_Type*, Hash*, int),
-	     char* argspec) {
+	     wchar_t* argspec) {
 
     Toy_Type *argspec_list;
     Toy_Type *o;
@@ -308,10 +309,10 @@ toy_add_func(Toy_Interp* interp,
 
 void
 toy_add_method(Toy_Interp* interp,
-	       char* class,
-	       char* method,
+	       wchar_t* class,
+	       wchar_t* method,
 	       Toy_Type* native(Toy_Interp*, Toy_Type*, Hash*, int),
-	       char* argspec) {
+	       wchar_t* argspec) {
 
     Toy_Type *argspec_list;
     Toy_Type *o;
@@ -329,26 +330,26 @@ toy_add_method(Toy_Interp* interp,
 }
 
 static Toy_Type*
-parse_argspec(char* argspec) {
+parse_argspec(wchar_t* argspec) {
     Toy_Type *l;
     Cell *c;
-    char *p;
+    wchar_t *p;
 
     if (argspec == NULL) return NULL;
 
     p = argspec;
-    c = new_cell("");
+    c = new_cell(L"");
     l = new_list(NULL);
 
-    if (strlen(argspec) == 0) {
+    if (wcslen(argspec) == 0) {
 	list_append(l, const_Nil);
 	return l;
     }
 
     while (*p) {
-	if (*p == ',') {
+	if (*p == L',') {
 	    list_append(l, new_symbol(cell_get_addr(c)));
-	    c = new_cell("");
+	    c = new_cell(L"");
 	} else {
 	    cell_add_char(c, *p);
 	}
@@ -368,7 +369,7 @@ parse_env(char* buff, char sep) {
     if (buff == NULL) return NULL;
 
     p = buff;
-    c = new_cell("");
+    c = new_cell(L"");
     l = new_list(NULL);
 
     if (strlen(buff) == 0) {
@@ -379,12 +380,12 @@ parse_env(char* buff, char sep) {
     while (*p) {
 	if (*p == sep) {
 	    list_append(l, new_string_str(cell_get_addr(c)));
-	    c = new_cell("");
+	    c = new_cell(L"");
 	    p++;
-	    cell_add_str(c, p);
+	    cell_add_str(c, to_wchar(p));
 	    break;
 	} else {
-	    cell_add_char(c, *p);
+	    cell_add_char(c, (wchar_t)*p);
 	}
 	p++;
     }
@@ -408,13 +409,13 @@ toy_new_obj_env(Toy_Interp *interp, Toy_Type *cur_object, Toy_Type *self) {
 }
 
 int
-toy_push_new_obj_env(Toy_Interp* interp, char* class, Toy_Type* self) {
+toy_push_new_obj_env(Toy_Interp* interp, wchar_t* class, Toy_Type* self) {
     Toy_Obj_Env *env;
     Toy_Type *o; 
 
     if ((interp->cur_obj_stack+1) >= interp->stack_size) return 0;
 
-    o = new_object("Object", new_hash(), new_list(const_Object));
+    o = new_object(L"Object", new_hash(), new_list(const_Object));
     if (NULL == (env = toy_new_obj_env(interp, o, o))) {
 	return 0;
     }
@@ -502,36 +503,36 @@ new_closure_env(Toy_Interp* interp) {
 }
 
 
-char*
+wchar_t*
 get_stack_trace(Toy_Interp *interp, Cell *stack) {
-    char *buff;
+    wchar_t *buff;
     int i;
 
-    buff = GC_MALLOC(256);
+    buff = GC_MALLOC(256*sizeof(wchar_t));
     ALLOC_SAFE(buff);
 
     if (interp->trace_info) {
-	snprintf(buff, 256, "%s:%d: %s in %s::%s\n",
+	swprintf(buff, 256, L"%s:%d: %s in %s::%s\n",
 		 get_script_path(interp, interp->func_stack[interp->cur_func_stack]->script_id),
 		 interp->trace_info->line,
 		 to_print(interp->trace_info->statement),
 		 (GET_TAG(interp->func_stack[interp->cur_func_stack]->trace_info->object_name) != NIL ?
-		  to_string(interp->func_stack[interp->cur_func_stack]->trace_info->object_name) : "self"),
+		  to_string(interp->func_stack[interp->cur_func_stack]->trace_info->object_name) : L"self"),
 		 (interp->func_stack[interp->cur_func_stack]->trace_info->func_name ?
-		  to_string(interp->func_stack[interp->cur_func_stack]->trace_info->func_name) : "???"));
+		  to_string(interp->func_stack[interp->cur_func_stack]->trace_info->func_name) : L"???"));
 	buff[255] = 0;
 	cell_add_str(stack, buff);
     }
 
     for (i=interp->cur_func_stack; i>0; i--) {
-	snprintf(buff, 256, "%s:%d: %s in %s::%s\n",
+	swprintf(buff, 256, L"%s:%d: %s in %s::%s\n",
 		 get_script_path(interp, interp->func_stack[i-1]->script_id),
 		 interp->func_stack[i]->trace_info->line,
 		 to_print(interp->func_stack[i]->trace_info->statement),
 		 (GET_TAG(interp->func_stack[i-1]->trace_info->object_name) != NIL ?
-		  		to_string(interp->func_stack[i-1]->trace_info->object_name) : "self"),
+		  		to_string(interp->func_stack[i-1]->trace_info->object_name) : L"self"),
 		 (interp->func_stack[i-1]->trace_info->func_name ?
-		  		to_string(interp->func_stack[i-1]->trace_info->func_name) : "???"));
+		  		to_string(interp->func_stack[i-1]->trace_info->func_name) : L"???"));
 	buff[255] = 0;
 	cell_add_str(stack, buff);
     }
@@ -539,17 +540,17 @@ get_stack_trace(Toy_Interp *interp, Cell *stack) {
     return cell_get_addr(stack);
 }
 
-char*
+wchar_t*
 get_script_path(Toy_Interp* interp, int script_id) {
     Hash *h;
     Toy_Type *cont;
     Toy_Script *s;
 
-    if (script_id <= 0) return "-";
+    if (script_id <= 0) return L"-";
 
     h = interp->scripts;
     cont = hash_get(h, to_string(new_integer_si(script_id)));
-    if (NULL == cont) return "???";
+    if (NULL == cont) return L"???";
 
     s = (Toy_Script*)cont->u.container;
     return cell_get_addr(s->path->u.string);
@@ -579,12 +580,3 @@ script_apply_trace_info(Toy_Type *script, Toy_Func_Trace_Info *trace_info) {
 
     return script;
 }
-
-#ifdef HAS_GCACHE
-void
-gcache_clear(Toy_Interp* interp) {
-    hash_clear(interp->gcache);
-    interp->cache_hit = 0;
-    interp->cache_missing = 0;
-}
-#endif

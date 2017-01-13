@@ -1,5 +1,6 @@
 /* $Id: types.c,v 1.41 2012/03/06 06:09:29 mit-sato Exp $ */
 
+#include <wchar.h>
 #include <assert.h>
 #include <string.h>
 #include <setjmp.h>
@@ -23,9 +24,9 @@ new_nil() {
 }
 
 Toy_Type*
-new_symbol(char *symbol) {
+new_symbol(wchar_t *symbol) {
     Toy_Type *o;
-    char *p;
+    wchar_t *p;
     int l;
 
     o = GC_MALLOC(sizeof(Toy_Type));
@@ -37,10 +38,10 @@ new_symbol(char *symbol) {
 
     p = cell_get_addr(o->u.symbol.cell);
     l = cell_get_length(o->u.symbol.cell);
-    if (p[l-1] == ':') {
+    if (p[l-1] == L':') {
 	o->tag |= TAG_NAMED_MASK;
     }
-    if (p[0] == ':') {
+    if (p[0] == L':') {
 	o->tag |= TAG_SWITCH_MASK;
     }
 
@@ -48,7 +49,7 @@ new_symbol(char *symbol) {
 }
 
 Toy_Type*
-new_ref(char *ref) {
+new_ref(wchar_t *ref) {
     Toy_Type *o;
     o = GC_MALLOC(sizeof(Toy_Type));
     ALLOC_SAFE(o);
@@ -91,9 +92,9 @@ new_integer_d(double val) {
     return new_integer(s);
 }
 
-char*
+wchar_t*
 integer_to_str(Toy_Type *val) {
-    char *buff;
+    char *cbuff;
     int size;
 
     if (GET_TAG(val) != INTEGER) return NULL;
@@ -101,11 +102,11 @@ integer_to_str(Toy_Type *val) {
     if (mpz_cmp_si(val->u.biginteger, 0) < 0) {
 	size ++;
     }
-    buff = GC_MALLOC(size + 1);
-    mpz_get_str(buff, 10, val->u.biginteger);
-    buff[size] = 0;
+    cbuff = GC_MALLOC(size + 1);
+    mpz_get_str(cbuff, 10, val->u.biginteger);
+    cbuff[size] = 0;
 
-    return buff;
+    return to_wchar(cbuff);
 }
 
 Toy_Type*
@@ -120,7 +121,7 @@ new_real(double real) {
 }
 
 Toy_Type*
-new_string_str(char *string) {
+new_string_str(wchar_t *string) {
     Toy_Type *o;
     Cell *c;
     o = GC_MALLOC(sizeof(Toy_Type));
@@ -210,7 +211,7 @@ new_native(Toy_Type* (*cfunc)(Toy_Interp*, Toy_Type*, struct _hash*, int arglen)
 }
 
 Toy_Type*
-new_object(char *name, struct _hash* slots, Toy_Type *delegate_list) {
+new_object(wchar_t *name, struct _hash* slots, Toy_Type *delegate_list) {
     Toy_Type *o;
     o = GC_MALLOC(sizeof(Toy_Type));
     ALLOC_SAFE(o);
@@ -223,7 +224,7 @@ new_object(char *name, struct _hash* slots, Toy_Type *delegate_list) {
 }
 
 Toy_Type*
-new_exception(char *code, char *desc, Toy_Interp *interp) {
+new_exception(wchar_t *code, wchar_t *desc, Toy_Interp *interp) {
     Toy_Type *o;
 
     o = GC_MALLOC(sizeof(Toy_Type));
@@ -237,14 +238,14 @@ new_exception(char *code, char *desc, Toy_Interp *interp) {
 	Cell *stack;
 
 	stack = new_cell(to_string(o));
-	cell_add_str(stack, "\n");
+	cell_add_str(stack, L"\n");
 	get_stack_trace(interp, stack);
 
 	list_append(o->u.exception.msg_list, new_string_cell(stack));
 
     } else {
 
-	list_append(o->u.exception.msg_list, new_string_str(""));
+	list_append(o->u.exception.msg_list, new_string_str(L""));
     }
 
     return o;
@@ -354,7 +355,7 @@ new_alias(struct _hash *slot, Toy_Type *key) {
 }
 
 Toy_Type*
-new_rquote(char *string) {
+new_rquote(wchar_t *string) {
     Toy_Type *o;
     Cell *c;
     o = GC_MALLOC(sizeof(Toy_Type));
@@ -442,9 +443,9 @@ coroutine_handl(void *context) {
 
     } else {
 	/* +++ */
-	fprintf(stderr, "coroutine_handl: detect SOVF\n");
+	fwprintf(stderr, L"coroutine_handl: detect SOVF\n");
 	co->u.coroutine->interp->co_parent->co_value =
-	    new_exception(TE_STACKOVERFLOW, "C stack overflow.", co->u.coroutine->interp);
+	    new_exception(TE_STACKOVERFLOW, L"C stack overflow.", co->u.coroutine->interp);
     }
 
     id = co->u.coroutine->interp->cstack_id;
@@ -495,11 +496,11 @@ new_coroutine(Toy_Interp *interp, Toy_Type* script) {
     if (GET_TAG(script) == CLOSURE) {
 	cstack_id = cstack_get(to_string(script->u.closure.block_body));
     } else {
-	cstack_id = cstack_get("");
+	cstack_id = cstack_get(L"");
     }
     
     if (-1 == cstack_id) {
-	return new_exception(TE_NOSLOT, "No stack slot space.", interp);
+	return new_exception(TE_NOSLOT, L"No stack slot space.", interp);
     }
 
     o->u.coroutine->interp->cstack_id = cstack_id;
@@ -520,7 +521,7 @@ new_coroutine(Toy_Interp *interp, Toy_Type* script) {
 				      NULL);
 
     if (NULL == o->u.coroutine->coro_id) {
-	return new_exception(TE_NOSLOT, "Can\'t create co-routine.", interp);
+	return new_exception(TE_NOSLOT, L"Can\'t create co-routine.", interp);
     }
 
     return o;
@@ -542,49 +543,49 @@ toy_clone(Toy_Type *obj) {
     return dest;
 }
 
-static char *toy_type_char[] = {
-    "NIL",
-    "SYMBOL",
-    "REF",
-    "LIST",
-    "INTEGER",
-    "REAL",
-    "STRING",
-    "SCRIPT",
-    "STATEMENT",
-    "BLOCK",
-    "EVAL",
-    "NATIVE",
-    "OBJECT",
-    "EXCEPTION",
-    "CLOSURE",
-    "FUNC",
-    "CONTROL",
-    "CONTAINER",
-    "GETMACRO",
-    "ALIAS",
-    "RQUOTE",
-    "INITMACRO",
-    "BIND",
-    "DICT",
-    "VECTOR",
-    "COROUTINE",
+static wchar_t *toy_type_char[] = {
+    L"NIL",
+    L"SYMBOL",
+    L"REF",
+    L"LIST",
+    L"INTEGER",
+    L"REAL",
+    L"STRING",
+    L"SCRIPT",
+    L"STATEMENT",
+    L"BLOCK",
+    L"EVAL",
+    L"NATIVE",
+    L"OBJECT",
+    L"EXCEPTION",
+    L"CLOSURE",
+    L"FUNC",
+    L"CONTROL",
+    L"CONTAINER",
+    L"GETMACRO",
+    L"ALIAS",
+    L"RQUOTE",
+    L"INITMACRO",
+    L"BIND",
+    L"DICT",
+    L"VECTOR",
+    L"COROUTINE",
 };
 
-char*
+wchar_t*
 toy_get_type_str(Toy_Type *obj) {
-    if (NULL == obj) return "(null address)";
+    if (NULL == obj) return L"(null address)";
     if (IS_TOY_OBJECT(obj)) {
 	return toy_type_char[GET_TAG(obj)];
     } else {
-	return "(unknown)";
+	return L"(unknown)";
     }
 }
 
-char*
+wchar_t*
 to_string(Toy_Type *obj) {
-    if (NULL == obj) return "(null address)";
-    if (! IS_TOY_OBJECT(obj)) return "(unknown)";
+    if (NULL == obj) return L"(null address)";
+    if (! IS_TOY_OBJECT(obj)) return L"(unknown)";
 
     switch (GET_TAG(obj)) {
     case NIL:
@@ -596,7 +597,7 @@ to_string(Toy_Type *obj) {
     case REF:
     {
 	Cell *c;
-	c = new_cell("$");
+	c = new_cell(L"$");
 	cell_add_str(c, cell_get_addr(obj->u.ref.cell));
 	return cell_get_addr(c);
     }
@@ -608,16 +609,16 @@ to_string(Toy_Type *obj) {
 
     case REAL:
     {
-	char *buff;
+	wchar_t *buff;
 	Cell *c;
 
-	buff = GC_MALLOC(32);
+	buff = GC_MALLOC(32*sizeof(wchar_t));
 	ALLOC_SAFE(buff);
 
 	if ((obj->u.real > 1.0E+9) || (obj->u.real < 1.0E-2)) {
-	    snprintf(buff, 31, "%.15E", obj->u.real);
+	    swprintf(buff, 31, L"%.15E", obj->u.real);
 	} else {
-	    snprintf(buff, 31, "%.15f", obj->u.real);
+	    swprintf(buff, 31, L"%.15f", obj->u.real);
 	}
 
 	c = new_cell(buff);
@@ -636,10 +637,10 @@ to_string(Toy_Type *obj) {
 
 	l = obj->u.statement_list;
 	if (IS_LIST_NULL(l)) {
-	    return "";
+	    return L"";
 	}
 
-	c = new_cell("");
+	c = new_cell(L"");
 	do {
 	    cell_add_str(c, to_print(list_get_item(l)));
 	    l = list_next(l);
@@ -655,17 +656,17 @@ to_string(Toy_Type *obj) {
 
 	l = obj->u.statement.item_list;
 	if (IS_LIST_NULL(l)) {
-	    return "";
+	    return L"";
 	}
 
-	c = new_cell("");
+	c = new_cell(L"");
 	do {
 	    cell_add_str(c, to_print(list_get_item(l)));
-	    if (list_length(l) > 1) cell_add_char(c, ' ');
+	    if (list_length(l) > 1) cell_add_char(c, L' ');
 	    l = list_next(l);
 	} while (l);
 
-	cell_add_char(c, ';');
+	cell_add_char(c, L';');
 	return cell_get_addr(c);
     }
 
@@ -674,28 +675,28 @@ to_string(Toy_Type *obj) {
 	Cell *c;
 
 	if (IS_LIST_NULL(obj)) {
-	    return "()";
+	    return L"()";
 	}
 
-	c = new_cell("(");
+	c = new_cell(L"(");
 	do {
 	    if (GET_TAG(obj) != LIST) {
-		cell_add_str(c, ". ");
+		cell_add_str(c, L". ");
 		cell_add_str(c, to_print(obj));
 		break;
 	    } else {
 		if (IS_LIST_NULL(obj)) {
-		    cell_add_str(c, ". ()");
+		    cell_add_str(c, L". ()");
 		} else {
 		    cell_add_str(c, to_print(list_get_item(obj)));
 		}
-		if (obj->u.list.nextp) cell_add_char(c, ' ');
+		if (obj->u.list.nextp) cell_add_char(c, L' ');
 	    }
 
 	    obj = list_next(obj);
 	} while (obj);
 
-	cell_add_str(c, ")");
+	cell_add_str(c, L")");
 	return cell_get_addr(c);
     }
 	
@@ -705,9 +706,9 @@ to_string(Toy_Type *obj) {
 	Cell *c;
 
 	s = obj->u.block_body;
-	c = new_cell("{");
+	c = new_cell(L"{");
 	cell_add_str(c, to_print(s));
-	cell_add_str(c, "}");
+	cell_add_str(c, L"}");
 	return cell_get_addr(c);
     }
 
@@ -717,21 +718,21 @@ to_string(Toy_Type *obj) {
 	Cell *c;
 
 	s = obj->u.eval_body;
-	c = new_cell("[");
+	c = new_cell(L"[");
 	cell_add_str(c, to_print(s));
-	cell_add_str(c, "]");
+	cell_add_str(c, L"]");
 	return cell_get_addr(c);
     }
 
     case NATIVE:
-	return "<NATIVE>";
+	return L"<NATIVE>";
 
     case EXCEPTION:
     {
 	Cell *c;
-	c = new_cell("<");
+	c = new_cell(L"<");
 	cell_add_str(c, cell_get_addr(obj->u.exception.code));
-	cell_add_str(c, "># ");
+	cell_add_str(c, L"># ");
 	cell_add_str(c, to_string(list_get_item(obj->u.exception.msg_list)));
 	return cell_get_addr(c);
     }
@@ -741,44 +742,44 @@ to_string(Toy_Type *obj) {
 	Toy_Type *l;
 	Cell *c;
 
-	c = new_cell("(");
+	c = new_cell(L"(");
 	l = obj->u.func.argspec->list;
 	while (! IS_LIST_NULL(l)) {
 	    if (list_get_item(l) == NIL) break;
 	    cell_add_str(c, to_print(list_get_item(l)));
-	    if (list_length(l) > 1) cell_add_char(c, ' ');
+	    if (list_length(l) > 1) cell_add_char(c, L' ');
 	    l = list_next(l);
 	}
-	cell_add_str(c, ") ");
+	cell_add_str(c, L") ");
 	cell_add_str(c, to_print(obj->u.func.closure));
 	return cell_get_addr(c);
     }
 
     case CONTROL:
     {
-	char *p;
+	wchar_t *p;
 	Cell *c;
 	switch (obj->u.control.code) {
 	case CTRL_RETURN:
-	    p = "<CONTROL-return># ";
+	    p = L"<CONTROL-return># ";
 	    break;
 	case CTRL_CONTINUE:
-	    p = "<CONTROL-continue># ";
+	    p = L"<CONTROL-continue># ";
 	    break;
 	case CTRL_BREAK:
-	    p = "<CONTROL-break># ";
+	    p = L"<CONTROL-break># ";
 	    break;
 	case CTRL_REDO:
-	    p = "<CONTROL-redo># ";
+	    p = L"<CONTROL-redo># ";
 	    break;
 	case CTRL_RETRY:
-	    p = "<CONTROL-retry># ";
+	    p = L"<CONTROL-retry># ";
 	    break;
 	case CTRL_GOTO:
-	    p = "<CONTROL-goto># ";
+	    p = L"<CONTROL-goto># ";
 	    break;
 	default:
-	    p = "<CONTROL-unknown># ";
+	    p = L"<CONTROL-unknown># ";
 	}
 	c = new_cell(p);
 	cell_add_str(c, to_string(obj->u.control.ret_value));
@@ -792,7 +793,7 @@ to_string(Toy_Type *obj) {
 	Toy_Type *name;
 
 	h = obj->u.object.slots;
-	c = new_cell("(object)");
+	c = new_cell(L"(object)");
 	name = hash_get_t(h, const_atname);
 	if (name) {
 	    cell_add_str(c, to_string(name));
@@ -806,22 +807,22 @@ to_string(Toy_Type *obj) {
 	Cell *c;
 
 	s = obj->u.closure.block_body;
-	c = new_cell("{");
+	c = new_cell(L"{");
 	cell_add_str(c, to_print(s));
-	cell_add_str(c, "}");
+	cell_add_str(c, L"}");
 	return cell_get_addr(c);
     }
 
     case CONTAINER:
-	return "<CONTAINER>";
+	return L"<CONTAINER>";
 
     case GETMACRO:
     {
 	Cell *c;
 
-	c = new_cell("");
+	c = new_cell(L"");
 	cell_add_str(c, to_string(obj->u.getmacro.obj));
-	cell_add_str(c, ",");
+	cell_add_str(c, L",");
 	cell_add_str(c, to_string(obj->u.getmacro.para));
 	return cell_get_addr(c);
     }
@@ -835,10 +836,10 @@ to_string(Toy_Type *obj) {
     {
 	Cell *c;
 
-	c = new_cell("`");
+	c = new_cell(L"`");
 	cell_add_str(c, to_print(obj->u.initmacro.class));
 	if (to_print(obj->u.initmacro.param)) {
-	    cell_add_str(c, " ");
+	    cell_add_str(c, L" ");
 	    cell_add_str(c, to_print(obj->u.initmacro.param));
 	}
 	return cell_get_addr(c);
@@ -849,35 +850,35 @@ to_string(Toy_Type *obj) {
 	Cell *c;
 	Toy_Type *l;
 	l = obj->u.bind_var;
-	c = new_cell("| ");
+	c = new_cell(L"| ");
 	while (! IS_LIST_NULL(l)) {
 	    if (list_get_item(l) == NIL) break;
 	    cell_add_str(c, to_print(list_get_item(l)));
-	    if (list_length(l) > 1) cell_add_char(c, ' ');
+	    if (list_length(l) > 1) cell_add_char(c, L' ');
 	    l = list_next(l);
 	}
-	cell_add_str(c, " |");
+	cell_add_str(c, L" |");
 	return cell_get_addr(c);
     }
 
     case DICT:
-	return "<DICT>";
+	return L"<DICT>";
 
     case VECTOR:
-	return "<VECTOR>";
+	return L"<VECTOR>";
 
     case COROUTINE:
-	return "<COROUTINE>";
+	return L"<COROUTINE>";
 
     default:
-	return "(unknown)";
+	return L"(unknown)";
     }
 }
 
-char*
+wchar_t*
 to_print(Toy_Type *obj) {
-    if (NULL == obj) return "(null address)";
-    if (! IS_TOY_OBJECT(obj)) return "(unknown)";
+    if (NULL == obj) return L"(null address)";
+    if (! IS_TOY_OBJECT(obj)) return L"(unknown)";
 
     switch (GET_TAG(obj)) {
     case NIL:
@@ -889,7 +890,7 @@ to_print(Toy_Type *obj) {
     case REF:
     {
 	Cell *c;
-	c = new_cell("$");
+	c = new_cell(L"$");
 	cell_add_str(c, cell_get_addr(obj->u.ref.cell));
 	return cell_get_addr(c);
     }
@@ -901,15 +902,15 @@ to_print(Toy_Type *obj) {
 
     case REAL:
     {
-	char *buff;
+	wchar_t *buff;
 	Cell *c;
 
-	buff = GC_MALLOC(32);
+	buff = GC_MALLOC(32*sizeof(wchar_t));
 	ALLOC_SAFE(buff);
 	if ((obj->u.real > 1.0E+9) || (obj->u.real < 1.0E-2)) {
-	    snprintf(buff, 31, "%.15E", obj->u.real);
+	    swprintf(buff, 31, L"%.15E", obj->u.real);
 	} else {
-	    snprintf(buff, 31, "%.15f", obj->u.real);
+	    swprintf(buff, 31, L"%.15f", obj->u.real);
 	}
 	c = new_cell(buff);
 	return cell_get_addr(c);
@@ -918,19 +919,19 @@ to_print(Toy_Type *obj) {
     case STRING:
     {
 	Cell *c;
-	char *p;
-	c = new_cell("\"");
+	wchar_t *p;
+	c = new_cell(L"\"");
 	p = cell_get_addr(obj->u.string);
 	while (*p) {
 	    switch (*p) {
-	    case '\t':
-		cell_add_str(c, "\\t");
+	    case L'\t':
+		cell_add_str(c, L"\\t");
 		break;
-	    case '\r':
-		cell_add_str(c, "\\r");
+	    case L'\r':
+		cell_add_str(c, L"\\r");
 		break;
-	    case '\n':
-		cell_add_str(c, "\\n");
+	    case L'\n':
+		cell_add_str(c, L"\\n");
 		break;
 		    
 	    default:
@@ -938,7 +939,7 @@ to_print(Toy_Type *obj) {
 	    }
 	    p++;
 	}
-	cell_add_char(c, '"');
+	cell_add_char(c, L'"');
 	return cell_get_addr(c);
     }
 	
@@ -949,10 +950,10 @@ to_print(Toy_Type *obj) {
 
 	l = obj->u.statement_list;
 	if (IS_LIST_NULL(l)) {
-	    return "";
+	    return L"";
 	}
 
-	c = new_cell("");
+	c = new_cell(L"");
 	do {
 	    cell_add_str(c, to_print(list_get_item(l)));
 	    l = list_next(l);
@@ -968,17 +969,17 @@ to_print(Toy_Type *obj) {
 
 	l = obj->u.statement.item_list;
 	if (IS_LIST_NULL(l)) {
-	    return "";
+	    return L"";
 	}
 
-	c = new_cell("");
+	c = new_cell(L"");
 	do {
 	    cell_add_str(c, to_print(list_get_item(l)));
-	    if (list_length(l) > 1) cell_add_char(c, ' ');
+	    if (list_length(l) > 1) cell_add_char(c, L' ');
 	    l = list_next(l);
 	} while (l);
 
-	cell_add_char(c, ';');
+	cell_add_char(c, L';');
 	return cell_get_addr(c);
     }
 
@@ -987,28 +988,28 @@ to_print(Toy_Type *obj) {
 	Cell *c;
 
 	if (IS_LIST_NULL(obj)) {
-	    return "()";
+	    return L"()";
 	}
 
-	c = new_cell("(");
+	c = new_cell(L"(");
 	do {
 	    if (GET_TAG(obj) != LIST) {
-		cell_add_str(c, ". ");
+		cell_add_str(c, L". ");
 		cell_add_str(c, to_print(obj));
 		break;
 	    } else {
 		if (IS_LIST_NULL(obj)) {
-		    cell_add_str(c, ". ()");
+		    cell_add_str(c, L". ()");
 		} else {
 		    cell_add_str(c, to_print(list_get_item(obj)));
 		}
-		if (obj->u.list.nextp) cell_add_char(c, ' ');
+		if (obj->u.list.nextp) cell_add_char(c, L' ');
 	    }
 
 	    obj = list_next(obj);
 	} while (obj);
 
-	cell_add_str(c, ")");
+	cell_add_str(c, L")");
 	return cell_get_addr(c);
     }
 	
@@ -1018,9 +1019,9 @@ to_print(Toy_Type *obj) {
 	Cell *c;
 
 	s = obj->u.block_body;
-	c = new_cell("{");
+	c = new_cell(L"{");
 	cell_add_str(c, to_print(s));
-	cell_add_str(c, "}");
+	cell_add_str(c, L"}");
 	return cell_get_addr(c);
     }
 
@@ -1030,21 +1031,21 @@ to_print(Toy_Type *obj) {
 	Cell *c;
 
 	s = obj->u.eval_body;
-	c = new_cell("[");
+	c = new_cell(L"[");
 	cell_add_str(c, to_print(s));
-	cell_add_str(c, "]");
+	cell_add_str(c, L"]");
 	return cell_get_addr(c);
     }
 
     case NATIVE:
-	return "<NATIVE>";
+	return L"<NATIVE>";
 
     case EXCEPTION:
     {
 	Cell *c;
-	c = new_cell("<");
+	c = new_cell(L"<");
 	cell_add_str(c, cell_get_addr(obj->u.exception.code));
-	cell_add_str(c, "># ");
+	cell_add_str(c, L"># ");
 	cell_add_str(c, to_print(list_get_item(obj->u.exception.msg_list)));
 	return cell_get_addr(c);
     }
@@ -1054,44 +1055,44 @@ to_print(Toy_Type *obj) {
 	Toy_Type *l;
 	Cell *c;
 
-	c = new_cell("(");
+	c = new_cell(L"(");
 	l = obj->u.func.argspec->list;
 	while (! IS_LIST_NULL(l)) {
 	    if (list_get_item(l) == NIL) break;
 	    cell_add_str(c, to_print(list_get_item(l)));
-	    if (list_length(l) > 1) cell_add_char(c, ' ');
+	    if (list_length(l) > 1) cell_add_char(c, L' ');
 	    l = list_next(l);
 	}
-	cell_add_str(c, ") ");
+	cell_add_str(c, L") ");
 	cell_add_str(c, to_print(obj->u.func.closure));
 	return cell_get_addr(c);
     }
 
     case CONTROL:
     {
-	char *p;
+	wchar_t *p;
 	Cell *c;
 	switch (obj->u.control.code) {
 	case CTRL_RETURN:
-	    p = "<CONTROL-return># ";
+	    p = L"<CONTROL-return># ";
 	    break;
 	case CTRL_CONTINUE:
-	    p = "<CONTROL-continue># ";
+	    p = L"<CONTROL-continue># ";
 	    break;
 	case CTRL_BREAK:
-	    p = "<CONTROL-break># ";
+	    p = L"<CONTROL-break># ";
 	    break;
 	case CTRL_REDO:
-	    p = "<CONTROL-redo># ";
+	    p = L"<CONTROL-redo># ";
 	    break;
 	case CTRL_RETRY:
-	    p = "<CONTROL-retry># ";
+	    p = L"<CONTROL-retry># ";
 	    break;
 	case CTRL_GOTO:
-	    p = "<CONTROL-goto># ";
+	    p = L"<CONTROL-goto># ";
 	    break;
 	default:
-	    p = "<CONTROL-unknown># ";
+	    p = L"<CONTROL-unknown># ";
 	}
 	c = new_cell(p);
 	cell_add_str(c, to_print(obj->u.control.ret_value));
@@ -1105,7 +1106,7 @@ to_print(Toy_Type *obj) {
 	Toy_Type *name;
 
 	h = obj->u.object.slots;
-	c = new_cell("(object)");
+	c = new_cell(L"(object)");
 	name = hash_get_t(h, const_atname);
 	if (name) {
 	    cell_add_str(c, to_print(name));
@@ -1119,22 +1120,22 @@ to_print(Toy_Type *obj) {
 	Cell *c;
 
 	s = obj->u.closure.block_body;
-	c = new_cell("{");
+	c = new_cell(L"{");
 	cell_add_str(c, to_print(s));
-	cell_add_str(c, "}");
+	cell_add_str(c, L"}");
 	return cell_get_addr(c);
     }
 
     case CONTAINER:
-	return "<CONTAINER>";
+	return L"<CONTAINER>";
 
     case GETMACRO:
     {
 	Cell *c;
 
-	c = new_cell("");
+	c = new_cell(L"");
 	cell_add_str(c, to_print(obj->u.getmacro.obj));
-	cell_add_str(c, ",");
+	cell_add_str(c, L",");
 	cell_add_str(c, to_print(obj->u.getmacro.para));
 	return cell_get_addr(c);
     }
@@ -1142,23 +1143,23 @@ to_print(Toy_Type *obj) {
     case RQUOTE:
     {
 	Cell *c;
-	char *p;
-	c = new_cell("\'");
+	wchar_t *p;
+	c = new_cell(L"\'");
 	p = cell_get_addr(obj->u.rquote);
 	while (*p) {
 	    switch (*p) {
-	    case '\\':
-		cell_add_str(c, "\\\\");
+	    case L'\\':
+		cell_add_str(c, L"\\\\");
 		break;
-	    case '\'':
-		cell_add_str(c, "\\\'");
+	    case L'\'':
+		cell_add_str(c, L"\\\'");
 		break;
 	    default:
 		cell_add_char(c, *p);
 	    }
 	    p++;
 	}
-	cell_add_char(c, '\'');
+	cell_add_char(c, L'\'');
 	return cell_get_addr(c);
     }
 
@@ -1166,10 +1167,10 @@ to_print(Toy_Type *obj) {
     {
 	Cell *c;
 
-	c = new_cell("`");
+	c = new_cell(L"`");
 	cell_add_str(c, to_print(obj->u.initmacro.class));
 	if (obj->u.initmacro.param) {
-	    cell_add_str(c, " ");
+	    cell_add_str(c, L" ");
 	    cell_add_str(c, to_print(obj->u.initmacro.param));
 	}
 	return cell_get_addr(c);
@@ -1179,15 +1180,15 @@ to_print(Toy_Type *obj) {
 	return to_string(obj);
 
     case DICT:
-	return "<DICT>";
+	return L"<DICT>";
 
     case VECTOR:
-	return "<VECTOR>";
+	return L"<VECTOR>";
 
     case COROUTINE:
-	return "<COROUTINE>";
+	return L"<COROUTINE>";
 
     default:
-	return "(unknown)";
+	return L"(unknown)";
     }
 }

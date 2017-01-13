@@ -2,9 +2,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <wchar.h>
 #include <signal.h>
-#include <setjmp.h>
 #include <string.h>
+#include <setjmp.h>
 #include <sys/mman.h>
 #include "toy.h"
 
@@ -72,7 +73,7 @@ init_cstack() {
 
     /* for main interp stack to use */
     CStack.stack_slot[0].state = SS_USE;
-    CStack.stack_slot[0].memo = "(main stack)";
+    CStack.stack_slot[0].memo = L"(main stack)";
 
     /* main stack add root to GC */
     GC_add_roots((void*)CStack.stack_slot[0].safe_addr,
@@ -228,7 +229,7 @@ cstack_clear_all(int slot_id) {
 }
 
 int
-cstack_get(char *memo) {
+cstack_get(wchar_t *memo) {
     int i;
 
     for (i = 0 ; i < CStack.number_of_slot ; i++) {
@@ -296,7 +297,7 @@ cstack_list() {
 	switch (CStack.stack_slot[i].state) {
 	case SS_FREE:
 	    list_append(elist, new_integer_si(i));
-	    list_append(elist, new_symbol("FREE"));
+	    list_append(elist, new_symbol(L"FREE"));
 	    list_append(elist,
 			new_integer_si((__PTRDIFF_TYPE__)
 				       (__PTRDIFF_TYPE__)
@@ -317,13 +318,13 @@ cstack_list() {
 			new_integer_si((__PTRDIFF_TYPE__)
 				       (__PTRDIFF_TYPE__)
 				       CStack.stack_slot[i].jmp_buff_enable));
-	    list_append(elist, new_string_str(""));
+	    list_append(elist, new_string_str(L""));
 
 	    break;
 
 	case SS_USE:
 	    list_append(elist, new_integer_si(i));
-	    list_append(elist, new_symbol("USE"));
+	    list_append(elist, new_symbol(L"USE"));
 	    list_append(elist,
 			new_integer_si((__PTRDIFF_TYPE__)
 				       (__PTRDIFF_TYPE__)

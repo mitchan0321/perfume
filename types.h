@@ -5,6 +5,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <wchar.h>
 #include <setjmp.h>
 #include <sys/types.h>
 #include <pcl.h>
@@ -44,7 +45,7 @@
 #define    __TYPE_LAST__	26
 
 
-#define S_NIL	"nil"
+#define S_NIL	L"nil"
 
 #define IS_LIST_NULL(l)	((l==NULL)?1:((NULL==l->u.list.item)&&(NULL==l->u.list.nextp)))
 
@@ -116,7 +117,7 @@ struct _toy_argspec {
 
 typedef struct _toy_interp {
     /* interpriter name */
-    char *name;
+    wchar_t *name;
 
     /* stack size */
     int stack_size;
@@ -334,8 +335,8 @@ typedef struct _toy_script {
 
 
 Toy_Type*	new_nil();
-Toy_Type*	new_symbol(char *atom);
-Toy_Type*	new_ref(char *ref);
+Toy_Type*	new_symbol(wchar_t *atom);
+Toy_Type*	new_ref(wchar_t *ref);
 Toy_Type*	new_list(Toy_Type *item);
 Toy_Type*	new_cons(Toy_Type *car, Toy_Type *cdr);
 Toy_Type*	list_append(Toy_Type *list, Toy_Type *item);
@@ -345,9 +346,9 @@ int		list_length(Toy_Type *list);
 Toy_Type*	new_integer(mpz_t biginteger);
 Toy_Type*	new_integer_si(long int integer);
 Toy_Type*	new_integer_d(double val);
-char*		integer_to_str(Toy_Type *val);
+wchar_t*	integer_to_str(Toy_Type *val);
 Toy_Type*	new_real(double real);
-Toy_Type*	new_string_str(char *string);
+Toy_Type*	new_string_str(wchar_t *string);
 Toy_Type*	new_string_cell(Cell *string);
 Toy_Type*	new_script(Toy_Type *statement_list);
 Toy_Type*	new_statement(Toy_Type *item_list, int line);
@@ -355,8 +356,8 @@ Toy_Type*	new_block(Toy_Type *block_body);
 Toy_Type*	new_eval(Toy_Type *eval_body);
 Toy_Type*	new_native(Toy_Type* (*cfunc)(Toy_Interp*, Toy_Type*, struct _hash*, int arglen),
 			   Toy_Type *argspec_list);
-Toy_Type*	new_object(char* name, struct _hash* slots, Toy_Type *delegate_list);
-Toy_Type*	new_exception(char *code, char *desc, Toy_Interp* interp);
+Toy_Type*	new_object(wchar_t* name, struct _hash* slots, Toy_Type *delegate_list);
+Toy_Type*	new_exception(wchar_t *code, wchar_t *desc, Toy_Interp* interp);
 Toy_Type*	new_closure(Toy_Type *block_body, Toy_Env* env, int script_id);
 Toy_Type*	new_func(Toy_Type *argspec_list, int posarglen, Array *posargarray, Hash *namedarg,
 			 Toy_Type *closure);
@@ -365,7 +366,7 @@ Toy_Type*	new_container(void *container);
 Toy_Type*	new_getmacro(Toy_Type *obj, Toy_Type *para);
 Toy_Type*	new_initmacro(Toy_Type *obj, Toy_Type *param);
 Toy_Type*	new_alias(struct _hash *slot, Toy_Type *key);
-Toy_Type*	new_rquote(char *string);
+Toy_Type*	new_rquote(wchar_t *string);
 Toy_Type*	new_callcc();
 Toy_Type*	new_bind(Toy_Type *bind_var);
 Toy_Type*	new_dict(struct _hash *dict);
@@ -373,9 +374,9 @@ Toy_Type*	new_vector(struct _array *vector);
 Toy_Type*	new_coroutine(Toy_Interp*, Toy_Type*);
 
 Toy_Type*	toy_clone(Toy_Type *obj);
-char*		toy_get_type_str(Toy_Type *obj);
-char*		to_string(Toy_Type *obj);
-char*		to_print(Toy_Type *obj);
+wchar_t*	toy_get_type_str(Toy_Type *obj);
+wchar_t*	to_string(Toy_Type *obj);
+wchar_t*	to_print(Toy_Type *obj);
 
 #define	list_next(l)		(((l)==NULL)?NULL:((GET_TAG((l))==LIST)?(l)->u.list.nextp:NULL))
 #define list_get_item(l)	(((l)==NULL)?NULL:((GET_TAG((l))==LIST)?(l)->u.list.item:NULL))

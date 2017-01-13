@@ -8,46 +8,46 @@ static int cell_get_alloc_size(int init_s, int dest_s);
 static Cell* cell_realloc(Cell *p, int dest_s);
 
 Cell*
-new_cell(const char *src) {
+new_cell(const wchar_t *src) {
     Cell *c;
     int alen, len;
 
-    if (NULL == src) return new_cell("");
+    if (NULL == src) return new_cell(L"");
     
     c = (Cell*)GC_MALLOC(sizeof(Cell));
     ALLOC_SAFE(c);
 
-    len = strlen(src)+1;
+    len = wcslen(src)+1;
     alen = cell_get_alloc_size(CELL_INIT_ALLOC, len);
     c->length = len-1;
     c->allocsize = alen;
-    c->data = (char*) GC_MALLOC_ATOMIC(alen);
+    c->data = (wchar_t*)GC_MALLOC_ATOMIC(alen*sizeof(wchar_t));
     ALLOC_SAFE(c->data);
-    strncpy(c->data, src, len);
+    wcsncpy(c->data, src, len);
 
     return c;
 }
 
 Cell*
-cell_add_str(Cell *p, const char *src) {
+cell_add_str(Cell *p, const wchar_t *src) {
     int len;
 
     if (NULL == p) return NULL;
 
-    len = strlen(src)+1;
+    len = wcslen(src)+1;
     if ((len + p->length) > p->allocsize) {
 	if (NULL == cell_realloc(p, len + p->length))
 	    return NULL;
     }
 
-    strncpy(&p->data[p->length], src, len);
+    wcsncpy(&p->data[p->length], src, len);
     p->length = p->length + len-1;
 
     return p;
 }
 
 Cell*
-cell_add_char(Cell *p, const char src) {
+cell_add_char(Cell *p, const wchar_t src) {
     int len;
 
     if (NULL == p) return NULL;
@@ -66,23 +66,9 @@ cell_add_char(Cell *p, const char src) {
 }
 
 int
-cell_eq_str(Cell *s, char *d) {
-    return strcmp(cell_get_addr(s), d);
+cell_eq_str(Cell *s, wchar_t *d) {
+    return wcscmp(cell_get_addr(s), d);
 }
-
-/*
-char*
-cell_get_addr(Cell *p) {
-    if (NULL == p) return 0;
-    return p->data;
-}
-
-int
-cell_get_length(Cell *p) {
-    if (NULL == p) return 0;
-    return p->length;
-}
-*/
 
 static int
 cell_get_alloc_size(int init_s, int dest_s) {
@@ -97,10 +83,10 @@ cell_get_alloc_size(int init_s, int dest_s) {
 static Cell*
 cell_realloc(Cell *p, int dest_s) {
     int i;
-    char *data;
+    wchar_t *data;
 
     i = cell_get_alloc_size(p->allocsize, dest_s);
-    data = GC_REALLOC(p->data, i);
+    data = GC_REALLOC(p->data, i*sizeof(wchar_t));
     ALLOC_SAFE(data);
 
     p->data = data;
@@ -113,9 +99,9 @@ Cell*
 cell_sub(Cell *c, int start, int end) {
     Cell *d;
     int i, l;
-    const char *p;
+    const wchar_t *p;
 
-    d = new_cell("");
+    d = new_cell(L"");
     if (NULL == d) return d;
 
     l = c->length;

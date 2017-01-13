@@ -3,11 +3,11 @@
 #ifndef __CONFIG_H__
 #define __CONFIG_H__
 
-#define VERSION			"@VERSION@"
-#define SETUP_FILE		"@PREFIX@/lib/perfume/setup.prfm"
-#define SETUP_FILE2		"./setup.prfm"
+#define VERSION			L"@VERSION@"
+#define SETUP_FILE		L"@PREFIX@/lib/perfume/setup.prfm"
+#define SETUP_FILE2		L"./setup.prfm"
 
-#define LIB_PATH		"@PREFIX@/lib/perfume/lib"
+#define LIB_PATH		L"@PREFIX@/lib/perfume/lib"
 #define MAXPATHLEN		4096
 
 /* for main co-routine stack size */

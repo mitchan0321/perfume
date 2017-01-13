@@ -29,6 +29,7 @@ bulk_load_file(Bulk *bulk, const char *file) {
     int fd;
     struct stat statbuff;
     int size;
+    char *readbuff;
 
     if (NULL == bulk) return 0;
 
@@ -37,15 +38,15 @@ bulk_load_file(Bulk *bulk, const char *file) {
     if (-1 == fstat(fd, &statbuff)) goto error;
     size = statbuff.st_size;
 
-    bulk->data = GC_MALLOC_ATOMIC(size);
-    ALLOC_SAFE(bulk->data);
-
     bulk->length = size;
     bulk->allocsize = size;
     bulk->pos = 0;
     bulk->line = 1;
 
-    if (-1 == read_size(fd, bulk->data, size)) goto error;
+    readbuff = GC_MALLOC_ATOMIC(size);
+    ALLOC_SAFE(readbuff);
+    if (-1 == read_size(fd, readbuff, size)) goto error;
+    bulk->data = to_wchar(readbuff);
 
     close(fd);
     return 1;
@@ -81,14 +82,14 @@ read_size(int fd, char* buff, int size) {
 }
 
 int
-bulk_set_string(Bulk *bulk, const char *str) {
+bulk_set_string(Bulk *bulk, const wchar_t *str) {
     int len;
 
     if (NULL == bulk) return 0;
     if (NULL == str) return 0;
 
-    len = strlen(str);
-    bulk->data = GC_MALLOC_ATOMIC(len);
+    len = wcslen(str);
+    bulk->data = GC_MALLOC_ATOMIC(len*sizeof(wchar_t));
     ALLOC_SAFE(bulk->data);
 
     bulk->length = len;
@@ -96,7 +97,7 @@ bulk_set_string(Bulk *bulk, const char *str) {
     bulk->pos = 0;
     bulk->line = 1;
 
-    memcpy(bulk->data, str, len);
+    memcpy(bulk->data, str, len*sizeof(wchar_t));
 
     return 1;
 }
@@ -180,7 +181,7 @@ bulk_set_position(Bulk *bulk, int pos) {
     return 1;
 }
 
-char*
+wchar_t*
 bulk_get_addr(Bulk *bulk) {
     if (NULL == bulk) return 0;
 

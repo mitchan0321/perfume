@@ -87,7 +87,7 @@ extern Toy_Type *const_nullstring;
 extern Toy_Type *const_silent;
 extern Toy_Type *const_debug_hook;
 extern Toy_Type *const_ast;
-extern char     *const_regex_cache;
+extern wchar_t  *const_regex_cache;
 #ifdef PROF
 extern void *GC_stackbottom;
 #endif /* PROF */
@@ -175,7 +175,7 @@ Toy_Type *const_nullstring;
 Toy_Type *const_silent;
 Toy_Type *const_debug_hook;
 Toy_Type *const_ast;
-char     *const_regex_cache;
+wchar_t  *const_regex_cache;
 int PageSize;
 #ifdef PROF
 void *GC_stackbottom;

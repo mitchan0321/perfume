@@ -3,6 +3,7 @@
 #ifndef __HASH__
 #define __HASH__
 
+#include <wchar.h>
 #include <t_gc.h>
 #include "types.h"
 
@@ -10,7 +11,7 @@
 
 
 struct hash_bucket {
-    char *key;
+    wchar_t *key;
     unsigned int index;
     struct _toy_type *item;
     struct hash_bucket *next;
@@ -23,21 +24,21 @@ typedef struct _hash {
     int synonyms;
 } Hash;
 
-unsigned int		hash_string_key(const char *key);
+unsigned int		hash_string_key(const wchar_t *key);
 Hash*			new_hash();
 void			hash_clear(Hash* h);
-Hash*			hash_set(Hash *hash, const char *key, const struct _toy_type *item);
+Hash*			hash_set(Hash *hash, const wchar_t *key, const struct _toy_type *item);
 Hash*			hash_set_t(Hash *hash, const struct _toy_type *key, const struct _toy_type *item);
-struct _toy_type*	hash_get(Hash *hash, const char *key);
+struct _toy_type*	hash_get(Hash *hash, const wchar_t *key);
 struct _toy_type*	hash_get_t(Hash *hash, const struct _toy_type *key);
-struct _toy_type*	hash_get_and_unset(Hash *hash, const char *key);
+struct _toy_type*	hash_get_and_unset(Hash *hash, const wchar_t *key);
 struct _toy_type*	hash_get_and_unset_t(Hash *hash, const struct _toy_type *key);
-Hash*			hash_unset(Hash *hash, const char *key);
+Hash*			hash_unset(Hash *hash, const wchar_t *key);
 Hash*			hash_unset_t(Hash *hash, const struct _toy_type *key);
-int			hash_is_exists(Hash *hash, const char *key);
+int			hash_is_exists(Hash *hash, const wchar_t *key);
 int			hash_is_exists_t(Hash *hash, const struct _toy_type *key);
-int			hash_link(Hash *hash, const char *key,
-				  Hash *to_hash, const char *to_key);
+int			hash_link(Hash *hash, const wchar_t *key,
+				  Hash *to_hash, const wchar_t *to_key);
 int			hash_link_t(Hash *hash, const struct _toy_type *key,
 				    Hash *to_hash, const struct _toy_type *to_key);
 struct _toy_type*	hash_get_keys(Hash *hash);
