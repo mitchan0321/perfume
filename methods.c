@@ -2461,8 +2461,8 @@ mth_string_match(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
 	reg = (regex_t*)container->u.container;
     }
     
-    str = (unsigned char*)cell_get_addr(self->u.string);
-    pattern = (unsigned char*)cell_get_addr(tpattern->u.rquote);
+    str = (unsigned char*)(to_char(cell_get_addr(self->u.string)));
+    pattern = (unsigned char*)(to_char(cell_get_addr(tpattern->u.rquote)));
 
     option = ONIG_OPTION_NONE;
     if (t_case) {
@@ -2473,7 +2473,7 @@ mth_string_match(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
 	/* no cache then create regex object */
 	r = onig_new(&reg,
 		     pattern,
-		     pattern + cell_get_length(tpattern->u.rquote),
+		     pattern + (cell_get_length(tpattern->u.rquote) * sizeof(char)),
 		     option,
 		     ONIG_ENCODING_UTF8,
 		     (t_grep == NULL) ? ONIG_SYNTAX_DEFAULT : ONIG_SYNTAX_GREP,
@@ -2492,7 +2492,7 @@ mth_string_match(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
 
     region = onig_region_new();
 
-    end = str + cell_get_length(self->u.string);
+    end = str + (cell_get_length(self->u.string) * sizeof(char));
     start = str;
     range = end;
     offs = 0;
@@ -2794,12 +2794,12 @@ mth_string_format_fill(wchar_t* item, int fill, int trim) {
 	/* lef align */
 	cell_add_str(result, item);
 	for (i=0 ; i<(-fill-slen) ; i++) {
-	    cell_add_char(result, ' ');
+	    cell_add_char(result, L' ');
 	}
     } else if (fill > 0) {
 	/* right align */
 	for (i=0 ; i<(fill-slen) ; i++) {
-	    cell_add_char(result, ' ');
+	    cell_add_char(result, L' ');
 	}
 	cell_add_str(result, item);
     }

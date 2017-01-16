@@ -3,6 +3,7 @@
 #ifndef __BULK__
 #define __BULK__
 
+#include <wchar.h>
 #include <t_gc.h>
 
 #ifndef EOF

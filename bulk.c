@@ -39,12 +39,13 @@ bulk_load_file(Bulk *bulk, const char *file) {
     size = statbuff.st_size;
 
     bulk->length = size;
-    bulk->allocsize = size;
+    bulk->allocsize = (size+1)*sizeof(wchar_t);
     bulk->pos = 0;
     bulk->line = 1;
 
-    readbuff = GC_MALLOC_ATOMIC(size);
+    readbuff = GC_MALLOC_ATOMIC(size+1);
     ALLOC_SAFE(readbuff);
+
     if (-1 == read_size(fd, readbuff, size)) goto error;
     bulk->data = to_wchar(readbuff);
 
@@ -89,11 +90,11 @@ bulk_set_string(Bulk *bulk, const wchar_t *str) {
     if (NULL == str) return 0;
 
     len = wcslen(str);
-    bulk->data = GC_MALLOC_ATOMIC(len*sizeof(wchar_t));
+    bulk->data = GC_MALLOC_ATOMIC((len+1)*sizeof(wchar_t));
     ALLOC_SAFE(bulk->data);
 
     bulk->length = len;
-    bulk->allocsize = len;
+    bulk->allocsize = (len+1)*sizeof(wchar_t);
     bulk->pos = 0;
     bulk->line = 1;
 
@@ -121,7 +122,7 @@ bulk_getchar(Bulk *bulk) {
     if (EOF == bulk_is_eof(bulk)) return EOF;
 
     c = bulk->data[bulk->pos];
-    if ('\n' == c) {
+    if (L'\n' == c) {
 	bulk->line++;
     }
     bulk->pos++;
@@ -134,7 +135,7 @@ bulk_ungetchar(Bulk *bulk) {
 
     if (NULL == bulk) return EOF;
     if (bulk->pos > 0) bulk->pos--;
-    if ('\n' == bulk->data[bulk->pos]) {
+    if (L'\n' == bulk->data[bulk->pos]) {
 	bulk->line--;
     }
 

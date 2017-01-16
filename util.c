@@ -11,7 +11,7 @@ to_wchar(const char *src) {
     dest = GC_MALLOC((len+1)*sizeof(wchar_t));
     ALLOC_SAFE(dest);
     for (i=0; i<=len; i++) {
-	dest[i] = (wchar_t)src[i];
+	dest[i] = ((wchar_t)src[i]) & 0xff;
     }
 
     return dest;

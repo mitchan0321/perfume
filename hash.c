@@ -201,9 +201,9 @@ hash_add_to_bucket(Hash *hash,
     ALLOC_SAFE(bs);
 
     if (key_re_alloc) {
-	dest_key = GC_MALLOC((key_len+1)*sizeof(wchar_t));
+	dest_key = GC_MALLOC(key_len*sizeof(wchar_t));
 	ALLOC_SAFE(dest_key);
-	wcsncpy(dest_key, key, key_len+1);
+	wcsncpy(dest_key, key, key_len);
 	bs->key = dest_key;
     } else {
 	bs->key = (wchar_t*)key;
@@ -641,7 +641,7 @@ hash_debug_dump(Hash *hash) {
 	    wprintf(L"bucket[%d] dump:\n", i);
 	    b = hash->bucket[i];
 	    while (b) {
-		wprintf(L"  key: \"%s\"\n", b->key);
+		wprintf(L"  key: \"%ls\"\n", b->key);
 		b = b->next;
 	    }
 	}

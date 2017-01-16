@@ -390,7 +390,7 @@ cmd_fun(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	argvs = cell_get_addr(argv->u.symbol.cell);
 	list_append(l, argv);
 
-	if (argvs[cell_get_length(argv->u.symbol.cell)-1] == ':') {
+	if (argvs[cell_get_length(argv->u.symbol.cell)-1] == L':') {
 	    Toy_Type *key;
 
 	    key = argv;
@@ -398,7 +398,7 @@ cmd_fun(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	    argv = list_get_item(argspec);
 	    if (GET_TAG(argv) != SYMBOL) goto error;
 
-	    if ((cell_get_addr(argv->u.symbol.cell))[0] == '&') {
+	    if ((cell_get_addr(argv->u.symbol.cell))[0] == L'&') {
 		Toy_Type *s;
 		s = new_symbol(&((cell_get_addr(argv->u.symbol.cell))[1]));
 		SET_LAZY(s);
@@ -409,7 +409,7 @@ cmd_fun(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	    list_append(l, argv);
 
 	} else {
-	    if ((cell_get_addr(argv->u.symbol.cell))[0] == '&') {
+	    if ((cell_get_addr(argv->u.symbol.cell))[0] == L'&') {
 		Toy_Type *s;
 		s = new_symbol(&((cell_get_addr(argv->u.symbol.cell))[1]));
 		SET_LAZY(s);
@@ -948,7 +948,7 @@ cmd_time(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     int count = 1, i;
     double min = DBL_MAX, max = 0.0, avg = 0.0, sum = 0.0;
 
-    buff = GC_MALLOC(256);
+    buff = GC_MALLOC(256*sizeof(wchar_t));
     ALLOC_SAFE(buff);
 
     if (arglen > 1) goto error;
@@ -2126,6 +2126,8 @@ cmd_exit(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	if (GET_TAG(code) != INTEGER) goto error;
 	exit(mpz_get_si(code->u.biginteger));
     }
+    fflush(stdout);
+    fflush(stderr);
     exit(0);
 
 error:

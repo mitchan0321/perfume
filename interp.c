@@ -257,15 +257,19 @@ interp_setup(Toy_Interp* interp, int argc, char **argv, char **envp) {
     /* load initial setup file "setup.prfm" */
     setupl = new_list(new_symbol(L"load"));
     list_append(setupl, new_string_str(SETUP_FILE));
-    any = toy_eval_script(interp, script_apply_trace_info(new_script(new_list(new_statement(setupl, 0))), trace_info));
+    any = toy_eval_script(interp,
+			  script_apply_trace_info(new_script(new_list(new_statement(setupl, 0))),
+						  trace_info));
     if (GET_TAG(any) == EXCEPTION) {
 	setupl = new_list(new_symbol(L"load"));
 	list_append(setupl, new_string_str(SETUP_FILE2));
-	any = toy_eval_script(interp, script_apply_trace_info(new_script(new_list(new_statement(setupl, 0))), trace_info));
+	any = toy_eval_script(interp, 
+			      script_apply_trace_info(new_script(new_list(new_statement(setupl, 0))),
+						      trace_info));
 
 	if (GET_TAG(any) == EXCEPTION) {
 
-	    fwprintf(stderr, L"Exception occurd in setup script file at load '%s', %s.\n",
+	    fwprintf(stderr, L"Exception occurd in setup script file at load '%ls', %ls.\n",
 		     SETUP_FILE2, to_string(any));
 	}
     }
@@ -512,7 +516,7 @@ get_stack_trace(Toy_Interp *interp, Cell *stack) {
     ALLOC_SAFE(buff);
 
     if (interp->trace_info) {
-	swprintf(buff, 256, L"%s:%d: %s in %s::%s\n",
+	swprintf(buff, 256, L"%ls:%d: %ls in %ls::%ls\n",
 		 get_script_path(interp, interp->func_stack[interp->cur_func_stack]->script_id),
 		 interp->trace_info->line,
 		 to_print(interp->trace_info->statement),
@@ -525,7 +529,7 @@ get_stack_trace(Toy_Interp *interp, Cell *stack) {
     }
 
     for (i=interp->cur_func_stack; i>0; i--) {
-	swprintf(buff, 256, L"%s:%d: %s in %s::%s\n",
+	swprintf(buff, 256, L"%ls:%d: %ls in %ls::%ls\n",
 		 get_script_path(interp, interp->func_stack[i-1]->script_id),
 		 interp->func_stack[i]->trace_info->line,
 		 to_print(interp->func_stack[i]->trace_info->statement),

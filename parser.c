@@ -65,7 +65,7 @@ toy_parse_script(Bulk *src, wchar_t endc) {
 		return script;
 	    }
 	    if (EOF == c) {
-		swprintf(buff, 100, L"Imbalanced close char '%c' at line %d.",
+		swprintf(buff, 256, L"Imbalanced close char '%lc' at line %d.",
 			 endc, bulk_get_line(src));
 		msg = new_cell(buff);
 		return new_exception(TE_PARSECLOSE, cell_get_addr(msg), NULL);
@@ -165,7 +165,7 @@ toy_parse_statement(Bulk *src, wchar_t endc) {
 	    break;
 
 	case L')': case L'}': case L']':
-	    swprintf(buff, 256, L"Illegal close char '%c' at line %d.",
+	    swprintf(buff, 256, L"Illegal close char '%lc' at line %d.",
 		     c, bulk_get_line(src));
 	    msg = new_cell(buff);
 	    any = new_exception(TE_PARSEBADCHAR, cell_get_addr(msg), NULL);
@@ -270,7 +270,7 @@ parse_end:
     if (0 == endc) {
 	return newstatement;
     } else {
-	swprintf(buff, 100, L"Imbalanced close char '%c' at line %d.",
+	swprintf(buff, 256, L"Imbalanced close char '%lc' at line %d.",
 		 endc, bulk_get_line(src));
 	msg = new_cell(buff);
 	return new_exception(TE_PARSECLOSE, cell_get_addr(msg), NULL);
@@ -290,10 +290,7 @@ toy_parse_symbol(Bulk *src, wchar_t *endc) {
     Toy_Type *symbol;
     Cell *newcell;
     int c;
-    wchar_t *buff;
-
-    buff = GC_MALLOC(128*sizeof(wchar_t));
-    ALLOC_SAFE(buff);
+    wchar_t buff[2];
 
     newcell = new_cell(L"");
     if (NULL == newcell) goto assert;
@@ -367,7 +364,7 @@ assert:
     return NULL;
 
 parse_error:
-    swprintf(buff, 256, L"Imbalanced close string '%c' at line %d.",
+    swprintf(buff, 256, L"Imbalanced close string '%lc' at line %d.",
 	     endc, bulk_get_line(src));
     msg = new_cell(buff);
     return new_exception(TE_PARSESTRING, cell_get_addr(msg), NULL);
@@ -417,7 +414,7 @@ assert:
     return NULL;
 
 parse_error:
-    swprintf(buff, 256, L"Imbalanced close rquote '%c' at line %d.",
+    swprintf(buff, 256, L"Imbalanced close rquote '%lc' at line %d.",
 	     endc, bulk_get_line(src));
     msg = new_cell(buff);
     return new_exception(TE_PARSESTRING, cell_get_addr(msg), NULL);
@@ -460,7 +457,7 @@ toy_parse_list(Bulk *src, wchar_t endc) {
 	    break;
 
 	case L')': case L'}': case L']':
-	    swprintf(buff, 256, L"Illegal close list char '%c' at line %d.",
+	    swprintf(buff, 256, L"Illegal close list char '%lc' at line %d.",
 		     c, bulk_get_line(src));
 	    msg = new_cell(buff);
 	    any = new_exception(TE_PARSEBADCHAR, cell_get_addr(msg), NULL);
@@ -532,7 +529,7 @@ toy_parse_list(Bulk *src, wchar_t endc) {
     }
 
 parse_end:
-    swprintf(buff, 100, L"Imbalanced close list char '%c' at line %d.",
+    swprintf(buff, 256, L"Imbalanced close list char '%lc' at line %d.",
 	     endc, bulk_get_line(src));
     msg = new_cell(buff);
     return new_exception(TE_PARSECLOSE, cell_get_addr(msg), NULL);
@@ -748,34 +745,34 @@ int print_object(Toy_Type *obj, int indent) {
 	return 0;
     }
 
-    wprintf(L"type=%s: ", toy_get_type_str(obj));
+    wprintf(L"type=%ls: ", toy_get_type_str(obj));
 
     switch GET_TAG(obj) {
     case NIL:
-	wprintf(L"%s\n", to_string(obj));
+	wprintf(L"%ls\n", to_string(obj));
 	break;
 
     case SYMBOL:
 	ocell = obj->u.symbol.cell;
-	wprintf(L"%s\n", cell_get_addr(ocell));
+	wprintf(L"%ls\n", cell_get_addr(ocell));
 	break;
 
     case REF:
 	ocell = obj->u.ref.cell;
-	wprintf(L"%s\n", cell_get_addr(ocell));
+	wprintf(L"%ls\n", cell_get_addr(ocell));
 	break;
 
     case INTEGER:
-	wprintf(L"%s\n", to_string(obj));
+	wprintf(L"%ls\n", to_string(obj));
 	break;
 
     case REAL:
-	wprintf(L"%s\n", to_string(obj));
+	wprintf(L"%ls\n", to_string(obj));
 	break;
 
     case STRING:
 	ocell = obj->u.string;
-	wprintf(L"\"%s\"\n", cell_get_addr(ocell));
+	wprintf(L"\"%ls\"\n", cell_get_addr(ocell));
 	break;
 
     case STATEMENT:

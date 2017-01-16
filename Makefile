@@ -8,7 +8,6 @@ CC		= cc
 
 # for product build. (use BoehmGC)
 CFLAGS		= -Wall -O3 -c -g
-#CFLAGS		= -Wall -c -g
 INCLUDE		= -I/usr/local/include -I.
 LIB		= -L/usr/lib -L/lib -L/usr/local/lib -lm -lgc -lpthread -lonig -lpcl -lgmp
 

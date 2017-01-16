@@ -368,20 +368,6 @@ new_rquote(wchar_t *string) {
     return o;
 }
 
-#if 0
-Toy_Type*
-new_callcc() {
-    Toy_Type *o;
-    o = GC_MALLOC(sizeof(Toy_Type));
-    ALLOC_SAFE(o);
-    
-    o->tag = CALLCC;
-    o->u.callcc_buff = GC_MALLOC(sizeof(CallCC));
-    ALLOC_SAFE(o->u.callcc_buff);
-    return o;
-}
-#endif
-
 Toy_Type*
 new_bind(Toy_Type *bind_var) {
     Toy_Type *o;
@@ -616,9 +602,9 @@ to_string(Toy_Type *obj) {
 	ALLOC_SAFE(buff);
 
 	if ((obj->u.real > 1.0E+9) || (obj->u.real < 1.0E-2)) {
-	    swprintf(buff, 31, L"%.15E", obj->u.real);
+	    swprintf(buff, 32, L"%.15E", obj->u.real);
 	} else {
-	    swprintf(buff, 31, L"%.15f", obj->u.real);
+	    swprintf(buff, 32, L"%.15f", obj->u.real);
 	}
 
 	c = new_cell(buff);
@@ -908,9 +894,9 @@ to_print(Toy_Type *obj) {
 	buff = GC_MALLOC(32*sizeof(wchar_t));
 	ALLOC_SAFE(buff);
 	if ((obj->u.real > 1.0E+9) || (obj->u.real < 1.0E-2)) {
-	    swprintf(buff, 31, L"%.15E", obj->u.real);
+	    swprintf(buff, 32, L"%.15E", obj->u.real);
 	} else {
-	    swprintf(buff, 31, L"%.15f", obj->u.real);
+	    swprintf(buff, 32, L"%.15f", obj->u.real);
 	}
 	c = new_cell(buff);
 	return cell_get_addr(c);

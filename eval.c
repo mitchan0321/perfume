@@ -142,19 +142,21 @@ control_goto:
     paramno_hint = GET_PARAMNO(statement);
 
     if (interp->trace && (! interp->debug_in)) {
-	char *buff;
+	wchar_t *buff;
+	char *cbuff;
 	int sts;
 
-	buff = GC_MALLOC(512);
+	buff = GC_MALLOC(512*sizeof(wchar_t));
 	ALLOC_SAFE(buff);
-	snprintf(buff, 512, "%s:%d: %s\n",
-		 to_char(get_script_path(interp, interp->script_id)),
+	swprintf(buff, 512, L"%ls:%d: %ls\n",
+		 get_script_path(interp, interp->script_id),
 		 trace_info->line,
-		 to_char(to_string(statement)));
+		 to_string(statement));
 	buff[511] = 0;
-	sts = write(interp->trace_fd, buff, strlen(buff));
+	cbuff = to_char(buff);
+	sts = write(interp->trace_fd, cbuff, strlen(cbuff));
 	if (-1 == sts) {
-	    fprintf(stderr, "Error occured at trace write.\n");
+	    fwprintf(stderr, L"Error occured at trace write.\n");
 	}
     }
 

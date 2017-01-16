@@ -10,7 +10,7 @@
 #define COMMAND		"perfumesh"
 
 int main(int argc, char **argv, char **envp) {
-    char buff[BUFFSIZE];
+    char buff[BUFFSIZE*sizeof(char)];
     Toy_Type *any, *result;
     Toy_Type *script;
     Toy_Type *err;
@@ -33,7 +33,7 @@ int main(int argc, char **argv, char **envp) {
 	    }
 	} else {
 	    if (0 == bulk_load_file(b, argv[1])) {
-		fwprintf(stderr, L"file not open \"%s\".\n", to_wchar(argv[1]));
+		fwprintf(stderr, L"file not open \"%ls\".\n", to_wchar(argv[1]));
 		exit(1);
 	    }
 	}
@@ -45,7 +45,7 @@ int main(int argc, char **argv, char **envp) {
 	switch (GET_TAG(any)) {
 	case EXCEPTION:
 	    err = any;
-	    fwprintf(stderr, L"parse error: %s\n",
+	    fwprintf(stderr, L"parse error: %ls\n",
 		     to_string(list_get_item(err->u.exception.msg_list)));
 	    exit(0);
 
@@ -57,12 +57,12 @@ int main(int argc, char **argv, char **envp) {
 		/* Do not print result at batch mode */
 
 	    } else {
-		fwprintf(stdout, L"EXCEPTION: %s\n", to_string(result));
+		fwprintf(stdout, L"EXCEPTION: %ls\n", to_string(result));
 	    }
 	    exit(0);
 
 	default:
-	    fwprintf(stderr, L"parse error: type=%s\n", toy_get_type_str(any));
+	    fwprintf(stderr, L"parse error: type=%ls\n", toy_get_type_str(any));
 	    exit(1);
 	}
     }
@@ -70,14 +70,14 @@ int main(int argc, char **argv, char **envp) {
     /* interpriter mode */
     while (! feof(stdin)) {
     next_loop:
-	fputs("> ", stderr);
+	fputws(L"> ", stderr);
 	if (NULL == fgets(buff, BUFFSIZE, stdin)) break;
 	buff[BUFFSIZE-1] = 0;
 
 	if (buff[0] == '!') {
 	    buff[strlen(buff)-1] = 0;
 	    if (0 == bulk_load_file(b, &buff[1])) {
-		fwprintf(stderr, L"file not open: %s\n", to_wchar(&buff[1]));
+		fwprintf(stderr, L"file not open: %ls\n", to_wchar(&buff[1]));
 		continue;
 	    }
 	} else {
@@ -92,14 +92,14 @@ int main(int argc, char **argv, char **envp) {
 	    switch (GET_TAG(any)) {
 	    case EXCEPTION:
 		err = any;
-		fwprintf(stderr, L"parse error: %s\n",
+		fwprintf(stderr, L"parse error: %ls\n",
 			 to_string(list_get_item(err->u.exception.msg_list)));
 		if (cell_eq_str(err->u.exception.code, TE_PARSEBADCHAR) == 0) break;
 		if (buff[0] == '!') break;
 
 		c = new_cell(to_wchar(buff));
 		while (1) {
-		    fputs("=> ", stderr);
+		    fputws(L"=> ", stderr);
 		    if (NULL == fgets(buff, BUFFSIZE, stdin)) goto exit_loop;
 
 		    buff[BUFFSIZE-1] = 0;
@@ -111,7 +111,7 @@ int main(int argc, char **argv, char **envp) {
 		    if (GET_TAG(any) == EXCEPTION) {
 			err = any;
 			if (cell_eq_str(err->u.exception.code, TE_PARSEBADCHAR) == 0) {
-			    fwprintf(stderr, L"parse error: %s\n",
+			    fwprintf(stderr, L"parse error: %ls\n",
 				     to_string(list_get_item(err->u.exception.msg_list)));
 			    goto next_loop;
 			}
@@ -126,20 +126,20 @@ int main(int argc, char **argv, char **envp) {
 
 		if (GET_TAG(result) != EXCEPTION) {
 		    wchar_t *p;
-		    fwprintf(stdout, L"result[%s]=> ", toy_get_type_str(result));
+		    fwprintf(stdout, L"result[%ls]=> ", toy_get_type_str(result));
 		    p = to_print(result);
 		    if (wcslen(p) > 512) {
 			fwprintf(stdout, L"%-.512s ...\n", p);
 		    } else {
-			fwprintf(stdout, L"%s\n", p);
+			fwprintf(stdout, L"%ls\n", p);
 		    }
 		} else {
-		    fwprintf(stdout, L"EXCEPTION: %s\n", to_string(result));
+		    fwprintf(stdout, L"EXCEPTION: %ls\n", to_string(result));
 		}
 		break;
 
 	    default:
-		fwprintf(stderr, L"parse error: type=%s\n", toy_get_type_str(any));
+		fwprintf(stderr, L"parse error: type=%ls\n", toy_get_type_str(any));
 		
 	    }
 	}
