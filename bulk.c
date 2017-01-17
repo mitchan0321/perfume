@@ -90,11 +90,11 @@ bulk_set_string(Bulk *bulk, const wchar_t *str) {
     if (NULL == str) return 0;
 
     len = wcslen(str);
-    bulk->data = GC_MALLOC_ATOMIC((len+1)*sizeof(wchar_t));
+    bulk->data = GC_MALLOC_ATOMIC((len)*sizeof(wchar_t));
     ALLOC_SAFE(bulk->data);
 
     bulk->length = len;
-    bulk->allocsize = (len+1)*sizeof(wchar_t);
+    bulk->allocsize = (len)*sizeof(wchar_t);
     bulk->pos = 0;
     bulk->line = 1;
 

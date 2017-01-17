@@ -71,6 +71,7 @@ int main(int argc, char **argv, char **envp) {
     while (! feof(stdin)) {
     next_loop:
 	fputws(L"> ", stderr);
+	fflush(stderr);
 	if (NULL == fgets(buff, BUFFSIZE, stdin)) break;
 	buff[BUFFSIZE-1] = 0;
 
@@ -100,6 +101,7 @@ int main(int argc, char **argv, char **envp) {
 		c = new_cell(to_wchar(buff));
 		while (1) {
 		    fputws(L"=> ", stderr);
+		    fflush(stderr);
 		    if (NULL == fgets(buff, BUFFSIZE, stdin)) goto exit_loop;
 
 		    buff[BUFFSIZE-1] = 0;
@@ -129,7 +131,7 @@ int main(int argc, char **argv, char **envp) {
 		    fwprintf(stdout, L"result[%ls]=> ", toy_get_type_str(result));
 		    p = to_print(result);
 		    if (wcslen(p) > 512) {
-			fwprintf(stdout, L"%-.512s ...\n", p);
+			fwprintf(stdout, L"%-.512ls ...\n", p);
 		    } else {
 			fwprintf(stdout, L"%ls\n", p);
 		    }

@@ -44,6 +44,7 @@ toy_parse_script(Bulk *src, wchar_t endc) {
     int c;
     wchar_t *buff;
     Cell *msg;
+    int list_is_null = 1;
 
     buff = GC_MALLOC(256*sizeof(wchar_t));
     ALLOC_SAFE(buff);
@@ -54,10 +55,18 @@ toy_parse_script(Bulk *src, wchar_t endc) {
     l = new_list(NULL);
     script->u.statement_list = l;
 
-    while (EOF != bulk_is_eof(src)) {
-	c = bulk_getchar(src);
+    c = bulk_getchar(src);
+    if ((c == EOF) && (endc != 0)) {
+	swprintf(buff, 256, L"Imbalanced close char '%lc' at line %d.",
+		 endc, bulk_get_line(src));
+	msg = new_cell(buff);
+	return new_exception(TE_PARSECLOSE, cell_get_addr(msg), NULL);
+    }
+
+//    while (EOF != bulk_is_eof(src)) {
+    while (EOF != c) {
 	if (0 == endc) {
-	    if ((EOF == c) || (endc == c)) {
+	    if (EOF == c) {
 		return script;
 	    }
 	} else {
@@ -97,10 +106,21 @@ toy_parse_script(Bulk *src, wchar_t endc) {
 
 	if (list_length(statement->u.statement_list) > 0) {
 	    l = list_append(l, statement);
+	    list_is_null = 0;
 	}
+
+	c = bulk_getchar(src);
     }
 
-    return script; 
+    if (endc == 0) return script;
+    if (list_is_null) return script;
+
+    swprintf(buff, 256, L"Imbalanced close char '%lc' at line %d.",
+	     endc, bulk_get_line(src));
+    msg = new_cell(buff);
+    return new_exception(TE_PARSECLOSE, cell_get_addr(msg), NULL);
+
+//    return script; 
 
 parse_error:
     return statement;
