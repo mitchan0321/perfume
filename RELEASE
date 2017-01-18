@@ -1,3 +1,4 @@
+2017/01/18	PRFM_20170118		1.0.0_PRE_2
 2017/01/16	PRFM_20170116		1.0.0_PRE_1
 2017/01/12	PRFM_20170112		0.9.3
 2016/03/12	PRFM_20160312		0.9.2
@@ -924,5 +925,13 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 2017/01/13:
 	Major change.
 		Change Internal character code, char -> wchar_t.
+
+2017/01/16:
+	parse.c, bulk.c
+		Fix parser bug.
+
+2017/01/18:
+	methods.c
+		Add String::uexport and String::uimport! methods.
 
 #eof

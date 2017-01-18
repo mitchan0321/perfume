@@ -2121,6 +2121,7 @@ error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
+
 Toy_Type*
 mth_string_len(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *s;
@@ -3067,6 +3068,64 @@ error:
 error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
 }
+
+Toy_Type*
+mth_string_uexport(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *l;
+    Toy_Type *result, *r;
+    int i;
+    wchar_t *p;
+
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (arglen != 0) goto error;
+
+    l = SELF(interp);
+    if (GET_TAG(l) != STRING) goto error2;
+    
+    result = r = new_list(NULL);
+    
+    p = cell_get_addr(l->u.string);
+    for (i=0; i<cell_get_length(l->u.string); i++) {
+	r = list_append(r, new_integer_si(p[i]));
+    }
+
+    return result;
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'uexport', syntax: String uexport", interp);
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
+mth_string_uimport(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *l, *result, *i;
+
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (arglen != 1) goto error;
+
+    result = SELF(interp);
+    if (GET_TAG(result) != STRING) goto error2;
+
+    l = list_get_item(posargs);
+    if (GET_TAG(l) != LIST) goto error;
+    
+    while (! IS_LIST_NULL(l)) {
+	i = list_get_item(l);
+	if (GET_TAG(i) != INTEGER) goto error;
+	cell_add_char(result->u.string, mpz_get_si(i->u.biginteger));
+	l = list_next(l);
+    }
+
+    return result;
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'uimport!', syntax: String uimport! (unicode ...)", interp);
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+
 
 Toy_Type*
 mth_block_eval(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
@@ -4437,6 +4496,8 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, L"String", L"clean", mth_string_clean, NULL);
     toy_add_method(interp, L"String", L"upper", mth_string_upper, NULL);
     toy_add_method(interp, L"String", L"lower", mth_string_lower, NULL);
+    toy_add_method(interp, L"String", L"uexport", mth_string_uexport, NULL);
+    toy_add_method(interp, L"String", L"uimport!", mth_string_uimport, NULL);
 
     toy_add_method(interp, L"File", L"init", mth_file_init, NULL);
     toy_add_method(interp, L"File", L"open", mth_file_open, NULL);
