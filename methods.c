@@ -3335,6 +3335,7 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     Cell *cbuff;
     int c;
     int flag_nonewline=0, flag_nocontrol=0;
+    encoder_error_info enc_error_info;
 
     if (arglen > 0) goto error;
 
@@ -3384,7 +3385,11 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 	    if (cell_get_length(cbuff) == 0) {
 		return const_Nil;
 	    } else {
-		return new_string_cell(cbuff);
+		Cell *c = decode_raw_to_unicode(cbuff, f->input_encoding, &enc_error_info);
+		if (NULL == c) {
+		    return new_exception(TE_BADENCODEBYTE, enc_error_info.message, interp);
+		}
+		return new_string_cell(c);
 	    }
 	}
 	
@@ -3405,7 +3410,11 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 	}
 	
 	if ('\n' == c) {
-	    return new_string_cell(cbuff);
+	    Cell *c = decode_raw_to_unicode(cbuff, f->input_encoding, &enc_error_info);
+	    if (NULL == c) {
+		return new_exception(TE_BADENCODEBYTE, enc_error_info.message, interp);
+	    }
+	    return new_string_cell(c);
 	}
     }
 
@@ -3422,6 +3431,9 @@ mth_file_puts(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     Toy_Type *container;
     int c;
     int flag_nonewline = 0;
+    wchar_t *p;
+    Cell *unicode, *raw;
+    encoder_error_info enc_error_info;
 
     if (arglen == 0) goto error;
 
@@ -3449,9 +3461,12 @@ mth_file_puts(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     }
 
     while (posargs) {
-	wchar_t *p;
-
-	p = to_string_call(interp, list_get_item(posargs));
+	unicode = new_cell(to_string_call(interp, list_get_item(posargs)));
+	raw = encode_unicode_to_raw(unicode, f->output_encoding, &enc_error_info);
+	if (NULL == raw) {
+	    return new_exception(TE_BADENCODEBYTE, enc_error_info.message, interp);
+	}
+	p = cell_get_addr(raw);
 	c = fputs(to_char(p), f->fd);
 	if (flag_nonewline == 0) {
 	    c = fputs("\n", f->fd);

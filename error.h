@@ -42,5 +42,6 @@
 #define TE_NOSLOT		L"ErrNoStackSlot"
 #define TE_IOAGAIN		L"ErrIOAgain"
 #define TE_NOENCODING		L"ErrNoEncoding"
+#define TE_BADENCODEBYTE	L"ErrBadEncodeByte"
 
 #endif /* __ERROR__ */
