@@ -3855,6 +3855,109 @@ error2:
 }
 
 Toy_Type*
+mth_file_setencoding(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Hash *self;
+    Toy_Type *container;
+    Toy_File *f;
+    Toy_Type *enc;
+    int enc_index;
+
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    self = SELF_HASH(interp);
+    container = hash_get_t(self, const_Holder);
+    if (NULL == container) goto error2;
+    f = container->u.container;
+
+    enc = list_get_item(posargs);
+    if (GET_TAG(enc) != SYMBOL) goto error;
+    
+    enc_index = get_encoding_index(cell_get_addr(enc->u.symbol.cell));
+    if (enc_index == -1) {
+	return new_exception(TE_NOENCODING, L"Encoding not implimentation", interp);
+    }
+
+    f->input_encoding = enc_index;
+    f->output_encoding = enc_index;
+    
+    return enc;
+    
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'set-encoding', syntax: File set-encoding encoding-name", interp);
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
+mth_file_setinputencoding(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Hash *self;
+    Toy_Type *container;
+    Toy_File *f;
+    Toy_Type *enc;
+    int enc_index;
+
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    self = SELF_HASH(interp);
+    container = hash_get_t(self, const_Holder);
+    if (NULL == container) goto error2;
+    f = container->u.container;
+
+    enc = list_get_item(posargs);
+    if (GET_TAG(enc) != SYMBOL) goto error;
+    
+    enc_index = get_encoding_index(cell_get_addr(enc->u.symbol.cell));
+    if (enc_index == -1) {
+	return new_exception(TE_NOENCODING, L"Encoding not implimentation", interp);
+    }
+
+    f->input_encoding = enc_index;
+    
+    return enc;
+    
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'set-input-encoding', syntax: File set-input-encoding encoding-name", interp);
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
+mth_file_setoutputencoding(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Hash *self;
+    Toy_Type *container;
+    Toy_File *f;
+    Toy_Type *enc;
+    int enc_index;
+
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    self = SELF_HASH(interp);
+    container = hash_get_t(self, const_Holder);
+    if (NULL == container) goto error2;
+    f = container->u.container;
+
+    enc = list_get_item(posargs);
+    if (GET_TAG(enc) != SYMBOL) goto error;
+    
+    enc_index = get_encoding_index(cell_get_addr(enc->u.symbol.cell));
+    if (enc_index == -1) {
+	return new_exception(TE_NOENCODING, L"Encoding not implimentation", interp);
+    }
+
+    f->output_encoding = enc_index;
+    
+    return enc;
+    
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'set-output-encoding', syntax: File set-output-encoding encoding-name", interp);
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
 mth_dict_set(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *o, *val;
     wchar_t *key;
@@ -4521,6 +4624,9 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, L"File", L"clear", mth_file_clear, NULL);
     toy_add_method(interp, L"File", L"set-nobuffer", mth_file_setnobuffer, NULL);
     toy_add_method(interp, L"File", L"set-noblock", mth_file_setnoblock, NULL);
+    toy_add_method(interp, L"File", L"set-encoding", mth_file_setencoding, NULL);
+    toy_add_method(interp, L"File", L"set-input-encoding", mth_file_setinputencoding, NULL);
+    toy_add_method(interp, L"File", L"set-output-encoding", mth_file_setoutputencoding, NULL);
 
     toy_add_method(interp, L"Block", L"eval", mth_block_eval, NULL);
 
