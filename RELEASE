@@ -934,4 +934,13 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 	methods.c
 		Add String::uexport and String::uimport! methods.
 
+2017/02/21:
+	add file
+		encoding.[ch]
+	methods.c
+		Add File::set-encoding, File::set-input-encoding and File::set-output-encoding.
+	error.h
+		Add error ErrNoEncoding.
+
+
 #eof
