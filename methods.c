@@ -3205,9 +3205,26 @@ new_file() {
 Toy_Type*
 mth_file_init(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Hash *self;
+    Toy_File *f;
+    Toy_Type *enc;
+    int iencoder;
 
     self = SELF_HASH(interp);
-    hash_set_t(self, const_Holder, new_container(new_file()));
+    f = new_file();
+    enc = hash_get_t(interp->globals, const_DEFAULT_FILE_ENCODING);
+    if (enc) {
+	if (GET_TAG(enc) == SYMBOL) {
+	    iencoder = get_encoding_index(cell_get_addr(enc->u.symbol.cell));
+	    if (-1 == iencoder) {
+		return new_exception(TE_BADENCODER, L"Bad encoder specified.", interp);
+	    }
+	    f->input_encoding = iencoder;
+	    f->output_encoding = iencoder;
+	} else {
+	    return new_exception(TE_BADENCODER, L"Bad encoder specified, need symbol.", interp);
+	}
+    }
+    hash_set_t(self, const_Holder, new_container(f));
 
     if (arglen > 0) {
 	Toy_Type *cmd, *l;
