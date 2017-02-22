@@ -2484,9 +2484,9 @@ mth_string_match(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
 	    );
 
 	if (r != ONIG_NORMAL) {
-	    char s[ONIG_MAX_ERROR_MESSAGE_LEN];
+	    OnigUChar s[ONIG_MAX_ERROR_MESSAGE_LEN];
 	    onig_error_code_to_str(s, r, &einfo);
-	    return new_exception(TE_REGEX, to_wchar(s), interp);
+	    return new_exception(TE_REGEX, to_wchar((char*)s), interp);
 	}
 
 	/* and regex object set to cache */
@@ -2538,9 +2538,9 @@ next_search:
 	    result = const_Nil;
 	}
     } else {
-	char s[ONIG_MAX_ERROR_MESSAGE_LEN];
+	OnigUChar s[ONIG_MAX_ERROR_MESSAGE_LEN];
 	onig_error_code_to_str(s, r, &einfo);
-	result = new_exception(TE_REGEX, to_wchar(s), interp);
+	result = new_exception(TE_REGEX, to_wchar((char*)s), interp);
     }
 
     onig_region_free(region, 1);
