@@ -43,5 +43,6 @@
 #define TE_IOAGAIN		L"ErrIOAgain"
 #define TE_NOENCODING		L"ErrNoEncoding"
 #define TE_BADENCODEBYTE	L"ErrBadEncodeByte"
+#define TE_BADENCODER		L"ErrBadEncoder"
 
 #endif /* __ERROR__ */
