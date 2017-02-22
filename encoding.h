@@ -6,18 +6,21 @@
 #include <wchar.h>
 #include "cell.h"
 
-#define ENCODING_NAME_MAX	(1) 	// now ready encodings are RAW and UTF-8.
-					// (index range is 0 to ENCODING_NAME_MAX)
+#define ENCODING_NAME_MAX		(1) 	// now ready encodings are RAW and UTF-8.
+						// (index range is 0 to ENCODING_NAME_MAX)
 
 /* encoding index */
-#define NENCODE_RAW		(0)
-#define NENCODE_UTF8		(1)
-#define NENCODE_EUCJP		(2)	// not yet
-#define NENCODE_SJIS		(3)	// not yet
-#define NENCODE_ISO2022JP	(4)	// not yet
+#define NENCODE_RAW			(0)
+#define NENCODE_UTF8			(1)
+#define NENCODE_EUCJP			(2)	// not yet
+#define NENCODE_SJIS			(3)	// not yet
+#define NENCODE_ISO2022JP		(4)	// not yet
 
 /* encoder/decoder error code */
-#define EENCODE_BADENCODING	(1)
+#define EENCODE_BADENCODING		(1)
+#define EENCODE_LESSLENGTH		(2)
+#define EENCODE_BAD2NDBYTE		(3)
+#define EENCODE_OUTOFRANGEUNICODE	(4)
 
 typedef struct _encoder_error_info {
     int errorno;
