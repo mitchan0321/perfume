@@ -234,9 +234,11 @@ interp_setup(Toy_Interp* interp, int argc, char **argv, char **envp) {
 	l = list_append(l, new_string_str(to_wchar(argv[i])));
     }
     gdict = interp->globals;
-    hash_set(gdict, L"ARGV", argl);
-    hash_set(gdict, L"LIB_PATH", new_list(new_string_str(LIB_PATH)));
-
+    hash_set_t(gdict, const_ARGV, argl);
+    hash_set_t(gdict, const_LIB_PATH, new_list(new_string_str(LIB_PATH)));
+    hash_set_t(gdict, const_DEFAULT_FILE_ENCODING, new_symbol(DEFAULT_FILE_ENCODING));
+    hash_set_t(gdict, const_DEFAULT_SCRIPT_ENCODING, new_symbol(DEFAULT_SCRIPT_ENCODING));
+    
     /* set ENV */
     l = envl = new_list(new_symbol(L"dict"));
     env = toy_call(interp, envl);
