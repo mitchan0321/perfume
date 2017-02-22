@@ -7,9 +7,9 @@
 #include <unistd.h>
 #include <string.h>
 #include "bulk.h"
+#include "cell.h"
+#include "encoding.h"
 #include "toy.h"
-
-static int read_size(int fd, char* buff, int size);
 
 Bulk*
 new_bulk() {
@@ -25,11 +25,13 @@ new_bulk() {
 }
 
 int
-bulk_load_file(Bulk *bulk, const char *file) {
+bulk_load_file(Bulk *bulk, const char *file, int encoder) {
     int fd;
     struct stat statbuff;
     int size;
     char *readbuff;
+    encoder_error_info error_info;
+    Cell *encbuff;
 
     if (NULL == bulk) return 0;
 
@@ -47,7 +49,11 @@ bulk_load_file(Bulk *bulk, const char *file) {
     ALLOC_SAFE(readbuff);
 
     if (-1 == read_size(fd, readbuff, size)) goto error;
-    bulk->data = to_wchar(readbuff);
+    readbuff[size] = 0;
+    encbuff = decode_raw_to_unicode(new_cell(to_wchar(readbuff)), encoder, &error_info);
+    if (NULL == encbuff) goto error;
+    bulk->data = cell_get_addr(encbuff);
+    bulk->length = cell_get_length(encbuff);
 
     close(fd);
     return 1;
@@ -61,25 +67,6 @@ error:
     bulk->data = 0;
 
     return 0;
-}
-
-static int
-read_size(int fd, char* buff, int size) {
-    int sts;
-    int pos = 0;
-    int remain = size;
-
-    do {
-	sts = read(fd, &buff[pos], remain);
-	if (-1 == sts) return -1;
-	if ( 0 == sts) return -1;
-
-	pos += sts;
-	remain -= sts;
-
-    } while (remain > 0);
-
-    return 1;
 }
 
 int
