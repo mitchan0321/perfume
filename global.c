@@ -55,6 +55,10 @@ void def_global() {
     const_atscriptid = new_symbol(L"@script-id");
     const_CWD = new_symbol(L"CWD");
     const_ENV = new_symbol(L"ENV");
+    const_ARGV = new_symbol(L"ARGV");
+    const_LIB_PATH = new_symbol(L"LIB_PATH");
+    const_DEFAULT_FILE_ENCODING = new_symbol(L"DEFAULT_FILE_ENCODING");
+    const_DEFAULT_SCRIPT_ENCODING = new_symbol(L"DEFAULT_SCRIPT_ENCODING");
     const_up = new_symbol(L"up:");
     const_VERSION = new_symbol(L"VERSION");
     const_nocase = new_symbol(L"nocase:");
