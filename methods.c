@@ -9,7 +9,7 @@
 #include <setjmp.h>
 #include <ctype.h>
 #include <sys/select.h>
-#include <oniguruma.h>
+#include <onigmo.h>
 #include <math.h>
 #include "toy.h"
 #include "interp.h"

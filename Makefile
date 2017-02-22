@@ -9,17 +9,17 @@ CC		= cc
 # for product build. (use BoehmGC)
 CFLAGS		= -Wall -O3 -c -g
 INCLUDE		= -I/usr/local/include -I.
-LIB		= -L/usr/lib -L/lib -L/usr/local/lib -lm -lgc -lpthread -lonig -lpcl -lgmp
+LIB		= -L/usr/lib -L/lib -L/usr/local/lib -lm -lgc -lpthread -lonigmo -lpcl -lgmp
 
 # for memory debuging build.
 #CFLAGS		= -c -g -DPROF
 #INCLUDE		= -I/usr/local/include -I.
-#LIB		= -L/usr/local/lib -lm -lonig -lpcl -lgmp
+#LIB		= -L/usr/local/lib -lm -lonigmo -lpcl -lgmp
 
 # for profiling build.
 #CFLAGS		= -c -g -pg -DPROF
 #INCLUDE		= -I/usr/local/include -I.
-#LIB		= -pg -L/usr/local/lib -lonig -lpcl -lgmp
+#LIB		= -pg -L/usr/local/lib -lonigmo -lpcl -lgmp
 
 ###
 ###   DONE
