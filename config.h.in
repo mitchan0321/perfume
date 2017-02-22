@@ -10,6 +10,9 @@
 #define LIB_PATH		L"@PREFIX@/lib/perfume/lib"
 #define MAXPATHLEN		4096
 
+#define DEFAULT_FILE_ENCODING	L"UTF-8"
+#define DEFAULT_SCRIPT_ENCODING	L"UTF-8"
+
 /* for main co-routine stack size */
 #define STACKSIZE		(1024)
 

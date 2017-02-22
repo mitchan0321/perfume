@@ -27,11 +27,11 @@ LIB		= -L/usr/lib -L/lib -L/usr/local/lib -lm -lgc -lpthread -lonigmo -lpcl -lgm
 ############################################################################
 
 HDRS		= bulk.h cell.h array.h error.h hash.h interp.h parser.h \
-		  toy.h types.h config.h global.h cstack.h util.h
+		  toy.h types.h config.h global.h cstack.h util.h encoding.h
 SRCS		= bulk.c cell.c	array.c hash.c list.c parser.c types.c \
-		  eval.c interp.c commands.c methods.c global.c cstack.c util.c
+		  eval.c interp.c commands.c methods.c global.c cstack.c util.c encoding.c
 OBJS		= bulk.o cell.o	array.o hash.o list.o parser.o types.o \
-		  eval.o interp.o commands.o methods.o global.o cstack.o util.o
+		  eval.o interp.o commands.o methods.o global.o cstack.o util.o encoding.o
 
 all:		perfumesh
 
@@ -89,6 +89,9 @@ cstack.o:	cstack.c $(HDRS)
 
 util.o:		util.c $(HDRS)
 	$(CC) $(CFLAGS) $(INCLUDE) util.c -o util.o
+
+encoding.o:	encoding.c $(HDRS)
+	$(CC) $(CFLAGS) $(INCLUDE) encoding.c -o encoding.o
 
 config.h:	config.h.in
 	sed 	-e s%@PREFIX@%$(PREFIX)%g \

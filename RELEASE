@@ -1,3 +1,4 @@
+2017/02/22	PRFM_20170222		1.0.0_RC_1
 2017/01/18	PRFM_20170118		1.0.0_PRE_2
 2017/01/16	PRFM_20170116		1.0.0_PRE_1
 2017/01/12	PRFM_20170112		0.9.3
@@ -933,5 +934,29 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 2017/01/18:
 	methods.c
 		Add String::uexport and String::uimport! methods.
+
+2017/02/22:
+	add file
+		encoding.[ch]
+	methods.c
+		Add File::set-encoding, File::set-input-encoding and File::set-output-encoding.
+		Add File::init use DEFAULT_FILE_ENCODING.
+		Change String::=~ support for UNICODE (internal UTF-32LE code).
+	error.h
+		Add error ErrNoEncoding.
+	bulk.[ch]
+		Add unicode encoding at bulk_load_file.
+	util.[ch]
+		Move function read_size from bulk.c.
+	commands.c
+		Add unicode encoding at command 'load'.
+	config.h.in
+		Add global variable defaults, DEFAULT_FILE_ENCODING, DEFAULT_SCRIPT_ENCODING.
+	error.h
+		Add encoding errors.
+	global.[ch]
+		Add global variable defaults, DEFAULT_FILE_ENCODING, DEFAULT_SCRIPT_ENCODING.
+	perfumesh.c
+		Add specify unicode encoding 'RAW' at script loading.
 
 #eof

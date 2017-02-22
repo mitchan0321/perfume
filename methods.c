@@ -19,6 +19,7 @@
 #include "array.h"
 #include "cstack.h"
 #include "util.h"
+#include "encoding.h"
 
 Toy_Type* cmd_fun(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen);
 
@@ -2462,8 +2463,9 @@ mth_string_match(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
 	reg = (regex_t*)container->u.container;
     }
     
-    str = (unsigned char*)(to_char(cell_get_addr(self->u.string)));
-    pattern = (unsigned char*)(to_char(cell_get_addr(tpattern->u.rquote)));
+    /* convert *wchar_t to UTF32-LE char stream data pointer */
+    str = (unsigned char*)(cell_get_addr(self->u.string));
+    pattern = (unsigned char*)(cell_get_addr(tpattern->u.rquote));
 
     option = ONIG_OPTION_NONE;
     if (t_case) {
@@ -2474,9 +2476,9 @@ mth_string_match(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
 	/* no cache then create regex object */
 	r = onig_new(&reg,
 		     pattern,
-		     pattern + (cell_get_length(tpattern->u.rquote) * sizeof(char)),
+		     pattern + (cell_get_length(tpattern->u.rquote) * sizeof(wchar_t)),
 		     option,
-		     ONIG_ENCODING_UTF8,
+		     ONIG_ENCODING_UTF32_LE,
 		     (t_grep == NULL) ? ONIG_SYNTAX_DEFAULT : ONIG_SYNTAX_GREP,
 		     &einfo
 	    );
@@ -2493,7 +2495,7 @@ mth_string_match(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
 
     region = onig_region_new();
 
-    end = str + (cell_get_length(self->u.string) * sizeof(char));
+    end = str + (cell_get_length(self->u.string) * sizeof(wchar_t));
     start = str;
     range = end;
     offs = 0;
@@ -2514,13 +2516,11 @@ next_search:
 	    if (! ((region->beg[i] >= 0) && (region->end[i] >= 0))) continue;
 
 	    ll = l = new_list(NULL);
-	    l = list_append(l, new_integer_si(region->beg[i] + offs));
-	    l = list_append(l, new_integer_si(region->end[i] + offs));
+	    l = list_append(l, new_integer_si((region->beg[i] + offs)/sizeof(wchar_t)));
+	    l = list_append(l, new_integer_si((region->end[i] + offs)/sizeof(wchar_t)));
 	    l = list_append(l, new_string_cell(cell_sub(self->u.string,
-							region->beg[i] + offs,
-							region->end[i] + offs)));
-	    //l = list_append(l, new_integer(region->beg[i]));
-	    //l = list_append(l, new_integer(region->end[i]));
+							(region->beg[i] + offs)/sizeof(wchar_t),
+							(region->end[i] + offs)/sizeof(wchar_t))));
 	    n = region->end[i];
 	    if (n > max) max = n;
 	    resultl = list_append(resultl, ll);
@@ -2529,6 +2529,7 @@ next_search:
 	onig_region_free(region, 1);
 	region = onig_region_new();
 	str += max;
+
 	start += max;
 	if ((start < end) && (max > 0) && t_all) goto next_search;
 
@@ -3157,6 +3158,8 @@ typedef struct _toy_file {
     Toy_Type *path;
     Cell *r_pending;
     int noblock;
+    int input_encoding;
+    int output_encoding;
 } Toy_File;
 
 void
@@ -3202,9 +3205,26 @@ new_file() {
 Toy_Type*
 mth_file_init(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Hash *self;
+    Toy_File *f;
+    Toy_Type *enc;
+    int iencoder;
 
     self = SELF_HASH(interp);
-    hash_set_t(self, const_Holder, new_container(new_file()));
+    f = new_file();
+    enc = hash_get_t(interp->globals, const_DEFAULT_FILE_ENCODING);
+    if (enc) {
+	if (GET_TAG(enc) == SYMBOL) {
+	    iencoder = get_encoding_index(cell_get_addr(enc->u.symbol.cell));
+	    if (-1 == iencoder) {
+		return new_exception(TE_BADENCODER, L"Bad encoder specified.", interp);
+	    }
+	    f->input_encoding = iencoder;
+	    f->output_encoding = iencoder;
+	} else {
+	    return new_exception(TE_BADENCODER, L"Bad encoder specified, need symbol.", interp);
+	}
+    }
+    hash_set_t(self, const_Holder, new_container(f));
 
     if (arglen > 0) {
 	Toy_Type *cmd, *l;
@@ -3332,6 +3352,7 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     Cell *cbuff;
     int c;
     int flag_nonewline=0, flag_nocontrol=0;
+    encoder_error_info enc_error_info;
 
     if (arglen > 0) goto error;
 
@@ -3381,7 +3402,11 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 	    if (cell_get_length(cbuff) == 0) {
 		return const_Nil;
 	    } else {
-		return new_string_cell(cbuff);
+		Cell *c = decode_raw_to_unicode(cbuff, f->input_encoding, &enc_error_info);
+		if (NULL == c) {
+		    return new_exception(TE_BADENCODEBYTE, enc_error_info.message, interp);
+		}
+		return new_string_cell(c);
 	    }
 	}
 	
@@ -3402,7 +3427,11 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 	}
 	
 	if ('\n' == c) {
-	    return new_string_cell(cbuff);
+	    Cell *c = decode_raw_to_unicode(cbuff, f->input_encoding, &enc_error_info);
+	    if (NULL == c) {
+		return new_exception(TE_BADENCODEBYTE, enc_error_info.message, interp);
+	    }
+	    return new_string_cell(c);
 	}
     }
 
@@ -3419,6 +3448,9 @@ mth_file_puts(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     Toy_Type *container;
     int c;
     int flag_nonewline = 0;
+    wchar_t *p;
+    Cell *unicode, *raw;
+    encoder_error_info enc_error_info;
 
     if (arglen == 0) goto error;
 
@@ -3446,9 +3478,12 @@ mth_file_puts(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     }
 
     while (posargs) {
-	wchar_t *p;
-
-	p = to_string_call(interp, list_get_item(posargs));
+	unicode = new_cell(to_string_call(interp, list_get_item(posargs)));
+	raw = encode_unicode_to_raw(unicode, f->output_encoding, &enc_error_info);
+	if (NULL == raw) {
+	    return new_exception(TE_BADENCODEBYTE, enc_error_info.message, interp);
+	}
+	p = cell_get_addr(raw);
 	c = fputs(to_char(p), f->fd);
 	if (flag_nonewline == 0) {
 	    c = fputs("\n", f->fd);
@@ -3536,6 +3571,7 @@ mth_file_stat(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     Toy_File *f;
     Toy_Type *container;
     Toy_Type *l, *mode;
+    wchar_t *enc;
 
     if (arglen > 0) goto error;
     if (hash_get_length(nameargs) > 0) goto error;
@@ -3578,6 +3614,10 @@ mth_file_stat(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     }
     list_append(l, new_cons(new_symbol(L"newline"), f->newline ? const_T : const_Nil));
     list_append(l, new_cons(new_symbol(L"noblock"), f->noblock ? const_T : const_Nil));
+    enc = get_encoding_name(f->input_encoding);
+    list_append(l, new_cons(new_symbol(L"input-encoding"), new_symbol(enc?enc:L"(BAD ENCODING)")));
+    enc = get_encoding_name(f->output_encoding);
+    list_append(l, new_cons(new_symbol(L"output-encoding"), new_symbol(enc?enc:L"(BAD ENCODING)")));
 
     return l;
 
@@ -3842,6 +3882,109 @@ mth_file_setnoblock(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int a
     
 error:
     return new_exception(TE_SYNTAX, L"Syntax error at 'set-noblock', syntax: File set-noblock t | nil", interp);
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
+mth_file_setencoding(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Hash *self;
+    Toy_Type *container;
+    Toy_File *f;
+    Toy_Type *enc;
+    int enc_index;
+
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    self = SELF_HASH(interp);
+    container = hash_get_t(self, const_Holder);
+    if (NULL == container) goto error2;
+    f = container->u.container;
+
+    enc = list_get_item(posargs);
+    if (GET_TAG(enc) != SYMBOL) goto error;
+    
+    enc_index = get_encoding_index(cell_get_addr(enc->u.symbol.cell));
+    if (enc_index == -1) {
+	return new_exception(TE_NOENCODING, L"Encoding not implimentation", interp);
+    }
+
+    f->input_encoding = enc_index;
+    f->output_encoding = enc_index;
+    
+    return enc;
+    
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'set-encoding', syntax: File set-encoding encoding-name", interp);
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
+mth_file_setinputencoding(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Hash *self;
+    Toy_Type *container;
+    Toy_File *f;
+    Toy_Type *enc;
+    int enc_index;
+
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    self = SELF_HASH(interp);
+    container = hash_get_t(self, const_Holder);
+    if (NULL == container) goto error2;
+    f = container->u.container;
+
+    enc = list_get_item(posargs);
+    if (GET_TAG(enc) != SYMBOL) goto error;
+    
+    enc_index = get_encoding_index(cell_get_addr(enc->u.symbol.cell));
+    if (enc_index == -1) {
+	return new_exception(TE_NOENCODING, L"Encoding not implimentation", interp);
+    }
+
+    f->input_encoding = enc_index;
+    
+    return enc;
+    
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'set-input-encoding', syntax: File set-input-encoding encoding-name", interp);
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
+mth_file_setoutputencoding(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Hash *self;
+    Toy_Type *container;
+    Toy_File *f;
+    Toy_Type *enc;
+    int enc_index;
+
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    self = SELF_HASH(interp);
+    container = hash_get_t(self, const_Holder);
+    if (NULL == container) goto error2;
+    f = container->u.container;
+
+    enc = list_get_item(posargs);
+    if (GET_TAG(enc) != SYMBOL) goto error;
+    
+    enc_index = get_encoding_index(cell_get_addr(enc->u.symbol.cell));
+    if (enc_index == -1) {
+	return new_exception(TE_NOENCODING, L"Encoding not implimentation", interp);
+    }
+
+    f->output_encoding = enc_index;
+    
+    return enc;
+    
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'set-output-encoding', syntax: File set-output-encoding encoding-name", interp);
 error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
 }
@@ -4513,6 +4656,9 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, L"File", L"clear", mth_file_clear, NULL);
     toy_add_method(interp, L"File", L"set-nobuffer", mth_file_setnobuffer, NULL);
     toy_add_method(interp, L"File", L"set-noblock", mth_file_setnoblock, NULL);
+    toy_add_method(interp, L"File", L"set-encoding", mth_file_setencoding, NULL);
+    toy_add_method(interp, L"File", L"set-input-encoding", mth_file_setinputencoding, NULL);
+    toy_add_method(interp, L"File", L"set-output-encoding", mth_file_setoutputencoding, NULL);
 
     toy_add_method(interp, L"Block", L"eval", mth_block_eval, NULL);
 

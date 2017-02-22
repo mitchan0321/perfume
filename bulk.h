@@ -19,7 +19,7 @@ typedef struct _bulk {
 } Bulk;
 
 Bulk*	new_bulk();
-int	bulk_load_file(Bulk *bulk, const char *file);
+int	bulk_load_file(Bulk *bulk, const char *file, int encoder);
 int	bulk_set_string(Bulk *bulk, const wchar_t *str);
 int	bulk_rewind(Bulk *bulk);
 int	bulk_getchar(Bulk *bulk);

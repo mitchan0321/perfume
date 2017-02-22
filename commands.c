@@ -32,6 +32,7 @@
 #include "bulk.h"
 #include "cstack.h"
 #include "util.h"
+#include "encoding.h"
 
 static void println(Toy_Interp *interp, wchar_t *msg);
 
@@ -1551,9 +1552,24 @@ cmd_load(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *tid, *nid;
     int id;
     Toy_Script *sscript;
+    Toy_Type *enc;
+    int iencoder;
 
     if (hash_get_length(nameargs) > 0) goto error;
     if (arglen != 1) goto error;
+
+    iencoder = NENCODE_RAW;
+    enc = hash_get_t(interp->globals, const_DEFAULT_SCRIPT_ENCODING);
+    if (enc) {
+	if (GET_TAG(enc) == SYMBOL) {
+	    iencoder = get_encoding_index(cell_get_addr(enc->u.symbol.cell));
+	    if (-1 == iencoder) {
+		return new_exception(TE_BADENCODER, L"Bad encoder specified.", interp);
+	    }
+	} else {
+	    return new_exception(TE_BADENCODER, L"Bad encoder specified, need symbol.", interp);
+	}
+    }
 
     tpath = list_get_item(posargs);
     if (GET_TAG(tpath) != STRING) goto error;
@@ -1562,7 +1578,7 @@ cmd_load(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     src = new_bulk();
     if (NULL == src) return const_Nil;
 
-    if (0 == bulk_load_file(src, path)) {
+    if (0 == bulk_load_file(src, path, iencoder)) {
 	return new_exception(TE_FILENOTOPEN, L"Script file not open.", interp);
     }
 
