@@ -2,17 +2,18 @@
 #include "encoding.h"
 
 static wchar_t *ENCODING_NAME_DEFS[] = {
-    L"RAW",		// index: 0 ... RAW encoding (no encoding data stream)
+    L"RAW",		// index: 0 ... RAW encoding (no encoding, byte data stream)
     L"UTF-8",		// index: 1 ... UTF-8 encoding
-    L"EUC-JP",		// index: 2 ... EUC-JP encoding (not yet)
-    L"SJIS",		// index: 3 ... Shift-JIS encoding (not yet)
-    L"ISO-2022-JP",	// index: 4 ... ISO-2022-JP(JIS) encoding (not yet)
+    L"EUC-JP",		// index: 2 ... EUC-JP encoding
+    L"Shift-JIS",	// index: 3 ... Shift-JIS encoding (not yet)
 };
 
 Cell*raw_decoder(Cell *raw, encoder_error_info *error_info);
 Cell*raw_encoder(Cell *unicode, encoder_error_info *error_info);
 Cell*utf8_decoder(Cell *raw, encoder_error_info *error_info);
 Cell*utf8_encoder(Cell *unicode, encoder_error_info *error_info);
+Cell*eucjp_decoder(Cell *raw, encoder_error_info *error_info);
+Cell*eucjp_encoder(Cell *unicode, encoder_error_info *error_info);
 
 typedef struct _encoder_methods {
     Cell*(*raw_to_unicode)(Cell *raw, encoder_error_info *error_info);
@@ -22,6 +23,8 @@ typedef struct _encoder_methods {
 static encoder_methods Encoder_methods[] = {
     {raw_decoder, raw_encoder},		// NENCODE_RAW
     {utf8_decoder, utf8_encoder},	// NENCODE_UTF8
+    {eucjp_decoder, eucjp_encoder},	// NENCODE_EUCJP
+    {0, 0}
 };
 
 wchar_t*
@@ -280,4 +283,64 @@ utf8_encoder(Cell *unicode, encoder_error_info *error_info) {
     }
 
     return result;
+}
+
+/* 
+ * Shift-JIS decoder/encoder.
+ */
+Cell*
+eucjp_decoder(Cell *raw, encoder_error_info *error_info) {
+    Cell *result;
+    wchar_t *p, c, c2, cr;
+    int len, i;
+
+    JISENCODER_INIT();
+
+    p = cell_get_addr(raw);
+    len = cell_get_length(raw);
+    result = new_cell(L"");
+
+    for (i=0; i<len; ) {
+	c = p[i];
+	if (c <= 0x7f) {
+	    cell_add_char(result, c);
+	    i++;
+	} else if ((c >= 0xa1) && (c <= 0xfe)) {
+	    i++;
+	    if (i >= len) {
+		/* lost data euc_jp 2nd byte, broken file? */
+		cell_add_char(result, c);
+		break;
+	    }
+
+	    c2 = p[i];
+	    if ((c2 >= 0xa1) && (c2 <= 0xfe)) {
+		cr = JIS0208_to_Unicode[(((c & 0x7f) << 8) | (c2 & 0x7f)) & 0xffff];
+		if (cr == 0) {
+		    /* not JISX0208 character */
+		    cell_add_char(result, c);
+		    cell_add_char(result, c2);
+		} else {
+		    /* valid JISX0208 character */
+		    cell_add_char(result, cr);
+		}
+	    } else {
+		/* less data euc_jp 2nd byte */
+		cell_add_char(result, c2);
+	    }
+	    i++;
+	} else {
+	    /* not JISX0208 character */
+	    cell_add_char(result, c);
+	    i++;
+	}
+    }
+    
+    return result;
+}
+
+Cell*
+eucjp_encoder(Cell *unicode, encoder_error_info *error_info) {
+    JISENCODER_INIT();
+    return unicode;
 }

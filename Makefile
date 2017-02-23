@@ -7,17 +7,17 @@ PREFIX		= /usr/local
 CC		= cc
 
 # for product build. (use BoehmGC)
-CFLAGS		= -Wall -O3 -c -g
+CFLAGS		= -Wall -O -c -g
 INCLUDE		= -I/usr/local/include -I.
 LIB		= -L/usr/lib -L/lib -L/usr/local/lib -lm -lgc -lpthread -lonigmo -lpcl -lgmp
 
 # for memory debuging build.
-#CFLAGS		= -c -g -DPROF
+#CFLAGS		= -Wall -O -c -g -DPROF
 #INCLUDE		= -I/usr/local/include -I.
 #LIB		= -L/usr/local/lib -lm -lonigmo -lpcl -lgmp
 
 # for profiling build.
-#CFLAGS		= -c -g -pg -DPROF
+#CFLAGS		= -Wall -O -c -g -pg -DPROF
 #INCLUDE		= -I/usr/local/include -I.
 #LIB		= -pg -L/usr/local/lib -lonigmo -lpcl -lgmp
 
@@ -29,9 +29,11 @@ LIB		= -L/usr/lib -L/lib -L/usr/local/lib -lm -lgc -lpthread -lonigmo -lpcl -lgm
 HDRS		= bulk.h cell.h array.h error.h hash.h interp.h parser.h \
 		  toy.h types.h config.h global.h cstack.h util.h encoding.h
 SRCS		= bulk.c cell.c	array.c hash.c list.c parser.c types.c \
-		  eval.c interp.c commands.c methods.c global.c cstack.c util.c encoding.c
+		  eval.c interp.c commands.c methods.c global.c cstack.c util.c \
+		  encoding.c encoding-table.c
 OBJS		= bulk.o cell.o	array.o hash.o list.o parser.o types.o \
-		  eval.o interp.o commands.o methods.o global.o cstack.o util.o encoding.o
+		  eval.o interp.o commands.o methods.o global.o cstack.o util.o \
+		  encoding.o encoding-table.o
 
 all:		perfumesh
 
@@ -93,6 +95,11 @@ util.o:		util.c $(HDRS)
 encoding.o:	encoding.c $(HDRS)
 	$(CC) $(CFLAGS) $(INCLUDE) encoding.c -o encoding.o
 
+encoding-table.o: encoding-table.c
+	rm -f encoding-set-utoj.h encoding-set-jtou.h
+	awk -f jisconv.awk < doc/jis0208.txt
+	$(CC) $(CFLAGS) -O0 $(INCLUDE) encoding-table.c -o encoding-table.o
+
 config.h:	config.h.in
 	sed 	-e s%@PREFIX@%$(PREFIX)%g \
 		-e s%@VERSION@%`head -1 RELEASE | awk '{print $$3}'`%g \
@@ -100,5 +107,6 @@ config.h:	config.h.in
 
 clean:
 	rm -f *.o perfumesh *~ lib/*~ tests/*~ *core* *.gmon config.h tests/setup.prfm a.out
+	rm -f encoding-set-utoj.h encoding-set-jtou.h
 
 #eof

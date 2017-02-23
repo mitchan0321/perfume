@@ -92,6 +92,5 @@ void def_global() {
     const_regex_cache = L"@REGEX_CACHE";
     PageSize = sysconf(_SC_PAGESIZE);
 #ifdef PROF
-    void *GC_stackbottom = 0;
 #endif /* PROF */
 }

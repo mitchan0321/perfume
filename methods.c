@@ -3191,6 +3191,7 @@ new_file() {
 				      NULL,
 				      NULL,
 				      NULL);
+
 /*
     GC_register_finalizer((void*)o,
 			  file_finalizer,
@@ -3211,6 +3212,10 @@ mth_file_init(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 
     self = SELF_HASH(interp);
     f = new_file();
+    f->input_encoding = NENCODE_RAW;
+    f->output_encoding = NENCODE_RAW;
+    hash_set_t(self, const_Holder, new_container(f));
+
     enc = hash_get_t(interp->globals, const_DEFAULT_FILE_ENCODING);
     if (enc) {
 	if (GET_TAG(enc) == SYMBOL) {
@@ -3224,7 +3229,6 @@ mth_file_init(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 	    return new_exception(TE_BADENCODER, L"Bad encoder specified, need symbol.", interp);
 	}
     }
-    hash_set_t(self, const_Holder, new_container(f));
 
     if (arglen > 0) {
 	Toy_Type *cmd, *l;
@@ -3907,7 +3911,7 @@ mth_file_setencoding(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int 
     
     enc_index = get_encoding_index(cell_get_addr(enc->u.symbol.cell));
     if (enc_index == -1) {
-	return new_exception(TE_NOENCODING, L"Encoding not implimentation", interp);
+	return new_exception(TE_NOENCODING, L"Encoding not implimentation.", interp);
     }
 
     f->input_encoding = enc_index;
@@ -3942,7 +3946,7 @@ mth_file_setinputencoding(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs,
     
     enc_index = get_encoding_index(cell_get_addr(enc->u.symbol.cell));
     if (enc_index == -1) {
-	return new_exception(TE_NOENCODING, L"Encoding not implimentation", interp);
+	return new_exception(TE_NOENCODING, L"Encoding not implimentation.", interp);
     }
 
     f->input_encoding = enc_index;
@@ -3976,7 +3980,7 @@ mth_file_setoutputencoding(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs
     
     enc_index = get_encoding_index(cell_get_addr(enc->u.symbol.cell));
     if (enc_index == -1) {
-	return new_exception(TE_NOENCODING, L"Encoding not implimentation", interp);
+	return new_exception(TE_NOENCODING, L"Encoding not implimentation.", interp);
     }
 
     f->output_encoding = enc_index;
