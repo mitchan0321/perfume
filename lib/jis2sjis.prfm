@@ -1,10 +1,39 @@
 #
 # convert JIS <-> Shift-JIS code conversion
-#   x: 1st bytes
-#   y: 2nd bytes
+#   x: 1st byte
+#   y: 2nd byte
 #
 # Reference URL: http://www.unixuser.org/~euske/doc/kanjicode/index.html
 #
+# Check script: convert JIS -> Shift-JIS result range check.
+#
+REM {
+    xdic ::= dict;
+    ydic ::= dict;
+    0x21 each to: 0x7e do: {| x |
+        0x21 each to: 0x7e do: {| y |
+            (sx sy) ::= jis2sjis $x $y;
+            $xdic set ["%02x" fmt $sx t] 1;
+            $ydic set ["%02x" fmt $sy t] 1;
+        };
+    };
+    println [lsort [[$xdic keys] map {| x | "" . $x}]];    # 0x81 .. 0x9f, 0xe0 .. 0xef
+    println [lsort [[$ydic keys] map {| x | "" . $x}]];    # 0x40 .. 0x7e, 0x80 .. 0xfc
+};
+
+#
+# Check script: check re-convert result Shift-JIS -> JIS after convert JIS -> Shift-JIS.
+#
+REM {
+    0x21 each to: 0x7e do: {| x |
+        0x21 each to: 0x7e do: {| y |
+            (sx sy) ::= jis2sjis $x $y;
+            (jx jy) ::= sjis2jis $sx $sy;
+            if [$x != $jx] {println "*x=" $x ",  y=" $y};
+            if [$y != $jy] {println " x=" $x ", *y=" $y};
+        };
+    };
+};
 
 defun jis2sjis (x y) {
     x1 ::= $x - 0x21;
