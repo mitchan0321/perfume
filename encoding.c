@@ -329,6 +329,7 @@ eucjp_decoder(Cell *raw, encoder_error_info *error_info) {
 		cell_add_char(result, c2);
 	    }
 	    i++;
+
 	} else {
 	    /* not JISX0208 character */
 	    cell_add_char(result, c);
