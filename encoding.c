@@ -1,13 +1,6 @@
 #include "toy.h"
 #include "encoding.h"
 
-static wchar_t *ENCODING_NAME_DEFS[] = {
-    L"RAW",		// index: 0 ... RAW encoding (no encoding, byte data stream)
-    L"UTF-8",		// index: 1 ... UTF-8 encoding
-    L"EUC-JP",		// index: 2 ... EUC-JP encoding
-    L"Shift-JIS",	// index: 3 ... Shift-JIS encoding (not yet)
-};
-
 Cell*raw_decoder(Cell *raw, encoder_error_info *error_info);
 Cell*raw_encoder(Cell *unicode, encoder_error_info *error_info);
 Cell*utf8_decoder(Cell *raw, encoder_error_info *error_info);
@@ -25,6 +18,14 @@ static encoder_methods Encoder_methods[] = {
     {utf8_decoder, utf8_encoder},	// NENCODE_UTF8
     {eucjp_decoder, eucjp_encoder},	// NENCODE_EUCJP
     {0, 0}
+};
+
+static wchar_t *ENCODING_NAME_DEFS[] = {
+    L"RAW",		// index: 0 ... RAW encoding (no encoding, byte data stream)
+    L"UTF-8",		// index: 1 ... UTF-8 encoding
+    L"EUC-JP",		// index: 2 ... EUC-JP encoding
+    L"Shift-JIS",	// index: 3 ... Shift-JIS encoding (not yet)
+    0
 };
 
 wchar_t*
@@ -286,7 +287,7 @@ utf8_encoder(Cell *unicode, encoder_error_info *error_info) {
 }
 
 /* 
- * Shift-JIS decoder/encoder.
+ * EUC-JP decoder/encoder.
  */
 Cell*
 eucjp_decoder(Cell *raw, encoder_error_info *error_info) {
@@ -302,9 +303,11 @@ eucjp_decoder(Cell *raw, encoder_error_info *error_info) {
 
     for (i=0; i<len; ) {
 	c = p[i];
-	if (c <= 0x7f) {
+	if ((c >= 0) && (c <= 0x7f)) {
+	    /* ascii */
 	    cell_add_char(result, c);
 	    i++;
+
 	} else if ((c >= 0xa1) && (c <= 0xfe)) {
 	    i++;
 	    if (i >= len) {
@@ -317,21 +320,22 @@ eucjp_decoder(Cell *raw, encoder_error_info *error_info) {
 	    if ((c2 >= 0xa1) && (c2 <= 0xfe)) {
 		cr = JIS0208_to_Unicode[(((c & 0x7f) << 8) | (c2 & 0x7f)) & 0xffff];
 		if (cr == 0) {
-		    /* not JISX0208 character */
+		    /* not JIS0208 character */
 		    cell_add_char(result, c);
 		    cell_add_char(result, c2);
 		} else {
-		    /* valid JISX0208 character */
+		    /* valid JIS0208 character */
 		    cell_add_char(result, cr);
 		}
 	    } else {
 		/* less data euc_jp 2nd byte */
+		cell_add_char(result, c);
 		cell_add_char(result, c2);
 	    }
 	    i++;
 
 	} else {
-	    /* not JISX0208 character */
+	    /* not JIS0208 character */
 	    cell_add_char(result, c);
 	    i++;
 	}
@@ -342,6 +346,41 @@ eucjp_decoder(Cell *raw, encoder_error_info *error_info) {
 
 Cell*
 eucjp_encoder(Cell *unicode, encoder_error_info *error_info) {
+    Cell *result;
+    wchar_t *p, c, cr;
+    int len, i;
+
     JISENCODER_INIT();
-    return unicode;
+
+    p = cell_get_addr(unicode);
+    len = cell_get_length(unicode);
+    result = new_cell(L"");
+
+    for (i=0; i<len; i++) {
+	c = p[i];
+	
+	if ((c >= 0x00) && (c <= 0x7f)) {
+	    /* ascii */
+	    cell_add_char(result, c);
+
+	} else if ((c > 0xffff) || (c < 0)) {
+	    /* out range JIS0208 character, can't convert */
+	    cell_add_char(result, L'?');
+
+	} else {
+	    cr = Unicode_to_JIS0208[c & 0xffff];
+	    if (0 == cr) {
+		/* not JIS0208 character, output throw */
+		cell_add_char(result, (c >> 8) & 0xff);
+		cell_add_char(result, (c     ) & 0xff);
+		
+	    } else {
+		/* JIS0208 character, convert to euc_jp */
+		cell_add_char(result, ((cr >> 8) & 0xff) | 0x80);
+		cell_add_char(result, ((cr     ) & 0xff) | 0x80);
+	    }
+	}
+    }
+    
+    return result;
 }

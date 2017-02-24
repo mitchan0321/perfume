@@ -91,6 +91,4 @@ void def_global() {
     const_ast = new_symbol(L"*");
     const_regex_cache = L"@REGEX_CACHE";
     PageSize = sysconf(_SC_PAGESIZE);
-#ifdef PROF
-#endif /* PROF */
 }

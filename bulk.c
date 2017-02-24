@@ -30,7 +30,7 @@ bulk_load_file(Bulk *bulk, const char *file, int encoder) {
     struct stat statbuff;
     int size;
     char *readbuff;
-    encoder_error_info error_info;
+    encoder_error_info *error_info;
     Cell *encbuff;
 
     if (NULL == bulk) return 0;
@@ -40,6 +40,9 @@ bulk_load_file(Bulk *bulk, const char *file, int encoder) {
     if (-1 == fstat(fd, &statbuff)) goto error;
     size = statbuff.st_size;
 
+    error_info = GC_MALLOC(sizeof(encoder_error_info));
+    ALLOC_SAFE(error_info);
+    
     bulk->length = size;
     bulk->allocsize = (size+1)*sizeof(wchar_t);
     bulk->pos = 0;
@@ -50,7 +53,7 @@ bulk_load_file(Bulk *bulk, const char *file, int encoder) {
 
     if (-1 == read_size(fd, readbuff, size)) goto error;
     readbuff[size] = 0;
-    encbuff = decode_raw_to_unicode(new_cell(to_wchar(readbuff)), encoder, &error_info);
+    encbuff = decode_raw_to_unicode(new_cell(to_wchar(readbuff)), encoder, error_info);
     if (NULL == encbuff) goto error;
     bulk->data = cell_get_addr(encbuff);
     bulk->length = cell_get_length(encbuff);
