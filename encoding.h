@@ -6,9 +6,11 @@
 #include <wchar.h>
 #include "cell.h"
 
-#define ENCODING_NAME_MAX		(2) 	// now ready encodings are;
-						//     RAW, UTF-8 and EUC-JP.
-						// (index range is 0 to ENCODING_NAME_MAX)
+/*
+ * Indicate the maximum encoding name index; range is 0 to ENCODING_NAME_MAX.
+ * Now ready encodings are RAW, UTF-8 and EUC-JP.
+ */
+#define ENCODING_NAME_MAX		(2)
 
 /* encoding index */
 #define NENCODE_RAW			(0)
@@ -28,14 +30,14 @@ typedef struct _encoder_error_info {
     wchar_t *message;
 } encoder_error_info;
 
-wchar_t*	get_encoding_name(int enc_idx);
-int		get_encoding_index(wchar_t *enc_name);
-Cell*		decode_raw_to_unicode(Cell *raw, int enc, encoder_error_info *error_info);
-Cell*		encode_unicode_to_raw(Cell *unicode, int enc, encoder_error_info *error_info);
+wchar_t* get_encoding_name(int enc_idx);
+int	 get_encoding_index(wchar_t *enc_name);
+Cell*	 decode_raw_to_unicode(Cell *raw, int enc, encoder_error_info *error_info);
+Cell*	 encode_unicode_to_raw(Cell *unicode, int enc, encoder_error_info *error_info);
 
 /* for JIS converter */
-extern wchar_t *Unicode_to_JIS0208;
-extern wchar_t *JIS0208_to_Unicode;
+extern wchar_t Unicode_to_JIS0208[65536];
+extern wchar_t JIS0208_to_Unicode[65536];
 extern int jisencoder_setup_done;
 void JisEncoder_Setup();
 #define JISENCODER_INIT()	if (jisencoder_setup_done == 0) {JisEncoder_Setup();}

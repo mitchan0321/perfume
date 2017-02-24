@@ -7,17 +7,18 @@ PREFIX		= /usr/local
 CC		= cc
 
 # for product build. (use BoehmGC)
-CFLAGS		= -Wall -O -c -g
+CFLAGS		= -Wall -O3 -c -g
 INCLUDE		= -I/usr/local/include -I.
-LIB		= -L/usr/lib -L/lib -L/usr/local/lib -lm -lgc -lpthread -lonigmo -lpcl -lgmp
+LIB		= -L/usr/lib -L/lib -L/usr/local/lib \
+		  -lm -lgc -lpthread -lonigmo -lpcl -lgmp
 
 # for memory debuging build.
-#CFLAGS		= -Wall -O -c -g -DPROF
+#CFLAGS		= -Wall -c -g -DPROF
 #INCLUDE		= -I/usr/local/include -I.
 #LIB		= -L/usr/local/lib -lm -lonigmo -lpcl -lgmp
 
 # for profiling build.
-#CFLAGS		= -Wall -O -c -g -pg -DPROF
+#CFLAGS		= -Wall -c -g -pg -DPROF
 #INCLUDE		= -I/usr/local/include -I.
 #LIB		= -pg -L/usr/local/lib -lonigmo -lpcl -lgmp
 
@@ -95,7 +96,7 @@ util.o:		util.c $(HDRS)
 encoding.o:	encoding.c $(HDRS)
 	$(CC) $(CFLAGS) $(INCLUDE) encoding.c -o encoding.o
 
-encoding-table.o: encoding-table.c
+encoding-table.o: encoding-table.c $(HDRS)
 	rm -f encoding-set-utoj.h encoding-set-jtou.h
 	awk -f jisconv.awk < doc/jis0208.txt
 	$(CC) $(CFLAGS) -O0 $(INCLUDE) encoding-table.c -o encoding-table.o

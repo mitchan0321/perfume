@@ -3182,7 +3182,7 @@ static Toy_File*
 new_file() {
     Toy_File *o;
 
-    o = GC_MALLOC_ATOMIC(sizeof(Toy_File));
+    o = GC_MALLOC(sizeof(Toy_File));
     ALLOC_SAFE(o);
     memset(o, 0, sizeof(Toy_File));
 
@@ -3356,10 +3356,13 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     Cell *cbuff;
     int c;
     int flag_nonewline=0, flag_nocontrol=0;
-    encoder_error_info enc_error_info;
+    encoder_error_info *enc_error_info;
 
     if (arglen > 0) goto error;
 
+    enc_error_info = GC_MALLOC(sizeof(encoder_error_info));
+    ALLOC_SAFE(enc_error_info);
+    
     if (hash_get_and_unset_t(nameargs, const_nonewline)) {
 	flag_nonewline = 1;
     }
@@ -3406,9 +3409,9 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 	    if (cell_get_length(cbuff) == 0) {
 		return const_Nil;
 	    } else {
-		Cell *c = decode_raw_to_unicode(cbuff, f->input_encoding, &enc_error_info);
+		Cell *c = decode_raw_to_unicode(cbuff, f->input_encoding, enc_error_info);
 		if (NULL == c) {
-		    return new_exception(TE_BADENCODEBYTE, enc_error_info.message, interp);
+		    return new_exception(TE_BADENCODEBYTE, enc_error_info->message, interp);
 		}
 		return new_string_cell(c);
 	    }
@@ -3431,9 +3434,9 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 	}
 	
 	if ('\n' == c) {
-	    Cell *c = decode_raw_to_unicode(cbuff, f->input_encoding, &enc_error_info);
+	    Cell *c = decode_raw_to_unicode(cbuff, f->input_encoding, enc_error_info);
 	    if (NULL == c) {
-		return new_exception(TE_BADENCODEBYTE, enc_error_info.message, interp);
+		return new_exception(TE_BADENCODEBYTE, enc_error_info->message, interp);
 	    }
 	    return new_string_cell(c);
 	}
@@ -3454,9 +3457,12 @@ mth_file_puts(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     int flag_nonewline = 0;
     wchar_t *p;
     Cell *unicode, *raw;
-    encoder_error_info enc_error_info;
+    encoder_error_info *enc_error_info;
 
     if (arglen == 0) goto error;
+
+    enc_error_info = GC_MALLOC(sizeof(encoder_error_info));
+    ALLOC_SAFE(enc_error_info);
 
     if (hash_get_and_unset_t(nameargs, const_nonewline)) {
 	flag_nonewline = 1;
@@ -3483,9 +3489,9 @@ mth_file_puts(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 
     while (posargs) {
 	unicode = new_cell(to_string_call(interp, list_get_item(posargs)));
-	raw = encode_unicode_to_raw(unicode, f->output_encoding, &enc_error_info);
+	raw = encode_unicode_to_raw(unicode, f->output_encoding, enc_error_info);
 	if (NULL == raw) {
-	    return new_exception(TE_BADENCODEBYTE, enc_error_info.message, interp);
+	    return new_exception(TE_BADENCODEBYTE, enc_error_info->message, interp);
 	}
 	p = cell_get_addr(raw);
 	c = fputs(to_char(p), f->fd);
