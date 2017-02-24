@@ -941,7 +941,7 @@ error:
 Toy_Type*
 cmd_time(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *script;
-    Toy_Type *result;
+    Toy_Type *result = NULL;
     struct timeval s, e;
     double rs, re, rt;
     wchar_t *buff;

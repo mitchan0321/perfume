@@ -199,7 +199,8 @@ sig_cstack_running_handler(int flag, siginfo_t* siginfo, void* ptr) {
     CStack_in_baria = 1;
     if (CStack.stack_slot[Current_coroutine].jmp_buff_enable) {
 	cstack_unprotect(Current_coroutine);
-	sigreturn(ptr);
+	//sigreturn(ptr);
+	return;
 #if 0
 	siglongjmp(CStack.stack_slot[Current_coroutine].jmp_buff, 1);
 #endif

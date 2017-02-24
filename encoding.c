@@ -326,6 +326,7 @@ eucjp_decoder(Cell *raw, encoder_error_info *error_info) {
 		}
 	    } else {
 		/* less data euc_jp 2nd byte */
+		cell_add_char(result, c);
 		cell_add_char(result, c2);
 	    }
 	    i++;
