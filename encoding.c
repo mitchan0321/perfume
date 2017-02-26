@@ -7,6 +7,8 @@ Cell*utf8_decoder(Cell *raw, encoder_error_info *error_info);
 Cell*utf8_encoder(Cell *unicode, encoder_error_info *error_info);
 Cell*eucjp_decoder(Cell *raw, encoder_error_info *error_info);
 Cell*eucjp_encoder(Cell *unicode, encoder_error_info *error_info);
+Cell*sjis_decoder(Cell *raw, encoder_error_info *error_info);
+Cell*sjis_encoder(Cell *unicode, encoder_error_info *error_info);
 
 typedef struct _encoder_methods {
     Cell*(*raw_to_unicode)(Cell *raw, encoder_error_info *error_info);
@@ -17,6 +19,7 @@ static encoder_methods Encoder_methods[] = {
     {raw_decoder, raw_encoder},		// NENCODE_RAW
     {utf8_decoder, utf8_encoder},	// NENCODE_UTF8
     {eucjp_decoder, eucjp_encoder},	// NENCODE_EUCJP
+    {sjis_decoder, sjis_encoder},	// NENCODE_SJIS
     {0, 0}
 };
 
@@ -318,13 +321,13 @@ eucjp_decoder(Cell *raw, encoder_error_info *error_info) {
 
 	    c2 = p[i];
 	    if ((c2 >= 0xa1) && (c2 <= 0xfe)) {
-		cr = JIS0208_to_Unicode[(((c & 0x7f) << 8) | (c2 & 0x7f)) & 0xffff];
+		cr = JISX0208_to_Unicode[(((c & 0x7f) << 8) | (c2 & 0x7f)) & 0xffff];
 		if (cr == 0) {
-		    /* not JIS0208 character */
+		    /* not JISX0208 character */
 		    cell_add_char(result, c);
 		    cell_add_char(result, c2);
 		} else {
-		    /* valid JIS0208 character */
+		    /* valid JISX0208 character */
 		    cell_add_char(result, cr);
 		}
 	    } else {
@@ -335,7 +338,7 @@ eucjp_decoder(Cell *raw, encoder_error_info *error_info) {
 	    i++;
 
 	} else {
-	    /* not JIS0208 character */
+	    /* not JISX0208 character */
 	    cell_add_char(result, c);
 	    i++;
 	}
@@ -364,20 +367,181 @@ eucjp_encoder(Cell *unicode, encoder_error_info *error_info) {
 	    cell_add_char(result, c);
 
 	} else if ((c > 0xffff) || (c < 0)) {
-	    /* out range JIS0208 character, can't convert */
+	    /* out range JISX0208 character, can't convert */
 	    cell_add_char(result, L'?');
 
 	} else {
-	    cr = Unicode_to_JIS0208[c & 0xffff];
+	    cr = Unicode_to_JISX0208[c & 0xffff];
 	    if (0 == cr) {
-		/* not JIS0208 character, output throw */
+		/* not JISX0208 character, output throw */
 		cell_add_char(result, (c >> 8) & 0xff);
 		cell_add_char(result, (c     ) & 0xff);
 		
 	    } else {
-		/* JIS0208 character, convert to euc_jp */
+		/* JISX0208 character, convert to euc_jp */
 		cell_add_char(result, ((cr >> 8) & 0xff) | 0x80);
 		cell_add_char(result, ((cr     ) & 0xff) | 0x80);
+	    }
+	}
+    }
+    
+    return result;
+}
+
+/* 
+ * Shift-JIS decoder/encoder, do nathing.
+ */
+wchar_t
+jis2sjis(wchar_t src) {
+    wchar_t x, y, x1, x2, x3, Xres, y1, Yres;
+
+    x = (src >> 8) & 0xff; // source hi-byte
+    y = (src     ) & 0xff; // source low-byte
+
+    x1 = x - 0x21;
+    x2 = x1 >> 1;
+    x3 = x1 & 0x01;
+    if (x2 <= 0x1e) {
+	Xres = x2 + 0x81;
+    } else {
+	Xres = x2 + 0xc1;
+    }
+
+    if (x3 == 1) {
+	Yres = y + 0x7e;
+    } else {
+	y1 = y + 0x1f;
+	if (y1 <= 0x7e) {
+	    Yres = y1;
+	} else {
+	    Yres = y1 + 0x01;
+	}
+    }
+
+    return (Xres << 8) | Yres;
+}
+
+wchar_t
+sjis2jis(wchar_t src) {
+    wchar_t x, y, x1, x2, x3, Xres, y1, Yres;
+
+    x = (src >> 8) & 0xff; // source hi-byte
+    y = (src     ) & 0xff; // source low-byte
+
+    if (y >= 0x9f) {
+	Yres = y - 0x7e;
+	x3 = 1;
+    } else {
+	if (y >=0x80) {
+	    y1 = y - 0x01;
+	} else {
+	    y1 = y;
+	}
+	Yres = y1 - 0x1f;
+	x3 = 0;
+    }
+
+    if (x >= 0xe0) {
+	x2 = x - 0xc1;
+    } else {
+	x2 = x - 0x81;
+    }
+    x1 = (x2 << 1) + x3;
+    Xres = x1 + 0x21;
+
+    return (Xres << 8) | Yres;    
+}
+
+Cell*
+sjis_decoder(Cell *raw, encoder_error_info *error_info) {
+    Cell *result;
+    wchar_t *p, c, c2, cr;
+    int len, i;
+
+    JISENCODER_INIT();
+
+    p = cell_get_addr(raw);
+    len = cell_get_length(raw);
+    result = new_cell(L"");
+
+    for (i=0; i<len; ) {
+	c = p[i];
+	if ((c >= 0) && (c <= 0x7f)) {
+	    /* ascii */
+	    cell_add_char(result, c);
+	    i++;
+
+	} else if (((c >= 0x81) && (c <= 0x9f)) || ((c >= 0xe0) && (c <= 0xff))) {
+	    i++;
+	    if (i >= len) {
+		/* lost data Shift-JIS 2nd byte, broken file? */
+		cell_add_char(result, c);
+		break;
+	    }
+
+	    c2 = p[i];
+	    if (((c2 >= 0x40) && (c2 <= 0x7e)) || ((c2 >= 0x80) && (c2 <= 0xfc))) {
+		cr = JISX0208_to_Unicode[sjis2jis(((c << 8) | c2) & 0xffff)];
+		if (cr == 0) {
+		    /* not JISX0208 character */
+		    cell_add_char(result, c);
+		    cell_add_char(result, c2);
+		} else {
+		    /* valid JISX0208 character */
+		    cell_add_char(result, cr);
+		}
+	    } else {
+		/* less data Shift-JIS 2nd byte */
+		cell_add_char(result, c);
+		cell_add_char(result, c2);
+	    }
+	    i++;
+
+	} else {
+	    /* not JISX0208 character */
+	    cell_add_char(result, c);
+	    i++;
+	}
+    }
+    
+    return result;
+}
+
+Cell*
+sjis_encoder(Cell *unicode, encoder_error_info *error_info) {
+    Cell *result;
+    wchar_t *p, c, cr;
+    int len, i;
+
+    JISENCODER_INIT();
+
+    p = cell_get_addr(unicode);
+    len = cell_get_length(unicode);
+    result = new_cell(L"");
+
+    for (i=0; i<len; i++) {
+	c = p[i];
+	
+	if ((c >= 0x00) && (c <= 0x7f)) {
+	    /* ascii */
+	    cell_add_char(result, c);
+
+	} else if ((c > 0xffff) || (c < 0)) {
+	    /* out range JISX0208 character, can't convert */
+	    cell_add_char(result, L'?');
+
+	} else {
+	    cr = Unicode_to_JISX0208[c & 0xffff];
+	    if (0 == cr) {
+		/* not JISX0208 character, output throw */
+		cell_add_char(result, (c >> 8) & 0xff);
+		cell_add_char(result, (c     ) & 0xff);
+		
+	    } else {
+		/* JISX0208 character, convert to Shift-JIS */
+		cr = jis2sjis(cr);
+		cell_add_char(result, ((cr >> 8) & 0xff));
+		cell_add_char(result, ((cr     ) & 0xff));
 	    }
 	}
     }

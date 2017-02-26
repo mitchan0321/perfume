@@ -8,15 +8,15 @@
 
 /*
  * Indicate the maximum encoding name index; range is 0 to ENCODING_NAME_MAX.
- * Now ready encodings are RAW, UTF-8 and EUC-JP.
+ * Now ready encodings are RAW, UTF-8, EUC-JP and Shift-JIS.
  */
-#define ENCODING_NAME_MAX		(2)
+#define ENCODING_NAME_MAX		(3)
 
 /* encoding index */
 #define NENCODE_RAW			(0)
 #define NENCODE_UTF8			(1)
 #define NENCODE_EUCJP			(2)
-#define NENCODE_SJIS			(3)	// not yet
+#define NENCODE_SJIS			(3)
 
 /* encoder/decoder error code */
 #define EENCODE_BADENCODING		(1)
@@ -36,8 +36,8 @@ Cell*	 decode_raw_to_unicode(Cell *raw, int enc, encoder_error_info *error_info)
 Cell*	 encode_unicode_to_raw(Cell *unicode, int enc, encoder_error_info *error_info);
 
 /* for JIS converter */
-extern wchar_t Unicode_to_JIS0208[65536];
-extern wchar_t JIS0208_to_Unicode[65536];
+extern wchar_t Unicode_to_JISX0208[65536];
+extern wchar_t JISX0208_to_Unicode[65536];
 extern int jisencoder_setup_done;
 void JisEncoder_Setup();
 #define JISENCODER_INIT()	if (jisencoder_setup_done == 0) {JisEncoder_Setup();}
