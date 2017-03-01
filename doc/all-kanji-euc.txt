@@ -1,0 +1,751 @@
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      01¶è  2120 813F A1A0     ¡¡ ¡¢ ¡£ ¡¤ ¡¥ ¡¦ ¡§ ¡¨ ¡© ¡ª ¡« ¡¬ ¡­ ¡® ¡¯
+      01¶è  2130 814F A1B0  ¡° ¡± ¡² ¡³ ¡´ ¡µ ¡¶ ¡· ¡¸ ¡¹ ¡º ¡» ¡¼ ¡½ ¡¾ ¡¿
+      01¶è  2140 815F A1C0  ¡À ¡Á ¡Â ¡Ã ¡Ä ¡Å ¡Æ ¡Ç ¡È ¡É ¡Ê ¡Ë ¡Ì ¡Í ¡Î ¡Ï
+      01¶è  2150 816F A1D0  ¡Ð ¡Ñ ¡Ò ¡Ó ¡Ô ¡Õ ¡Ö ¡× ¡Ø ¡Ù ¡Ú ¡Û ¡Ü ¡Ý ¡Þ ¡ß
+      01¶è  2160 8180 A1E0  ¡à ¡á ¡â ¡ã ¡ä ¡å ¡æ ¡ç ¡è ¡é ¡ê ¡ë ¡ì ¡í ¡î ¡ï
+      01¶è  2170 8190 A1F0  ¡ð ¡ñ ¡ò ¡ó ¡ô ¡õ ¡ö ¡÷ ¡ø ¡ù ¡ú ¡û ¡ü ¡ý ¡þ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      02¶è  2220 819E A2A0     ¢¡ ¢¢ ¢£ ¢¤ ¢¥ ¢¦ ¢§ ¢¨ ¢© ¢ª ¢« ¢¬ ¢­ ¢® ¡¦
+      02¶è  2230 81AE A2B0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¢º ¢» ¢¼ ¢½ ¢¾ ¢¿
+      02¶è  2240 81BE A2C0  ¢À ¢Á ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¢Ê ¢Ë ¢Ì ¢Í ¢Î ¢Ï
+      02¶è  2250 81CE A2D0  ¢Ð ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¢Ü ¢Ý ¢Þ ¢ß
+      02¶è  2260 81DE A2E0  ¢à ¢á ¢â ¢ã ¢ä ¢å ¢æ ¢ç ¢è ¢é ¢ê ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      02¶è  2270 81EE A2F0  ¡¦ ¡¦ ¢ò ¢ó ¢ô ¢õ ¢ö ¢÷ ¢ø ¢ù ¡¦ ¡¦ ¡¦ ¡¦ ¢þ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      03¶è  2320 823F A3A0     ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      03¶è  2330 824F A3B0  £° £± £² £³ £´ £µ £¶ £· £¸ £¹ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      03¶è  2340 825F A3C0  ¡¦ £Á £Â £Ã £Ä £Å £Æ £Ç £È £É £Ê £Ë £Ì £Í £Î £Ï
+      03¶è  2350 826F A3D0  £Ð £Ñ £Ò £Ó £Ô £Õ £Ö £× £Ø £Ù £Ú ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      03¶è  2360 8280 A3E0  ¡¦ £á £â £ã £ä £å £æ £ç £è £é £ê £ë £ì £í £î £ï
+      03¶è  2370 8290 A3F0  £ð £ñ £ò £ó £ô £õ £ö £÷ £ø £ù £ú ¡¦ ¡¦ ¡¦ ¡¦
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      04¶è  2420 829E A4A0     ¤¡ ¤¢ ¤£ ¤¤ ¤¥ ¤¦ ¤§ ¤¨ ¤© ¤ª ¤« ¤¬ ¤­ ¤® ¤¯
+      04¶è  2430 82AE A4B0  ¤° ¤± ¤² ¤³ ¤´ ¤µ ¤¶ ¤· ¤¸ ¤¹ ¤º ¤» ¤¼ ¤½ ¤¾ ¤¿
+      04¶è  2440 82BE A4C0  ¤À ¤Á ¤Â ¤Ã ¤Ä ¤Å ¤Æ ¤Ç ¤È ¤É ¤Ê ¤Ë ¤Ì ¤Í ¤Î ¤Ï
+      04¶è  2450 82CE A4D0  ¤Ð ¤Ñ ¤Ò ¤Ó ¤Ô ¤Õ ¤Ö ¤× ¤Ø ¤Ù ¤Ú ¤Û ¤Ü ¤Ý ¤Þ ¤ß
+      04¶è  2460 82DE A4E0  ¤à ¤á ¤â ¤ã ¤ä ¤å ¤æ ¤ç ¤è ¤é ¤ê ¤ë ¤ì ¤í ¤î ¤ï
+      04¶è  2470 82EE A4F0  ¤ð ¤ñ ¤ò ¤ó ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      05¶è  2520 833F A5A0     ¥¡ ¥¢ ¥£ ¥¤ ¥¥ ¥¦ ¥§ ¥¨ ¥© ¥ª ¥« ¥¬ ¥­ ¥® ¥¯
+      05¶è  2530 834F A5B0  ¥° ¥± ¥² ¥³ ¥´ ¥µ ¥¶ ¥· ¥¸ ¥¹ ¥º ¥» ¥¼ ¥½ ¥¾ ¥¿
+      05¶è  2540 835F A5C0  ¥À ¥Á ¥Â ¥Ã ¥Ä ¥Å ¥Æ ¥Ç ¥È ¥É ¥Ê ¥Ë ¥Ì ¥Í ¥Î ¥Ï
+      05¶è  2550 836F A5D0  ¥Ð ¥Ñ ¥Ò ¥Ó ¥Ô ¥Õ ¥Ö ¥× ¥Ø ¥Ù ¥Ú ¥Û ¥Ü ¥Ý ¥Þ ¥ß
+      05¶è  2560 8380 A5E0  ¥à ¥á ¥â ¥ã ¥ä ¥å ¥æ ¥ç ¥è ¥é ¥ê ¥ë ¥ì ¥í ¥î ¥ï
+      05¶è  2570 8390 A5F0  ¥ð ¥ñ ¥ò ¥ó ¥ô ¥õ ¥ö ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      06¶è  2620 839E A6A0     ¦¡ ¦¢ ¦£ ¦¤ ¦¥ ¦¦ ¦§ ¦¨ ¦© ¦ª ¦« ¦¬ ¦­ ¦® ¦¯
+      06¶è  2630 83AE A6B0  ¦° ¦± ¦² ¦³ ¦´ ¦µ ¦¶ ¦· ¦¸ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      06¶è  2640 83BE A6C0  ¡¦ ¦Á ¦Â ¦Ã ¦Ä ¦Å ¦Æ ¦Ç ¦È ¦É ¦Ê ¦Ë ¦Ì ¦Í ¦Î ¦Ï
+      06¶è  2650 83CE A6D0  ¦Ð ¦Ñ ¦Ò ¦Ó ¦Ô ¦Õ ¦Ö ¦× ¦Ø ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      06¶è  2660 83DE A6E0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      06¶è  2670 83EE A6F0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      07¶è  2720 843F A7A0     §¡ §¢ §£ §¤ §¥ §¦ §§ §¨ §© §ª §« §¬ §­ §® §¯
+      07¶è  2730 844F A7B0  §° §± §² §³ §´ §µ §¶ §· §¸ §¹ §º §» §¼ §½ §¾ §¿
+      07¶è  2740 845F A7C0  §À §Á ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      07¶è  2750 846F A7D0  ¡¦ §Ñ §Ò §Ó §Ô §Õ §Ö §× §Ø §Ù §Ú §Û §Ü §Ý §Þ §ß
+      07¶è  2760 8480 A7E0  §à §á §â §ã §ä §å §æ §ç §è §é §ê §ë §ì §í §î §ï
+      07¶è  2770 8490 A7F0  §ð §ñ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      08¶è  2820 849E A8A0     ¨¡ ¨¢ ¨£ ¨¤ ¨¥ ¨¦ ¨§ ¨¨ ¨© ¨ª ¨« ¨¬ ¨­ ¨® ¨¯
+      08¶è  2830 84AE A8B0  ¨° ¨± ¨² ¨³ ¨´ ¨µ ¨¶ ¨· ¨¸ ¨¹ ¨º ¨» ¨¼ ¨½ ¨¾ ¨¿
+      08¶è  2840 84BE A8C0  ¨À ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      08¶è  2850 84CE A8D0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      08¶è  2860 84DE A8E0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      08¶è  2870 84EE A8F0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      09¶è  2920 853F A9A0     ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      09¶è  2930 854F A9B0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      09¶è  2940 855F A9C0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      09¶è  2950 856F A9D0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      09¶è  2960 8580 A9E0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      09¶è  2970 8590 A9F0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      10¶è  2A20 859E AAA0     ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      10¶è  2A30 85AE AAB0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      10¶è  2A40 85BE AAC0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      10¶è  2A50 85CE AAD0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      10¶è  2A60 85DE AAE0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      10¶è  2A70 85EE AAF0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      11¶è  2B20 863F ABA0     ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      11¶è  2B30 864F ABB0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      11¶è  2B40 865F ABC0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      11¶è  2B50 866F ABD0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      11¶è  2B60 8680 ABE0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      11¶è  2B70 8690 ABF0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      12¶è  2C20 869E ACA0     ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      12¶è  2C30 86AE ACB0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      12¶è  2C40 86BE ACC0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      12¶è  2C50 86CE ACD0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      12¶è  2C60 86DE ACE0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      12¶è  2C70 86EE ACF0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      13¶è  2D20 873F ADA0     ­¡ ­¢ ­£ ­¤ ­¥ ­¦ ­§ ­¨ ­© ­ª ­« ­¬ ­­ ­® ­¯
+      13¶è  2D30 874F ADB0  ­° ­± ­² ­³ ­´ ­µ ­¶ ­· ­¸ ­¹ ­º ­» ­¼ ­½ ­¾ ¡¦
+      13¶è  2D40 875F ADC0  ­À ­Á ­Â ­Ã ­Ä ­Å ­Æ ­Ç ­È ­É ­Ê ­Ë ­Ì ­Í ­Î ­Ï
+      13¶è  2D50 876F ADD0  ­Ð ­Ñ ­Ò ­Ó ­Ô ­Õ ­Ö ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ­ß
+      13¶è  2D60 8780 ADE0  ­à ­á ­â ­ã ­ä ­å ­æ ­ç ­è ­é ­ê ­ë ­ì ­í ­î ­ï
+      13¶è  2D70 8790 ADF0  ¢â ¢á ¢é ­ó ­ô ¢å ¢Ý ¢Ü ­ø ­ù ¢è ¢Á ¢À ¡¦ ¡¦
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      14¶è  2E20 879E AEA0     ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      14¶è  2E30 87AE AEB0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      14¶è  2E40 87BE AEC0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      14¶è  2E50 87CE AED0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      14¶è  2E60 87DE AEE0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      14¶è  2E70 87EE AEF0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      15¶è  2F20 883F AFA0     ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      15¶è  2F30 884F AFB0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      15¶è  2F40 885F AFC0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      15¶è  2F50 886F AFD0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      15¶è  2F60 8880 AFE0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      15¶è  2F70 8890 AFF0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      16¶è  3020 889E B0A0     °¡ °¢ °£ °¤ °¥ °¦ °§ °¨ °© °ª °« °¬ °­ °® °¯
+      16¶è  3030 88AE B0B0  °° °± °² °³ °´ °µ °¶ °· °¸ °¹ °º °» °¼ °½ °¾ °¿
+      16¶è  3040 88BE B0C0  °À °Á °Â °Ã °Ä °Å °Æ °Ç °È °É °Ê °Ë °Ì °Í °Î °Ï
+      16¶è  3050 88CE B0D0  °Ð °Ñ °Ò °Ó °Ô °Õ °Ö °× °Ø °Ù °Ú °Û °Ü °Ý °Þ °ß
+      16¶è  3060 88DE B0E0  °à °á °â °ã °ä °å °æ °ç °è °é °ê °ë °ì °í °î °ï
+      16¶è  3070 88EE B0F0  °ð °ñ °ò °ó °ô °õ °ö °÷ °ø °ù °ú °û °ü °ý °þ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      17¶è  3120 893F B1A0     ±¡ ±¢ ±£ ±¤ ±¥ ±¦ ±§ ±¨ ±© ±ª ±« ±¬ ±­ ±® ±¯
+      17¶è  3130 894F B1B0  ±° ±± ±² ±³ ±´ ±µ ±¶ ±· ±¸ ±¹ ±º ±» ±¼ ±½ ±¾ ±¿
+      17¶è  3140 895F B1C0  ±À ±Á ±Â ±Ã ±Ä ±Å ±Æ ±Ç ±È ±É ±Ê ±Ë ±Ì ±Í ±Î ±Ï
+      17¶è  3150 896F B1D0  ±Ð ±Ñ ±Ò ±Ó ±Ô ±Õ ±Ö ±× ±Ø ±Ù ±Ú ±Û ±Ü ±Ý ±Þ ±ß
+      17¶è  3160 8980 B1E0  ±à ±á ±â ±ã ±ä ±å ±æ ±ç ±è ±é ±ê ±ë ±ì ±í ±î ±ï
+      17¶è  3170 8990 B1F0  ±ð ±ñ ±ò ±ó ±ô ±õ ±ö ±÷ ±ø ±ù ±ú ±û ±ü ±ý ±þ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      18¶è  3220 899E B2A0     ²¡ ²¢ ²£ ²¤ ²¥ ²¦ ²§ ²¨ ²© ²ª ²« ²¬ ²­ ²® ²¯
+      18¶è  3230 89AE B2B0  ²° ²± ²² ²³ ²´ ²µ ²¶ ²· ²¸ ²¹ ²º ²» ²¼ ²½ ²¾ ²¿
+      18¶è  3240 89BE B2C0  ²À ²Á ²Â ²Ã ²Ä ²Å ²Æ ²Ç ²È ²É ²Ê ²Ë ²Ì ²Í ²Î ²Ï
+      18¶è  3250 89CE B2D0  ²Ð ²Ñ ²Ò ²Ó ²Ô ²Õ ²Ö ²× ²Ø ²Ù ²Ú ²Û ²Ü ²Ý ²Þ ²ß
+      18¶è  3260 89DE B2E0  ²à ²á ²â ²ã ²ä ²å ²æ ²ç ²è ²é ²ê ²ë ²ì ²í ²î ²ï
+      18¶è  3270 89EE B2F0  ²ð ²ñ ²ò ²ó ²ô ²õ ²ö ²÷ ²ø ²ù ²ú ²û ²ü ²ý ²þ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      19¶è  3320 8A3F B3A0     ³¡ ³¢ ³£ ³¤ ³¥ ³¦ ³§ ³¨ ³© ³ª ³« ³¬ ³­ ³® ³¯
+      19¶è  3330 8A4F B3B0  ³° ³± ³² ³³ ³´ ³µ ³¶ ³· ³¸ ³¹ ³º ³» ³¼ ³½ ³¾ ³¿
+      19¶è  3340 8A5F B3C0  ³À ³Á ³Â ³Ã ³Ä ³Å ³Æ ³Ç ³È ³É ³Ê ³Ë ³Ì ³Í ³Î ³Ï
+      19¶è  3350 8A6F B3D0  ³Ð ³Ñ ³Ò ³Ó ³Ô ³Õ ³Ö ³× ³Ø ³Ù ³Ú ³Û ³Ü ³Ý ³Þ ³ß
+      19¶è  3360 8A80 B3E0  ³à ³á ³â ³ã ³ä ³å ³æ ³ç ³è ³é ³ê ³ë ³ì ³í ³î ³ï
+      19¶è  3370 8A90 B3F0  ³ð ³ñ ³ò ³ó ³ô ³õ ³ö ³÷ ³ø ³ù ³ú ³û ³ü ³ý ³þ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      20¶è  3420 8A9E B4A0     ´¡ ´¢ ´£ ´¤ ´¥ ´¦ ´§ ´¨ ´© ´ª ´« ´¬ ´­ ´® ´¯
+      20¶è  3430 8AAE B4B0  ´° ´± ´² ´³ ´´ ´µ ´¶ ´· ´¸ ´¹ ´º ´» ´¼ ´½ ´¾ ´¿
+      20¶è  3440 8ABE B4C0  ´À ´Á ´Â ´Ã ´Ä ´Å ´Æ ´Ç ´È ´É ´Ê ´Ë ´Ì ´Í ´Î ´Ï
+      20¶è  3450 8ACE B4D0  ´Ð ´Ñ ´Ò ´Ó ´Ô ´Õ ´Ö ´× ´Ø ´Ù ´Ú ´Û ´Ü ´Ý ´Þ ´ß
+      20¶è  3460 8ADE B4E0  ´à ´á ´â ´ã ´ä ´å ´æ ´ç ´è ´é ´ê ´ë ´ì ´í ´î ´ï
+      20¶è  3470 8AEE B4F0  ´ð ´ñ ´ò ´ó ´ô ´õ ´ö ´÷ ´ø ´ù ´ú ´û ´ü ´ý ´þ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      21¶è  3520 8B3F B5A0     µ¡ µ¢ µ£ µ¤ µ¥ µ¦ µ§ µ¨ µ© µª µ« µ¬ µ­ µ® µ¯
+      21¶è  3530 8B4F B5B0  µ° µ± µ² µ³ µ´ µµ µ¶ µ· µ¸ µ¹ µº µ» µ¼ µ½ µ¾ µ¿
+      21¶è  3540 8B5F B5C0  µÀ µÁ µÂ µÃ µÄ µÅ µÆ µÇ µÈ µÉ µÊ µË µÌ µÍ µÎ µÏ
+      21¶è  3550 8B6F B5D0  µÐ µÑ µÒ µÓ µÔ µÕ µÖ µ× µØ µÙ µÚ µÛ µÜ µÝ µÞ µß
+      21¶è  3560 8B80 B5E0  µà µá µâ µã µä µå µæ µç µè µé µê µë µì µí µî µï
+      21¶è  3570 8B90 B5F0  µð µñ µò µó µô µõ µö µ÷ µø µù µú µû µü µý µþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      22¶è  3620 8B9E B6A0     ¶¡ ¶¢ ¶£ ¶¤ ¶¥ ¶¦ ¶§ ¶¨ ¶© ¶ª ¶« ¶¬ ¶­ ¶® ¶¯
+      22¶è  3630 8BAE B6B0  ¶° ¶± ¶² ¶³ ¶´ ¶µ ¶¶ ¶· ¶¸ ¶¹ ¶º ¶» ¶¼ ¶½ ¶¾ ¶¿
+      22¶è  3640 8BBE B6C0  ¶À ¶Á ¶Â ¶Ã ¶Ä ¶Å ¶Æ ¶Ç ¶È ¶É ¶Ê ¶Ë ¶Ì ¶Í ¶Î ¶Ï
+      22¶è  3650 8BCE B6D0  ¶Ð ¶Ñ ¶Ò ¶Ó ¶Ô ¶Õ ¶Ö ¶× ¶Ø ¶Ù ¶Ú ¶Û ¶Ü ¶Ý ¶Þ ¶ß
+      22¶è  3660 8BDE B6E0  ¶à ¶á ¶â ¶ã ¶ä ¶å ¶æ ¶ç ¶è ¶é ¶ê ¶ë ¶ì ¶í ¶î ¶ï
+      22¶è  3670 8BEE B6F0  ¶ð ¶ñ ¶ò ¶ó ¶ô ¶õ ¶ö ¶÷ ¶ø ¶ù ¶ú ¶û ¶ü ¶ý ¶þ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      23¶è  3720 8C3F B7A0     ·¡ ·¢ ·£ ·¤ ·¥ ·¦ ·§ ·¨ ·© ·ª ·« ·¬ ·­ ·® ·¯
+      23¶è  3730 8C4F B7B0  ·° ·± ·² ·³ ·´ ·µ ·¶ ·· ·¸ ·¹ ·º ·» ·¼ ·½ ·¾ ·¿
+      23¶è  3740 8C5F B7C0  ·À ·Á ·Â ·Ã ·Ä ·Å ·Æ ·Ç ·È ·É ·Ê ·Ë ·Ì ·Í ·Î ·Ï
+      23¶è  3750 8C6F B7D0  ·Ð ·Ñ ·Ò ·Ó ·Ô ·Õ ·Ö ·× ·Ø ·Ù ·Ú ·Û ·Ü ·Ý ·Þ ·ß
+      23¶è  3760 8C80 B7E0  ·à ·á ·â ·ã ·ä ·å ·æ ·ç ·è ·é ·ê ·ë ·ì ·í ·î ·ï
+      23¶è  3770 8C90 B7F0  ·ð ·ñ ·ò ·ó ·ô ·õ ·ö ·÷ ·ø ·ù ·ú ·û ·ü ·ý ·þ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      24¶è  3820 8C9E B8A0     ¸¡ ¸¢ ¸£ ¸¤ ¸¥ ¸¦ ¸§ ¸¨ ¸© ¸ª ¸« ¸¬ ¸­ ¸® ¸¯
+      24¶è  3830 8CAE B8B0  ¸° ¸± ¸² ¸³ ¸´ ¸µ ¸¶ ¸· ¸¸ ¸¹ ¸º ¸» ¸¼ ¸½ ¸¾ ¸¿
+      24¶è  3840 8CBE B8C0  ¸À ¸Á ¸Â ¸Ã ¸Ä ¸Å ¸Æ ¸Ç ¸È ¸É ¸Ê ¸Ë ¸Ì ¸Í ¸Î ¸Ï
+      24¶è  3850 8CCE B8D0  ¸Ð ¸Ñ ¸Ò ¸Ó ¸Ô ¸Õ ¸Ö ¸× ¸Ø ¸Ù ¸Ú ¸Û ¸Ü ¸Ý ¸Þ ¸ß
+      24¶è  3860 8CDE B8E0  ¸à ¸á ¸â ¸ã ¸ä ¸å ¸æ ¸ç ¸è ¸é ¸ê ¸ë ¸ì ¸í ¸î ¸ï
+      24¶è  3870 8CEE B8F0  ¸ð ¸ñ ¸ò ¸ó ¸ô ¸õ ¸ö ¸÷ ¸ø ¸ù ¸ú ¸û ¸ü ¸ý ¸þ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      25¶è  3920 8D3F B9A0     ¹¡ ¹¢ ¹£ ¹¤ ¹¥ ¹¦ ¹§ ¹¨ ¹© ¹ª ¹« ¹¬ ¹­ ¹® ¹¯
+      25¶è  3930 8D4F B9B0  ¹° ¹± ¹² ¹³ ¹´ ¹µ ¹¶ ¹· ¹¸ ¹¹ ¹º ¹» ¹¼ ¹½ ¹¾ ¹¿
+      25¶è  3940 8D5F B9C0  ¹À ¹Á ¹Â ¹Ã ¹Ä ¹Å ¹Æ ¹Ç ¹È ¹É ¹Ê ¹Ë ¹Ì ¹Í ¹Î ¹Ï
+      25¶è  3950 8D6F B9D0  ¹Ð ¹Ñ ¹Ò ¹Ó ¹Ô ¹Õ ¹Ö ¹× ¹Ø ¹Ù ¹Ú ¹Û ¹Ü ¹Ý ¹Þ ¹ß
+      25¶è  3960 8D80 B9E0  ¹à ¹á ¹â ¹ã ¹ä ¹å ¹æ ¹ç ¹è ¹é ¹ê ¹ë ¹ì ¹í ¹î ¹ï
+      25¶è  3970 8D90 B9F0  ¹ð ¹ñ ¹ò ¹ó ¹ô ¹õ ¹ö ¹÷ ¹ø ¹ù ¹ú ¹û ¹ü ¹ý ¹þ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      26¶è  3A20 8D9E BAA0     º¡ º¢ º£ º¤ º¥ º¦ º§ º¨ º© ºª º« º¬ º­ º® º¯
+      26¶è  3A30 8DAE BAB0  º° º± º² º³ º´ ºµ º¶ º· º¸ º¹ ºº º» º¼ º½ º¾ º¿
+      26¶è  3A40 8DBE BAC0  ºÀ ºÁ ºÂ ºÃ ºÄ ºÅ ºÆ ºÇ ºÈ ºÉ ºÊ ºË ºÌ ºÍ ºÎ ºÏ
+      26¶è  3A50 8DCE BAD0  ºÐ ºÑ ºÒ ºÓ ºÔ ºÕ ºÖ º× ºØ ºÙ ºÚ ºÛ ºÜ ºÝ ºÞ ºß
+      26¶è  3A60 8DDE BAE0  ºà ºá ºâ ºã ºä ºå ºæ ºç ºè ºé ºê ºë ºì ºí ºî ºï
+      26¶è  3A70 8DEE BAF0  ºð ºñ ºò ºó ºô ºõ ºö º÷ ºø ºù ºú ºû ºü ºý ºþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      27¶è  3B20 8E3F BBA0     »¡ »¢ »£ »¤ »¥ »¦ »§ »¨ »© »ª »« »¬ »­ »® »¯
+      27¶è  3B30 8E4F BBB0  »° »± »² »³ »´ »µ »¶ »· »¸ »¹ »º »» »¼ »½ »¾ »¿
+      27¶è  3B40 8E5F BBC0  »À »Á »Â »Ã »Ä »Å »Æ »Ç »È »É »Ê »Ë »Ì »Í »Î »Ï
+      27¶è  3B50 8E6F BBD0  »Ð »Ñ »Ò »Ó »Ô »Õ »Ö »× »Ø »Ù »Ú »Û »Ü »Ý »Þ »ß
+      27¶è  3B60 8E80 BBE0  »à »á »â »ã »ä »å »æ »ç »è »é »ê »ë »ì »í »î »ï
+      27¶è  3B70 8E90 BBF0  »ð »ñ »ò »ó »ô »õ »ö »÷ »ø »ù »ú »û »ü »ý »þ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      28¶è  3C20 8E9E BCA0     ¼¡ ¼¢ ¼£ ¼¤ ¼¥ ¼¦ ¼§ ¼¨ ¼© ¼ª ¼« ¼¬ ¼­ ¼® ¼¯
+      28¶è  3C30 8EAE BCB0  ¼° ¼± ¼² ¼³ ¼´ ¼µ ¼¶ ¼· ¼¸ ¼¹ ¼º ¼» ¼¼ ¼½ ¼¾ ¼¿
+      28¶è  3C40 8EBE BCC0  ¼À ¼Á ¼Â ¼Ã ¼Ä ¼Å ¼Æ ¼Ç ¼È ¼É ¼Ê ¼Ë ¼Ì ¼Í ¼Î ¼Ï
+      28¶è  3C50 8ECE BCD0  ¼Ð ¼Ñ ¼Ò ¼Ó ¼Ô ¼Õ ¼Ö ¼× ¼Ø ¼Ù ¼Ú ¼Û ¼Ü ¼Ý ¼Þ ¼ß
+      28¶è  3C60 8EDE BCE0  ¼à ¼á ¼â ¼ã ¼ä ¼å ¼æ ¼ç ¼è ¼é ¼ê ¼ë ¼ì ¼í ¼î ¼ï
+      28¶è  3C70 8EEE BCF0  ¼ð ¼ñ ¼ò ¼ó ¼ô ¼õ ¼ö ¼÷ ¼ø ¼ù ¼ú ¼û ¼ü ¼ý ¼þ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      29¶è  3D20 8F3F BDA0     ½¡ ½¢ ½£ ½¤ ½¥ ½¦ ½§ ½¨ ½© ½ª ½« ½¬ ½­ ½® ½¯
+      29¶è  3D30 8F4F BDB0  ½° ½± ½² ½³ ½´ ½µ ½¶ ½· ½¸ ½¹ ½º ½» ½¼ ½½ ½¾ ½¿
+      29¶è  3D40 8F5F BDC0  ½À ½Á ½Â ½Ã ½Ä ½Å ½Æ ½Ç ½È ½É ½Ê ½Ë ½Ì ½Í ½Î ½Ï
+      29¶è  3D50 8F6F BDD0  ½Ð ½Ñ ½Ò ½Ó ½Ô ½Õ ½Ö ½× ½Ø ½Ù ½Ú ½Û ½Ü ½Ý ½Þ ½ß
+      29¶è  3D60 8F80 BDE0  ½à ½á ½â ½ã ½ä ½å ½æ ½ç ½è ½é ½ê ½ë ½ì ½í ½î ½ï
+      29¶è  3D70 8F90 BDF0  ½ð ½ñ ½ò ½ó ½ô ½õ ½ö ½÷ ½ø ½ù ½ú ½û ½ü ½ý ½þ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      30¶è  3E20 8F9E BEA0     ¾¡ ¾¢ ¾£ ¾¤ ¾¥ ¾¦ ¾§ ¾¨ ¾© ¾ª ¾« ¾¬ ¾­ ¾® ¾¯
+      30¶è  3E30 8FAE BEB0  ¾° ¾± ¾² ¾³ ¾´ ¾µ ¾¶ ¾· ¾¸ ¾¹ ¾º ¾» ¾¼ ¾½ ¾¾ ¾¿
+      30¶è  3E40 8FBE BEC0  ¾À ¾Á ¾Â ¾Ã ¾Ä ¾Å ¾Æ ¾Ç ¾È ¾É ¾Ê ¾Ë ¾Ì ¾Í ¾Î ¾Ï
+      30¶è  3E50 8FCE BED0  ¾Ð ¾Ñ ¾Ò ¾Ó ¾Ô ¾Õ ¾Ö ¾× ¾Ø ¾Ù ¾Ú ¾Û ¾Ü ¾Ý ¾Þ ¾ß
+      30¶è  3E60 8FDE BEE0  ¾à ¾á ¾â ¾ã ¾ä ¾å ¾æ ¾ç ¾è ¾é ¾ê ¾ë ¾ì ¾í ¾î ¾ï
+      30¶è  3E70 8FEE BEF0  ¾ð ¾ñ ¾ò ¾ó ¾ô ¾õ ¾ö ¾÷ ¾ø ¾ù ¾ú ¾û ¾ü ¾ý ¾þ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      31¶è  3F20 903F BFA0     ¿¡ ¿¢ ¿£ ¿¤ ¿¥ ¿¦ ¿§ ¿¨ ¿© ¿ª ¿« ¿¬ ¿­ ¿® ¿¯
+      31¶è  3F30 904F BFB0  ¿° ¿± ¿² ¿³ ¿´ ¿µ ¿¶ ¿· ¿¸ ¿¹ ¿º ¿» ¿¼ ¿½ ¿¾ ¿¿
+      31¶è  3F40 905F BFC0  ¿À ¿Á ¿Â ¿Ã ¿Ä ¿Å ¿Æ ¿Ç ¿È ¿É ¿Ê ¿Ë ¿Ì ¿Í ¿Î ¿Ï
+      31¶è  3F50 906F BFD0  ¿Ð ¿Ñ ¿Ò ¿Ó ¿Ô ¿Õ ¿Ö ¿× ¿Ø ¿Ù ¿Ú ¿Û ¿Ü ¿Ý ¿Þ ¿ß
+      31¶è  3F60 9080 BFE0  ¿à ¿á ¿â ¿ã ¿ä ¿å ¿æ ¿ç ¿è ¿é ¿ê ¿ë ¿ì ¿í ¿î ¿ï
+      31¶è  3F70 9090 BFF0  ¿ð ¿ñ ¿ò ¿ó ¿ô ¿õ ¿ö ¿÷ ¿ø ¿ù ¿ú ¿û ¿ü ¿ý ¿þ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      32¶è  4020 909E C0A0     À¡ À¢ À£ À¤ À¥ À¦ À§ À¨ À© Àª À« À¬ À­ À® À¯
+      32¶è  4030 90AE C0B0  À° À± À² À³ À´ Àµ À¶ À· À¸ À¹ Àº À» À¼ À½ À¾ À¿
+      32¶è  4040 90BE C0C0  ÀÀ ÀÁ ÀÂ ÀÃ ÀÄ ÀÅ ÀÆ ÀÇ ÀÈ ÀÉ ÀÊ ÀË ÀÌ ÀÍ ÀÎ ÀÏ
+      32¶è  4050 90CE C0D0  ÀÐ ÀÑ ÀÒ ÀÓ ÀÔ ÀÕ ÀÖ À× ÀØ ÀÙ ÀÚ ÀÛ ÀÜ ÀÝ ÀÞ Àß
+      32¶è  4060 90DE C0E0  Àà Àá Àâ Àã Àä Àå Àæ Àç Àè Àé Àê Àë Àì Àí Àî Àï
+      32¶è  4070 90EE C0F0  Àð Àñ Àò Àó Àô Àõ Àö À÷ Àø Àù Àú Àû Àü Àý Àþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      33¶è  4120 913F C1A0     Á¡ Á¢ Á£ Á¤ Á¥ Á¦ Á§ Á¨ Á© Áª Á« Á¬ Á­ Á® Á¯
+      33¶è  4130 914F C1B0  Á° Á± Á² Á³ Á´ Áµ Á¶ Á· Á¸ Á¹ Áº Á» Á¼ Á½ Á¾ Á¿
+      33¶è  4140 915F C1C0  ÁÀ ÁÁ ÁÂ ÁÃ ÁÄ ÁÅ ÁÆ ÁÇ ÁÈ ÁÉ ÁÊ ÁË ÁÌ ÁÍ ÁÎ ÁÏ
+      33¶è  4150 916F C1D0  ÁÐ ÁÑ ÁÒ ÁÓ ÁÔ ÁÕ ÁÖ Á× ÁØ ÁÙ ÁÚ ÁÛ ÁÜ ÁÝ ÁÞ Áß
+      33¶è  4160 9180 C1E0  Áà Áá Áâ Áã Áä Áå Áæ Áç Áè Áé Áê Áë Áì Áí Áî Áï
+      33¶è  4170 9190 C1F0  Áð Áñ Áò Áó Áô Áõ Áö Á÷ Áø Áù Áú Áû Áü Áý Áþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      34¶è  4220 919E C2A0     Â¡ Â¢ Â£ Â¤ Â¥ Â¦ Â§ Â¨ Â© Âª Â« Â¬ Â­ Â® Â¯
+      34¶è  4230 91AE C2B0  Â° Â± Â² Â³ Â´ Âµ Â¶ Â· Â¸ Â¹ Âº Â» Â¼ Â½ Â¾ Â¿
+      34¶è  4240 91BE C2C0  ÂÀ ÂÁ ÂÂ ÂÃ ÂÄ ÂÅ ÂÆ ÂÇ ÂÈ ÂÉ ÂÊ ÂË ÂÌ ÂÍ ÂÎ ÂÏ
+      34¶è  4250 91CE C2D0  ÂÐ ÂÑ ÂÒ ÂÓ ÂÔ ÂÕ ÂÖ Â× ÂØ ÂÙ ÂÚ ÂÛ ÂÜ ÂÝ ÂÞ Âß
+      34¶è  4260 91DE C2E0  Âà Âá Ââ Âã Âä Âå Âæ Âç Âè Âé Âê Âë Âì Âí Âî Âï
+      34¶è  4270 91EE C2F0  Âð Âñ Âò Âó Âô Âõ Âö Â÷ Âø Âù Âú Âû Âü Âý Âþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      35¶è  4320 923F C3A0     Ã¡ Ã¢ Ã£ Ã¤ Ã¥ Ã¦ Ã§ Ã¨ Ã© Ãª Ã« Ã¬ Ã­ Ã® Ã¯
+      35¶è  4330 924F C3B0  Ã° Ã± Ã² Ã³ Ã´ Ãµ Ã¶ Ã· Ã¸ Ã¹ Ãº Ã» Ã¼ Ã½ Ã¾ Ã¿
+      35¶è  4340 925F C3C0  ÃÀ ÃÁ ÃÂ ÃÃ ÃÄ ÃÅ ÃÆ ÃÇ ÃÈ ÃÉ ÃÊ ÃË ÃÌ ÃÍ ÃÎ ÃÏ
+      35¶è  4350 926F C3D0  ÃÐ ÃÑ ÃÒ ÃÓ ÃÔ ÃÕ ÃÖ Ã× ÃØ ÃÙ ÃÚ ÃÛ ÃÜ ÃÝ ÃÞ Ãß
+      35¶è  4360 9280 C3E0  Ãà Ãá Ãâ Ãã Ãä Ãå Ãæ Ãç Ãè Ãé Ãê Ãë Ãì Ãí Ãî Ãï
+      35¶è  4370 9290 C3F0  Ãð Ãñ Ãò Ãó Ãô Ãõ Ãö Ã÷ Ãø Ãù Ãú Ãû Ãü Ãý Ãþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      36¶è  4420 929E C4A0     Ä¡ Ä¢ Ä£ Ä¤ Ä¥ Ä¦ Ä§ Ä¨ Ä© Äª Ä« Ä¬ Ä­ Ä® Ä¯
+      36¶è  4430 92AE C4B0  Ä° Ä± Ä² Ä³ Ä´ Äµ Ä¶ Ä· Ä¸ Ä¹ Äº Ä» Ä¼ Ä½ Ä¾ Ä¿
+      36¶è  4440 92BE C4C0  ÄÀ ÄÁ ÄÂ ÄÃ ÄÄ ÄÅ ÄÆ ÄÇ ÄÈ ÄÉ ÄÊ ÄË ÄÌ ÄÍ ÄÎ ÄÏ
+      36¶è  4450 92CE C4D0  ÄÐ ÄÑ ÄÒ ÄÓ ÄÔ ÄÕ ÄÖ Ä× ÄØ ÄÙ ÄÚ ÄÛ ÄÜ ÄÝ ÄÞ Äß
+      36¶è  4460 92DE C4E0  Äà Äá Äâ Äã Ää Äå Äæ Äç Äè Äé Äê Äë Äì Äí Äî Äï
+      36¶è  4470 92EE C4F0  Äð Äñ Äò Äó Äô Äõ Äö Ä÷ Äø Äù Äú Äû Äü Äý Äþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      37¶è  4520 933F C5A0     Å¡ Å¢ Å£ Å¤ Å¥ Å¦ Å§ Å¨ Å© Åª Å« Å¬ Å­ Å® Å¯
+      37¶è  4530 934F C5B0  Å° Å± Å² Å³ Å´ Åµ Å¶ Å· Å¸ Å¹ Åº Å» Å¼ Å½ Å¾ Å¿
+      37¶è  4540 935F C5C0  ÅÀ ÅÁ ÅÂ ÅÃ ÅÄ ÅÅ ÅÆ ÅÇ ÅÈ ÅÉ ÅÊ ÅË ÅÌ ÅÍ ÅÎ ÅÏ
+      37¶è  4550 936F C5D0  ÅÐ ÅÑ ÅÒ ÅÓ ÅÔ ÅÕ ÅÖ Å× ÅØ ÅÙ ÅÚ ÅÛ ÅÜ ÅÝ ÅÞ Åß
+      37¶è  4560 9380 C5E0  Åà Åá Åâ Åã Åä Åå Åæ Åç Åè Åé Åê Åë Åì Åí Åî Åï
+      37¶è  4570 9390 C5F0  Åð Åñ Åò Åó Åô Åõ Åö Å÷ Åø Åù Åú Åû Åü Åý Åþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      38¶è  4620 939E C6A0     Æ¡ Æ¢ Æ£ Æ¤ Æ¥ Æ¦ Æ§ Æ¨ Æ© Æª Æ« Æ¬ Æ­ Æ® Æ¯
+      38¶è  4630 93AE C6B0  Æ° Æ± Æ² Æ³ Æ´ Æµ Æ¶ Æ· Æ¸ Æ¹ Æº Æ» Æ¼ Æ½ Æ¾ Æ¿
+      38¶è  4640 93BE C6C0  ÆÀ ÆÁ ÆÂ ÆÃ ÆÄ ÆÅ ÆÆ ÆÇ ÆÈ ÆÉ ÆÊ ÆË ÆÌ ÆÍ ÆÎ ÆÏ
+      38¶è  4650 93CE C6D0  ÆÐ ÆÑ ÆÒ ÆÓ ÆÔ ÆÕ ÆÖ Æ× ÆØ ÆÙ ÆÚ ÆÛ ÆÜ ÆÝ ÆÞ Æß
+      38¶è  4660 93DE C6E0  Æà Æá Æâ Æã Æä Æå Ææ Æç Æè Æé Æê Æë Æì Æí Æî Æï
+      38¶è  4670 93EE C6F0  Æð Æñ Æò Æó Æô Æõ Æö Æ÷ Æø Æù Æú Æû Æü Æý Æþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      39¶è  4720 943F C7A0     Ç¡ Ç¢ Ç£ Ç¤ Ç¥ Ç¦ Ç§ Ç¨ Ç© Çª Ç« Ç¬ Ç­ Ç® Ç¯
+      39¶è  4730 944F C7B0  Ç° Ç± Ç² Ç³ Ç´ Çµ Ç¶ Ç· Ç¸ Ç¹ Çº Ç» Ç¼ Ç½ Ç¾ Ç¿
+      39¶è  4740 945F C7C0  ÇÀ ÇÁ ÇÂ ÇÃ ÇÄ ÇÅ ÇÆ ÇÇ ÇÈ ÇÉ ÇÊ ÇË ÇÌ ÇÍ ÇÎ ÇÏ
+      39¶è  4750 946F C7D0  ÇÐ ÇÑ ÇÒ ÇÓ ÇÔ ÇÕ ÇÖ Ç× ÇØ ÇÙ ÇÚ ÇÛ ÇÜ ÇÝ ÇÞ Çß
+      39¶è  4760 9480 C7E0  Çà Çá Çâ Çã Çä Çå Çæ Çç Çè Çé Çê Çë Çì Çí Çî Çï
+      39¶è  4770 9490 C7F0  Çð Çñ Çò Çó Çô Çõ Çö Ç÷ Çø Çù Çú Çû Çü Çý Çþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      40¶è  4820 949E C8A0     È¡ È¢ È£ È¤ È¥ È¦ È§ È¨ È© Èª È« È¬ È­ È® È¯
+      40¶è  4830 94AE C8B0  È° È± È² È³ È´ Èµ È¶ È· È¸ È¹ Èº È» È¼ È½ È¾ È¿
+      40¶è  4840 94BE C8C0  ÈÀ ÈÁ ÈÂ ÈÃ ÈÄ ÈÅ ÈÆ ÈÇ ÈÈ ÈÉ ÈÊ ÈË ÈÌ ÈÍ ÈÎ ÈÏ
+      40¶è  4850 94CE C8D0  ÈÐ ÈÑ ÈÒ ÈÓ ÈÔ ÈÕ ÈÖ È× ÈØ ÈÙ ÈÚ ÈÛ ÈÜ ÈÝ ÈÞ Èß
+      40¶è  4860 94DE C8E0  Èà Èá Èâ Èã Èä Èå Èæ Èç Èè Èé Èê Èë Èì Èí Èî Èï
+      40¶è  4870 94EE C8F0  Èð Èñ Èò Èó Èô Èõ Èö È÷ Èø Èù Èú Èû Èü Èý Èþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      41¶è  4920 953F C9A0     É¡ É¢ É£ É¤ É¥ É¦ É§ É¨ É© Éª É« É¬ É­ É® É¯
+      41¶è  4930 954F C9B0  É° É± É² É³ É´ Éµ É¶ É· É¸ É¹ Éº É» É¼ É½ É¾ É¿
+      41¶è  4940 955F C9C0  ÉÀ ÉÁ ÉÂ ÉÃ ÉÄ ÉÅ ÉÆ ÉÇ ÉÈ ÉÉ ÉÊ ÉË ÉÌ ÉÍ ÉÎ ÉÏ
+      41¶è  4950 956F C9D0  ÉÐ ÉÑ ÉÒ ÉÓ ÉÔ ÉÕ ÉÖ É× ÉØ ÉÙ ÉÚ ÉÛ ÉÜ ÉÝ ÉÞ Éß
+      41¶è  4960 9580 C9E0  Éà Éá Éâ Éã Éä Éå Éæ Éç Éè Éé Éê Éë Éì Éí Éî Éï
+      41¶è  4970 9590 C9F0  Éð Éñ Éò Éó Éô Éõ Éö É÷ Éø Éù Éú Éû Éü Éý Éþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      42¶è  4A20 959E CAA0     Ê¡ Ê¢ Ê£ Ê¤ Ê¥ Ê¦ Ê§ Ê¨ Ê© Êª Ê« Ê¬ Ê­ Ê® Ê¯
+      42¶è  4A30 95AE CAB0  Ê° Ê± Ê² Ê³ Ê´ Êµ Ê¶ Ê· Ê¸ Ê¹ Êº Ê» Ê¼ Ê½ Ê¾ Ê¿
+      42¶è  4A40 95BE CAC0  ÊÀ ÊÁ ÊÂ ÊÃ ÊÄ ÊÅ ÊÆ ÊÇ ÊÈ ÊÉ ÊÊ ÊË ÊÌ ÊÍ ÊÎ ÊÏ
+      42¶è  4A50 95CE CAD0  ÊÐ ÊÑ ÊÒ ÊÓ ÊÔ ÊÕ ÊÖ Ê× ÊØ ÊÙ ÊÚ ÊÛ ÊÜ ÊÝ ÊÞ Êß
+      42¶è  4A60 95DE CAE0  Êà Êá Êâ Êã Êä Êå Êæ Êç Êè Êé Êê Êë Êì Êí Êî Êï
+      42¶è  4A70 95EE CAF0  Êð Êñ Êò Êó Êô Êõ Êö Ê÷ Êø Êù Êú Êû Êü Êý Êþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      43¶è  4B20 963F CBA0     Ë¡ Ë¢ Ë£ Ë¤ Ë¥ Ë¦ Ë§ Ë¨ Ë© Ëª Ë« Ë¬ Ë­ Ë® Ë¯
+      43¶è  4B30 964F CBB0  Ë° Ë± Ë² Ë³ Ë´ Ëµ Ë¶ Ë· Ë¸ Ë¹ Ëº Ë» Ë¼ Ë½ Ë¾ Ë¿
+      43¶è  4B40 965F CBC0  ËÀ ËÁ ËÂ ËÃ ËÄ ËÅ ËÆ ËÇ ËÈ ËÉ ËÊ ËË ËÌ ËÍ ËÎ ËÏ
+      43¶è  4B50 966F CBD0  ËÐ ËÑ ËÒ ËÓ ËÔ ËÕ ËÖ Ë× ËØ ËÙ ËÚ ËÛ ËÜ ËÝ ËÞ Ëß
+      43¶è  4B60 9680 CBE0  Ëà Ëá Ëâ Ëã Ëä Ëå Ëæ Ëç Ëè Ëé Ëê Ëë Ëì Ëí Ëî Ëï
+      43¶è  4B70 9690 CBF0  Ëð Ëñ Ëò Ëó Ëô Ëõ Ëö Ë÷ Ëø Ëù Ëú Ëû Ëü Ëý Ëþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      44¶è  4C20 969E CCA0     Ì¡ Ì¢ Ì£ Ì¤ Ì¥ Ì¦ Ì§ Ì¨ Ì© Ìª Ì« Ì¬ Ì­ Ì® Ì¯
+      44¶è  4C30 96AE CCB0  Ì° Ì± Ì² Ì³ Ì´ Ìµ Ì¶ Ì· Ì¸ Ì¹ Ìº Ì» Ì¼ Ì½ Ì¾ Ì¿
+      44¶è  4C40 96BE CCC0  ÌÀ ÌÁ ÌÂ ÌÃ ÌÄ ÌÅ ÌÆ ÌÇ ÌÈ ÌÉ ÌÊ ÌË ÌÌ ÌÍ ÌÎ ÌÏ
+      44¶è  4C50 96CE CCD0  ÌÐ ÌÑ ÌÒ ÌÓ ÌÔ ÌÕ ÌÖ Ì× ÌØ ÌÙ ÌÚ ÌÛ ÌÜ ÌÝ ÌÞ Ìß
+      44¶è  4C60 96DE CCE0  Ìà Ìá Ìâ Ìã Ìä Ìå Ìæ Ìç Ìè Ìé Ìê Ìë Ìì Ìí Ìî Ìï
+      44¶è  4C70 96EE CCF0  Ìð Ìñ Ìò Ìó Ìô Ìõ Ìö Ì÷ Ìø Ìù Ìú Ìû Ìü Ìý Ìþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      45¶è  4D20 973F CDA0     Í¡ Í¢ Í£ Í¤ Í¥ Í¦ Í§ Í¨ Í© Íª Í« Í¬ Í­ Í® Í¯
+      45¶è  4D30 974F CDB0  Í° Í± Í² Í³ Í´ Íµ Í¶ Í· Í¸ Í¹ Íº Í» Í¼ Í½ Í¾ Í¿
+      45¶è  4D40 975F CDC0  ÍÀ ÍÁ ÍÂ ÍÃ ÍÄ ÍÅ ÍÆ ÍÇ ÍÈ ÍÉ ÍÊ ÍË ÍÌ ÍÍ ÍÎ ÍÏ
+      45¶è  4D50 976F CDD0  ÍÐ ÍÑ ÍÒ ÍÓ ÍÔ ÍÕ ÍÖ Í× ÍØ ÍÙ ÍÚ ÍÛ ÍÜ ÍÝ ÍÞ Íß
+      45¶è  4D60 9780 CDE0  Íà Íá Íâ Íã Íä Íå Íæ Íç Íè Íé Íê Íë Íì Íí Íî Íï
+      45¶è  4D70 9790 CDF0  Íð Íñ Íò Íó Íô Íõ Íö Í÷ Íø Íù Íú Íû Íü Íý Íþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      46¶è  4E20 979E CEA0     Î¡ Î¢ Î£ Î¤ Î¥ Î¦ Î§ Î¨ Î© Îª Î« Î¬ Î­ Î® Î¯
+      46¶è  4E30 97AE CEB0  Î° Î± Î² Î³ Î´ Îµ Î¶ Î· Î¸ Î¹ Îº Î» Î¼ Î½ Î¾ Î¿
+      46¶è  4E40 97BE CEC0  ÎÀ ÎÁ ÎÂ ÎÃ ÎÄ ÎÅ ÎÆ ÎÇ ÎÈ ÎÉ ÎÊ ÎË ÎÌ ÎÍ ÎÎ ÎÏ
+      46¶è  4E50 97CE CED0  ÎÐ ÎÑ ÎÒ ÎÓ ÎÔ ÎÕ ÎÖ Î× ÎØ ÎÙ ÎÚ ÎÛ ÎÜ ÎÝ ÎÞ Îß
+      46¶è  4E60 97DE CEE0  Îà Îá Îâ Îã Îä Îå Îæ Îç Îè Îé Îê Îë Îì Îí Îî Îï
+      46¶è  4E70 97EE CEF0  Îð Îñ Îò Îó Îô Îõ Îö Î÷ Îø Îù Îú Îû Îü Îý Îþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      47¶è  4F20 983F CFA0     Ï¡ Ï¢ Ï£ Ï¤ Ï¥ Ï¦ Ï§ Ï¨ Ï© Ïª Ï« Ï¬ Ï­ Ï® Ï¯
+      47¶è  4F30 984F CFB0  Ï° Ï± Ï² Ï³ Ï´ Ïµ Ï¶ Ï· Ï¸ Ï¹ Ïº Ï» Ï¼ Ï½ Ï¾ Ï¿
+      47¶è  4F40 985F CFC0  ÏÀ ÏÁ ÏÂ ÏÃ ÏÄ ÏÅ ÏÆ ÏÇ ÏÈ ÏÉ ÏÊ ÏË ÏÌ ÏÍ ÏÎ ÏÏ
+      47¶è  4F50 986F CFD0  ÏÐ ÏÑ ÏÒ ÏÓ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      47¶è  4F60 9880 CFE0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      47¶è  4F70 9890 CFF0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      48¶è  5020 989E D0A0     Ð¡ Ð¢ Ð£ Ð¤ Ð¥ Ð¦ Ð§ Ð¨ Ð© Ðª Ð« Ð¬ Ð­ Ð® Ð¯
+      48¶è  5030 98AE D0B0  Ð° Ð± Ð² Ð³ Ð´ Ðµ Ð¶ Ð· Ð¸ Ð¹ Ðº Ð» Ð¼ Ð½ Ð¾ Ð¿
+      48¶è  5040 98BE D0C0  ÐÀ ÐÁ ÐÂ ÐÃ ÐÄ ÐÅ ÐÆ ÐÇ ÐÈ ÐÉ ÐÊ ÐË ÐÌ ÐÍ ÐÎ ÐÏ
+      48¶è  5050 98CE D0D0  ÐÐ ÐÑ ÐÒ ÐÓ ÐÔ ÐÕ ÐÖ Ð× ÐØ ÐÙ ÐÚ ÐÛ ÐÜ ÐÝ ÐÞ Ðß
+      48¶è  5060 98DE D0E0  Ðà Ðá Ðâ Ðã Ðä Ðå Ðæ Ðç Ðè Ðé Ðê Ðë Ðì Ðí Ðî Ðï
+      48¶è  5070 98EE D0F0  Ðð Ðñ Ðò Ðó Ðô Ðõ Ðö Ð÷ Ðø Ðù Ðú Ðû Ðü Ðý Ðþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      49¶è  5120 993F D1A0     Ñ¡ Ñ¢ Ñ£ Ñ¤ Ñ¥ Ñ¦ Ñ§ Ñ¨ Ñ© Ñª Ñ« Ñ¬ Ñ­ Ñ® Ñ¯
+      49¶è  5130 994F D1B0  Ñ° Ñ± Ñ² Ñ³ Ñ´ Ñµ Ñ¶ Ñ· Ñ¸ Ñ¹ Ñº Ñ» Ñ¼ Ñ½ Ñ¾ Ñ¿
+      49¶è  5140 995F D1C0  ÑÀ ÑÁ ÑÂ ÑÃ ÑÄ ÑÅ ÑÆ ÑÇ ÑÈ ÑÉ ÑÊ ÑË ÑÌ ÑÍ ÑÎ ÑÏ
+      49¶è  5150 996F D1D0  ÑÐ ÑÑ ÑÒ ÑÓ ÑÔ ÑÕ ÑÖ Ñ× ÑØ ÑÙ ÑÚ ÑÛ ÑÜ ÑÝ ÑÞ Ñß
+      49¶è  5160 9980 D1E0  Ñà Ñá Ñâ Ñã Ñä Ñå Ñæ Ñç Ñè Ñé Ñê Ñë Ñì Ñí Ñî Ñï
+      49¶è  5170 9990 D1F0  Ñð Ññ Ñò Ñó Ñô Ñõ Ñö Ñ÷ Ñø Ñù Ñú Ñû Ñü Ñý Ñþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      50¶è  5220 999E D2A0     Ò¡ Ò¢ Ò£ Ò¤ Ò¥ Ò¦ Ò§ Ò¨ Ò© Òª Ò« Ò¬ Ò­ Ò® Ò¯
+      50¶è  5230 99AE D2B0  Ò° Ò± Ò² Ò³ Ò´ Òµ Ò¶ Ò· Ò¸ Ò¹ Òº Ò» Ò¼ Ò½ Ò¾ Ò¿
+      50¶è  5240 99BE D2C0  ÒÀ ÒÁ ÒÂ ÒÃ ÒÄ ÒÅ ÒÆ ÒÇ ÒÈ ÒÉ ÒÊ ÒË ÒÌ ÒÍ ÒÎ ÒÏ
+      50¶è  5250 99CE D2D0  ÒÐ ÒÑ ÒÒ ÒÓ ÒÔ ÒÕ ÒÖ Ò× ÒØ ÒÙ ÒÚ ÒÛ ÒÜ ÒÝ ÒÞ Òß
+      50¶è  5260 99DE D2E0  Òà Òá Òâ Òã Òä Òå Òæ Òç Òè Òé Òê Òë Òì Òí Òî Òï
+      50¶è  5270 99EE D2F0  Òð Òñ Òò Òó Òô Òõ Òö Ò÷ Òø Òù Òú Òû Òü Òý Òþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      51¶è  5320 9A3F D3A0     Ó¡ Ó¢ Ó£ Ó¤ Ó¥ Ó¦ Ó§ Ó¨ Ó© Óª Ó« Ó¬ Ó­ Ó® Ó¯
+      51¶è  5330 9A4F D3B0  Ó° Ó± Ó² Ó³ Ó´ Óµ Ó¶ Ó· Ó¸ Ó¹ Óº Ó» Ó¼ Ó½ Ó¾ Ó¿
+      51¶è  5340 9A5F D3C0  ÓÀ ÓÁ ÓÂ ÓÃ ÓÄ ÓÅ ÓÆ ÓÇ ÓÈ ÓÉ ÓÊ ÓË ÓÌ ÓÍ ÓÎ ÓÏ
+      51¶è  5350 9A6F D3D0  ÓÐ ÓÑ ÓÒ ÓÓ ÓÔ ÓÕ ÓÖ Ó× ÓØ ÓÙ ÓÚ ÓÛ ÓÜ ÓÝ ÓÞ Óß
+      51¶è  5360 9A80 D3E0  Óà Óá Óâ Óã Óä Óå Óæ Óç Óè Óé Óê Óë Óì Óí Óî Óï
+      51¶è  5370 9A90 D3F0  Óð Óñ Óò Óó Óô Óõ Óö Ó÷ Óø Óù Óú Óû Óü Óý Óþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      52¶è  5420 9A9E D4A0     Ô¡ Ô¢ Ô£ Ô¤ Ô¥ Ô¦ Ô§ Ô¨ Ô© Ôª Ô« Ô¬ Ô­ Ô® Ô¯
+      52¶è  5430 9AAE D4B0  Ô° Ô± Ô² Ô³ Ô´ Ôµ Ô¶ Ô· Ô¸ Ô¹ Ôº Ô» Ô¼ Ô½ Ô¾ Ô¿
+      52¶è  5440 9ABE D4C0  ÔÀ ÔÁ ÔÂ ÔÃ ÔÄ ÔÅ ÔÆ ÔÇ ÔÈ ÔÉ ÔÊ ÔË ÔÌ ÔÍ ÔÎ ÔÏ
+      52¶è  5450 9ACE D4D0  ÔÐ ÔÑ ÔÒ ÔÓ ÔÔ ÔÕ ÔÖ Ô× ÔØ ÔÙ ÔÚ ÔÛ ÔÜ ÔÝ ÔÞ Ôß
+      52¶è  5460 9ADE D4E0  Ôà Ôá Ôâ Ôã Ôä Ôå Ôæ Ôç Ôè Ôé Ôê Ôë Ôì Ôí Ôî Ôï
+      52¶è  5470 9AEE D4F0  Ôð Ôñ Ôò Ôó Ôô Ôõ Ôö Ô÷ Ôø Ôù Ôú Ôû Ôü Ôý Ôþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      53¶è  5520 9B3F D5A0     Õ¡ Õ¢ Õ£ Õ¤ Õ¥ Õ¦ Õ§ Õ¨ Õ© Õª Õ« Õ¬ Õ­ Õ® Õ¯
+      53¶è  5530 9B4F D5B0  Õ° Õ± Õ² Õ³ Õ´ Õµ Õ¶ Õ· Õ¸ Õ¹ Õº Õ» Õ¼ Õ½ Õ¾ Õ¿
+      53¶è  5540 9B5F D5C0  ÕÀ ÕÁ ÕÂ ÕÃ ÕÄ ÕÅ ÕÆ ÕÇ ÕÈ ÕÉ ÕÊ ÕË ÕÌ ÕÍ ÕÎ ÕÏ
+      53¶è  5550 9B6F D5D0  ÕÐ ÕÑ ÕÒ ÕÓ ÕÔ ÕÕ ÕÖ Õ× ÕØ ÕÙ ÕÚ ÕÛ ÕÜ ÕÝ ÕÞ Õß
+      53¶è  5560 9B80 D5E0  Õà Õá Õâ Õã Õä Õå Õæ Õç Õè Õé Õê Õë Õì Õí Õî Õï
+      53¶è  5570 9B90 D5F0  Õð Õñ Õò Õó Õô Õõ Õö Õ÷ Õø Õù Õú Õû Õü Õý Õþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      54¶è  5620 9B9E D6A0     Ö¡ Ö¢ Ö£ Ö¤ Ö¥ Ö¦ Ö§ Ö¨ Ö© Öª Ö« Ö¬ Ö­ Ö® Ö¯
+      54¶è  5630 9BAE D6B0  Ö° Ö± Ö² Ö³ Ö´ Öµ Ö¶ Ö· Ö¸ Ö¹ Öº Ö» Ö¼ Ö½ Ö¾ Ö¿
+      54¶è  5640 9BBE D6C0  ÖÀ ÖÁ ÖÂ ÖÃ ÖÄ ÖÅ ÖÆ ÖÇ ÖÈ ÖÉ ÖÊ ÖË ÖÌ ÖÍ ÖÎ ÖÏ
+      54¶è  5650 9BCE D6D0  ÖÐ ÖÑ ÖÒ ÖÓ ÖÔ ÖÕ ÖÖ Ö× ÖØ ÖÙ ÖÚ ÖÛ ÖÜ ÖÝ ÖÞ Öß
+      54¶è  5660 9BDE D6E0  Öà Öá Öâ Öã Öä Öå Öæ Öç Öè Öé Öê Öë Öì Öí Öî Öï
+      54¶è  5670 9BEE D6F0  Öð Öñ Öò Öó Öô Öõ Öö Ö÷ Öø Öù Öú Öû Öü Öý Öþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      55¶è  5720 9C3F D7A0     ×¡ ×¢ ×£ ×¤ ×¥ ×¦ ×§ ×¨ ×© ×ª ×« ×¬ ×­ ×® ×¯
+      55¶è  5730 9C4F D7B0  ×° ×± ×² ×³ ×´ ×µ ×¶ ×· ×¸ ×¹ ×º ×» ×¼ ×½ ×¾ ×¿
+      55¶è  5740 9C5F D7C0  ×À ×Á ×Â ×Ã ×Ä ×Å ×Æ ×Ç ×È ×É ×Ê ×Ë ×Ì ×Í ×Î ×Ï
+      55¶è  5750 9C6F D7D0  ×Ð ×Ñ ×Ò ×Ó ×Ô ×Õ ×Ö ×× ×Ø ×Ù ×Ú ×Û ×Ü ×Ý ×Þ ×ß
+      55¶è  5760 9C80 D7E0  ×à ×á ×â ×ã ×ä ×å ×æ ×ç ×è ×é ×ê ×ë ×ì ×í ×î ×ï
+      55¶è  5770 9C90 D7F0  ×ð ×ñ ×ò ×ó ×ô ×õ ×ö ×÷ ×ø ×ù ×ú ×û ×ü ×ý ×þ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      56¶è  5820 9C9E D8A0     Ø¡ Ø¢ Ø£ Ø¤ Ø¥ Ø¦ Ø§ Ø¨ Ø© Øª Ø« Ø¬ Ø­ Ø® Ø¯
+      56¶è  5830 9CAE D8B0  Ø° Ø± Ø² Ø³ Ø´ Øµ Ø¶ Ø· Ø¸ Ø¹ Øº Ø» Ø¼ Ø½ Ø¾ Ø¿
+      56¶è  5840 9CBE D8C0  ØÀ ØÁ ØÂ ØÃ ØÄ ØÅ ØÆ ØÇ ØÈ ØÉ ØÊ ØË ØÌ ØÍ ØÎ ØÏ
+      56¶è  5850 9CCE D8D0  ØÐ ØÑ ØÒ ØÓ ØÔ ØÕ ØÖ Ø× ØØ ØÙ ØÚ ØÛ ØÜ ØÝ ØÞ Øß
+      56¶è  5860 9CDE D8E0  Øà Øá Øâ Øã Øä Øå Øæ Øç Øè Øé Øê Øë Øì Øí Øî Øï
+      56¶è  5870 9CEE D8F0  Øð Øñ Øò Øó Øô Øõ Øö Ø÷ Øø Øù Øú Øû Øü Øý Øþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      57¶è  5920 9D3F D9A0     Ù¡ Ù¢ Ù£ Ù¤ Ù¥ Ù¦ Ù§ Ù¨ Ù© Ùª Ù« Ù¬ Ù­ Ù® Ù¯
+      57¶è  5930 9D4F D9B0  Ù° Ù± Ù² Ù³ Ù´ Ùµ Ù¶ Ù· Ù¸ Ù¹ Ùº Ù» Ù¼ Ù½ Ù¾ Ù¿
+      57¶è  5940 9D5F D9C0  ÙÀ ÙÁ ÙÂ ÙÃ ÙÄ ÙÅ ÙÆ ÙÇ ÙÈ ÙÉ ÙÊ ÙË ÙÌ ÙÍ ÙÎ ÙÏ
+      57¶è  5950 9D6F D9D0  ÙÐ ÙÑ ÙÒ ÙÓ ÙÔ ÙÕ ÙÖ Ù× ÙØ ÙÙ ÙÚ ÙÛ ÙÜ ÙÝ ÙÞ Ùß
+      57¶è  5960 9D80 D9E0  Ùà Ùá Ùâ Ùã Ùä Ùå Ùæ Ùç Ùè Ùé Ùê Ùë Ùì Ùí Ùî Ùï
+      57¶è  5970 9D90 D9F0  Ùð Ùñ Ùò Ùó Ùô Ùõ Ùö Ù÷ Ùø Ùù Ùú Ùû Ùü Ùý Ùþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      58¶è  5A20 9D9E DAA0     Ú¡ Ú¢ Ú£ Ú¤ Ú¥ Ú¦ Ú§ Ú¨ Ú© Úª Ú« Ú¬ Ú­ Ú® Ú¯
+      58¶è  5A30 9DAE DAB0  Ú° Ú± Ú² Ú³ Ú´ Úµ Ú¶ Ú· Ú¸ Ú¹ Úº Ú» Ú¼ Ú½ Ú¾ Ú¿
+      58¶è  5A40 9DBE DAC0  ÚÀ ÚÁ ÚÂ ÚÃ ÚÄ ÚÅ ÚÆ ÚÇ ÚÈ ÚÉ ÚÊ ÚË ÚÌ ÚÍ ÚÎ ÚÏ
+      58¶è  5A50 9DCE DAD0  ÚÐ ÚÑ ÚÒ ÚÓ ÚÔ ÚÕ ÚÖ Ú× ÚØ ÚÙ ÚÚ ÚÛ ÚÜ ÚÝ ÚÞ Úß
+      58¶è  5A60 9DDE DAE0  Úà Úá Úâ Úã Úä Úå Úæ Úç Úè Úé Úê Úë Úì Úí Úî Úï
+      58¶è  5A70 9DEE DAF0  Úð Úñ Úò Úó Úô Úõ Úö Ú÷ Úø Úù Úú Úû Úü Úý Úþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      59¶è  5B20 9E3F DBA0     Û¡ Û¢ Û£ Û¤ Û¥ Û¦ Û§ Û¨ Û© Ûª Û« Û¬ Û­ Û® Û¯
+      59¶è  5B30 9E4F DBB0  Û° Û± Û² Û³ Û´ Ûµ Û¶ Û· Û¸ Û¹ Ûº Û» Û¼ Û½ Û¾ Û¿
+      59¶è  5B40 9E5F DBC0  ÛÀ ÛÁ ÛÂ ÛÃ ÛÄ ÛÅ ÛÆ ÛÇ ÛÈ ÛÉ ÛÊ ÛË ÛÌ ÛÍ ÛÎ ÛÏ
+      59¶è  5B50 9E6F DBD0  ÛÐ ÛÑ ÛÒ ÛÓ ÛÔ ÛÕ ÛÖ Û× ÛØ ÛÙ ÛÚ ÛÛ ÛÜ ÛÝ ÛÞ Ûß
+      59¶è  5B60 9E80 DBE0  Ûà Ûá Ûâ Ûã Ûä Ûå Ûæ Ûç Ûè Ûé Ûê Ûë Ûì Ûí Ûî Ûï
+      59¶è  5B70 9E90 DBF0  Ûð Ûñ Ûò Ûó Ûô Ûõ Ûö Û÷ Ûø Ûù Ûú Ûû Ûü Ûý Ûþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      60¶è  5C20 9E9E DCA0     Ü¡ Ü¢ Ü£ Ü¤ Ü¥ Ü¦ Ü§ Ü¨ Ü© Üª Ü« Ü¬ Ü­ Ü® Ü¯
+      60¶è  5C30 9EAE DCB0  Ü° Ü± Ü² Ü³ Ü´ Üµ Ü¶ Ü· Ü¸ Ü¹ Üº Ü» Ü¼ Ü½ Ü¾ Ü¿
+      60¶è  5C40 9EBE DCC0  ÜÀ ÜÁ ÜÂ ÜÃ ÜÄ ÜÅ ÜÆ ÜÇ ÜÈ ÜÉ ÜÊ ÜË ÜÌ ÜÍ ÜÎ ÜÏ
+      60¶è  5C50 9ECE DCD0  ÜÐ ÜÑ ÜÒ ÜÓ ÜÔ ÜÕ ÜÖ Ü× ÜØ ÜÙ ÜÚ ÜÛ ÜÜ ÜÝ ÜÞ Üß
+      60¶è  5C60 9EDE DCE0  Üà Üá Üâ Üã Üä Üå Üæ Üç Üè Üé Üê Üë Üì Üí Üî Üï
+      60¶è  5C70 9EEE DCF0  Üð Üñ Üò Üó Üô Üõ Üö Ü÷ Üø Üù Üú Üû Üü Üý Üþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      61¶è  5D20 9F3F DDA0     Ý¡ Ý¢ Ý£ Ý¤ Ý¥ Ý¦ Ý§ Ý¨ Ý© Ýª Ý« Ý¬ Ý­ Ý® Ý¯
+      61¶è  5D30 9F4F DDB0  Ý° Ý± Ý² Ý³ Ý´ Ýµ Ý¶ Ý· Ý¸ Ý¹ Ýº Ý» Ý¼ Ý½ Ý¾ Ý¿
+      61¶è  5D40 9F5F DDC0  ÝÀ ÝÁ ÝÂ ÝÃ ÝÄ ÝÅ ÝÆ ÝÇ ÝÈ ÝÉ ÝÊ ÝË ÝÌ ÝÍ ÝÎ ÝÏ
+      61¶è  5D50 9F6F DDD0  ÝÐ ÝÑ ÝÒ ÝÓ ÝÔ ÝÕ ÝÖ Ý× ÝØ ÝÙ ÝÚ ÝÛ ÝÜ ÝÝ ÝÞ Ýß
+      61¶è  5D60 9F80 DDE0  Ýà Ýá Ýâ Ýã Ýä Ýå Ýæ Ýç Ýè Ýé Ýê Ýë Ýì Ýí Ýî Ýï
+      61¶è  5D70 9F90 DDF0  Ýð Ýñ Ýò Ýó Ýô Ýõ Ýö Ý÷ Ýø Ýù Ýú Ýû Ýü Ýý Ýþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      62¶è  5E20 9F9E DEA0     Þ¡ Þ¢ Þ£ Þ¤ Þ¥ Þ¦ Þ§ Þ¨ Þ© Þª Þ« Þ¬ Þ­ Þ® Þ¯
+      62¶è  5E30 9FAE DEB0  Þ° Þ± Þ² Þ³ Þ´ Þµ Þ¶ Þ· Þ¸ Þ¹ Þº Þ» Þ¼ Þ½ Þ¾ Þ¿
+      62¶è  5E40 9FBE DEC0  ÞÀ ÞÁ ÞÂ ÞÃ ÞÄ ÞÅ ÞÆ ÞÇ ÞÈ ÞÉ ÞÊ ÞË ÞÌ ÞÍ ÞÎ ÞÏ
+      62¶è  5E50 9FCE DED0  ÞÐ ÞÑ ÞÒ ÞÓ ÞÔ ÞÕ ÞÖ Þ× ÞØ ÞÙ ÞÚ ÞÛ ÞÜ ÞÝ ÞÞ Þß
+      62¶è  5E60 9FDE DEE0  Þà Þá Þâ Þã Þä Þå Þæ Þç Þè Þé Þê Þë Þì Þí Þî Þï
+      62¶è  5E70 9FEE DEF0  Þð Þñ Þò Þó Þô Þõ Þö Þ÷ Þø Þù Þú Þû Þü Þý Þþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      63¶è  5F20 E03F DFA0     ß¡ ß¢ ß£ ß¤ ß¥ ß¦ ß§ ß¨ ß© ßª ß« ß¬ ß­ ß® ß¯
+      63¶è  5F30 E04F DFB0  ß° ß± ß² ß³ ß´ ßµ ß¶ ß· ß¸ ß¹ ßº ß» ß¼ ß½ ß¾ ß¿
+      63¶è  5F40 E05F DFC0  ßÀ ßÁ ßÂ ßÃ ßÄ ßÅ ßÆ ßÇ ßÈ ßÉ ßÊ ßË ßÌ ßÍ ßÎ ßÏ
+      63¶è  5F50 E06F DFD0  ßÐ ßÑ ßÒ ßÓ ßÔ ßÕ ßÖ ß× ßØ ßÙ ßÚ ßÛ ßÜ ßÝ ßÞ ßß
+      63¶è  5F60 E080 DFE0  ßà ßá ßâ ßã ßä ßå ßæ ßç ßè ßé ßê ßë ßì ßí ßî ßï
+      63¶è  5F70 E090 DFF0  ßð ßñ ßò ßó ßô ßõ ßö ß÷ ßø ßù ßú ßû ßü ßý ßþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      64¶è  6020 E09E E0A0     à¡ à¢ à£ à¤ à¥ à¦ à§ à¨ à© àª à« à¬ à­ à® à¯
+      64¶è  6030 E0AE E0B0  à° à± à² à³ à´ àµ à¶ à· à¸ à¹ àº à» à¼ à½ à¾ à¿
+      64¶è  6040 E0BE E0C0  àÀ àÁ àÂ àÃ àÄ àÅ àÆ àÇ àÈ àÉ àÊ àË àÌ àÍ àÎ àÏ
+      64¶è  6050 E0CE E0D0  àÐ àÑ àÒ àÓ àÔ àÕ àÖ à× àØ àÙ àÚ àÛ àÜ àÝ àÞ àß
+      64¶è  6060 E0DE E0E0  àà àá àâ àã àä àå àæ àç àè àé àê àë àì àí àî àï
+      64¶è  6070 E0EE E0F0  àð àñ àò àó àô àõ àö à÷ àø àù àú àû àü àý àþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      65¶è  6120 E13F E1A0     á¡ á¢ á£ á¤ á¥ á¦ á§ á¨ á© áª á« á¬ á­ á® á¯
+      65¶è  6130 E14F E1B0  á° á± á² á³ á´ áµ á¶ á· á¸ á¹ áº á» á¼ á½ á¾ á¿
+      65¶è  6140 E15F E1C0  áÀ áÁ áÂ áÃ áÄ áÅ áÆ áÇ áÈ áÉ áÊ áË áÌ áÍ áÎ áÏ
+      65¶è  6150 E16F E1D0  áÐ áÑ áÒ áÓ áÔ áÕ áÖ á× áØ áÙ áÚ áÛ áÜ áÝ áÞ áß
+      65¶è  6160 E180 E1E0  áà áá áâ áã áä áå áæ áç áè áé áê áë áì áí áî áï
+      65¶è  6170 E190 E1F0  áð áñ áò áó áô áõ áö á÷ áø áù áú áû áü áý áþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      66¶è  6220 E19E E2A0     â¡ â¢ â£ â¤ â¥ â¦ â§ â¨ â© âª â« â¬ â­ â® â¯
+      66¶è  6230 E1AE E2B0  â° â± â² â³ â´ âµ â¶ â· â¸ â¹ âº â» â¼ â½ â¾ â¿
+      66¶è  6240 E1BE E2C0  âÀ âÁ âÂ âÃ âÄ âÅ âÆ âÇ âÈ âÉ âÊ âË âÌ âÍ âÎ âÏ
+      66¶è  6250 E1CE E2D0  âÐ âÑ âÒ âÓ âÔ âÕ âÖ â× âØ âÙ âÚ âÛ âÜ âÝ âÞ âß
+      66¶è  6260 E1DE E2E0  âà âá ââ âã âä âå âæ âç âè âé âê âë âì âí âî âï
+      66¶è  6270 E1EE E2F0  âð âñ âò âó âô âõ âö â÷ âø âù âú âû âü âý âþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      67¶è  6320 E23F E3A0     ã¡ ã¢ ã£ ã¤ ã¥ ã¦ ã§ ã¨ ã© ãª ã« ã¬ ã­ ã® ã¯
+      67¶è  6330 E24F E3B0  ã° ã± ã² ã³ ã´ ãµ ã¶ ã· ã¸ ã¹ ãº ã» ã¼ ã½ ã¾ ã¿
+      67¶è  6340 E25F E3C0  ãÀ ãÁ ãÂ ãÃ ãÄ ãÅ ãÆ ãÇ ãÈ ãÉ ãÊ ãË ãÌ ãÍ ãÎ ãÏ
+      67¶è  6350 E26F E3D0  ãÐ ãÑ ãÒ ãÓ ãÔ ãÕ ãÖ ã× ãØ ãÙ ãÚ ãÛ ãÜ ãÝ ãÞ ãß
+      67¶è  6360 E280 E3E0  ãà ãá ãâ ãã ãä ãå ãæ ãç ãè ãé ãê ãë ãì ãí ãî ãï
+      67¶è  6370 E290 E3F0  ãð ãñ ãò ãó ãô ãõ ãö ã÷ ãø ãù ãú ãû ãü ãý ãþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      68¶è  6420 E29E E4A0     ä¡ ä¢ ä£ ä¤ ä¥ ä¦ ä§ ä¨ ä© äª ä« ä¬ ä­ ä® ä¯
+      68¶è  6430 E2AE E4B0  ä° ä± ä² ä³ ä´ äµ ä¶ ä· ä¸ ä¹ äº ä» ä¼ ä½ ä¾ ä¿
+      68¶è  6440 E2BE E4C0  äÀ äÁ äÂ äÃ äÄ äÅ äÆ äÇ äÈ äÉ äÊ äË äÌ äÍ äÎ äÏ
+      68¶è  6450 E2CE E4D0  äÐ äÑ äÒ äÓ äÔ äÕ äÖ ä× äØ äÙ äÚ äÛ äÜ äÝ äÞ äß
+      68¶è  6460 E2DE E4E0  äà äá äâ äã ää äå äæ äç äè äé äê äë äì äí äî äï
+      68¶è  6470 E2EE E4F0  äð äñ äò äó äô äõ äö ä÷ äø äù äú äû äü äý äþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      69¶è  6520 E33F E5A0     å¡ å¢ å£ å¤ å¥ å¦ å§ å¨ å© åª å« å¬ å­ å® å¯
+      69¶è  6530 E34F E5B0  å° å± å² å³ å´ åµ å¶ å· å¸ å¹ åº å» å¼ å½ å¾ å¿
+      69¶è  6540 E35F E5C0  åÀ åÁ åÂ åÃ åÄ åÅ åÆ åÇ åÈ åÉ åÊ åË åÌ åÍ åÎ åÏ
+      69¶è  6550 E36F E5D0  åÐ åÑ åÒ åÓ åÔ åÕ åÖ å× åØ åÙ åÚ åÛ åÜ åÝ åÞ åß
+      69¶è  6560 E380 E5E0  åà åá åâ åã åä åå åæ åç åè åé åê åë åì åí åî åï
+      69¶è  6570 E390 E5F0  åð åñ åò åó åô åõ åö å÷ åø åù åú åû åü åý åþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      70¶è  6620 E39E E6A0     æ¡ æ¢ æ£ æ¤ æ¥ æ¦ æ§ æ¨ æ© æª æ« æ¬ æ­ æ® æ¯
+      70¶è  6630 E3AE E6B0  æ° æ± æ² æ³ æ´ æµ æ¶ æ· æ¸ æ¹ æº æ» æ¼ æ½ æ¾ æ¿
+      70¶è  6640 E3BE E6C0  æÀ æÁ æÂ æÃ æÄ æÅ æÆ æÇ æÈ æÉ æÊ æË æÌ æÍ æÎ æÏ
+      70¶è  6650 E3CE E6D0  æÐ æÑ æÒ æÓ æÔ æÕ æÖ æ× æØ æÙ æÚ æÛ æÜ æÝ æÞ æß
+      70¶è  6660 E3DE E6E0  æà æá æâ æã æä æå ææ æç æè æé æê æë æì æí æî æï
+      70¶è  6670 E3EE E6F0  æð æñ æò æó æô æõ æö æ÷ æø æù æú æû æü æý æþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      71¶è  6720 E43F E7A0     ç¡ ç¢ ç£ ç¤ ç¥ ç¦ ç§ ç¨ ç© çª ç« ç¬ ç­ ç® ç¯
+      71¶è  6730 E44F E7B0  ç° ç± ç² ç³ ç´ çµ ç¶ ç· ç¸ ç¹ çº ç» ç¼ ç½ ç¾ ç¿
+      71¶è  6740 E45F E7C0  çÀ çÁ çÂ çÃ çÄ çÅ çÆ çÇ çÈ çÉ çÊ çË çÌ çÍ çÎ çÏ
+      71¶è  6750 E46F E7D0  çÐ çÑ çÒ çÓ çÔ çÕ çÖ ç× çØ çÙ çÚ çÛ çÜ çÝ çÞ çß
+      71¶è  6760 E480 E7E0  çà çá çâ çã çä çå çæ çç çè çé çê çë çì çí çî çï
+      71¶è  6770 E490 E7F0  çð çñ çò çó çô çõ çö ç÷ çø çù çú çû çü çý çþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      72¶è  6820 E49E E8A0     è¡ è¢ è£ è¤ è¥ è¦ è§ è¨ è© èª è« è¬ è­ è® è¯
+      72¶è  6830 E4AE E8B0  è° è± è² è³ è´ èµ è¶ è· è¸ è¹ èº è» è¼ è½ è¾ è¿
+      72¶è  6840 E4BE E8C0  èÀ èÁ èÂ èÃ èÄ èÅ èÆ èÇ èÈ èÉ èÊ èË èÌ èÍ èÎ èÏ
+      72¶è  6850 E4CE E8D0  èÐ èÑ èÒ èÓ èÔ èÕ èÖ è× èØ èÙ èÚ èÛ èÜ èÝ èÞ èß
+      72¶è  6860 E4DE E8E0  èà èá èâ èã èä èå èæ èç èè èé èê èë èì èí èî èï
+      72¶è  6870 E4EE E8F0  èð èñ èò èó èô èõ èö è÷ èø èù èú èû èü èý èþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      73¶è  6920 E53F E9A0     é¡ é¢ é£ é¤ é¥ é¦ é§ é¨ é© éª é« é¬ é­ é® é¯
+      73¶è  6930 E54F E9B0  é° é± é² é³ é´ éµ é¶ é· é¸ é¹ éº é» é¼ é½ é¾ é¿
+      73¶è  6940 E55F E9C0  éÀ éÁ éÂ éÃ éÄ éÅ éÆ éÇ éÈ éÉ éÊ éË éÌ éÍ éÎ éÏ
+      73¶è  6950 E56F E9D0  éÐ éÑ éÒ éÓ éÔ éÕ éÖ é× éØ éÙ éÚ éÛ éÜ éÝ éÞ éß
+      73¶è  6960 E580 E9E0  éà éá éâ éã éä éå éæ éç éè éé éê éë éì éí éî éï
+      73¶è  6970 E590 E9F0  éð éñ éò éó éô éõ éö é÷ éø éù éú éû éü éý éþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      74¶è  6A20 E59E EAA0     ê¡ ê¢ ê£ ê¤ ê¥ ê¦ ê§ ê¨ ê© êª ê« ê¬ ê­ ê® ê¯
+      74¶è  6A30 E5AE EAB0  ê° ê± ê² ê³ ê´ êµ ê¶ ê· ê¸ ê¹ êº ê» ê¼ ê½ ê¾ ê¿
+      74¶è  6A40 E5BE EAC0  êÀ êÁ êÂ êÃ êÄ êÅ êÆ êÇ êÈ êÉ êÊ êË êÌ êÍ êÎ êÏ
+      74¶è  6A50 E5CE EAD0  êÐ êÑ êÒ êÓ êÔ êÕ êÖ ê× êØ êÙ êÚ êÛ êÜ êÝ êÞ êß
+      74¶è  6A60 E5DE EAE0  êà êá êâ êã êä êå êæ êç êè êé êê êë êì êí êî êï
+      74¶è  6A70 E5EE EAF0  êð êñ êò êó êô êõ êö ê÷ êø êù êú êû êü êý êþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      75¶è  6B20 E63F EBA0     ë¡ ë¢ ë£ ë¤ ë¥ ë¦ ë§ ë¨ ë© ëª ë« ë¬ ë­ ë® ë¯
+      75¶è  6B30 E64F EBB0  ë° ë± ë² ë³ ë´ ëµ ë¶ ë· ë¸ ë¹ ëº ë» ë¼ ë½ ë¾ ë¿
+      75¶è  6B40 E65F EBC0  ëÀ ëÁ ëÂ ëÃ ëÄ ëÅ ëÆ ëÇ ëÈ ëÉ ëÊ ëË ëÌ ëÍ ëÎ ëÏ
+      75¶è  6B50 E66F EBD0  ëÐ ëÑ ëÒ ëÓ ëÔ ëÕ ëÖ ë× ëØ ëÙ ëÚ ëÛ ëÜ ëÝ ëÞ ëß
+      75¶è  6B60 E680 EBE0  ëà ëá ëâ ëã ëä ëå ëæ ëç ëè ëé ëê ëë ëì ëí ëî ëï
+      75¶è  6B70 E690 EBF0  ëð ëñ ëò ëó ëô ëõ ëö ë÷ ëø ëù ëú ëû ëü ëý ëþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      76¶è  6C20 E69E ECA0     ì¡ ì¢ ì£ ì¤ ì¥ ì¦ ì§ ì¨ ì© ìª ì« ì¬ ì­ ì® ì¯
+      76¶è  6C30 E6AE ECB0  ì° ì± ì² ì³ ì´ ìµ ì¶ ì· ì¸ ì¹ ìº ì» ì¼ ì½ ì¾ ì¿
+      76¶è  6C40 E6BE ECC0  ìÀ ìÁ ìÂ ìÃ ìÄ ìÅ ìÆ ìÇ ìÈ ìÉ ìÊ ìË ìÌ ìÍ ìÎ ìÏ
+      76¶è  6C50 E6CE ECD0  ìÐ ìÑ ìÒ ìÓ ìÔ ìÕ ìÖ ì× ìØ ìÙ ìÚ ìÛ ìÜ ìÝ ìÞ ìß
+      76¶è  6C60 E6DE ECE0  ìà ìá ìâ ìã ìä ìå ìæ ìç ìè ìé ìê ìë ìì ìí ìî ìï
+      76¶è  6C70 E6EE ECF0  ìð ìñ ìò ìó ìô ìõ ìö ì÷ ìø ìù ìú ìû ìü ìý ìþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      77¶è  6D20 E73F EDA0     í¡ í¢ í£ í¤ í¥ í¦ í§ í¨ í© íª í« í¬ í­ í® í¯
+      77¶è  6D30 E74F EDB0  í° í± í² í³ í´ íµ í¶ í· í¸ í¹ íº í» í¼ í½ í¾ í¿
+      77¶è  6D40 E75F EDC0  íÀ íÁ íÂ íÃ íÄ íÅ íÆ íÇ íÈ íÉ íÊ íË íÌ íÍ íÎ íÏ
+      77¶è  6D50 E76F EDD0  íÐ íÑ íÒ íÓ íÔ íÕ íÖ í× íØ íÙ íÚ íÛ íÜ íÝ íÞ íß
+      77¶è  6D60 E780 EDE0  íà íá íâ íã íä íå íæ íç íè íé íê íë íì íí íî íï
+      77¶è  6D70 E790 EDF0  íð íñ íò íó íô íõ íö í÷ íø íù íú íû íü íý íþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      78¶è  6E20 E79E EEA0     î¡ î¢ î£ î¤ î¥ î¦ î§ î¨ î© îª î« î¬ î­ î® î¯
+      78¶è  6E30 E7AE EEB0  î° î± î² î³ î´ îµ î¶ î· î¸ î¹ îº î» î¼ î½ î¾ î¿
+      78¶è  6E40 E7BE EEC0  îÀ îÁ îÂ îÃ îÄ îÅ îÆ îÇ îÈ îÉ îÊ îË îÌ îÍ îÎ îÏ
+      78¶è  6E50 E7CE EED0  îÐ îÑ îÒ îÓ îÔ îÕ îÖ î× îØ îÙ îÚ îÛ îÜ îÝ îÞ îß
+      78¶è  6E60 E7DE EEE0  îà îá îâ îã îä îå îæ îç îè îé îê îë îì îí îî îï
+      78¶è  6E70 E7EE EEF0  îð îñ îò îó îô îõ îö î÷ îø îù îú îû îü îý îþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      79¶è  6F20 E83F EFA0     ï¡ ï¢ ï£ ï¤ ï¥ ï¦ ï§ ï¨ ï© ïª ï« ï¬ ï­ ï® ï¯
+      79¶è  6F30 E84F EFB0  ï° ï± ï² ï³ ï´ ïµ ï¶ ï· ï¸ ï¹ ïº ï» ï¼ ï½ ï¾ ï¿
+      79¶è  6F40 E85F EFC0  ïÀ ïÁ ïÂ ïÃ ïÄ ïÅ ïÆ ïÇ ïÈ ïÉ ïÊ ïË ïÌ ïÍ ïÎ ïÏ
+      79¶è  6F50 E86F EFD0  ïÐ ïÑ ïÒ ïÓ ïÔ ïÕ ïÖ ï× ïØ ïÙ ïÚ ïÛ ïÜ ïÝ ïÞ ïß
+      79¶è  6F60 E880 EFE0  ïà ïá ïâ ïã ïä ïå ïæ ïç ïè ïé ïê ïë ïì ïí ïî ïï
+      79¶è  6F70 E890 EFF0  ïð ïñ ïò ïó ïô ïõ ïö ï÷ ïø ïù ïú ïû ïü ïý ïþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      80¶è  7020 E89E F0A0     ð¡ ð¢ ð£ ð¤ ð¥ ð¦ ð§ ð¨ ð© ðª ð« ð¬ ð­ ð® ð¯
+      80¶è  7030 E8AE F0B0  ð° ð± ð² ð³ ð´ ðµ ð¶ ð· ð¸ ð¹ ðº ð» ð¼ ð½ ð¾ ð¿
+      80¶è  7040 E8BE F0C0  ðÀ ðÁ ðÂ ðÃ ðÄ ðÅ ðÆ ðÇ ðÈ ðÉ ðÊ ðË ðÌ ðÍ ðÎ ðÏ
+      80¶è  7050 E8CE F0D0  ðÐ ðÑ ðÒ ðÓ ðÔ ðÕ ðÖ ð× ðØ ðÙ ðÚ ðÛ ðÜ ðÝ ðÞ ðß
+      80¶è  7060 E8DE F0E0  ðà ðá ðâ ðã ðä ðå ðæ ðç ðè ðé ðê ðë ðì ðí ðî ðï
+      80¶è  7070 E8EE F0F0  ðð ðñ ðò ðó ðô ðõ ðö ð÷ ðø ðù ðú ðû ðü ðý ðþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      81¶è  7120 E93F F1A0     ñ¡ ñ¢ ñ£ ñ¤ ñ¥ ñ¦ ñ§ ñ¨ ñ© ñª ñ« ñ¬ ñ­ ñ® ñ¯
+      81¶è  7130 E94F F1B0  ñ° ñ± ñ² ñ³ ñ´ ñµ ñ¶ ñ· ñ¸ ñ¹ ñº ñ» ñ¼ ñ½ ñ¾ ñ¿
+      81¶è  7140 E95F F1C0  ñÀ ñÁ ñÂ ñÃ ñÄ ñÅ ñÆ ñÇ ñÈ ñÉ ñÊ ñË ñÌ ñÍ ñÎ ñÏ
+      81¶è  7150 E96F F1D0  ñÐ ñÑ ñÒ ñÓ ñÔ ñÕ ñÖ ñ× ñØ ñÙ ñÚ ñÛ ñÜ ñÝ ñÞ ñß
+      81¶è  7160 E980 F1E0  ñà ñá ñâ ñã ñä ñå ñæ ñç ñè ñé ñê ñë ñì ñí ñî ñï
+      81¶è  7170 E990 F1F0  ñð ññ ñò ñó ñô ñõ ñö ñ÷ ñø ñù ñú ñû ñü ñý ñþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      82¶è  7220 E99E F2A0     ò¡ ò¢ ò£ ò¤ ò¥ ò¦ ò§ ò¨ ò© òª ò« ò¬ ò­ ò® ò¯
+      82¶è  7230 E9AE F2B0  ò° ò± ò² ò³ ò´ òµ ò¶ ò· ò¸ ò¹ òº ò» ò¼ ò½ ò¾ ò¿
+      82¶è  7240 E9BE F2C0  òÀ òÁ òÂ òÃ òÄ òÅ òÆ òÇ òÈ òÉ òÊ òË òÌ òÍ òÎ òÏ
+      82¶è  7250 E9CE F2D0  òÐ òÑ òÒ òÓ òÔ òÕ òÖ ò× òØ òÙ òÚ òÛ òÜ òÝ òÞ òß
+      82¶è  7260 E9DE F2E0  òà òá òâ òã òä òå òæ òç òè òé òê òë òì òí òî òï
+      82¶è  7270 E9EE F2F0  òð òñ òò òó òô òõ òö ò÷ òø òù òú òû òü òý òþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      83¶è  7320 EA3F F3A0     ó¡ ó¢ ó£ ó¤ ó¥ ó¦ ó§ ó¨ ó© óª ó« ó¬ ó­ ó® ó¯
+      83¶è  7330 EA4F F3B0  ó° ó± ó² ó³ ó´ óµ ó¶ ó· ó¸ ó¹ óº ó» ó¼ ó½ ó¾ ó¿
+      83¶è  7340 EA5F F3C0  óÀ óÁ óÂ óÃ óÄ óÅ óÆ óÇ óÈ óÉ óÊ óË óÌ óÍ óÎ óÏ
+      83¶è  7350 EA6F F3D0  óÐ óÑ óÒ óÓ óÔ óÕ óÖ ó× óØ óÙ óÚ óÛ óÜ óÝ óÞ óß
+      83¶è  7360 EA80 F3E0  óà óá óâ óã óä óå óæ óç óè óé óê óë óì óí óî óï
+      83¶è  7370 EA90 F3F0  óð óñ óò óó óô óõ óö ó÷ óø óù óú óû óü óý óþ
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      84¶è  7420 EA9E F4A0     ô¡ ô¢ ô£ ô¤ ô¥ ô¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      84¶è  7430 EAAE F4B0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      84¶è  7440 EABE F4C0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      84¶è  7450 EACE F4D0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      84¶è  7460 EADE F4E0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      84¶è  7470 EAEE F4F0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      85¶è  7520 EB3F F5A0     ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      85¶è  7530 EB4F F5B0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      85¶è  7540 EB5F F5C0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      85¶è  7550 EB6F F5D0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      85¶è  7560 EB80 F5E0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+      85¶è  7570 EB90 F5F0  ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦ ¡¦
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      86¶è  7620 EB9E F6A0
+      86¶è  7630 EBAE F6B0
+      86¶è  7640 EBBE F6C0
+      86¶è  7650 EBCE F6D0
+      86¶è  7660 EBDE F6E0
+      86¶è  7670 EBEE F6F0
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      87¶è  7720 EC3F F7A0
+      87¶è  7730 EC4F F7B0
+      87¶è  7740 EC5F F7C0
+      87¶è  7750 EC6F F7D0
+      87¶è  7760 EC80 F7E0
+      87¶è  7770 EC90 F7F0
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      88¶è  7820 EC9E F8A0
+      88¶è  7830 ECAE F8B0
+      88¶è  7840 ECBE F8C0
+      88¶è  7850 ECCE F8D0
+      88¶è  7860 ECDE F8E0
+      88¶è  7870 ECEE F8F0
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      89¶è  7920 ED3F F9A0
+      89¶è  7930 ED4F F9B0
+      89¶è  7940 ED5F F9C0
+      89¶è  7950 ED6F F9D0
+      89¶è  7960 ED80 F9E0
+      89¶è  7970 ED90 F9F0
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      90¶è  7A20 ED9E FAA0
+      90¶è  7A30 EDAE FAB0
+      90¶è  7A40 EDBE FAC0
+      90¶è  7A50 EDCE FAD0
+      90¶è  7A60 EDDE FAE0
+      90¶è  7A70 EDEE FAF0
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      91¶è  7B20 EE3F FBA0
+      91¶è  7B30 EE4F FBB0
+      91¶è  7B40 EE5F FBC0
+      91¶è  7B50 EE6F FBD0
+      91¶è  7B60 EE80 FBE0
+      91¶è  7B70 EE90 FBF0
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      92¶è  7C20 EE9E FCA0
+      92¶è  7C30 EEAE FCB0
+      92¶è  7C40 EEBE FCC0
+      92¶è  7C50 EECE FCD0
+      92¶è  7C60 EEDE FCE0
+      92¶è  7C70 EEEE FCF0
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      93¶è  7D20 EF3F FDA0
+      93¶è  7D30 EF4F FDB0
+      93¶è  7D40 EF5F FDC0
+      93¶è  7D50 EF6F FDD0
+      93¶è  7D60 EF80 FDE0
+      93¶è  7D70 EF90 FDF0
+
+            JIS  SJIS EUC   +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F
+      94¶è  7E20 EF9E FEA0
+      94¶è  7E30 EFAE FEB0
+      94¶è  7E40 EFBE FEC0
+      94¶è  7E50 EFCE FED0
+      94¶è  7E60 EFDE FEE0
+      94¶è  7E70 EFEE FEF0

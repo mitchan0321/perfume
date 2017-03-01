@@ -98,14 +98,14 @@ raw_encoder(Cell *unicode, encoder_error_info *error_info) {
  * UTF-8 decoder/encoder.
  */
 #define RETR_CHAR(p, i, len)	((i<len)?p[i]:-1)
-#define HAS_ERROR(c, e) 					\
+#define HAS_ERROR(c, e, l) 					\
     if (-1 == c) {						\
 	if (e) {						\
 	    e->errorno = EENCODE_LESSLENGTH;			\
 	    e->pos = i;						\
 	    e->message = L"Less length UTF-8 sequence";		\
 	}							\
-	goto error;						\
+	goto l;							\
     }								\
     if ((c & 0XC0) != 0X80) {					\
 	if (e) {						\
@@ -113,7 +113,7 @@ raw_encoder(Cell *unicode, encoder_error_info *error_info) {
 	    e->pos = i;						\
 	    e->message = L"Bad UTF-8 bit pattern 2nd byte";	\
 	}							\
-	goto error;						\
+	goto l;							\
     }
 
 Cell*
@@ -146,7 +146,7 @@ utf8_decoder(Cell *raw, encoder_error_info *error_info) {
 	    i++;
 	    
 	    c2 = RETR_CHAR(p, i, len);
-	    HAS_ERROR(c2, error_info);
+	    HAS_ERROR(c2, error_info, error);
 	    c2 = c2 & (~0xC0);
 	    i++;
 
@@ -161,12 +161,12 @@ utf8_decoder(Cell *raw, encoder_error_info *error_info) {
 	    i++;
 
 	    c2 = RETR_CHAR(p, i , len);
-	    HAS_ERROR(c2, error_info);
+	    HAS_ERROR(c2, error_info, error);
 	    c2 = c2 & (~0xC0);
 	    i++;
 
 	    c3 = RETR_CHAR(p, i, len);
-	    HAS_ERROR(c3, error_info);
+	    HAS_ERROR(c3, error_info, error);
 	    c3 = c3 & (~0xC0);
 	    i++;
 
@@ -181,17 +181,17 @@ utf8_decoder(Cell *raw, encoder_error_info *error_info) {
 	    i++;
 
 	    c2 = RETR_CHAR(p, i, len);
-	    HAS_ERROR(c2, error_info);
+	    HAS_ERROR(c2, error_info, error);
 	    c2 = c2 & (~0xC0);
 	    i++;
 
 	    c3 = RETR_CHAR(p, i, len);
-	    HAS_ERROR(c3, error_info);
+	    HAS_ERROR(c3, error_info, error);
 	    c3 = c3 & (~0xC0);
 	    i++;
 
 	    c4 = RETR_CHAR(p, i, len);
-	    HAS_ERROR(c4, error_info);
+	    HAS_ERROR(c4, error_info, error);
 	    c4 = c4 & (~0xC0);
 	    i++;
 	    
@@ -337,8 +337,28 @@ eucjp_decoder(Cell *raw, encoder_error_info *error_info) {
 	    }
 	    i++;
 
+	} else if (c == 0x8E) {
+	    /* JISX0201 character prefix found */
+	    i++;
+	    if (i >= len) {
+		/* lost data euc_jp JISX0201 2nd byte, broken file? */
+		cell_add_char(result, c);
+		break;
+	    }
+
+	    c2 = p[i];
+	    if ((c2 >= 0xA1) && (c2 <= 0xDF)) {
+		/* JISX0201 character found */
+		cell_add_char(result, 0xFF61 - 0xA1 + c2);
+	    } else {
+		/* not JISX0201 character */
+		cell_add_char(result, c);
+		cell_add_char(result, c2);
+	    }
+	    i++;
+	    
 	} else {
-	    /* not JISX0208 character */
+	    /* not JISX0208 and not JISX0201 character */
 	    cell_add_char(result, c);
 	    i++;
 	}
@@ -370,6 +390,11 @@ eucjp_encoder(Cell *unicode, encoder_error_info *error_info) {
 	    /* out range JISX0208 character, can't convert */
 	    cell_add_char(result, L'?');
 
+	} else if ((c >= 0xFF61) && (c <= 0xFF9F)) {
+	    /* JISX0201 character */
+	    cell_add_char(result, 0x8E);
+	    cell_add_char(result, c - (0xFF61 - 0xA1));
+	    
 	} else {
 	    cr = Unicode_to_JISX0208[c & 0xffff];
 	    if (0 == cr) {
@@ -471,6 +496,11 @@ sjis_decoder(Cell *raw, encoder_error_info *error_info) {
 	    cell_add_char(result, c);
 	    i++;
 
+	} else if ((c >= 0xA1) && (c <= 0xDF)) {
+	    /* JISX0201 character found */
+	    cell_add_char(result, 0xFF61 - 0xA1 + c);
+	    i++;
+	    
 	} else if (((c >= 0x81) && (c <= 0x9f)) || ((c >= 0xe0) && (c <= 0xff))) {
 	    i++;
 	    if (i >= len) {
@@ -498,7 +528,7 @@ sjis_decoder(Cell *raw, encoder_error_info *error_info) {
 	    i++;
 
 	} else {
-	    /* not JISX0208 character */
+	    /* not JISX0208 and not JISX0201 character */
 	    cell_add_char(result, c);
 	    i++;
 	}
@@ -530,6 +560,10 @@ sjis_encoder(Cell *unicode, encoder_error_info *error_info) {
 	    /* out range JISX0208 character, can't convert */
 	    cell_add_char(result, L'?');
 
+	} else if ((c >= 0xFF61) && (c <= 0xFF9F)) {
+	    /* JISX0201 character */
+	    cell_add_char(result, c - (0xFF61 - 0xA1));
+	    
 	} else {
 	    cr = Unicode_to_JISX0208[c & 0xffff];
 	    if (0 == cr) {
