@@ -40,11 +40,13 @@ defun diff (bpath apath display-graph: disp) {
  
     # display edit graph
     if [set? disp] {
+        _dsw := nil;
         println "# Before source list: " $b-src;
         println "# After source list:  " $a-src;
 	println "# Edit graph:";
+	println "#   \\ (a)";
         0 each to: [[$b-src len] - 1] do: {| bidx |
-	    print "# ";
+	    if $_dsw {print "#     "} {print "# (b) "; _dsw := t};
             0 each to: [[$a-src len] - 1] do: {| aidx |
 	        print [if [diff-has-slant $bidx $aidx $b-src $a-src] {result "\\"} {result "."}];
 	    };
