@@ -1,0 +1,182 @@
+defun diff (before after display-edit: disp) {
+    b-id ::= vector;   	      # before file id array
+    $b-id append! -1;	      # never match every source
+    a-id ::= vector;	      # after file id array
+    $a-id append! -2;	      # never match every source
+    src-id ::= dict;  	      # source -> id dict
+    id-src ::= dict;  	      # id -> source dict
+
+    # read before file
+    before ::= "" . $before;
+    if [$before = "-"] {before := "/dev/tty"};
+    bfile := `File($before);
+    $bfile each do: {| r |
+        if [$src-id set? $r] {
+	    id ::= $src-id get $r;
+	    $b-id append! $id;
+	} {
+	    id ::= [$src-id len] + 1;
+	    $src-id set $r $id;
+	    $id-src set $id $r;
+	    $b-id append! $id;
+	};
+    };
+    $bfile close;
+
+    # read after file
+    after ::= "" . $after;
+    if [$after = "-"] {after := "/dev/tty"};
+    afile := `File($after);
+    $afile each do: {| r |
+        if [$src-id set? $r] {
+	    id ::= $src-id get $r;
+	    $a-id append! $id;
+	} {
+	    id ::= [$src-id len] + 1;
+	    $src-id set $r $id;
+	    $id-src set $id $r;
+	    $a-id append! $id;
+	};
+    };
+    $afile close;
+ 
+    # display edit graph
+    if [set? disp] {
+        println "# Before source list: " $b-id;
+        println "# After source list:  " $a-id;
+	println "# Edit graph:";
+        0 each to: [[$b-id len] - 1] do: {| bidx |
+	    print "# ";
+            0 each to: [[$a-id len] - 1] do: {| aidx |
+	        print [if [diff-has-slant $bidx $aidx $b-id $a-id] {result "\\"} {result "."}];
+	    };
+	    println;
+        };
+    };
+
+    # walk throw editgraph
+    bmax ::= [$b-id len] - 1;
+    amax ::= [$a-id len] - 1;
+    a-cost := -1;
+    b-cost := -1;
+    broot := 0;
+    aroot := 0;
+    path := ();
+    while {or [$broot < $bmax] [$aroot < $amax]} do: {
+        if [$broot = $bmax] {
+	    # move right to end
+	    aroot ::= $aroot + 1;
+	    $path append! (a $a-id,$aroot);
+	    continue;
+	};
+        if [$aroot = $amax] {
+	    # move down to end
+	    broot ::= $broot + 1;
+	    $path append! (b $b-id,$broot);
+	    continue;
+	};
+
+	if [diff-has-slant $broot $aroot $b-id $a-id] {
+	    # move slant
+	    broot ::= $broot + 1;
+	    aroot ::= $aroot + 1;
+	    $path append! (s $a-id,$aroot);
+	    a-cost := -1;
+	    b-cost := -1;
+	    continue;
+	};
+
+	# compute cost down and right move
+	if [$b-cost <= -1] {
+	    b-cost ::= diff-down-cost $broot $bmax $aroot $amax $b-id $a-id;
+	};
+	if [$a-cost <= -1] {
+	    a-cost ::= diff-right-cost $broot $bmax $aroot $amax $b-id $a-id;
+	};
+
+	if [$b-cost = $a-cost] {
+	    # if down cost equal right cost, then move down.
+	    broot ::= $broot + 1;
+	    $path append! (b $b-id,$broot);
+	    a-cost := -1;
+	    b-cost ::= $b-cost - 1;
+	    continue;
+	};
+	
+	if [$a-cost <= -1] {
+	    # right move cost unavailable, move down
+	    broot ::= $broot + 1;
+	    $path append! (b $b-id,$broot);
+	    a-cost := -1;
+	    b-cost ::= $b-cost - 1;
+	    continue;
+	};
+	
+	if [$b-cost <= -1] {
+	    # down move cost unavailable, move right
+	    aroot ::= $aroot + 1;
+	    $path append! (a $a-id,$aroot);
+	    a-cost ::= $a-cost - 1;
+	    b-cost := -1;
+	    continue;
+	};
+
+       if [$b-cost < $a-cost] {
+	    # right move cost too weak, move down
+	    broot ::= $broot + 1;
+	    $path append! (b $b-id,$broot);
+	    a-cost := -1;
+	    b-cost ::= $b-cost - 1;
+	    continue;
+	} {
+	    # down move cost too weak, move right
+	    aroot ::= $aroot + 1;
+	    $path append! (a $a-id,$aroot);
+	    a-cost ::= $a-cost - 1;
+	    b-cost := -1;
+	    continue;
+	};
+    };
+
+    # display path
+    if [set? disp] {
+        println "# Path: " $path;
+    };
+
+    # display diff source
+    $path each do: {| i |
+        (c s) := $i;
+	case $c
+	    b {println "- " $id-src,$s}
+	    a {println "+ " $id-src,$s}
+	    s {println "  " $id-src,$s}
+	;
+    };
+};
+
+defun diff-has-slant (bidx aidx b-id a-id) {
+    try {
+        if [$b-id,[$bidx + 1] = $a-id,[$aidx + 1]] {
+            return t;
+        };
+        return nil;
+    } catch: {return nil};
+};
+
+defun diff-down-cost (broot bmax aroot amax b-id a-id) {
+    cost := 1;
+    [$broot + 1] each to: $bmax do: {| bidx |
+        if [diff-has-slant $bidx $aroot $b-id $a-id] {return $cost};
+	cost ::= $cost + 1;
+    };
+    return -1;
+};
+
+defun diff-right-cost (broot bmax aroot amax b-id a-id) {
+    cost := 1;
+    [$aroot + 1] each to: $amax do: {| aidx |
+        if [diff-has-slant $broot $aidx $b-id $a-id] {return $cost};
+	cost ::= $cost + 1;
+    };
+    return -1;
+};
