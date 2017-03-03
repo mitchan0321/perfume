@@ -1,3 +1,4 @@
+2017/03/03	PRFM_20170303		1.0.0_RC_3
 2017/03/01	PRFM_20170301		1.0.0_RC_2
 2017/02/22	PRFM_20170222		1.0.0_RC_1
 2017/01/18	PRFM_20170118		1.0.0_PRE_2
@@ -964,5 +965,11 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 	encoding.[ch]
 		Add encodings are RAW, UTF-8, EUC-JP and Shift-JIS, support character sets are UNICODE,
 		JIS X0208 and JIS X0201.
+
+2017/03/03:
+	commands.c, methods.c
+		Fix iterator CTRL_CONTINUE bug.
+	lib/diff.prfm
+		Add utility diff tool, like UNIX diff command.
 
 #eof
