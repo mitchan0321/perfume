@@ -1,139 +1,138 @@
-defun diff (before after display-graph: disp) {
-    b-id ::= vector;   	      # before file id array
-    $b-id append! -1;	      # never match every source
-    a-id ::= vector;	      # after file id array
-    $a-id append! -2;	      # never match every source
+defun diff (bpath apath display-graph: disp) {
+    b-src ::= vector(-1);     # before file id array and append never match mark every source list top
+    a-src ::= vector(-2);     # after file id array and append never match mark every source list top
     src-id ::= dict;  	      # source -> id dict
     id-src ::= dict;  	      # id -> source dict
 
     # read before file
-    before ::= "" . $before;
-    if [$before = "-"] {before := "/dev/tty"};
-    bfile := `File($before);
+    bpath ::= "" . $bpath;
+    if [$bpath = "-"] {bpath := "/dev/tty"};
+    bfile := `File($bpath);
     $bfile each do: {| r |
         if [$src-id set? $r] {
 	    id ::= $src-id get $r;
-	    $b-id append! $id;
+	    $b-src append! $id;
 	} {
 	    id ::= [$src-id len] + 1;
 	    $src-id set $r $id;
 	    $id-src set $id $r;
-	    $b-id append! $id;
+	    $b-src append! $id;
 	};
     };
     $bfile close;
 
     # read after file
-    after ::= "" . $after;
-    if [$after = "-"] {after := "/dev/tty"};
-    afile := `File($after);
+    apath ::= "" . $apath;
+    if [$apath = "-"] {apath := "/dev/tty"};
+    afile := `File($apath);
     $afile each do: {| r |
         if [$src-id set? $r] {
 	    id ::= $src-id get $r;
-	    $a-id append! $id;
+	    $a-src append! $id;
 	} {
 	    id ::= [$src-id len] + 1;
 	    $src-id set $r $id;
 	    $id-src set $id $r;
-	    $a-id append! $id;
+	    $a-src append! $id;
 	};
     };
     $afile close;
  
     # display edit graph
     if [set? disp] {
-        println "# Before source list: " $b-id;
-        println "# After source list:  " $a-id;
+        println "# Before source list: " $b-src;
+        println "# After source list:  " $a-src;
 	println "# Edit graph:";
-        0 each to: [[$b-id len] - 1] do: {| bidx |
+        0 each to: [[$b-src len] - 1] do: {| bidx |
 	    print "# ";
-            0 each to: [[$a-id len] - 1] do: {| aidx |
-	        print [if [diff-has-slant $bidx $aidx $b-id $a-id] {result "\\"} {result "."}];
+            0 each to: [[$a-src len] - 1] do: {| aidx |
+	        print [if [diff-has-slant $bidx $aidx $b-src $a-src] {result "\\"} {result "."}];
 	    };
 	    println;
         };
     };
 
-    # walk throw editgraph
-    bmax ::= [$b-id len] - 1;
-    amax ::= [$a-id len] - 1;
-    b-cost := -1;
-    a-cost := -1;
-    broot := 0;
-    aroot := 0;
-    path := ();
+    # walk throw edit graph
+    bmax ::= [$b-src len] - 1;
+    amax ::= [$a-src len] - 1;
+    bcost := -1;			# cost for down move, -1 is slant not found
+    acost := -1;			# cost for right move, -1 is slant not founc
+    broot := 0;				# root for b-axis, start point is 0
+    aroot := 0;				# root for a-axis, start point is 0
+    path := ();				# collect walked path
+    
     while {or [$broot < $bmax] [$aroot < $amax]} do: {
         if [$broot = $bmax] {
-	    # move right to end
-	    aroot ::= $aroot + 1;
-	    $path append! (a $a-id,$aroot);
+	    # position is bottom, move right to end
+	    $aroot ++;
+	    $path append! (a $a-src,$aroot);
 	    continue;
 	};
         if [$aroot = $amax] {
-	    # move down to end
-	    broot ::= $broot + 1;
-	    $path append! (b $b-id,$broot);
+	    # position is right, move down to end
+	    $broot ++;
+	    $path append! (b $b-src,$broot);
 	    continue;
 	};
 
-	if [diff-has-slant $broot $aroot $b-id $a-id] {
-	    # move slant
-	    broot ::= $broot + 1;
-	    aroot ::= $aroot + 1;
-	    $path append! (s $a-id,$aroot);
-	    a-cost := -1;
-	    b-cost := -1;
+	if [diff-has-slant $broot $aroot $b-src $a-src] {
+	    # has slant ($broot, $aroot), move slant and cost clear
+	    $broot ++;
+	    $aroot ++;
+	    $path append! (s $a-src,$aroot);
+	    acost := -1;
+	    bcost := -1;
 	    continue;
 	};
 
-	# compute cost down and right move
-	if [$b-cost <= -1] {
-	    b-cost ::= diff-down-cost $broot $bmax $aroot $amax $b-id $a-id;
+	# compute cost down move and right move
+	if [$bcost <= -1] {
+	    bcost ::= diff-down-cost $broot $bmax $aroot $amax $b-src $a-src;
 	};
-	if [$a-cost <= -1] {
-	    a-cost ::= diff-right-cost $broot $bmax $aroot $amax $b-id $a-id;
+	if [$acost <= -1] {
+	    acost ::= diff-right-cost $broot $bmax $aroot $amax $b-src $a-src;
 	};
 
-	if [$b-cost = $a-cost] {
+	if [$bcost = $acost] {
 	    # if down cost equal right cost, then move down.
-	    broot ::= $broot + 1;
-	    $path append! (b $b-id,$broot);
-	    a-cost := -1;
-	    b-cost ::= $b-cost - 1;
+	    $broot ++;
+	    $path append! (b $b-src,$broot);
+	    acost := -1;
+	    bcost ::= $bcost - 1;
 	    continue;
 	};
 	
-	if [$a-cost <= -1] {
+	if [$acost <= -1] {
 	    # right move cost unavailable, move down
-	    broot ::= $broot + 1;
-	    $path append! (b $b-id,$broot);
-	    a-cost := -1;
-	    b-cost ::= $b-cost - 1;
+	    $broot ++;
+	    $path append! (b $b-src,$broot);
+	    acost := -1;
+	    bcost ::= $bcost - 1;
 	    continue;
 	};
 	
-	if [$b-cost <= -1] {
+	if [$bcost <= -1] {
 	    # down move cost unavailable, move right
-	    aroot ::= $aroot + 1;
-	    $path append! (a $a-id,$aroot);
-	    a-cost ::= $a-cost - 1;
-	    b-cost := -1;
+	    $aroot ++;
+	    $path append! (a $a-src,$aroot);
+	    acost ::= $acost - 1;
+	    bcost := -1;
 	    continue;
 	};
 
-       if [$b-cost < $a-cost] {
-	    # right move cost too weak, move down
-	    broot ::= $broot + 1;
-	    $path append! (b $b-id,$broot);
-	    a-cost := -1;
-	    b-cost ::= $b-cost - 1;
+       if [$bcost < $acost] {
+	    # right move cost weak than down move cost, move down
+	    $broot ++;
+	    $path append! (b $b-src,$broot);
+	    acost := -1;
+	    bcost ::= $bcost - 1;
 	    continue;
 	} {
-	    # down move cost too weak, move right
-	    aroot ::= $aroot + 1;
-	    $path append! (a $a-id,$aroot);
-	    a-cost ::= $a-cost - 1;
-	    b-cost := -1;
+	    # down move cost weak than right move cost, move right
+	    $aroot ++;
+	    $path append! (a $a-src,$aroot);
+	    acost ::= $acost - 1;
+	    bcost := -1;
 	    continue;
 	};
     };
@@ -154,29 +153,29 @@ defun diff (before after display-graph: disp) {
     };
 };
 
-defun diff-has-slant (bidx aidx b-id a-id) {
+defun diff-has-slant (bidx aidx b-src a-src) {
     try {
-        if [$b-id,[$bidx + 1] = $a-id,[$aidx + 1]] {
+        if [$b-src,[$bidx + 1] = $a-src,[$aidx + 1]] {
             return t;
         };
         return nil;
     } catch: {return nil};
 };
 
-defun diff-down-cost (broot bmax aroot amax b-id a-id) {
+defun diff-down-cost (broot bmax aroot amax b-src a-src) {
     cost := 1;
     [$broot + 1] each to: $bmax do: {| bidx |
-        if [diff-has-slant $bidx $aroot $b-id $a-id] {return $cost};
-	cost ::= $cost + 1;
+        if [diff-has-slant $bidx $aroot $b-src $a-src] {return $cost};
+	$cost ++;
     };
     return -1;
 };
 
-defun diff-right-cost (broot bmax aroot amax b-id a-id) {
+defun diff-right-cost (broot bmax aroot amax b-src a-src) {
     cost := 1;
     [$aroot + 1] each to: $amax do: {| aidx |
-        if [diff-has-slant $broot $aidx $b-id $a-id] {return $cost};
-	cost ::= $cost + 1;
+        if [diff-has-slant $broot $aidx $b-src $a-src] {return $cost};
+	$cost ++;
     };
     return -1;
 };
