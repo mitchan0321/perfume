@@ -830,10 +830,13 @@ loop:
 	    case CTRL_BREAK:
 		return result->u.control.ret_value;
 	    case CTRL_CONTINUE:
+		result = const_Nil;
 		goto loop;
 	    case CTRL_REDO:
+		result = const_Nil;
 		goto loop2;
 	    case CTRL_RETRY:
+		result = const_Nil;
 		goto loop;
 	    }
 	}
@@ -2871,10 +2874,13 @@ loop:
 	    case CTRL_BREAK:
 		return result->u.control.ret_value;
 	    case CTRL_CONTINUE:
+		result = const_Nil;
 		goto loop;
 	    case CTRL_REDO:
+		result = const_Nil;
 		goto loop2;
 	    case CTRL_RETRY:
+		result = const_Nil;
 		goto loop;
 	    }
 	}

@@ -657,14 +657,17 @@ loop:
 	    goto done;
 
 	case CTRL_CONTINUE:
+	    result = const_Nil;
 	    goto loop_continue;
 	    break;
 
 	case CTRL_REDO:
+	    result = const_Nil;
 	    goto loop;
 	    break;
 
 	case CTRL_RETRY:
+	    result = const_Nil;
 	    goto loop_retry;
 	    break;
 	}
@@ -738,14 +741,17 @@ loop:
 	    goto done;
 
 	case CTRL_CONTINUE:
+	    result = const_Nil;
 	    goto loop_continue;
 	    break;
 
 	case CTRL_REDO:
+	    result = const_Nil;
 	    goto loop;
 	    break;
 
 	case CTRL_RETRY:
+	    result = const_Nil;
 	    goto loop_retry;
 	    break;
 	}
@@ -1528,12 +1534,15 @@ loop:
 	    return result->u.control.ret_value;
 	    break;
 	case CTRL_CONTINUE:
+	    result = const_Nil;
 	    goto loop_continue;
 	    break;
 	case CTRL_REDO:
+	    result = const_Nil;
 	    goto loop;
 	    break;
 	case CTRL_RETRY:
+	    result = const_Nil;
 	    goto loop_retry;
 	    break;
 	}
@@ -2054,12 +2063,15 @@ loop:
 	    return result->u.control.ret_value;
 	    break;
 	case CTRL_CONTINUE:
+	    result = const_Nil;
 	    goto loop_continue;
 	    break;
 	case CTRL_REDO:
+	    result = const_Nil;
 	    goto loop;
 	    break;
 	case CTRL_RETRY:
+	    result = const_Nil;
 	    goto loop_retry;
 	    break;
 	}
@@ -4338,12 +4350,15 @@ loop:
 	    return result->u.control.ret_value;
 	    break;
 	case CTRL_CONTINUE:
+	    result = const_Nil;
 	    goto loop_continue;
 	    break;
 	case CTRL_REDO:
+	    result = const_Nil;
 	    goto loop;
 	    break;
 	case CTRL_RETRY:
+	    result = const_Nil;
 	    goto loop_retry;
 	    break;
 	}
