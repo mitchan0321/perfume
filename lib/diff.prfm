@@ -1,4 +1,4 @@
-defun diff (before after display-edit: disp) {
+defun diff (before after display-graph: disp) {
     b-id ::= vector;   	      # before file id array
     $b-id append! -1;	      # never match every source
     a-id ::= vector;	      # after file id array
@@ -57,8 +57,8 @@ defun diff (before after display-edit: disp) {
     # walk throw editgraph
     bmax ::= [$b-id len] - 1;
     amax ::= [$a-id len] - 1;
-    a-cost := -1;
     b-cost := -1;
+    a-cost := -1;
     broot := 0;
     aroot := 0;
     path := ();
