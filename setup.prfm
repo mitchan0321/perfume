@@ -72,8 +72,12 @@ defun unknown (*) {
 #
 if {file exists? [$ENV,"HOME" . "/.perfume"]}
 then: {
-    try {load [$ENV,"HOME" . "/.perfume"];} 
-    catch: {| e | println "Error at read '$HOME/.perfume', " [$e cdr] "."};
+    try {
+	load [$ENV,"HOME" . "/.perfume"];
+    } 
+    catch: {| e |
+	println "Error at read '$HOME/.perfume', " [$e cdr] ".";
+    };
 };
 
 true;
