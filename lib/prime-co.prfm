@@ -2,6 +2,8 @@
 
 defun prime-co () {
     coro {
+	pause 2;
+	pause 3;
 	set prime 3;
 	while {true} do: {
 	    $prime ++ 2;
