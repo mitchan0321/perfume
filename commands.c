@@ -1236,6 +1236,8 @@ cmd_cond(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	    if (GET_TAG(result) == CONTROL) {
 		if (result->u.control.code == CTRL_BREAK) {
 		    return result->u.control.ret_value;
+		} else {
+		    return result;
 		}
 	    }
 	    if (GET_TAG(result) == EXCEPTION) return result;
@@ -3287,6 +3289,23 @@ error:
 			 L"Syntax error at 'tag?', syntax: tag? var", interp);
 }
 
+Toy_Type*
+cmd_ref(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *var;
+    
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    var = list_get_item(posargs);
+    if (GET_TAG(var) != SYMBOL) goto error;
+
+    return toy_resolv_var(interp, var, 1, interp->trace_info);
+
+error:
+    return new_exception(TE_SYNTAX,
+			 L"Syntax error at 'ref', syntax: ref symbol", interp);
+}
+
 int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, L"false", cmd_false, NULL);
     toy_add_func(interp, L"true", cmd_true, NULL);
@@ -3388,6 +3407,7 @@ int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, L"true?", cmd_istrue, NULL);
     toy_add_func(interp, L"false?", cmd_isfalse, NULL);
     toy_add_func(interp, L"tag?", cmd_tag, NULL);
+    toy_add_func(interp, L"ref", cmd_ref, NULL);
 
     return 0;
 }
