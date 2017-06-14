@@ -1,3 +1,4 @@
+2017/06/14	PRFM_20170614		1.0.1
 2017/03/21	PRFM_20170321_OMAPERO15	1.0.0
 2017/03/03	PRFM_20170303		1.0.0_RC_3
 2017/03/01	PRFM_20170301		1.0.0_RC_2
@@ -977,5 +978,25 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 	1.0.0 / PRFM_20170321_OMAPERO15 RELEASE.
 	lib/diff.prfm
 		Add option :heuristic and :costbase.
+
+2017/06/14:
+	commands.c
+		Fix not return control code bug fix at cond command.
+		Add ref command for refer symbol value.
+	lib/diff.prfm
+		Change costbase algorithm.
+	lib/util.prfm
+		Add Integer::isprime method.
+		Add expr command for RPN expression evaluation.
+	methods.c
+		Add Integer::nextprime method for search next prime.
+		Add Integer::sqrt method for integer square root.
+		Add Integer::neg method for integer negate.
+		Add Integer::abs method for integer absolute.
+		Add Real::neg method for real negate.
+		Add Real::abs method for real absolute.
+		Add String::fmt control character "%a" for real value show indicate.
+	types.c
+		Change Real value to_string format.
 
 #eof
