@@ -514,7 +514,7 @@ mth_integer_ge(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
 	if (INTEGER != GET_TAG(arg)) return arg;
     }
 
-    if (mpz_cmp(SELF(interp)->u.biginteger, arg->u.biginteger) >=0) {
+    if (mpz_cmp(SELF(interp)->u.biginteger, arg->u.biginteger) >= 0) {
 	return SELF(interp);
     }
     return const_Nil;
@@ -938,6 +938,92 @@ mth_integer_power(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 
 error:
     return new_exception(TE_SYNTAX, L"Syntax error at '^', syntax: Integer ^ integer-val(>=0)", interp);
+
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
+mth_integer_nextprime(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    mpz_t s, next;
+
+    if (arglen > 0) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (GET_TAG(SELF(interp)) != INTEGER) goto error2;
+
+    mpz_init(s);
+    mpz_init(next);
+    mpz_set(s, SELF(interp)->u.biginteger);
+    mpz_nextprime(next, s);
+
+    return new_integer(next);
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'nextprime', syntax: Integer nextprime", interp);
+
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
+mth_integer_sqrt(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    mpz_t s, sqrt;
+
+    if (arglen > 0) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (GET_TAG(SELF(interp)) != INTEGER) goto error2;
+
+    mpz_init(s);
+    mpz_init(sqrt);
+    mpz_set(s, SELF(interp)->u.biginteger);
+    mpz_sqrt(sqrt, s);
+
+    return new_integer(sqrt);
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'sqrt', syntax: Integer sqrt", interp);
+
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
+mth_integer_neg(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    mpz_t s, neg;
+
+    if (arglen > 0) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (GET_TAG(SELF(interp)) != INTEGER) goto error2;
+
+    mpz_init(s);
+    mpz_init(neg);
+    mpz_set(s, SELF(interp)->u.biginteger);
+    mpz_neg(neg, s);
+
+    return new_integer(neg);
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'neg', syntax: Integer neg", interp);
+
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
+mth_integer_abs(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    mpz_t s;
+
+    if (arglen > 0) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (GET_TAG(SELF(interp)) != INTEGER) goto error2;
+
+    mpz_init(s);
+    mpz_abs(s, SELF(interp)->u.biginteger);
+
+    return new_integer(s);
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'abs', syntax: Integer abs", interp);
 
 error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
@@ -1382,6 +1468,35 @@ error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
+Toy_Type*
+mth_real_neg(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+
+    if (arglen != 0) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (GET_TAG(SELF(interp)) != REAL) goto error2;
+
+    return new_real(- SELF(interp)->u.real);
+    
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'neg', syntax: Real neg", interp);
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
+mth_real_abs(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+
+    if (arglen != 0) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (GET_TAG(SELF(interp)) != REAL) goto error2;
+
+    return new_real(fabs(SELF(interp)->u.real));
+    
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'abs', syntax: Real abs", interp);
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
 
 Toy_Type*
 mth_list_last(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
@@ -2930,6 +3045,7 @@ mth_string_format(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 		case L'f': case L'F':
 		case L'e': case L'E':
 		case L'g': case L'G':
+		case L'a': case L'A':
 		    cell_add_char(sacc, *p);
 
 		    item = list_get_item(posargs);
@@ -4591,6 +4707,10 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, L"Integer", L"^^", mth_integer_xor, NULL);
     toy_add_method(interp, L"Integer", L"~~", mth_integer_not, NULL);
     toy_add_method(interp, L"Integer", L"^", mth_integer_power, NULL);
+    toy_add_method(interp, L"Integer", L"nextprime", mth_integer_nextprime, NULL);
+    toy_add_method(interp, L"Integer", L"sqrt", mth_integer_sqrt, NULL);
+    toy_add_method(interp, L"Integer", L"neg", mth_integer_neg, NULL);
+    toy_add_method(interp, L"Integer", L"abs", mth_integer_abs, NULL);
 
     toy_add_method(interp, L"Real", L"+", mth_real_plus, NULL);
     toy_add_method(interp, L"Real", L"-", mth_real_minus, NULL);
@@ -4615,6 +4735,8 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, L"Real", L"exp", mth_real_exp, NULL);
     toy_add_method(interp, L"Real", L"exp10", mth_real_exp10, NULL);
     toy_add_method(interp, L"Real", L"pow", mth_real_pow, NULL);
+    toy_add_method(interp, L"Real", L"neg", mth_real_neg, NULL);
+    toy_add_method(interp, L"Real", L"abs", mth_real_abs, NULL);
 
     toy_add_method(interp, L"List", L"last", mth_list_last, NULL);
     toy_add_method(interp, L"List", L"item", mth_list_item, NULL);
