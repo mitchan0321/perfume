@@ -27,7 +27,7 @@ static wchar_t *ENCODING_NAME_DEFS[] = {
     L"RAW",		// index: 0 ... RAW encoding (no encoding, byte data stream)
     L"UTF-8",		// index: 1 ... UTF-8 encoding
     L"EUC-JP",		// index: 2 ... EUC-JP encoding
-    L"Shift-JIS",	// index: 3 ... Shift-JIS encoding (not yet)
+    L"Shift-JIS",	// index: 3 ... Shift-JIS encoding
     0
 };
 
@@ -414,7 +414,7 @@ eucjp_encoder(Cell *unicode, encoder_error_info *error_info) {
 }
 
 /* 
- * Shift-JIS decoder/encoder, do nathing.
+ * Shift-JIS decoder/encoder.
  */
 wchar_t
 jis2sjis(wchar_t src) {
