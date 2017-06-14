@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <string.h>
 #include <setjmp.h>
+#include <math.h>
 #include <sys/mman.h>
 #include <sys/types.h>
 #include "toy.h"
@@ -600,13 +601,35 @@ to_string(Toy_Type *obj) {
 
 	buff = GC_MALLOC(32*sizeof(wchar_t));
 	ALLOC_SAFE(buff);
-
-	if ((obj->u.real > 1.0E+9) || (obj->u.real < 1.0E-2)) {
-	    swprintf(buff, 32, L"%.15E", obj->u.real);
+	if ((fabs(obj->u.real) > 1.0E+9) || (fabs(obj->u.real) < 1.0E-2)) {
+	    if (obj->u.real == 0.0) {
+		swprintf(buff, 32, L"%-.15f", obj->u.real);
+	    } else {
+		swprintf(buff, 32, L"%.15E", obj->u.real);
+	    }
 	} else {
-	    swprintf(buff, 32, L"%.15f", obj->u.real);
+	    if (fabs(obj->u.real) < 10.0) {
+		swprintf(buff, 32, L"%-.15f", obj->u.real);
+	    } else if (fabs(obj->u.real) < 100.0) {
+		swprintf(buff, 32, L"%-.14f", obj->u.real);
+	    } else if (fabs(obj->u.real) < 1000.0) {
+		swprintf(buff, 32, L"%-.13f", obj->u.real);
+	    } else if (fabs(obj->u.real) < 10000.0) {
+		swprintf(buff, 32, L"%-.12f", obj->u.real);
+	    } else if (fabs(obj->u.real) < 100000.0) {
+		swprintf(buff, 32, L"%-.11f", obj->u.real);
+	    } else if (fabs(obj->u.real) < 1000000.0) {
+		swprintf(buff, 32, L"%-.10f", obj->u.real);
+	    } else if (fabs(obj->u.real) < 10000000.0) {
+		swprintf(buff, 32, L"%-.9f", obj->u.real);
+	    } else if (fabs(obj->u.real) < 100000000.0) {
+		swprintf(buff, 32, L"%-.8f", obj->u.real);
+	    } else if (fabs(obj->u.real) < 1000000000.0) {
+		swprintf(buff, 32, L"%-.7f", obj->u.real);
+	    } else {
+		swprintf(buff, 32, L"%-.6f", obj->u.real);
+	    }
 	}
-
 	c = new_cell(buff);
 	return cell_get_addr(c);
     }
@@ -893,10 +916,34 @@ to_print(Toy_Type *obj) {
 
 	buff = GC_MALLOC(32*sizeof(wchar_t));
 	ALLOC_SAFE(buff);
-	if ((obj->u.real > 1.0E+9) || (obj->u.real < 1.0E-2)) {
-	    swprintf(buff, 32, L"%.15E", obj->u.real);
+	if ((fabs(obj->u.real) > 1.0E+9) || (fabs(obj->u.real) < 1.0E-2)) {
+	    if (obj->u.real == 0.0) {
+		swprintf(buff, 32, L"%-.15f", obj->u.real);
+	    } else {
+		swprintf(buff, 32, L"%.15E", obj->u.real);
+	    }
 	} else {
-	    swprintf(buff, 32, L"%.15f", obj->u.real);
+	    if (fabs(obj->u.real) < 10.0) {
+		swprintf(buff, 32, L"%-.15f", obj->u.real);
+	    } else if (fabs(obj->u.real) < 100.0) {
+		swprintf(buff, 32, L"%-.14f", obj->u.real);
+	    } else if (fabs(obj->u.real) < 1000.0) {
+		swprintf(buff, 32, L"%-.13f", obj->u.real);
+	    } else if (fabs(obj->u.real) < 10000.0) {
+		swprintf(buff, 32, L"%-.12f", obj->u.real);
+	    } else if (fabs(obj->u.real) < 100000.0) {
+		swprintf(buff, 32, L"%-.11f", obj->u.real);
+	    } else if (fabs(obj->u.real) < 1000000.0) {
+		swprintf(buff, 32, L"%-.10f", obj->u.real);
+	    } else if (fabs(obj->u.real) < 10000000.0) {
+		swprintf(buff, 32, L"%-.9f", obj->u.real);
+	    } else if (fabs(obj->u.real) < 100000000.0) {
+		swprintf(buff, 32, L"%-.8f", obj->u.real);
+	    } else if (fabs(obj->u.real) < 1000000000.0) {
+		swprintf(buff, 32, L"%-.7f", obj->u.real);
+	    } else {
+		swprintf(buff, 32, L"%-.6f", obj->u.real);
+	    }
 	}
 	c = new_cell(buff);
 	return cell_get_addr(c);
