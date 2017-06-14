@@ -181,18 +181,22 @@ defun diff-cost-base () {
     	$costarray set ($b $amax) [$bmax - $b];
     };
 
-    [$amax - 1] each to: 0 do: {| a |
-        [$bmax - 1] each to: 0 do: {| b |
-	    if [$b-src,[$b + 1] = $a-src,[$a + 1]] {
-	        $costarray set ($b $a) $costarray,([$b + 1] [$a + 1]);
-	    } {
-	        a1 := $costarray,($b [$a + 1]);
-	        b1 := $costarray,([$b + 1] $a);
-		if [$a1 < $b1] {
-		    $costarray set ($b $a) [$a1 + 1];
-		} {
-		    $costarray set ($b $a) [$b1 + 1];
-		};
+    if {! [or [$amax = 0] [$bmax = 0]]} {
+        [$amax - 1] each to: 0 do: {| a |
+            [$bmax - 1] each to: 0 do: {| b |
+                if [$b-src,[$b + 1] = $a-src,[$a + 1]] {
+	            $costarray set ($b $a) $costarray,([$b + 1] [$a + 1]);
+                } {
+                    a1 := $costarray,($b [$a + 1]);
+                    b1 := $costarray,([$b + 1] $a);
+	            if [or [nil? $a1] [nil? $b1]] {break};
+		
+                    if [$a1 < $b1] {
+		        $costarray set ($b $a) [$a1 + 1];
+		    } {
+		        $costarray set ($b $a) [$b1 + 1];
+		    };
+	        };
 	    };
 	};
     };
