@@ -166,6 +166,13 @@ Integer method ! () {
     1 .. [self] : inject 1 do: {| s i | $s * $i}
 };
 
+Integer method isprime () {
+    if {[[self] - 1 : nextprime] = [self]}
+        t
+	nil
+    ;
+};
+
 #
 # IPv4 utils
 #
@@ -321,4 +328,94 @@ defun load-class (s force: force) {
 #
 defun tag (*) {
     tag? [$* car];
+};
+
+#
+# RPN expr
+#
+begin {
+    2opsyms := (+ - * / % ^ && || ^^ = != > >= < <= [symbol "."]);
+    defun expr (args: expr) {
+        help := "Syntax Error, syntax: expr rpn-expr";
+        if [$expr null?] then: {throw ErrSyntax $help};
+
+        lstack := ();
+    	$expr each do: {| item |
+            case [type? $item]
+	    SYMBOL {
+	        cond
+	    	[$2opsyms find $item] {
+		    if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
+		    i2 ::= $lstack >>;
+		    if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
+		    i1 ::= $lstack >>;
+		    $lstack << [$i1 $item $i2];
+		    break;
+                }
+	    
+	        [eq? $item pop] {
+		    if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
+		    $lstack >>;
+		    break;
+	        }
+	    
+	        [eq? $item exchg] {
+		    if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
+		    i2 ::= $lstack >>;
+		    if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
+		    i1 ::= $lstack >>;
+		    $lstack << $i2;
+		    $lstack << $i1;
+		    break;
+	        }
+	    
+	        [eq? $item dup] {
+		     if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
+		     i1 ::= $lstack >>;
+		     $lstack << $i1;
+		     $lstack << $i1;
+		     break;
+	        }
+
+	        [eq? $item if] {
+	       	    if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
+		    c ::= $lstack >>;
+	            if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
+		    fv ::= $lstack >>;
+	            if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
+		    tv ::= $lstack >>;
+		    if $c {$lstack << $tv} {$lstack << $fv};
+		    break;
+	        }
+
+	        [eq? $item list] {
+	            return $lstack;
+                }
+		
+	        [eq? $item top] {
+	            return [$lstack >>];
+                }
+	    
+	        t {
+		    if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
+	            i1 ::= $lstack >>;
+		    $lstack << [$i1 $item];
+	    	}
+	    	;
+	    }
+	
+	    LIST {
+	        $lstack << [call expr $item];
+	    }
+	
+	    * {
+	        $lstack << $item;
+	    }
+	    ;
+	
+        };
+
+        if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
+        $lstack >>;
+    };
 };
