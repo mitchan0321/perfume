@@ -1,0 +1,53 @@
+defun prime-fact (n) {
+    s ::= dict;
+    prime-fact-sub $n $s;
+
+    result := ();
+    lsort [$s keys : map {| i | "" . $i : int}] : each do: {| i |
+        $result <<- ($i $s,$i);
+    };
+    return $result;
+};
+
+defun prime-fact-sub (n s) {
+    f := 2;
+    t ::= $n sqrt;
+    while {$f <= $t} do: {
+        if {[$n % $f] = 0}
+        then: {
+            prime := nil;
+            add-fact $f $s;
+            prime-fact-sub [$n / $f] $s;
+            return;
+        };
+        f ::= nextprime* $f;
+    };
+    add-fact $n $s;
+};
+
+defun nextprime* (n) {
+    $n nextprime;
+};
+memoiz nextprime*;
+
+defun add-fact (n s) {
+    if [$s set? $n]
+    then: {$s set $n [$s,$n + 1]}
+    else: {$s set $n 1}
+    ;
+};
+
+defun prime-fact-check (l) {
+    $l inject 1 do: {| s i |
+        s ::= $s * [$i,0 ^ $i,1];
+    };
+    return $s;
+};
+
+defun prime-fact-test (n) {
+    1 each to: $n do: {| i |
+        f ::= prime-fact $i;
+        r ::= prime-fact-check $f;
+        println $i ", " $f ", " [if [$i = $r] "OK" "*** NG ***"];
+    };
+};
