@@ -15,10 +15,8 @@ defun prime-fact-sub (n s) {
     while {$f <= $t} do: {
         if {[$n % $f] = 0}
         then: {
-            prime := nil;
             add-fact $f $s;
-            prime-fact-sub [$n / $f] $s;
-            return;
+            goto prime-fact-sub [$n / $f] $s;
         };
         f ::= nextprime* $f;
     };
