@@ -21,8 +21,15 @@ defun exec (args: args) {
     $IN set-nobuffer;
     if {true? CO-MODE} then: {$IN set-noblock t};
 
+    err := $d,error;
+    ERR ::= new File;
+    $ERR set! $err mode: i;
+    $ERR set-newline nil;
+    $ERR set-nobuffer;
+    if {true? CO-MODE} then: {$ERR set-noblock t};
+
     if {true? PipeObject} then: {
-	$PipeObject set-term-hook [fun () {$IN close; $OUT close}];
+	$PipeObject set-term-hook [fun () {$IN close; $OUT close; $ERR close}];
     };
 
     status := 255;

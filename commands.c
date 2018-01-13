@@ -2288,7 +2288,7 @@ cmd_forkandexec(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     wchar_t *command;
     char **argv;
     int i, pid;
-    int left_ch[2], right_ch[2];
+    int left_ch[2], right_ch[2], err_ch[2];
     Toy_Type *result;
     int flag;
 
@@ -2319,6 +2319,9 @@ cmd_forkandexec(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     if (-1 == pipe(right_ch)) {
 	return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
     }
+    if (-1 == pipe(err_ch)) {
+	return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+    }
     
     pid = fork();
     
@@ -2330,6 +2333,7 @@ cmd_forkandexec(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
 	/* I am a child */
 	close(left_ch[1]);
 	close(right_ch[0]);
+	close(err_ch[0]);
 
 	close(0);
 	dup(left_ch[0]);
@@ -2339,6 +2343,10 @@ cmd_forkandexec(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
 	dup(right_ch[1]);
 	close(right_ch[1]);
 
+	close(2);
+	dup(err_ch[1]);
+	close(err_ch[1]);
+
 	execvp(to_char(command), argv);
 	exit(255);
     }
@@ -2346,6 +2354,7 @@ cmd_forkandexec(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     /* I am a parent */
     close(left_ch[0]);
     close(right_ch[1]);
+    close(err_ch[1]);
 
     flag = fcntl(left_ch[1], F_GETFD, 0);
     if (flag >= 0) {
@@ -2359,10 +2368,17 @@ cmd_forkandexec(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
 	fcntl(right_ch[0], F_SETFD, flag);
     }
 
+    flag = fcntl(err_ch[0], F_GETFD, 0);
+    if (flag >= 0) {
+	flag |= FD_CLOEXEC;
+	fcntl(err_ch[0], F_SETFD, flag);
+    }
+
     result = new_list(NULL);
     list_append(result, new_cons(new_symbol(L"pid"), new_integer_si(pid)));
     list_append(result, new_cons(new_symbol(L"left"), new_integer_si(left_ch[1])));
     list_append(result, new_cons(new_symbol(L"right"), new_integer_si(right_ch[0])));
+    list_append(result, new_cons(new_symbol(L"error"), new_integer_si(err_ch[0])));
     
     return result;
 
