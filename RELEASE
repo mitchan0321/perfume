@@ -999,4 +999,9 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 	types.c
 		Change Real value to_string format.
 
+2018/04/19:
+	methods.c
+		Add ":string" option in Dict::keys and Dict::pairs,
+		return some string type key items when idicated.
+
 #eof
