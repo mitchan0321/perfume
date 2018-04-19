@@ -3865,7 +3865,7 @@ mth_file_isready(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     Toy_Type *ttimeout;
 
     if (arglen > 0) goto error;
-    ttimeout = hash_get_and_unset_t(nameargs, new_symbol(L"timeout:"));
+    ttimeout = hash_get_and_unset_t(nameargs, const_timeout);
     if (ttimeout) {
 	if (GET_TAG(ttimeout) != INTEGER) goto error;
 	itimeout = mpz_get_si(ttimeout->u.biginteger);
@@ -4250,16 +4250,23 @@ error2:
 Toy_Type*
 mth_dict_keys(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *o;
+    Toy_Type *string_flag;
 
     if (arglen != 0) goto error;
+
+    string_flag = hash_get_and_unset_t(nameargs, const_string_key);
+    if (hash_get_length(nameargs) != 0) goto error;
 
     o = SELF(interp);
     if (GET_TAG(o) != DICT) goto error2;
 
+    if (string_flag && (GET_TAG(string_flag) != NIL)) {
+	return hash_get_keys_str(o->u.dict);
+    }
     return hash_get_keys(o->u.dict);
 
 error:
-    return new_exception(TE_SYNTAX, L"Syntax error at 'keys', syntax: Dict keys", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'keys', syntax: Dict keys [:string]", interp);
 
 error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
@@ -4268,16 +4275,23 @@ error2:
 Toy_Type*
 mth_dict_pairs(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *o;
+    Toy_Type *string_flag;
 
     if (arglen != 0) goto error;
 
+    string_flag = hash_get_and_unset_t(nameargs, const_string_key);
+    if (hash_get_length(nameargs) != 0) goto error;
+
     o = SELF(interp);
     if (GET_TAG(o) != DICT) goto error2;
-
+    
+    if (string_flag && (GET_TAG(string_flag) != NIL)) {
+	return hash_get_pairs_str(o->u.dict);
+    }
     return hash_get_pairs(o->u.dict);
 
 error:
-    return new_exception(TE_SYNTAX, L"Syntax error at 'pairs', syntax: Dict keys", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'pairs', syntax: Dict pairs [:string]", interp);
 
 error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
