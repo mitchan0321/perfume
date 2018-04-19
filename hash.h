@@ -42,7 +42,9 @@ int			hash_link(Hash *hash, const wchar_t *key,
 int			hash_link_t(Hash *hash, const struct _toy_type *key,
 				    Hash *to_hash, const struct _toy_type *to_key);
 struct _toy_type*	hash_get_keys(Hash *hash);
+struct _toy_type*	hash_get_keys_str(Hash *hash);
 struct _toy_type*	hash_get_pairs(Hash *hash);
+struct _toy_type*	hash_get_pairs_str(Hash *hash);
 void			hash_debug_dump(Hash *hash);
 
 /* for search object method cache */

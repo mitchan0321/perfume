@@ -582,6 +582,33 @@ hash_get_keys(Hash *hash) {
 }
 
 Toy_Type*
+hash_get_keys_str(Hash *hash) {
+    Toy_Type *l, *sl;
+    int i;
+    struct hash_bucket *b;
+
+    if (NULL == hash) return NULL;
+
+    l = new_list(NULL);
+
+    if (NULL == hash->bucket) return l;
+
+    sl = l;
+
+    for (i=0; i<(hash->bucket_size); i++) {
+	if (NULL != hash->bucket[i]) {
+	    b = hash->bucket[i];
+	    while (b) {
+		sl = list_append(sl, new_string_str(b->key));
+		b = b->next;
+	    }
+	}
+    }
+
+    return l;
+}
+
+Toy_Type*
 hash_get_pairs(Hash *hash) {
     Toy_Type *l, *sl, *p;
     int i;
@@ -609,6 +636,44 @@ hash_get_pairs(Hash *hash) {
 		    }
 		} else {
 		    p = new_cons(new_symbol(b->key), b->item);
+		}
+		sl = list_append(sl, p);
+		b = b->next;
+	    }
+	}
+    }
+
+    return l;
+}
+
+Toy_Type*
+hash_get_pairs_str(Hash *hash) {
+    Toy_Type *l, *sl, *p;
+    int i;
+    struct hash_bucket *b;
+
+    if (NULL == hash) return NULL;
+
+    l = new_list(NULL);
+
+    if (NULL == hash->bucket) return l;
+
+    sl = l;
+
+    for (i=0; i<(hash->bucket_size); i++) {
+	if (NULL != hash->bucket[i]) {
+	    b = hash->bucket[i];
+	    while (b) {
+		if (GET_TAG(b->item) == ALIAS) {
+		    Toy_Type *v;
+		    v = hash_get_t(b->item->u.alias.slot, b->item->u.alias.key);
+		    if (NULL == v) {
+			p = new_cons(new_string_str(b->key), const_Nil);
+		    } else {
+			p = new_cons(new_string_str(b->key), v);
+		    }
+		} else {
+		    p = new_cons(new_string_str(b->key), b->item);
 		}
 		sl = list_append(sl, p);
 		b = b->next;
