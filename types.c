@@ -104,6 +104,7 @@ integer_to_str(Toy_Type *val) {
 	size ++;
     }
     cbuff = GC_MALLOC(size + 1);
+    ALLOC_SAFE(cbuff);
     mpz_get_str(cbuff, 10, val->u.biginteger);
     cbuff[size] = 0;
 
