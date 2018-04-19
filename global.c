@@ -65,6 +65,7 @@ void def_global() {
     const_grep = new_symbol(L"grep:");
     const_all = new_symbol(L"all:");
     const_string = new_symbol(L"string");
+    const_string_key = new_symbol(L"string:");
     const_delegate = new_symbol(L"delegate:");
     const_init = new_symbol(L"init:");
     const_int1 = new_integer_si(1);
@@ -87,6 +88,7 @@ void def_global() {
     const_nocontrol = new_symbol(L"nocontrol:");
     const_nullstring = new_string_str(L"");
     const_silent = new_symbol(L"silent:");
+    const_timeout = new_symbol(L"timeout:");
     const_debug_hook = new_symbol(L"debug-hook");
     const_ast = new_symbol(L"*");
     const_regex_cache = L"@REGEX_CACHE";
