@@ -1,3 +1,4 @@
+2018/05/15	PRFM_20180515		1.1.0
 2017/06/14	PRFM_20170614		1.0.1
 2017/03/21	PRFM_20170321_OMAPERO15	1.0.0
 2017/03/03	PRFM_20170303		1.0.0_RC_3
@@ -1003,5 +1004,16 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 	methods.c
 		Add ":string" option in Dict::keys and Dict::pairs,
 		return some string type key items when idicated.
+
+2018/05/15:
+	commands.c
+		Fix try command, return CTRL_BREAK when occured CTRL_BREAK in body.
+		Add command for TCP/IP socket functions: socket-server, select, accept and close.
+		Add connect command option, bind-address: and bind-port:
+	lib/util.prfm
+		Add function host-address-string. Convert for host-address to string expression.
+		Add syntax for like the C-language's for.
+	types.h
+		Fix comment bug, INTEGER 64bit signed integer -> big integer.
 
 #eof
