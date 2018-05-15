@@ -16,6 +16,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/socket.h>
+#include <sys/select.h>
 #include <arpa/inet.h>
 #if __FreeBSD__
 #include <netinet/in.h>
@@ -1093,9 +1094,11 @@ retry:
 
     if (GET_TAG(result) == CONTROL) {
 	if (result->u.control.code == CTRL_RETRY) goto retry;
+#if 0
 	if (result->u.control.code == CTRL_BREAK) {
 	    result = result->u.control.ret_value;
 	}
+#endif
     }
 
     if (fin_body) {
@@ -2725,9 +2728,24 @@ cmd_connect(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     int socket_fd, sts;
     struct sockaddr_in serv_addr_in;
     Toy_Type *tport, *thostaddr;
-    int port, hostaddr;
+    Toy_Type *tbindport, *tbindhostaddr;
+    unsigned int port, hostaddr;
+    unsigned int bindport=0, bindhostaddr=0;
 
     if (arglen != 2) goto error;
+
+    tbindport = hash_get_and_unset_t(nameargs, new_symbol(L"bind-port:"));
+    if (tbindport) {
+	if (GET_TAG(tbindport) != INTEGER) goto error;
+	bindport = mpz_get_si(tbindport->u.biginteger);
+    }
+
+    tbindhostaddr = hash_get_and_unset_t(nameargs, new_symbol(L"bind-address:"));
+    if (tbindhostaddr) {
+	if (GET_TAG(tbindhostaddr) != INTEGER) goto error;
+	bindhostaddr = mpz_get_si(tbindhostaddr->u.biginteger);
+    }
+
     if (hash_get_length(nameargs) > 0) goto error;
 
     thostaddr = list_get_item(posargs);
@@ -2745,6 +2763,18 @@ cmd_connect(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
     }
 
+    if ((bindport != 0) || (bindhostaddr != 0)) {
+	struct sockaddr_in bind_addr_in;
+
+	bind_addr_in.sin_family = AF_INET;
+	bind_addr_in.sin_port = htons((uint16_t)bindport);
+	bind_addr_in.sin_addr.s_addr = htonl((uint32_t)bindhostaddr);
+	sts = bind(socket_fd, (const struct sockaddr*)&bind_addr_in, sizeof(bind_addr_in));
+	if (-1 == sts) {
+	    return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+	}
+    }
+
     serv_addr_in.sin_family = AF_INET;
     serv_addr_in.sin_port = htons((uint16_t)port);
     serv_addr_in.sin_addr.s_addr = htonl((uint32_t)hostaddr);
@@ -2758,7 +2788,226 @@ cmd_connect(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 
 error:
     return new_exception(TE_SYNTAX,
-			 L"Syntax error at 'connect', syntax: connect hostaddr port", interp);
+			 L"Syntax error at 'connect', syntax: connect hostaddr port [bind-port: port] [bind-address: address]", interp);
+}
+
+Toy_Type*
+cmd_socket_server(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    int socket_fd, sts;
+    struct sockaddr_in serv_addr_in;
+    Toy_Type *tport, *thostaddr;
+    unsigned int port, hostaddr=0;
+    int val;
+
+    if (arglen != 1) goto error;
+
+    thostaddr = hash_get_and_unset_t(nameargs, new_symbol(L"bind-address:"));
+    if (thostaddr) {
+	if (GET_TAG(thostaddr) != INTEGER) goto error;
+	hostaddr = mpz_get_si(thostaddr->u.biginteger);
+    };
+
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    tport = list_get_item(posargs);
+    if (GET_TAG(tport) != INTEGER) goto error;
+    port = mpz_get_si(tport->u.biginteger);
+
+    socket_fd = socket(PF_INET, SOCK_STREAM, 0);
+
+    if (-1 == socket_fd) {
+	return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+    }
+
+    val = 1;
+    setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val));
+
+    serv_addr_in.sin_family = AF_INET;
+    serv_addr_in.sin_port = htons((uint16_t)port);
+    serv_addr_in.sin_addr.s_addr = htonl((uint32_t)hostaddr);
+    sts = bind(socket_fd, (const struct sockaddr*)&serv_addr_in, sizeof(serv_addr_in));
+    if (-1 == sts) {
+	return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+    }
+
+    sts = listen(socket_fd, SOMAXCONN);
+    if (-1 == sts) {
+	return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+    }
+
+    return new_integer_si(socket_fd);
+    
+error:
+    return new_exception(TE_SYNTAX,
+			 L"Syntax error at 'socket-server', syntax: socket-server port [bind-address: address]", interp);
+}
+
+Toy_Type*
+cmd_select(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    fd_set read_fds, write_fds, except_fds;
+    Toy_Type *read_l, *write_l, *except_l, *timeout_v, *tfd;
+    int maxfd = 0, fd;
+    int timeout_l;
+    struct timeval timeout;
+    int result;
+    int i;
+    Toy_Type *read_result_l, *write_result_l, *except_result_l, *l, *result_l;;
+
+    if (list_length(posargs) != 4) goto error;
+    if (hash_get_length(nameargs) != 0) goto error;
+
+    read_l = list_get_item(posargs);
+    posargs = list_next(posargs);
+    write_l = list_get_item(posargs);
+    posargs = list_next(posargs);
+    except_l = list_get_item(posargs);
+    posargs = list_next(posargs);
+    timeout_v = list_get_item(posargs);
+
+    if (GET_TAG(read_l) != LIST) goto error;
+    if (GET_TAG(write_l) != LIST) goto error;
+    if (GET_TAG(except_l) != LIST) goto error;
+    if ((GET_TAG(timeout_v) != INTEGER) && (GET_TAG(timeout_v) != NIL)) goto error;
+
+    FD_ZERO(&read_fds);
+    FD_ZERO(&write_fds);
+    FD_ZERO(&except_fds);
+
+    while (! IS_LIST_NULL(read_l)) {
+	tfd = list_get_item(read_l);
+	if (GET_TAG(tfd) != INTEGER) goto error;
+	fd = mpz_get_si(tfd->u.biginteger);
+	FD_SET(fd, &read_fds);
+	if (fd > maxfd) maxfd = fd;
+	read_l = list_next(read_l);
+    }
+
+    while (! IS_LIST_NULL(write_l)) {
+	tfd = list_get_item(write_l);
+	if (GET_TAG(tfd) != INTEGER) goto error;
+	fd = mpz_get_si(tfd->u.biginteger);
+	FD_SET(fd, &write_fds);
+	if (fd > maxfd) maxfd = fd;
+	write_l = list_next(write_l);
+    }
+
+    while (! IS_LIST_NULL(except_l)) {
+	tfd = list_get_item(except_l);
+	if (GET_TAG(tfd) != INTEGER) goto error;
+	fd = mpz_get_si(tfd->u.biginteger);
+	FD_SET(fd, &except_fds);
+	if (fd > maxfd) maxfd = fd;
+	except_l = list_next(except_l);
+    }
+
+    maxfd ++;
+
+    if (GET_TAG(timeout_v) == INTEGER) {
+	timeout_l = mpz_get_si(timeout_v->u.biginteger);
+	timeout.tv_sec = timeout_l / 1000;
+	timeout.tv_usec = (timeout_l % 1000) * 1000;
+
+	result = select(maxfd, &read_fds, &write_fds, &except_fds, &timeout);
+    } else {
+	result = select(maxfd, &read_fds, &write_fds, &except_fds, NULL);
+    }
+
+    if (-1 == result) {
+	return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+    }
+
+    l = read_result_l = new_list(NULL);
+    for (i=0; i<maxfd; i++) {
+	if (FD_ISSET(i, &read_fds)) {
+	    l = list_append(l, new_integer_si(i));
+	}
+    }
+
+    l = write_result_l = new_list(NULL);
+    for (i=0; i<maxfd; i++) {
+	if (FD_ISSET(i, &write_fds)) {
+	    l = list_append(l, new_integer_si(i));
+	}
+    }
+
+    l = except_result_l = new_list(NULL);
+    for (i=0; i<maxfd; i++) {
+	if (FD_ISSET(i, &except_fds)) {
+	    l = list_append(l, new_integer_si(i));
+	}
+    }
+
+    result_l = new_list(NULL);
+    list_append(result_l, read_result_l);
+    list_append(result_l, write_result_l);
+    list_append(result_l, except_result_l);
+
+    return result_l;
+
+error:
+    return new_exception(TE_SYNTAX,
+			 L"Syntax error at 'select', syntax: select (read-fds ....) (write-fds ...) (except-fds ...) timeout\n\
+\tread-fds ..... check for ready to read file descriptors list.\n\
+\twrite-fds .... check for ready to write file descriptors list.\n\
+\texcept-fds ... check for ready to except file descriptors list.\n\
+\ttimeout ...... return timeout(milli-second), 0: never wait, nil: wait until some file descritors are ready.", interp);
+}
+
+Toy_Type*
+cmd_accept(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *tfd;
+    int fd;
+    struct sockaddr_in client_addr_in;
+    socklen_t client_addr_in_size;
+    int sts;
+    Toy_Type *result;
+
+    if (list_length(posargs) != 1) goto error;
+    if (hash_get_length(nameargs) != 0) goto error;
+    tfd = list_get_item(posargs);
+    if (GET_TAG(tfd) != INTEGER) goto error;
+    fd = mpz_get_si(tfd->u.biginteger);
+
+    client_addr_in_size = (socklen_t)sizeof(client_addr_in);
+    sts = accept(fd, (struct sockaddr*)&client_addr_in, &client_addr_in_size);
+    if (-1 == sts) {
+	return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+    }
+
+    result = new_list(NULL);
+    list_append(result, new_integer_si(sts));
+    list_append(result, new_integer_si(ntohl(client_addr_in.sin_addr.s_addr)));
+    list_append(result, new_integer_si((int)ntohs(client_addr_in.sin_port)));
+
+    return result;
+
+error:
+    return new_exception(TE_SYNTAX,
+			 L"Syntax error at 'accept', syntax: accept server-socket-fd", interp);
+}
+
+Toy_Type*
+cmd_close(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *tfd;
+    int fd;
+    int sts;
+
+    if (list_length(posargs) != 1) goto error;
+    if (hash_get_length(nameargs) != 0) goto error;
+    tfd = list_get_item(posargs);
+    if (GET_TAG(tfd) != INTEGER) goto error;
+    fd = mpz_get_si(tfd->u.biginteger);
+
+    sts = close(fd);
+    if (-1 == sts) {
+	return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+    }
+
+    return new_integer_si(sts);
+    
+error:
+    return new_exception(TE_SYNTAX,
+			 L"Syntax error at 'close', syntax: close file-descriptor", interp);
 }
 
 Toy_Type*
@@ -3395,6 +3644,10 @@ int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, L"vector", cmd_newvector, NULL);
     toy_add_func(interp, L"eq?", cmd_equal, NULL);
     toy_add_func(interp, L"connect", cmd_connect, NULL);
+    toy_add_func(interp, L"socket-server", cmd_socket_server, NULL);
+    toy_add_func(interp, L"select", cmd_select, NULL);
+    toy_add_func(interp, L"accept", cmd_accept, NULL);
+    toy_add_func(interp, L"close", cmd_close, NULL);
     toy_add_func(interp, L"resolv-in-addr", cmd_resolv_in_addr, NULL);
     toy_add_func(interp, L"coro", cmd_coro, NULL);
     toy_add_func(interp, L"pause", cmd_pause, NULL);
