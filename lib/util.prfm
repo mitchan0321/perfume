@@ -200,6 +200,11 @@ defun resolv-host (host) {
     };
 };
 
+defun host-address-string (addr) {
+    "%d.%d.%d.%d" fmt [[$addr >> 24] && 0xff] [[$addr >> 16] && 0xff] [[$addr >> 8] && 0xff] [$addr && 0xff];
+};
+
+
 # String number operation
 
 String method + (a) {
@@ -417,5 +422,20 @@ begin {
 
         if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
         $lstack >>;
+    };
+};
+
+#
+# for statement
+#
+defun for (init cond incr do: body) {
+    $init eval;
+    while {$cond eval} do: {
+	try {
+            $body eval
+        }
+        fin: {
+            $incr eval;
+        };
     };
 };
