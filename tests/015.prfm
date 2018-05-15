@@ -22,7 +22,6 @@ catch: {| i |
     println $i;
     $c ++;
     if {$c < 2} then: {retry};
-    break;
 }
 fin: {
     println "fin 2";
@@ -38,7 +37,6 @@ catch: {| i |
     println $i;
     $c ++;
     if {$c < 2} then: {retry};
-    break "xyz";
 }
 fin: {
     println "fin 3";
