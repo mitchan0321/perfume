@@ -20,7 +20,7 @@
 #define    SYMBOL  		1	/* symbol */
 #define	   REF			2	/* reference (e.g. $XX) */
 #define    LIST	  		3	/* list (e.g. (...)) */
-#define    INTEGER  		4	/* 64bit signed integer */
+#define    INTEGER  		4	/* big integer */
 #define    REAL	  		5	/* 64bit real */
 #define    STRING		6	/* string (e.g. "...") */
 #define    SCRIPT		7	/* script is some statements */
