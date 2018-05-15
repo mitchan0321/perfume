@@ -1008,6 +1008,7 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 2018/05/15:
 	commands.c
 		Fix try command, return CTRL_BREAK when occured CTRL_BREAK in body.
+		Fix try command, if occur EXCEPTION at catch body, 
 		Add command for TCP/IP socket functions: socket-server, select, accept and close.
 		Add connect command option, bind-address: and bind-port:
 	lib/util.prfm
@@ -1015,5 +1016,7 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 		Add syntax for like the C-language's for.
 	types.h
 		Fix comment bug, INTEGER 64bit signed integer -> big integer.
+	tests/*
+		Fix test scripts and test result file.
 
 #eof
