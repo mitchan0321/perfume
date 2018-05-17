@@ -967,7 +967,7 @@ error2:
 
 Toy_Type*
 mth_integer_sqrt(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
-    mpz_t s, sqrt;
+    mpz_t s, sqrt, zero;
 
     if (arglen > 0) goto error;
     if (hash_get_length(nameargs) > 0) goto error;
@@ -975,7 +975,11 @@ mth_integer_sqrt(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
 
     mpz_init(s);
     mpz_init(sqrt);
+    mpz_init(zero);
     mpz_set(s, SELF(interp)->u.biginteger);
+    if (mpz_cmp(s, zero) < 0) {
+	return new_exception(TE_ZERODIV, L"Zero divide.", interp);
+    }
     mpz_sqrt(sqrt, s);
 
     return new_integer(sqrt);
@@ -1301,6 +1305,9 @@ mth_real_sqrt(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     if (hash_get_length(nameargs) > 0) goto error;
     if (GET_TAG(SELF(interp)) != REAL) goto error2;
 
+    if (SELF(interp)->u.real < 0.0) {
+	return new_exception(TE_ZERODIV, L"Zero divide.", interp);
+    }
     return new_real(sqrt(SELF(interp)->u.real));
     
 error:
