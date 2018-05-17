@@ -1,3 +1,4 @@
+2018/05/17	PRFM_20180517		1.1.1
 2018/05/15	PRFM_20180515		1.1.0
 2017/06/14	PRFM_20170614		1.0.1
 2017/03/21	PRFM_20170321_OMAPERO15	1.0.0
@@ -1018,5 +1019,9 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 		Fix comment bug, INTEGER 64bit signed integer -> big integer.
 	tests/*
 		Fix test scripts and test result file.
+
+2018/05/17:
+	methods.c
+		Fix Integer::sqrt, Real:sqrt, detect minus number and throw Exception.
 
 #eof
