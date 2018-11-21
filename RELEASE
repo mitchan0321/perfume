@@ -1,3 +1,4 @@
+2018/11/21	PRFM_20181121		1.2.0_PRE_1
 2018/05/17	PRFM_20180517		1.1.1
 2018/05/15	PRFM_20180515		1.1.0
 2017/06/14	PRFM_20170614		1.0.1
@@ -1023,5 +1024,13 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 2018/05/17:
 	methods.c
 		Fix Integer::sqrt, Real:sqrt, detect minus number and throw Exception.
+
+2018/11/21:
+	lib/chat.prfm,chatd.prfm,chat-config.prfm
+		Add new apprication chat system.
+	lib/prime-fact
+		A few code optimized.
+	methods.c
+		Add method File::fd? for query file object holding descriptor number.
 
 #eof
