@@ -1,0 +1,37 @@
+defun chat (host) {
+    chat-config;
+
+    f ::= connect [resolv-host $host] $CHAT-PORT;
+    server ::= new File;
+    $server set! $f mode: io;
+    $server set-encoding UTF-8;
+    $server set-newline t;
+    println "*** " [$server stat];
+
+    try {
+        loop do: {
+            (ifds ofds efds) ::= select ([$stdin fd?]) () () 100;
+	    if {$ifds null?} else: {
+		message ::= $stdin gets;
+		if [or [$stdin eof?] [nil? $message]] then: {
+	            println "Chat client exit.";
+		    return;
+		};
+		$server puts [$message clean];
+	    };
+	
+	    (ifds ofds efds) ::= select ([$server fd?]) () () 100;
+	    if {$ifds null?} else: {
+		message ::= $server gets;
+		if [or [$server eof?] [nil? $message]] then: {
+		    println "Chat server down.";
+		    return;
+		};
+		println [$message clean];
+	    };
+	};
+    }
+    fin: {
+	$server close;
+    };
+};
