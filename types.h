@@ -383,4 +383,7 @@ wchar_t*	to_print(Toy_Type *obj);
 #define list_set_car(l,v)	(((l)==NULL)?NULL:((GET_TAG((l))==LIST)?(l)->u.list.item=v:NULL))
 #define list_set_cdr(l,v)	(((l)==NULL)?NULL:((GET_TAG((l))==LIST)?(l)->u.list.nextp=v:NULL))
 
+#define wcisspace(c)		((c < 0x80) && isspace(c))
+#define wcisprint(c)		(isprint(c) || (c >= 0x80))
+
 #endif /* __TYPES__ */
