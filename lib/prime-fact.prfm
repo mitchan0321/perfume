@@ -3,7 +3,7 @@ defun prime-fact (n) {
     prime-fact-sub $n $s;
 
     result := ();
-    lsort [$s keys : map {| i | "" . $i : int}] : each do: {| i |
+    lsort [$s keys :string : map {| i | $i int}] : each do: {| i |
         $result <<- ($i $s,$i);
     };
     return $result;
@@ -36,10 +36,7 @@ defun add-fact (n s) {
 };
 
 defun prime-fact-check (l) {
-    $l inject 1 do: {| s i |
-        s ::= $s * [$i,0 ^ $i,1];
-    };
-    return $s;
+    $l inject 1 do: {| s i | $s * [$i,0 ^ $i,1]};
 };
 
 defun prime-fact-test (n) {
