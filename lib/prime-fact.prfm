@@ -36,10 +36,7 @@ defun add-fact (n s) {
 };
 
 defun prime-fact-check (l) {
-    $l inject 1 do: {| s i |
-        s ::= $s * [$i,0 ^ $i,1];
-    };
-    return $s;
+    $l inject 1 do: {| s i | $s * [$i,0 ^ $i,1]};
 };
 
 defun prime-fact-test (n) {
