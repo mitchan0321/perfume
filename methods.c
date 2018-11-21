@@ -3133,10 +3133,12 @@ mth_string_clean(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     }
     
     while (*p) {
-	if ((! wcisspace(*p)) || (*p == L' ')) {
-	    if (wcisprint(*p)) {
+	if ((! wcisspace(*p)) || (*p == L' ') || (*p == L'\t')) {
+	    if (wcisprint(*p) || (*p == L'\t')) {
 		cell_add_char(c, *p);
 	    }
+	} else {
+	    cell_add_char(c, L' ');
 	}
 	p++;
     }
