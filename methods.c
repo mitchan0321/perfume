@@ -2754,14 +2754,14 @@ mth_string_split(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
 	    word = new_cell(L"");
 
 	    /* skip white space */
-	    while (*p && isspace(*p)) {
+	    while (*p && wcisspace(*p)) {
 		p++;
 	    }
 	    if (! *p) break;
 
 	    /* collect word, until white space */
 	    while (*p) {
-		if (! isspace(*p)) {
+		if (! wcisspace(*p)) {
 		    cell_add_char(word, *p);
 		} else {
 		    break;
@@ -3116,7 +3116,7 @@ mth_string_clean(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     p = cell_get_addr(SELF(interp)->u.string);
 
     while (*p) {
-	if (isspace(*p)) {
+	if (wcisspace(*p)) {
 	    p++;
 	} else {
 	    break;
@@ -3125,7 +3125,7 @@ mth_string_clean(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
 
     len = wcslen(p);
     for (i=len-1; i>=0; i--) {
-	if (isspace(p[i])) {
+	if (wcisspace(p[i])) {
 	    p[i]=0;
 	} else {
 	    break;
@@ -3133,8 +3133,8 @@ mth_string_clean(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     }
     
     while (*p) {
-	if ((*p == L' ') || (! isspace(*p))) {
-	    if (isprint(*p)) {
+	if ((! wcisspace(*p)) || (*p == L' ')) {
+	    if (wcisprint(*p)) {
 		cell_add_char(c, *p);
 	    }
 	}
@@ -3559,7 +3559,7 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 		}
 	    }
 	} else {
-	    if (isprint(c) || (c >= 0x80)) {
+	    if (wcisprint(c)) {
 		cell_add_char(cbuff, c);
 	    } else {
 		if (! flag_nocontrol) {
