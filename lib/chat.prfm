@@ -6,7 +6,7 @@ defun chat (host) {
     $server set! $f mode: io;
     $server set-encoding UTF-8;
     $server set-newline t;
-    println "*** " [$server stat];
+#    println "*** " [$server stat];
 
     try {
         loop do: {
