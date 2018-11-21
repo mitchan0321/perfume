@@ -3804,6 +3804,32 @@ error2:
 }
 
 Toy_Type*
+mth_file_getfd(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Hash *self;
+    Toy_File *f;
+    Toy_Type *container;
+
+    if (arglen > 0) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    self = SELF_HASH(interp);
+    container = hash_get_t(self, const_Holder);
+    if (NULL == container) goto error2;
+    f = container->u.container;
+
+    if (NULL == f->fd) {
+	return new_exception(TE_FILEACCESS, L"File not open.", interp);
+    }
+
+    return new_integer_si(fileno(f->fd));
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'fd?', syntax: File fd?", interp);
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
 mth_file_set(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Hash *self;
     Toy_File *f;
@@ -4819,6 +4845,7 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, L"File", L"stat", mth_file_stat, NULL);
     toy_add_method(interp, L"File", L"set-newline", mth_file_setnewline, NULL);
     toy_add_method(interp, L"File", L"eof?", mth_file_iseof, NULL);
+    toy_add_method(interp, L"File", L"fd?", mth_file_getfd, NULL);
     toy_add_method(interp, L"File", L"set!", mth_file_set, NULL);
     toy_add_method(interp, L"File", L"ready?", mth_file_isready, NULL);
     toy_add_method(interp, L"File", L"clear", mth_file_clear, NULL);

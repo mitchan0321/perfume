@@ -1,0 +1,5 @@
+defun chat-config () {
+    if [defvar? CHAT-PORT] else: {
+	defvar CHAT-PORT 6367;
+    };
+};

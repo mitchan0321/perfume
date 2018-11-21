@@ -1,0 +1,61 @@
+defun chatd () {
+
+    # create listen port
+
+    lfd ::= socket-server $CHAT-PORT;
+    println "Listening file descriptor: " $lfd;
+    client-list ::= dict;
+    client-addr ::= dict;
+    
+    loop do: {
+
+	# check listen port for connect request from client
+
+        (ifds ofds efds) ::= select ($lfd) () () 0;
+
+	if [$ifds null?] else: {
+
+	    # proseed client connect request
+
+	    (fd addr port) ::= accept $lfd;
+	    f ::= new File;
+	    $f set! $fd mode: io;
+	    $f set-encoding UTF-8;
+	    $f set-newline t;
+	    $client-list set $fd $f;
+	    $client-addr set $fd ["%v:%v" fmt [host-address-string $addr] $port];
+	    println "Connect client from " $client-addr,$fd;
+	};
+
+	# message exchange
+
+	(ifds dmy dmy) ::= select [$client-list keys :string : map {| k | $k int}] () () 100;
+
+	$ifds each do: {| c-in |
+	    message ::= $client-list,$c-in gets;
+
+	    if [or [$client-list,$c-in eof?] [nil? $message]] then: {
+		
+		# disconnect from client
+
+		println "Disconnect client from " $client-addr,$c-in;
+		$client-list unset $c-in;
+		$client-addr unset $c-in;
+		continue;
+	    };
+
+	    # message distribute another client
+
+	    message ::= $message clean;
+	    (dmy ofds dmy) ::= select () [$client-list keys :string : map {| k | $k int}] () 0;
+	    $ofds each do: {| c-out |
+		if {$c-out = $c-in} then: {continue};
+		$client-list,$c-out puts $message;
+		println "*** [" $message "] to " $client-addr,$c-out;
+	    };
+	};
+    };
+};
+
+chat-config;
+chatd;

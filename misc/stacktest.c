@@ -19,8 +19,8 @@
 #define CO_STACKSIZE		(1024)
 
 /* maximum number of slot */
-// #define STACK_SLOT_MAX		(512)
-#define STACK_SLOT_MAX		(256)
+#define STACK_SLOT_MAX		(1024)
+// #define STACK_SLOT_MAX		(256)
 
 /*
  * This number is co-routines native C stack size.
