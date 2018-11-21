@@ -287,7 +287,7 @@ sig_cstack_running_handler(int flag, siginfo_t* siginfo, void* ptr) {
     fprintf(stderr, "si_status: %d\n", siginfo->si_status);
     fprintf(stderr, "si_addr: %016lx\n", (long int)siginfo->si_addr);
     fprintf(stderr, "si_value: %d\n", siginfo->si_value.sival_int);
-    fprintf(stderr, "si_reason: %d\n", siginfo->_reason._fault._trapno);
+/*    fprintf(stderr, "si_reason: %d\n", siginfo->_reason._fault._trapno); */
     if (CStack_in_baria) {
 	fprintf(stderr, "SOVF Double fault detect.\n");
 	exit(1);
@@ -295,8 +295,9 @@ sig_cstack_running_handler(int flag, siginfo_t* siginfo, void* ptr) {
     CStack_in_baria = 1;
     if (CStack.stack_slot[Current_coroutine].jmp_buff_enable) {
 	cstack_unprotect(Current_coroutine);
-	sigreturn(ptr);
+	return;
 #if 0
+	sigreturn(ptr);
 	siglongjmp(CStack.stack_slot[Current_coroutine].jmp_buff, 1);
 #endif
     }
