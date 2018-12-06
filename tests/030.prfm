@@ -8,6 +8,6 @@ println [$s =~ all: 1 'a'];
 println [$s =~ all: 1 nocase: 1 'a'];
 println [$s =~ nocase: 1 'A.'];
 println [$s =~ nocase: 1 'a*'];
-println [$s =~ nocase: 1 'b*'];
+println [$s =~ nocase: 1 'b+'];
 println [$s =~ nocase: 1 '\w(\w)'];
 println [$s =~ all: 1 nocase: 1 '\w(\w)'];
