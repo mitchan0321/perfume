@@ -1,5 +1,26 @@
-# $Id:$
+#
+# set built-in classes.
+#
+if {defvar? @BUILT-IN-CLASSES} else: {
+    defvar @BUILT-IN-CLASSES [dict];
+    $@BUILT-IN-CLASSES set Block t;
+    $@BUILT-IN-CLASSES set Coro t;
+    $@BUILT-IN-CLASSES set Dict t;
+    $@BUILT-IN-CLASSES set File t;
+    $@BUILT-IN-CLASSES set Functions t;
+    $@BUILT-IN-CLASSES set Integer t;
+    $@BUILT-IN-CLASSES set List t;
+    $@BUILT-IN-CLASSES set Nil t;
+    $@BUILT-IN-CLASSES set Object t;
+    $@BUILT-IN-CLASSES set Real t;
+    $@BUILT-IN-CLASSES set RQuote t;
+    $@BUILT-IN-CLASSES set String t;
+    $@BUILT-IN-CLASSES set Vector t;
+};
 
+#
+# load current setup.prfm file if exist.
+#
 if {and [file exists? "./setup.prfm"] [! [defvar? _ONCE_]]}
 then: {
     defvar _ONCE_ t;
