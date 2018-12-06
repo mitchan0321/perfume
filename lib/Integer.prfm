@@ -1,0 +1,13 @@
+#
+# Integer util method
+#
+Integer method ! () {
+    1 .. [self] : inject 1 do: {| s i | $s * $i}
+};
+
+Integer method isprime () {
+    if {[[self] - 1 : nextprime] = [self]}
+        t
+	nil
+    ;
+};

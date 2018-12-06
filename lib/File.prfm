@@ -1,0 +1,17 @@
+#
+# File::each
+#
+File method each (do: body) {
+    while {! [eof?]} do: {
+	s ::= gets;
+	if [nil? $s] then: {break};
+	yield $body $s;
+    };
+};
+
+File method string () {
+    x ::= dict [stat];
+    name := $x,path;
+    if {nil? $name} then: {name := ""};
+    "File::" . $name "#" [stat];
+};

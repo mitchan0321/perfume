@@ -1,0 +1,5 @@
+#
+# constant value define
+#
+if {defvar? PI} else: {defvar PI 3.14159265358979323846};
+if {defvar? E}  else: {defvar E 2.7182818284590452354};

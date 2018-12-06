@@ -1,0 +1,69 @@
+#
+# List utility
+#
+List method clone () {
+    set result ();
+    [self] each do: {| l |
+	$result append! $l;
+    };
+    return $result;
+};
+
+List method insert! (pos obj) {
+    [seek $pos] << $obj;
+    return [self];
+};
+
+List method delete! (pos) {
+    if [$pos >= [[len] - 1]]
+    then: {->>}
+    else: {[seek $pos] >>};
+    return [self];
+};
+
+List method insert (pos obj) {
+    set result [[self] clone];
+    [$result seek $pos] << $obj;
+    return $result;
+};
+
+List method delete (pos) {
+    set result [[self] clone];
+    if [$pos >= [[len] - 1]]
+    then: {$result ->>}
+    else: {[$result seek $pos] >>};
+    return $result;
+};
+
+List method find (obj) {
+    set i 0;
+    [self] each do: {| f |
+	if [eq? $f $obj] then: {return $i};
+	$i ++;
+    };
+    return nil;
+};
+
+List method find* (obj) {
+    set i 0;
+    set result ();
+    [self] each do: {| f |
+	if [eq? $f $obj] then: {$result append! $i};
+	set i [$i + 1];
+    };
+    return $result;
+};
+
+List method reverse () {
+    set a [vector [self]];
+    set result ();
+    set r $result;
+    
+    if [[$a len] = 0] then: {return $result};
+
+    [[$a len] - 1] .. 0 : each do: {| i |
+        set r [$r append! $a,$i];
+    };
+
+    return $result;
+};

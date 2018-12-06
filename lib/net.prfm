@@ -1,0 +1,30 @@
+#
+# IPv4 utils
+#
+# Using: resolv-host host-name or ip-addr-string.
+#
+defun resolv-host (host) {
+    try {
+	set a [[[resolv-in-addr $host] split sep: "."] map {| i | $i int}];
+
+	if [[$a len] != 4] then: {
+	    throw ErrBadAddrSpec "Bad inet address spec.";
+	};
+
+	$a each do: {| i |
+	    if [$i > 255] then: {
+		throw ErrBadAddrSpec "Bad inet address spec.";
+	    };
+	};
+
+	return [([$a,0 << 24] [$a,1 << 16] [$a,2 << 8] $a,3)
+		inject 0 do: {| s i | $s + $i}];
+
+    } catch: {| e |
+	throw $e;
+    };
+};
+
+defun host-address-string (addr) {
+    "%d.%d.%d.%d" fmt [[$addr >> 24] && 0xff] [[$addr >> 16] && 0xff] [[$addr >> 8] && 0xff] [$addr && 0xff];
+};

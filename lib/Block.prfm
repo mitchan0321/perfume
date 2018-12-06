@@ -1,0 +1,23 @@
+#
+# block eval and input/output redirect from/to specified file.
+#
+Block method >> (file) {
+    pipe out: $file [self];
+};
+
+Block method >>> (file) {
+    pipe out: $file :append [self];
+};
+
+Block method << (file) {
+    pipe in: $file [self];
+};
+
+Block method <<< (string) {
+    s ::= new Stream;
+    [$string split sep: "\n"] each do: {| r |
+	$s puts $r;
+    };
+    $s close;
+    pipe in: $s [self];
+};

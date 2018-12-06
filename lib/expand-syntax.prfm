@@ -1,0 +1,172 @@
+#
+# for load function / class by symbol name
+#
+defun load-func (s force: force) {
+    if {! [set? force]} then: {
+	if [dict-func : set? $s] then: {return nil};
+    };
+
+    dict-func : unset $s;
+    $LIB_PATH each do: {| f |
+	try {unset p; alias up: 1 __fname__ p};
+	set p [$f . "/" $s ".prfm"];
+	uplevel {try {load $__fname__} catch: {}; unset __fname__};
+	if [dict-func : set? $s] then: {return t};
+    };
+    throw ErrNoFunction ["No such function, '" . $s "'."];
+};
+
+defun load-class (s force: force) {
+    if {! [set? force]} then: {
+	if [dict-class : set? $s] then: {return nil};
+    };
+    if {$@BUILT-IN-CLASSES set? $s} then: {return nil};
+    
+    dict-class : unset $s;
+    $LIB_PATH each do: {| f |
+	try {unset p; alias up: 1 __fname__ p};
+	set p [$f . "/" $s ".prfm"];
+	uplevel {try {load $__fname__} catch: {}; unset __fname__};
+	if [dict-class : set? $s] then: {return t};
+    };
+    throw ErrNoClass ["No such class, '" . $s "'."];
+};
+
+#
+# for statement
+#
+defun for (init cond incr do: body) {
+    $init eval;
+    while {$cond eval} do: {
+	try {
+            $body eval
+        }
+        fin: {
+            $incr eval;
+        };
+    };
+};
+
+#
+# apply constructor delegate chain
+# Using: xx method () init {apply-constructor}
+#
+defun apply-constructor () {
+    [[self] delegate?] each do: {| i |
+	apply-constructor-sub $i;
+    };
+};
+
+defun apply-constructor-sub (o) {
+    set s [symbol ["__init__" . $o]];
+    if [sets? $s] then: {return};
+    sets $s t;
+
+    set l [$o delegate?];
+    if {$l null?} then: {return};
+
+    $l each do: {| i |
+	apply-constructor-sub $i;
+	try {
+	    [$i var? init];
+	}
+        catch: {};
+    };
+};
+
+#
+# Wrap tag? command.
+#
+defun tag (*) {
+    tag? [$* car];
+};
+
+#
+# RPN expr
+#
+begin {
+    2opsyms := (+ - * / % ^ && || ^^ = != > >= < <= [symbol "."]);
+    defun expr (args: expr) {
+        help := "Syntax Error, syntax: expr rpn-expr";
+        if [$expr null?] then: {throw ErrSyntax $help};
+
+        lstack := ();
+    	$expr each do: {| item |
+            case [type? $item]
+	    SYMBOL {
+	        cond
+	    	[$2opsyms find $item] {
+		    if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
+		    i2 ::= $lstack >>;
+		    if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
+		    i1 ::= $lstack >>;
+		    $lstack << [$i1 $item $i2];
+		    break;
+                }
+	    
+	        [eq? $item pop] {
+		    if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
+		    $lstack >>;
+		    break;
+	        }
+	    
+	        [eq? $item exchg] {
+		    if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
+		    i2 ::= $lstack >>;
+		    if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
+		    i1 ::= $lstack >>;
+		    $lstack << $i2;
+		    $lstack << $i1;
+		    break;
+	        }
+	    
+	        [eq? $item dup] {
+		     if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
+		     i1 ::= $lstack >>;
+		     $lstack << $i1;
+		     $lstack << $i1;
+		     break;
+	        }
+
+	        [eq? $item if] {
+	       	    if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
+		    c ::= $lstack >>;
+	            if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
+		    fv ::= $lstack >>;
+	            if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
+		    tv ::= $lstack >>;
+		    if $c {$lstack << $tv} {$lstack << $fv};
+		    break;
+	        }
+
+	        [eq? $item list] {
+	            return $lstack;
+                }
+		
+	        [eq? $item top] {
+	            return [$lstack >>];
+                }
+	    
+	        t {
+		    if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
+	            i1 ::= $lstack >>;
+		    $lstack << [$i1 $item];
+	    	}
+	    	;
+	    }
+	
+	    LIST {
+	        $lstack << [call expr $item];
+	    }
+	
+	    * {
+	        $lstack << $item;
+	    }
+	    ;
+	
+        };
+
+        if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
+        $lstack >>;
+    };
+};

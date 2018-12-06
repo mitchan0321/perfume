@@ -1,0 +1,7 @@
+#
+# Vector util method
+#
+Vector method string () {
+    "[vector " . [list] "]";
+};
+

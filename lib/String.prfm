@@ -1,0 +1,127 @@
+#
+# String number operation
+#
+
+String method + (a) {
+    [[self] number] + $a;
+};
+
+String method - (a) {
+    [[self] number] - $a;
+};
+
+String method * (a) {
+    [[self] number] * $a;
+};
+
+String method / (a) {
+    [[self] number] / $a;
+};
+
+String method % (a) {
+    [[self] int] % $a;
+};
+
+String method ^ (a) {
+    [[self] int] ^ $a;
+};
+
+String method && (a) {
+    [[self] int] && $a;
+};
+
+String method || (a) {
+    [[self] int] || $a;
+};
+
+String method ^^ (a) {
+    [[self] int] ^^ $a;
+};
+
+String method ~~ () {
+    [[self] int] ~~;
+};
+
+String method sin () {
+    [[self] real] sin;
+};
+
+String method cos () {
+    [[self] real] cos;
+};
+
+String method tan () {
+    [[self] real] tan;
+};
+
+String method asin () {
+    [[self] real] asin;
+};
+
+String method acos () {
+    [[self] real] acos;
+};
+
+String method atan () {
+    [[self] real] atan;
+};
+
+String method sqrt () {
+    [[self] real] sqrt;
+};
+
+String method pow (a) {
+    [[self] real] pow $a;
+};
+
+String method exp10 () {
+    [[self] real] exp10;
+};
+
+String method exp () {
+    [[self] real] exp;
+};
+
+String method log10 () {
+    [[self] real] log10;
+};
+
+String method log () {
+    [[self] real] log;
+};
+
+#
+# String::expand
+#   Expand and replace value into string.
+#   Syntax: "... ${val1} ... ${val2} ... ${valN} ..."
+#   Result: Replace at ${val1}, ${val2}, ... ${valN} string to val1, val2 ... valN symbols value.
+#
+String method expand () {
+    l := ();
+    r ::= [self] =~ :all '\$\{[^\$\{\}]*\}';
+    if {nil? $r} then: {return [self]};
+    
+    remain := [self];
+    [$r reverse] each do: {| i |
+	(start end match) := $i;
+	$l << [$remain sub $end];
+	var ::= symbol [$match sub 2 [$match len : - 1]];
+	try {
+	    el ::= (ref $var) create-block;
+	    $l << [uplevel $el];
+	}
+	catch: {
+	    throw ErrNoSuchVariable> ["No such variable, '" . $var "'."];
+	};
+
+	remain ::= $remain sub 0 $start;
+    };
+    $l << $remain;
+
+    result := "";
+    $l each do: {| i |
+        $result append! $i;
+    };
+
+    return $result;
+};

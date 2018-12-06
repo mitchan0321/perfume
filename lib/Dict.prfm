@@ -1,0 +1,12 @@
+#
+# Dict util methods
+#
+Dict method each (do: body) {
+    if {set? body} else: {throw ErrNoBlock "No specified block."};
+    [keys] each do: {| k | yield $body $k [self],$k};
+};
+
+Dict method string () {
+    "[dict " . [pairs] "]";
+};
+
