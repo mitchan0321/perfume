@@ -1,25 +1,12 @@
-# $Id:$
-
-# calc prime
+# calc prime (Integer::nextprime version)
 
 defun prime (n) {
-  set prime (3 5);
-  set last [$prime last];
-  set cand [$last item];
-  set c [$prime len];
-
-  while {true} do: {
-    if {[$last item] > $n} then: {return $prime};
-
-
-    $cand ++ 2;
-    $prime each do: {| i |
-      if {[$i * 2] > $cand} then: {break};
-      if {[$cand % $i] = 0} then: {$cand ++ 2; retry};
+    set result (2);
+    set p $result;
+    set i [$result last : car];
+    while {$i < $n} do: {
+	i ::= $i nextprime;
+	p ::= $p append! $i;
     };
-    #found prime
-    set last [$last append! $cand];
-    set cand [$last item];
-    $c ++;
-  };
+    return $result;
 };

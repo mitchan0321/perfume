@@ -1,22 +1,11 @@
-# $Id:$
+# calc prime (coroutine version)
 
 defun prime-co () {
     coro {
-	pause 2;
-	pause 3;
-	set prime 3;
+        prime := 2;
 	while {true} do: {
-	    $prime ++ 2;
-	    set i 3;
-	    while {$i < [$prime / 2]} do: {
-		if {[$prime % $i] = 0} then: {
-		    $prime ++ 2;
-		    set i 3;
-		    retry;
-		};
-		$i ++ 2;
-	    };
 	    pause $prime;
+	    prime ::= $prime nextprime;
 	};
     };
 };
