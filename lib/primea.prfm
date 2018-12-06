@@ -1,11 +1,8 @@
-# $Id:$
-
-# calc prime
+# calc prime (self calculate version)
 
 defun primea (n) {
     set prime [vector (2 3 5)];
     set cand 5;
-    set c [$prime len];
 
     while {true} do: {
 	if {[$prime last] > $n} then: {return $prime};
@@ -18,6 +15,5 @@ defun primea (n) {
 
         #found prime
 	$prime append! $cand;
-	$c ++;
     };
 };
