@@ -44,5 +44,7 @@
 #define TE_NOENCODING		L"ErrNoEncoding"
 #define TE_BADENCODEBYTE	L"ErrBadEncodeByte"
 #define TE_BADENCODER		L"ErrBadEncoder"
+#define TE_INFINITY		L"ErrInfinity"
+#define TE_NAN			L"ErrNaN"
 
 #endif /* __ERROR__ */
