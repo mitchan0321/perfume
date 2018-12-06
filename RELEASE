@@ -1,3 +1,4 @@
+2018/12/23	PRFM_20181223_K30	1.2.0
 2018/11/21	PRFM_20181121		1.2.0_PRE_1
 2018/05/17	PRFM_20180517		1.1.1
 2018/05/15	PRFM_20180515		1.1.0
@@ -1032,5 +1033,25 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 		A few code optimized.
 	methods.c
 		Add method File::fd? for query file object holding descriptor number.
+
+2018/12/23:
+	error.h
+		Add new Exception, ErrInfinity and ErrNaN.
+	methods.c
+		Fix zero divide operation error.
+		Add Real::inf? and Real::nan? for check real value infinity and non number value.
+		Fix String::split and String::clear wide character bug.
+		Fix String::sub when end index supressed bug.
+		Add List::create-block.
+	lib/util.prfm
+		Separate files Block.prfm, Dict.prfm, File.prfm, Integer.prfm, List.prfm,
+		Object.prfm, String.prfm, Vector.prfm, consts.prfm, expand-syntax.prfm and
+		net.prfm.
+		Add Block::>>>, Block::<<<.
+		Add String::expand.
+	lib/pipe.prfm
+		Add :append option for append output to file.
+	parser.c
+		Add new escape \<cr> that mean next line to be continued.
 
 #eof
