@@ -109,7 +109,7 @@ cell_sub(Cell *c, int start, int end) {
 
     if (end < 0) return d;
     if (start < 0) start = 0;
-    if (end == 0) end = l;
+/*    if (end == 0) end = l; */
     if (end <= start) return d;
     if (start >= l) return d;
 
