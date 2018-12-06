@@ -376,6 +376,9 @@ mth_integer_mod(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
 	if (INTEGER != GET_TAG(arg)) return arg;
     }
 
+    if (0 == mpz_cmp_si(arg->u.biginteger, 0)) {
+	return new_exception(TE_ZERODIV, L"Zero divide.", interp);
+    }
     mpz_init(s);
     mpz_set(s, SELF(interp)->u.biginteger);
     mpz_mod(s, s, arg->u.biginteger);
@@ -1291,6 +1294,13 @@ mth_real_tointeger(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int ar
     if (hash_get_length(nameargs) > 0) goto error;
     if (GET_TAG(SELF(interp)) != REAL) goto error2;
 
+    if (isinf(SELF(interp)->u.real)) {
+	return new_exception(TE_INFINITY, L"Do not convert infinity value.", interp);
+    }
+    if (isnan(SELF(interp)->u.real)) {
+	return new_exception(TE_NAN, L"Do not convert NaN value.", interp);
+    }
+
     return new_integer_d(SELF(interp)->u.real);
     
 error:
@@ -1501,6 +1511,44 @@ mth_real_abs(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
     
 error:
     return new_exception(TE_SYNTAX, L"Syntax error at 'abs', syntax: Real abs", interp);
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
+mth_real_isinf(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+
+    if (arglen != 0) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (GET_TAG(SELF(interp)) != REAL) goto error2;
+
+    if (isinf(SELF(interp)->u.real)) {
+	return const_T;
+    } else {
+	return const_Nil;
+    }
+    
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'inf?', syntax: Real inf?", interp);
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
+mth_real_isnan(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+
+    if (arglen != 0) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (GET_TAG(SELF(interp)) != REAL) goto error2;
+
+    if (isnan(SELF(interp)->u.real)) {
+	return const_T;
+    } else {
+	return const_Nil;
+    }
+    
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'nan?', syntax: Real nan?", interp);
 error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
 }
@@ -2256,6 +2304,25 @@ error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
+Toy_Type*
+mth_list_block(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *l;
+
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (list_length(posargs) != 0) goto error;
+
+    l = SELF(interp);
+    if (GET_TAG(l) != LIST) goto error2;
+    return new_closure(new_script(new_list(
+				      new_statement(l,
+					interp->func_stack[interp->cur_func_stack]->trace_info->line))),
+		       new_closure_env(interp), interp->func_stack[interp->cur_func_stack]->script_id);
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'block', syntax: List create-block", interp);
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
 
 Toy_Type*
 mth_string_len(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
@@ -2705,14 +2772,16 @@ mth_string_sub(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     if (GET_TAG(t) != INTEGER) goto error;
     start = mpz_get_si(t->u.biginteger);
 
+    self = SELF(interp);
     if (arglen == 2) {
 	posargs = list_next(posargs);
 	t = list_get_item(posargs);
 	if (GET_TAG(t) != INTEGER) goto error;
 	end = mpz_get_si(t->u.biginteger);
+    } else {
+	end = cell_get_length(self->u.string);
     }
 
-    self = SELF(interp);
     if (GET_TAG(self) != STRING) goto error2;
 
     o = self->u.string;
@@ -4786,6 +4855,8 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, L"Real", L"pow", mth_real_pow, NULL);
     toy_add_method(interp, L"Real", L"neg", mth_real_neg, NULL);
     toy_add_method(interp, L"Real", L"abs", mth_real_abs, NULL);
+    toy_add_method(interp, L"Real", L"inf?", mth_real_isinf, NULL);
+    toy_add_method(interp, L"Real", L"nan?", mth_real_isnan, NULL);
 
     toy_add_method(interp, L"List", L"last", mth_list_last, NULL);
     toy_add_method(interp, L"List", L"item", mth_list_item, NULL);
@@ -4813,6 +4884,7 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, L"List", L"inject", mth_list_inject, NULL);
     toy_add_method(interp, L"List", L"set-car!", mth_list_setcar, NULL);
     toy_add_method(interp, L"List", L"set-cdr!", mth_list_setcdr, NULL);
+    toy_add_method(interp, L"List", L"create-block", mth_list_block, NULL);
 
     toy_add_method(interp, L"String", L"len", mth_string_len, NULL);
     toy_add_method(interp, L"String", L"=", mth_string_equal, NULL);
