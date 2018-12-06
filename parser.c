@@ -372,10 +372,15 @@ toy_parse_string(Bulk *src, wchar_t endc) {
 	    case L'n':
 		c = L'\n';
 		break;
+	    case L'\n':
+		c = 0;
+		break;
 	    }
 	}
 
-	if (NULL == cell_add_char(newcell, c)) goto assert;
+	if (0 != c) {
+	    if (NULL == cell_add_char(newcell, c)) goto assert;
+	};
 	c = bulk_getchar(src);
     }
     return str;
