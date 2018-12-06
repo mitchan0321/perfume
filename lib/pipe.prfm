@@ -5,8 +5,8 @@
 load-class :force PipeWrapper;
 load-class :force Stream;
 
-defun pipe (in: in out: out args: blocks) {
-    syntax := "Syntax: pipe [in: input-stream | path | (path-list)] [out: output-stream | path] {block} ... ";
+defun pipe (in: in out: out append: append args: blocks) {
+    syntax := "Syntax: pipe [in: input-stream | path | (path-list)] [out: output-stream | path] [:append] {block} ... ";
     flist := (); # open file list
 
     #
@@ -71,7 +71,11 @@ defun pipe (in: in out: out args: blocks) {
 		}
 	    }
 	    STRING {
-		out := `File($out mode: o);
+		if {true? append} then: {
+		    out := `File($out mode: a);
+		} else: {
+		    out := `File($out mode: o);
+	        };
 		$flist append! $out;
 	    }
 	    * {throw ErrSyntax $syntax}
