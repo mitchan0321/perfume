@@ -345,6 +345,7 @@ Toy_Type*	list_get_item(Toy_Type *list);
 int		list_length(Toy_Type *list);
 Toy_Type*	new_integer(mpz_t biginteger);
 Toy_Type*	new_integer_si(long int integer);
+Toy_Type*	new_integer_ullsi(unsigned long long integer);
 Toy_Type*	new_integer_d(double val);
 wchar_t*	integer_to_str(Toy_Type *val);
 Toy_Type*	new_real(double real);

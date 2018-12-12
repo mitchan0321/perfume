@@ -85,6 +85,15 @@ new_integer_si(long int integer) {
 }
 
 Toy_Type*
+new_integer_ullsi(unsigned long long int integer) {
+    mpz_t s;
+
+    mpz_init(s);
+    mpz_set_si(s, (long int)(integer));
+    return new_integer(s);
+}
+
+Toy_Type*
 new_integer_d(double val) {
     mpz_t s;
 
