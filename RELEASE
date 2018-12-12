@@ -1029,7 +1029,7 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 2018/11/21:
 	lib/chat.prfm,chatd.prfm,chat-config.prfm
 		Add new apprication chat system.
-	lib/prime-fact
+	lib/prime-fact.prfm
 		A few code optimized.
 	methods.c
 		Add method File::fd? for query file object holding descriptor number.
@@ -1043,6 +1043,13 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 		Fix String::split and String::clear wide character bug.
 		Fix String::sub when end index supressed bug.
 		Add List::create-block.
+		Add String::at return specified indexed character.
+	commands.c
+		Add file sub commands are stat, rm, rmdir, rename, mkdir and chmod.
+		Add dict-closure command that return closures dictionary from specified
+		blocks environment.
+		Add strftime command that format and return string from the specified time-value.
+		Add time-of-day command that return local machine time.
 	lib/util.prfm
 		Separate files Block.prfm, Dict.prfm, File.prfm, Integer.prfm, List.prfm,
 		Object.prfm, String.prfm, Vector.prfm, consts.prfm, expand-syntax.prfm and
@@ -1051,7 +1058,11 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 		Add String::expand.
 	lib/pipe.prfm
 		Add :append option for append output to file.
+	lib/awk.prfm
+		Add awk like function that name is awk.
+		Add ll for example file status access.
 	parser.c
 		Add new escape \<cr> that mean next line to be continued.
+		Add octal number literal. ex) 0o[0-7]+
 
 #eof
