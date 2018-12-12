@@ -10,6 +10,7 @@
 #include <dirent.h>
 #include <setjmp.h>
 #include <float.h>
+#include <time.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -1830,13 +1831,19 @@ cmd_file(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 
 	println(interp, L"file command [args ...]");
 	println(interp, L"commands are:");
-	println(interp, L"  ?                 Print this message.");
-	println(interp, L"  exists? \"file\"    If \"file\" exist then return non-nil.");
-	println(interp, L"  dir? \"file\"       If \"file\" is directory then return non-nil.");
-	println(interp, L"  read? \"file\"      If \"file\" is readable then return non-nil.");
-	println(interp, L"  write? \"file\"     If \"file\" is writable then return non-nil.");
-	println(interp, L"  exec? \"file\"      If \"file\" is excecutable then return non-nil.");
-	println(interp, L"  list \"directory\"  Return \"directory\"\'s entry list.");
+	println(interp, L"  ?                    Print this message.");
+	println(interp, L"  exists? \"file\"       If \"file\" exist then return t.");
+	println(interp, L"  dir? \"file\"          If \"file\" is directory then return t.");
+	println(interp, L"  read? \"file\"         If \"file\" is readable then return t.");
+	println(interp, L"  write? \"file\"        If \"file\" is writable then return t.");
+	println(interp, L"  exec? \"file\"         If \"file\" is excecutable then return t.");
+	println(interp, L"  list \"directory\"     Return \"directory\"\'s entry list.");
+	println(interp, L"  stat \"file\"          Return \"file\" status.");
+	println(interp, L"  rm \"file\"            rm \"file\".");
+	println(interp, L"  rmdir \"dir\"          rmdir \"dir\".");
+	println(interp, L"  rename \"from\" \"dest\" rename file \"from\" to \"dest\".");
+	println(interp, L"  mkdir \"dir\"          make directory \"dir\" and mode.");
+	println(interp, L"  chmod \"file\" mode    change \"file\" access mode.");
 
 	return const_Nil;
 	
@@ -1964,6 +1971,173 @@ cmd_file(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	closedir(dir);
 	return dirl;
 
+    } else if (wcscmp(commands, L"stat") == 0) {
+	Toy_Type *fname;
+	char *fnames;
+	int sts;
+	struct stat fstat;
+	Toy_Type *result, *l;
+	wchar_t *t;
+
+	if (arglen != 2) goto error_stat;
+	posargs = list_next(posargs);
+	fname = list_get_item(posargs);
+	if (GET_TAG(fname) != STRING) goto error_stat;
+	fnames = to_char(cell_get_addr(fname->u.string));
+
+	sts = stat(fnames, &fstat);
+	if (-1 == sts) {
+	    return new_exception(TE_FILEACCESS, L"file stat can\'t get.", interp);
+	}
+	l = result = new_list(NULL);
+	
+	l = list_append(l, new_cons(new_symbol(L"dev-major"), 
+				    new_integer_si(major(fstat.st_dev))));
+	l = list_append(l, new_cons(new_symbol(L"dev-mainor"), 
+				    new_integer_si(minor(fstat.st_dev))));
+	l = list_append(l, new_cons(new_symbol(L"inode"), 
+				    new_integer_si(fstat.st_ino)));
+	l = list_append(l, new_cons(new_symbol(L"mode"), 
+				    new_integer_si(fstat.st_mode)));
+	l = list_append(l, new_cons(new_symbol(L"link"), 
+				    new_integer_si(fstat.st_nlink)));
+	l = list_append(l, new_cons(new_symbol(L"uid"), 
+				    new_integer_si(fstat.st_uid)));
+	l = list_append(l, new_cons(new_symbol(L"gid"), 
+				    new_integer_si(fstat.st_gid)));
+	l = list_append(l, new_cons(new_symbol(L"device"), 
+				    new_integer_si(fstat.st_rdev)));
+	l = list_append(l, new_cons(new_symbol(L"size"), 
+				    new_integer_si(fstat.st_size)));
+	l = list_append(l, new_cons(new_symbol(L"block-size"), 
+				    new_integer_si(fstat.st_blksize)));
+	l = list_append(l, new_cons(new_symbol(L"blocks"), 
+				    new_integer_si(fstat.st_blocks)));
+	l = list_append(l, new_cons(new_symbol(L"atime"), 
+				    new_integer_ullsi(fstat.st_atim.tv_sec)));
+	l = list_append(l, new_cons(new_symbol(L"mtime"), 
+				    new_integer_ullsi(fstat.st_mtim.tv_sec)));
+	l = list_append(l, new_cons(new_symbol(L"ctime"), 
+				    new_integer_ullsi(fstat.st_ctim.tv_sec)));
+
+	if ((fstat.st_mode & S_IFMT) == S_IFSOCK) {
+	    t = L"s";
+	} else if ((fstat.st_mode & S_IFMT) == S_IFLNK) {
+	    t = L"l";
+	} else if ((fstat.st_mode & S_IFMT) == S_IFREG) {
+	    t = L"-";
+	} else if ((fstat.st_mode & S_IFMT) == S_IFBLK) {
+	    t = L"b";
+	} else if ((fstat.st_mode & S_IFMT) == S_IFDIR) {
+	    t = L"d";
+	} else if ((fstat.st_mode & S_IFMT) == S_IFCHR) {
+	    t = L"c";
+	} else if ((fstat.st_mode & S_IFMT) == S_IFIFO) {
+	    t = L"p";
+	} else {
+	    t = L"?";
+	}
+	l = list_append(l, new_cons(new_symbol(L"type"),
+				    new_string_str(t)));
+	l = list_append(l, new_cons(new_symbol(L"perm"),
+				    new_integer_si(fstat.st_mode & 07777)));
+					       
+	return result;
+
+    } else if (wcscmp(commands, L"rm") == 0) {
+	Toy_Type *fname;
+	char *fnames;
+	
+	if (arglen != 2) goto error_delete;
+	posargs = list_next(posargs);
+	fname = list_get_item(posargs);
+	if (GET_TAG(fname) != STRING) goto error_delete;
+	fnames = to_char(cell_get_addr(fname->u.string));
+
+	if (-1 == unlink(fnames)) {
+	    return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+	}
+
+	return const_T;
+	
+    } else if (wcscmp(commands, L"rmdir") == 0) {
+	Toy_Type *fname;
+	char *fnames;
+	
+	if (arglen != 2) goto error_deldir;
+	posargs = list_next(posargs);
+	fname = list_get_item(posargs);
+	if (GET_TAG(fname) != STRING) goto error_deldir;
+	fnames = to_char(cell_get_addr(fname->u.string));
+
+	if (-1 == rmdir(fnames)) {
+	    return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+	}
+
+	return const_T;
+	
+    } else if (wcscmp(commands, L"rename") == 0) {
+	Toy_Type *fname, *dname;
+	char *fnames, *dnames;
+	
+	if (arglen != 3) goto error_move;
+	posargs = list_next(posargs);
+	fname = list_get_item(posargs);
+	posargs = list_next(posargs);
+	dname = list_get_item(posargs);
+	if (GET_TAG(fname) != STRING) goto error_move;
+	if (GET_TAG(dname) != STRING) goto error_move;
+	fnames = to_char(cell_get_addr(fname->u.string));
+	dnames = to_char(cell_get_addr(dname->u.string));
+
+	if (-1 == rename(fnames, dnames)) {
+	    return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+	}
+
+	return const_T;
+
+    } else if (wcscmp(commands, L"mkdir") == 0) {
+	Toy_Type *dirname, *mode;
+	char *dirnames;
+	int imode;
+	
+	if (arglen != 3) goto error_mkdir;
+	posargs = list_next(posargs);
+	dirname = list_get_item(posargs);
+	if (GET_TAG(dirname) != STRING) goto error_mkdir;
+	dirnames = to_char(cell_get_addr(dirname->u.string));
+	posargs = list_next(posargs);
+	mode = list_get_item(posargs);
+	if (GET_TAG(mode) != INTEGER) goto error_mkdir;
+	imode = mpz_get_si(mode->u.biginteger);
+
+	if (-1 == mkdir(dirnames, imode)) {
+	    return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+	}
+
+	return const_T;
+	
+    } else if (wcscmp(commands, L"chmod") == 0) {
+	Toy_Type *fname, *mode;
+	char *fnames;
+	int modei;
+	
+	if (arglen != 3) goto error_chmod;
+	posargs = list_next(posargs);
+	fname = list_get_item(posargs);
+	posargs = list_next(posargs);
+	mode = list_get_item(posargs);
+	if (GET_TAG(fname) != STRING) goto error_chmod;
+	if (GET_TAG(mode) != INTEGER) goto error_chmod;
+	fnames = to_char(cell_get_addr(fname->u.string));
+	modei = mpz_get_ui(mode->u.biginteger);
+
+	if (-1 == chmod(fnames, modei)) {
+	    return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+	}
+
+	return const_T;
+
     }
     
 error:
@@ -1980,6 +2154,18 @@ error_exec:
     return new_exception(TE_SYNTAX, L"Syntax error, syntax: file exec? \"file\"", interp);
 error_list:
     return new_exception(TE_SYNTAX, L"Syntax error, syntax: file list \"directory\"", interp);
+error_stat:
+    return new_exception(TE_SYNTAX, L"Syntax error, syntax: file stat \"file\"", interp);
+error_delete:
+    return new_exception(TE_SYNTAX, L"Syntax error, syntax: file rm \"file\"", interp);
+error_deldir:
+    return new_exception(TE_SYNTAX, L"Syntax error, syntax: file rmdir \"dir\"", interp);
+error_move:
+    return new_exception(TE_SYNTAX, L"Syntax error, syntax: file rename \"from\" \"dest\"", interp);
+error_mkdir:
+    return new_exception(TE_SYNTAX, L"Syntax error, syntax: file mkdir \"dir\" mode", interp);
+error_chmod:
+    return new_exception(TE_SYNTAX, L"Syntax error, syntax: file chmod \"file\" mode", interp);
 }
 
 Toy_Type*
@@ -2548,6 +2734,21 @@ cmd_funcdict(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
 Toy_Type*
 cmd_classdict(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     return new_dict(interp->classes);
+}
+
+Toy_Type*
+cmd_closuredict(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *closure;
+    if (list_length(posargs) != 1) goto error;
+    if (hash_get_length(nameargs) != 0) goto error;
+
+    closure = list_get_item(posargs);
+    if (GET_TAG(closure) != CLOSURE) goto error;
+    return new_dict(closure->u.closure.env->func_env->localvar);
+
+error:
+    return new_exception(TE_SYNTAX,
+			 L"Syntax error at 'dict-closure', syntax: dict-closure {block}", interp);
 }
 
 Toy_Type*
@@ -3571,6 +3772,53 @@ error:
 			 L"Syntax error at 'ref', syntax: ref symbol", interp);
 }
 
+Toy_Type*
+cmd_strftime(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *fmt, *ltime;
+    char buff[256];
+    struct tm t;
+    long int i;
+    
+    if (arglen != 2) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    fmt = list_get_item(posargs);
+    posargs = list_next(posargs);
+    ltime = list_get_item(posargs);
+
+    if (GET_TAG(fmt) != STRING) goto error;
+    if (GET_TAG(ltime) != INTEGER) goto error;
+    
+    i = mpz_get_si(ltime->u.biginteger);
+    localtime_r(&i, &t);
+    if (0 == strftime(buff, 256, to_char(cell_get_addr(fmt->u.string)), &t)) {
+	return new_exception(TE_SYNTAX, L"time format syntax error.", interp);
+    }
+    return new_string_str(to_wchar(buff));
+
+error:
+    return new_exception(TE_SYNTAX,
+			 L"Syntax error at 'strftime', syntax: strftime \"format\" localtime", interp);
+}
+
+Toy_Type*
+cmd_gettimeofday(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    struct timeval tv;
+    
+    if (arglen != 0) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    memset(&tv, 0, sizeof(tv));
+    if (-1 == gettimeofday(&tv, NULL)) {
+	return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+    }
+    return new_integer_si(tv.tv_sec);
+
+error:
+    return new_exception(TE_SYNTAX,
+			 L"Syntax error at 'time-of-day', syntax: get-time-of-day", interp);
+}
+
 int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, L"false", cmd_false, NULL);
     toy_add_func(interp, L"true", cmd_true, NULL);
@@ -3641,6 +3889,7 @@ int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, L"dict-global", cmd_globaldict, NULL);
     toy_add_func(interp, L"dict-func", cmd_funcdict, NULL);
     toy_add_func(interp, L"dict-class", cmd_classdict, NULL);
+    toy_add_func(interp, L"dict-closure", cmd_closuredict, NULL);
     toy_add_func(interp, L"vector", cmd_newvector, NULL);
     toy_add_func(interp, L"eq?", cmd_equal, NULL);
     toy_add_func(interp, L"connect", cmd_connect, NULL);
@@ -3677,6 +3926,8 @@ int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, L"false?", cmd_isfalse, NULL);
     toy_add_func(interp, L"tag?", cmd_tag, NULL);
     toy_add_func(interp, L"ref", cmd_ref, NULL);
+    toy_add_func(interp, L"strftime", cmd_strftime, NULL);
+    toy_add_func(interp, L"time-of-day", cmd_gettimeofday, NULL);
 
     return 0;
 }
