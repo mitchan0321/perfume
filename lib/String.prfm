@@ -98,7 +98,7 @@ String method log () {
 #
 String method expand () {
     l := ();
-    r ::= [self] =~ :all '\$\{[^\$\{\}]*\}';
+    r ::= [self] =~ :all '\$\{[^${} ]+\}';
     if {nil? $r} then: {return [self]};
     
     remain := [self];
