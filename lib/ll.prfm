@@ -1,0 +1,52 @@
+begin {
+    User ::= dict;
+    Group ::= dict;
+    
+    awk "/etc/passwd" sep: ":" {
+	$User set $3 $1;
+    };
+    awk "/etc/group" sep: ":" {
+	$Group set $3 $1;
+    };
+
+    defun ll (args: l) {
+    
+	if {$l null?}
+        then: {
+	    call ll [lsort [file list "."]];
+	}
+	else: {
+	    if {[$l len] = 1} then: {
+		f ::= "" . [$l car];
+		if [file dir? $f] then: {
+		    call ll [msort [glob [$f . [if {[$f at -1]  = "/"} "" "/"]]]];
+		} else: {
+		    ll-sub $f;
+		};
+		return;
+	    };
+
+	    $l each do: {| f |
+		ll-sub ["" . $f];
+	    };
+	};
+    };
+
+    defun ll-sub (f) {
+	try {
+	    d ::= dict [file stat ["" . $f]];
+	} catch: {
+	    println "no permission \'" $f "\'.";
+	    return;
+	};
+
+	println ["%v%04o %-8v %-8v %v %10d %v" fmt
+		 $d,type
+		 $d,perm
+		 [if [$User set? $d,uid] $User,[$d get uid] $d,uid]
+		 [if [$Group set? $d,gid] $Group,[$d get gid] $d,gid]
+		 [strftime "%Y/%m/%d %H:%M" $d,mtime]
+		 $d,size
+		 $f];
+    };
+};
