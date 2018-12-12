@@ -85,7 +85,7 @@ defun tag (*) {
 # RPN expr
 #
 begin {
-    2opsyms := (+ - * / % ^ && || ^^ = != > >= < <= [symbol "."]);
+    2opsyms := (+ - * / % ^ && || ^^ = != > >= < <= [symbol "."] << >>);
     defun expr (args: expr) {
         help := "Syntax Error, syntax: expr rpn-expr";
         if [$expr null?] then: {throw ErrSyntax $help};
