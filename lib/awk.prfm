@@ -1,0 +1,28 @@
+defun awk (file body sep: sep) {
+    f := `File ($file mode: i);
+    try {
+        $f each do: {| r |
+	    if {set? sep}
+	    then: {
+		l ::= $r split sep: $sep;
+	    }
+	    else: {
+		l ::= $r split;
+	    }
+	    ;
+
+	    begin local: [dict-closure $body] {
+		set [symbol "0"] $r;
+		set n 1;
+		$l each  do: {| i |
+		    set [symbol [$n string]] $i;
+		    $n ++;
+		};
+	        $body eval;
+	    };
+        }
+    }
+    fin: {
+	$f close;
+    };
+};
