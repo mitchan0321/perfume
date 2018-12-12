@@ -699,6 +699,25 @@ non_real:
 
 non_hex:
 
+    /* is octal ? */
+
+    p = cell_get_addr(a->u.symbol.cell);
+    if (wcslen((const wchar_t*)p) < 3) goto non_octal;
+
+    if ((p[0] == L'0') && ((p[1] == L'o') || (p[1] == L'O'))) {
+	p++; p++;
+	while (*p) {
+	    if ((*p < '0') || (*p > '7')) goto non_octal;
+	    p++;
+	}
+
+	mpz_init(s);
+	mpz_set_str(s, to_char(&(cell_get_addr(a->u.symbol.cell)[2])), 8);
+	return new_integer(s);
+    }
+
+non_octal:
+
     return a;
 }
 
