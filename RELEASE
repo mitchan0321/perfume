@@ -1049,6 +1049,7 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 		Add dict-closure command that return closures dictionary from specified
 		blocks environment.
 		Add strftime command that format and return string from the specified time-value.
+		Add strptime command that date string convert to integer time-value.
 		Add time-of-day command that return local machine time.
 	lib/util.prfm
 		Separate files Block.prfm, Dict.prfm, File.prfm, Integer.prfm, List.prfm,
