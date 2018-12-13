@@ -1,5 +1,8 @@
 /* $Id: commands.c,v 1.68 2012/03/06 06:09:27 mit-sato Exp $ */
 
+#define _XOPEN_SOURCE 700
+#define _BSD_SOURCE
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,7 +13,6 @@
 #include <dirent.h>
 #include <setjmp.h>
 #include <float.h>
-#define _XOPEN_SOURCE
 #include <time.h>
 #include <sys/time.h>
 #include <sys/types.h>
