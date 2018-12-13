@@ -3799,7 +3799,7 @@ cmd_strftime(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
 
 error:
     return new_exception(TE_SYNTAX,
-			 L"Syntax error at 'strftime', syntax: strftime \"format\" localtime", interp);
+			 L"Syntax error at 'strftime', syntax: strftime \"format\" time-value", interp);
 }
 
 Toy_Type*
@@ -3813,15 +3813,15 @@ cmd_strptime(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
     if (arglen != 2) goto error;
     if (hash_get_length(nameargs) > 0) goto error;
 
-    date = list_get_item(posargs);
-    posargs = list_next(posargs);
     fmt = list_get_item(posargs);
+    posargs = list_next(posargs);
+    date = list_get_item(posargs);
 
-    if (GET_TAG(date) != STRING) goto error;
     if (GET_TAG(fmt) != STRING) goto error;
+    if (GET_TAG(date) != STRING) goto error;
     
-    sdate = to_char(cell_get_addr(date->u.string));
     sfmt = to_char(cell_get_addr(fmt->u.string));
+    sdate = to_char(cell_get_addr(date->u.string));
     memset(&t, 0, sizeof(t));
     
     if (NULL == strptime(sdate, sfmt, &t)) {
@@ -3833,7 +3833,7 @@ cmd_strptime(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
 
 error:
     return new_exception(TE_SYNTAX,
-			 L"Syntax error at 'strptime', syntax: strptime \"date-string\" \"format\"", interp);
+			 L"Syntax error at 'strptime', syntax: strptime \"format\" \"date-string\"", interp);
 }
 
 Toy_Type*
