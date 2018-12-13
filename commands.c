@@ -10,6 +10,7 @@
 #include <dirent.h>
 #include <setjmp.h>
 #include <float.h>
+#define _XOPEN_SOURCE
 #include <time.h>
 #include <sys/time.h>
 #include <sys/types.h>
@@ -3821,8 +3822,9 @@ cmd_strptime(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
     
     sdate = to_char(cell_get_addr(date->u.string));
     sfmt = to_char(cell_get_addr(fmt->u.string));
+    memset(&t, 0, sizeof(t));
     
-    if (! strptime(sdate, sfmt, &t)) {
+    if (NULL == strptime(sdate, sfmt, &t)) {
 	return new_exception(TE_SYNTAX, L"time format syntax error.", interp);
     }
 
