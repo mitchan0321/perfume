@@ -3802,6 +3802,39 @@ error:
 }
 
 Toy_Type*
+cmd_strptime(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *date, *fmt;
+    const char *sdate, *sfmt;
+    
+    struct tm t;
+    long int result;
+    
+    if (arglen != 2) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    date = list_get_item(posargs);
+    posargs = list_next(posargs);
+    fmt = list_get_item(posargs);
+
+    if (GET_TAG(date) != STRING) goto error;
+    if (GET_TAG(fmt) != STRING) goto error;
+    
+    sdate = to_char(cell_get_addr(date->u.string));
+    sfmt = to_char(cell_get_addr(fmt->u.string));
+    
+    if (! strptime(sdate, sfmt, &t)) {
+	return new_exception(TE_SYNTAX, L"time format syntax error.", interp);
+    }
+
+    result = mktime(&t);
+    return new_integer_si(result);
+
+error:
+    return new_exception(TE_SYNTAX,
+			 L"Syntax error at 'strptime', syntax: strptime \"date-string\" \"format\"", interp);
+}
+
+Toy_Type*
 cmd_gettimeofday(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     struct timeval tv;
     
@@ -3927,6 +3960,7 @@ int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, L"tag?", cmd_tag, NULL);
     toy_add_func(interp, L"ref", cmd_ref, NULL);
     toy_add_func(interp, L"strftime", cmd_strftime, NULL);
+    toy_add_func(interp, L"strptime", cmd_strptime, NULL);
     toy_add_func(interp, L"time-of-day", cmd_gettimeofday, NULL);
 
     return 0;
