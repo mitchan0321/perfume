@@ -1,5 +1,8 @@
 /* $Id: commands.c,v 1.68 2012/03/06 06:09:27 mit-sato Exp $ */
 
+#define _XOPEN_SOURCE 700
+#define _BSD_SOURCE
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -3798,7 +3801,41 @@ cmd_strftime(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
 
 error:
     return new_exception(TE_SYNTAX,
-			 L"Syntax error at 'strftime', syntax: strftime \"format\" localtime", interp);
+			 L"Syntax error at 'strftime', syntax: strftime \"format\" time-value", interp);
+}
+
+Toy_Type*
+cmd_strptime(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *date, *fmt;
+    const char *sdate, *sfmt;
+    
+    struct tm t;
+    long int result;
+    
+    if (arglen != 2) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    fmt = list_get_item(posargs);
+    posargs = list_next(posargs);
+    date = list_get_item(posargs);
+
+    if (GET_TAG(fmt) != STRING) goto error;
+    if (GET_TAG(date) != STRING) goto error;
+    
+    sfmt = to_char(cell_get_addr(fmt->u.string));
+    sdate = to_char(cell_get_addr(date->u.string));
+    memset(&t, 0, sizeof(t));
+    
+    if (NULL == strptime(sdate, sfmt, &t)) {
+	return new_exception(TE_SYNTAX, L"time format syntax error.", interp);
+    }
+
+    result = mktime(&t);
+    return new_integer_si(result);
+
+error:
+    return new_exception(TE_SYNTAX,
+			 L"Syntax error at 'strptime', syntax: strptime \"format\" \"date-string\"", interp);
 }
 
 Toy_Type*
@@ -3927,6 +3964,7 @@ int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, L"tag?", cmd_tag, NULL);
     toy_add_func(interp, L"ref", cmd_ref, NULL);
     toy_add_func(interp, L"strftime", cmd_strftime, NULL);
+    toy_add_func(interp, L"strptime", cmd_strptime, NULL);
     toy_add_func(interp, L"time-of-day", cmd_gettimeofday, NULL);
 
     return 0;
