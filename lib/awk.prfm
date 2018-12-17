@@ -1,7 +1,12 @@
 defun awk (file body sep: sep) {
     f := `File ($file mode: i);
+    begin local: [dict-closure $body] {
+	@FILENAME := $file;
+    };
     try {
+        cnt := 0;
         $f each do: {| r |
+	    cnt ::= $cnt + 1;
 	    if {set? sep}
 	    then: {
 		l ::= $r split sep: $sep;
@@ -12,6 +17,8 @@ defun awk (file body sep: sep) {
 	    ;
 
 	    begin local: [dict-closure $body] {
+		@NF ::= $l len;
+		@NR := $cnt;
 		set [symbol "0"] $r;
 		set n 1;
 		$l each  do: {| i |
