@@ -9,6 +9,9 @@ begin {
 	$Group set $3 $1;
     };
 
+    Perms ::= vector("---" "--x" "-w-" "-wx" "r--" "r-x" "rw-" "rwx");
+    Bits  ::= vector("---" "--S" "-G-" "-GS" "U--" "U-S" "UG-" "UGS");
+
     defun ll (args: l) {
     
 	if {$l null?}
@@ -40,13 +43,24 @@ begin {
 	    return;
 	};
 
-	println ["%v%04o %-8v %-8v %v %10d %v" fmt
+	println ["%v%13v %-8v %-8v %v %10d %v" fmt
 		 $d,type
-		 $d,perm
+		 [ll-sub-mkperm $d,perm]
 		 [if [$User set? $d,uid] $User,[$d get uid] $d,uid]
 		 [if [$Group set? $d,gid] $Group,[$d get gid] $d,gid]
 		 [strftime "%Y/%m/%d %H:%M" $d,mtime]
 		 $d,size
 		 $f];
+    };
+
+    defun ll-sub-mkperm (p) {
+        result := "";
+	f ::= "%04o" fmt $p;
+	$result append! [$Perms get [$f at 1 : int]];
+	$result append! [$Perms get [$f at 2 : int]];
+	$result append! [$Perms get [$f at 3 : int]];
+	$result append! ",";
+	$result append! [$Bits get [$f at 0 : int]];
+	return $result;
     };
 };
