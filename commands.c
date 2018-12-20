@@ -1,6 +1,6 @@
 /* $Id: commands.c,v 1.68 2012/03/06 06:09:27 mit-sato Exp $ */
 
-#define _XOPEN_SOURCE 700
+#define _XOPEN_SOURCE
 #define _BSD_SOURCE
 
 #include <stdio.h>
