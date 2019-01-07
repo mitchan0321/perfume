@@ -1,9 +1,10 @@
 /* $Id: commands.c,v 1.68 2012/03/06 06:09:27 mit-sato Exp $ */
 
-#define _XOPEN_SOURCE
+#define _XOPEN_SOURCE	600	/* define SUSv3 and C99 spec */
 #define _BSD_SOURCE
 
 #include <stdio.h>
+#include <wchar.h>
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
@@ -38,9 +39,6 @@
 #include "cstack.h"
 #include "util.h"
 #include "encoding.h"
-
-static void println(Toy_Interp *interp, wchar_t *msg);
-
 
 Toy_Type*
 cmd_false(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
@@ -1566,6 +1564,7 @@ cmd_load(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Script *sscript;
     Toy_Type *enc;
     int iencoder;
+    encoder_error_info *error_info;
 
     if (hash_get_length(nameargs) > 0) goto error;
     if (arglen != 1) goto error;
@@ -1585,7 +1584,11 @@ cmd_load(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 
     tpath = list_get_item(posargs);
     if (GET_TAG(tpath) != STRING) goto error;
-    path = to_char(to_string_call(interp, tpath));
+
+    path = encode_dirent(interp, cell_get_addr(tpath->u.string), &error_info);
+    if (NULL == path) {
+	return new_exception(TE_BADENCODER, error_info->message, interp);
+    }
 
     src = new_bulk();
     if (NULL == src) return const_Nil;
@@ -1697,7 +1700,9 @@ error:
 Toy_Type*
 cmd_pwd(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     char *buff;
-    Toy_Type *cwd;
+    Cell *cwd;
+    encoder_error_info *error_info;
+    Toy_Type *result;
 
     buff = GC_MALLOC(MAXPATHLEN);
     ALLOC_SAFE(buff);
@@ -1709,10 +1714,14 @@ cmd_pwd(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
     }
 
-    cwd = new_string_str(to_wchar(buff));
-    hash_set_t(interp->globals, const_CWD, cwd);
+    cwd = decode_dirent(interp, buff, &error_info);
+    if (0 == cwd) {
+	return new_exception(TE_BADENCODER, error_info->message, interp);
+    }
+    result = new_string_cell(cwd);
+    hash_set_t(interp->globals, const_CWD, result);
 
-    return cwd;
+    return result;
 
 error:
     return new_exception(TE_SYNTAX, L"Syntax error, syntax: pwd", interp);
@@ -1723,6 +1732,8 @@ cmd_chdir(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *dir;
     int t;
     wchar_t *p;
+    char *raw;
+    encoder_error_info *error_info;
 
     if (arglen > 1) goto error;
     if (hash_get_length(nameargs) > 0) goto error;
@@ -1749,7 +1760,12 @@ cmd_chdir(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	goto error;
     }
 
-    if (0 == chdir(to_char(p))) {
+    raw = encode_dirent(interp, p, &error_info);
+    if (NULL == raw) {
+	return new_exception(TE_BADENCODER, error_info->message, interp);
+    }
+
+    if (0 == chdir(raw)) {
 	return cmd_pwd(interp, new_list(NULL), new_hash(), 0);
     }
 
@@ -1855,12 +1871,18 @@ cmd_file(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	char *fnames;
 	int status;
 	struct stat sb;
+	encoder_error_info *error_info;
 
 	if (arglen != 2) goto error_exists;
 	posargs = list_next(posargs);
+
 	fname = list_get_item(posargs);
 	if (GET_TAG(fname) != STRING) goto error_exists;
-	fnames = to_char(cell_get_addr(fname->u.string));
+
+	fnames = encode_dirent(interp, cell_get_addr(fname->u.string), &error_info);
+	if (NULL == fnames) {
+	    return new_exception(TE_BADENCODER, error_info->message, interp);
+	}
 
 	status = stat((const char*)fnames, &sb);
 
@@ -1872,12 +1894,18 @@ cmd_file(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	char *fnames;
 	int status;
 	struct stat sb;
+	encoder_error_info *error_info;
 
 	if (arglen != 2) goto error_dir;
 	posargs = list_next(posargs);
+
 	fname = list_get_item(posargs);
 	if (GET_TAG(fname) != STRING) goto error_dir;
-	fnames = to_char(cell_get_addr(fname->u.string));
+
+	fnames = encode_dirent(interp, cell_get_addr(fname->u.string), &error_info);
+	if (NULL == fnames) {
+	    return new_exception(TE_BADENCODER, error_info->message, interp);
+	}
 
 	status = stat((const char*)fnames, &sb);
 
@@ -1893,12 +1921,18 @@ cmd_file(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	Toy_Type *fname;
 	char *fnames;
 	int status;
+	encoder_error_info *error_info;
 
 	if (arglen != 2) goto error_read;
 	posargs = list_next(posargs);
+
 	fname = list_get_item(posargs);
 	if (GET_TAG(fname) != STRING) goto error_read;
-	fnames = to_char(cell_get_addr(fname->u.string));
+
+	fnames = encode_dirent(interp, cell_get_addr(fname->u.string), &error_info);
+	if (NULL == fnames) {
+	    return new_exception(TE_BADENCODER, error_info->message, interp);
+	}
 
 	status = access((const char*)fnames, R_OK);
 
@@ -1910,12 +1944,18 @@ cmd_file(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	Toy_Type *fname;
 	char *fnames;
 	int status;
+	encoder_error_info *error_info;
 
 	if (arglen != 2) goto error_write;
 	posargs = list_next(posargs);
+
 	fname = list_get_item(posargs);
 	if (GET_TAG(fname) != STRING) goto error_write;
-	fnames = to_char(cell_get_addr(fname->u.string));
+
+	fnames = encode_dirent(interp, cell_get_addr(fname->u.string), &error_info);
+	if (NULL == fnames) {
+	    return new_exception(TE_BADENCODER, error_info->message, interp);
+	}
 
 	status = access((const char*)fnames, W_OK);
 
@@ -1927,12 +1967,18 @@ cmd_file(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	Toy_Type *fname;
 	char *fnames;
 	int status;
+	encoder_error_info *error_info;
 
 	if (arglen != 2) goto error_exec;
 	posargs = list_next(posargs);
+
 	fname = list_get_item(posargs);
 	if (GET_TAG(fname) != STRING) goto error_exec;
-	fnames = to_char(cell_get_addr(fname->u.string));
+
+	fnames = encode_dirent(interp, cell_get_addr(fname->u.string), &error_info);
+	if (NULL == fnames) {
+	    return new_exception(TE_BADENCODER, error_info->message, interp);
+	}
 
 	status = access((const char*)fnames, X_OK);
 
@@ -1946,13 +1992,19 @@ cmd_file(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	DIR *dir;
 	struct dirent *dirent;
 	Toy_Type *dirl, *l;
+	encoder_error_info *error_info;
+	Cell *encbuff;
 
 	if ((arglen != 1) && (arglen != 2)) goto error_list;
 	if (arglen == 2) {
 	    posargs = list_next(posargs);
 	    fname = list_get_item(posargs);
 	    if (GET_TAG(fname) != STRING) goto error_list;
-	    fnames = to_char(cell_get_addr(fname->u.string));
+	    
+	    fnames = encode_dirent(interp, cell_get_addr(fname->u.string), &error_info);
+	    if (NULL == fnames) {
+		return new_exception(TE_BADENCODER, error_info->message, interp);
+	    }
 	} else {
 	    fnames = ".";
 	}
@@ -1966,7 +2018,13 @@ cmd_file(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	
 	dirent = readdir(dir);
 	while (dirent) {
-	    l = list_append(l, new_string_str(to_wchar(dirent->d_name)));
+	    encbuff = decode_dirent(interp, dirent->d_name, &error_info);
+	    if (NULL == encbuff) {
+		closedir(dir);
+		return new_exception(TE_BADENCODER, error_info->message, interp);
+	    }
+
+	    l = list_append(l, new_string_cell(encbuff));
 
 	    dirent = readdir(dir);
 	}
@@ -1981,12 +2039,18 @@ cmd_file(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	struct stat fstat;
 	Toy_Type *result, *l;
 	wchar_t *t;
+	encoder_error_info *error_info;
 
 	if (arglen != 2) goto error_stat;
 	posargs = list_next(posargs);
+
 	fname = list_get_item(posargs);
 	if (GET_TAG(fname) != STRING) goto error_stat;
-	fnames = to_char(cell_get_addr(fname->u.string));
+	
+	fnames = encode_dirent(interp, cell_get_addr(fname->u.string), &error_info);
+	if (NULL == fnames) {
+	    return new_exception(TE_BADENCODER, error_info->message, interp);
+	}
 
 	sts = stat(fnames, &fstat);
 	if (-1 == sts) {
@@ -2050,12 +2114,18 @@ cmd_file(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     } else if (wcscmp(commands, L"rm") == 0) {
 	Toy_Type *fname;
 	char *fnames;
+	encoder_error_info *error_info;
 	
 	if (arglen != 2) goto error_delete;
 	posargs = list_next(posargs);
+
 	fname = list_get_item(posargs);
 	if (GET_TAG(fname) != STRING) goto error_delete;
-	fnames = to_char(cell_get_addr(fname->u.string));
+
+	fnames = encode_dirent(interp, cell_get_addr(fname->u.string), &error_info);
+	if (NULL == fnames) {
+	    return new_exception(TE_BADENCODER, error_info->message, interp);
+	}
 
 	if (-1 == unlink(fnames)) {
 	    return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
@@ -2066,12 +2136,18 @@ cmd_file(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     } else if (wcscmp(commands, L"rmdir") == 0) {
 	Toy_Type *fname;
 	char *fnames;
+	encoder_error_info *error_info;
 	
 	if (arglen != 2) goto error_deldir;
 	posargs = list_next(posargs);
+
 	fname = list_get_item(posargs);
 	if (GET_TAG(fname) != STRING) goto error_deldir;
-	fnames = to_char(cell_get_addr(fname->u.string));
+
+	fnames = encode_dirent(interp, cell_get_addr(fname->u.string), &error_info);
+	if (NULL == fnames) {
+	    return new_exception(TE_BADENCODER, error_info->message, interp);
+	}
 
 	if (-1 == rmdir(fnames)) {
 	    return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
@@ -2082,16 +2158,27 @@ cmd_file(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     } else if (wcscmp(commands, L"rename") == 0) {
 	Toy_Type *fname, *dname;
 	char *fnames, *dnames;
+	encoder_error_info *error_info;
 	
 	if (arglen != 3) goto error_move;
 	posargs = list_next(posargs);
 	fname = list_get_item(posargs);
+
 	posargs = list_next(posargs);
 	dname = list_get_item(posargs);
+
 	if (GET_TAG(fname) != STRING) goto error_move;
 	if (GET_TAG(dname) != STRING) goto error_move;
-	fnames = to_char(cell_get_addr(fname->u.string));
-	dnames = to_char(cell_get_addr(dname->u.string));
+
+	fnames = encode_dirent(interp, cell_get_addr(fname->u.string), &error_info);
+	if (NULL == fnames) {
+	    return new_exception(TE_BADENCODER, error_info->message, interp);
+	}
+
+	dnames = encode_dirent(interp, cell_get_addr(dname->u.string), &error_info);
+	if (NULL == dnames) {
+	    return new_exception(TE_BADENCODER, error_info->message, interp);
+	}
 
 	if (-1 == rename(fnames, dnames)) {
 	    return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
@@ -2103,12 +2190,19 @@ cmd_file(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	Toy_Type *dirname, *mode;
 	char *dirnames;
 	int imode;
+	encoder_error_info *error_info;
 	
 	if (arglen != 3) goto error_mkdir;
 	posargs = list_next(posargs);
+
 	dirname = list_get_item(posargs);
 	if (GET_TAG(dirname) != STRING) goto error_mkdir;
-	dirnames = to_char(cell_get_addr(dirname->u.string));
+
+	dirnames = encode_dirent(interp, cell_get_addr(dirname->u.string), &error_info);
+	if (NULL == dirnames) {
+	    return new_exception(TE_BADENCODER, error_info->message, interp);
+	}
+
 	posargs = list_next(posargs);
 	mode = list_get_item(posargs);
 	if (GET_TAG(mode) != INTEGER) goto error_mkdir;
@@ -2124,6 +2218,7 @@ cmd_file(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	Toy_Type *fname, *mode;
 	char *fnames;
 	int modei;
+	encoder_error_info *error_info;
 	
 	if (arglen != 3) goto error_chmod;
 	posargs = list_next(posargs);
@@ -2132,7 +2227,12 @@ cmd_file(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	mode = list_get_item(posargs);
 	if (GET_TAG(fname) != STRING) goto error_chmod;
 	if (GET_TAG(mode) != INTEGER) goto error_chmod;
-	fnames = to_char(cell_get_addr(fname->u.string));
+
+	fnames = encode_dirent(interp, cell_get_addr(fname->u.string), &error_info);
+	if (NULL == fnames) {
+	    return new_exception(TE_BADENCODER, error_info->message, interp);
+	}
+
 	modei = mpz_get_ui(mode->u.biginteger);
 
 	if (-1 == chmod(fnames, modei)) {
@@ -2140,7 +2240,6 @@ cmd_file(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	}
 
 	return const_T;
-
     }
     
 error:
@@ -2429,7 +2528,7 @@ cmd_cacheinfo(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 
     return l;
 }
-#endif
+#endif /* HAS_GCACHE */
 
 Toy_Type*
 cmd_begin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
@@ -2483,6 +2582,7 @@ cmd_forkandexec(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     int left_ch[2], right_ch[2], err_ch[2];
     Toy_Type *result;
     int flag;
+    encoder_error_info *error_info;
 
     if (hash_get_length(nameargs) > 0) goto error;
     if (arglen < 1) goto error;
@@ -2498,9 +2598,17 @@ cmd_forkandexec(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
 	arglen = list_length(posargs) + 1;
     }
     
-    argv[0] = to_char(command);
+    argv[0] = encode_dirent(interp, command, &error_info);
+    if (NULL == argv[0]) {
+	return new_exception(TE_BADENCODER, error_info->message, interp);
+    }
     for (i = 1; i<arglen; i++) {
-	argv[i] = to_char(to_string_call(interp, list_get_item(posargs)));
+	wchar_t *e = to_string_call(interp, list_get_item(posargs));
+	argv[i] = encode_dirent(interp, e, &error_info);
+	if (NULL == argv[i]) {
+	    return new_exception(TE_BADENCODER, error_info->message, interp);
+	}
+
 	posargs = list_next(posargs);
     }
     argv[i] = NULL;
@@ -2539,7 +2647,7 @@ cmd_forkandexec(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
 	dup(err_ch[1]);
 	close(err_ch[1]);
 
-	execvp(to_char(command), argv);
+	execvp(argv[0], argv);
 	exit(255);
     }
 
@@ -3968,16 +4076,4 @@ int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, L"time-of-day", cmd_gettimeofday, NULL);
 
     return 0;
-}
-
-static void
-println(Toy_Interp *interp, wchar_t *msg) {
-    Toy_Type *l;
-
-    l = new_list(new_symbol(L"println"));
-    list_append(l, new_string_str(msg));
-
-    toy_call(interp, l);
-
-    return;
 }

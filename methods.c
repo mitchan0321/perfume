@@ -3489,6 +3489,8 @@ mth_file_open(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     Toy_Type *mode, *path;
     wchar_t *pmode;
     int flag;
+    char *cpath;
+    encoder_error_info *error_info;
 
     self = SELF_HASH(interp);
     container = hash_get_t(self, const_Holder);
@@ -3531,7 +3533,12 @@ mth_file_open(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 	f->fd = NULL;
     }
 
-    f->fd = fopen(to_char(cell_get_addr(f->path->u.string)),
+    cpath = encode_dirent(interp, cell_get_addr(path->u.string), &error_info);
+    if (NULL == cpath) {
+	return new_exception(TE_BADENCODER, error_info->message, interp);
+    }
+
+    f->fd = fopen(cpath,
 		  (f->mode==FMODE_INPUT)  ? "r"  :
 		  (f->mode==FMODE_OUTPUT) ? "w"  :
 		  (f->mode==FMODE_INOUT)  ? "r+" :
