@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include "toy.h"
+#include <string.h>
 #include "util.h"
-#include "string.h"
+#include "global.h"
 
 int
 read_size(int fd, char* buff, int size) {
@@ -53,4 +53,88 @@ to_char(const wchar_t *src) {
     }
 
     return dest;
+}
+
+void
+println(Toy_Interp *interp, wchar_t *msg) {
+    Toy_Type *l;
+
+    l = new_list(new_symbol(L"println"));
+    list_append(l, new_string_str(msg));
+
+    toy_call(interp, l);
+
+    return;
+}
+
+char*
+encode_dirent(Toy_Interp *interp, wchar_t *name, encoder_error_info **info) {
+    Toy_Type *enc;
+    int iencoder;
+    encoder_error_info *error_info;
+    Cell *raw;
+
+    error_info = GC_MALLOC(sizeof(encoder_error_info));
+    ALLOC_SAFE(error_info);
+    *info = error_info;
+
+    iencoder = NENCODE_RAW;
+    enc = hash_get_t(interp->globals, const_DEFAULT_DIRENT_ENCODING);
+    if (enc) {
+	if (GET_TAG(enc) == SYMBOL) {
+	    iencoder = get_encoding_index(cell_get_addr(enc->u.symbol.cell));
+	    if (-1 == iencoder) {
+		error_info->errorno = EENCODE_BADENCODING;
+		error_info->pos = -1;
+		error_info->message = L"Bad encoder specified.";
+		return 0;
+	    }
+	} else {
+	    error_info->errorno = EENCODE_BADENCODING;
+	    error_info->pos = -1;
+	    error_info->message = L"Bad encoder specified, need symbol.";
+	    return 0;
+	}
+    }
+
+    raw = encode_unicode_to_raw(new_cell(name), iencoder, error_info);
+    if (NULL == raw) return 0;
+
+    return to_char(cell_get_addr(raw));
+}
+
+Cell*
+decode_dirent(Toy_Interp *interp, char *name, encoder_error_info **info) {
+    Toy_Type *enc;
+    int iencoder;
+    encoder_error_info *error_info;
+    Cell *unicode;
+
+    error_info = GC_MALLOC(sizeof(encoder_error_info));
+    ALLOC_SAFE(error_info);
+    *info = error_info;
+
+    iencoder = NENCODE_RAW;
+    enc = hash_get_t(interp->globals, const_DEFAULT_DIRENT_ENCODING);
+    if (enc) {
+	if (GET_TAG(enc) == SYMBOL) {
+	    iencoder = get_encoding_index(cell_get_addr(enc->u.symbol.cell));
+	    if (-1 == iencoder) {
+		error_info->errorno = EENCODE_BADENCODING;
+		error_info->pos = -1;
+		error_info->message = L"Bad encoder specified.";
+		return 0;
+	    }
+	} else {
+	    error_info->errorno = EENCODE_BADENCODING;
+	    error_info->pos = -1;
+	    error_info->message = L"Bad encoder specified, need symbol.";
+	    return 0;
+	}
+    }
+
+    unicode = decode_raw_to_unicode(new_cell(to_wchar(name)), iencoder, error_info);
+    if (NULL == unicode) return 0;
+
+    return unicode;
 }
