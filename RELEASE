@@ -1,3 +1,4 @@
+2019/01/07	PRFM_20190107		1.2.1_PRE_1
 2018/12/23	PRFM_20181223_K30	1.2.0
 2018/11/21	PRFM_20181121		1.2.0_PRE_1
 2018/05/17	PRFM_20180517		1.1.1
@@ -1065,5 +1066,17 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 	parser.c
 		Add new escape \<cr> that mean next line to be continued.
 		Add octal number literal. ex) 0o[0-7]+
+
+2019/01/07
+	commands.c
+		Utility function is moved from commands.c to util.c that name is println.
+		Add charactor encoding code to using directory entry name operation commands,
+		these names are: load, cd, pwd, file and all sub-commands, fork-exec and File::open.
+	util.[ch]
+		Add new utility functions, encode_dirent and decode_dirent.
+	config.h.in, global.[ch], interp.c
+		Add global variable DEFAULT_DIRENT_ENCODING. Default value is "UTF-8".
+	COPYING
+		Add year 2019.
 
 #eof
