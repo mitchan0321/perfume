@@ -28,7 +28,7 @@ PipeWrapper method stat? () {
 
 PipeWrapper method run () {
     if {sets? coro} else: {
-	sets coro [coro $body];
+	sets coro [begin local: [dict-closure $body] {coro $body}];
 	$coro eval {
 	    setvar stdin $in;
 	    setvar stdout $out;
