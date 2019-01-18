@@ -42,6 +42,14 @@ String method ~~ () {
     [[self] int] ~~;
 };
 
+String method >> (a) {
+    [[self] int] >> $a;
+};
+
+String method << (a) {
+    [[self] int] << $a;
+};
+
 String method sin () {
     [[self] real] sin;
 };
