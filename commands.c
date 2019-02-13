@@ -2052,7 +2052,7 @@ cmd_file(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	    return new_exception(TE_BADENCODER, error_info->message, interp);
 	}
 
-	sts = stat(fnames, &fstat);
+	sts = lstat(fnames, &fstat);
 	if (-1 == sts) {
 	    return new_exception(TE_FILEACCESS, L"file stat can\'t get.", interp);
 	}
@@ -2087,19 +2087,19 @@ cmd_file(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	l = list_append(l, new_cons(new_symbol(L"ctime"), 
 				    new_integer_ullsi(fstat.st_ctim.tv_sec)));
 
-	if ((fstat.st_mode & S_IFMT) == S_IFSOCK) {
+	if (S_ISSOCK(fstat.st_mode)) {
 	    t = L"s";
-	} else if ((fstat.st_mode & S_IFMT) == S_IFLNK) {
+	} else if (S_ISLNK(fstat.st_mode)) {
 	    t = L"l";
-	} else if ((fstat.st_mode & S_IFMT) == S_IFREG) {
+	} else if (S_ISREG(fstat.st_mode)) {
 	    t = L"-";
-	} else if ((fstat.st_mode & S_IFMT) == S_IFBLK) {
+	} else if (S_ISBLK(fstat.st_mode)) {
 	    t = L"b";
-	} else if ((fstat.st_mode & S_IFMT) == S_IFDIR) {
+	} else if (S_ISDIR(fstat.st_mode)) {
 	    t = L"d";
-	} else if ((fstat.st_mode & S_IFMT) == S_IFCHR) {
+	} else if (S_ISCHR(fstat.st_mode)) {
 	    t = L"c";
-	} else if ((fstat.st_mode & S_IFMT) == S_IFIFO) {
+	} else if (S_ISFIFO(fstat.st_mode)) {
 	    t = L"p";
 	} else {
 	    t = L"?";
