@@ -50,7 +50,7 @@ begin {
 		 [if [$Group set? $d,gid] $Group,[$d get gid] $d,gid]
 		 [strftime "%Y/%m/%d %H:%M" $d,mtime]
 		 $d,size
-		 $f];
+		 [if {$d,type != "l"} $f [$f . " -> " $d,symbolic-link]]];
     };
 
     defun ll-sub-mkperm (p) {
