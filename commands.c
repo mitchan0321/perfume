@@ -2108,6 +2108,31 @@ cmd_file(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 				    new_string_str(t)));
 	l = list_append(l, new_cons(new_symbol(L"perm"),
 				    new_integer_si(fstat.st_mode & 07777)));
+
+	/* if symbolic link, read link and encode */
+	if (S_ISLNK(fstat.st_mode)) {
+	    char *buff;
+	    int sts;
+	    
+	    buff = GC_MALLOC(MAXPATHLEN);
+	    ALLOC_SAFE(buff);
+	    sts = readlink(fnames, buff, MAXPATHLEN);
+	    if (-1 == sts) {
+		l = list_append(l, new_cons(new_symbol(L"symbolic-link"),
+					    const_Nil));
+	    } else {
+		encoder_error_info *error_info;
+		Cell *cfnames;
+		cfnames = decode_dirent(interp, buff, &error_info);
+		if (0 == cfnames) {
+		    l = list_append(l, new_cons(new_symbol(L"symbolic-link"),
+						const_Nil));
+		} else {
+		    l = list_append(l, new_cons(new_symbol(L"symbolic-link"),
+						new_string_cell(cfnames)));
+		}
+	    }
+	}
 					       
 	return result;
 
