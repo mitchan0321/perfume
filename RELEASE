@@ -1,3 +1,4 @@
+2019/02/26	PRFM_20190226		1.2.2
 2019/02/15	PRFM_20190215_A30	1.2.1
 2019/01/07	PRFM_20190107		1.2.1_PRE_1
 2018/12/23	PRFM_20181223_K30	1.2.0
@@ -1091,5 +1092,11 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 2019/02/07
 	commands.c
 		Chage command 'file stat' use system call stat(2) to lstat(2) and use file type macro.
+
+2019/02/26
+	commands.c
+		Add 'symbolic-link' property to file stat result list, when 'type' property is "l".
+	lib/ll.prfm
+		Add display symbolic link object.
 
 #eof
