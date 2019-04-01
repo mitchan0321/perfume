@@ -1,0 +1,58 @@
+# prime fact (Hash::set test)
+
+defun prime-fact (n) {
+    s ::= dict;
+    prime-fact-sub $n $s;
+
+    result := ();
+    lsort [$s keys :string : map {| i | $i int}] : each do: {| i |
+        $result <<- ($i $s,$i);
+    };
+    return $result;
+};
+
+defun prime-fact-sub (n s) {
+
+    if {$n isprime} then: {
+	add-fact $n $s;
+	return;
+    };
+
+    f := 2;
+    t ::= $n sqrt;
+    while {$f <= $t} do: {
+        if {[$n % $f] = 0}
+        then: {
+            add-fact $f $s;
+            goto prime-fact-sub [$n / $f] $s;
+        };
+        f ::= nextprime* $f;
+    };
+};
+
+defun nextprime* (n) {
+    $n nextprime;
+};
+memoiz nextprime*;
+
+defun add-fact (n s) {
+    if [$s set? $n]
+#    then: {$s set $n [$s,$n + 1]}
+    then: {$s,$n ++}
+    else: {$s set $n 1}
+    ;
+};
+
+defun prime-fact-check (l) {
+    $l inject 1 do: {| s i | $s * [$i,0 ^ $i,1]};
+};
+
+defun prime-fact-test (n) {
+    1 each to: $n do: {| i |
+        f ::= prime-fact $i;
+        r ::= prime-fact-check $f;
+        println $i ", " $f ", " [if [$i = $r] "OK" "*** NG ***"];
+    };
+};
+
+prime-fact-test 1000;

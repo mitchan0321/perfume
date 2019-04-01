@@ -1,0 +1,14 @@
+# calc prime (List::append! test)
+
+defun prime (n) {
+    set result (2);
+    set p $result;
+    set i [$result last : car];
+    while {$i < $n} do: {
+	i ::= $i nextprime;
+	p ::= $p append! $i;
+    };
+    return $result;
+};
+
+println [prime 100];
