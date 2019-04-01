@@ -778,7 +778,7 @@ error:
 	    if (GET_TAG(val) == EXCEPTION) {return val;}		\
 	    if (IS_LAZY(var)) {SET_LAZY(val);}				\
 	}								\
-	hash_set_t(args, var, val);					\
+	hash_set_t(args, var, toy_clone(val));				\
 	l = list_next(l);						\
 }
 
@@ -803,7 +803,7 @@ bind_args(Toy_Interp *interp, Toy_Type *arglist, struct _toy_argspec *aspec,
 		last = list_append(last, val);
 		l = list_next(l);
 	    }
-	    hash_set_t(args, const_ast, result);
+	    hash_set_t(args, const_ast, toy_clone(result));
 	    return const_Nil;
 	}
     }
@@ -856,7 +856,7 @@ bind_args(Toy_Interp *interp, Toy_Type *arglist, struct _toy_argspec *aspec,
 		SET_LAZY(val);
 	    }
 
-	    hash_set_t(args, var, val);
+	    hash_set_t(args, var, toy_clone(val));
 
 	} else if (IS_SWITCH_SYM(val)) {
 	    Cell *cval;
@@ -867,7 +867,7 @@ bind_args(Toy_Interp *interp, Toy_Type *arglist, struct _toy_argspec *aspec,
 
 	    if (NULL == var) goto error3;
 
-	    hash_set_t(args, var, const_int1);
+	    hash_set_t(args, var, toy_clone(const_int1));
 
 	} else {
 
@@ -891,13 +891,13 @@ bind_args(Toy_Interp *interp, Toy_Type *arglist, struct _toy_argspec *aspec,
 		    val = toy_expand(interp, l, env, trace_info);
 		    if (GET_TAG(val) == EXCEPTION) return val;
 
-		    hash_set_t(args, var, val);
+		    hash_set_t(args, var, toy_clone(val));
 		}
 
 		return const_Nil;
 	    }
 
-	    hash_set_t(args, var, val);
+	    hash_set_t(args, var, toy_clone(val));
 
 	    argpos++;
 	}
