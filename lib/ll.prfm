@@ -2,12 +2,12 @@ begin {
     User ::= dict;
     Group ::= dict;
     
-    awk "/etc/passwd" sep: ":" {
+    awk sep: ":" {
 	$User set $3 $1;
-    };
-    awk "/etc/group" sep: ":" {
+    } "/etc/passwd";
+    awk sep: ":" {
 	$Group set $3 $1;
-    };
+    } "/etc/group";
 
     Perms ::= vector("---" "--x" "-w-" "-wx" "r--" "r-x" "rw-" "rwx");
     Bits  ::= vector("---" "--S" "-G-" "-GS" "U--" "U-S" "UG-" "UGS");

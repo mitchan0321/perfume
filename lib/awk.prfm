@@ -1,13 +1,41 @@
-defun awk (file body sep: sep) {
-    f := `File ($file mode: i);
+defun awk (body
+	   sep: sep
+	   args: files) {
+
+    if {! [set? sep]} {set sep nil};
+    
+    if [$files null?] 
+    then: {
+	awk-sub $body $sep $stdin $INFILE;
+    }
+    else: {
+	$files each do: {| n |
+	    try {
+		f := `File($n mode: i);
+		awk-sub $body $sep $f $n;
+	    }
+	    catch: {| e |
+		println file: $stderr [$e cdr];
+	    }
+	    fin: {
+		if [set? f] then: {
+		    $f close;
+		    unset f;
+		};
+	    };
+	};
+    };
+};
+
+defun awk-sub (body sep file file-name) {
     begin local: [dict-closure $body] {
-	@FILENAME := $file;
+	@FILENAME := $file-name;
     };
     try {
         cnt := 0;
-        $f each do: {| r |
+        $file each do: {| r |
 	    cnt ::= $cnt + 1;
-	    if {set? sep}
+	    if $sep
 	    then: {
 		l ::= $r split sep: $sep;
 	    }
@@ -27,9 +55,6 @@ defun awk (file body sep: sep) {
 		};
 	        $body eval;
 	    };
-        }
-    }
-    fin: {
-	$f close;
+	};
     };
 };
