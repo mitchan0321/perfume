@@ -528,14 +528,22 @@ Toy_Type*
 toy_clone(Toy_Type *obj) {
     Toy_Type *dest;
 
-    dest = GC_MALLOC(sizeof(Toy_Type));
-    ALLOC_SAFE(dest);
-    if (INTEGER == GET_TAG(obj)) {
+    switch (GET_TAG(obj)) {
+    case INTEGER:
+	dest = GC_MALLOC(sizeof(Toy_Type));
+	ALLOC_SAFE(dest);
 	dest->tag = obj->tag;
 	mpz_init(dest->u.biginteger);
 	mpz_set(dest->u.biginteger, obj->u.biginteger);
-    } else {
-	memcpy((void*)dest, (const void*)obj, sizeof(Toy_Type));
+	break;
+    case STRING:
+	dest = GC_MALLOC(sizeof(Toy_Type));
+	ALLOC_SAFE(dest);
+	dest->tag = obj->tag;
+	dest->u.string = new_cell(cell_get_addr(obj->u.string));
+	break;
+    default:
+	dest = obj;
     }
     return dest;
 }
