@@ -26,16 +26,13 @@ new_array() {
 
 Array*
 array_append(Array *array, Toy_Type *item) {
-    Toy_Type *t;
-
     if (NULL == array) return NULL;
 
     if ((array->cur_size + 1) > array->alloc_size) {
 	if (NULL == array_realloc(array)) return NULL;
     }
 
-    t = toy_clone(item);
-    array->array[array->cur_size] = *t;
+    array->array[array->cur_size] = *item;
     array->cur_size++;
 
     return array;
@@ -43,14 +40,11 @@ array_append(Array *array, Toy_Type *item) {
 
 Array*
 array_set(Array *array, Toy_Type *item, int pos) {
-    Toy_Type *t;
-
     if (NULL == array) return NULL;
 
     if ((pos < 0) || (pos >= array->cur_size)) return NULL;
 
-    t = toy_clone(item);
-    array->array[pos] = *t;
+    array->array[pos] = *item;
 
     return array;
 }
@@ -61,7 +55,7 @@ array_get(Array *array, int pos) {
 
     if ((pos < 0) || (pos >= array->cur_size)) return NULL;
 
-    return toy_clone(&(array->array[pos]));
+    return &array->array[pos];
 }
 
 int

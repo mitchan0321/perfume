@@ -4281,7 +4281,7 @@ mth_dict_set(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
     key = to_string_call(interp, list_get_item(posargs));
     val = list_get_item(list_next(posargs));
 
-    hash_set(o->u.dict, key, val);
+    hash_set(o->u.dict, key, toy_clone(val));
 
     return val;
 
@@ -4450,7 +4450,7 @@ mth_vector_append(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     o = SELF(interp);
     if (GET_TAG(o) != VECTOR) goto error2;
 
-    array_append(o->u.vector, item);
+    array_append(o->u.vector, toy_clone(item));
     return item;
 
 error:
@@ -4476,7 +4476,7 @@ mth_vector_set(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     o = SELF(interp);
     if (GET_TAG(o) != VECTOR) goto error2;
 
-    if (! array_set(o->u.vector, item, mpz_get_si(index->u.biginteger))) {
+    if (! array_set(o->u.vector, toy_clone(item), mpz_get_si(index->u.biginteger))) {
 	return new_exception(TE_ARRAYBOUNDARY, L"Array boudary error.", interp);
     }
 
