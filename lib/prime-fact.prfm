@@ -10,6 +10,12 @@ defun prime-fact (n) {
 };
 
 defun prime-fact-sub (n s) {
+
+    if {$n isprime} then: {
+	add-fact $n $s;
+	return;
+    };
+
     f := 2;
     t ::= $n sqrt;
     while {$f <= $t} do: {
@@ -20,7 +26,6 @@ defun prime-fact-sub (n s) {
         };
         f ::= nextprime* $f;
     };
-    add-fact $n $s;
 };
 
 defun nextprime* (n) {
@@ -30,7 +35,8 @@ memoiz nextprime*;
 
 defun add-fact (n s) {
     if [$s set? $n]
-    then: {$s set $n [$s,$n + 1]}
+#    then: {$s set $n [$s,$n + 1]}
+    then: {$s,$n ++}
     else: {$s set $n 1}
     ;
 };
