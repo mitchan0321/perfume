@@ -1,4 +1,4 @@
-# return test
+# return and integer variable clone test 
 
 defun a (i) {
   return {$i ++};
