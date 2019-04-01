@@ -1,3 +1,4 @@
+2019/04/01	PRFM_20190401		1.2.3
 2019/02/26	PRFM_20190226		1.2.2
 2019/02/15	PRFM_20190215_A30	1.2.1
 2019/01/07	PRFM_20190107		1.2.1_PRE_1
@@ -72,9 +73,8 @@
 2008/07/27	TOY_20080727		0.0.3
 2008/07/26	TOY_20080726		0.0.2
 2008/07/25	TOY_20080725		0.0.1
---
-$Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 
+--
 2008/07/25:	
 	initial CVS repository imported.
 
@@ -1098,5 +1098,28 @@ $Id: RELEASE,v 1.68 2012/06/10 07:38:48 mit-sato Exp $
 		Add 'symbolic-link' property to file stat result list, when 'type' property is "l".
 	lib/ll.prfm
 		Add display symbolic link object.
+
+2019/04/01
+	methods.c, array.c
+		Fix for vector item only cloning at Vector::set time.
+		Fix for dict item only cloning at Dict::set time.
+	eval.c
+		Fix primitive type (Integer and String) only cloning at
+		given function call parameter.
+	commands.c
+		Fix primitive type (Integer and String) only cloning at
+		called set command.
+	types.c
+		Rewrite toy_clone.
+		Primitive data types are Integer and String in perfume language.
+	lib/Integer.prfm
+		Add Integer method, Integer::C and Integer::P.
+	lib/awk.prfm, ll.prfm
+		Change parameter order and some files and use standard input when
+		no file name specified.
+	lib/prime-fact.prfm
+		Fix a few performance.
+	tests/*
+		Fix bug and some tests added.
 
 #eof
