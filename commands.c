@@ -122,17 +122,7 @@ cmd_set(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	posargs = list_next(posargs);
 	val = list_get_item(posargs);
 	if (NULL == val) goto error;
-
-	switch (GET_TAG(val)) {
-	case INTEGER: case REAL:
-	    val = toy_clone(val);
-	    break;
-	case STRING:
-	    val = new_string_str(cell_get_addr(val->u.string));
-	    break;
-	}
-
-	hash_set_t(h, var, val);
+	hash_set_t(h, var, toy_clone(val));
 
 	return val;
     }
@@ -175,16 +165,8 @@ cmd_sets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 
 	posargs = list_next(posargs);
 	val = list_get_item(posargs);
-	switch (GET_TAG(val)) {
-	case INTEGER: case REAL:
-	    hash_set_t(h, var, toy_clone(val));
-	    break;
-	case STRING:
-	    hash_set_t(h, var, new_string_str(cell_get_addr(val->u.string)));
-	    break;
-	default:
-	    hash_set_t(h, var, val);
-	}
+	if (val == NULL) goto error;
+	hash_set_t(h, var, toy_clone(val));
 
 	return val;
     }
