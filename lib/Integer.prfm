@@ -2,7 +2,20 @@
 # Integer util method
 #
 Integer method ! () {
+    if {[self] = 0} then: {return 1};
     1 .. [self] : inject 1 do: {| s i | $s * $i}
+};
+
+Integer method C (k) {
+    set n [self];
+    if {$k > $n} then: {return 0};
+    [$n !] / [[$k !] * [[$n - $k] !]];
+};
+
+Integer method P (k) {
+    set n [self];
+    if {$k > $n} then: {return 0};
+    [$n !] / [[$n - $k] !];
 };
 
 Integer method isprime () {
