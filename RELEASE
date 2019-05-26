@@ -1,3 +1,4 @@
+2019/05/27	PRFM_20190527		1.2.4
 2019/04/01	PRFM_20190401		1.2.3
 2019/02/26	PRFM_20190226		1.2.2
 2019/02/15	PRFM_20190215_A30	1.2.1
@@ -1121,5 +1122,13 @@
 		Fix a few performance.
 	tests/*
 		Fix bug and some tests added.
+
+2019/05/27
+	lib/standard-io-command-templ.prfm
+		Add file lib/standard-io-command-templ.prfm as for standard I/O command template function.
+	lib/{awk.prfm,cat.prfm,grep.prfm,head.prfm,ncat.prfm,wc.prfm}
+		Change these commands are change to use standard-io-command-tmpl.
+	eval.c
+		Fix, if statement first item is premitive then clone it.
 
 #eof
