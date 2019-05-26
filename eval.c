@@ -174,6 +174,8 @@ control_goto:
 	}
     } else if (GET_TAG(first) == LIST) {
 	first = toy_expand(interp, first, env, trace_info);
+    } else if ((GET_TAG(first) == INTEGER) || (GET_TAG(first) == STRING)) {
+	first = toy_clone(first);
     }
     self = first;
 
