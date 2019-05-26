@@ -1,30 +1,17 @@
+load-func standard-io-command-templ;
+
 defun awk (body
 	   sep: sep
 	   args: files) {
 
     if {! [set? sep]} {set sep nil};
     
-    if [$files null?] 
-    then: {
-	awk-sub $body $sep $stdin $INFILE;
-    }
-    else: {
-	$files each do: {| n |
-	    try {
-		f := `File($n mode: i);
-		awk-sub $body $sep $f $n;
-	    }
-	    catch: {| e |
-		println file: $stderr [$e cdr];
-	    }
-	    fin: {
-		if [set? f] then: {
-		    $f close;
-		    unset f;
-		};
-	    };
-	};
-    };
+    standard-io-command-templ
+	native-value: nil
+	files: $files
+	driver: [fun (file file-name native-value) {
+	    awk-sub $body $sep $file $file-name;
+	}];
 };
 
 defun awk-sub (body sep file file-name) {

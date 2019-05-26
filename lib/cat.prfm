@@ -1,27 +1,14 @@
+load-func standard-io-command-templ;
+
 defun cat (native-value: nv
 	   args: files) {
 
-    if [$files null?] 
-    then: {
-	cat-sub $stdin;
-    }
-    else: {
-	$files each do: {| n |
-	    try {
-		f := `File($n mode: i);
-		cat-sub $f;
-	    }
-	    catch: {| e |
-		println file: $stderr [$e cdr];
-	    }
-	    fin: {
-		if [set? f] then: {
-		    $f close;
-		    unset f;
-		};
-	    };
-	};
-    };
+    standard-io-command-templ
+	native-value: nil
+	files: $files
+	driver: [fun (file file-name native-value) {
+	    cat-sub $file;
+	}];
 };
 
 defun cat-sub (f) {

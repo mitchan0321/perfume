@@ -1,30 +1,16 @@
 # grep
+load-func standard-io-command-templ;
 
 defun grep (pat
 	    native-value: nv
 	    args: files) {
 
-    if [$files null?] 
-    then: {
-	grep-sub $stdin $INFILE $pat;
-    }
-    else: {
-	$files each do: {| n |
-	    try {
-		f := `File($n mode: i);
-		grep-sub $f $n $pat;
-	    }
-	    catch: {| e |
-		println file: $stderr [$e cdr];
-	    }
-	    fin: {
-		if [set? f] then: {
-		    $f close;
-		    unset f;
-		};
-	    };
-	};
-    };
+    standard-io-command-templ
+	native-value: nil
+	files: $files
+	driver: [fun (file file-name native-value) {
+	    grep-sub $file $file-name $pat;
+	}];
 };
 
 defun grep-sub (file name pat) {

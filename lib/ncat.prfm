@@ -1,30 +1,17 @@
+load-func standard-io-command-templ;
+
 defun ncat (fmt: fmt
 	    native-value: nv
 	    args: files) {
 
     if {set? fmt} else: {fmt := "%5d"};
 
-    if [$files null?] 
-    then: {
-	ncat-sub $stdin $fmt;
-    }
-    else: {
-	$files each do: {| n |
-	    try {
-		f := `File($n mode: i);
-		ncat-sub $f $fmt;
-	    }
-	    catch: {| e |
-		println file: $stderr [$e cdr];
-	    }
-	    fin: {
-		if [set? f] then: {
-		    $f close;
-		    unset f;
-		};
-	    };
-	};
-    };
+    standard-io-command-templ
+	native-value: nil
+	files: $files
+	driver: [fun (file file-name native-value) {
+	    ncat-sub $file $fmt;
+	}];
 };
 
 defun ncat-sub (file fmt) {
