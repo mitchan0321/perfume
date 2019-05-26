@@ -1,0 +1,26 @@
+defun standard-io-command-templ (native-value: nv
+				 files: file-list
+				 driver: drv) {
+
+    if [$file-list null?] 
+    then: {
+	$drv $stdin $INFILE $nv;
+    }
+    else: {
+	$file-list each do: {| n |
+	    try {
+		f := `File($n mode: i);
+		$drv $f $n $nv;
+	    }
+	    catch: {| e |
+		println file: $stderr [$e cdr];
+	    }
+	    fin: {
+		if [set? f] then: {
+		    $f close;
+		    unset f;
+		};
+	    };
+	};
+    };
+};
