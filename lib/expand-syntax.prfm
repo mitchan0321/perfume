@@ -170,3 +170,38 @@ begin {
         $lstack >>;
     };
 };
+
+#
+# This functions are pipe utility command suite.
+#
+defun >@ (body) {
+    result := nil;
+    $stdin each do: {| i |
+	dict-closure $body : set _ $i;
+	result ::= yield $body;
+    };
+    $stdout puts $result;
+};
+
+defun >@> (body) {
+    $stdin each do: {| i |
+	dict-closure $body : set _ $i;
+	$stdout puts [yield $body];
+    };
+};
+
+List method @> (args: body) {
+    if [$body null?]
+    then: {
+	[self] each do: {| i |
+	    $stdout puts $i;
+	};
+    }
+    else: {
+	b ::= $body car;
+        [self] each do: {| i |
+            dict-closure $b : set _ $i;
+            $stdout puts [yield $b];
+        };
+    };
+};
