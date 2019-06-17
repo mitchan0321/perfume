@@ -573,12 +573,16 @@ mth_integer_inc(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
 	return SELF(interp);
     }
 
+    if (GET_TAG(arg) != INTEGER) {
+	arg = to_int(interp,arg);
+    }
     if (GET_TAG(arg) == INTEGER) {
 	mpz_add(SELF(interp)->u.biginteger,
 		SELF(interp)->u.biginteger,
 		arg->u.biginteger);
 	return SELF(interp);
     }
+    return arg;
 
 error:
     return new_exception(TE_SYNTAX, L"Syntax error at '++', syntax: Integer ++ [int-val]", interp);
@@ -604,12 +608,16 @@ mth_integer_dec(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
 	return SELF(interp);
     }
 
+    if (GET_TAG(arg) != INTEGER) {
+	arg = to_int(interp,arg);
+    }
     if (GET_TAG(arg) == INTEGER) {
 	mpz_sub(SELF(interp)->u.biginteger,
 		SELF(interp)->u.biginteger,
 		arg->u.biginteger);
 	return SELF(interp);
     }
+    return arg;
 
 error:
     return new_exception(TE_SYNTAX, L"Syntax error at '--', syntax: Integer -- [int-val]", interp);
