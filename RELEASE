@@ -1,3 +1,4 @@
+2019/06/17	PRFM_20190617		1.2.5
 2019/05/27	PRFM_20190527		1.2.4
 2019/04/01	PRFM_20190401		1.2.3
 2019/02/26	PRFM_20190226		1.2.2
@@ -1125,10 +1126,28 @@
 
 2019/05/27
 	lib/standard-io-command-templ.prfm
-		Add file lib/standard-io-command-templ.prfm as for standard I/O command template function.
+		Add file lib/standard-io-command-templ.prfm as for standard I/O
+		command template function.
 	lib/{awk.prfm,cat.prfm,grep.prfm,head.prfm,ncat.prfm,wc.prfm}
 		Change these commands are change to use standard-io-command-tmpl.
 	eval.c
 		Fix, if statement first item is premitive then clone it.
+
+2019/06/17
+	lib/PipeWrapper.prfm
+		Fix bug, choosing select co-routine's local stack.
+	lib/expand-syntax.prfm
+		Add function for pipe utility command suite are:
+		  List::@>{body} ...
+		  	Input from list and list item output to $stdout.
+		  >@{body} ...
+		  	Input from $stdin and iterative process body, only last result
+			to $stdout.
+		  >@>{body} ...
+		  	Input from $stdin and iterative process body and output	result
+			to $stdout per call body.
+	methods.c
+		Fix Integer::++ and Integer::-- function argument can acceptable any type
+		(auto conversion to Integer call).
 
 #eof
