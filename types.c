@@ -752,7 +752,17 @@ to_string(Toy_Type *obj) {
     }
 
     case NATIVE:
-	return L"<NATIVE>";
+    {
+	Cell *c;
+	
+	if (obj->u.native.argspec_list == NULL) {
+	    return L"() <NATIVE>";
+	}
+	c = new_cell(NULL);
+	cell_add_str(c, to_print(obj->u.native.argspec_list));
+	cell_add_str(c, L" <NATIVE>");
+	return cell_get_addr(c);
+    }
 
     case EXCEPTION:
     {
@@ -1089,7 +1099,17 @@ to_print(Toy_Type *obj) {
     }
 
     case NATIVE:
-	return L"<NATIVE>";
+    {
+	Cell *c;
+	
+	if (obj->u.native.argspec_list == NULL) {
+	    return L"() <NATIVE>";
+	}
+	c = new_cell(NULL);
+	cell_add_str(c, to_print(obj->u.native.argspec_list));
+	cell_add_str(c, L" <NATIVE>");
+	return cell_get_addr(c);
+    }
 
     case EXCEPTION:
     {
