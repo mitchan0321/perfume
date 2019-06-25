@@ -1149,9 +1149,12 @@ cmd_case(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *body;
     Toy_Type *l;
     Toy_Type *result;
+    Toy_Type *default_body;
     wchar_t *pvar;
 
     if ((arglen < 3) || ((arglen % 2) == 0)) goto error;
+    default_body = hash_get_and_unset_t(nameargs, const_default);
+    if (hash_get_length(nameargs) > 0) goto error;
 
     var = list_get_item(posargs);
     pvar = to_string_call(interp, var);
@@ -1164,31 +1167,32 @@ cmd_case(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	l = list_next(l);
 	body = list_get_item(l);
 
-	if (wcscmp(to_string_call(interp, val), L"*") == 0) {
+	if (wcscmp(pvar, to_string_call(interp, val)) == 0) {
 	    if (GET_TAG(body) == CLOSURE) {
 		result = eval_closure(interp, body, interp->trace_info);
 	    } else {
 		result = body;
 	    }
-	    break;
-
-	} else if (wcscmp(pvar, to_string_call(interp, val)) == 0) {
-	    if (GET_TAG(body) == CLOSURE) {
-		result = eval_closure(interp, body, interp->trace_info);
-	    } else {
-		result = body;
-	    }
-	    break;
+	    return result;
 	}
 
 	l = list_next(l);
     }
 
-    return result;
+    if (NULL != default_body) {
+	if (GET_TAG(default_body) == CLOSURE) {
+	    result = eval_closure(interp, default_body, interp->trace_info);
+	} else {
+	    result = default_body;
+	}
+	return result;
+    }
+
+    return const_Nil;
     
 error:
     return new_exception(TE_SYNTAX,
-	 L"Syntax error at 'case',\n\tsyntax: case var val1 {body1} val2 {body2} ... * {default-body}", interp);
+	 L"Syntax error at 'case',\n\tsyntax: case val val1 {body1} val2 {body2} ... default: {default-body}", interp);
 }
 
 Toy_Type*
@@ -3971,116 +3975,140 @@ error:
 			 L"Syntax error at 'time-of-day', syntax: get-time-of-day", interp);
 }
 
+Toy_Type*
+cmd_getargspec(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *f, *a;
+    
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    f = list_get_item(posargs);
+    if (GET_TAG(f) == FUNC) {
+	a = f->u.func.argspec->list;
+    } else if (GET_TAG(f) == NATIVE) {
+	a = f->u.native.argspec_list;
+    } else {
+	goto error;
+    }
+    if (NULL == a) return new_list(NULL);
+    return a;
+
+error:
+    return new_exception(TE_SYNTAX,
+			 L"Syntax error at 'argspec', syntax: argspec native | func", interp);
+}
+
 int toy_add_commands(Toy_Interp *interp) {
-    toy_add_func(interp, L"false", cmd_false, NULL);
-    toy_add_func(interp, L"true", cmd_true, NULL);
-    toy_add_func(interp, L"set", cmd_set, NULL);
-    toy_add_func(interp, L"sets", cmd_sets, NULL);
-    toy_add_func(interp, L"setc", cmd_setc, NULL);
-    toy_add_func(interp, L"defvar", cmd_defvar, NULL);
-    toy_add_func(interp, L"fun", cmd_fun, NULL);
-    toy_add_func(interp, L"defun", cmd_defun, NULL);
-    toy_add_func(interp, L"info", cmd_info, NULL);
-    toy_add_func(interp, L"return", cmd_return, NULL);
-    toy_add_func(interp, L"break", cmd_break, NULL);
-    toy_add_func(interp, L"continue", cmd_continue, NULL);
-    toy_add_func(interp, L"redo", cmd_redo, NULL);
-    toy_add_func(interp, L"retry", cmd_retry, NULL);
-    toy_add_func(interp, L"new", cmd_new, NULL);
-    toy_add_func(interp, L"show-stack", cmd_showstack, NULL);
-    toy_add_func(interp, L"if", cmd_if, NULL);
-    toy_add_func(interp, L"while", cmd_while, NULL);
-    toy_add_func(interp, L"print", cmd_print, NULL);
-    toy_add_func(interp, L"println", cmd_println, NULL);
-    toy_add_func(interp, L"time", cmd_time, NULL);
-    toy_add_func(interp, L"class", cmd_class, NULL);
-    toy_add_func(interp, L"try", cmd_try, NULL);
-    toy_add_func(interp, L"throw", cmd_throw, NULL);
-    toy_add_func(interp, L"case", cmd_case, NULL);
-    toy_add_func(interp, L"cond", cmd_cond, NULL);
-    toy_add_func(interp, L"set?", cmd_isset, NULL);
-    toy_add_func(interp, L"sets?", cmd_issets, NULL);
-    toy_add_func(interp, L"setc?", cmd_issetc, NULL);
-    toy_add_func(interp, L"unset", cmd_unset, NULL);
-    toy_add_func(interp, L"unsets", cmd_unsets, NULL);
-    toy_add_func(interp, L"self", cmd_self, NULL);
-    toy_add_func(interp, L"stack-trace", cmd_stacktrace, NULL);
-    toy_add_func(interp, L"trap", cmd_trap, NULL);
-    toy_add_func(interp, L"!", cmd_not, NULL);
-    toy_add_func(interp, L"and", cmd_and, NULL);
-    toy_add_func(interp, L"or", cmd_or, NULL);
-    toy_add_func(interp, L"load", cmd_load, NULL);
-    toy_add_func(interp, L"sid", cmd_sid, NULL);
-    toy_add_func(interp, L"sdir", cmd_sdir, NULL);
-    toy_add_func(interp, L"pwd", cmd_pwd, NULL);
-    toy_add_func(interp, L"cd", cmd_chdir, NULL);
-    toy_add_func(interp, L"alias", cmd_alias, NULL);
-    toy_add_func(interp, L"sleep", cmd_sleep, NULL);
-    toy_add_func(interp, L"setvar", cmd_setvar, NULL);
-    toy_add_func(interp, L"file", cmd_file, NULL);
-    toy_add_func(interp, L"exists?", cmd_exists, NULL);
-    toy_add_func(interp, L"defvar?", cmd_isdefvar, NULL);
-    toy_add_func(interp, L"type?", cmd_istype, NULL);
-    toy_add_func(interp, L"call", cmd_call, NULL);
-    toy_add_func(interp, L"rand", cmd_rand, NULL);
-    toy_add_func(interp, L"symbol", cmd_symbol, NULL);
-    toy_add_func(interp, L"trace", cmd_trace, NULL);
-    toy_add_func(interp, L"exit", cmd_exit, NULL);
-    toy_add_func(interp, L"fork", cmd_fork, NULL);
-    toy_add_func(interp, L"yield", cmd_yield, NULL);
-    toy_add_func(interp, L"result", cmd_result, NULL);
-    toy_add_func(interp, L"lazy", cmd_lazy, NULL);
-    toy_add_func(interp, L"begin", cmd_begin, NULL);
-    toy_add_func(interp, L"fork-exec", cmd_forkandexec, NULL);
-    toy_add_func(interp, L"wait", cmd_wait, NULL);
-    toy_add_func(interp, L"read", cmd_read, NULL);
-    toy_add_func(interp, L"goto", cmd_goto, NULL);
-    toy_add_func(interp, L"dict", cmd_newdict, NULL);
-    toy_add_func(interp, L"dict-local", cmd_localdict, NULL);
-    toy_add_func(interp, L"dict-object", cmd_objdict, NULL);
-    toy_add_func(interp, L"dict-global", cmd_globaldict, NULL);
-    toy_add_func(interp, L"dict-func", cmd_funcdict, NULL);
-    toy_add_func(interp, L"dict-class", cmd_classdict, NULL);
-    toy_add_func(interp, L"dict-closure", cmd_closuredict, NULL);
-    toy_add_func(interp, L"vector", cmd_newvector, NULL);
-    toy_add_func(interp, L"eq?", cmd_equal, NULL);
-    toy_add_func(interp, L"connect", cmd_connect, NULL);
-    toy_add_func(interp, L"socket-server", cmd_socket_server, NULL);
-    toy_add_func(interp, L"select", cmd_select, NULL);
-    toy_add_func(interp, L"accept", cmd_accept, NULL);
-    toy_add_func(interp, L"close", cmd_close, NULL);
-    toy_add_func(interp, L"resolv-in-addr", cmd_resolv_in_addr, NULL);
-    toy_add_func(interp, L"coro", cmd_coro, NULL);
-    toy_add_func(interp, L"pause", cmd_pause, NULL);
-    toy_add_func(interp, L"gc", cmd_gc, NULL);
-    toy_add_func(interp, L"loop", cmd_loop, NULL);
-    toy_add_func(interp, L"stack-list", cmd_stacklist, NULL);
-    toy_add_func(interp, L"symbol?", cmd_issymbol, NULL);
-    toy_add_func(interp, L"nil?", cmd_isnil, NULL);
-    toy_add_func(interp, L"list?", cmd_islist, NULL);
-    toy_add_func(interp, L"integer?", cmd_isinteger, NULL);
-    toy_add_func(interp, L"real?", cmd_isreal, NULL);
-    toy_add_func(interp, L"string?", cmd_isstring, NULL);
-    toy_add_func(interp, L"rquote?", cmd_isrquote, NULL);
-    toy_add_func(interp, L"block?", cmd_isblock, NULL);
-    toy_add_func(interp, L"closure?", cmd_isblock, NULL);
-    toy_add_func(interp, L"func?", cmd_isfunc, NULL);
-    toy_add_func(interp, L"object?", cmd_isobject, NULL);
-    toy_add_func(interp, L"dict?", cmd_isdict, NULL);
-    toy_add_func(interp, L"vector?", cmd_isvector, NULL);
-    toy_add_func(interp, L"cstack-release", cmd_cstack_release, NULL);
-    toy_add_func(interp, L"coro-id", cmd_coroid, NULL);
-    toy_add_func(interp, L"REM", cmd_remark, NULL);
-    toy_add_func(interp, L"uplevel", cmd_uplevel, NULL);
-    toy_add_func(interp, L"debug", cmd_debug, NULL);
-    toy_add_func(interp, L"where", cmd_where, NULL);
-    toy_add_func(interp, L"true?", cmd_istrue, NULL);
-    toy_add_func(interp, L"false?", cmd_isfalse, NULL);
-    toy_add_func(interp, L"tag?", cmd_tag, NULL);
-    toy_add_func(interp, L"ref", cmd_ref, NULL);
-    toy_add_func(interp, L"strftime", cmd_strftime, NULL);
-    toy_add_func(interp, L"strptime", cmd_strptime, NULL);
-    toy_add_func(interp, L"time-of-day", cmd_gettimeofday, NULL);
+    toy_add_func(interp, L"false", 	cmd_false, 		NULL);
+    toy_add_func(interp, L"true", 	cmd_true, 		NULL);
+    toy_add_func(interp, L"set", 	cmd_set, 		L"var,val");
+    toy_add_func(interp, L"sets", 	cmd_sets, 		L"var,val");
+    toy_add_func(interp, L"setc", 	cmd_setc, 		L"var,val");
+    toy_add_func(interp, L"defvar", 	cmd_defvar,	 	L"var,val");
+    toy_add_func(interp, L"fun", 	cmd_fun, 		L"argspec,body");
+    toy_add_func(interp, L"defun", 	cmd_defun, 		L"func-name,argspec,body");
+    toy_add_func(interp, L"info", 	cmd_info, 		L"desc");
+    toy_add_func(interp, L"return", 	cmd_return,		L"val");
+    toy_add_func(interp, L"break", 	cmd_break, 		L"val");
+    toy_add_func(interp, L"continue", 	cmd_continue,		NULL);
+    toy_add_func(interp, L"redo", 	cmd_redo, 		NULL);
+    toy_add_func(interp, L"retry", 	cmd_retry,		NULL);
+    toy_add_func(interp, L"new", 	cmd_new, 		L"class-name");
+    toy_add_func(interp, L"show-stack", cmd_showstack,		NULL);
+    toy_add_func(interp, L"if", 	cmd_if, 		L"condition,then:,then-body,else:,else-body");
+    toy_add_func(interp, L"while", 	cmd_while, 		L"condition,do:,body");
+    toy_add_func(interp, L"print", 	cmd_print, 		L"args");
+    toy_add_func(interp, L"println", 	cmd_println, 		L"args");
+    toy_add_func(interp, L"time", 	cmd_time, 		L"count:,times,body");
+    toy_add_func(interp, L"class", 	cmd_class, 		L"class-name,delegate:,class-name-list");
+    toy_add_func(interp, L"try", 	cmd_try, 		L"body,catch:,catch-body,fin:,fin-body");
+    toy_add_func(interp, L"throw", 	cmd_throw, 		L"exception,message");
+    toy_add_func(interp, L"case", 	cmd_case, 		L"val,val-body-pair-list,default:,body");
+    toy_add_func(interp, L"cond", 	cmd_cond, 		L"expr-body-pair-list");
+    toy_add_func(interp, L"set?", 	cmd_isset, 		L"var");
+    toy_add_func(interp, L"sets?", 	cmd_issets, 		L"var");
+    toy_add_func(interp, L"setc?", 	cmd_issetc, 		L"var");
+    toy_add_func(interp, L"unset", 	cmd_unset, 		L"var");
+    toy_add_func(interp, L"unsets", 	cmd_unsets, 		L"var");
+    toy_add_func(interp, L"self", 	cmd_self, 		NULL);
+    toy_add_func(interp, L"stack-trace", cmd_stacktrace,	NULL);
+    toy_add_func(interp, L"trap", 	cmd_trap, 		L"signal,block");
+    toy_add_func(interp, L"!", 		cmd_not, 		L"val");
+    toy_add_func(interp, L"and", 	cmd_and, 		L"val-list");
+    toy_add_func(interp, L"or", 	cmd_or, 		L"val-list");
+    toy_add_func(interp, L"load", 	cmd_load, 		L"file-path");
+    toy_add_func(interp, L"sid", 	cmd_sid, 		L"func");
+    toy_add_func(interp, L"sdir", 	cmd_sdir, 		NULL);
+    toy_add_func(interp, L"pwd", 	cmd_pwd, 		NULL);
+    toy_add_func(interp, L"cd", 	cmd_chdir, 		L"dir-name");
+    toy_add_func(interp, L"alias", 	cmd_alias, 		L"var,alias,up:,up-stack");
+    toy_add_func(interp, L"sleep", 	cmd_sleep, 		L"milli-seconds");
+    toy_add_func(interp, L"setvar", 	cmd_setvar, 		L"var,val");
+    toy_add_func(interp, L"file", 	cmd_file, 		L"command,args");
+    toy_add_func(interp, L"exists?", 	cmd_exists, 		L"var");
+    toy_add_func(interp, L"defvar?", 	cmd_isdefvar, 		L"var");
+    toy_add_func(interp, L"type?", 	cmd_istype, 		L"val");
+    toy_add_func(interp, L"call", 	cmd_call, 		L"func,arg-list");
+    toy_add_func(interp, L"rand", 	cmd_rand, 		NULL);
+    toy_add_func(interp, L"symbol", 	cmd_symbol, 		L"name");
+    toy_add_func(interp, L"trace", 	cmd_trace, 		L"body,fd:,file-desc");
+    toy_add_func(interp, L"exit", 	cmd_exit, 		L"val");
+    toy_add_func(interp, L"fork", 	cmd_fork, 		NULL);
+    toy_add_func(interp, L"yield", 	cmd_yield, 		L"body,val-list");
+    toy_add_func(interp, L"result", 	cmd_result, 		L"val");
+    toy_add_func(interp, L"lazy", 	cmd_lazy, 		L"body");
+    toy_add_func(interp, L"begin", 	cmd_begin, 		L"body,local:,dict,:rebase");
+    toy_add_func(interp, L"fork-exec", 	cmd_forkandexec, 	L"command,args");
+    toy_add_func(interp, L"wait", 	cmd_wait, 		L"val");
+    toy_add_func(interp, L"read", 	cmd_read, 		L"var");
+    toy_add_func(interp, L"goto", 	cmd_goto, 		L"func,val-list");
+    toy_add_func(interp, L"dict", 	cmd_newdict, 		L"key-val-pair-list");
+    toy_add_func(interp, L"dict-local", cmd_localdict, 		NULL);
+    toy_add_func(interp, L"dict-object", cmd_objdict, 		NULL);
+    toy_add_func(interp, L"dict-global", cmd_globaldict, 	NULL);
+    toy_add_func(interp, L"dict-func", 	cmd_funcdict, 		NULL);
+    toy_add_func(interp, L"dict-class", cmd_classdict, 		NULL);
+    toy_add_func(interp, L"dict-closure", cmd_closuredict, 	L"body");
+    toy_add_func(interp, L"vector", 	cmd_newvector, 		L"val-list");
+    toy_add_func(interp, L"eq?", 	cmd_equal, 		L"val,val");
+    toy_add_func(interp, L"connect", 	cmd_connect,		L"addr,port,bind-port:,port,bind-address:,address");
+    toy_add_func(interp, L"socket-server", cmd_socket_server, 	L"port,bind-address:,address");
+    toy_add_func(interp, L"select", 	cmd_select, 		L"read-fds-list,write-fds-list,except-fds-list,timeout");
+    toy_add_func(interp, L"accept", 	cmd_accept, 		L"file-desc");
+    toy_add_func(interp, L"close", 	cmd_close, 		L"file-desc");
+    toy_add_func(interp, L"resolv-in-addr", cmd_resolv_in_addr, L"hostname");
+    toy_add_func(interp, L"coro", 	cmd_coro, 		L"body");
+    toy_add_func(interp, L"pause", 	cmd_pause, 		L"val");
+    toy_add_func(interp, L"gc", 	cmd_gc, 		NULL);
+    toy_add_func(interp, L"loop", 	cmd_loop, 		L"do:,body");
+    toy_add_func(interp, L"stack-list", cmd_stacklist, 		NULL);
+    toy_add_func(interp, L"symbol?", 	cmd_issymbol, 		L"val");
+    toy_add_func(interp, L"nil?", 	cmd_isnil, 		L"val");
+    toy_add_func(interp, L"list?", 	cmd_islist, 		L"val");
+    toy_add_func(interp, L"integer?", 	cmd_isinteger, 		L"val");
+    toy_add_func(interp, L"real?", 	cmd_isreal, 		L"val");
+    toy_add_func(interp, L"string?", 	cmd_isstring, 		L"val");
+    toy_add_func(interp, L"rquote?", 	cmd_isrquote, 		L"val");
+    toy_add_func(interp, L"block?", 	cmd_isblock, 		L"val");
+    toy_add_func(interp, L"closure?", 	cmd_isblock, 		L"val");
+    toy_add_func(interp, L"func?", 	cmd_isfunc, 		L"val");
+    toy_add_func(interp, L"object?", 	cmd_isobject, 		L"val");
+    toy_add_func(interp, L"dict?", 	cmd_isdict, 		L"val");
+    toy_add_func(interp, L"vector?", 	cmd_isvector,		L"val");
+    toy_add_func(interp, L"cstack-release", cmd_cstack_release, L"slot");
+    toy_add_func(interp, L"coro-id", 	cmd_coroid, 		NULL);
+    toy_add_func(interp, L"REM", 	cmd_remark, 		L"val");
+    toy_add_func(interp, L"uplevel", 	cmd_uplevel, 		NULL);
+    toy_add_func(interp, L"debug", 	cmd_debug, 		L"val");
+    toy_add_func(interp, L"where", 	cmd_where, 		L"condition,do:,body");
+    toy_add_func(interp, L"true?", 	cmd_istrue, 		L"var");
+    toy_add_func(interp, L"false?", 	cmd_isfalse, 		L"var");
+    toy_add_func(interp, L"tag?", 	cmd_tag, 		L"val");
+    toy_add_func(interp, L"ref", 	cmd_ref, 		L"var");
+    toy_add_func(interp, L"strftime", 	cmd_strftime, 		L"format,time-val");
+    toy_add_func(interp, L"strptime", 	cmd_strptime, 		L"format,date-string");
+    toy_add_func(interp, L"time-of-day", cmd_gettimeofday, 	NULL);
+    toy_add_func(interp, L"argspec", 	cmd_getargspec, 	L"func");
 
     return 0;
 }
