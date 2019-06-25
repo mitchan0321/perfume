@@ -1,3 +1,4 @@
+2019/06/25	PRFM_20190625		1.2.6
 2019/06/17	PRFM_20190617		1.2.5
 2019/05/27	PRFM_20190527		1.2.4
 2019/04/01	PRFM_20190401		1.2.3
@@ -1138,16 +1139,30 @@
 		Fix bug, choosing select co-routine's local stack.
 	lib/expand-syntax.prfm
 		Add function for pipe utility command suite are:
-		  List::@>{body} ...
+		  List::@>{body}
 		  	Input from list and list item output to $stdout.
-		  >@{body} ...
+		  >@{body}
 		  	Input from $stdin and iterative process body, only last result
 			to $stdout.
-		  >@>{body} ...
+		  >@>{body}
 		  	Input from $stdin and iterative process body and output	result
 			to $stdout per call body.
 	methods.c
 		Fix Integer::++ and Integer::-- function argument can acceptable any type
 		(auto conversion to Integer call).
+
+2019/06/05
+	commands.c
+		Add native functions argspec description.
+		Add new command 'argspec' for get the specified functions or native commands
+		argument spec list.
+		Change case command syntax, if no matches pattern then select 'default:'
+		keyword body.
+	methods.c
+		Add native methods argspec description.
+	lib/*
+		Change case command default body specify.
+	types.c
+		Change '<NATIVE>' objects printable style.
 
 #eof
