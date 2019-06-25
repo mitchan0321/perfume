@@ -92,6 +92,7 @@ void def_global() {
     const_timeout = new_symbol(L"timeout:");
     const_debug_hook = new_symbol(L"debug-hook");
     const_ast = new_symbol(L"*");
+    const_default = new_symbol(L"default:");
     const_regex_cache = L"@REGEX_CACHE";
     PageSize = sysconf(_SC_PAGESIZE);
 }
