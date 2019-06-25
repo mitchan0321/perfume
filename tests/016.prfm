@@ -5,10 +5,10 @@ try {
 }
 catch: {| i |
     case [$i car]
-	* {println x}
+	default: {println x}
 	a {println $i};
 }
-fin: {true};		# => x
+fin: {true};		# => (a . abc)
 
 
 try {
@@ -17,6 +17,16 @@ try {
 catch: {| i |
     case [$i car]
 	a {println $i}
-	* {println x};
+        default: {println x};
 }
 fin: {true};		# => (a . abc)
+
+try {
+    throw (a . "abc");
+}
+catch: {| i |
+    case [$i car]
+	b {println $i}
+        default: {println x};
+}
+fin: {true};		# => x

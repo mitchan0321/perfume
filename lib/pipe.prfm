@@ -43,7 +43,7 @@ defun pipe (in: in out: out append: append args: blocks) {
 		in := `File($in mode: i);
 		$flist append! $in;
 	    }
-	    * {throw ErrSyntax $syntax}
+	    default: {throw ErrSyntax $syntax}
 	;
 	 
 	d ::= dict [$in stat];
@@ -78,7 +78,7 @@ defun pipe (in: in out: out append: append args: blocks) {
 	        };
 		$flist append! $out;
 	    }
-	    * {throw ErrSyntax $syntax}
+	    default: {throw ErrSyntax $syntax}
 	;
 	
 	d ::= dict [$out stat];

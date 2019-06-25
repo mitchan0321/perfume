@@ -58,7 +58,7 @@ defun interp-co () {
 		WarnParseString {
 		    set __cont__ t;
 	        }
-	        * {
+	        default: {
 		    println "EXCEPTION: <" [$__exp car] "># " [$__exp cdr];
 		    unset __cont__;
 	        };

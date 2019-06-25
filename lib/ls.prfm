@@ -25,7 +25,7 @@ defun ls (all: all ind: ind args: dir) {
 			ErrFileAccess {
 			    println file: $stderr "No access permission, \"" $f "\"";
 			}
-			* {throw $e};
+			default: {throw $e};
 		    };
 	        };
 	    };

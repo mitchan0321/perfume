@@ -159,7 +159,7 @@ begin {
 	        $lstack << [call expr $item];
 	    }
 	
-	    * {
+	    default: {
 	        $lstack << $item;
 	    }
 	    ;
