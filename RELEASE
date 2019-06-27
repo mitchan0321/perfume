@@ -1151,7 +1151,7 @@
 		Fix Integer::++ and Integer::-- function argument can acceptable any type
 		(auto conversion to Integer call).
 
-2019/06/05
+2019/06/25
 	commands.c
 		Add native functions argspec description.
 		Add new command 'argspec' for get the specified functions or native commands
