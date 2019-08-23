@@ -1,3 +1,4 @@
+2019/08/23	PRFM_20190823		1.2.7
 2019/06/25	PRFM_20190625		1.2.6
 2019/06/17	PRFM_20190617		1.2.5
 2019/05/27	PRFM_20190527		1.2.4
@@ -1164,5 +1165,10 @@
 		Change case command default body specify.
 	types.c
 		Change '<NATIVE>' objects printable style.
+
+2019/08/23
+	commands.c
+		Add new command spawn is execute unix command. Standard I/O descriptores are
+		inherit to child process.
 
 #eof
