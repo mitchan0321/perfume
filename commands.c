@@ -2698,6 +2698,67 @@ error:
 }
 
 Toy_Type*
+cmd_spawn(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    wchar_t *command;
+    char **argv;
+    int i, pid, status, wsts;
+
+    encoder_error_info *error_info;
+
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (arglen < 1) goto error;
+
+    command  = to_string_call(interp, list_get_item(posargs));
+
+    argv = GC_MALLOC(sizeof(char*) * (arglen+1));
+    ALLOC_SAFE(argv);
+
+    posargs = list_next(posargs);
+    if ((GET_TAG(list_get_item(posargs)) == LIST) && (list_length(posargs) == 1)) {
+	posargs = list_get_item(posargs);
+	arglen = list_length(posargs) + 1;
+    }
+    
+    argv[0] = encode_dirent(interp, command, &error_info);
+    if (NULL == argv[0]) {
+	return new_exception(TE_BADENCODER, error_info->message, interp);
+    }
+    for (i = 1; i<arglen; i++) {
+	wchar_t *e = to_string_call(interp, list_get_item(posargs));
+	argv[i] = encode_dirent(interp, e, &error_info);
+	if (NULL == argv[i]) {
+	    return new_exception(TE_BADENCODER, error_info->message, interp);
+	}
+
+	posargs = list_next(posargs);
+    }
+    argv[i] = NULL;
+
+    pid = fork();
+    
+    if (-1 == pid) {
+	return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+    }
+
+    if (0 == pid) {
+	/* I am a child */
+	execvp(argv[0], argv);
+	exit(255);
+    }
+
+    /* I am a parent */
+    wsts = waitpid(pid, &status, 0);
+    if (-1 == wsts) {
+	return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+    }
+    
+    return new_integer_si(WEXITSTATUS(status));
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error, syntax: spawn command [arg ...] | [(arg ...)]", interp);
+}
+
+Toy_Type*
 cmd_wait(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     int wsts, pid, ssts;
     Toy_Type *tpid;
@@ -4031,7 +4092,7 @@ int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, L"unset", 	cmd_unset, 		L"var");
     toy_add_func(interp, L"unsets", 	cmd_unsets, 		L"var");
     toy_add_func(interp, L"self", 	cmd_self, 		NULL);
-    toy_add_func(interp, L"stack-trace", cmd_stacktrace,	NULL);
+    toy_add_func(interp, L"stack-trace",cmd_stacktrace,		NULL);
     toy_add_func(interp, L"trap", 	cmd_trap, 		L"signal,block");
     toy_add_func(interp, L"!", 		cmd_not, 		L"val");
     toy_add_func(interp, L"and", 	cmd_and, 		L"val-list");
@@ -4059,13 +4120,14 @@ int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, L"lazy", 	cmd_lazy, 		L"body");
     toy_add_func(interp, L"begin", 	cmd_begin, 		L"body,local:,dict,:rebase");
     toy_add_func(interp, L"fork-exec", 	cmd_forkandexec, 	L"command,args");
+    toy_add_func(interp, L"spawn", 	cmd_spawn,	 	L"command,args");
     toy_add_func(interp, L"wait", 	cmd_wait, 		L"val");
     toy_add_func(interp, L"read", 	cmd_read, 		L"var");
     toy_add_func(interp, L"goto", 	cmd_goto, 		L"func,val-list");
     toy_add_func(interp, L"dict", 	cmd_newdict, 		L"key-val-pair-list");
     toy_add_func(interp, L"dict-local", cmd_localdict, 		NULL);
-    toy_add_func(interp, L"dict-object", cmd_objdict, 		NULL);
-    toy_add_func(interp, L"dict-global", cmd_globaldict, 	NULL);
+    toy_add_func(interp, L"dict-object",cmd_objdict, 		NULL);
+    toy_add_func(interp, L"dict-global",cmd_globaldict, 	NULL);
     toy_add_func(interp, L"dict-func", 	cmd_funcdict, 		NULL);
     toy_add_func(interp, L"dict-class", cmd_classdict, 		NULL);
     toy_add_func(interp, L"dict-closure", cmd_closuredict, 	L"body");
@@ -4107,7 +4169,7 @@ int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, L"ref", 	cmd_ref, 		L"var");
     toy_add_func(interp, L"strftime", 	cmd_strftime, 		L"format,time-val");
     toy_add_func(interp, L"strptime", 	cmd_strptime, 		L"format,date-string");
-    toy_add_func(interp, L"time-of-day", cmd_gettimeofday, 	NULL);
+    toy_add_func(interp, L"time-of-day",cmd_gettimeofday, 	NULL);
     toy_add_func(interp, L"argspec", 	cmd_getargspec, 	L"func");
 
     return 0;
