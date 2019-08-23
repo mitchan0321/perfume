@@ -2,6 +2,7 @@
 
 #define _XOPEN_SOURCE	600	/* define SUSv3 and C99 spec */
 #define _BSD_SOURCE
+#define __BSD_VISIBLE 1
 
 #include <stdio.h>
 #include <wchar.h>
@@ -18,7 +19,6 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/socket.h>
 #include <sys/select.h>
