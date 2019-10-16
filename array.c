@@ -6,6 +6,7 @@
 #include "toy.h"
 
 static Array* array_realloc(Array*);
+static Array* array_realloc_size(Array*, int);
 
 Array*
 new_array() {
@@ -81,6 +82,14 @@ array_swap(Array *array, int pos1, int pos2) {
     return 1;
 }
 
+Array*
+array_resize(Array *array, int new_size) {
+    if (NULL == array) return NULL;
+
+    if (new_size < 0) return NULL;
+    return array_realloc_size(array, new_size);
+}
+
 
 static Array*
 array_realloc(Array* array) {
@@ -101,6 +110,37 @@ array_realloc(Array* array) {
 
     array->alloc_size = alloc_size;
     array->array = new_array;
+
+    return array;
+}
+
+static Array*
+array_realloc_size(Array* array, int size) {
+    Toy_Type *new_t;
+    int i;
+
+    if (size < 0) return NULL;
+    
+    if (size <= array->alloc_size) {
+	array->cur_size = size;
+	for (i=size; i<array->alloc_size; i++) {
+	    memset(&array->array[i], 0, sizeof(Toy_Type));
+	}
+	return array;
+    }
+
+    new_t = GC_MALLOC(sizeof(Toy_Type) * ((size>0) ? size : ARRAY_INIT_SIZE));
+    ALLOC_SAFE(new_t);
+    memset(new_t, 0, sizeof(Toy_Type) * ((size>0) ? size : ARRAY_INIT_SIZE));
+
+    for (i=0; i<size; i++) {
+	if (i >= array->cur_size) break;
+	new_t[i] = array->array[i];
+    }
+    
+    array->array = new_t;
+    array->cur_size = size;
+    array->alloc_size = ((size>0) ? size : ARRAY_INIT_SIZE);
 
     return array;
 }

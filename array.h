@@ -19,5 +19,6 @@ Array*		array_set(Array *array, struct _toy_type *item, int pos);
 struct _toy_type* array_get(Array *array, int pos);
 int		array_get_size(Array *array);
 int		array_swap(Array *array, int, int);
+Array*		array_resize(Array *array, int);
 
 #endif /* __ARRAY__ */
