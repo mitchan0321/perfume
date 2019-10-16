@@ -10,3 +10,6 @@ Dict method string () {
     "[dict " . [pairs] "]";
 };
 
+Dict method literal () {
+    "[dict " . [pairs] "]";
+};
