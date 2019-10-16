@@ -1,3 +1,4 @@
+2019/10/16	PRFM_20191016		1.2.8
 2019/08/23	PRFM_20190823		1.2.7
 2019/06/25	PRFM_20190625		1.2.6
 2019/06/17	PRFM_20190617		1.2.5
@@ -1170,5 +1171,21 @@
 	commands.c
 		Add new command spawn is execute unix command. Standard I/O descriptores are
 		inherit to child process.
+
+2019/10/16
+	eval.c, parser.c
+		Fix Object::init given parameter specific bug.
+	hash.c
+		Add Hash bucket size const.
+	methods.c, array.[ch], lib/Dict.prfm, lib/Vector.prfm
+		Add Vector::resize method.
+		Add Vector::fill method.
+		Add Object::literal method.
+		Add Dict::stat method.
+		Some error messages are fixed.
+	lib/List.prfm
+		Add List::max, List::min methods.
+	lib/String.prfm
+		Add String::replace method.
 
 #eof
