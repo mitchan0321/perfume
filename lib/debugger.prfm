@@ -285,7 +285,7 @@ defun __debug-make-key (path line) {
 };
 
 defun __debug-interp (local) {
-    tty ::= new File init: (("/dev/tty" mode: io));
+    tty ::= new File init: ("/dev/tty" mode: io);
     $tty set-newline t;
     setvar @DEBUGOUT $tty;
     setvar @DEBUGIN  $tty;
