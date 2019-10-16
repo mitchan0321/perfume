@@ -58,5 +58,6 @@ Hash*			hash_set_method_cache(Hash* hash,
 
 #define hash_get_length(x)	((x==NULL)?0:x->items)
 #define hash_get_synonyms(x)	((x==NULL)?0:x->synonyms)
+#define hash_get_bucketsize(x)	((x==NULL)?0:x->bucket_size)
 
 #endif /* __HASH__ */
