@@ -67,3 +67,29 @@ List method reverse () {
 
     return $result;
 };
+
+List method max () {
+    l ::= self;
+    if [$l null?] {return nil};
+
+    max ::= $l car;
+    if [$l cdr] else: {return $max};
+    $l cdr : each do: {| i |
+	if {$i > $max} {max := $i};
+    };
+
+    return $max;
+};
+
+List method min () {
+    l ::= self;
+    if [$l null?] {return nil};
+
+    min ::= $l car;
+    if [$l cdr] else: {return $min};
+    $l cdr : each do: {| i |
+	if {$i < $min} {min := $i};
+    };
+
+    return $min;
+};
