@@ -948,12 +948,7 @@ toy_parse_initmacro(Toy_Type *statement) {
 		statement = list_next(statement);
 		param = list_get_item(statement);
 
-		if (GET_TAG(param) == LIST) {
-		    l = list_append(l, new_initmacro(class, toy_parse_initmacro(param)));
-		} else {
-		    l = list_append(l, new_initmacro(class, param));
-		}
-
+		l = list_append(l, new_initmacro(class, param));
 	    } else {
 
 		l = list_append(l, cur);
