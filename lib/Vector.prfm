@@ -5,3 +5,13 @@ Vector method string () {
     "[vector " . [list] "]";
 };
 
+Vector method literal () {
+    "[vector " . [list] "]";
+};
+
+Vector method fill (val) {
+    v ::= self;
+    0 each to: [$v len : - 1] do: {| i |
+	$v set $i $val;
+    };
+};
