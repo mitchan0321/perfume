@@ -536,6 +536,12 @@ toy_clone(Toy_Type *obj) {
 	mpz_init(dest->u.biginteger);
 	mpz_set(dest->u.biginteger, obj->u.biginteger);
 	break;
+    case REAL:
+	dest = GC_MALLOC(sizeof(Toy_Type));
+	ALLOC_SAFE(dest);
+	dest->tag = obj->tag;
+	dest->u.real = obj->u.real;
+	break;
     case STRING:
 	dest = GC_MALLOC(sizeof(Toy_Type));
 	ALLOC_SAFE(dest);
@@ -993,6 +999,12 @@ to_print(Toy_Type *obj) {
 		break;
 	    case L'\n':
 		cell_add_str(c, L"\\n");
+		break;
+	    case L'"':
+		cell_add_str(c, L"\\\"");
+		break;
+	    case L'\\':
+		cell_add_str(c, L"\\\\");
 		break;
 		    
 	    default:
