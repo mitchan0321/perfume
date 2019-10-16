@@ -183,6 +183,18 @@ error:
 }
 
 Toy_Type*
+mth_object_toliteral(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (arglen > 0) goto error;
+
+    return new_string_str(to_print(SELF(interp)));
+    
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'string', syntax: Object literal", interp);
+}
+
+Toy_Type*
 mth_object_getmethod(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *method, *result;
     
@@ -3474,11 +3486,10 @@ mth_file_init(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 	}
     }
 
-    if (arglen > 0) {
+    if ((arglen > 0) && (LIST == GET_TAG(posargs))) {
 	Toy_Type *cmd, *l;
 
 	l = cmd = new_list(new_symbol(L"open"));
-	posargs = list_get_item(posargs);
 	while (posargs) {
 	    list_append(l, list_get_item(posargs));
 	    posargs = list_next(posargs);
@@ -4371,6 +4382,27 @@ error2:
 }
 
 Toy_Type*
+mth_dict_stat(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *o;
+    Toy_Type *result;
+
+    if (arglen != 0) goto error;
+
+    o = SELF(interp);
+    if (GET_TAG(o) != DICT) goto error2;
+
+    result = new_list(new_integer_si(hash_get_synonyms(o->u.dict)));
+    list_append(result, new_integer_si(hash_get_bucketsize(o->u.dict)));
+    return result;
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'stat', syntax: Dict stat", interp);
+
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
 mth_dict_unset(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *o, *result;
     wchar_t *key;
@@ -4485,7 +4517,7 @@ mth_vector_set(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     if (GET_TAG(o) != VECTOR) goto error2;
 
     if (! array_set(o->u.vector, toy_clone(item), mpz_get_si(index->u.biginteger))) {
-	return new_exception(TE_ARRAYBOUNDARY, L"Array boudary error.", interp);
+	return new_exception(TE_ARRAYBOUNDARY, L"Array boundary error.", interp);
     }
 
     return item;
@@ -4513,7 +4545,7 @@ mth_vector_get(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
 
     item = array_get(o->u.vector, mpz_get_si(index->u.biginteger));
     if (! item) {
-	return new_exception(TE_ARRAYBOUNDARY, L"Array boudary error.", interp);
+	return new_exception(TE_ARRAYBOUNDARY, L"Array boundary error.", interp);
     }
 
     return item;
@@ -4681,13 +4713,42 @@ mth_vector_swap(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     idx2 = mpz_get_si(index2->u.biginteger);
     
     if (! array_swap(o->u.vector, idx1, idx2)) {
-	return new_exception(TE_ARRAYBOUNDARY, L"Array boudary error.", interp);
+	return new_exception(TE_ARRAYBOUNDARY, L"Array boundary error.", interp);
     }
 
     return const_T;
 
 error:
     return new_exception(TE_SYNTAX, L"Syntax error at 'swap', syntax: Vector swap pos1 pos2", interp);
+
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
+mth_vector_resize(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *new_size, *o;
+    int size;
+
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    new_size = list_get_item(posargs);
+    if (GET_TAG(new_size) != INTEGER) goto error;
+
+    o = SELF(interp);
+    if (GET_TAG(o) != VECTOR) goto error2;
+
+    size = mpz_get_si(new_size->u.biginteger);
+    
+    if (NULL == array_resize(o->u.vector, size)) {
+	return new_exception(TE_ARRAYBOUNDARY, L"Bad array size specified.", interp);
+    }
+
+    return const_T;
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'resize', syntax: Vector resize new-size", interp);
 
 error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
@@ -4844,6 +4905,7 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, L"Object", L"eq", 		mth_object_eq, 		L"val");
 #endif
     toy_add_method(interp, L"Object", L"string", 	mth_object_tostring, 	NULL);
+    toy_add_method(interp, L"Object", L"literal", 	mth_object_toliteral, 	NULL);
     toy_add_method(interp, L"Object", L"method?",	mth_object_getmethod,	L"name");
     toy_add_method(interp, L"Object", L"apply", 	mth_object_apply, 	L"body");
 
@@ -4981,6 +5043,7 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, L"Dict", L"get", 		mth_dict_get, 		L"var");
     toy_add_method(interp, L"Dict", L"set?", 		mth_dict_isset, 	L"val");
     toy_add_method(interp, L"Dict", L"len", 		mth_dict_len, 		NULL);
+    toy_add_method(interp, L"Dict", L"stat",		mth_dict_stat, 		NULL);
     toy_add_method(interp, L"Dict", L"unset", 		mth_dict_unset, 	L"val");
     toy_add_method(interp, L"Dict", L"keys", 		mth_dict_keys, 		NULL);
     toy_add_method(interp, L"Dict", L"pairs", 		mth_dict_pairs, 	NULL);
@@ -4993,6 +5056,7 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, L"Vector", L"list", 		mth_vector_list, 	NULL);
     toy_add_method(interp, L"Vector", L"each", 		mth_vector_each, 	L"do:,body");
     toy_add_method(interp, L"Vector", L"swap", 		mth_vector_swap, 	L"val,val");
+    toy_add_method(interp, L"Vector", L"resize",	mth_vector_resize, 	L"val");
 
     toy_add_method(interp, L"Coro", L"next", 		mth_coro_next, 		NULL);
     toy_add_method(interp, L"Coro", L"release", 	mth_coro_release, 	NULL);
