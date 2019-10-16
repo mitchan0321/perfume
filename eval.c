@@ -476,7 +476,7 @@ toy_expand(Toy_Interp* interp, Toy_Type* obj, Toy_Env** env, Toy_Func_Trace_Info
 	stl = st = new_list(const_new);
 	st = list_append(st, obj->u.initmacro.class);
 	st = list_append(st, const_init);
-	st = list_append(st, new_list(obj->u.initmacro.param));
+	st = list_append(st, obj->u.initmacro.param);
 
 	result = toy_eval(interp, new_statement(stl, trace_info->line), env);
 	return result;
@@ -1001,7 +1001,11 @@ toy_call_init(Toy_Interp *interp, Toy_Type *object, Toy_Type *args) {
     }
     obj_env = toy_new_obj_env(interp, object, object);
     
-    posargs = args;
+    if (GET_TAG(args) == LIST) {
+	posargs = args;
+    } else {
+	posargs = NULL;
+    }
     namedargs = new_hash(NULL);
 
     switch (GET_TAG(method)) {
