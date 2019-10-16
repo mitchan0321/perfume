@@ -1,7 +1,8 @@
 #
 # set built-in classes.
 #
-if {defvar? @BUILT-IN-CLASSES} else: {
+if {defvar? @BUILT-IN-CLASSES}
+else: {
     defvar @BUILT-IN-CLASSES [dict];
     $@BUILT-IN-CLASSES set Block t;
     $@BUILT-IN-CLASSES set Coro t;
