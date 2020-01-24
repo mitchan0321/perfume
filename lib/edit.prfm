@@ -1,0 +1,14 @@
+defun edit (file) {
+    if [list? $file] then: {
+        $file each do: {| f |
+            edit $f;
+        };
+        return;
+    };
+
+    if [string? $file] else: {throw ErrSyntax "edit \"file-name\"."};
+
+    set cmd "vi";
+    if [defvar? EDITOR] then: {set cmd $EDITOR};
+    spawn $cmd $file;
+};
