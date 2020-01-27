@@ -1,11 +1,6 @@
-begin {
-    Week ::= vector("Sun" "Mon" "Tue" "Wed" "Thu" "Fri" "Sat");
-
-    defun date (day: d) {
-        set adj 0;
-        if [set? d] then: {set adj [$d * 3600 : * 24]};
-        tod ::= [time-of-day] + $adj;
-        fmt ::= "%%Y/%%m/%%d %%H:%%M:%%S (%v)" fmt [$Week get [strftime "%w" $tod : int]];
-        println [strftime $fmt $tod];
-    };
+defun date (day: d) {
+    set adj 0;
+    if [set? d] then: {set adj [$d * 3600 : * 24]};
+    tod ::= [time-of-day] + $adj;
+    println [strftime "%Y/%m/%d %H:%M:%S (%a)" $tod];
 };
