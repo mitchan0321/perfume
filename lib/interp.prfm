@@ -23,6 +23,7 @@ defun interp-co () {
 	    r ::= $stdin gets;
 	    if {nil? $r} then: {r := ""; $stdin clear; println};
 	    set __cbuff $r;
+	    $__buff append! "\n";
 	    $__buff append! $__cbuff;
         } else: {
 	    r ::= $stdin gets;
