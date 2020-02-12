@@ -1515,6 +1515,10 @@ cmd_and(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 
     while (posargs) {
 	o = list_get_item(posargs);
+	if (GET_TAG(o) == CLOSURE) {
+	    o = toy_eval_script(interp, o->u.closure.block_body);
+	    if (GET_TAG(o) == EXCEPTION) return o;
+	} 
 	if (GET_TAG(o) == NIL) return const_Nil;
 	posargs = list_next(posargs);
     }
@@ -1534,6 +1538,10 @@ cmd_or(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 
     while (posargs) {
 	o = list_get_item(posargs);
+	if (GET_TAG(o) == CLOSURE) {
+	    o = toy_eval_script(interp, o->u.closure.block_body);
+	    if (GET_TAG(o) == EXCEPTION) return o;
+	} 
 	if (GET_TAG(o) != NIL) return const_T;
 	posargs = list_next(posargs);
     }

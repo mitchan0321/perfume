@@ -1,3 +1,4 @@
+2019/12/02	PRFM_20191202		1.2.9_PRE_1
 2019/10/16	PRFM_20191016		1.2.8
 2019/08/23	PRFM_20190823		1.2.7
 2019/06/25	PRFM_20190625		1.2.6
@@ -1187,5 +1188,13 @@
 		Add List::max, List::min methods.
 	lib/String.prfm
 		Add String::replace method.
+
+2019/12/02
+	lib/interp.prfm
+		If interpriter input line is continued, insert "\n" to command string.
+	lib/String.prfm
+		Add String methods String::!, String::abs and String::neg.
+	commands.c
+		and/or commands are proceed argument if it was block type object.
 
 #eof
