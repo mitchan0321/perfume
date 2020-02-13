@@ -96,34 +96,34 @@ List method min () {
 
 List method permutations (n do: body) {
     sum := ();
-    [self] permutations-sub $n $sum $body;
+    permutations-sub $n $sum $body;
 };
 
 List method permutations-sub (n sum body) {
     if [$n <= 0] {
-	return [yield $body $sum];
-    };
-
-    c := 0;
-    [self] each do: {| i |
-	[[self] delete $c] permutations-sub [$n - 1] [$sum . $i] $body;
-	$c ++;
+	yield $body $sum;
+    } {
+        c := 0;
+        each do: {| i |
+            [delete $c] permutations-sub [$n - 1] [$sum . $i] $body;
+            $c ++;
+	};
     };
 };
 
 List method combinations (n do: body) {
     sum := ();
-    [self] combinations-sub $n $sum $body;
+    combinations-sub $n $sum $body;
 };
 
 List method combinations-sub (n sum body) {
     if [$n <= 0] {
-	return [yield $body $sum];
-    };
-
-    l ::= self;
-    each do: {| i |
-	l ::= $l delete 0;
-	$l combinations-sub [$n - 1] [$sum . $i] $body;
+	yield $body $sum;
+    } {
+        l ::= self;
+        each do: {| i |
+	    l ::= $l delete 0;
+	    $l combinations-sub [$n - 1] [$sum . $i] $body;
+        };
     };
 };
