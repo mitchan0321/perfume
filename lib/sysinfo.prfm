@@ -7,4 +7,6 @@ Default file encoding: ${DEFAULT_FILE_ENCODING}
 Default script encoding: ${DEFAULT_SCRIPT_ENCODING}
 Current working directory: ${CWD}"
     expand];
+
+    return;
 };
