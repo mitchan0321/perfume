@@ -3736,6 +3736,20 @@ error:
 }
 
 Toy_Type*
+cmd_iscontrol(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) != 0) goto error;
+
+    if (CONTROL == GET_TAG(list_get_item(posargs))) return const_T;
+    return const_Nil;
+
+error:
+    return new_exception(TE_SYNTAX,
+			 L"Syntax error at 'control?', syntax: control? val", interp);
+}
+
+Toy_Type*
 cmd_cstack_release(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *t;
     int slot;
@@ -4172,6 +4186,7 @@ int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, L"object?", 	cmd_isobject, 		L"val");
     toy_add_func(interp, L"dict?", 	cmd_isdict, 		L"val");
     toy_add_func(interp, L"vector?", 	cmd_isvector,		L"val");
+    toy_add_func(interp, L"control?", 	cmd_iscontrol,		L"val");
     toy_add_func(interp, L"cstack-release", cmd_cstack_release, L"slot");
     toy_add_func(interp, L"coro-id", 	cmd_coroid, 		NULL);
     toy_add_func(interp, L"REM", 	cmd_remark, 		L"val");
