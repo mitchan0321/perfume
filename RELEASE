@@ -1,3 +1,4 @@
+2020/02/19	PRFM_20200219		1.2.9_PRE_2
 2019/12/02	PRFM_20191202		1.2.9_PRE_1
 2019/10/16	PRFM_20191016		1.2.8
 2019/08/23	PRFM_20190823		1.2.7
@@ -1196,5 +1197,20 @@
 		Add String methods String::!, String::abs and String::neg.
 	commands.c
 		and/or commands are proceed argument if it was block type object.
+
+2020/02/19
+	commands.c
+		Add command 'control?' for return t if object type is control.
+	eval.c
+		If return control object from commands or functions, return thru it
+		expect control#return.
+	lib/List.prfm
+		Add methods List::permutations and List::combinations.
+	lib/date.prfm,edit.prfm
+		Add utilitys date and edit.
+	lib/interp.prfm
+		If return control object from command line, display this after onvert to string.
+	lib/sysinfo.prfm
+		Add display item 'DEFAULT_DIRENT_ENCODING'.
 
 #eof
