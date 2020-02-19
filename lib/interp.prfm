@@ -40,15 +40,20 @@ defun interp-co () {
 			    then: {
 				    alias up: 1 __buff __buff;
 			    };
-			    $__buff eval;
+			    result ([$__buff eval]);
 		    } local: $__local_var :rebase;
 	    ];
 	    $stdin clear;
 
-	    println "result[" [type? $__result] "]=> "
-		[if [[["" . $__result] len] > 512]
-		     then: {[["" . $__result] sub 0 512] . " ..."}
-		     else: {"" . $__result}];
+	    if [control? [$__result car]] {
+		println "return control=> " [$__result car];
+	    } {
+		set __result [$__result car];
+	        println "result[" [type? $__result] "]=> "
+		    [if [[["" . $__result] len] > 512]
+		         then: {[["" . $__result] sub 0 512] . " ..."}
+		         else: {"" . $__result}];
+	    };
 	    unset __cont__;
 
         } catch: {| __exp |
