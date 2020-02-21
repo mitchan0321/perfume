@@ -14,6 +14,7 @@
 #include "hash.h"
 #include "array.h"
 #include "bulk.h"
+#include "binbulk.h"
 #include "t_gc.h"
 
 #define    NIL			0	/* nil */
@@ -42,7 +43,8 @@
 #define	   DICT			23	/* dictionary (as primitive hash) */
 #define	   VECTOR		24	/* vector (as primitive array) */
 #define	   COROUTINE		25	/* coroutine */
-#define    __TYPE_LAST__	26
+#define	   BULK			26	/* bulk data store */
+#define    __TYPE_LAST__	27
 
 
 #define S_NIL	L"nil"
@@ -323,6 +325,9 @@ typedef struct _toy_type {
 	/* COROUTINE */
 	Toy_Coroutine *coroutine;
 
+	/* BULK */
+	struct _binbulk *bulk;
+
     } u;
 } Toy_Type;
 
@@ -372,6 +377,7 @@ Toy_Type*	new_callcc();
 Toy_Type*	new_bind(Toy_Type *bind_var);
 Toy_Type*	new_dict(struct _hash *dict);
 Toy_Type*	new_vector(struct _array *vector);
+Toy_Type*	new_binbulk_t(struct _binbulk *bulk);
 Toy_Type*	new_coroutine(Toy_Interp*, Toy_Type*);
 
 Toy_Type*	toy_clone(Toy_Type *obj);

@@ -4892,6 +4892,303 @@ error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
+Toy_Type*
+mth_bulk_append(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *self, *c;
+    struct _binbulk *bulk;
+    wchar_t v;
+    
+    self = SELF(interp);
+    if (GET_TAG(self) != BULK) goto error2;
+    bulk = self->u.bulk;
+
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    c = list_get_item(posargs);
+    
+    if (GET_TAG(c) == LIST) {
+	while (! IS_LIST_NULL(c)) {
+	    Toy_Type *i;
+	    i = list_get_item(c);
+	    if (GET_TAG(i) != INTEGER) goto error;
+	    binbulk_add_char(bulk, (wchar_t)mpz_get_si(i->u.biginteger));
+	    c = list_next(c);
+	}
+	return const_T;
+    }
+    
+    if (GET_TAG(c) != INTEGER) goto error;
+    v = (wchar_t)mpz_get_si(c->u.biginteger);
+
+    binbulk_add_char(bulk, v);
+
+    return const_T;
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'append', syntax: Bulk append int-val | (int-val ...)", interp);
+
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
+mth_bulk_get(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *self;
+    struct _binbulk *bulk;
+    wchar_t v;
+
+    self = SELF(interp);
+    if (GET_TAG(self) != BULK) goto error2;
+    bulk = self->u.bulk;
+
+    if (arglen != 0) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+    
+    if ((v = binbulk_get_char(bulk)) == -1) {
+	return const_Nil;
+    }
+    return new_integer_si((int)v);
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'get', syntax: Bulk get", interp);
+
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
+mth_bulk_set(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *self, *c;
+    struct _binbulk *bulk;
+    wchar_t v;
+    
+    self = SELF(interp);
+    if (GET_TAG(self) != BULK) goto error2;
+    bulk = self->u.bulk;
+
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    c = list_get_item(posargs);
+    if (GET_TAG(c) != INTEGER) goto error;
+    v = (wchar_t)mpz_get_si(c->u.biginteger);
+
+    if (binbulk_set_char(bulk, v) == -1) {
+	return const_Nil;
+    }
+    return const_T;
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'set', syntax: Bulk set int-val", interp);
+
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
+mth_bulk_seek(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *self, *c;
+    struct _binbulk *bulk;
+    int v;
+    
+    self = SELF(interp);
+    if (GET_TAG(self) != BULK) goto error2;
+    bulk = self->u.bulk;
+
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    c = list_get_item(posargs);
+    if (GET_TAG(c) != INTEGER) goto error;
+    v = mpz_get_si(c->u.biginteger);
+
+    if ((v = binbulk_seek(bulk, v)) == -1) {
+	return const_Nil;
+    }
+
+    return new_integer_si(v);
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'seek', syntax: Bulk seek int-val", interp);
+
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
+mth_bulk_position(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *self;
+    struct _binbulk *bulk;
+    int v;
+
+    self = SELF(interp);
+    if (GET_TAG(self) != BULK) goto error2;
+    bulk = self->u.bulk;
+
+    if (arglen != 0) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+    
+    v = binbulk_get_position(bulk);
+    return new_integer_si(v);
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'position', syntax: Bulk position", interp);
+
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
+mth_bulk_len(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *self;
+    struct _binbulk *bulk;
+    int v;
+
+    self = SELF(interp);
+    if (GET_TAG(self) != BULK) goto error2;
+    bulk = self->u.bulk;
+
+    if (arglen != 0) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+    
+    v = binbulk_get_length(bulk);
+    return new_integer_si(v);
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'len', syntax: Bulk len", interp);
+
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
+mth_bulk_capacity(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *self;
+    struct _binbulk *bulk;
+    int v;
+
+    self = SELF(interp);
+    if (GET_TAG(self) != BULK) goto error2;
+    bulk = self->u.bulk;
+
+    if (arglen != 0) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+    
+    v = binbulk_get_capacity(bulk);
+    return new_integer_si(v);
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'capacity', syntax: Bulk capacity", interp);
+
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
+mth_bulk_truncate(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *self, *c;
+    struct _binbulk *bulk;
+    int v;
+
+    self = SELF(interp);
+    if (GET_TAG(self) != BULK) goto error2;
+    bulk = self->u.bulk;
+
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+    
+    c = list_get_item(posargs);
+    if (GET_TAG(c) != INTEGER) goto error;
+    v = mpz_get_si(c->u.biginteger);
+
+    if ((v = binbulk_truncate(bulk, v)) == -1) {
+	return const_Nil;
+    }
+    return new_integer_si(v);
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'truncate', syntax: Bulk truncate val", interp);
+
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
+mth_bulk_read(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *self, *c;
+    struct _binbulk *bulk;
+    int fd, size;
+
+    self = SELF(interp);
+    if (GET_TAG(self) != BULK) goto error2;
+    bulk = self->u.bulk;
+
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+    
+    c = list_get_item(posargs);
+    if (GET_TAG(c) != INTEGER) goto error;
+    fd = mpz_get_si(c->u.biginteger);
+
+    if ((size = binbulk_read(bulk, fd)) == -1) {
+	if (errno != 0) {
+	    return new_exception(TE_FILEACCESS, to_wchar(strerror(errno)), interp);
+	}
+	return new_exception(TE_FILEACCESS, L"Bad file type.", interp);	
+    }
+    return new_integer_si(size);
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'read', syntax: Bulk read fd", interp);
+
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
+mth_bulk_write(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *self, *c;
+    struct _binbulk *bulk;
+    int fd, size, from, to;
+
+    self = SELF(interp);
+    if (GET_TAG(self) != BULK) goto error2;
+    bulk = self->u.bulk;
+
+    if (arglen != 3) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+    
+    c = list_get_item(posargs);
+    if (GET_TAG(c) != INTEGER) goto error;
+    fd = mpz_get_si(c->u.biginteger);
+
+    posargs = list_next(posargs);
+    c = list_get_item(posargs);
+    if (GET_TAG(c) != INTEGER) goto error;
+    from = mpz_get_si(c->u.biginteger);
+
+    posargs = list_next(posargs);
+    c = list_get_item(posargs);
+    if (GET_TAG(c) != INTEGER) goto error;
+    to = mpz_get_si(c->u.biginteger);
+
+    if ((size = binbulk_write(bulk, fd, from, to)) == -1) {
+	if (errno != 0) {
+	    return new_exception(TE_FILEACCESS, to_wchar(strerror(errno)), interp);
+	}
+	return new_exception(TE_FILEACCESS, L"Bad file type or bad parameter specified.", interp);	
+    }
+    return new_integer_si(size);
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'write', syntax: Bulk write fd start end", interp);
+
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+
 int
 toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, L"Object", L"vars", 		mth_object_vars,	NULL);
@@ -5063,5 +5360,16 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, L"Coro", L"stat", 		mth_coro_stat, 		NULL);
     toy_add_method(interp, L"Coro", L"eval", 		mth_coro_eval, 		L"body");
 
+    toy_add_method(interp, L"Bulk", L"append", 		mth_bulk_append,	L"val");
+    toy_add_method(interp, L"Bulk", L"get", 		mth_bulk_get,		NULL);
+    toy_add_method(interp, L"Bulk", L"set", 		mth_bulk_set,		L"val");
+    toy_add_method(interp, L"Bulk", L"seek", 		mth_bulk_seek,		L"val");
+    toy_add_method(interp, L"Bulk", L"position",	mth_bulk_position,	NULL);
+    toy_add_method(interp, L"Bulk", L"len", 		mth_bulk_len,		NULL);
+    toy_add_method(interp, L"Bulk", L"capacity", 	mth_bulk_capacity,	NULL);
+    toy_add_method(interp, L"Bulk", L"truncate", 	mth_bulk_truncate,	L"val");
+    toy_add_method(interp, L"Bulk", L"read", 		mth_bulk_read,		L"val");
+    toy_add_method(interp, L"Bulk", L"write", 		mth_bulk_write,		L"val");
+    
     return 0;
 }

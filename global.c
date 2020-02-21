@@ -20,6 +20,7 @@ void def_global() {
     const_CallCC = new_symbol(L"CallCC");
     const_Dict = new_symbol(L"Dict");
     const_Vector = new_symbol(L"Vector");
+    const_Bulk = new_symbol(L"Bulk");
     const_Coro = new_symbol(L"Coro");
     const_Nil = new_nil();
     const_T = new_symbol(L"t");

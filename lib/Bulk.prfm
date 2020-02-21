@@ -1,0 +1,20 @@
+# for debug method
+Bulk method stat () {
+    println "Length: " [[self] len];
+    println "Position: " [[self] position];
+    println "Capacity: " [[self] capacity];
+
+    if {[[self] len] = 0} {
+	println "Value: no data";
+    } {
+	org ::= [self] seek 0;
+        l := ();
+        ll := $l;
+	0 each to: [[self] len : - 1] do: {| i |
+	    if {$i > 100} {break};
+	    ll ::= $ll append! [[self] get];
+	};
+	println "Value: " $l;
+	[self] seek $org;
+    };
+};

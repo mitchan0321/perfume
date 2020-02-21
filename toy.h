@@ -8,6 +8,7 @@
 #include "cell.h"
 #include "hash.h"
 #include "bulk.h"
+#include "binbulk.h"
 #include "parser.h"
 #include "interp.h"
 #include "error.h"

@@ -17,6 +17,7 @@ else: {
     $@BUILT-IN-CLASSES set RQuote t;
     $@BUILT-IN-CLASSES set String t;
     $@BUILT-IN-CLASSES set Vector t;
+    $@BUILT-IN-CLASSES set Bulk t;
 };
 
 #

@@ -414,6 +414,18 @@ new_vector(struct _array *vector) {
     return o;
 }
 
+Toy_Type*
+new_binbulk_t(struct _binbulk *bulk) {
+    Toy_Type *o;
+    o = GC_MALLOC(sizeof(Toy_Type));
+    ALLOC_SAFE(o);
+    
+    o->tag = BULK;
+    SET_NOPRINTABLE(o);
+    o->u.bulk = bulk;
+    return o;
+}
+
 static void
 coroutine_handl(void *context) {
     Toy_Type *co;
@@ -581,6 +593,7 @@ static wchar_t *toy_type_char[] = {
     L"DICT",
     L"VECTOR",
     L"COROUTINE",
+    L"BULK",
 };
 
 wchar_t*
@@ -912,6 +925,9 @@ to_string(Toy_Type *obj) {
 
     case COROUTINE:
 	return L"<COROUTINE>";
+
+    case BULK:
+	return L"<BULK>";
 
     default:
 	return L"(unknown)";
@@ -1270,6 +1286,9 @@ to_print(Toy_Type *obj) {
 
     case COROUTINE:
 	return L"<COROUTINE>";
+
+    case BULK:
+	return L"<BULK>";
 
     default:
 	return L"(unknown)";

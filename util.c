@@ -25,6 +25,25 @@ read_size(int fd, char* buff, int size) {
     return 1;
 }
 
+int
+write_size(int fd, char* buff, int size) {
+    int sts;
+    int pos = 0;
+    int remain = size;
+
+    do {
+	sts = write(fd, &buff[pos], remain);
+	if (-1 == sts) return -1;
+	if ( 0 == sts) return -1;
+
+	pos += sts;
+	remain -= sts;
+
+    } while (remain > 0);
+
+    return 1;
+}
+
 wchar_t*
 to_wchar(const char *src) {
     wchar_t *dest;

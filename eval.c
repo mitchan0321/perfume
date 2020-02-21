@@ -752,6 +752,10 @@ toy_resolv_object(Toy_Interp *interp, Toy_Type *object) {
 	val = hash_get_t(interp->classes, const_Coro);
 	break;
 
+    case BULK:
+	val = hash_get_t(interp->classes, const_Bulk);
+	break;
+
     default:
 	goto error;
     }

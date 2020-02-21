@@ -43,6 +43,7 @@
 #include "hash.h"
 #include "array.h"
 #include "bulk.h"
+#include "binbulk.h"
 #include "cstack.h"
 #include "util.h"
 #include "encoding.h"
@@ -2978,6 +2979,7 @@ error:
 			 L"Syntax error at 'vector', syntax: vector [(val ...)]", interp);
 }
 
+
 Toy_Type*
 cmd_equal(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *a, *b;
@@ -3107,6 +3109,12 @@ cmd_equal(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 
     case VECTOR:
 	if (tb != VECTOR) return const_Nil;
+	if (a == b) return const_T;
+	return const_Nil;
+	break;
+
+    case BULK:
+	if (tb != BULK) return const_Nil;
 	if (a == b) return const_T;
 	return const_Nil;
 	break;
@@ -3736,6 +3744,20 @@ error:
 }
 
 Toy_Type*
+cmd_isbulk(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) != 0) goto error;
+
+    if (BULK == GET_TAG(list_get_item(posargs))) return const_T;
+    return const_Nil;
+
+error:
+    return new_exception(TE_SYNTAX,
+			 L"Syntax error at 'bulk?', syntax: bulk? val", interp);
+}
+
+Toy_Type*
 cmd_iscontrol(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 
     if (arglen != 1) goto error;
@@ -4088,6 +4110,17 @@ error:
 			 L"Syntax error at 'argspec', syntax: argspec native | func", interp);
 }
 
+Toy_Type*
+cmd_newbulk(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    
+    if (arglen == 0) {
+	return new_binbulk_t(new_binbulk());
+    }
+
+    return new_exception(TE_SYNTAX,
+			 L"Syntax error at 'bulk', syntax: bulk", interp);
+}
+
 int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, L"false", 	cmd_false, 		NULL);
     toy_add_func(interp, L"true", 	cmd_true, 		NULL);
@@ -4186,6 +4219,7 @@ int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, L"object?", 	cmd_isobject, 		L"val");
     toy_add_func(interp, L"dict?", 	cmd_isdict, 		L"val");
     toy_add_func(interp, L"vector?", 	cmd_isvector,		L"val");
+    toy_add_func(interp, L"bulk?", 	cmd_isbulk,		L"val");
     toy_add_func(interp, L"control?", 	cmd_iscontrol,		L"val");
     toy_add_func(interp, L"cstack-release", cmd_cstack_release, L"slot");
     toy_add_func(interp, L"coro-id", 	cmd_coroid, 		NULL);
@@ -4201,6 +4235,7 @@ int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, L"strptime", 	cmd_strptime, 		L"format,date-string");
     toy_add_func(interp, L"time-of-day",cmd_gettimeofday, 	NULL);
     toy_add_func(interp, L"argspec", 	cmd_getargspec, 	L"func");
-
+    toy_add_func(interp, L"bulk", 	cmd_newbulk, 		L"val-list");
+    
     return 0;
 }

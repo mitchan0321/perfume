@@ -15,6 +15,7 @@ load [[$LIB_PATH item] . "/Block.prfm"];
 load [[$LIB_PATH item] . "/File.prfm"];
 load [[$LIB_PATH item] . "/Dict.prfm"];
 load [[$LIB_PATH item] . "/Vector.prfm"];
+load [[$LIB_PATH item] . "/Bulk.prfm"];
 
 #
 # other functions.
