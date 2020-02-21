@@ -1210,7 +1210,7 @@
 	lib/date.prfm,edit.prfm
 		Add utilitys date and edit.
 	lib/interp.prfm
-		If return control object from command line, display this after onvert to string.
+		If return control object from command line, display this after convert to string.
 	lib/sysinfo.prfm
 		Add display item 'DEFAULT_DIRENT_ENCODING'.
 
