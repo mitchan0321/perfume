@@ -1,3 +1,4 @@
+2020/02/21	PRFM_20200221		1.3.0
 2020/02/19	PRFM_20200219		1.2.9_PRE_2
 2019/12/02	PRFM_20191202		1.2.9_PRE_1
 2019/10/16	PRFM_20191016		1.2.8
@@ -1212,5 +1213,16 @@
 		If return control object from command line, display this after onvert to string.
 	lib/sysinfo.prfm
 		Add display item 'DEFAULT_DIRENT_ENCODING'.
+
+2020/02/21
+	Makefile, binbulk.[ch], commands.c, methods.c, interp.c, setup.prfm, global.[ch],
+	util.[ch], eval.c, types.[ch], toy.h, lib/util.prfm, lib/Bulk.prfm
+		Add new data type Bulk for operation binary data and file i/o.
+		Add class Bulk.
+		Add command 'bulk' for create Bulk data object.
+		Add methods Bulk::append, Bulk::get, Bulk::set, Bulk::seek, Bulk::position,
+		    Bulk::len, Bulk::capacity, Bulk::truncate, Bulk::read and Bulk::write.
+	lib/hexdump.prfm
+		Add utility hexdump.
 
 #eof
