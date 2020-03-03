@@ -1,26 +1,50 @@
-defun hexdump (path) {
-    f := `File($path mode: i);
-    b ::= bulk;
-    $b read [$f fd?];
-    $f close;
+begin {
+    HexChar ::= vector(
+	" "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "
+	" "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "
+	" "  "!"  "\"" "#"  "$"  "%"  "&"  "\'" "("  ")"  "*"  "+"  ","  "-"  "."  "/"
+	"0"  "1"  "2"  "3"  "4"  "5"  "6"  "7"  "8"  "9"  ":"  ";"  "<"  "="  ">"  "?"
+	"@"  "A"  "B"  "C"  "D"  "E"  "F"  "G"  "H"  "I"  "J"  "K"  "L"  "M"  "N"  "O"
+	"P"  "Q"  "R"  "S"  "T"  "U"  "V"  "W"  "X"  "Y"  "Z"  "["  "\\" "]"  "^"  "_"
+	"`"  "a"  "b"  "c"  "d"  "e"  "f"  "g"  "h"  "i"  "j"  "k"  "l"  "m"  "n"  "o"
+	"p"  "q"  "r"  "s"  "t"  "u"  "v"  "w"  "x"  "y"  "z"  "{"  "|"  "}"  "~"  " "
+	" "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "
+	" "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "
+	" "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "
+	" "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "
+	" "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "
+	" "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "
+	" "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "
+	" "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "  " "
+    );
 
-    $b seek 0;
-    set eof nil;
-    set p 0;
-    while {false? eof} do: {
-	[1 .. 16 do: {| i | symbol ["c%d" fmt $i]}] := [1 .. 16 do: {$b get}];
+    defun hexdump (path) {
+        f := `File($path mode: i);
+        b ::= bulk;
+        $b read [$f fd?];
+        $f close;
 
-	1 each to: 16 do: {| i |
-	    s ::= symbol ["c%d" fmt $i];
-	    if {nil? [set $s]} {
-		set $s "  ";
-		set eof t;
-	    } {
-		set $s ["%02x" fmt [set $s]];
+        $b seek 0;
+        set eof nil;
+        set p 0;
+        while {false? eof} do: {
+            [1 .. 16 do: {| i | symbol ["c%d" fmt $i]}] := [1 .. 16 do: {$b get}];
+
+	    d := "";
+	    1 each to: 16 do: {| i |
+                s ::= symbol ["c%d" fmt $i];
+                if {nil? [set $s]} {
+		    $d append! " ";
+	            set $s "  ";
+	            set eof t;
+                } {
+		    $d append! [$HexChar get [set $s]];
+		    set $s ["%02x" fmt [set $s]];
+                };
 	    };
-	};
-	println ["%08d  %v %v %v %v %v %v %v %v  %v %v %v %v %v %v %v %v" fmt
-		 $p $c1 $c2 $c3 $c4 $c5 $c6 $c7 $c8 $c9 $c10 $c11 $c12 $c13 $c14 $c15 $c16];
-	$p ++ 16;
+            println ["%08d  %v %v %v %v %v %v %v %v  %v %v %v %v %v %v %v %v  %v" fmt
+                $p $c1 $c2 $c3 $c4 $c5 $c6 $c7 $c8 $c9 $c10 $c11 $c12 $c13 $c14 $c15 $c16 $d];
+	    $p ++ 16;
+        };
     };
 };
