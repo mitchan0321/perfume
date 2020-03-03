@@ -1225,4 +1225,8 @@
 	lib/hexdump.prfm
 		Add utility hexdump.
 
+2020/03/03
+	lib/hexdump.prfm
+		Add display character map.
+
 #eof
