@@ -2,3 +2,16 @@
 # Object::?
 #
 Object method ? () {self};
+
+#
+# Object::?? val as Nil coalescing operator.
+#
+Object method ?? (a) {
+    if [block? [self]] {return [[[self] eval] ?? $a]};
+    return [self];
+};
+Nil method ?? (a) {
+    if [block? $a] {return [$a eval]};
+    return $a;
+};
+defun t (*) {return t};
