@@ -17,7 +17,7 @@
 #include "binbulk.h"
 #include "t_gc.h"
 
-#define    BOOL			0	/* nil */
+#define    BOOL			0	/* bool */
 #define    SYMBOL  		1	/* symbol */
 #define	   REF			2	/* reference (e.g. $XX) */
 #define    LIST	  		3	/* list (e.g. (...)) */
