@@ -17,7 +17,7 @@
 #include "binbulk.h"
 #include "t_gc.h"
 
-#define    NIL			0	/* nil */
+#define    BOOL			0	/* nil */
 #define    SYMBOL  		1	/* symbol */
 #define	   REF			2	/* reference (e.g. $XX) */
 #define    LIST	  		3	/* list (e.g. (...)) */
@@ -46,18 +46,21 @@
 #define	   BULK			26	/* bulk data store */
 #define    __TYPE_LAST__	27
 
+#define	   FALSE                0	/* BOOL value, FALSE */
+#define	   TRUE                 1	/* BOOL value, TRUE */
 
 #define S_NIL	L"nil"
-
-#define IS_LIST_NULL(l)	((l==NULL)?1:((NULL==l->u.list.item)&&(NULL==l->u.list.nextp)))
+#define S_T	L"t"
 
 #define TAG_MASK		(0x000000ff)
-#define GET_TAG(p)		((p==NULL)?-1:(TAG_MASK & (p->tag)))
+#define GET_TAG(p)		((p==NULL) ? -1 : (TAG_MASK & (p->tag)))
+#define IS_LIST_NULL(l)		((l==NULL) ? 1 : ((NULL==l->u.list.item)&&(NULL==l->u.list.nextp)))
+#define IS_NIL(x)		((GET_TAG(x)==BOOL) ? (x->u.bool.value==FALSE) : 0)
 
 #define TAG_NAMED_MASK		(0x00008000)
 #define TAG_SWITCH_MASK		(0x00004000)
-#define IS_NAMED_SYM(p)		((p==NULL)?0:(TAG_NAMED_MASK & (p->tag)))
-#define IS_SWITCH_SYM(p)	((p==NULL)?0:(TAG_SWITCH_MASK & (p->tag)))
+#define IS_NAMED_SYM(p)		((p==NULL) ? 0 : (TAG_NAMED_MASK & (p->tag)))
+#define IS_SWITCH_SYM(p)	((p==NULL) ? 0 : (TAG_SWITCH_MASK & (p->tag)))
 
 #define SET_SCRIPT_ID(p,i)	(p->tag|=((i<<16)&0xffff0000))
 #define GET_SCRIPT_ID(p)	(int)((p->tag&0xffff0000)>>16)
@@ -77,7 +80,7 @@
 #define GET_PARAMNO(p)		(int)((p->tag&TAG_PARAMNO_MASK)>>10)
 #define CLEAR_PARAMNO(p)	(p->tag&=(~TAG_PARAMNO_MASK))
 
-#define IS_TOY_OBJECT(p)	((GET_TAG(p)>=NIL)&&(GET_TAG(p)<__TYPE_LAST__))
+#define IS_TOY_OBJECT(p)	((GET_TAG(p)>=BOOL)&&(GET_TAG(p)<__TYPE_LAST__))
 #define SELF_HASH(i)		(i->obj_stack[i->cur_obj_stack]->cur_object_slot)
 #define SELF(i)			(i->obj_stack[i->cur_obj_stack]->self)
 #define SELF_OBJ(i)		(i->obj_stack[i->cur_obj_stack]->cur_object)
@@ -200,7 +203,10 @@ typedef struct _toy_type {
     u_int32_t tag;
 
     union _u {
-	/* NIL */
+	/* BOOL */
+	struct _bool {
+	    int value;
+	} bool;
 
 	/* SYMBOL */
 	struct _symbol {
@@ -339,7 +345,7 @@ typedef struct _toy_script {
 } Toy_Script;
 
 
-Toy_Type*	new_nil();
+Toy_Type*	new_bool(int val);
 Toy_Type*	new_symbol(wchar_t *atom);
 Toy_Type*	new_ref(wchar_t *ref);
 Toy_Type*	new_list(Toy_Type *item);
@@ -385,10 +391,10 @@ wchar_t*	toy_get_type_str(Toy_Type *obj);
 wchar_t*	to_string(Toy_Type *obj);
 wchar_t*	to_print(Toy_Type *obj);
 
-#define	list_next(l)		(((l)==NULL)?NULL:((GET_TAG((l))==LIST)?(l)->u.list.nextp:NULL))
-#define list_get_item(l)	(((l)==NULL)?NULL:((GET_TAG((l))==LIST)?(l)->u.list.item:NULL))
-#define list_set_car(l,v)	(((l)==NULL)?NULL:((GET_TAG((l))==LIST)?(l)->u.list.item=v:NULL))
-#define list_set_cdr(l,v)	(((l)==NULL)?NULL:((GET_TAG((l))==LIST)?(l)->u.list.nextp=v:NULL))
+#define	list_next(l)		(((l)==NULL) ? NULL : ((GET_TAG((l))==LIST) ? (l)->u.list.nextp : NULL))
+#define list_get_item(l)	(((l)==NULL) ? NULL : ((GET_TAG((l))==LIST) ? (l)->u.list.item : NULL))
+#define list_set_car(l,v)	(((l)==NULL) ? NULL : ((GET_TAG((l))==LIST) ? (l)->u.list.item=v : NULL))
+#define list_set_cdr(l,v)	(((l)==NULL) ? NULL : ((GET_TAG((l))==LIST) ? (l)->u.list.nextp=v : NULL))
 
 #define wcisspace(c)		((c < 0x80) && isspace(c))
 #define wcisprint(c)		(isprint(c) || (c >= 0x80))

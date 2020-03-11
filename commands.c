@@ -756,13 +756,12 @@ cmd_if(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	if (t == EXCEPTION) return cond;
 	if (t == CONTROL) {
 	    cond = cond->u.control.ret_value;
-	    t = GET_TAG(cond);
 	}
     } else {
-	t = GET_TAG(cond_block);
+	cond = cond_block;
     }
 
-    if (t == NIL) {
+    if (IS_NIL(cond)) {
 	if (else_block == NULL) return const_Nil;
 	if (GET_TAG(else_block) != CLOSURE) return else_block;
 	result = eval_closure(interp, else_block, interp->trace_info);
@@ -808,10 +807,9 @@ loop:
     if (t == EXCEPTION) return cond;
     if (t == CONTROL) {
 	cond = cond->u.control.ret_value;
-	t = GET_TAG(cond);
     }
 
-    if (t != NIL) {
+    if (! IS_NIL(cond)) {
     loop2:
 	result = eval_closure(interp, do_block, interp->trace_info);
 	r = GET_TAG(result);
@@ -1226,7 +1224,7 @@ cmd_cond(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	}
 	if (GET_TAG(cond) == EXCEPTION) return cond;
 
-	if (GET_TAG(cond) != NIL) {
+	if (! IS_NIL(cond)) {
 	    if (GET_TAG(body) == CLOSURE) {
 		result = toy_yield(interp, body, new_list(cond));
 	    } else {
@@ -1497,7 +1495,7 @@ cmd_not(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 
     o = list_get_item(posargs);
 
-    if (GET_TAG(o) == NIL) {
+    if (IS_NIL(o)) {
 	return const_T;
     } else {
 	return const_Nil;
@@ -1520,7 +1518,7 @@ cmd_and(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	    o = toy_eval_script(interp, o->u.closure.block_body);
 	    if (GET_TAG(o) == EXCEPTION) return o;
 	} 
-	if (GET_TAG(o) == NIL) return const_Nil;
+	if (IS_NIL(o)) return const_Nil;
 	posargs = list_next(posargs);
     }
 
@@ -1543,7 +1541,7 @@ cmd_or(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	    o = toy_eval_script(interp, o->u.closure.block_body);
 	    if (GET_TAG(o) == EXCEPTION) return o;
 	} 
-	if (GET_TAG(o) != NIL) return const_T;
+	if (! IS_NIL(o)) return const_T;
 	posargs = list_next(posargs);
     }
 
@@ -2515,7 +2513,7 @@ cmd_result(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 
     if (hash_get_length(nameargs) == 1) {
 	if (NULL == (t = hash_get_and_unset_t(nameargs, const_last))) goto error;
-	if (NIL == GET_TAG(t)) return const_Nil;
+	if (IS_NIL(t)) return const_Nil;
 	return interp->last_status;
     } else if (hash_get_length(nameargs) > 1) {
 	goto error;
@@ -2996,15 +2994,15 @@ cmd_equal(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     tb = GET_TAG(b);
 
     switch (ta) {
-    case NIL:
-	if (tb == NIL) return const_T;
+    case BOOL:
+	if (tb != BOOL) return const_Nil;
+	if (a->u.bool.value == b->u.bool.value) return const_T;
 	return const_Nil;
 	break;
 
     case SYMBOL:
 	if (tb != SYMBOL) return const_Nil;
-	if (wcscmp(cell_get_addr(a->u.symbol.cell), cell_get_addr(b->u.symbol.cell)) == 0)
-	    return const_T;
+	if (wcscmp(cell_get_addr(a->u.symbol.cell), cell_get_addr(b->u.symbol.cell)) == 0) return const_T;
 	return const_Nil;
 	break;
 
@@ -3016,8 +3014,7 @@ cmd_equal(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 
     case INTEGER:
 	if (tb != INTEGER) return const_Nil;
-	if (0 == (mpz_cmp(a->u.biginteger,
-			  b->u.biginteger))) return const_T;
+	if (0 == (mpz_cmp(a->u.biginteger, b->u.biginteger))) return const_T;
 	return const_Nil;
 	break;
 
@@ -3274,7 +3271,7 @@ cmd_select(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     if (GET_TAG(read_l) != LIST) goto error;
     if (GET_TAG(write_l) != LIST) goto error;
     if (GET_TAG(except_l) != LIST) goto error;
-    if ((GET_TAG(timeout_v) != INTEGER) && (GET_TAG(timeout_v) != NIL)) goto error;
+    if ((GET_TAG(timeout_v) != INTEGER) && (! IS_NIL(timeout_v))) goto error;
 
     FD_ZERO(&read_fds);
     FD_ZERO(&write_fds);
@@ -3595,7 +3592,7 @@ cmd_isnil(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     if (arglen != 1) goto error;
     if (hash_get_length(nameargs) != 0) goto error;
 
-    if (NIL == GET_TAG(list_get_item(posargs))) return const_T;
+    if (IS_NIL(list_get_item(posargs))) return const_T;
     return const_Nil;
 
 error:
@@ -3921,7 +3918,7 @@ cmd_istrue(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     
     val = toy_resolv_var(interp, var, 1, interp->trace_info);
     if (GET_TAG(val) == EXCEPTION) return const_Nil;
-    if (GET_TAG(val) == NIL) return const_Nil;
+    if (IS_NIL(val)) return const_Nil;
 
     return const_T;
 
@@ -3942,7 +3939,7 @@ cmd_isfalse(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     
     val = toy_resolv_var(interp, var, 1, interp->trace_info);
     if (GET_TAG(val) == EXCEPTION) return const_T;
-    if (GET_TAG(val) == NIL) return const_T;
+    if (IS_NIL(val)) return const_T;
 
     return const_Nil;
 

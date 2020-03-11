@@ -544,7 +544,7 @@ toy_parse_list(Bulk *src, wchar_t endc) {
 		if (NULL == any) goto assert;
 
 		list_set_cdr(l, toy_symbol_conv(list_get_item(any)));
-		if (NULL == list_get_item(l)) list_set_car(l, new_nil());
+		if (NULL == list_get_item(l)) list_set_car(l, new_bool(FALSE));
 		bulk_ungetchar(src);
 
 	    } else {
@@ -609,12 +609,15 @@ toy_symbol_conv(Toy_Type *a) {
     wchar_t *addr, *p;
     mpz_t s;
 
-    if (NULL == a) return new_nil();
+    if (NULL == a) return new_bool(FALSE);
     if (GET_TAG(a) != SYMBOL) return a;
 
     addr = cell_get_addr(a->u.symbol.cell);
     if (wcscmp(addr, S_NIL) == 0) {
-	return new_nil();
+	return new_bool(FALSE);
+    }
+    if (wcscmp(addr, S_T) == 0) {
+	return new_bool(TRUE);
     }
     if (wcscmp(addr, L".") == 0) {
 	return a;
@@ -792,8 +795,12 @@ int print_object(Toy_Type *obj, int indent) {
     wprintf(L"type=%ls: ", toy_get_type_str(obj));
 
     switch GET_TAG(obj) {
-    case NIL:
-	wprintf(L"%ls\n", to_string(obj));
+    case BOOL:
+	if (obj->u.bool.value == FALSE) {
+	    wprintf(L"nil\n");
+	} else {
+	    wprintf(L"t\n");
+	}
 	break;
 
     case SYMBOL:

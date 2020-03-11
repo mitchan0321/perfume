@@ -10,7 +10,7 @@
 
 #ifndef _DEF_GLOBAL_
 extern Toy_Type *const_Symbol;
-extern Toy_Type *const_NilClass;
+extern Toy_Type *const_Bool;
 extern Toy_Type *const_Block;
 extern Toy_Type *const_List;
 extern Toy_Type *const_Real;
@@ -107,7 +107,7 @@ extern int PageSize;
 #else
 
 Toy_Type *const_Symbol;
-Toy_Type *const_NilClass;
+Toy_Type *const_Bool;
 Toy_Type *const_Block;
 Toy_Type *const_List;
 Toy_Type *const_Real;

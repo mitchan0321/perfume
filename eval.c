@@ -28,7 +28,7 @@ static Toy_Type* toy_yield_bind(Toy_Interp *interp, Toy_Type *bind_var);
 		int code = sig_flag;					\
 		sig_flag = 0;						\
 		sig_result = eval_sig_handl(interp, code);		\
-		if (sig_result && (GET_TAG(sig_result) != NIL)) {	\
+		if (sig_result && (! IS_NIL(sig_result))) {		\
 			result = sig_result;				\
 		}							\
 	}
@@ -711,8 +711,8 @@ toy_resolv_object(Toy_Interp *interp, Toy_Type *object) {
     Cell *msg;
 
     switch (GET_TAG(object)) {
-    case NIL:
-	val = hash_get_t(interp->classes, const_NilClass);
+    case BOOL:
+	val = hash_get_t(interp->classes, const_Bool);
 	break;
     case CLOSURE:
 	val = hash_get_t(interp->classes, const_Block);

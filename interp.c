@@ -209,7 +209,7 @@ interp_setup(Toy_Interp* interp, int argc, char **argv, char **envp) {
     /* make world */
 
     toy_add_class(interp, L"Functions", interp->funcs, delegate);
-    toy_add_class(interp, L"Nil", NULL, delegate);
+    toy_add_class(interp, L"Bool", NULL, delegate);
     toy_add_class(interp, L"Integer", NULL, delegate);
     toy_add_class(interp, L"Real", NULL, delegate);
     toy_add_class(interp, L"String", NULL, delegate);
@@ -524,10 +524,10 @@ get_stack_trace(Toy_Interp *interp, Cell *stack) {
 		 get_script_path(interp, interp->func_stack[interp->cur_func_stack]->script_id),
 		 interp->trace_info->line,
 		 to_print(interp->trace_info->statement),
-		 (GET_TAG(interp->func_stack[interp->cur_func_stack]->trace_info->object_name) != NIL ?
-		  to_string(interp->func_stack[interp->cur_func_stack]->trace_info->object_name) : L"self"),
+		 ((! IS_NIL(interp->func_stack[interp->cur_func_stack]->trace_info->object_name)) ?
+		     to_string(interp->func_stack[interp->cur_func_stack]->trace_info->object_name) : L"self"),
 		 (interp->func_stack[interp->cur_func_stack]->trace_info->func_name ?
-		  to_string(interp->func_stack[interp->cur_func_stack]->trace_info->func_name) : L"???"));
+		     to_string(interp->func_stack[interp->cur_func_stack]->trace_info->func_name) : L"???"));
 	buff[255] = 0;
 	cell_add_str(stack, buff);
     }
@@ -537,7 +537,7 @@ get_stack_trace(Toy_Interp *interp, Cell *stack) {
 		 get_script_path(interp, interp->func_stack[i-1]->script_id),
 		 interp->func_stack[i]->trace_info->line,
 		 to_print(interp->func_stack[i]->trace_info->statement),
-		 (GET_TAG(interp->func_stack[i-1]->trace_info->object_name) != NIL ?
+		 ((! IS_NIL(interp->func_stack[i-1]->trace_info->object_name)) ?
 		  		to_string(interp->func_stack[i-1]->trace_info->object_name) : L"self"),
 		 (interp->func_stack[i-1]->trace_info->func_name ?
 		  		to_string(interp->func_stack[i-1]->trace_info->func_name) : L"???"));

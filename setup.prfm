@@ -11,7 +11,7 @@ else: {
     $@BUILT-IN-CLASSES set Functions t;
     $@BUILT-IN-CLASSES set Integer t;
     $@BUILT-IN-CLASSES set List t;
-    $@BUILT-IN-CLASSES set Nil t;
+    $@BUILT-IN-CLASSES set Bool t;
     $@BUILT-IN-CLASSES set Object t;
     $@BUILT-IN-CLASSES set Real t;
     $@BUILT-IN-CLASSES set RQuote t;

@@ -15,12 +15,13 @@
 #include "cstack.h"
 
 Toy_Type*
-new_nil() {
+new_bool(int val) {
     Toy_Type *o;
     o = GC_MALLOC_ATOMIC(sizeof(Toy_Type));
     ALLOC_SAFE(o);
 
-    o->tag = NIL;
+    o->tag = BOOL;
+    o->u.bool.value = val;
     return o;
 }
 
@@ -567,7 +568,7 @@ toy_clone(Toy_Type *obj) {
 }
 
 static wchar_t *toy_type_char[] = {
-    L"NIL",
+    L"BOOL",
     L"SYMBOL",
     L"REF",
     L"LIST",
@@ -612,8 +613,12 @@ to_string(Toy_Type *obj) {
     if (! IS_TOY_OBJECT(obj)) return L"(unknown)";
 
     switch (GET_TAG(obj)) {
-    case NIL:
-	return S_NIL;
+    case BOOL:
+	if (obj->u.bool.value == FALSE) {
+	    return S_NIL;
+	} else {
+	    return S_T;
+	}
 
     case SYMBOL:
 	return cell_get_addr(obj->u.symbol.cell);
@@ -801,7 +806,7 @@ to_string(Toy_Type *obj) {
 	c = new_cell(L"(");
 	l = obj->u.func.argspec->list;
 	while (! IS_LIST_NULL(l)) {
-	    if (list_get_item(l) == NIL) break;
+//***	    if (list_get_item(l) == NIL) break;
 	    cell_add_str(c, to_print(list_get_item(l)));
 	    if (list_length(l) > 1) cell_add_char(c, L' ');
 	    l = list_next(l);
@@ -908,7 +913,7 @@ to_string(Toy_Type *obj) {
 	l = obj->u.bind_var;
 	c = new_cell(L"| ");
 	while (! IS_LIST_NULL(l)) {
-	    if (list_get_item(l) == NIL) break;
+//***	    if (list_get_item(l) == NIL) break;
 	    cell_add_str(c, to_print(list_get_item(l)));
 	    if (list_length(l) > 1) cell_add_char(c, L' ');
 	    l = list_next(l);
@@ -940,8 +945,12 @@ to_print(Toy_Type *obj) {
     if (! IS_TOY_OBJECT(obj)) return L"(unknown)";
 
     switch (GET_TAG(obj)) {
-    case NIL:
-	return S_NIL;
+    case BOOL:
+	if (obj->u.bool.value == FALSE) {
+	    return S_NIL;
+	} else {
+	    return S_T;
+	}
 
     case SYMBOL:
 	return cell_get_addr(obj->u.symbol.cell);
@@ -1157,7 +1166,7 @@ to_print(Toy_Type *obj) {
 	c = new_cell(L"(");
 	l = obj->u.func.argspec->list;
 	while (! IS_LIST_NULL(l)) {
-	    if (list_get_item(l) == NIL) break;
+//***	    if (list_get_item(l) == NIL) break;
 	    cell_add_str(c, to_print(list_get_item(l)));
 	    if (list_length(l) > 1) cell_add_char(c, L' ');
 	    l = list_next(l);

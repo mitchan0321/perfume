@@ -8,7 +8,7 @@
 
 void def_global() {
     const_Symbol = new_symbol(L"Symbol");
-    const_NilClass = new_symbol(L"Nil");
+    const_Bool = new_symbol(L"Bool");
     const_Block = new_symbol(L"Block");
     const_List = new_symbol(L"List");
     const_Real = new_symbol(L"Real");
@@ -22,8 +22,8 @@ void def_global() {
     const_Vector = new_symbol(L"Vector");
     const_Bulk = new_symbol(L"Bulk");
     const_Coro = new_symbol(L"Coro");
-    const_Nil = new_nil();
-    const_T = new_symbol(L"t");
+    const_Nil = new_bool(FALSE);
+    const_T = new_bool(TRUE);
     const_Question = new_symbol(L"?");
     const_Holder = new_symbol(L"@holder");
     const_Init = new_symbol(L"init");

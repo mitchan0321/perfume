@@ -10,8 +10,8 @@ Object method ?? (a) {
     if [block? [self]] {return [[[self] eval] ?? $a]};
     return [self];
 };
-Nil method ?? (a) {
+Bool method ?? (a) {
+    if {! [nil? [self]]} {return t};
     if [block? $a] {return [$a eval]};
     return $a;
 };
-defun t (*) {return t};

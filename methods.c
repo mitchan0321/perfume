@@ -1927,7 +1927,7 @@ mth_list_filter(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
 	    ret = toy_yield(interp, block, new_list(self));
 	}
 	if (GET_TAG(ret) == EXCEPTION) return ret;
-	if (GET_TAG(ret) != NIL) {
+	if (! IS_NIL(ret)) {
 	    l = list_append(l, list_get_item(self));
 	}
 	self = list_next(self);
@@ -2635,13 +2635,13 @@ mth_string_match(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
 
     /* parse option */
     t_case = hash_get_and_unset_t(nameargs, const_nocase);
-    if ((t_case == NULL) || (GET_TAG(t_case) == NIL)) t_case = NULL;
+    if ((t_case == NULL) || (IS_NIL(t_case))) t_case = NULL;
 
     t_all = hash_get_and_unset_t(nameargs, const_all);
-    if ((t_all == NULL) || (GET_TAG(t_all) == NIL)) t_all = NULL;
+    if ((t_all == NULL) || (IS_NIL(t_all))) t_all = NULL;
 
     t_grep = hash_get_and_unset_t(nameargs, const_grep);
-    if ((t_grep == NULL) || (GET_TAG(t_grep) == NIL)) t_grep = NULL;
+    if ((t_grep == NULL) || (IS_NIL(t_grep))) t_grep = NULL;
     
     if (hash_get_length(nameargs) > 0) goto error;
 
@@ -3823,7 +3823,7 @@ mth_file_setnewline(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int a
     f = container->u.container;
 
     flag = list_get_item(posargs);
-    if (GET_TAG(flag) == NIL) {
+    if (IS_NIL(flag)) {
 	f->newline = 0;
 	return const_Nil;
     } else {
@@ -4143,7 +4143,7 @@ mth_file_setnoblock(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int a
     if (hash_get_length(nameargs) > 0) goto error;
 
     flag = list_get_item(posargs);
-    if (GET_TAG(flag) == NIL) {
+    if (IS_NIL(flag)) {
 	iflag = 0;	// mark normal (read block)
     } else {
 	iflag = 1;	// mark non-block (read non-block)
@@ -4441,7 +4441,7 @@ mth_dict_keys(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     o = SELF(interp);
     if (GET_TAG(o) != DICT) goto error2;
 
-    if (string_flag && (GET_TAG(string_flag) != NIL)) {
+    if (string_flag && (! IS_NIL(string_flag))) {
 	return hash_get_keys_str(o->u.dict);
     }
     return hash_get_keys(o->u.dict);
@@ -4466,7 +4466,7 @@ mth_dict_pairs(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     o = SELF(interp);
     if (GET_TAG(o) != DICT) goto error2;
     
-    if (string_flag && (GET_TAG(string_flag) != NIL)) {
+    if (string_flag && (! IS_NIL(string_flag))) {
 	return hash_get_pairs_str(o->u.dict);
     }
     return hash_get_pairs(o->u.dict);

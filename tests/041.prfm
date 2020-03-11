@@ -18,15 +18,15 @@ defun prime-fact-sub (n s) {
 	return;
     };
 
-    f := 2;
-    t ::= $n sqrt;
-    while {$f <= $t} do: {
-        if {[$n % $f] = 0}
+    from := 2;
+    to ::= $n sqrt;
+    while {$from <= $to} do: {
+        if {[$n % $from] = 0}
         then: {
-            add-fact $f $s;
-            goto prime-fact-sub [$n / $f] $s;
+            add-fact $from $s;
+            goto prime-fact-sub [$n / $from] $s;
         };
-        f ::= nextprime* $f;
+        from ::= nextprime* $from;
     };
 };
 
