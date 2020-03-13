@@ -4,14 +4,41 @@
 Object method ? () {self};
 
 #
-# Object::?? val as Nil coalescing operator.
+# Object::?? val --- Nil coalescing operator.
 #
 Object method ?? (a) {
-    if [block? [self]] {return [[[self] eval] ?? $a]};
     return [self];
 };
+
+Block method ?? (a) {
+    return [[[self] eval] ?? $a];
+};
+
 Bool method ?? (a) {
-    if {! [nil? [self]]} {return t};
+    if {nil? [self]} else: {return <t>};
     if [block? $a] {return [$a eval]};
     return $a;
+};
+
+#
+# Object::??? true-val false-val --- 3 operand operater.
+#
+Object method ??? (a b) {
+    return $a;
+};
+
+Block method ??? (a b) {
+    return [[[self] eval] ??? $a $b];
+};
+
+Bool method ??? (a b) {
+    if [self]
+    then: {
+        if {block? $a} {return [$a eval]};
+	return $a;
+    }
+    else: {
+        if {block? $b} {return [$b eval]};
+	return $b;
+    };
 };
