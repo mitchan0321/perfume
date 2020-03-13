@@ -11,20 +11,20 @@ defun exec (args: args) {
     out := $d,left;
     OUT ::= new File;
     $OUT set! $out mode: o;
-    $OUT set-newline t;
+    $OUT set-newline <t>;
     $OUT set-nobuffer;
 
     in := $d,right;
     IN ::= new File;
     $IN set! $in mode: i;
-    $IN set-newline nil;
+    $IN set-newline <nil>;
     $IN set-nobuffer;
     if {true? CO-MODE} then: {$IN set-noblock t};
 
     err := $d,error;
     ERR ::= new File;
     $ERR set! $err mode: i;
-    $ERR set-newline nil;
+    $ERR set-newline <nil>;
     $ERR set-nobuffer;
     if {true? CO-MODE} then: {$ERR set-noblock t};
 

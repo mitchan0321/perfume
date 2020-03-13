@@ -4,7 +4,7 @@ defun cat (native-value: nv
 	   args: files) {
 
     standard-io-command-templ
-	native-value: nil
+	native-value: <nil>
 	files: $files
 	driver: [fun (file file-name native-value) {
 	    cat-sub $file;

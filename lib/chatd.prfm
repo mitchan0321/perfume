@@ -21,7 +21,7 @@ defun chatd () {
 	    f ::= new File;
 	    $f set! $fd mode: io;
 	    $f set-encoding UTF-8;
-	    $f set-newline t;
+	    $f set-newline <t>;
 	    $client-list set $fd $f;
 	    $client-addr set $fd ["%v:%v" fmt [host-address-string $addr] $port];
 	    println "Connect client from " $client-addr,$fd;

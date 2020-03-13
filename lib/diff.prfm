@@ -47,13 +47,13 @@ defun diff (bpath
  
     # display edit graph
     if [set? disp] {
-        _dsw := nil;
+        _dsw := <nil>;
         println "# Before source list(b): " $b-src;
         println "# After source list(a):  " $a-src;
         println "# Edit graph:";
         println "#   \\ (a)";
         0 each to: [[$b-src len] - 1] do: {| bidx |
-            if $_dsw {print "#     "} {print "# (b) "; _dsw := t};
+            if $_dsw {print "#     "} {print "# (b) "; _dsw := <t>};
             0 each to: [[$a-src len] - 1] do: {| aidx |
                 print [if [diff-has-slant $bidx $aidx $b-src $a-src] {result "\\"} {result "."}];
             };
@@ -82,8 +82,8 @@ defun diff-heuristic () {
     broot := 0;                         # root for b-axis, start point is 0
     aroot := 0;                         # root for a-axis, start point is 0
     if [[$bmax - $broot] >= [$amax - $aroot]] {basedir := b} {basedir := a};
-    bcost-avail := nil;
-    acost-avail := nil;
+    bcost-avail := <nil>;
+    acost-avail := <nil>;
     
     while {or [$broot < $bmax] [$aroot < $amax]} do: {
         if [$broot = $bmax] {
@@ -118,8 +118,8 @@ defun diff-heuristic () {
             acost ::= diff-right-cost $broot $bmax $aroot $amax $b-src $a-src;
         };
 
-        bcost-avail := nil;
-        acost-avail := nil;
+        bcost-avail := <nil>;
+        acost-avail := <nil>;
 
 	# adjust direction
 	fixdir := $basedir;
@@ -127,8 +127,8 @@ defun diff-heuristic () {
         [or [$bcost = $acost] [and [$bcost <= -1] [$acost <= -1]]] {
             # if same cost (or -1), keep previous direction.
 	    if [$bcost = -1] {
-	        bcost-avail := nil;
-		acost-avail := nil;
+	        bcost-avail := <nil>;
+		acost-avail := <nil>;
 	    }
 	    break;
         }
@@ -153,15 +153,15 @@ defun diff-heuristic () {
 	b {
             $broot ++;
             $path append! (b $b-src,$broot);
-            acost-avail := nil;
-	    bcost-avail := t;
+            acost-avail := <nil>;
+	    bcost-avail := <t>;
 	    $bcost --;
 	}
 	a {
             $aroot ++;
             $path append! (a $a-src,$aroot);
-            acost-avail := t;
-	    bcost-avail := nil;
+            acost-avail := <t>;
+	    bcost-avail := <nil>;
 	    $acost --;
         };
     };
@@ -274,10 +274,10 @@ defun diff-display () {
 defun diff-has-slant (bidx aidx b-src a-src) {
     try {
         if [$b-src,[$bidx + 1] = $a-src,[$aidx + 1]] {
-            return t;
+            return <t>;
         };
-        return nil;
-    } catch: {return nil};
+        return <nil>;
+    } catch: {return <nil>};
 };
 
 defun diff-down-cost (broot bmax aroot amax b-src a-src) {

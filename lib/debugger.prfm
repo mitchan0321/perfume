@@ -4,26 +4,26 @@ if {defvar? @BREAKPOINT} else: {defvar @BREAKPOINT [dict]};
 if {defvar? @BREAKINFO}  else: {defvar @BREAKINFO  [dict]};
 if {defvar? @DEBUGOUT}   else: {defvar @DEBUGOUT   $stderr};
 if {defvar? @DEBUGIN}    else: {defvar @DEBUGIN    $stdin};
-if {defvar? @DEBUGSTEP}  else: {defvar @DEBUGSTEP  nil};
-if {defvar? @DEBUGNAME}  else: {defvar @DEBUGNAME  nil};
+if {defvar? @DEBUGSTEP}  else: {defvar @DEBUGSTEP  <nil>};
+if {defvar? @DEBUGNAME}  else: {defvar @DEBUGNAME  <nil>};
 if {defvar? @DEBUGSTACK} else: {defvar @DEBUGSTACK [vector]};
-if {defvar? @DEBUGNEXTP} else: {defvar @DEBUGNEXTP nil};
+if {defvar? @DEBUGNEXTP} else: {defvar @DEBUGNEXTP <nil>};
 if {defvar? @DEBUGNEXTL} else: {defvar @DEBUGNEXTL -1};
 if {defvar? @DEBUGNEXTS} else: {defvar @DEBUGNEXTS -1};
-if {defvar? @DEBUGTRAP}  else: {defvar @DEBUGTRAP  nil};
+if {defvar? @DEBUGTRAP}  else: {defvar @DEBUGTRAP  <nil>};
 if {defvar? @DEBUGMODE}  else: {defvar @DEBUGMODE  step};
 
 defun debugger (off: off) {
     if {set? off} then: {
 	debug 0;
 	if {block? $@DEBUGTRAP}
-            then: {trap SIGINT $@DEBUGTRAP; setvar @DEBUGTRAP nil}
+            then: {trap SIGINT $@DEBUGTRAP; setvar @DEBUGTRAP <nil>}
 	;
     } else: {
 	debug 1;
 	println file: $stderr "Debugger turned on, help for enter \".h\".";
 	if {nil? $@DEBUGTRAP}
-	    then: {setvar @DEBUGTRAP [trap SIGINT];  trap SIGINT {setvar @DEBUGSTEP t}}
+	    then: {setvar @DEBUGTRAP [trap SIGINT];  trap SIGINT {setvar @DEBUGSTEP <t>}}
 	;
     };
 
@@ -82,7 +82,7 @@ defun .b (args: args) {
     };
     
     path ::= __debug-name-to-path $name;
-    $@BREAKPOINT set [__debug-make-key $path $line] t;
+    $@BREAKPOINT set [__debug-make-key $path $line] <t>;
 };
 
 defun .c (args: args) {
@@ -129,7 +129,7 @@ defun .ls (args: args) {
     
     path ::= __debug-name-to-path $name;
     x := `File($path mode: i);
-    $x set-newline nil;
+    $x set-newline <nil>;
 
     i := 0;
     $x each do: {| r |
@@ -145,7 +145,7 @@ defun .ls (args: args) {
 defun .l () {
     path := $@BREAKINFO,path;
     x := `File($path mode: i);
-    $x set-newline nil;
+    $x set-newline <nil>;
 
     n := $@BREAKINFO,line;
     f ::= $n - 8;
@@ -189,7 +189,7 @@ defun .u () {
     if {$i = 0} then: {println file: $@DEBUGOUT "DEBUG: Already stack top."; return};
     $i --;
     d ::= $@DEBUGSTACK get $i;
-    if {$i > 0} then: {d2 ::= $@DEBUGSTACK get [$i - 1]} else: {d2 := nil};
+    if {$i > 0} then: {d2 ::= $@DEBUGSTACK get [$i - 1]} else: {d2 := <nil>};
     $@BREAKINFO set line      $d,line;
     $@BREAKINFO set object    $d,object;
     $@BREAKINFO set function  $d,function;
@@ -210,7 +210,7 @@ defun .d () {
     if {$i >= [[$@DEBUGSTACK len] - 1]} then: {println file: $@DEBUGOUT "DEBUG: Already stack bottom."; return};
     $i ++;
     d ::= $@DEBUGSTACK get $i;
-    if {$i > 0} then: {d2 ::= $@DEBUGSTACK get [$i - 1]} else: {d2 := nil};
+    if {$i > 0} then: {d2 ::= $@DEBUGSTACK get [$i - 1]} else: {d2 := <nil>};
     $@BREAKINFO set line      $d,line;
     $@BREAKINFO set object    $d,object;
     $@BREAKINFO set function  $d,function;
@@ -232,7 +232,7 @@ defun .s () {
 };
 
 defun .s-sub () {
-    setvar @DEBUGSTEP t;
+    setvar @DEBUGSTEP <t>;
 
     throw NEXT;
 };
@@ -252,12 +252,12 @@ defun .n-sub () {
 
 defun .o (args: n) {
     if {$n null?} then: {
-	if {$@BREAKINFO,stack <= 0} then: {return nil};
+	if {$@BREAKINFO,stack <= 0} then: {return <nil>};
 	[$@BREAKINFO,stack - 1] each to: 0 do: {| i |
 	    d := $@DEBUGSTACK,$i;
 	    if {nil? $d,object} else: {return $d,object};
 	};
-	return nil;
+	return <nil>;
     };
 
     d := $@DEBUGSTACK,[$n get 0];
@@ -274,19 +274,19 @@ defun __debug-name-to-path (name) {
     sid ::= sid $name;
     if {nil? $sid} then: {throw DEBUGGER "No such function or class."};
     
-    path ::= sdir : filter {| i | if {$i,0 = $sid} then: t} : map {| i | result $i,1} : get 0;
+    path ::= sdir : filter {| i | if {$i,0 = $sid} then: <t>} : map {| i | result $i,1} : get 0;
     if {nil? $path} then: {throw DEBUGGER "No such function or class."};
 
     return $path;
 };
 
 defun __debug-make-key (path line) {
-    return ["" . $path ":" ["%3d" fmt $line]];
+    return ["%v:%05d" fmt $path $line];
 };
 
 defun __debug-interp (local) {
     tty ::= new File init: ("/dev/tty" mode: io);
-    $tty set-newline t;
+    $tty set-newline <t>;
     setvar @DEBUGOUT $tty;
     setvar @DEBUGIN  $tty;
 
@@ -320,8 +320,8 @@ defun __debug-main-loop () {
 
 	if {nil? $__debug-r__} then: {
 	    println file: $@DEBUGOUT "";
-	    setvar @DEBUGSTEP nil;
-	    setvar @DEBUGNEXTP nil;
+	    setvar @DEBUGSTEP <nil>;
+	    setvar @DEBUGNEXTP <nil>;
 	    setvar @DEBUGNEXTL -1;
 	    setvar @DEBUGNEXTS -1;
 	    return;
@@ -369,7 +369,7 @@ defun debug-hook (line object function statement path dict stack_index
 
 	# enter debugger by out-of-scope by next line (return detect).
 						    
-	setvar @DEBUGNEXTP nil;
+	setvar @DEBUGNEXTP <nil>;
 	setvar @DEBUGNEXTL -1;
 	setvar @DEBUGNEXTS -1;
 
@@ -385,7 +385,7 @@ defun debug-hook (line object function statement path dict stack_index
         if {and [$path = $@DEBUGNEXTP] 
 		[! [eq? $line $@DEBUGNEXTL]]}
 	then: {
-	    setvar @DEBUGNEXTP nil;
+	    setvar @DEBUGNEXTP <nil>;
 	    setvar @DEBUGNEXTL -1;
 	    setvar @DEBUGNEXTS -1;
 
@@ -399,9 +399,9 @@ defun debug-hook (line object function statement path dict stack_index
 
     # enter debugger by step execution.
 
-    if {eq? t $@DEBUGSTEP}
+    if {eq? <t> $@DEBUGSTEP}
     then: {
-	setvar @DEBUGSTEP nil;
+	setvar @DEBUGSTEP <nil>;
 
 	debug-hook-sub $line $object $function $statement
 	    $path $dict $stack_index $where_func [where : reverse];

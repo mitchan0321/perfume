@@ -3,7 +3,7 @@
 #
 defun load-func (s force: force) {
     if {! [set? force]} then: {
-	if [dict-func : set? $s] then: {return nil};
+	if [dict-func : set? $s] then: {return <nil>};
     };
 
     dict-func : unset $s;
@@ -11,23 +11,23 @@ defun load-func (s force: force) {
 	try {unset p; alias up: 1 __fname__ p};
 	set p [$f . "/" $s ".prfm"];
 	uplevel {try {load $__fname__} catch: {}; unset __fname__};
-	if [dict-func : set? $s] then: {return t};
+	if [dict-func : set? $s] then: {return <t>};
     };
     throw ErrNoFunction ["No such function, '" . $s "'."];
 };
 
 defun load-class (s force: force) {
     if {! [set? force]} then: {
-	if [dict-class : set? $s] then: {return nil};
+	if [dict-class : set? $s] then: {return <nil>};
     };
-    if {$@BUILT-IN-CLASSES set? $s} then: {return nil};
+    if {$@BUILT-IN-CLASSES set? $s} then: {return <nil>};
     
     dict-class : unset $s;
     $LIB_PATH each do: {| f |
 	try {unset p; alias up: 1 __fname__ p};
 	set p [$f . "/" $s ".prfm"];
 	uplevel {try {load $__fname__} catch: {}; unset __fname__};
-	if [dict-class : set? $s] then: {return t};
+	if [dict-class : set? $s] then: {return <t>};
     };
     throw ErrNoClass ["No such class, '" . $s "'."];
 };
@@ -60,7 +60,7 @@ defun apply-constructor () {
 defun apply-constructor-sub (o) {
     set s [symbol ["__init__" . $o]];
     if [sets? $s] then: {return};
-    sets $s t;
+    sets $s <t>;
 
     set l [$o delegate?];
     if {$l null?} then: {return};
@@ -147,7 +147,7 @@ begin {
 	            return [$lstack >>];
                 }
 	    
-	        t {
+	        <t> {
 		    if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
 	            i1 ::= $lstack >>;
 		    $lstack << [$i1 $item];
@@ -175,7 +175,7 @@ begin {
 # This functions are pipe utility command suite.
 #
 defun >@ (body) {
-    result := nil;
+    result := <nil>;
     $stdin each do: {| i |
 	dict-closure $body : set _ $i;
 	result ::= yield $body;
