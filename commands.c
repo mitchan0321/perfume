@@ -3601,6 +3601,20 @@ error:
 }
 
 Toy_Type*
+cmd_isbool(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) != 0) goto error;
+
+    if (GET_TAG(list_get_item(posargs)) == BOOL) return const_T;
+    return const_Nil;
+
+error:
+    return new_exception(TE_SYNTAX,
+			 L"Syntax error at 'nil?', syntax: bool? val", interp);
+}
+
+Toy_Type*
 cmd_islist(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 
     if (arglen != 1) goto error;
@@ -4205,6 +4219,7 @@ int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, L"stack-list", cmd_stacklist, 		NULL);
     toy_add_func(interp, L"symbol?", 	cmd_issymbol, 		L"val");
     toy_add_func(interp, L"nil?", 	cmd_isnil, 		L"val");
+    toy_add_func(interp, L"bool?", 	cmd_isbool, 		L"val");
     toy_add_func(interp, L"list?", 	cmd_islist, 		L"val");
     toy_add_func(interp, L"integer?", 	cmd_isinteger, 		L"val");
     toy_add_func(interp, L"real?", 	cmd_isreal, 		L"val");
