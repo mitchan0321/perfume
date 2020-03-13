@@ -13,8 +13,8 @@ REM {
     0x21 each to: 0x7e do: {| x |
         0x21 each to: 0x7e do: {| y |
             (sx sy) ::= jis2sjis $x $y;
-            $xdic set ["%02x" fmt $sx t] 1;
-            $ydic set ["%02x" fmt $sy t] 1;
+            $xdic set ["%02x" fmt $sx] 1;
+            $ydic set ["%02x" fmt $sy] 1;
         };
     };
     println [lsort [[$xdic keys] map {| x | "" . $x}]];    # 0x81 .. 0x9f, 0xe0 .. 0xef

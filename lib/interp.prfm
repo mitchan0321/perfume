@@ -13,7 +13,7 @@ defun interp () {
 };
 
 defun interp-co () {
-    if {defvar? INTERACTIVE} else: {defvar INTERACTIVE t};
+    if {defvar? INTERACTIVE} else: {defvar INTERACTIVE <t>};
     set __local_var [dict];	# for eval local environment
 
     $stdin clear;
@@ -59,10 +59,10 @@ defun interp-co () {
         } catch: {| __exp |
             case [$__exp car]
 	        WarnParseClose {
-		    set __cont__ t;
+		    set __cont__ <t>;
 	        }
 		WarnParseString {
-		    set __cont__ t;
+		    set __cont__ <t>;
 	        }
 	        default: {
 		    println "EXCEPTION: <" [$__exp car] "># " [$__exp cdr];

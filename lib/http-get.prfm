@@ -10,12 +10,12 @@ defun http-get (host location port: port) {
 	in ::= new File;
 	$in set! $fd mode: i;
 	$in set-nobuffer;
-	$in set-newline t;
+	$in set-newline <t>;
 
 	out ::= new File;
 	$out set! $fd mode: o;
 	$out set-nobuffer;
-	$out set-newline t;
+	$out set-newline <t>;
 	
 	#
 	# send request

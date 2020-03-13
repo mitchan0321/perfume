@@ -7,6 +7,6 @@ defun fizzbuzz () {
             {[$i % 15] = 0} {break "FizzBuzz"}
             {[$i % 3] = 0}  {break "Fizz"}
             {[$i % 5] = 0}  {break "Buzz"}
-            t               $i
+            <t>             $i
     } : each do: {| i | println $i};
 };

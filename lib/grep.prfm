@@ -6,7 +6,7 @@ defun grep (pat
 	    args: files) {
 
     standard-io-command-templ
-	native-value: nil
+	native-value: <nil>
 	files: $files
 	driver: [fun (file file-name native-value) {
 	    grep-sub $file $file-name $pat;
