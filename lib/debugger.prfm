@@ -55,7 +55,7 @@ defun .h () {
     println file: $@DEBUGOUT "  .s               - Enter step mode, stop at next step.";
     println file: $@DEBUGOUT "  (enter)          - Step mode: Step execution and break.";
     println file: $@DEBUGOUT "                     Line mode: Line execution and break.";
-    println file: $@DEBUGOUT "  (ctrl-d)         - Continue execution.";
+    println file: $@DEBUGOUT "  (ctrl-d) or .q   - Continue execution.";
     println file: $@DEBUGOUT "  (ctrl-c)         - Enter debugger when program is running.";
     println file: $@DEBUGOUT "[Variable]";
     println file: $@DEBUGOUT "  .o               - Return current object, may be self.";
@@ -281,7 +281,7 @@ defun __debug-name-to-path (name) {
 };
 
 defun __debug-make-key (path line) {
-    return ["%v:%05d" fmt $path $line];
+    return ["%v:%d" fmt $path $line];
 };
 
 defun __debug-interp (local) {
@@ -318,7 +318,7 @@ defun __debug-main-loop () {
 	print file: $@DEBUGOUT "DEBUG(" $@DEBUGMODE ")> ";
 	__debug-r__ ::= $@DEBUGIN gets :nonewline;
 
-	if {nil? $__debug-r__} then: {
+	if {or {nil? $__debug-r__} {eq? $__debug-r__ ".q"}} then: {
 	    println file: $@DEBUGOUT "";
 	    setvar @DEBUGSTEP <nil>;
 	    setvar @DEBUGNEXTP <nil>;
