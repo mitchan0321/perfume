@@ -7,7 +7,7 @@ defun ncat (fmt: fmt
     if {set? fmt} else: {fmt := "%5d"};
 
     standard-io-command-templ
-	native-value: nil
+	native-value: <nil>
 	files: $files
 	driver: [fun (file file-name native-value) {
 	    ncat-sub $file $fmt;

@@ -25,10 +25,10 @@ defun make-proxy-sub (o h) {
 
 	case [type? [$o var? $m]]
 	NATIVE {
-	    if {$h set? $m} else: {$h set $m t};
+	    if {$h set? $m} else: {$h set $m <t>};
 	}
 	FUNC {
-	    if {$h set? $m} else: {$h set $m t};
+	    if {$h set? $m} else: {$h set $m <t>};
 	};
     };
 

@@ -13,7 +13,7 @@ defun pipe (in: in out: out append: append args: blocks) {
     # if in: is list, recurcive call
     #
     if {set? in} then: {
-	s := nil;
+	s := <nil>;
 	if {list? $in} then: {
 	    $in each do: {| i |
 		l := (in: $i);
@@ -183,14 +183,14 @@ defun pipe-check-done-cond (blist) {
 	};
     };
 
-    if {eq? [$blist last : item : stat?] DONE} then: {return t};
+    if {eq? [$blist last : item : stat?] DONE} then: {return <t>};
     
     $blist each do: {| b |
-	if {eq? [$b stat?] DONE} else: {return nil};
+	if {eq? [$b stat?] DONE} else: {return <nil>};
     };
 
     # all co-routines are done.
-    return t;
+    return <t>;
 };
 
 defun pipe-release (blist flist) {

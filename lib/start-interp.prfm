@@ -12,5 +12,5 @@ then: {
 
 defun start-interp () {
     [dict-func] unset start-interp;
-    return t;
+    return <t>;
 };

@@ -4,7 +4,7 @@ load-func standard-io-command-templ;
 defun wc (native-value: nv
 	  args: files) {
 
-    nv ::= if [true? nv] t nil;
+    nv ::= if [true? nv] <t> <nil>;
 
     standard-io-command-templ
 	native-value: $nv
