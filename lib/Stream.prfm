@@ -6,7 +6,7 @@
 #   Impliment methods are:
 #     Stream::eof?   --- is eof?
 #     Stream::close  --- close stream object.
-#     Stream::ready? --- if available internal buffer then return t.
+#     Stream::ready? --- if available internal buffer then return <t>.
 #     Stream::puts   --- put string.
 #     Stream::gets   --- get string.
 #     Stream::flush  --- flush internal buffer.
@@ -27,31 +27,31 @@ class Stream;
 
 Stream method init (args: a) {
     sets queue ();
-    sets eof nil;
-    sets co nil;
+    sets eof <nil>;
+    sets co <nil>;
     sets name "";
     if [and [set? a] [! [$a null?]]] then: {sets name [$a item]};
     sets limit 512;
 #    sets limit 5;	# for debug
     sets count 0;
-    sets newline nil;
+    sets newline <nil>;
 };
 
 Stream method eof? () {
-    if [! [$queue null?]] then: {return nil};
+    if [! [$queue null?]] then: {return <nil>};
     return $eof;
 };
 
 Stream method close () {
-    sets eof t;
+    sets eof <t>;
 };
 
 Stream method clear () {
-    sets eof nil;
+    sets eof <nil>;
 };
 
 Stream method ready? (timeout: timeout) {
-    if [$queue null?] then: nil else: t;
+    if [$queue null?] then: <nil> else: <t>;
 };
 
 Stream method puts (nonewline: nonewline args: r) {
@@ -78,11 +78,11 @@ Stream method puts-sub (i) {
     };
     $count ++;
 
-    return t;
+    return <t>;
 };
 
 Stream method gets (nonewline: nonewline) {
-    if [eof?] then: {return nil};
+    if [eof?] then: {return <nil>};
     
     while {$queue null?} do: {
 	if $co then: {
@@ -90,7 +90,7 @@ Stream method gets (nonewline: nonewline) {
 	} else: {
 	    throw ErrFileAccess "Stream is no data.";
         };
-	if [eof?] then: {return nil};
+	if [eof?] then: {return <nil>};
     };
     
     $count --;
@@ -99,11 +99,11 @@ Stream method gets (nonewline: nonewline) {
 };
 
 Stream method flush () {
-    return t;
+    return <t>;
 };
 
 Stream method stat () {
-    return ((fd . nil) (mode . io) (path . $name) (eof . $eof)
+    return ((fd . <nil>) (mode . io) (path . $name) (eof . $eof)
 	    (limit . $limit) (count . $count) (newline . $newline));
 };
 
@@ -116,7 +116,7 @@ Stream method each (do: body) {
 };
 
 Stream method set-comode () {
-    sets co t;
+    sets co <t>;
 };
 
 Stream method set-limit (l) {

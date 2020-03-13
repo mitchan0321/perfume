@@ -20,7 +20,7 @@ Integer method P (k) {
 
 Integer method isprime () {
     if {[[self] - 1 : nextprime] = [self]}
-        t
-	nil
+        <t>
+	<nil>
     ;
 };

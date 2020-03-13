@@ -17,9 +17,9 @@ PipeWrapper method init (in out body) {
     sets infile "";
     sets outfile "";
     sets error "";
-    sets result nil;
+    sets result <nil>;
     sets PipeObject [self];
-    sets @term-hook nil;
+    sets @term-hook <nil>;
 };
 
 PipeWrapper method stat? () {
@@ -34,7 +34,7 @@ PipeWrapper method run () {
 	    setvar stdout $out;
 	    setvar INFILE $infile;
 	    setvar OUTFILE $outfile;
-	    if {defvar? CO-MODE} else: {defvar CO-MODE t};
+	    if {defvar? CO-MODE} else: {defvar CO-MODE <t>};
 	};
     };
 

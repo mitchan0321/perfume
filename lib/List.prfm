@@ -41,7 +41,7 @@ List method find (obj) {
 	if [eq? $f $obj] then: {return $i};
 	$i ++;
     };
-    return nil;
+    return <nil>;
 };
 
 List method find* (obj) {
@@ -70,7 +70,7 @@ List method reverse () {
 
 List method max () {
     l ::= self;
-    if [$l null?] {return nil};
+    if [$l null?] {return <nil>};
 
     max ::= $l car;
     if [$l cdr] else: {return $max};
@@ -83,7 +83,7 @@ List method max () {
 
 List method min () {
     l ::= self;
-    if [$l null?] {return nil};
+    if [$l null?] {return <nil>};
 
     min ::= $l car;
     if [$l cdr] else: {return $min};
@@ -97,7 +97,7 @@ List method min () {
 List method permutations (n do: body) {
     sum := ();
     permutations-sub $n $sum $body;
-    return nil;
+    return <nil>;
 };
 
 List method permutations-sub (n sum body) {
@@ -119,7 +119,7 @@ List method permutations-sub (n sum body) {
 List method combinations (n do: body) {
     sum := ();
     combinations-sub $n $sum $body;
-    return nil;
+    return <nil>;
 };
 
 List method combinations-sub (n sum body) {

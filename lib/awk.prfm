@@ -4,10 +4,10 @@ defun awk (body
 	   sep: sep
 	   args: files) {
 
-    if {! [set? sep]} {set sep nil};
+    if {! [set? sep]} {set sep <nil>};
     
     standard-io-command-templ
-	native-value: nil
+	native-value: <nil>
 	files: $files
 	driver: [fun (file file-name native-value) {
 	    awk-sub $body $sep $file $file-name;

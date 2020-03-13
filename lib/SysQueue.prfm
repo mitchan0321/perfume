@@ -11,7 +11,7 @@ SysQueue method init () {
 SysQueue method add-queue (
     o 			# object
     e 			# event block
-    once: once		# if event once none nil
+    once: once		# if event once none <nil>
 ) {
     if {set? once} else: {set once 0};
     $queue_add_req append! ($o $e $once);
@@ -23,7 +23,7 @@ SysQueue method remove-queue (o) {
 
 SysQueue method enter-loop () {
     if [sets? __in_loop__] then: {return};
-    sets __in_loop__ t;
+    sets __in_loop__ <t>;
 
     try {
 	enter-loop-sub;
