@@ -49,8 +49,8 @@
 #define	   FALSE                0	/* BOOL value, FALSE */
 #define	   TRUE                 1	/* BOOL value, TRUE */
 
-#define S_NIL	L"nil"
-#define S_T	L"t"
+#define S_NIL	L"<nil>"
+#define S_T	L"<t>"
 
 #define TAG_MASK		(0x000000ff)
 #define GET_TAG(p)		((p==NULL) ? -1 : (TAG_MASK & (p->tag)))
