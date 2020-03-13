@@ -2,10 +2,10 @@
 ()
 abc
 abc
-nil
-t
-nil
-t
-nil
+<nil>
+<t>
+<nil>
+<t>
+<nil>
 (a)
-((a . nil))
+((a . <nil>))
