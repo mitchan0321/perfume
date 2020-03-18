@@ -24,6 +24,7 @@ int	binbulk_alloc_size(BinBulk *bulk, int size);
 int	binbulk_realloc_size(BinBulk *bulk, int size);
 int	binbulk_add_char(BinBulk *bulk, wchar_t c);
 wchar_t	binbulk_get_char(BinBulk *bulk);
+int	binbulk_is_eof(BinBulk *bulk);
 wchar_t	binbulk_set_char(BinBulk *bulk, wchar_t c);
 int	binbulk_seek(BinBulk *bulk, int pos);
 int	binbulk_get_position(BinBulk *bulk);
@@ -31,5 +32,7 @@ int	binbulk_get_capacity(BinBulk *bulk);
 int	binbulk_truncate(BinBulk *bulk, int size);
 int	binbulk_read(BinBulk *bulk, int fd);
 int	binbulk_write(BinBulk *bulk, int fd, int from, int to);
+Cell*	binbulk_base64_encode(BinBulk *bulk, int count_bytes);
+int	binbulk_base64_decode(BinBulk *bulk, Cell *b64);
 
 #endif /* __BINBULK__ */
