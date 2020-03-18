@@ -5188,6 +5188,74 @@ error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
+Toy_Type*
+mth_bulk_base64encode(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *self;
+    BinBulk *bulk;
+    Toy_Type *body;
+    Cell *b64str;
+    Toy_Type *b64obj, *arg, *sts;
+
+    self = SELF(interp);
+    if (GET_TAG(self) != BULK) goto error2;
+    bulk = self->u.bulk;
+
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+    
+    body = list_get_item(posargs);
+    if (GET_TAG(body) != CLOSURE) goto error;
+
+    sts = const_Nil;
+    binbulk_seek(bulk, 0);
+    while (! binbulk_is_eof(bulk)) {
+	b64str = binbulk_base64_encode(bulk, 57);
+	b64obj = new_string_cell(b64str);
+	arg = new_list(b64obj);
+	sts = toy_yield(interp, body, arg);
+	if (GET_TAG(sts) == EXCEPTION) return  sts;
+    }
+    
+    return sts;
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'base64encode', syntax: Bulk base64encode {| b64str | body}", interp);
+
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
+mth_bulk_base64decode(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *self;
+    BinBulk *bulk;
+    Toy_Type *b64str;
+    int sts;
+
+    self = SELF(interp);
+    if (GET_TAG(self) != BULK) goto error2;
+    bulk = self->u.bulk;
+
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+    
+    b64str = list_get_item(posargs);
+    if (GET_TAG(b64str) != STRING) goto error;
+
+    sts = binbulk_base64_decode(bulk, b64str->u.string);
+    if (! sts) {
+	return new_exception(TE_SYNTAX, L"Bad base64 string.", interp);
+    }
+    
+    return const_T;
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'base64decode', syntax: Bulk base64decode string", interp);
+
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
 
 int
 toy_add_methods(Toy_Interp* interp) {
@@ -5370,6 +5438,8 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, L"Bulk", L"truncate", 	mth_bulk_truncate,	L"val");
     toy_add_method(interp, L"Bulk", L"read", 		mth_bulk_read,		L"val");
     toy_add_method(interp, L"Bulk", L"write", 		mth_bulk_write,		L"val");
-    
+    toy_add_method(interp, L"Bulk", L"base64encode",	mth_bulk_base64encode,	L"body");
+    toy_add_method(interp, L"Bulk", L"base64decode",	mth_bulk_base64decode,	L"body");
+
     return 0;
 }
