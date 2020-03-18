@@ -1,0 +1,23 @@
+defun base64 (file decode: decode) {
+    if {set? decode} {
+        goto base64-decode;
+    };
+
+    f := `File($file mode: i);
+    b ::= bulk;
+    $b read [$f fd?];
+    $f close;
+
+    $b base64encode {| i | println $i};
+};
+
+defun base64-decode () {
+    b ::= bulk;
+    $stdin each do: {| i |
+        $b base64decode $i;
+    };
+
+    f := `File($file mode: o);
+    $b write [$f fd?] 0 0;
+    $f close;
+};
