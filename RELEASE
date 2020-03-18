@@ -1,3 +1,4 @@
+2020/03/18	PRFM_20200318		1.4.0_PRE_2
 2020/03/13	PRFM_20200313		1.4.0_PRE_1
 2020/02/21	PRFM_20200221		1.3.0
 2020/02/19	PRFM_20200219		1.2.9_PRE_2
@@ -1245,5 +1246,13 @@
 		Add command bool?.
 	lib/Object.prfm
 		Add method Object::???, 3 operand operator.
+
+2020/03/18
+	binbulk.[ch]
+		Add functions binbulk_base64_encode, binbulk_base64_decode and binbulk_is_eof.
+	methods.c
+		Add methods Bulk::base64encode and Bulk::base64decode.
+	lib/base64.prfm
+		Add utility base64.prfm.
 
 #eof
