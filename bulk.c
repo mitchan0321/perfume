@@ -1,5 +1,3 @@
-/* $Id: bulk.c,v 1.3 2009/07/20 14:32:04 mit-sato Exp $ */
-
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/uio.h>

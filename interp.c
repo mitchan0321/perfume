@@ -1,5 +1,3 @@
-/* $Id: interp.c,v 1.43 2012/03/06 06:09:29 mit-sato Exp $ */
-
 #include <assert.h>
 #include <string.h>
 #include <signal.h>

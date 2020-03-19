@@ -1,5 +1,3 @@
-/* $Id: commands.c,v 1.68 2012/03/06 06:09:27 mit-sato Exp $ */
-
 #define _XOPEN_SOURCE	600	/* define SUSv3 and C99 spec */
 #if __FreeBSD__
 #	define _BSD_SOURCE

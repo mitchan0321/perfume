@@ -1,5 +1,3 @@
-/* $Id: error.h,v 1.14 2011/10/22 12:28:52 mit-sato Exp $ */
-
 #ifndef __ERROR__
 #define __ERROR__
 

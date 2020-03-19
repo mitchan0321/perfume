@@ -1,5 +1,3 @@
-# $Id:$
-
 # takeuchi function
 
 defun tak (x y z) {

@@ -1,5 +1,3 @@
-/* $Id: toysh.c,v 1.14 2012/03/01 12:33:31 mit-sato Exp $ */
-
 #include <stdio.h>
 #include <string.h>
 #include <wchar.h>

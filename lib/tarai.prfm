@@ -1,5 +1,3 @@
-# $Id:$
-
 # tarai function
 
 defun tarai (x y z) {

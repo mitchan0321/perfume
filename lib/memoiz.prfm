@@ -1,5 +1,3 @@
-# $Id:$
-
 # Create a memoization function.
 # Usage: memoiz func-name => func
 

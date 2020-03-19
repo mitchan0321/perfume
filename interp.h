@@ -1,5 +1,3 @@
-/* $Id: interp.h,v 1.11 2012/03/06 06:09:29 mit-sato Exp $ */
-
 #ifndef __INTERP__
 #define __INTERP__
 

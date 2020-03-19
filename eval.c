@@ -1,5 +1,3 @@
-/* $Id: eval.c,v 1.57 2012/03/06 06:09:28 mit-sato Exp $ */
-
 #include <toy.h>
 #include <assert.h>
 #include <setjmp.h>

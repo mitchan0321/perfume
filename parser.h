@@ -1,5 +1,3 @@
-/* $Id: parser.h,v 1.3 2009/05/10 10:44:03 mit-sato Exp $ */
-
 #ifndef __PARSER__
 #define __PARSER__
 

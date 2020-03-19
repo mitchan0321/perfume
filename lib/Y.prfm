@@ -1,5 +1,3 @@
-# $Id:$
-
 # Y Combinator
 defun Y(f) {
     [fun (g) {

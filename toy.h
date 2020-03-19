@@ -1,5 +1,3 @@
-/* $Id: toy.h,v 1.21 2012/03/01 12:33:31 mit-sato Exp $ */
-
 #ifndef __TOY__
 #define __TOY__
 

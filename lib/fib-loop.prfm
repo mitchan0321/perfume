@@ -1,5 +1,3 @@
-# $Id:$
-
 # calc fibonacci number by loop
 
 defun fib-loop (n) {

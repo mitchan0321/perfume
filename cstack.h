@@ -1,5 +1,3 @@
-/* $Id: cstack.h,v 1.5 2012/06/10 07:00:23 mit-sato Exp $ */
-
 #include <sys/types.h>
 #include <setjmp.h>
 #include "config.h"

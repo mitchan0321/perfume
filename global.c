@@ -1,5 +1,3 @@
-/* $Id: global.c,v 1.11 2010/01/16 04:31:43 mit-sato Exp $ */
-
 #include <unistd.h>
 #include "toy.h"
 #include "types.h"

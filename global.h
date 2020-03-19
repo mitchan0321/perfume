@@ -1,5 +1,3 @@
-/* $Id: global.h,v 1.26 2010/01/16 04:31:43 mit-sato Exp $ */
-
 #ifndef _GLOBAL_
 #define _GLOBAL_
 

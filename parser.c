@@ -1,5 +1,3 @@
-/* $Id: parser.c,v 1.20 2012/03/01 12:33:31 mit-sato Exp $ */
-
 #include <wchar.h>
 #include <ctype.h>
 #include <stdlib.h>

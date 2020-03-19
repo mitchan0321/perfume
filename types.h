@@ -1,5 +1,3 @@
-/* $Id: types.h,v 1.39 2012/03/06 06:09:30 mit-sato Exp $ */
-
 #ifndef __TYPES__
 #define __TYPES__
 

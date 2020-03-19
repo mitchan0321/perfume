@@ -1,5 +1,3 @@
-/* $Id: cell.h,v 1.4 2009/03/23 14:03:37 mit-sato Exp $ */
-
 #ifndef __CELL__
 #define __CELL__
 

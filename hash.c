@@ -1,5 +1,3 @@
-/* $Id: hash.c,v 1.16 2011/08/28 10:51:29 mit-sato Exp $ */
-
 #include <string.h>
 #include <assert.h>
 #include <sys/types.h>

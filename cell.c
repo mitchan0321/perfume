@@ -1,5 +1,3 @@
-/* $Id: cell.c,v 1.4 2009/07/20 14:32:04 mit-sato Exp $ */
-
 #include <string.h>
 #include "cell.h"
 #include "toy.h"

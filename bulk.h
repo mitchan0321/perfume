@@ -1,5 +1,3 @@
-/* $Id: bulk.h,v 1.1.1.1 2008/07/25 14:11:35 mit-sato Exp $ */
-
 #ifndef __BULK__
 #define __BULK__
 

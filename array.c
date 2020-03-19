@@ -1,5 +1,3 @@
-/* $Id: array.c,v 1.4 2011/08/28 10:51:29 mit-sato Exp $ */
-
 #include <string.h>
 #include "types.h"
 #include "array.h"

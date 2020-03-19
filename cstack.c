@@ -1,5 +1,3 @@
-/* $Id: cstack.c,v 1.7 2012/06/10 07:00:23 mit-sato Exp $ */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <wchar.h>

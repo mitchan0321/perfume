@@ -1,5 +1,3 @@
-/* $Id: hash.h,v 1.7 2009/08/27 12:21:03 mit-sato Exp $ */
-
 #ifndef __HASH__
 #define __HASH__
 

@@ -1,5 +1,3 @@
-/* $Id: list.c,v 1.2 2009/07/20 14:32:05 mit-sato Exp $ */
-
 #include "types.h"
 #include "toy.h"
 

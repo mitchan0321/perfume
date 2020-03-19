@@ -1,5 +1,3 @@
-/* $Id: t_gc.h,v 1.7 2011/09/04 13:00:54 mit-sato Exp $ */
-
 #ifndef __T_GC__
 #define __T_GC__
 

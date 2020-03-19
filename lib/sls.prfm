@@ -1,5 +1,3 @@
-# $Id:$
-
 defun sls () {
     [sdir] each do: {| i |
 	    println [$i get 0] " " [$i get 1];

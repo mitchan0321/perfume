@@ -1,5 +1,3 @@
-/* $Id: types.c,v 1.41 2012/03/06 06:09:29 mit-sato Exp $ */
-
 #include <wchar.h>
 #include <assert.h>
 #include <string.h>

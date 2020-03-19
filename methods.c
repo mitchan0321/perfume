@@ -1,5 +1,3 @@
-/* $Id: methods.c,v 1.68 2011/12/09 12:54:40 mit-sato Exp $ */
-
 #include <unistd.h>
 #include <fcntl.h>
 #include <stdio.h>

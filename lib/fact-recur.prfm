@@ -1,5 +1,3 @@
-# $Id:$
-
 # calc fact
 
 defun fact-recur (n) {

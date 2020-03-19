@@ -1,5 +1,3 @@
-# $Id:$
-
 #
 # flat - output all available methods.
 # syntax: flat object | class-name

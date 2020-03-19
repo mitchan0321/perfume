@@ -1,5 +1,3 @@
-# $Id:$
-
 if [defvar? SYSQUEUE] else: {
     defvar SYSQUEUE [new SysQueue];
 };

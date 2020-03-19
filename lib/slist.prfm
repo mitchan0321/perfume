@@ -1,4 +1,3 @@
-# $Id:$
 # show co-routin stack list
 
 defun slist (all: all wide: wide) {

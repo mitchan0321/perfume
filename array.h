@@ -1,5 +1,3 @@
-/* $Id: array.h,v 1.2 2011/08/28 10:51:29 mit-sato Exp $ */
-
 #include "types.h"
 
 #ifndef __ARRAY__

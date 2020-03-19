@@ -1,5 +1,3 @@
-# $Id:$
-
 # like ls -1
 
 defun ls (all: all ind: ind args: dir) {
