@@ -306,7 +306,7 @@ control_goto:
 		    Cell *ckey;
 		    ckey = new_cell(&(cell_get_addr(arg->u.symbol.cell)[1]));
 		    cell_add_str(ckey, L":");
-		    hash_set(namedargs, cell_get_addr(ckey), const_int1);
+		    hash_set(namedargs, cell_get_addr(ckey), const_T);
 		} else if (IS_NAMED_SYM(arg)) {
 		    name = arg;
 		    l = list_next(l);
@@ -872,7 +872,7 @@ bind_args(Toy_Interp *interp, Toy_Type *arglist, struct _toy_argspec *aspec,
 
 	    if (NULL == var) goto error3;
 
-	    hash_set_t(args, var, toy_clone(const_int1));
+	    hash_set_t(args, var, toy_clone(const_T));
 
 	} else {
 

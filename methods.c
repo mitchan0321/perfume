@@ -852,6 +852,25 @@ error:
 error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
 }
+Toy_Type*
+mth_integer_lror(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *self, *arg;
+
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) != 0) goto error;
+    self = SELF(interp);
+    if (GET_TAG(self) != INTEGER) goto error2;
+    arg = list_get_item(posargs);
+    if (GET_TAG(arg) != INTEGER) goto error;
+
+    return new_integer_si((unsigned long int)mpz_get_si(self->u.biginteger)
+			  >> mpz_get_si(arg->u.biginteger));
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at '>>>', syntax: Integer >> bit", interp);
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
 
 Toy_Type*
 mth_integer_or(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
@@ -5290,6 +5309,7 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, L"Integer", L"real", 	mth_integer_toreal,	NULL);
     toy_add_method(interp, L"Integer", L"<<", 		mth_integer_rol,	L"val");
     toy_add_method(interp, L"Integer", L">>", 		mth_integer_ror, 	L"val");
+    toy_add_method(interp, L"Integer", L">>>", 		mth_integer_lror, 	L"val");
     toy_add_method(interp, L"Integer", L"||", 		mth_integer_or, 	L"val");
     toy_add_method(interp, L"Integer", L"&&", 		mth_integer_and, 	L"val");
     toy_add_method(interp, L"Integer", L"^^", 		mth_integer_xor, 	L"val");
