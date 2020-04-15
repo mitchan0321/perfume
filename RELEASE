@@ -1,3 +1,4 @@
+2020/04/15	PRFM_20200415		1.4.0
 2020/03/18	PRFM_20200318		1.4.0_PRE_2
 2020/03/13	PRFM_20200313		1.4.0_PRE_1
 2020/02/21	PRFM_20200221		1.3.0
@@ -1254,5 +1255,9 @@
 		Add methods Bulk::base64encode and Bulk::base64decode.
 	lib/base64.prfm
 		Add utility base64.prfm.
+
+2020/04/15
+	doc/manual.*
+		All fonts are changed to Noto-* font family.
 
 #eof
