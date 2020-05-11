@@ -733,23 +733,15 @@ toy_resolv_object(Toy_Interp *interp, Toy_Type *object) {
     case EXCEPTION:
 	val = hash_get_t(interp->classes, const_Exception);
 	break;
-#if 0
-    case CALLCC:
-	val = hash_get_t(interp->classes, const_CallCC);
-	break;
-#endif
     case DICT:
 	val = hash_get_t(interp->classes, const_Dict);
 	break;
-
     case VECTOR:
 	val = hash_get_t(interp->classes, const_Vector);
 	break;
-
     case COROUTINE:
 	val = hash_get_t(interp->classes, const_Coro);
 	break;
-
     case BULK:
 	val = hash_get_t(interp->classes, const_Bulk);
 	break;
