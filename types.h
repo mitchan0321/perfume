@@ -182,13 +182,14 @@ typedef struct _toy_coroutine {
 
 /*
  * TAG format:
- *       FEDCBA9876543210
- *      +----------------+
- *   +2 |   script id    |
- *      +----------------+
- *   +0 |@#$***! |  TYPE |
- *      +----------------+
+ *       FEDCBA98 76543210
+ *      +--------+--------+
+ *   +0 |    script id    |
+ *      +--------+--------+
+ *   +2 |@#$***! |%%%%%%%%|
+ *      +--------+--------+
  *
+ *	%: type field
  *	@: named arg flag
  *	#: switch arg flag
  *	$: lazy flag
