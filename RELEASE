@@ -1260,4 +1260,8 @@
 	doc/manual.*
 		All fonts are changed to Noto-* font family.
 
+2020/05/28
+	lib/flat.prfm
+		Fix OBJECT type objects method collection algorithm.
+
 #eof
