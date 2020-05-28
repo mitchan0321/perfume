@@ -17,13 +17,15 @@ defun flat (o) {
 defun flat-sub (o h) {
     [$o vars] each do: {| m |
 
-	case [type? [$o var? $m]]
-	NATIVE {
-	    if {$h set? $m} else: {$h set $m $o};
-	}
-	FUNC {
-	    if {$h set? $m} else: {$h set $m $o};
+	set t [type? [$o var? $m]];
+	if {or [eq? $t NATIVE] [eq? $t FUNC]} {
+	    if [or [eq? [type? $o] OBJECT] [eq? [type? $o] SYMBOL]] {
+	        if {$h set? $m} else: {$h set $m $o};
+	    } {
+	        if {$h set? $m} else: {$h set $m [$o var? @name]};
+	    };
 	};
+
     };
 
     [$o delegate?] each do: {| c |
