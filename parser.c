@@ -794,7 +794,7 @@ int print_object(Toy_Type *obj, int indent) {
 
     switch GET_TAG(obj) {
     case BOOL:
-	if (obj->u.bool.value == FALSE) {
+	if (obj->u.tbool.value == FALSE) {
 	    wprintf(L"nil\n");
 	} else {
 	    wprintf(L"t\n");

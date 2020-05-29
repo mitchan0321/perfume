@@ -2994,7 +2994,7 @@ cmd_equal(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     switch (ta) {
     case BOOL:
 	if (tb != BOOL) return const_Nil;
-	if (a->u.bool.value == b->u.bool.value) return const_T;
+	if (a->u.tbool.value == b->u.tbool.value) return const_T;
 	return const_Nil;
 	break;
 

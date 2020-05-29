@@ -7,20 +7,21 @@ PREFIX		= /usr/local
 CC		= cc
 
 # for product build. (use BoehmGC)
-CFLAGS		= -Wall -O3 -c -g
+#CFLAGS		= -Wall -O3 -c -g
+CFLAGS		= -Wall -O3 -c -g -DNCURSES
 INCLUDE		= -I/usr/local/include -I.
 LIB		= -L/usr/lib -L/lib -L/usr/local/lib \
-		  -lm -lgc -lpthread -lonigmo -lpcl -lgmp
+		  -lm -lgc -lpthread -lonigmo -lpcl -lgmp -lncursesw
 
 # for memory debuging build.
 #CFLAGS		= -Wall -c -g -DPROF
 #INCLUDE		= -I/usr/local/include -I.
-#LIB		= -L/usr/local/lib -lm -lonigmo -lpcl -lgmp
+#LIB		= -L/usr/local/lib -lm -lonigmo -lpcl -lgmp -lncursesw
 
 # for profiling build.
 #CFLAGS		= -Wall -c -g -pg -DPROF
 #INCLUDE		= -I/usr/local/include -I.
-#LIB		= -pg -L/usr/local/lib -lonigmo -lpcl -lgmp
+#LIB		= -pg -L/usr/local/lib -lonigmo -lpcl -lgmp -lncursesw
 
 ###
 ###   DONE
@@ -31,10 +32,12 @@ HDRS		= bulk.h binbulk.h cell.h array.h error.h hash.h interp.h parser.h \
 		  toy.h types.h config.h global.h cstack.h util.h encoding.h
 SRCS		= bulk.c binbulk.c cell.c array.c hash.c list.c parser.c types.c \
 		  eval.c interp.c commands.c methods.c global.c cstack.c util.c \
-		  encoding.c encoding-table.c
+		  encoding.c encoding-table.c \
+		  ncurses.c
 OBJS		= bulk.o binbulk.o cell.o array.o hash.o list.o parser.o types.o \
 		  eval.o interp.o commands.o methods.o global.o cstack.o util.o \
-		  encoding.o encoding-table.o
+		  encoding.o encoding-table.o \
+		  ncurses.o
 
 all:		perfumesh
 
@@ -103,6 +106,9 @@ encoding-table.o: encoding-table.c $(HDRS)
 	rm -f encoding-set-utoj.h encoding-set-jtou.h
 	awk -f jisconv.awk < doc/jis0208.txt
 	$(CC) $(CFLAGS) -O0 $(INCLUDE) encoding-table.c -o encoding-table.o
+
+ncurses.o:	ncurses.c $(HDRS)
+	$(CC) $(CFLAGS) $(INCLUDE) ncurses.c -o ncurses.o
 
 config.h:	config.h.in
 	sed 	-e s%@PREFIX@%$(PREFIX)%g \

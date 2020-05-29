@@ -5273,6 +5273,9 @@ error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
+#ifdef NCURSES
+int toy_add_method_ncurses(Toy_Interp* interp);
+#endif /* NCURSES */
 
 int
 toy_add_methods(Toy_Interp* interp) {
@@ -5458,6 +5461,10 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, L"Bulk", L"write", 		mth_bulk_write,		L"val");
     toy_add_method(interp, L"Bulk", L"base64encode",	mth_bulk_base64encode,	L"body");
     toy_add_method(interp, L"Bulk", L"base64decode",	mth_bulk_base64decode,	L"body");
+ 
+#ifdef NCURSES
+    toy_add_method_ncurses(interp);
+#endif /* NCURSES */
 
     return 0;
 }

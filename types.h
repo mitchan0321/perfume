@@ -53,7 +53,7 @@
 #define TAG_MASK		(0x000000ff)
 #define GET_TAG(p)		((p==NULL) ? -1 : (TAG_MASK & (p->tag)))
 #define IS_LIST_NULL(l)		((l==NULL) ? 1 : ((NULL==l->u.list.item)&&(NULL==l->u.list.nextp)))
-#define IS_NIL(x)		((GET_TAG(x)==BOOL) ? (x->u.bool.value==FALSE) : 0)
+#define IS_NIL(x)		((GET_TAG(x)==BOOL) ? (x->u.tbool.value==FALSE) : 0)
 
 #define TAG_NAMED_MASK		(0x00008000)
 #define TAG_SWITCH_MASK		(0x00004000)
@@ -203,9 +203,9 @@ typedef struct _toy_type {
 
     union _u {
 	/* BOOL */
-	struct _bool {
+	struct _tbool {
 	    int value;
-	} bool;
+	} tbool;
 
 	/* SYMBOL */
 	struct _symbol {

@@ -19,7 +19,7 @@ new_bool(int val) {
     ALLOC_SAFE(o);
 
     o->tag = BOOL;
-    o->u.bool.value = val;
+    o->u.tbool.value = val;
     return o;
 }
 
@@ -612,7 +612,7 @@ to_string(Toy_Type *obj) {
 
     switch (GET_TAG(obj)) {
     case BOOL:
-	if (obj->u.bool.value == FALSE) {
+	if (obj->u.tbool.value == FALSE) {
 	    return S_NIL;
 	} else {
 	    return S_T;
@@ -944,7 +944,7 @@ to_print(Toy_Type *obj) {
 
     switch (GET_TAG(obj)) {
     case BOOL:
-	if (obj->u.bool.value == FALSE) {
+	if (obj->u.tbool.value == FALSE) {
 	    return S_NIL;
 	} else {
 	    return S_T;
