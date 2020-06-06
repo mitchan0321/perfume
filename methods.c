@@ -22,6 +22,23 @@
 Toy_Type* cmd_fun(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen);
 
 Toy_Type*
+mth_object_hash(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *self;
+    wchar_t buff[32];
+    
+    if (arglen > 0) goto error;
+    if (hash_get_length(nameargs)) goto error;
+
+    self = SELF(interp);
+
+    swprintf(buff, 32, L"#%016lx", (long int)self);
+    return new_symbol(buff);
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'vars', syntax: Object vars", interp);
+}
+
+Toy_Type*
 mth_object_vars(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Hash *selfh;
     
@@ -2698,7 +2715,7 @@ mth_string_match(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
 	reg = NULL;
     } else {
 	/* cache hit! */
-	reg = (regex_t*)container->u.container;
+	reg = (regex_t*)container->u.container.data;
     }
     
     /* convert *wchar_t to UTF32-LE char stream data pointer */
@@ -2728,7 +2745,7 @@ mth_string_match(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
 	}
 
 	/* and regex object set to cache */
-	hash_set_t(regex_hash, new_symbol(cell_get_addr(key_str)), new_container(reg));
+	hash_set_t(regex_hash, new_symbol(cell_get_addr(key_str)), new_container(reg, L"REGEX"));
     }
 
     region = onig_region_new();
@@ -3487,7 +3504,7 @@ mth_file_init(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     f = new_file();
     f->input_encoding = NENCODE_RAW;
     f->output_encoding = NENCODE_RAW;
-    hash_set_t(self, const_Holder, new_container(f));
+    hash_set_t(self, const_Holder, new_container(f, L"FILE"));
 
     enc = hash_get_t(interp->globals, const_DEFAULT_FILE_ENCODING);
     if (enc) {
@@ -3531,7 +3548,7 @@ mth_file_open(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     self = SELF_HASH(interp);
     container = hash_get_t(self, const_Holder);
     if (NULL == container) goto error2;
-    f = container->u.container;
+    f = container->u.container.data;
 
     if (arglen > 1) goto error;
     if (hash_get_length(nameargs) > 1) goto error;
@@ -3610,7 +3627,7 @@ mth_file_close(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     self = SELF_HASH(interp);
     container = hash_get_t(self, const_Holder);
     if (NULL == container) goto error2;
-    f = container->u.container;
+    f = container->u.container.data;
 
     if (f->fd) {
 	fclose(f->fd);
@@ -3653,7 +3670,7 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     self = SELF_HASH(interp);
     container = hash_get_t(self, const_Holder);
     if (NULL == container) goto error2;
-    f = container->u.container;
+    f = container->u.container.data;
 
     if (0 == f->newline) {
 	flag_nonewline = 1;
@@ -3751,7 +3768,7 @@ mth_file_puts(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     self = SELF_HASH(interp);
     container = hash_get_t(self, const_Holder);
     if (NULL == container) goto error2;
-    f = container->u.container;
+    f = container->u.container.data;
 
     if ((f->newline == 1) && (flag_nonewline == 0)) {
 	flag_nonewline = 0;
@@ -3806,7 +3823,7 @@ mth_file_flush(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     self = SELF_HASH(interp);
     container = hash_get_t(self, const_Holder);
     if (NULL == container) goto error2;
-    f = container->u.container;
+    f = container->u.container.data;
 
     if (NULL == f->fd) {
 	return new_exception(TE_FILEACCESS, L"File not open.", interp);
@@ -3837,7 +3854,7 @@ mth_file_setnewline(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int a
     self = SELF_HASH(interp);
     container = hash_get_t(self, const_Holder);
     if (NULL == container) goto error2;
-    f = container->u.container;
+    f = container->u.container.data;
 
     flag = list_get_item(posargs);
     if (IS_NIL(flag)) {
@@ -3868,7 +3885,7 @@ mth_file_stat(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     self = SELF_HASH(interp);
     container = hash_get_t(self, const_Holder);
     if (NULL == container) goto error2;
-    f = container->u.container;
+    f = container->u.container.data;
 
     l = new_list(NULL);
 
@@ -3928,7 +3945,7 @@ mth_file_iseof(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     self = SELF_HASH(interp);
     container = hash_get_t(self, const_Holder);
     if (NULL == container) goto error2;
-    f = container->u.container;
+    f = container->u.container.data;
 
     if (NULL == f->fd) {
 	return new_exception(TE_FILEACCESS, L"File not open.", interp);
@@ -3959,7 +3976,7 @@ mth_file_getfd(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     self = SELF_HASH(interp);
     container = hash_get_t(self, const_Holder);
     if (NULL == container) goto error2;
-    f = container->u.container;
+    f = container->u.container.data;
 
     if (NULL == f->fd) {
 	return new_exception(TE_FILEACCESS, L"File not open.", interp);
@@ -3988,7 +4005,7 @@ mth_file_set(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
     self = SELF_HASH(interp);
     container = hash_get_t(self, const_Holder);
     if (NULL == container) goto error2;
-    f = container->u.container;
+    f = container->u.container.data;
 
     tfd = list_get_item(posargs);
     if (GET_TAG(tfd) != INTEGER) goto error;
@@ -4052,7 +4069,7 @@ mth_file_isready(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     self = SELF_HASH(interp);
     container = hash_get_t(self, const_Holder);
     if (NULL == container) goto error2;
-    f = container->u.container;
+    f = container->u.container.data;
 
     fd = f->fd;
     if (NULL == fd) return const_Nil;
@@ -4106,7 +4123,7 @@ mth_file_clear(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     self = SELF_HASH(interp);
     container = hash_get_t(self, const_Holder);
     if (NULL == container) goto error2;
-    f = container->u.container;
+    f = container->u.container.data;
 
     fd = f->fd;
     if (NULL == fd) goto error2;
@@ -4134,7 +4151,7 @@ mth_file_setnobuffer(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int 
     self = SELF_HASH(interp);
     container = hash_get_t(self, const_Holder);
     if (NULL == container) goto error2;
-    f = container->u.container;
+    f = container->u.container.data;
     fd = f->fd;
     if (EOF == setvbuf(fd, 0, _IOLBF, 0)) {
 	return new_exception(TE_FILEACCESS, L"Buffering mode change error.", interp);
@@ -4169,7 +4186,7 @@ mth_file_setnoblock(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int a
     self = SELF_HASH(interp);
     container = hash_get_t(self, const_Holder);
     if (NULL == container) goto error2;
-    f = container->u.container;
+    f = container->u.container.data;
     fd = f->fd;
 
     val = fcntl(fileno(fd), F_GETFL, 0);
@@ -4215,7 +4232,7 @@ mth_file_setencoding(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int 
     self = SELF_HASH(interp);
     container = hash_get_t(self, const_Holder);
     if (NULL == container) goto error2;
-    f = container->u.container;
+    f = container->u.container.data;
 
     enc = list_get_item(posargs);
     if (GET_TAG(enc) != SYMBOL) goto error;
@@ -4250,7 +4267,7 @@ mth_file_setinputencoding(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs,
     self = SELF_HASH(interp);
     container = hash_get_t(self, const_Holder);
     if (NULL == container) goto error2;
-    f = container->u.container;
+    f = container->u.container.data;
 
     enc = list_get_item(posargs);
     if (GET_TAG(enc) != SYMBOL) goto error;
@@ -4284,7 +4301,7 @@ mth_file_setoutputencoding(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs
     self = SELF_HASH(interp);
     container = hash_get_t(self, const_Holder);
     if (NULL == container) goto error2;
-    f = container->u.container;
+    f = container->u.container.data;
 
     enc = list_get_item(posargs);
     if (GET_TAG(enc) != SYMBOL) goto error;
@@ -5273,12 +5290,22 @@ error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
-#ifdef NCURSES
-int toy_add_method_ncurses(Toy_Interp* interp);
-#endif /* NCURSES */
+Toy_Type*
+mth_container_desc(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *self;
+
+    self = SELF(interp);
+    if (GET_TAG(self) != CONTAINER) goto error2;
+
+    return new_string_cell(self->u.container.desc);
+    
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
 
 int
 toy_add_methods(Toy_Interp* interp) {
+    toy_add_method(interp, L"Object", L"hash", 		mth_object_hash,	NULL);
     toy_add_method(interp, L"Object", L"vars", 		mth_object_vars,	NULL);
     toy_add_method(interp, L"Object", L"method",	mth_object_method,	L"method-name,argspec,body");
     toy_add_method(interp, L"Object", L"var?", 		mth_object_get, 	L"var");
@@ -5461,10 +5488,8 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, L"Bulk", L"write", 		mth_bulk_write,		L"val");
     toy_add_method(interp, L"Bulk", L"base64encode",	mth_bulk_base64encode,	L"body");
     toy_add_method(interp, L"Bulk", L"base64decode",	mth_bulk_base64decode,	L"body");
- 
-#ifdef NCURSES
-    toy_add_method_ncurses(interp);
-#endif /* NCURSES */
+
+    toy_add_method(interp, L"Container", L"desc",	mth_container_desc,	NULL);
 
     return 0;
 }

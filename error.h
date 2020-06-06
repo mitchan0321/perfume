@@ -44,5 +44,6 @@
 #define TE_BADENCODER		L"ErrBadEncoder"
 #define TE_INFINITY		L"ErrInfinity"
 #define TE_NAN			L"ErrNaN"
+#define TE_CURSES		L"ErrCurses"
 
 #endif /* __ERROR__ */

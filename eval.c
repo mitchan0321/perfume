@@ -745,6 +745,9 @@ toy_resolv_object(Toy_Interp *interp, Toy_Type *object) {
     case BULK:
 	val = hash_get_t(interp->classes, const_Bulk);
 	break;
+    case CONTAINER:
+	val = hash_get_t(interp->classes, const_Container);
+	break;
 
     default:
 	goto error;

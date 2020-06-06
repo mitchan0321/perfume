@@ -10,7 +10,7 @@ defun slist (all: all wide: wide) {
 	     "===" "==" "============" "============" "============" "============" "=" "======"];
 
     if {! [set? all]} then: {
-	set ll [$l,1 filter {| i | eq? $i,1 USE}];
+	set ll [$l,1 filter {| i | ! [eq? $i,1 FREE]}];
     } else: {
         set ll $l,1;
     };

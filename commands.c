@@ -1614,7 +1614,7 @@ cmd_load(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     sscript->path = tpath;
     sscript->src = src;
     sscript->script = script;
-    cont = new_container(sscript);
+    cont = new_container(sscript,L"SCRIPT");
 
     hash_set_t(shash, const_atscriptid, nid);
     hash_set(shash, to_string(nid), cont);
@@ -1681,7 +1681,7 @@ cmd_sdir(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	cont = hash_get(h, to_string(new_integer_si(i)));
 	if (NULL == cont) return const_Nil;
 
-	script = (Toy_Script*)(cont->u.container);
+	script = (Toy_Script*)(cont->u.container.data);
 	iteml = item = new_list(NULL);
 	iteml = list_append(iteml, new_integer_si(script->id));
 	iteml = list_append(iteml, script->path);
@@ -4246,6 +4246,11 @@ int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, L"time-of-day",cmd_gettimeofday, 	NULL);
     toy_add_func(interp, L"argspec", 	cmd_getargspec, 	L"func");
     toy_add_func(interp, L"bulk", 	cmd_newbulk, 		L"val-list");
+ 
+#ifdef NCURSES
+    int toy_add_func_ncurses(Toy_Interp* interp);
+    toy_add_func_ncurses(interp);
+#endif /* NCURSES */
     
     return 0;
 }

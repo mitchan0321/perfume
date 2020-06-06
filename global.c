@@ -19,6 +19,7 @@ void def_global() {
     const_Dict = new_symbol(L"Dict");
     const_Vector = new_symbol(L"Vector");
     const_Bulk = new_symbol(L"Bulk");
+    const_Container = new_symbol(L"Container");
     const_Coro = new_symbol(L"Coro");
     const_Nil = new_bool(FALSE);
     const_T = new_bool(TRUE);

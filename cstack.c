@@ -257,7 +257,7 @@ cstack_release(int slot_id) {
 	return;
     }
     
-    CStack.stack_slot[slot_id].state = SS_FREE;
+    CStack.stack_slot[slot_id].state = SS_PEND;
     CStack.stack_slot[slot_id].jmp_buff_enable = 0;
     CStack.stack_slot[slot_id].memo = 0;
 
@@ -273,6 +273,7 @@ void cstack_release_clear(int slot_id) {
     }
     
     cstack_release(slot_id);
+    CStack.stack_slot[slot_id].state = SS_FREE;
     cstack_unprotect(slot_id);
     cstack_clear(slot_id);
     cstack_protect(slot_id);
@@ -324,6 +325,33 @@ cstack_list() {
 	case SS_USE:
 	    list_append(elist, new_integer_si(i));
 	    list_append(elist, new_symbol(L"USE"));
+	    list_append(elist,
+			new_integer_si((__PTRDIFF_TYPE__)
+				       (__PTRDIFF_TYPE__)
+				       CStack.stack_slot[i].start_addr));
+	    list_append(elist,
+			new_integer_si((__PTRDIFF_TYPE__)
+				       (__PTRDIFF_TYPE__)
+				       CStack.stack_slot[i].barrier_addr));
+	    list_append(elist,
+			new_integer_si((__PTRDIFF_TYPE__)
+				       (__PTRDIFF_TYPE__)
+				       CStack.stack_slot[i].safe_addr));
+	    list_append(elist,
+			new_integer_si((__PTRDIFF_TYPE__)
+				       (__PTRDIFF_TYPE__)
+				       CStack.stack_slot[i].end_addr));
+	    list_append(elist,
+			new_integer_si((__PTRDIFF_TYPE__)
+				       (__PTRDIFF_TYPE__)
+				       CStack.stack_slot[i].jmp_buff_enable));
+	    list_append(elist, new_string_str(CStack.stack_slot[i].memo));
+
+	    break;
+
+	case SS_PEND:
+	    list_append(elist, new_integer_si(i));
+	    list_append(elist, new_symbol(L"PEND"));
 	    list_append(elist,
 			new_integer_si((__PTRDIFF_TYPE__)
 				       (__PTRDIFF_TYPE__)

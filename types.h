@@ -290,7 +290,10 @@ typedef struct _toy_type {
 	} control;
 
 	/* CONTAINER */
-	void *container;
+	struct _container {
+	    void *data;
+	    Cell *desc;
+	} container;
 
 	/* GET Macro */
 	struct _getmacro {
@@ -373,7 +376,7 @@ Toy_Type*	new_closure(Toy_Type *block_body, Toy_Env* env, int script_id);
 Toy_Type*	new_func(Toy_Type *argspec_list, int posarglen, Array *posargarray, Hash *namedarg,
 			 Toy_Type *closure);
 Toy_Type*	new_control(int code, Toy_Type *ret_value);
-Toy_Type*	new_container(void *container);
+Toy_Type*	new_container(void *container, wchar_t *desc);
 Toy_Type*	new_getmacro(Toy_Type *obj, Toy_Type *para);
 Toy_Type*	new_initmacro(Toy_Type *obj, Toy_Type *param);
 Toy_Type*	new_alias(struct _hash *slot, Toy_Type *key);

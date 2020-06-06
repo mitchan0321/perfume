@@ -220,9 +220,7 @@ interp_setup(Toy_Interp* interp, int argc, char **argv, char **envp) {
     toy_add_class(interp, L"Vector", NULL, delegate);
     toy_add_class(interp, L"Coro", NULL, delegate);
     toy_add_class(interp, L"Bulk", NULL, delegate);
-#ifdef NCURSES
-    toy_add_class(interp, L"Curses", NULL, delegate);
-#endif /* NCURSES */
+    toy_add_class(interp, L"Container", NULL, delegate);
 
     toy_add_commands(interp);
     toy_add_methods(interp);
@@ -561,7 +559,7 @@ get_script_path(Toy_Interp* interp, int script_id) {
     cont = hash_get(h, to_string(new_integer_si(script_id)));
     if (NULL == cont) return L"???";
 
-    s = (Toy_Script*)cont->u.container;
+    s = (Toy_Script*)cont->u.container.data;
     return cell_get_addr(s->path->u.string);
 }
 

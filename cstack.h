@@ -26,6 +26,7 @@ int  cstack_isalive(int slot);
 #define SS_INVAL	(-1)
 #define SS_FREE		(0)
 #define SS_USE		(1)
+#define SS_PEND		(2)
 
 #endif /* __CSTACK__ */
 

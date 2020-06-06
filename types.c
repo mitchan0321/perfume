@@ -318,13 +318,14 @@ new_control(int code, Toy_Type *ret_value) {
 }
 
 Toy_Type*
-new_container(void *container) {
+new_container(void *container, wchar_t *desc) {
     Toy_Type *o;
     o = GC_MALLOC(sizeof(Toy_Type));
     ALLOC_SAFE(o);
 
     o->tag = CONTAINER;
-    o->u.container = container;
+    o->u.container.data = container;
+    o->u.container.desc = new_cell(desc);
     return o;
 }
 
@@ -457,7 +458,7 @@ coroutine_handl(void *context) {
     }
 
     id = co->u.coroutine->interp->cstack_id;
-    co->u.coroutine->interp->cstack_id = 0;
+    // co->u.coroutine->interp->cstack_id = 0;
     co->u.coroutine->interp->co_parent->co_value = result;
     co->u.coroutine->state = CO_STS_DONE;
     cstack_release(id);
@@ -873,7 +874,12 @@ to_string(Toy_Type *obj) {
     }
 
     case CONTAINER:
-	return L"<CONTAINER>";
+    {
+	Cell *c;
+	c = new_cell(L"<CONTAINER># ");
+	cell_add_str(c, cell_get_addr(obj->u.container.desc));
+	return cell_get_addr(c);
+    }
 
     case GETMACRO:
     {
@@ -1233,7 +1239,12 @@ to_print(Toy_Type *obj) {
     }
 
     case CONTAINER:
-	return L"<CONTAINER>";
+    {
+	Cell *c;
+	c = new_cell(L"<CONTAINER># ");
+	cell_add_str(c, cell_get_addr(obj->u.container.desc));
+	return cell_get_addr(c);
+    }
 
     case GETMACRO:
     {
