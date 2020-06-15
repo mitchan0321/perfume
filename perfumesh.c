@@ -31,7 +31,7 @@ int main(int argc, char **argv, char **envp) {
 		exit(1);
 	    }
 	} else {
-	    if (0 == bulk_load_file(b, argv[1], NENCODE_RAW)) {
+	    if (0 == bulk_load_file(b, argv[1], NENCODE_UTF8)) {
 		fwprintf(stderr, L"file not open \"%ls\".\n", to_wchar(argv[1]));
 		exit(1);
 	    }
@@ -76,7 +76,7 @@ int main(int argc, char **argv, char **envp) {
 
 	if (buff[0] == '!') {
 	    buff[strlen(buff)-1] = 0;
-	    if (0 == bulk_load_file(b, &buff[1], NENCODE_RAW)) {
+	    if (0 == bulk_load_file(b, &buff[1], NENCODE_UTF8)) {
 		fwprintf(stderr, L"file not open: %ls\n", to_wchar(&buff[1]));
 		continue;
 	    }
