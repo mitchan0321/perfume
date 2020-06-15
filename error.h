@@ -10,6 +10,7 @@
 #define TE_NOVAR		L"ErrNoSuchVariable"
 #define TE_NORUNNABLE		L"ErrNoRunnableObject"
 #define TE_NOFUNC		L"_ErrNoFunction"
+#define TE_NOFUNC2ND		L"ErrNoFunction"	/* May be occured in unknown function defined at setup.prfm */
 #define TE_NOOBJECT		L"ErrNoTypeObject"
 #define TE_FEWARGS		L"ErrFewArg"
 #define TE_MANYARGS		L"ErrManyArg"
