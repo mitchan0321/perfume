@@ -85,6 +85,10 @@ toy_eval_script(Toy_Interp* interp, Toy_Type *script) {
 
 		    result = toy_call(interp, body);
 		    interp->last_status = result;
+		    if (GET_TAG(result) == EXCEPTION) {
+			interp->script_id = script_id;
+			return result;
+		    }
 		}
 
 	    } else {
