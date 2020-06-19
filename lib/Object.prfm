@@ -24,6 +24,7 @@ Bool method ?? (a) {
 # Object::??? true-val false-val --- 3 operand operater.
 #
 Object method ??? (a b) {
+    if {block? $a} {return [$a eval]};
     return $a;
 };
 
