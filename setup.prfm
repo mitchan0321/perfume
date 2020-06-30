@@ -47,11 +47,11 @@ $stdin set! 0 mode: i;
 
 defvar stdout [new File];
 $stdout set! 1 mode: o;
-$stdout set-newline t;
+$stdout set-newline <t>;
 
 defvar stderr [new File];
 $stderr set! 2 mode: o;
-$stderr set-newline t;
+$stderr set-newline <t>;
 
 defvar INFILE "-";
 defvar OUTFILE "-";
