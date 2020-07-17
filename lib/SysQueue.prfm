@@ -42,7 +42,7 @@ SysQueue method enter-loop-sub () {
 	    set e $f,1;
 	    set once $f,2;
 
-	    if {$o ready?}
+	    if {$o ready? timeout: 1000}
 	    then: {
 	        try {
 		    set sts [$e eval];
