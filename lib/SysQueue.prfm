@@ -32,8 +32,6 @@ SysQueue method enter-loop () {
 
 SysQueue method enter-loop-sub () {
     while {true} do: {
-	sleep 1;
-
 	$queue concat $queue_add_req;
 	sets queue_add_req ();
 
