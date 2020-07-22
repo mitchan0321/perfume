@@ -1,0 +1,35 @@
+class EditBuffer;
+
+EditBuffer method init() {
+    init-constructor;
+};
+
+EditBuffer method init-constructor () {
+    sets Src [vector];
+    sets Line 0;
+    sets Column 0;
+    sets ViewLine 0;
+    sets ViewColumn 0;
+    sets File "";
+    sets BufferName "";
+};
+
+EditBuffer method load-file (path) {
+    init-constructor;
+    
+    f := `File($path mode: i);
+    try {
+	$f each do: {| r |
+	    $Src append! $r;
+	};
+    }
+    fin: {
+	$f close;
+    };
+
+    sets File $path;
+};
+
+EditBuffer set-name (name) {
+    sets BufferName $name;
+};

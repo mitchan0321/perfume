@@ -1,0 +1,20 @@
+load-class BufferManager;
+load-class EditBuffer;
+load-class WUtil;
+
+class Window;
+
+method Window init () {
+    init-constructor;
+};
+
+method Window init-constructor () {
+    sets CursWin <nil>;
+};
+
+method Window set-curs (c) {
+    sets CursWin $c;
+};
+
+method Window bind-buffer (buff) {
+};

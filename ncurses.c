@@ -25,73 +25,6 @@ func_curses_init(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     setlocale(LC_ALL, "");
     wmain = initscr();
     start_color();
-    /* ad-hoc definition for color */
-    init_pair( 1, COLOR_BLACK, 	COLOR_BLACK);
-    init_pair( 2, COLOR_RED, 	COLOR_BLACK);
-    init_pair( 3, COLOR_GREEN, 	COLOR_BLACK);
-    init_pair( 4, COLOR_YELLOW, COLOR_BLACK);
-    init_pair( 5, COLOR_BLUE, 	COLOR_BLACK);
-    init_pair( 6, COLOR_MAGENTA,COLOR_BLACK);
-    init_pair( 7, COLOR_CYAN,	COLOR_BLACK);
-    init_pair( 8, COLOR_WHITE,	COLOR_BLACK);
-    init_pair( 9, COLOR_BLACK, 	COLOR_RED);
-    init_pair(10, COLOR_RED, 	COLOR_RED);
-    init_pair(11, COLOR_GREEN, 	COLOR_RED);
-    init_pair(12, COLOR_YELLOW, COLOR_RED);
-    init_pair(13, COLOR_BLUE, 	COLOR_RED);
-    init_pair(14, COLOR_MAGENTA,COLOR_RED);
-    init_pair(15, COLOR_CYAN,	COLOR_RED);
-    init_pair(16, COLOR_WHITE,	COLOR_RED);
-    init_pair(17, COLOR_BLACK, 	COLOR_GREEN);
-    init_pair(18, COLOR_RED, 	COLOR_GREEN);
-    init_pair(19, COLOR_GREEN, 	COLOR_GREEN);
-    init_pair(20, COLOR_YELLOW, COLOR_GREEN);
-    init_pair(21, COLOR_BLUE, 	COLOR_GREEN);
-    init_pair(22, COLOR_MAGENTA,COLOR_GREEN);
-    init_pair(23, COLOR_CYAN,	COLOR_GREEN);
-    init_pair(24, COLOR_WHITE,	COLOR_GREEN);
-    init_pair(25, COLOR_BLACK, 	COLOR_YELLOW);
-    init_pair(26, COLOR_RED, 	COLOR_YELLOW);
-    init_pair(27, COLOR_GREEN, 	COLOR_YELLOW);
-    init_pair(28, COLOR_YELLOW, COLOR_YELLOW);
-    init_pair(29, COLOR_BLUE, 	COLOR_YELLOW);
-    init_pair(30, COLOR_MAGENTA,COLOR_YELLOW);
-    init_pair(31, COLOR_CYAN,	COLOR_YELLOW);
-    init_pair(32, COLOR_WHITE,	COLOR_YELLOW);
-    init_pair(33, COLOR_BLACK, 	COLOR_BLUE);
-    init_pair(34, COLOR_RED, 	COLOR_BLUE);
-    init_pair(35, COLOR_GREEN, 	COLOR_BLUE);
-    init_pair(36, COLOR_YELLOW, COLOR_BLUE);
-    init_pair(37, COLOR_BLUE, 	COLOR_BLUE);
-    init_pair(38, COLOR_MAGENTA,COLOR_BLUE);
-    init_pair(39, COLOR_CYAN,	COLOR_BLUE);
-    init_pair(40, COLOR_WHITE,	COLOR_BLUE);
-    init_pair(41, COLOR_BLACK, 	COLOR_MAGENTA);
-    init_pair(42, COLOR_RED, 	COLOR_MAGENTA);
-    init_pair(43, COLOR_GREEN, 	COLOR_MAGENTA);
-    init_pair(44, COLOR_YELLOW, COLOR_MAGENTA);
-    init_pair(45, COLOR_BLUE, 	COLOR_MAGENTA);
-    init_pair(46, COLOR_MAGENTA,COLOR_MAGENTA);
-    init_pair(47, COLOR_CYAN,	COLOR_MAGENTA);
-    init_pair(48, COLOR_WHITE,	COLOR_MAGENTA);
-    init_pair(49, COLOR_BLACK, 	COLOR_CYAN);
-    init_pair(50, COLOR_RED, 	COLOR_CYAN);
-    init_pair(51, COLOR_GREEN, 	COLOR_CYAN);
-    init_pair(52, COLOR_YELLOW, COLOR_CYAN);
-    init_pair(53, COLOR_BLUE, 	COLOR_CYAN);
-    init_pair(54, COLOR_MAGENTA,COLOR_CYAN);
-    init_pair(55, COLOR_CYAN,	COLOR_CYAN);
-    init_pair(56, COLOR_WHITE,	COLOR_CYAN);
-    init_pair(57, COLOR_BLACK, 	COLOR_WHITE);
-    init_pair(58, COLOR_RED, 	COLOR_WHITE);
-    init_pair(59, COLOR_GREEN, 	COLOR_WHITE);
-    init_pair(60, COLOR_YELLOW, COLOR_WHITE);
-    init_pair(61, COLOR_BLUE, 	COLOR_WHITE);
-    init_pair(62, COLOR_MAGENTA,COLOR_WHITE);
-    init_pair(63, COLOR_CYAN,	COLOR_WHITE);
-    init_pair(64, COLOR_WHITE,	COLOR_WHITE);
-    /* enf of color definition */
-    
     cbreak();
     noecho();
     nonl();
@@ -194,6 +127,57 @@ func_curses_createwindow(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, 
 
 error:
     return new_exception(TE_SYNTAX, L"Syntax error at 'curs-create-window', syntax: curs-create-window window y x lines columns", interp);
+}
+
+Toy_Type*
+func_curses_newwindow(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    WINDOW *w, *wsub;
+    Toy_Type *container;
+    int y, x, py, px, nline, ncol;
+    Toy_Type *arg;
+
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (arglen != 5) goto error;
+    
+    container = list_get_item(posargs);
+    if (GET_TAG(container) != CONTAINER) goto error;
+    if (wcscmp(cell_get_addr(container->u.container.desc), L"CURSES") != 0) {
+	return new_exception(TE_CURSES, L"Curses error at 'curs-new-window', Bad descriptor.", interp);
+    }
+    w = container->u.container.data;
+    posargs = list_next(posargs);
+
+    arg = list_get_item(posargs);
+    if (GET_TAG(arg) != INTEGER) goto error;
+    y = mpz_get_si(arg->u.biginteger);
+
+    posargs = list_next(posargs);
+    arg = list_get_item(posargs);
+    if (GET_TAG(arg) != INTEGER) goto error;
+    x = mpz_get_si(arg->u.biginteger);
+
+    posargs = list_next(posargs);
+    arg = list_get_item(posargs);
+    if (GET_TAG(arg) != INTEGER) goto error;
+    nline = mpz_get_si(arg->u.biginteger);
+
+    posargs = list_next(posargs);
+    arg = list_get_item(posargs);
+    if (GET_TAG(arg) != INTEGER) goto error;
+    ncol = mpz_get_si(arg->u.biginteger);
+
+    getbegyx(w, py, px);
+    if (-1 == py) py = 0;
+    if (-1 == px) px = 0;
+    wsub = newwin(nline, ncol, y + py, x + px);
+    if (NULL == wsub) {
+	return new_exception(TE_CURSES, L"Curses error at 'curs-new-window', May be bad parameter.", interp);
+    }
+
+    return new_container(wsub, L"CURSES");
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'curs-new-window', syntax: curs-new-window window y x lines columns", interp);
 }
 
 Toy_Type*
@@ -540,6 +524,7 @@ func_curses_setbgcolor(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, in
     WINDOW *w;
     Toy_Type *container, *colorp;
     int icolorp;
+    int y, x, i, j;
 
     if (hash_get_length(nameargs) > 0) goto error;
     if (arglen != 2) goto error;
@@ -557,8 +542,15 @@ func_curses_setbgcolor(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, in
     icolorp = mpz_get_si(colorp->u.biginteger);
 
     wcolor_set(w, icolorp, NULL);
-    wbkgdset(w, ' ');
-    wborder(w, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ');
+    //wbkgdset(w, ' ');
+    getmaxyx(w, y, x);
+    for (i=0; i<y; i++) {
+	for (j=0; j<x; j++) {
+	    wmove(w, i, j);
+	    wprintw(w, " ");
+	    wcolor_set(w, icolorp, NULL);
+	}
+    }
     
     return const_T;
 
@@ -660,12 +652,44 @@ error:
     return new_exception(TE_SYNTAX, L"Syntax error at 'curs-move', syntax: curs-move window y x", interp);
 }
 
+Toy_Type*
+func_curses_add_color(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    int pair, fg, bg;
+    Toy_Type *arg;
+
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (arglen != 3) goto error;
+
+    arg = list_get_item(posargs);
+    if (GET_TAG(arg) != INTEGER) goto error;
+    pair = mpz_get_si(arg->u.biginteger);
+    posargs = list_next(posargs);
+
+    arg = list_get_item(posargs);
+    if (GET_TAG(arg) != INTEGER) goto error;
+    fg = mpz_get_si(arg->u.biginteger);
+    posargs = list_next(posargs);
+
+    arg = list_get_item(posargs);
+    if (GET_TAG(arg) != INTEGER) goto error;
+    bg = mpz_get_si(arg->u.biginteger);
+    posargs = list_next(posargs);
+
+    init_pair(pair, fg,	bg);
+
+    return const_T;
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'curs-add-color', syntax: curs-add-color pair fg-color bg-color", interp);
+}
+
 int
 toy_add_func_ncurses(Toy_Interp* interp) {
     toy_add_func(interp, L"curs-init",		func_curses_init,		NULL);
     toy_add_func(interp, L"curs-get-screen-size",func_curses_getscreensize,	L"window");
     toy_add_func(interp, L"curs-terminate",	func_curses_terminate,		NULL);
     toy_add_func(interp, L"curs-create-window",	func_curses_createwindow,	L"window,y,x,line,column");
+    toy_add_func(interp, L"curs-new-window",	func_curses_newwindow,		L"window,y,x,line,column");
     toy_add_func(interp, L"curs-clear",		func_curses_clear,		L"window");
     toy_add_func(interp, L"curs-print",		func_curses_print,		L"window,message,encoding,y,x");
     toy_add_func(interp, L"curs-refresh",	func_curses_refresh,		L"window");
@@ -677,6 +701,7 @@ toy_add_func_ncurses(Toy_Interp* interp) {
     toy_add_func(interp, L"curs-set-overlay",	func_curses_setoverlay,		L"over-window,dest-window");
     toy_add_func(interp, L"curs-destroy-window",func_curses_destroywindow,	L"window");
     toy_add_func(interp, L"curs-move",		func_curses_move,		L"window,y,x");
+    toy_add_func(interp, L"curs-add-color",	func_curses_add_color,		L"pair,fg-color,bg-color");
     
     return 0;
 }

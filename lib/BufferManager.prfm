@@ -1,0 +1,21 @@
+class BufferManager;
+
+BufferManager apply {
+    init-constructor;
+};
+
+BufferManager init-constructor () {
+    if {sets? Buffer} else: {sets Buffer [dict ()]};
+};
+
+BufferManager method create-buffer (name) {
+    b ::= new EditBuffer;
+    n := $name;
+    i := 1;
+    while {$Buffer set? $n} do: {
+	$i ++;
+	n ::= $name . "<" $i ">";
+    };
+    $b set-name $n;
+    $Buffer set $n $b;
+};

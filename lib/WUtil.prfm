@@ -1,0 +1,33 @@
+class WUtil;
+
+WUtil method color-pair (fg bg) {
+    if {sets? ColorPair} else: {
+	sets ColorPair [dict];
+    };
+    if {sets? ColorName} else: {
+	sets ColorName [dict];
+	$ColorName set BLACK   0;
+	$ColorName set RED     1;
+	$ColorName set GREEN   2;
+	$ColorName set YELLOW  3;
+	$ColorName set BLUE    4;
+	$ColorName set MAGENTA 5;
+	$ColorName set CYAN    6;
+	$ColorName set WHITE   7;
+    };
+
+    if {$ColorName set? $fg} else: {throw ErrNoSuchColorName "No such foreground color name."};
+    if {$ColorName set? $bg} else: {throw ErrNoSuchColorName "No such background color name."};    
+
+    if {$ColorPair set? ($ColorName,$fg $ColorName,$bg)}
+    then: {
+	return [$ColorPair get ($ColorName,$fg $ColorName,$bg)];
+    }
+    else: {
+	p ::= $ColorPair len;
+	$p ++;
+	curs-add-color $p $ColorName,$fg $ColorName,$bg;
+	$ColorPair set ($ColorName,$fg $ColorName,$bg) $p;
+	return $p;
+    };
+};
