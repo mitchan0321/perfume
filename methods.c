@@ -3482,14 +3482,6 @@ new_file() {
 				      NULL,
 				      NULL);
 
-/*
-    GC_register_finalizer((void*)o,
-			  file_finalizer,
-			  NULL,
-			  NULL,
-			  NULL);
-*/
-
     return o;
 }
 
