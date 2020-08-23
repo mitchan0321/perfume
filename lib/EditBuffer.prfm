@@ -6,10 +6,6 @@ EditBuffer method init() {
 
 EditBuffer method init-constructor () {
     sets Src [vector];
-    sets Line 0;
-    sets Column 0;
-    sets ViewLine 0;
-    sets ViewColumn 0;
     sets File "";
     sets BufferName "";
 };

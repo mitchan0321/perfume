@@ -2,6 +2,7 @@ load-class BufferManager;
 load-class EditBuffer;
 load-class Window;
 load-class WUtil;
+load-class BufferGeom;
 
 defun pmacs () {
     try {

@@ -1,0 +1,8 @@
+class BufferGeom;
+
+BufferGeom method init () {
+    sets Line 0;
+    sets Column 0;
+    sets ViewLine 0;
+    sets ViewColumn 0;
+};
