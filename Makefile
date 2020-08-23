@@ -5,13 +5,20 @@
 
 PREFIX		= /usr/local
 CC		= cc
+#OPTIONS	=
+OPTIONS		= -DNCURSES
 
 # for product build. (use BoehmGC)
-#CFLAGS		= -Wall -O3 -c -g
-CFLAGS		= -Wall -O3 -c -g -DNCURSES
+CFLAGS		= -Wall -O3 -c -g $(OPTIONS)
 INCLUDE		= -I/usr/local/include -I.
 LIB		= -L/usr/lib -L/lib -L/usr/local/lib \
-		  -lm -lgc -lpthread -lonigmo -lpcl -lgmp -lncursesw
+		  -lm -lpthread -lncursesw -lgmp -lgc -lonigmo -lpcl
+# for normaly link option (BSD and Linux)
+#		  -lm -lpthread -lncursesw -lgmp -lgc -lonigmo -lpcl
+# for Linux static link options
+#		  -static-libgcc -Wl,-Bdynamic,-lc,-ldl,-lm,-lpthread,-lncursesw,-lgc,-Bstatic,-lgmp,-lonigmo,-lpcl
+# for BSD static link options
+#		  -static -lm -lpthread -lncursesw -lgmp -lgc -lonigmo -lpcl
 
 # for memory debuging build.
 #CFLAGS		= -Wall -c -g -DPROF

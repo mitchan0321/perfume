@@ -1,7 +1,3 @@
-load-class BufferManager;
-load-class EditBuffer;
-load-class WUtil;
-
 class Window;
 
 method Window init () {

@@ -1,0 +1,15 @@
+load-class BufferManager;
+load-class EditBuffer;
+load-class Window;
+load-class WUtil;
+
+defun pmacs () {
+    try {
+	c ::= curs-init;
+	defvar MainWindow ::= new Window;
+	$MainWindow set-curs $c;
+    }
+    fin {
+	curs-terminate;
+    };
+};
