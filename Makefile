@@ -7,28 +7,33 @@ PREFIX		= /usr/local
 CC		= cc
 #OPTIONS	=
 OPTIONS		= -DNCURSES
+#OPTLIBS	=
+OPTLIBS		= -lncursesw
+# $(OPTLIBS2) macro is needs libraries separated by comma.
+#OPTLIBS2	=
+OPTLIBS2	= -lncursesw
 
 # for product build. (use BoehmGC)
 CFLAGS		= -Wall -O3 -c -g $(OPTIONS)
 INCLUDE		= -I/usr/local/include -I.
 LIB		= -L/usr/lib -L/lib -L/usr/local/lib \
-		  -lm -lpthread -lncursesw -lgmp -lgc -lonigmo -lpcl
+		  -lm -lpthread -lgmp -lgc -lonigmo -lpcl $(OPTLIBS)
 # for normaly link option (BSD and Linux)
-#		  -lm -lpthread -lncursesw -lgmp -lgc -lonigmo -lpcl
+#		  -lm -lpthread -lgmp -lgc -lonigmo -lpcl $(OPTLIBS)
 # for Linux static link options
-#		  -static-libgcc -Wl,-Bdynamic,-lc,-ldl,-lm,-lpthread,-lncursesw,-lgc,-Bstatic,-lgmp,-lonigmo,-lpcl
+#		  -static-libgcc -Wl,-Bdynamic,-lc,-ldl,-lm,-lpthread,-lgc,-Bstatic,-lgmp,-lonigmo,-lpcl,$(OPTLIBS2)
 # for BSD static link options
-#		  -static -lm -lpthread -lncursesw -lgmp -lgc -lonigmo -lpcl
+#		  -static -lm -lpthread -lgmp -lgc -lonigmo -lpcl $(OPTLIBS)
 
 # for memory debuging build.
 #CFLAGS		= -Wall -c -g -DPROF
 #INCLUDE		= -I/usr/local/include -I.
-#LIB		= -L/usr/local/lib -lm -lonigmo -lpcl -lgmp -lncursesw
+#LIB		= -L/usr/local/lib -lm -lonigmo -lpcl -lgmp $(OPTLIBS)
 
 # for profiling build.
 #CFLAGS		= -Wall -c -g -pg -DPROF
 #INCLUDE		= -I/usr/local/include -I.
-#LIB		= -pg -L/usr/local/lib -lonigmo -lpcl -lgmp -lncursesw
+#LIB		= -pg -L/usr/local/lib -lonigmo -lpcl -lgmp $(OPTLIBS)
 
 ###
 ###   DONE
