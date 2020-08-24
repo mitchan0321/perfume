@@ -35,7 +35,7 @@ mth_object_hash(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     return new_symbol(buff);
 
 error:
-    return new_exception(TE_SYNTAX, L"Syntax error at 'vars', syntax: Object vars", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'hash', syntax: Object hash", interp);
 }
 
 Toy_Type*
