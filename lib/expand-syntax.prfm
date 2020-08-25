@@ -82,6 +82,13 @@ defun tag (*) {
 };
 
 #
+# undef: unset global variable
+#
+defun undef (name) {
+    try {dict-global : unset $name};
+};
+
+#
 # RPN expr
 #
 begin {

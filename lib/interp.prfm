@@ -64,6 +64,7 @@ defun interp-co () {
 	        }
 	        default: {
 		    println "EXCEPTION: <" [$__exp car] "># " [$__exp cdr];
+		    println $@stack-trace;
 		    unset __cont__;
 	        };
         };

@@ -1,16 +1,28 @@
+load-class CombiWindow;
+
 class Window;
 
-method Window init () {
+Window method init (curs) {
+    sets CursWin $curs;
     init-constructor;
 };
 
-method Window init-constructor () {
-    sets CursWin <nil>;
+Window method init-constructor () {
+    sets WindowList ();
 };
 
-method Window set-curs (c) {
-    sets CursWin $c;
+Window method bind-buffer (buff) {
 };
 
-method Window bind-buffer (buff) {
+Window method get-curs () {
+    return $CursWin;
+};
+
+Window method create-full-window () {
+    (l c) ::= curs-get-screen-size $CursWin;
+    $WindowList <<- [new CombiWindow init: ([self] 0 0 [$l - 1] $c)];
+};
+
+Window method refresh () {
+    $WindowList each do: {| w | $w refresh};
 };

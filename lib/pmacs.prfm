@@ -1,16 +1,19 @@
-load-class BufferManager;
-load-class EditBuffer;
-load-class Window;
-load-class WUtil;
-load-class BufferGeom;
+load-class :force BufferManager;
+load-class :force EditBuffer;
+load-class :force Window;
+load-class :force WUtil;
+load-class :force BufferGeom;
 
 defun pmacs () {
     try {
-	c ::= curs-init;
-	defvar MainWindow ::= new Window;
-	$MainWindow set-curs $c;
+	defvar MainWindow [new Window init: ([curs-init])];
+	init-color-DB;
+	$MainWindow create-full-window;
+	$MainWindow refresh;
+	sleep 10000;
     }
-    fin {
+    fin: {
 	curs-terminate;
+	undef MainWindow;
     };
 };

@@ -548,7 +548,6 @@ func_curses_setbgcolor(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, in
 	for (j=0; j<x; j++) {
 	    wmove(w, i, j);
 	    wprintw(w, " ");
-	    wcolor_set(w, icolorp, NULL);
 	}
     }
     
