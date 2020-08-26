@@ -1,14 +1,18 @@
-load-class CombiWindow;
+load-class :force CombiWindow;
+load-class :force MiniWindow;
 
 class Window;
 
 Window method init (curs) {
-    sets CursWin $curs;
+    sets RootWin $curs;
     init-constructor;
 };
 
 Window method init-constructor () {
     sets WindowList ();
+    (y x) ::= curs-get-screen-size $RootWin;
+    sets CursWin [curs-create-window $RootWin 0 0 [$y - 1] $x];
+    sets CursWinMini [curs-create-window $RootWin [$y - 1] 0 1 $x];
 };
 
 Window method bind-buffer (buff) {
@@ -18,11 +22,83 @@ Window method get-curs () {
     return $CursWin;
 };
 
+Window method get-curs-mini () {
+    return $CursWinMini;
+};
+
 Window method create-full-window () {
     (l c) ::= curs-get-screen-size $CursWin;
-    $WindowList <<- [new CombiWindow init: ([self] 0 0 [$l - 1] $c)];
+    $WindowList <<- [new CombiWindow init: ([self] 0 0 $l $c)];
+    $WindowList car : activate;
+};
+
+Window method create-minibuffer-window () {
+    (l c) ::= curs-get-screen-size $CursWinMini;
+    win ::= new MiniWindow init: ([self] 0 0 $l $c);
+
+    sets MiniWindow $win;
+    $MiniWindow set-name "MiniBuffer";
+    $MiniWindow activate;
+};
+
+Window method create-split-vertical-window (div: ndivs) {
+    if {set? ndivs} else: {set ndivs 2};
+    
+    (l c) ::= curs-get-screen-size $CursWin;
+    c-orig := $c;
+    c ::= $c / $ndivs;
+    w := 0;
+    1 each to: $ndivs do: {| win-ord |
+	if {$win-ord != $ndivs}
+	then: {
+	    win ::= new CombiWindow init: ([self] 0 $w $l $c);
+	}
+	else: {
+	    win ::= new CombiWindow init: ([self] 0 $w $l [$c-orig - [$c * [$ndivs - 1]]]);
+	};
+	$win set-name ["Window#" . $win-ord];
+	$WindowList <<- $win;
+	
+	w ::= $w + $c;
+    };
+    $WindowList car : activate;
+    $WindowList cdr : each do: {| i | $i diactivate};
+};
+
+Window method create-split-horizontal-window (div: ndivs) {
+    if {set? ndivs} else: {set ndivs 2};
+    
+    (l c) ::= curs-get-screen-size $CursWin;
+    l-orig := $l;
+    l ::= $l / $ndivs;
+    w := 0;
+    1 each to: $ndivs do: {| win-ord |
+	if {$win-ord != $ndivs}
+	then: {
+	    win ::= new CombiWindow init: ([self] $w 0 $l $c);
+	}
+	else: {
+	    win ::= new CombiWindow init: ([self] $w 0 [$l-orig - [$l * [$ndivs - 1]]] $c);
+	};
+	$win set-name ["Window#" . $win-ord];
+	$WindowList <<- $win;
+	
+	w ::= $w + $l;
+    };
+    $WindowList car : activate;
+    $WindowList cdr : each do: {| i | $i diactivate};
 };
 
 Window method refresh () {
     $WindowList each do: {| w | $w refresh};
+    $MiniWindow refresh;
+};
+
+Window method display-window-message (win msg) {
+    $WindowList concat $MiniWindow : each do: {| i |
+	if {[$i get-name] = $win} {
+	    $i display $msg;
+	    break;
+	};
+    };
 };

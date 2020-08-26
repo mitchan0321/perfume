@@ -542,7 +542,6 @@ func_curses_setbgcolor(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, in
     icolorp = mpz_get_si(colorp->u.biginteger);
 
     wcolor_set(w, icolorp, NULL);
-    //wbkgdset(w, ' ');
     getmaxyx(w, y, x);
     for (i=0; i<y; i++) {
 	for (j=0; j<x; j++) {

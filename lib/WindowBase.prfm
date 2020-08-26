@@ -1,0 +1,25 @@
+class WindowBase;
+
+WindowBase method set-name (name) {
+    sets WinName $name;
+};
+
+WindowBase method get-name () {
+    return $WinName;
+};
+
+WindowBase method activate (*) {
+    throw ErrNoMethodImpl "No Impliment method 'activate'.";
+};
+
+WindowBase method diactivate (*) {
+    throw ErrNoMethodImpl "No Impliment method 'diactivate'.";
+};
+
+WindowBase method refresh (*) {
+    throw ErrNoMethodImpl "No Impliment method 'refresh'.";
+};
+
+WindowBase method display (*) {
+    throw ErrNoMethodImpl "No Impliment method 'display'.";
+};

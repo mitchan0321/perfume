@@ -1,18 +1,45 @@
-class CombiWindow;
+class CombiWindow WindowBase;
 
 CombiWindow method init (main y x line column) {
-    c ::= $main get-curs;
-    sets BufferCurs	  [curs-new-window $c $y 		 $x 			[$line - 1] [$column - 1]];
-    sets StatusLineCurs	  [curs-new-window $c [$y + $line : - 1] $x 			1 	     $column     ];
-    sets VerticalLineCurs [curs-new-window $c $y 		 [$x + $column : - 1] 	[$line - 1] 1		 ];
+    curs ::= $main get-curs;
 
+    sets BufferCurs	  [curs-new-window
+			   $curs
+			   $y 		 	$x
+			   [$line - 1]  	[$column - 1]
+	];
+
+    sets StatusLineCurs	  [curs-new-window
+			   $curs
+			   [$y + $line : - 1]   $x
+			   1 	     		$column
+	];
+    
+    sets VerticalLineCurs [curs-new-window
+			   $curs
+			   $y 		 	[$x + $column : - 1]
+			   [$line - 1] 		1
+	];
+};
+
+CombiWindow method activate () {
     set-window-color-default $BufferCurs EDIT_BUFFER;
     set-window-color-default $StatusLineCurs ACTIVE_STATUS_LINE;
     set-window-color-default $VerticalLineCurs ACTIVE_VERT_LINE;    
+};
+
+CombiWindow method diactivate () {
+    set-window-color-default $BufferCurs EDIT_BUFFER;
+    set-window-color-default $StatusLineCurs INACTIVE_STATUS_LINE;
+    set-window-color-default $VerticalLineCurs INACTIVE_VERT_LINE;    
 };
 
 CombiWindow method refresh () {
     curs-refresh $BufferCurs;
     curs-refresh $StatusLineCurs;
     curs-refresh $VerticalLineCurs;	    
+};
+
+CombiWindow method display (msg) {
+    curs-print $BufferCurs $msg $DISPLAY_ENCODING 0 0;
 };
