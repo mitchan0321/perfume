@@ -2018,6 +2018,48 @@ error2:
 
 Toy_Type*
 mth_list_concat(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *self, *l, *item, *src, *result;
+
+    if (hash_get_length(nameargs) != 0) goto error;
+
+    src = SELF(interp);
+    l = result = new_list(NULL);
+    while (src) {
+	l = list_append(l, list_get_item(src));
+	src = list_next(src);
+    }
+
+    l = self = result;
+    
+    if (GET_TAG(self) != LIST) goto error2;
+
+    while (! IS_LIST_NULL(posargs)) {
+	item = list_get_item(posargs);
+
+	if (GET_TAG(item) == LIST) {
+	    Toy_Type *fitem;
+	    fitem = item;
+	    while (! IS_LIST_NULL(fitem)) {
+		l = list_append(l, list_get_item(fitem));
+		fitem = list_next(fitem);
+	    }
+	} else {
+	    l = list_append(l, item);
+	}
+
+	posargs = list_next(posargs);
+    }
+
+    return self;
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'concat', syntax: List concat (list) | var ...", interp);
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
+mth_list_concat_se(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *self, *l, *item;
 
     if (hash_get_length(nameargs) != 0) goto error;
@@ -5387,6 +5429,7 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, L"List", L"filter", 		mth_list_filter, 	L"body");
     toy_add_method(interp, L"List", L"map", 		mth_list_map, 		L"body");
     toy_add_method(interp, L"List", L"concat", 		mth_list_concat, 	L"body");
+    toy_add_method(interp, L"List", L"concat!",		mth_list_concat_se, 	L"body");
     toy_add_method(interp, L"List", L"seek", 		mth_list_seek, 		L"val");
     toy_add_method(interp, L"List", L"split", 		mth_list_split, 	L"val");
     toy_add_method(interp, L"List", L"<<", 		mth_list_unshift, 	L"val");
