@@ -25,5 +25,5 @@ WindowBase method display (*) {
 };
 
 WindowBase method string () {
-    return ["<Window#" . [get-window-name] ">"];
+    return ["<" . [get-window-name] ">"];
 };
