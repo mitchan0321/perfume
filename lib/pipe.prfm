@@ -18,9 +18,9 @@ defun pipe (in: in out: out append: append args: blocks) {
 	    $in each do: {| i |
 		l := (in: $i);
 		if {set? out} then: {
-		    $l concat (out: $out);
+		    $l concat! (out: $out);
 		};
-		$l concat $blocks;
+		$l concat! $blocks;
 		s ::= call pipe $l;
 	    };
 	    return $s;

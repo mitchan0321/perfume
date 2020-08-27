@@ -35,10 +35,10 @@ defun msort (l order: cmp getter: gtr) {
         };
     };
     if [$l1 null?] else: {
-        $lr concat $l1;
+	$lr concat! $l1;
     };
     if [$l2 null?] else: {
-        $lr concat $l2;
+	$lr concat! $l2;
     };
 
     return $r;

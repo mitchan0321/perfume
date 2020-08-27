@@ -32,7 +32,7 @@ SysQueue method enter-loop () {
 
 SysQueue method enter-loop-sub () {
     while {true} do: {
-	$queue concat $queue_add_req;
+	$queue concat! $queue_add_req;
 	sets queue_add_req ();
 
 	$queue each do: {| f |
