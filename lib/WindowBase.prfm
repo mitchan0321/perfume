@@ -1,25 +1,29 @@
 class WindowBase;
 
-WindowBase method set-name (name) {
+WindowBase method set-window-name (name) {
     sets WinName $name;
 };
 
-WindowBase method get-name () {
+WindowBase method get-window-name () {
     return $WinName;
 };
 
 WindowBase method activate (*) {
-    throw ErrNoMethodImpl "No Impliment method 'activate'.";
+    throw ErrNoMethodImpl ["No Impliment method '" . $@name "::activate'."];
 };
 
 WindowBase method diactivate (*) {
-    throw ErrNoMethodImpl "No Impliment method 'diactivate'.";
+    throw ErrNoMethodImpl ["No Impliment method '" . $@name "::diactivate'."];
 };
 
 WindowBase method refresh (*) {
-    throw ErrNoMethodImpl "No Impliment method 'refresh'.";
+    throw ErrNoMethodImpl ["No Impliment method '" . $@name "::refresh'."];
 };
 
 WindowBase method display (*) {
-    throw ErrNoMethodImpl "No Impliment method 'display'.";
+    throw ErrNoMethodImpl ["No Impliment method '" . $@name "::display'."];
+};
+
+WindowBase method string () {
+    return ["<Window#" . [get-window-name] ">"];
 };

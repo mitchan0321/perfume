@@ -1,10 +1,10 @@
 class BufferManager;
 
-BufferManager apply {
+BufferManager method init () {
     init-constructor;
 };
 
-BufferManager init-constructor () {
+BufferManager method init-constructor () {
     if {sets? Buffer} else: {sets Buffer [dict ()]};
 };
 
@@ -16,6 +16,6 @@ BufferManager method create-buffer (name) {
 	$i ++;
 	n ::= $name . "<" $i ">";
     };
-    $b set-name $n;
+    $b set-buffer-name $n;
     $Buffer set $n $b;
 };

@@ -1,6 +1,6 @@
 class EditBuffer;
 
-EditBuffer method init() {
+EditBuffer method init () {
     init-constructor;
 };
 
@@ -26,6 +26,10 @@ EditBuffer method load-file (path) {
     sets File $path;
 };
 
-EditBuffer set-name (name) {
+EditBuffer set-buffer-name (name) {
     sets BufferName $name;
+};
+
+EditBuffer get-buffer-name (name) {
+    return $BufferName;
 };

@@ -10,12 +10,16 @@ Window method init (curs) {
 
 Window method init-constructor () {
     sets WindowList ();
+    $WindowList method string () {
+	s := "";
+	[self] each do: {| i |
+	    $s append! [$i string];
+	    $s append! "/";
+	};
+    };
     (y x) ::= curs-get-screen-size $RootWin;
     sets CursWin [curs-create-window $RootWin 0 0 [$y - 1] $x];
     sets CursWinMini [curs-create-window $RootWin [$y - 1] 0 1 $x];
-};
-
-Window method bind-buffer (buff) {
 };
 
 Window method get-curs () {
@@ -26,19 +30,21 @@ Window method get-curs-mini () {
     return $CursWinMini;
 };
 
-Window method create-full-window () {
-    (l c) ::= curs-get-screen-size $CursWin;
-    $WindowList <<- [new CombiWindow init: ([self] 0 0 $l $c)];
-    $WindowList car : activate;
-};
-
 Window method create-minibuffer-window () {
     (l c) ::= curs-get-screen-size $CursWinMini;
     win ::= new MiniWindow init: ([self] 0 0 $l $c);
 
     sets MiniWindow $win;
-    $MiniWindow set-name "MiniBuffer";
+    $MiniWindow set-window-name "MiniBuffer";
     $MiniWindow activate;
+};
+
+Window method create-full-window () {
+    (l c) ::= curs-get-screen-size $CursWin;
+    win ::= new CombiWindow init: ([self] 0 0 $l $c);
+    $win set-window-name "Window#1";
+    $WindowList <<- $win;
+    $WindowList car : activate;
 };
 
 Window method create-split-vertical-window (div: ndivs) {
@@ -56,7 +62,7 @@ Window method create-split-vertical-window (div: ndivs) {
 	else: {
 	    win ::= new CombiWindow init: ([self] 0 $w $l [$c-orig - [$c * [$ndivs - 1]]]);
 	};
-	$win set-name ["Window#" . $win-ord];
+	$win set-window-name ["Window#" . $win-ord];
 	$WindowList <<- $win;
 	
 	w ::= $w + $c;
@@ -80,7 +86,7 @@ Window method create-split-horizontal-window (div: ndivs) {
 	else: {
 	    win ::= new CombiWindow init: ([self] $w 0 [$l-orig - [$l * [$ndivs - 1]]] $c);
 	};
-	$win set-name ["Window#" . $win-ord];
+	$win set-window-name ["Window#" . $win-ord];
 	$WindowList <<- $win;
 	
 	w ::= $w + $l;
@@ -95,10 +101,31 @@ Window method refresh () {
 };
 
 Window method display-window-message (win msg) {
-    $WindowList concat $MiniWindow : each do: {| i |
-	if {[$i get-name] = $win} {
+    $WindowList . $MiniWindow : each do: {| i |
+	if {[$i get-window-name] = $win} {
 	    $i display $msg;
 	    break;
 	};
     };
 };
+
+Window method get-minibuffer-window () {
+    return $MiniWindow;
+};
+
+Window method get-current-window () {
+    return [$WindowList car];
+};
+
+Window method roll-current-window () {
+    win ::= $WindowList >>;
+    $WindowList <<- $win;
+    $WindowList car : activate;
+    try {$WindowList cdr : each do: {| i | $i diactivate}} catch: {};
+    return [$WindowList car];
+};
+
+Window method bind-buffer (buff) {
+    
+};
+

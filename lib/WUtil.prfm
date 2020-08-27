@@ -74,11 +74,15 @@ defun init-color-DB () {
 };
 
 defun init-config () {
-    $LIB_PATH each do: {| i |
-	if {file exists? [$i . "/pmacs.conf"]} {
-	   load [$i . "/pmacs.conf"];
-	   break;
+    if {defvar? PMACS_INIT}
+    else: {
+	$LIB_PATH each do: {| i |
+	    if {file exists? [$i . "/pmacs.conf"]} {
+		load [$i . "/pmacs.conf"];
+		break;
+	    };
 	};
+	defvar PMACS_INIT <t>;
     };
 };
 
