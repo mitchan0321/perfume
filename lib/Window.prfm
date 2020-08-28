@@ -111,6 +111,7 @@ Window method display-window-message (win msg) {
 	    break;
 	};
     };
+    throw ErrNoSuchWindow ["No such window name '" . $win "'"];
 };
 
 Window method get-minibuffer-window () {
@@ -129,7 +130,8 @@ Window method roll-current-window () {
     return [$WindowList car];
 };
 
-Window method bind-buffer (buff) {
+Window method bind-buffer (win buffer) {
+    buffer-name ::= BufferManager create-buffer [$buffer get-buffer-name];
     
 };
 

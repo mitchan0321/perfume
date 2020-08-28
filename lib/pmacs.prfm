@@ -21,10 +21,12 @@ defun pmacs () {
 	$MainWindow roll-current-window;
 
         $MainWindow display-window-message "MiniBuffer" "Hello";
-	$MainWindow display-window-message "Window#1" "Hello Window#1\nabcdeあいうえお";
-	$MainWindow display-window-message "Window#2" "Hello Window#2\nabcdeあいうえお";
-	$MainWindow display-window-message "Window#3" "Hello Window#3\nabcdeあいうえお";
-	$MainWindow display-window-message "Window#1" [$MainWindow get WindowList : string];
+#	$MainWindow display-window-message "Window#1" "Hello Window#1\nabcdeあいうえお";
+#	$MainWindow display-window-message "Window#2" "Hello Window#2\nabcdeあいうえお";
+#	$MainWindow display-window-message "Window#3" "Hello Window#3\nabcdeあいうえお";
+#	$MainWindow display-window-message "Window#1" [$MainWindow get WindowList : string];
+
+        $MainWindow bind-buffer "Window#1" [new EditBuffer];
 
 	$MainWindow refresh;
 	sleep 100000;
