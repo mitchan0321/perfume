@@ -49,6 +49,8 @@ Window method create-full-window () {
 
 Window method create-split-vertical-window (div: ndivs) {
     if {set? ndivs} else: {set ndivs 2};
+    if {$ndivs < 2} then: {set ndivs 2};
+    if {$ndivs > $MAX_WINDOW_DIVS} then: {set ndivs $MAX_WINDOW_DIVS};
     
     (l c) ::= curs-get-screen-size $CursWin;
     c-orig := $c;
@@ -73,6 +75,8 @@ Window method create-split-vertical-window (div: ndivs) {
 
 Window method create-split-horizontal-window (div: ndivs) {
     if {set? ndivs} else: {set ndivs 2};
+    if {$ndivs < 2} then: {set ndivs 2};
+    if {$ndivs > $MAX_WINDOW_DIVS} then: {set ndivs $MAX_WINDOW_DIVS};
     
     (l c) ::= curs-get-screen-size $CursWin;
     l-orig := $l;
