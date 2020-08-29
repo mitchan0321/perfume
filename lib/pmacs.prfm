@@ -49,18 +49,23 @@ defun pmacs () {
 	$MainWindow refresh;
 	sleep 1000;
         key := "";
+	exit ::= vector("" "" "" "");
 	while {true} do: {
 	    i ::= curs-keyin [$MainWindow get-current-window : get-curs] 100;
 	    if {nil? $i} {continue};
 	    if {[$key len] > 80} {key := ""};
-	    $key append! ["" . $i " "];
-	    $MainWindow display-window-message "MiniBuffer" [$key .
-		"                                                                                "];
+	    if {integer? $i} {
+		$exit set 0 [$exit get 1]; $exit set 1 [$exit get 2]; $exit set 2 [$exit get 3];
+		$exit set 3 ["" uimport! ($i)];
+		if {[$exit list : join] = "exit"} {break};
+	    };
+	    $key append! ["" . [[integer? $i] ??? ["%02x" fmt $i] [result $i]] " "];
+	    $MainWindow display-window-message "MiniBuffer" ["%-89v" fmt $key];
 	    # $MainWindow render-all;
 	    $MainWindow refresh;
 	};
 
-/*
+REM {
 	$MainWindow roll-current-window;
 	$MainWindow roll-current-window;
 	$MainWindow bind-buffer
@@ -70,7 +75,7 @@ defun pmacs () {
 	$MainWindow render-all;
 	$MainWindow refresh;
 	sleep 500000;
-*/
+};
 	
     }
     fin: {

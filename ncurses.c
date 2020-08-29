@@ -719,7 +719,7 @@ func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     if (-1 == in) return const_Nil;
 
     if (in >= 256) {
-	if ((in >= KEY_F(0)) && (in <= KEY_F(60))) {
+	if ((in >= KEY_F(0)) && (in <= KEY_F(63))) {
 	    swprintf(buff, 32, L"KEY_F%d", in-KEY_F(0));	    
 	    return new_symbol(buff);
 	}
