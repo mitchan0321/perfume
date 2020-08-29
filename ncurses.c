@@ -693,8 +693,8 @@ error:
 Toy_Type*
 func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     WINDOW *w;
-    Toy_Type *container;
-    int itimeout, in;
+    Toy_Type *container, *encoding;
+    int itimeout, in, iencoder;
     Toy_Type *arg;
     wchar_t buff[32];
 
@@ -712,6 +712,18 @@ func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     arg = list_get_item(posargs);
     if (GET_TAG(arg) != INTEGER) goto error;
     itimeout = mpz_get_si(arg->u.biginteger);
+    posargs = list_next(posargs);
+
+    encoding = list_get_item(posargs);
+    if (GET_TAG(encoding) != STRING) goto error;
+    posargs = list_next(posargs);
+
+    iencoder = get_encoding_index(cell_get_addr(encoding->u.string));
+    if (-1 == iencoder) {
+	return new_exception(TE_BADENCODER, L"Bad encoder specified.", interp);
+    }
+
+    // to be continued...
 
     wtimeout(w, itimeout);
     in = wgetch(w);
@@ -752,7 +764,7 @@ toy_add_func_ncurses(Toy_Interp* interp) {
     toy_add_func(interp, L"curs-destroy-window",func_curses_destroywindow,	L"window");
     toy_add_func(interp, L"curs-move",		func_curses_move,		L"window,y,x");
     toy_add_func(interp, L"curs-add-color",	func_curses_add_color,		L"pair,fg-color,bg-color");
-    toy_add_func(interp, L"curs-keyin",		func_curses_keyin,		L"window,timeout");
+    toy_add_func(interp, L"curs-keyin",		func_curses_keyin,		L"window,timeout,encoding");
     
     return 0;
 }
