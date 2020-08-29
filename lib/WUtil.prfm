@@ -42,7 +42,7 @@ WUtil method color-pair (fg bg) {
 
 WUtil method get-bgcolor (name) {
     n ::= $ColorDB get $name;
-    if [nil? $n] then: {throw ErrNoSuchColor ["WUtil::get-bgcolor: No such color DB name, " . $name]};
+    $n ?? {throw ErrNoSuchColor ["WUtil::get-bgcolor: No such color DB name, " . $name]};
     try {
 	(fg bg) ::= $ColorPair get $n;
     }
@@ -52,7 +52,7 @@ WUtil method get-bgcolor (name) {
 
 WUtil method get-fgcolor (name) {
     n ::= $ColorDB get $name;
-    if [nil? $n] then: {throw ErrNoSuchColor ["WUtil::get-fgcolor: No such color DB name, " . $name]};
+    $n ?? {throw ErrNoSuchColor ["WUtil::get-fgcolor: No such color DB name, " . $name]};
     try {
 	(fg bg) ::= $ColorPair get $n;
     }

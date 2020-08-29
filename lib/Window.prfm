@@ -108,7 +108,7 @@ Window method display-window-message (win msg) {
     $WindowList . $MiniWindow : each do: {| i |
 	if {[$i get-window-name] = $win} {
 	    $i display $msg;
-	    break;
+	    return;
 	};
     };
     throw ErrNoSuchWindow ["No such window name '" . $win "'"];
@@ -130,8 +130,36 @@ Window method roll-current-window () {
     return [$WindowList car];
 };
 
-Window method bind-buffer (win buffer) {
-    buffer-name ::= BufferManager create-buffer [$buffer get-buffer-name];
-    
+Window method bind-buffer (window-name buffer) {
+    buffer-name ::= $buffer get-buffer-name;
+    window := <nil>;
+    $WindowList each do: {| i |
+	if {[$i get-window-name] = $window-name} {
+	    window := $i;
+	    break;
+	};
+    };
+    $window ?? {throw ErrNoSuchWindow ["No such window name '" . $window-name "'"]};
+
+    $window set-buffer $buffer;
+    BufferManager set-buffer-geom $window-name [$buffer get-buffer-name];
 };
 
+Window method render-all () {
+    $WindowList each do: {| i |
+	$i render;
+    };
+};
+
+Window method render (window-name) {
+    window := <nil>;
+    $WindowList each do: {| i |
+	if {[$i get-window-name] = $window-name} {
+	    window := $i;
+	    break;
+	};
+    };
+    $window ?? {throw ErrNoSuchWindow ["No such window name '" . $window-name "'"]};
+
+    $window render;
+};

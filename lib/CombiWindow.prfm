@@ -1,6 +1,8 @@
 class CombiWindow WindowBase;
 
 CombiWindow method init (main y x line column) {
+    apply {WindowBase method? init :};
+    
     curs ::= $main get-curs;
 
     sets BufferCurs	  [curs-new-window
@@ -42,4 +44,26 @@ CombiWindow method refresh () {
 
 CombiWindow method display (msg) {
     curs-print $BufferCurs $msg $DISPLAY_ENCODING 0 0;
+};
+
+CombiWindow method render () {
+    (y x) ::= curs-get-screen-size $BufferCurs;
+    win ::= get-window-name;
+    buff ::= get-buffer;
+    buff-name ::= $buff get-buffer-name;
+    (_dumy_ _dumy_ geom) ::= BufferManager get-buffer-geom $win $buff-name;
+    curs-print $StatusLineCurs [" --- " .  $buff-name " - " $win] $DISPLAY_ENCODING 0 0;
+    0 each to: [$y - 1] do: {| i |
+	curs-print $VerticalLineCurs "|" $DISPLAY_ENCODING $i 0;
+    };
+
+    i := 0;
+    $buff buffer-select $geom,ViewLine [$geom,ViewLine + $y : - 1] {
+	| src |
+	curs-render-line
+	    $BufferCurs
+	    $i $geom,ViewColumn $src
+	    $DEFAULT_TAB_WIDTH $DISPLAY_ENCODING;
+	$i ++;
+    };
 };

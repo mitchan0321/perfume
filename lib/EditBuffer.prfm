@@ -5,15 +5,14 @@ EditBuffer method init () {
 };
 
 EditBuffer method init-constructor () {
-    sets Src [vector];
-    sets File "";
-    sets BufferName "";
+    sets Src <nil>;
+    sets File <nil>;
+    sets BufferName <nil>;
 };
 
-EditBuffer method load-file (path) {
-    init-constructor;
-    
+EditBuffer method load-content (path) {
     f := `File($path mode: i);
+    sets Src [vector];
     try {
 	$f each do: {| r |
 	    $Src append! $r;
@@ -24,12 +23,19 @@ EditBuffer method load-file (path) {
     };
 
     sets File $path;
+    BufferManager regist-buffer [self] [$path split sep: "/" : last : car];
 };
 
-EditBuffer set-buffer-name (name) {
+EditBuffer method set-buffer-name (name) {
     sets BufferName $name;
 };
 
-EditBuffer get-buffer-name (name) {
+EditBuffer method get-buffer-name () {
     return $BufferName;
+};
+
+EditBuffer method buffer-select (from to block) {
+    $from each to: $to do: {| i |
+	yield $block [$Src get $i];
+    };
 };

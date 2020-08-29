@@ -1,7 +1,10 @@
 class MiniWindow WindowBase;
 
 MiniWindow method init (main y x line column)  {
+    apply {WindowBase method? init :};
+
     curs ::= $main get-curs-mini;
+    
     sets MiniCurs [curs-new-window
 			   $curs
 			   $y 		 	$x

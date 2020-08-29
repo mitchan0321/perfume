@@ -8,32 +8,59 @@ load-class :force BufferGeom;
 defun pmacs () {
     try {
 	defvar MainWindow [new Window init: ([curs-init])];
+	BufferManager init;
 	WUtil init;
 	
 	$MainWindow create-minibuffer-window;
 	
-#        $MainWindow create-full-window;
-#        $MainWindow create-split-vertical-window;
-        $MainWindow create-split-vertical-window div: 3;
-#        $MainWindow create-split-horizontal-window;
-#        $MainWindow create-split-horizontal-window div: 2;
+	# $MainWindow create-full-window;
+	# $MainWindow create-split-vertical-window;
+        # $MainWindow create-split-vertical-window div: 4;
+	# $MainWindow create-split-horizontal-window;
+	$MainWindow create-split-horizontal-window div: 4;
 
 	$MainWindow roll-current-window;
 
         $MainWindow display-window-message "MiniBuffer" "Hello";
-#	$MainWindow display-window-message "Window#1" "Hello Window#1\nabcdeあいうえお";
-#	$MainWindow display-window-message "Window#2" "Hello Window#2\nabcdeあいうえお";
-#	$MainWindow display-window-message "Window#3" "Hello Window#3\nabcdeあいうえお";
-#	$MainWindow display-window-message "Window#1" [$MainWindow get WindowList : string];
+	# $MainWindow display-window-message "Window#1" "Hello Window#1\nabcdeあいうえお";
+	# $MainWindow display-window-message "Window#2" "Hello Window#2\nabcdeあいうえお";
+	# $MainWindow display-window-message "Window#3" "Hello Window#3\nabcdeあいうえお";
+	# $MainWindow display-window-message "Window#1" [$MainWindow get WindowList : string];
 
-        $MainWindow bind-buffer "Window#1" [new EditBuffer];
+	# USE CASE: "file open"
 
+	b ::= new EditBuffer;
+	$b load-content "/home/mit-sato/perfume/eval.c";
+        $MainWindow bind-buffer "Window#1" $b;
+
+	b ::= new EditBuffer;
+	$b load-content "/home/mit-sato/perfume/methods.c";
+	$MainWindow bind-buffer "Window#2" $b;
+
+	b ::= new EditBuffer;
+	$b load-content "/home/mit-sato/eval.c";
+	$MainWindow bind-buffer "Window#3" $b;
+
+	#b ::= new EditBuffer;
+	#$b load-content "/home/mit-sato/eval.c";
+	$MainWindow bind-buffer "Window#4" $b;
+
+	$MainWindow render-all;
 	$MainWindow refresh;
-	sleep 100000;
+	sleep 5000;
+
+	$MainWindow roll-current-window;
+	$MainWindow roll-current-window;
+	$MainWindow bind-buffer
+	    [$MainWindow get-current-window : get-window-name]
+	    [BufferManager get-buffer "eval.c"];
+	
+	$MainWindow render-all;
+	$MainWindow refresh;
+	sleep 500000;
     }
     fin: {
 	curs-terminate;
-	undef MainWindow;
     }
     catch: {| e |
 	__error_info__ ::= "ERROR: <" . [$e car] "># " [$e cdr] "\n\n" $@stack-trace;
