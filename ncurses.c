@@ -22,6 +22,7 @@ func_curses_init(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     if (hash_get_length(nameargs) > 0) goto error;
     if (arglen > 0) goto error;
 
+    setenv("ESCDELAY", "100", 1);
     setlocale(LC_ALL, "");
     wmain = initscr();
     start_color();
@@ -122,6 +123,9 @@ func_curses_createwindow(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, 
     if (NULL == wsub) {
 	return new_exception(TE_CURSES, L"Curses error at 'curs-create-window', May be bad parameter.", interp);
     }
+    notimeout(wsub, FALSE);
+    intrflush(wsub, FALSE);
+    keypad(wsub, TRUE);
 
     return new_container(wsub, L"CURSES");
 
@@ -173,6 +177,9 @@ func_curses_newwindow(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int
     if (NULL == wsub) {
 	return new_exception(TE_CURSES, L"Curses error at 'curs-new-window', May be bad parameter.", interp);
     }
+    notimeout(wsub, FALSE);
+    intrflush(wsub, FALSE);
+    keypad(wsub, TRUE);
 
     return new_container(wsub, L"CURSES");
 
@@ -541,6 +548,8 @@ func_curses_setbgcolor(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, in
     if (GET_TAG(colorp) != INTEGER) goto error;
     icolorp = mpz_get_si(colorp->u.biginteger);
 
+    // bkgd(icolorp);
+
     wcolor_set(w, icolorp, NULL);
     getmaxyx(w, y, x);
     for (i=0; i<y; i++) {
@@ -681,6 +690,49 @@ error:
     return new_exception(TE_SYNTAX, L"Syntax error at 'curs-add-color', syntax: curs-add-color pair fg-color bg-color", interp);
 }
 
+Toy_Type*
+func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    WINDOW *w;
+    Toy_Type *container;
+    int itimeout, in;
+    Toy_Type *arg;
+    wchar_t buff[32];
+
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (arglen != 2) goto error;
+
+    container = list_get_item(posargs);
+    if (GET_TAG(container) != CONTAINER) goto error;
+    if (wcscmp(cell_get_addr(container->u.container.desc), L"CURSES") != 0) {
+	return new_exception(TE_CURSES, L"Curses error at 'curs-keyin', Bad descriptor.", interp);
+    }
+    w = container->u.container.data;
+    posargs = list_next(posargs);
+
+    arg = list_get_item(posargs);
+    if (GET_TAG(arg) != INTEGER) goto error;
+    itimeout = mpz_get_si(arg->u.biginteger);
+
+    wtimeout(w, itimeout);
+    in = wgetch(w);
+
+    if (-1 == in) return const_Nil;
+
+    if (in >= 256) {
+	if ((in >= KEY_F(0)) && (in <= KEY_F(60))) {
+	    swprintf(buff, 32, L"KEY_F%d", in-KEY_F(0));	    
+	    return new_symbol(buff);
+	}
+	swprintf(buff, 32, L"%s", keyname(in));
+	return new_symbol(buff);
+    }
+
+    return new_integer_si(in);
+    
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'curs-keyin', syntax: curs-keyin window timeout", interp);
+}
+
 int
 toy_add_func_ncurses(Toy_Interp* interp) {
     toy_add_func(interp, L"curs-init",		func_curses_init,		NULL);
@@ -700,6 +752,7 @@ toy_add_func_ncurses(Toy_Interp* interp) {
     toy_add_func(interp, L"curs-destroy-window",func_curses_destroywindow,	L"window");
     toy_add_func(interp, L"curs-move",		func_curses_move,		L"window,y,x");
     toy_add_func(interp, L"curs-add-color",	func_curses_add_color,		L"pair,fg-color,bg-color");
+    toy_add_func(interp, L"curs-keyin",		func_curses_keyin,		L"window,timeout");
     
     return 0;
 }

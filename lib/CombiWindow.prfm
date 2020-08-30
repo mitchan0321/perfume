@@ -22,6 +22,9 @@ CombiWindow method init (main y x line column) {
 			   $y 		 	[$x + $column : - 1]
 			   [$line - 1] 		1
 	];
+
+    sets CursorLine 0;
+    sets CursorColumn 0;
 };
 
 CombiWindow method activate () {
@@ -37,13 +40,21 @@ CombiWindow method diactivate () {
 };
 
 CombiWindow method refresh () {
-    curs-refresh $BufferCurs;
     curs-refresh $StatusLineCurs;
     curs-refresh $VerticalLineCurs;	    
+    curs-refresh $BufferCurs;
+};
+
+CombiWindow method set-cursor () {
+    curs-move $BufferCurs $CursorLine $CursorColumn;
 };
 
 CombiWindow method display (msg) {
     curs-print $BufferCurs $msg $DISPLAY_ENCODING 0 0;
+};
+
+CombiWindow method get-curs () {
+    return $BufferCurs;
 };
 
 CombiWindow method render () {

@@ -22,6 +22,7 @@ MiniWindow method diactivate () {
 
 MiniWindow method refresh () {
     curs-refresh $MiniCurs;
+    curs-move $MiniCurs 0 0;
 };
 
 MiniWindow method display (msg) {

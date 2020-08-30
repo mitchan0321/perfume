@@ -41,6 +41,14 @@ WindowBase method render (*) {
     throw ErrNoMethodImpl ["No Impliment method '" . $@name "::render'."];
 };
 
+WindowBase method set-cursor (*) {
+    throw ErrNoMethodImpl ["No Impliment method '" . $@name "::set-cursor'."];
+};
+
+WindowBase method get-curs (*) {
+    throw ErrNoMethodImpl ["No Impliment method '" . $@name "::get-curs'."];
+};
+
 WindowBase method string () {
     return ["<" . [get-window-name] ">"];
 };

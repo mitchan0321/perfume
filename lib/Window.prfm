@@ -100,8 +100,9 @@ Window method create-split-horizontal-window (div: ndivs) {
 };
 
 Window method refresh () {
-    $WindowList each do: {| w | $w refresh};
     $MiniWindow refresh;
+    try {$WindowList cdr : each do: {| w | $w refresh}} catch: {};
+    get-current-window : apply {set-cursor; refresh};
 };
 
 Window method display-window-message (win msg) {
@@ -111,7 +112,7 @@ Window method display-window-message (win msg) {
 	    return;
 	};
     };
-    throw ErrNoSuchWindow ["No such window name '" . $win "'"];
+    ##### throw ErrNoSuchWindow ["No such window name '" . $win "'"];
 };
 
 Window method get-minibuffer-window () {
@@ -139,7 +140,8 @@ Window method bind-buffer (window-name buffer) {
 	    break;
 	};
     };
-    $window ?? {throw ErrNoSuchWindow ["No such window name '" . $window-name "'"]};
+    ##### $window ?? {throw ErrNoSuchWindow ["No such window name '" . $window-name "'"]};
+    $window ?? {return};
 
     $window set-buffer $buffer;
     BufferManager set-buffer-geom $window-name [$buffer get-buffer-name];
@@ -159,7 +161,8 @@ Window method render (window-name) {
 	    break;
 	};
     };
-    $window ?? {throw ErrNoSuchWindow ["No such window name '" . $window-name "'"]};
-
+    ##### $window ?? {throw ErrNoSuchWindow ["No such window name '" . $window-name "'"]};
+    $window ?? {return};
+    
     $window render;
 };

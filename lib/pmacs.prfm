@@ -15,9 +15,9 @@ defun pmacs () {
 	
 	# $MainWindow create-full-window;
 	# $MainWindow create-split-vertical-window;
-        # $MainWindow create-split-vertical-window div: 4;
+        $MainWindow create-split-vertical-window div: 2;
 	# $MainWindow create-split-horizontal-window;
-	$MainWindow create-split-horizontal-window div: 4;
+	# $MainWindow create-split-horizontal-window div: 4;
 
 	$MainWindow roll-current-window;
 
@@ -47,17 +47,31 @@ defun pmacs () {
 
 	$MainWindow render-all;
 	$MainWindow refresh;
-	sleep 5000;
+	sleep 1000;
+        key := "";
+	while {true} do: {
+	    i ::= curs-keyin [$MainWindow get-current-window : get-curs] 100;
+	    if {nil? $i} {continue};
+	    if {[$key len] > 80} {key := ""};
+	    $key append! ["" . $i " "];
+	    $MainWindow display-window-message "MiniBuffer" [$key .
+		"                                                                                "];
+	    # $MainWindow render-all;
+	    $MainWindow refresh;
+	};
 
+/*
 	$MainWindow roll-current-window;
 	$MainWindow roll-current-window;
 	$MainWindow bind-buffer
 	    [$MainWindow get-current-window : get-window-name]
-	    [BufferManager get-buffer "eval.c"];
+	    [BufferManager get-buffer "eval.c[2]"];
 	
 	$MainWindow render-all;
 	$MainWindow refresh;
 	sleep 500000;
+*/
+	
     }
     fin: {
 	curs-terminate;
