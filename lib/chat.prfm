@@ -10,24 +10,27 @@ defun chat (host) {
 
     try {
         loop do: {
-            (ifds ofds efds) ::= select ([$stdin fd?]) () () 100;
+            (ifds ofds efds) ::= select ([$stdin fd?] [$server fd?]) () () 100;
 	    if {$ifds null?} else: {
-		message ::= $stdin gets;
-		if [or [$stdin eof?] [nil? $message]] then: {
-	            println "Chat client exit.";
-		    return;
+		$ifds each do: {| fds |
+		    cond
+		    {$fds = [$stdin fd?]} {
+			message ::= $stdin gets;
+			if [or [$stdin eof?] [nil? $message]] then: {
+			    println "Chat client exit.";
+			    return;
+			};
+			$server puts [$message clean];
+		    }
+		    {$fds = [$server fd?]} {
+			message ::= $server gets;
+			if [or [$server eof?] [nil? $message]] then: {
+			    println "Chat server down.";
+			    return;
+			};
+			println [$message clean];
+		    };
 		};
-		$server puts [$message clean];
-	    };
-	
-	    (ifds ofds efds) ::= select ([$server fd?]) () () 100;
-	    if {$ifds null?} else: {
-		message ::= $server gets;
-		if [or [$server eof?] [nil? $message]] then: {
-		    println "Chat server down.";
-		    return;
-		};
-		println [$message clean];
 	    };
 	};
     }
