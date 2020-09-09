@@ -4130,6 +4130,19 @@ cmd_newbulk(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 			 L"Syntax error at 'bulk', syntax: bulk", interp);
 }
 
+Toy_Type*
+cmd_selffunc(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    if (arglen != 0) goto error;
+    if (hash_get_length(nameargs) != 0) goto error;
+    
+    return interp->current_func;
+
+    error:
+    return new_exception(TE_SYNTAX,
+			 L"Syntax error at 'bulk', syntax: bulk", interp);
+}
+
+
 int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, L"false", 	cmd_false, 		NULL);
     toy_add_func(interp, L"true", 	cmd_true, 		NULL);
@@ -4246,6 +4259,7 @@ int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, L"time-of-day",cmd_gettimeofday, 	NULL);
     toy_add_func(interp, L"argspec", 	cmd_getargspec, 	L"func");
     toy_add_func(interp, L"bulk", 	cmd_newbulk, 		L"val-list");
+    toy_add_func(interp, L"self-func", 	cmd_selffunc, 		NULL);
  
 #ifdef NCURSES
     int toy_add_func_ncurses(Toy_Interp* interp);
