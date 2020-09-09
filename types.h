@@ -171,6 +171,10 @@ typedef struct _toy_interp {
 
     /* last command status */
     struct _toy_type *last_status;
+
+    /* current function */
+    struct _toy_type *current_func;
+    
 } Toy_Interp;
 
 typedef struct _toy_coroutine {
