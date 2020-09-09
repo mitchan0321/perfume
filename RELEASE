@@ -1,3 +1,4 @@
+2020/09/10	PRFM_20200910		1.4.1
 2020/04/15	PRFM_20200415		1.4.0
 2020/03/18	PRFM_20200318		1.4.0_PRE_2
 2020/03/13	PRFM_20200313		1.4.0_PRE_1
@@ -1263,5 +1264,27 @@
 2020/05/28
 	lib/flat.prfm
 		Fix OBJECT type objects method collection algorithm.
+
+2020/09/10
+	type.h, commands.c
+		Add description string in CONTAINER data type structure.
+		Add self function object pointer in Toy_Type structure.
+		Add command self-func.
+	methods.c
+		Add method Object::hash.
+	cstack.[ch]
+		Add co-routin slot status SS_PEND.
+		This status indicates that the co-routine is between the end and the release.
+	methods.c
+		Add new method List::concat! and change side effects disappeared from List::concat.
+		Add new method Container::desc.
+	lib/{chat.prfm, chatd.prfm}
+		Change algorithm.
+	lib/expand-symtax.prfm
+		Fix load-func and load-class when expect error in loading file.
+	lib/interp.prfm
+		Change to display stacktrace when execute line occurds exception.
+	ncurses.c
+		Add optional feature, curses library wrapper commands.
 
 #eof
