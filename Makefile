@@ -10,16 +10,16 @@ CC		= cc
 ###
 
 ### OPTIONS macro for indicate enable the feature.
-#OPTIONS	=
-OPTIONS		= -DNCURSES
+OPTIONS	=
+#OPTIONS		= -DNCURSES
 
 ### OPTLIBS macro for indicate link the libraries.
-#OPTLIBS	=
-OPTLIBS		= -lncursesw
+OPTLIBS	=
+#OPTLIBS		= -lncursesw
 
 ### OPTLIBS2 macro for indicate link the libraries, separated by comma.
-#OPTLIBS2	=
-OPTLIBS2	= -lncursesw
+OPTLIBS2	=
+#OPTLIBS2	= -lncursesw
 
 
 ### for product build. (use BoehmGC)
