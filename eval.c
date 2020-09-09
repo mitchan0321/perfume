@@ -390,6 +390,7 @@ control_goto:
 	}
 	lstack_use = 1;
 
+	interp->current_func = first;
 	ret = toy_eval_script(interp, first->u.func.closure->u.closure.block_body);
 //	if ((GET_TAG(ret) == CONTROL) && (ret->u.control.code != CTRL_GOTO)) {
 	if ((GET_TAG(ret) == CONTROL) && (ret->u.control.code == CTRL_RETURN)) {	    
