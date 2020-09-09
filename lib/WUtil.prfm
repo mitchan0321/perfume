@@ -1,0 +1,92 @@
+class WUtil;
+
+WUtil method init () {
+    init-config;
+    init-color-DB;
+};
+
+WUtil method color-pair (fg bg) {
+    if {sets? ColorPair} else: {
+	sets ColorPair [dict];
+	$ColorPair set count 0;
+    };
+    if {sets? ColorName} else: {
+	sets ColorName [dict];
+	$ColorName set BLACK   0;
+	$ColorName set RED     1;
+	$ColorName set GREEN   2;
+	$ColorName set YELLOW  3;
+	$ColorName set BLUE    4;
+	$ColorName set MAGENTA 5;
+	$ColorName set CYAN    6;
+	$ColorName set WHITE   7;
+    };
+
+    if {$ColorName set? $fg} else: {throw ErrNoSuchColorName "No such foreground color name."};
+    if {$ColorName set? $bg} else: {throw ErrNoSuchColorName "No such background color name."};    
+
+    if {$ColorPair set? ($ColorName,$fg $ColorName,$bg)}
+    then: {
+	return [$ColorPair get ($ColorName,$fg $ColorName,$bg)];
+    }
+    else: {
+	p ::= $ColorPair get count;
+	p ::= $p + 1;
+	curs-add-color $p $ColorName,$fg $ColorName,$bg;
+	$ColorPair set ($ColorName,$fg $ColorName,$bg) $p;
+	$ColorPair set $p ($ColorName,$fg $ColorName,$bg);
+	$ColorPair set count $p;
+	return $p;
+    };
+};
+
+WUtil method get-bgcolor (name) {
+    n ::= $ColorDB get $name;
+    $n ?? {throw ErrNoSuchColor ["WUtil::get-bgcolor: No such color DB name, " . $name]};
+    try {
+	(fg bg) ::= $ColorPair get $n;
+    }
+    catch: {throw ErrNoSuchColor ["WUtil::get-bgcolor: No color pair no, " . $n]};
+    return $bg;
+};
+
+WUtil method get-fgcolor (name) {
+    n ::= $ColorDB get $name;
+    $n ?? {throw ErrNoSuchColor ["WUtil::get-fgcolor: No such color DB name, " . $name]};
+    try {
+	(fg bg) ::= $ColorPair get $n;
+    }
+    catch: {throw ErrNoSuchColor ["WUtil::get-fgcolor: No color pair no, " . $n]};
+    return $fg;
+};
+
+defun init-color-DB () {
+    if [defvar? ColorDB] else: {
+	defvar ColorDB [dict];
+    };
+
+    $LIB_PATH each do: {| i |
+	if {file exists? [$i . "/color-defs.prfm"]} {
+	   load [$i . "/color-defs.prfm"];
+	   break;
+	};
+    };
+};
+
+defun init-config () {
+    if {defvar? PMACS_INIT}
+    else: {
+	$LIB_PATH each do: {| i |
+	    if {file exists? [$i . "/pmacs.conf"]} {
+		load [$i . "/pmacs.conf"];
+		break;
+	    };
+	};
+	defvar PMACS_INIT <t>;
+    };
+};
+
+defun set-window-color-default (curs name) {
+    curs-set-bgcolor $curs [$ColorDB get $name];
+    curs-set-color   $curs [$ColorDB get $name];
+};
