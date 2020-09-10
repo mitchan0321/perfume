@@ -1,0 +1,42 @@
+class BufferManager;
+
+BufferManager method init () {
+    [sets? BufferList] ?? {sets BufferList [dict ()]};
+    [sets? BufferGeom] ?? {sets BufferGeom [dict ()]};
+};
+
+BufferManager method regist-buffer (buff name) {
+    i := 1;
+    name-orig := $name;
+    while {$BufferList set? $name} do: {
+	$i ++;
+	name ::= $name-orig . "[" $i "]";
+    };
+    $buff set-buffer-name $name;
+    $BufferList set $name $buff;
+};
+
+BufferManager method get-buffer (name) {
+    return [$BufferList get $name];
+};
+
+BufferManager method set-buffer-geom (window-name buffer-name) {
+    [$BufferGeom set? ($window-name $buffer-name)] ?? {
+	$BufferGeom each do: {| k v |
+	    (w b g) := $v;
+	    if {$b = $buffer-name} {
+		$BufferGeom set
+		    ($window-name $buffer-name)
+		    ($window-name $buffer-name [$g clone]);
+		return;
+	    };
+	};
+	$BufferGeom set
+	    ($window-name $buffer-name)
+	    ($window-name $buffer-name [new BufferGeom]);
+    };
+};
+
+BufferManager method get-buffer-geom (window-name buffer-name) {
+    return [$BufferGeom get ($window-name $buffer-name)];
+};

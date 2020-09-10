@@ -1,0 +1,17 @@
+class BufferGeom;
+
+BufferGeom method init () {
+    sets ViewLine 0;
+    sets ViewColumn 0;
+};
+
+BufferGeom method clone () {
+    b ::= new BufferGeom;
+    $b set! ViewLine $ViewLine;
+    $b set! ViewColumn $ViewColumn;
+    return $b;
+};
+
+BufferGeom method string () {
+    return ["[" . $ViewLine "],[" $ViewColumn "]"];
+};
