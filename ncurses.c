@@ -697,9 +697,12 @@ func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     int itimeout, in, iencoder;
     Toy_Type *arg;
     wchar_t buff[32];
+    Cell *incell, *dstr;
+    Toy_Type *inlist, *result;
+    encoder_error_info *enc_error_info;
 
     if (hash_get_length(nameargs) > 0) goto error;
-    if (arglen != 2) goto error;
+    if (arglen != 3) goto error;
 
     container = list_get_item(posargs);
     if (GET_TAG(container) != CONTAINER) goto error;
@@ -723,26 +726,56 @@ func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 	return new_exception(TE_BADENCODER, L"Bad encoder specified.", interp);
     }
 
-    // to be continued...
+    enc_error_info = GC_MALLOC(sizeof(encoder_error_info));
+    ALLOC_SAFE(enc_error_info);
+    incell = new_cell(L"");
+    inlist = result = new_list(NULL);
 
     wtimeout(w, itimeout);
+
     in = wgetch(w);
+    while (in != -1) {
+	if (in >= 256) {
+	    // detect function key input
+	    if ((in >= KEY_F(0)) && (in <= KEY_F(63))) {
+		swprintf(buff, 32, L"KEY_F%d", in-KEY_F(0));	    
+		inlist = list_append(inlist, new_symbol(buff));
+	    } else {
+		swprintf(buff, 32, L"%s", keyname(in));
+		inlist = list_append(inlist, new_symbol(buff));
+	    }
 
-    if (-1 == in) return const_Nil;
+	    // if function key detect, return to caller soon.
+	    break;
+	    
+	} else {
+	    // detect character input
+	    cell_add_char(incell, in);
 
-    if (in >= 256) {
-	if ((in >= KEY_F(0)) && (in <= KEY_F(63))) {
-	    swprintf(buff, 32, L"KEY_F%d", in-KEY_F(0));	    
-	    return new_symbol(buff);
+	    // read remain character
+	    wtimeout(w, itimeout / 4);
+	    in = wgetch(w);
+	    while (in != -1) {
+		cell_add_char(incell, in);
+		in = wgetch(w);
+	    }
+	    // decode encoding
+	    dstr = decode_raw_to_unicode(incell, iencoder, enc_error_info);
+	    if (NULL == dstr) {
+		return new_exception(TE_BADENCODEBYTE, enc_error_info->message, interp);
+	    }
+	    inlist = list_append(inlist, new_string_cell(dstr));
+	    incell = new_cell(L"");
+	    break;
 	}
-	swprintf(buff, 32, L"%s", keyname(in));
-	return new_symbol(buff);
+
+	in = wgetch(w);
     }
 
-    return new_integer_si(in);
+    return result;
     
 error:
-    return new_exception(TE_SYNTAX, L"Syntax error at 'curs-keyin', syntax: curs-keyin window timeout", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'curs-keyin', syntax: curs-keyin window timeout encoding", interp);
 }
 
 int
