@@ -1,3 +1,10 @@
+###
+### Set options initial value
+###
+OPTIONS =
+OPTLIBS =
+OPTLIBS2 =
+
 ############################################################################
 ###
 ###   FIX ME
@@ -6,20 +13,17 @@ PREFIX		= /usr/local
 CC		= cc
 
 ###
-### OPTIONS
+### SET ENABLE FEATURE OPTIONS
 ###
 
-### OPTIONS macro for indicate enable the feature.
-#OPTIONS	=
-OPTIONS		= -DNCURSES
+### Enable curses library (for use in perfume intepriter execute curs-* commands)
+NCURSES = yes
 
-### OPTLIBS macro for indicate link the libraries.
-#OPTLIBS	=
-OPTLIBS		= -lncursesw
-
-### OPTLIBS2 macro for indicate link the libraries, separated by comma.
-#OPTLIBS2	=
-OPTLIBS2	= -lncursesw
+ifeq ($(NCURSES),yes)
+  OPTIONS	+= -DNCURSES
+  OPTLIBS	+= -lncursesw
+  OPTLIBS2	+= -lncursesw
+endif
 
 
 ### for product build. (use BoehmGC)
@@ -53,12 +57,15 @@ HDRS		= bulk.h binbulk.h cell.h array.h error.h hash.h interp.h parser.h \
 		  toy.h types.h config.h global.h cstack.h util.h encoding.h
 SRCS		= bulk.c binbulk.c cell.c array.c hash.c list.c parser.c types.c \
 		  eval.c interp.c commands.c methods.c global.c cstack.c util.c \
-		  encoding.c encoding-table.c \
-		  ncurses.c
+		  encoding.c encoding-table.c
 OBJS		= bulk.o binbulk.o cell.o array.o hash.o list.o parser.o types.o \
 		  eval.o interp.o commands.o methods.o global.o cstack.o util.o \
-		  encoding.o encoding-table.o \
-		  ncurses.o
+		  encoding.o encoding-table.o
+
+ifeq ($(NCURSES),yes)
+  SRCS		+= ncurses.c
+  OBJS		+= ncurses.o
+endif
 
 all:		perfumesh
 
@@ -128,8 +135,16 @@ encoding-table.o: encoding-table.c $(HDRS)
 	awk -f jisconv.awk < doc/jis0208.txt
 	$(CC) $(CFLAGS) -O0 $(INCLUDE) encoding-table.c -o encoding-table.o
 
+###
+### Compile optional feature
+###
+ifeq ($(NCURSES),yes)
 ncurses.o:	ncurses.c $(HDRS)
 	$(CC) $(CFLAGS) $(INCLUDE) ncurses.c -o ncurses.o
+endif
+###
+### End
+###
 
 config.h:	config.h.in
 	sed 	-e s%@PREFIX@%$(PREFIX)%g \
@@ -137,7 +152,7 @@ config.h:	config.h.in
 		< config.h.in > config.h
 
 clean:
-	rm -f *.o perfumesh *~ lib/*~ tests/*~ *core* *.gmon config.h tests/setup.prfm a.out
+	rm -f *.o perfumesh *~ lib/*~ tests/*~ *core* *.gmon config.h tests/setup.prfm a.out tests/test
 	rm -f encoding-set-utoj.h encoding-set-jtou.h
 
 #eof
