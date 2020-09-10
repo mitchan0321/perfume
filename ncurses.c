@@ -191,6 +191,8 @@ Toy_Type*
 func_curses_clear(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     WINDOW *w;
     Toy_Type *container;
+    int i, j;
+    int y, x;
 
     if (hash_get_length(nameargs) > 0) goto error;
     if (arglen != 1) goto error;
@@ -203,7 +205,14 @@ func_curses_clear(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     w = container->u.container.data;
     posargs = list_next(posargs);
 
-    wclear(w);
+    werase(w);
+    getmaxyx(w, y, x);
+    for (i=0; i<y; i++) {
+	for (j=0; j<x; j++) {
+	    wmove(w, i, j);
+	    wprintw(w, " ");
+	}
+    }
     return const_T;
 
 error:

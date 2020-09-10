@@ -20,6 +20,14 @@ BufferManager method get-buffer (name) {
     return [$BufferList get $name];
 };
 
+BufferManager method get-next-buffer (buff) {
+    
+    l ::= msort [$BufferList keys :string];
+    i ::= $l find [$buff get-buffer-name];
+    r ::= $l get [$i + 1];
+    return [$BufferList get [$r ??? $r $l,0]];
+};
+
 BufferManager method set-buffer-geom (window-name buffer-name) {
     [$BufferGeom set? ($window-name $buffer-name)] ?? {
 	$BufferGeom each do: {| k v |
@@ -38,5 +46,5 @@ BufferManager method set-buffer-geom (window-name buffer-name) {
 };
 
 BufferManager method get-buffer-geom (window-name buffer-name) {
-    return [$BufferGeom get ($window-name $buffer-name)];
+    return [$BufferGeom get ($window-name $buffer-name) : get 2];
 };

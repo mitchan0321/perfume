@@ -36,12 +36,16 @@ EditBuffer method get-buffer-name () {
 
 EditBuffer method buffer-select (from to block) {
     $from each to: $to do: {| i |
-	if {$i < [$Src len]}
+	if {and [$i < [$Src len]] [$i >= 0]}
 	then: {
-	    yield $block [$Src get $i];
+	    yield $block $Src,$i;
 	}
 	else: {
 	    yield $block "";
 	};
     };
+};
+
+EditBuffer method get-buffer-length () {
+    return [$Src ??? [$Src len] 0];
 };

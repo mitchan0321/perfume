@@ -53,20 +53,34 @@ CombiWindow method display (msg) {
     curs-print $BufferCurs $msg $DISPLAY_ENCODING 0 0;
 };
 
+CombiWindow method clear () {
+    curs-clear $StatusLineCurs;
+    curs-clear $VerticalLineCurs;	    
+    curs-clear $BufferCurs;
+};
+
 CombiWindow method get-curs () {
     return $BufferCurs;
 };
 
 CombiWindow method render () {
+    clear;
+    
     (y x) ::= curs-get-screen-size $BufferCurs;
     win ::= get-window-name;
     buff ::= get-buffer;
     buff-name ::= $buff get-buffer-name;
-    (_dumy_ _dumy_ geom) ::= BufferManager get-buffer-geom $win $buff-name;
-    curs-print $StatusLineCurs [" --- " .  $buff-name " - " $win] $DISPLAY_ENCODING 0 0;
-    0 each to: [$y - 1] do: {| i |
-	curs-print $VerticalLineCurs "|" $DISPLAY_ENCODING $i 0;
-    };
+    geom ::= BufferManager get-buffer-geom $win $buff-name;
+
+    curs-print $StatusLineCurs [
+	  "--- %v %v G=(%d,%d) V=(%d,%d) ---" fmt
+	  $buff-name $win
+	  $geom,ViewLine $geom,ViewColumn
+	  $CursorLine $CursorColumn
+	]
+	$DISPLAY_ENCODING 0 0;
+    
+    render-vertical-line;
 
     i := 0;
     $buff buffer-select $geom,ViewLine [$geom,ViewLine + $y : - 1] {
@@ -76,5 +90,125 @@ CombiWindow method render () {
 	    $i $geom,ViewColumn $src
 	    $DEFAULT_TAB_WIDTH $DISPLAY_ENCODING;
 	$i ++;
+    };
+};
+
+CombiWindow method render-vertical-line () {
+    win ::= get-window-name;
+    buff ::= get-buffer;
+    buff-name ::= $buff get-buffer-name;
+    geom ::= BufferManager get-buffer-geom $win $buff-name;
+    (y x) ::= curs-get-screen-size $BufferCurs;
+
+    curs-clear $VerticalLineCurs;
+    len ::= $buff get-buffer-length;
+
+    if {$len = 0} {
+        lines := $y;
+    } {
+	lines ::= $y * $y : / $len;
+	if {$lines < 0}  {lines := 0};
+	if {$lines > $y} {lines := $y};
+    };
+
+    if {$len = 0} {
+        start := 0;
+    } {
+	start ::= $y * $geom,ViewLine : / $len;
+	if {$start < 0}   {start := 0};
+	if {$start >= $y} {start := [$y -1]};
+    };
+
+    0 each to: $lines do: {| i |
+	curs-print $VerticalLineCurs "+" $DISPLAY_ENCODING [$i + $start] 0;
+    };
+};
+
+CombiWindow method page-down () {
+    win ::= get-window-name;
+    buff ::= get-buffer;
+    buff-name ::= $buff get-buffer-name;
+    geom ::= BufferManager get-buffer-geom $win $buff-name;
+    (y x) ::= curs-get-screen-size $BufferCurs;
+
+    new-y ::= $geom,ViewLine + $y;
+    if {$new-y > [[$buff get-buffer-length] - $y : + 1]} {new-y ::= [$buff get-buffer-length] - $y : + 1};
+    if {$new-y < 0} {new-y := 0};
+    $geom set! ViewLine $new-y;
+};
+
+CombiWindow method page-up () {
+    win ::= get-window-name;
+    buff ::= get-buffer;
+    buff-name ::= $buff get-buffer-name;
+    geom ::= BufferManager get-buffer-geom $win $buff-name;
+    (y x) ::= curs-get-screen-size $BufferCurs;
+
+    new-y ::= $geom,ViewLine - $y;
+    if {$new-y < 0} {new-y := 0};
+    $geom set! ViewLine $new-y;
+};
+
+CombiWindow method move-down () {
+    win ::= get-window-name;
+    buff ::= get-buffer;
+    buff-name ::= $buff get-buffer-name;
+    geom ::= BufferManager get-buffer-geom $win $buff-name;
+    (y x) ::= curs-get-screen-size $BufferCurs;
+
+    if {[$geom,ViewLine + $CursorLine] >= [$buff get-buffer-length]} {return};
+    sets CursorLine [$CursorLine + 1];
+    if {$CursorLine >= $y} {
+	sets CursorLine [$CursorLine - 1];
+	new-y ::= $geom,ViewLine + 1;
+	if {$new-y > [$buff get-buffer-length]} {new-y ::= $buff get-buffer-length};
+	$geom set! ViewLine $new-y;
+    };
+};
+
+CombiWindow method move-up () {
+    win ::= get-window-name;
+    buff ::= get-buffer;
+    buff-name ::= $buff get-buffer-name;
+    geom ::= BufferManager get-buffer-geom $win $buff-name;
+    (y x) ::= curs-get-screen-size $BufferCurs;
+
+    sets CursorLine [$CursorLine - 1];
+    if {$CursorLine < 0} {
+	sets CursorLine 0;
+	new-y ::= $geom,ViewLine - 1;
+	if {$new-y < 0} {new-y := 0};
+	$geom set! ViewLine $new-y;
+    };
+};
+
+CombiWindow method move-right () {
+    win ::= get-window-name;
+    buff ::= get-buffer;
+    buff-name ::= $buff get-buffer-name;
+    geom ::= BufferManager get-buffer-geom $win $buff-name;
+    (y x) ::= curs-get-screen-size $BufferCurs;
+
+    sets CursorColumn [$CursorColumn + 1];
+    if {$CursorColumn >= $x} {
+	sets CursorColumn [$CursorColumn - 1];
+	new-x ::= $geom,ViewColumn + 1;
+	$geom set! ViewColumn $new-x;
+    };
+};
+
+CombiWindow method move-left () {
+    win ::= get-window-name;
+    buff ::= get-buffer;
+    buff-name ::= $buff get-buffer-name;
+    geom ::= BufferManager get-buffer-geom $win $buff-name;
+    (y x) ::= curs-get-screen-size $BufferCurs;
+
+    sets CursorColumn [$CursorColumn - 1];
+    if {$CursorColumn < 0} {
+	sets CursorColumn 0;
+	new-x ::= $geom,ViewColumn - 1;
+	if {$new-x < 0} {new-x := 0};
+	$geom set! ViewColumn $new-x;
     };
 };

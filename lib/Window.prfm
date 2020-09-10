@@ -39,6 +39,9 @@ Window method create-minibuffer-window () {
     $MiniWindow activate;
 };
 
+Window method add-window-resize-hook () {
+};
+
 Window method create-full-window () {
     (l c) ::= curs-get-screen-size $CursWin;
     win ::= new CombiWindow init: ([self] 0 0 $l $c);
@@ -115,6 +118,15 @@ Window method display-window-message (win msg) {
     ##### throw ErrNoSuchWindow ["No such window name '" . $win "'"];
 };
 
+Window method clear-window (win) {
+    $WindowList . $MiniWindow : each do: {| i |
+	if {[$i get-window-name] = $win} {
+	    $i clear;
+	    return;
+	};
+    };
+};
+
 Window method get-minibuffer-window () {
     return $MiniWindow;
 };
@@ -129,6 +141,14 @@ Window method roll-current-window () {
     $WindowList car : activate;
     try {$WindowList cdr : each do: {| i | $i diactivate}} catch: {};
     return [$WindowList car];
+};
+
+Window method roll-buffer () {
+    win := $WindowList,0;
+
+    buff ::= BufferManager get-next-buffer [$win get-buffer];
+    win-name ::= $win get-window-name;
+    bind-buffer $win-name $buff;
 };
 
 Window method bind-buffer (window-name buffer) {

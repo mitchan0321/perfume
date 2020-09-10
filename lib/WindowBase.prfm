@@ -41,6 +41,10 @@ WindowBase method render (*) {
     throw ErrNoMethodImpl ["No Impliment method '" . $@name "::render'."];
 };
 
+WindowBase method clear (*) {
+    throw ErrNoMethodImpl ["No Impliment method '" . $@name "::clear'."];
+};
+
 WindowBase method set-cursor (*) {
     throw ErrNoMethodImpl ["No Impliment method '" . $@name "::set-cursor'."];
 };
