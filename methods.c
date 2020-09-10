@@ -2087,7 +2087,7 @@ mth_list_concat_se(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int ar
     return self;
 
 error:
-    return new_exception(TE_SYNTAX, L"Syntax error at 'concat', syntax: List concat (list) | var ...", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'concat!', syntax: List concat! (list) | var ...", interp);
 error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
 }
