@@ -367,7 +367,7 @@ Toy_Type*
 func_curses_render_line(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     WINDOW *w;
     Toy_Type *container, *arg;
-    int window_y, view_x, tab_width;
+    int window_y, view_x, offset_x, tab_width;
     Toy_Type *disp_string, *encoding;
     int win_size_y, win_size_x;
     int iencoder;
@@ -379,7 +379,7 @@ func_curses_render_line(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, i
     Cell *result;
 	
     if (hash_get_length(nameargs) > 0) goto error;
-    if (arglen != 6) goto error;
+    if (arglen != 7) goto error;
 
     container = list_get_item(posargs);
     if (GET_TAG(container) != CONTAINER) goto error;
@@ -398,7 +398,12 @@ func_curses_render_line(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, i
     if (GET_TAG(arg) != INTEGER) goto error;
     view_x = mpz_get_si(arg->u.biginteger);
     posargs = list_next(posargs);
-    
+
+    arg = list_get_item(posargs);
+    if (GET_TAG(arg) != INTEGER) goto error;
+    offset_x = mpz_get_si(arg->u.biginteger);
+    posargs = list_next(posargs);
+
     arg = list_get_item(posargs);
     if (GET_TAG(arg) != STRING) goto error;
     disp_string = arg;
@@ -468,10 +473,11 @@ func_curses_render_line(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, i
 		rendaring_data[i-1].display_position + rendaring_data[i-1].display_width;
 	}
     }
+    win_size_x -= offset_x;
     for (i=0; i<slen; i++) {
 	if (((rendaring_data[i].display_position - view_x) >= 0) &&
 	    ((rendaring_data[i].display_position - view_x + rendaring_data[i].display_width) <= (win_size_x))) {
-	    wmove(w, window_y, rendaring_data[i].display_position - view_x);
+	    wmove(w, window_y, rendaring_data[i].display_position - view_x + offset_x);
 	    wprintw(w, "%s", to_char(rendaring_data[i].display_char));
 	}
     }
@@ -479,7 +485,7 @@ func_curses_render_line(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, i
     return const_T;
 
 error:
-    return new_exception(TE_SYNTAX, L"Syntax error at 'curs-render-line', syntax: curs-render-line window window-y view-x string tab-width encoding", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'curs-render-line', syntax: curs-render-line window window-y view-x offset-x string tab-width encoding", interp);
 }
 
 Toy_Type*
@@ -787,6 +793,170 @@ error:
     return new_exception(TE_SYNTAX, L"Syntax error at 'curs-keyin', syntax: curs-keyin window timeout encoding", interp);
 }
 
+Toy_Type*
+func_curses_pos_to_index(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *arg, *disp_string;
+    int i;
+    int pos;
+    int tab_width;
+    int slen;
+    Render_Encode *rendaring_data;
+    wchar_t *p;
+    
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (arglen != 3) goto error;
+
+    arg = list_get_item(posargs);
+    if (GET_TAG(arg) != STRING) goto error;
+    disp_string = arg;
+    posargs = list_next(posargs);
+    
+    arg = list_get_item(posargs);
+    if (GET_TAG(arg) != INTEGER) goto error;
+    pos = mpz_get_si(arg->u.biginteger);
+    posargs = list_next(posargs);
+
+    arg = list_get_item(posargs);
+    if (GET_TAG(arg) != INTEGER) goto error;
+    tab_width = mpz_get_si(arg->u.biginteger);
+    posargs = list_next(posargs);
+
+    slen = cell_get_length(disp_string->u.string);
+    rendaring_data = GC_MALLOC(sizeof(Render_Encode) * (slen+1));
+    ALLOC_SAFE(rendaring_data);
+    slen ++;
+
+    p = cell_get_addr(disp_string->u.string);
+    p[slen-1] = -1;
+    for (i=0; i<slen; i++) {
+	if (p[i] == -1) {
+	    /* string last character (dummy data) */
+	    rendaring_data[i].display_width = 1;
+	}
+	else if ((p[i] < 0x20) || (p[i] == 0x7f)) {
+	    /* control character encoding */
+	    rendaring_data[i].display_width = 1;
+	}
+	else if (p[i] < 0x7f) {
+	    /* ASCII character encoding */
+	    rendaring_data[i].display_width = 1;
+	} else {
+	    /* multi display width character */
+	    if ((p[i] >= 0xFF61) && (p[i] <= 0xFF9F)) {
+		/* JISX0201 (single width) */
+		rendaring_data[i].display_width = 1;
+	    } else {
+		/* otherwise (multi width) */
+		rendaring_data[i].display_width = 2;
+	    }
+	}
+    }
+
+    rendaring_data[0].display_position = 0;
+    for (i=1; i<slen; i++) {
+	if (p[i-1] == 0x09) {
+	    rendaring_data[i].display_position = 
+		((rendaring_data[i-1].display_position + tab_width) / tab_width) * tab_width;
+	} else {
+	    rendaring_data[i].display_position = 
+		rendaring_data[i-1].display_position + rendaring_data[i-1].display_width;
+	}
+    }
+    for (i=slen-1; i>=0; i--) {
+	if (rendaring_data[i].display_position <= pos) {
+	    return new_integer_si(i);
+	}
+    }
+    return new_integer_si(0);
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'curs-pos-to-index', syntax: curs-pos-to-index string pos tab-width", interp);
+}
+
+Toy_Type*
+func_curses_index_to_pos(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *arg, *disp_string;
+    int i;
+    int index;
+    int tab_width;
+    int slen;
+    Render_Encode *rendaring_data;
+    wchar_t *p;
+    
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (arglen != 3) goto error;
+
+    arg = list_get_item(posargs);
+    if (GET_TAG(arg) != STRING) goto error;
+    disp_string = arg;
+    posargs = list_next(posargs);
+    
+    arg = list_get_item(posargs);
+    if (GET_TAG(arg) != INTEGER) goto error;
+    index = mpz_get_si(arg->u.biginteger);
+    posargs = list_next(posargs);
+
+    arg = list_get_item(posargs);
+    if (GET_TAG(arg) != INTEGER) goto error;
+    tab_width = mpz_get_si(arg->u.biginteger);
+    posargs = list_next(posargs);
+
+    slen = cell_get_length(disp_string->u.string);
+    rendaring_data = GC_MALLOC(sizeof(Render_Encode) * (slen+1));
+    slen ++;
+    ALLOC_SAFE(rendaring_data);
+
+    p = cell_get_addr(disp_string->u.string);
+    p[slen-1] = -1;
+    for (i=0; i<slen; i++) {
+	if (p[i] == -1) {
+	    /* string last character (dummy data) */
+	    rendaring_data[i].display_width = 1;
+	}
+	else if ((p[i] < 0x20) || (p[i] == 0x7f)) {
+	    /* control character encoding */
+	    rendaring_data[i].display_width = 1;
+	}
+	else if (p[i] < 0x7f) {
+	    /* ASCII character encoding */
+	    rendaring_data[i].display_width = 1;
+	} else {
+	    /* multi display width character */
+	    if ((p[i] >= 0xFF61) && (p[i] <= 0xFF9F)) {
+		/* JISX0201 (single width) */
+		rendaring_data[i].display_width = 1;
+	    } else {
+		/* otherwise (multi width) */
+		rendaring_data[i].display_width = 2;
+	    }
+	}
+    }
+
+    rendaring_data[0].display_position = 0;
+    for (i=1; i<slen; i++) {
+	if (p[i-1] == 0x09) {
+	    rendaring_data[i].display_position = 
+		((rendaring_data[i-1].display_position + tab_width) / tab_width) * tab_width;
+	} else {
+	    rendaring_data[i].display_position = 
+		rendaring_data[i-1].display_position + rendaring_data[i-1].display_width;
+	}
+    }
+    if (slen == 0) {
+	return new_integer_si(0);
+    }
+    if (index < 0) {
+	return new_integer_si(0);
+    }
+    if (index >= slen) {
+	return new_integer_si(rendaring_data[slen-1].display_position);
+    }
+    return new_integer_si(rendaring_data[index].display_position);
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'curs-index-to-pos', syntax: curs-index-to-pos string index", interp);
+}
+
 int
 toy_add_func_ncurses(Toy_Interp* interp) {
     toy_add_func(interp, L"curs-init",		func_curses_init,		NULL);
@@ -798,7 +968,7 @@ toy_add_func_ncurses(Toy_Interp* interp) {
     toy_add_func(interp, L"curs-print",		func_curses_print,		L"window,message,encoding,y,x");
     toy_add_func(interp, L"curs-refresh",	func_curses_refresh,		L"window");
     toy_add_func(interp, L"curs-color",		func_curses_color,		L"window,y,x,len,color,attr");
-    toy_add_func(interp, L"curs-render-line",	func_curses_render_line,	L"window,window-y,view-x,string,tab-width,encoding");
+    toy_add_func(interp, L"curs-render-line",	func_curses_render_line,	L"window,window-y,view-x,offset-x,string,tab-width,encoding");
     toy_add_func(interp, L"curs-box",		func_curses_box,		L"window");
     toy_add_func(interp, L"curs-set-color",	func_curses_setcolor,		L"window,color-pair");
     toy_add_func(interp, L"curs-set-bgcolor",	func_curses_setbgcolor,		L"window,color-number");
@@ -807,6 +977,8 @@ toy_add_func_ncurses(Toy_Interp* interp) {
     toy_add_func(interp, L"curs-move",		func_curses_move,		L"window,y,x");
     toy_add_func(interp, L"curs-add-color",	func_curses_add_color,		L"pair,fg-color,bg-color");
     toy_add_func(interp, L"curs-keyin",		func_curses_keyin,		L"window,timeout,encoding");
+    toy_add_func(interp, L"curs-pos-to-index",	func_curses_pos_to_index,	L"string,pos,tab-width");
+    toy_add_func(interp, L"curs-index-to-pos",	func_curses_index_to_pos,	L"string,index,tab-width");
     return 0;
 }
 

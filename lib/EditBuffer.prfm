@@ -38,6 +38,15 @@ EditBuffer method buffer-select (from to block) {
     };
 };
 
+EditBuffer method get-buffer-line (line) {
+    $Src ?? {return <nil>};
+    if {$line >= [$Src len]} {
+	return <nil>;
+    } {
+	return [$Src get $line];
+    }
+};
+
 EditBuffer method get-buffer-length () {
     return [$Src ??? [$Src len] 0];
 };

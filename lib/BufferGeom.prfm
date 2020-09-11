@@ -17,5 +17,5 @@ BufferGeom method clone () {
 };
 
 BufferGeom method string () {
-    return ["[vl:%v,vc%v,cl%v,cc%v]" fmt $ViewLine $ViewColumn $CursorLine $CursorColumn];
+    return ["[vl:%v,vc:%v,cl:%v,cc:%v]" fmt $ViewLine $ViewColumn $CursorLine $CursorColumn];
 };

@@ -45,7 +45,7 @@ defun pmacs (trace: t) {
 	# $MainWindow bind-buffer "Window#2" $b;
 
 	b ::= new EditBuffer;
-	$b load-content "/home/mit-sato/perfume/testfile";
+	$b load-content "/home/mit-sato/perfume/misc/testfile";
 	# $MainWindow bind-buffer "Window#3" $b;
 
 	b ::= new EditBuffer;
@@ -181,7 +181,7 @@ REM {
 defun debug-message (msg) {
     if $MainWindow {
 	[$MainWindow get-minibuffer-window] ?? {throw ErrNoMiniBuffer "No MiniBuffer for debugging."};
-	$MainWindow display-window-message "MiniBuffer" ["DEBUG(Press any key): %-80v" fmt $msg];
+	$MainWindow display-window-message "MiniBuffer" ["DEBUG: %-80v" fmt $msg];
 	$MainWindow get-minibuffer-window : refresh;
 	curs-keyin [$MainWindow get-minibuffer-window : get-curs] 0 $INPUT_ENCODING;
     };

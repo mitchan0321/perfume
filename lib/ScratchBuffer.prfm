@@ -1,4 +1,4 @@
-class ScratchBuffer BufferBase;
+class ScratchBuffer EditBuffer;
 
 ScratchBuffer method init () {
     init-constructor;

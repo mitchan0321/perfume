@@ -55,6 +55,11 @@ Window method create-full-window () {
     $win set-window-name "Window#1";
     $WindowList <<- $win;
     $WindowList car : activate;
+
+    $WindowList each do: {| w |
+	buff ::= $w get-buffer;
+	$MainWindow bind-buffer [$w get-window-name] $buff;
+    };
 };
 
 Window method create-split-vertical-window (div: ndivs) {
@@ -82,6 +87,11 @@ Window method create-split-vertical-window (div: ndivs) {
     };
     $WindowList car : activate;
     $WindowList cdr : each do: {| i | $i diactivate};
+
+    $WindowList each do: {| w |
+	buff ::= $w get-buffer;
+	$MainWindow bind-buffer [$w get-window-name] $buff;
+    };
 };
 
 Window method create-split-horizontal-window (div: ndivs) {
@@ -109,6 +119,11 @@ Window method create-split-horizontal-window (div: ndivs) {
     };
     $WindowList car : activate;
     $WindowList cdr : each do: {| i | $i diactivate};
+
+    $WindowList each do: {| w |
+	buff ::= $w get-buffer;
+	$MainWindow bind-buffer [$w get-window-name] $buff;
+    };
 };
 
 Window method create-split-cross-window () {
@@ -137,6 +152,11 @@ Window method create-split-cross-window () {
 
     $WindowList car : activate;
     $WindowList cdr : each do: {| i | $i diactivate};
+
+    $WindowList each do: {| w |
+	buff ::= $w get-buffer;
+	$MainWindow bind-buffer [$w get-window-name] $buff;
+    };
 };
 
 Window method refresh () {
