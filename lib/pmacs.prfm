@@ -5,7 +5,12 @@ load-class :force WindowBase;
 load-class :force WUtil;
 load-class :force BufferGeom;
 
-defun pmacs () {
+defun pmacs (trace: t) {
+    if {true? t} {
+	f := `File ("./trace.pmacs" mode: o);
+	trace 1 out: [$f fd?];
+    };
+    
     try {
 	defvar MainWindow [new Window init: ([curs-init])];
 	BufferManager init;
@@ -15,9 +20,9 @@ defun pmacs () {
 	
 	# $MainWindow create-full-window;
 	# $MainWindow create-split-vertical-window;
-        # $MainWindow create-split-vertical-window div: 3;
+        $MainWindow create-split-vertical-window div: 3;
 	# $MainWindow create-split-horizontal-window;
-	$MainWindow create-split-horizontal-window div: 3;
+	# $MainWindow create-split-horizontal-window div: 3;
 	
 
         # $MainWindow display-window-message "MiniBuffer" "Hello";
@@ -40,8 +45,8 @@ defun pmacs () {
 	$b load-content "/home/mit-sato/perfume/testfile";
 	$MainWindow bind-buffer "Window#3" $b;
 
-	#b ::= new EditBuffer;
-	#$b load-content "/home/mit-sato/eval.c";
+	b ::= new EditBuffer;
+	$b load-content "/home/mit-sato/eval.c";
 	$MainWindow bind-buffer "Window#4" $b;
 
 	$MainWindow render-all;
@@ -122,7 +127,7 @@ REM {
 	curs-terminate;
     }
     catch: {| e |
-	__error_info__ ::= "ERROR: <" . [$e car] "># " [$e cdr] "\n\n" $@stack-trace;
+	__error_info__ ::= "ERROR: <%v># %v\n\n%v" fmt [$e car] [$e cdr] $@stack-trace;
     }
     ;
 

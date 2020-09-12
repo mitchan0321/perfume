@@ -3,15 +3,19 @@ class BufferGeom;
 BufferGeom method init () {
     sets ViewLine 0;
     sets ViewColumn 0;
+    sets CursorLine 0;
+    sets CursorColumn 0;
 };
 
 BufferGeom method clone () {
     b ::= new BufferGeom;
     $b set! ViewLine $ViewLine;
     $b set! ViewColumn $ViewColumn;
+    $b set! CursorLine $CursorLine;
+    $b set! CursorColumn $CursorColumn;
     return $b;
 };
 
 BufferGeom method string () {
-    return ["[" . $ViewLine "],[" $ViewColumn "]"];
+    return ["[vl:%v,vc%v,cl%v,cc%v]" fmt $ViewLine $ViewColumn $CursorLine $CursorColumn];
 };

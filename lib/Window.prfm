@@ -152,7 +152,6 @@ Window method roll-buffer () {
 };
 
 Window method bind-buffer (window-name buffer) {
-    buffer-name ::= $buffer get-buffer-name;
     window := <nil>;
     $WindowList each do: {| i |
 	if {[$i get-window-name] = $window-name} {
@@ -160,11 +159,24 @@ Window method bind-buffer (window-name buffer) {
 	    break;
 	};
     };
-    ##### $window ?? {throw ErrNoSuchWindow ["No such window name '" . $window-name "'"]};
     $window ?? {return};
 
+    # Save window buffer geometory
+    orig-buff ::= $window get-buffer;
+    if $orig-buff {
+	BufferManager set-buffer-geom $window-name [$orig-buff get-buffer-name]
+	    $window,CursorLine $window,CursorColumn;
+    };
+
+    # Restore window buffer geometory
     $window set-buffer $buffer;
-    BufferManager set-buffer-geom $window-name [$buffer get-buffer-name];
+    geom ::= BufferManager get-buffer-geom $window-name [$buffer get-buffer-name];
+    if $geom {
+	$window set! CursorLine $geom,CursorLine;
+	$window set! CursorColumn $geom,CursorColumn;
+    };
+    BufferManager set-buffer-geom $window-name [$buffer get-buffer-name]
+	$window,CursorLine $window,CursorColumn;
 };
 
 Window method render-all () {
