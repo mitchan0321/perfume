@@ -22,6 +22,7 @@ void cstack_protect(int slot);
 void cstack_unprotect(int slot);
 void cstack_return();
 int  cstack_isalive(int slot);
+void* cstack_get_safe_addr();
 
 #define SS_INVAL	(-1)
 #define SS_FREE		(0)
@@ -32,6 +33,21 @@ int  cstack_isalive(int slot);
 
 #ifdef __CSTACK_DEF__
 
+/**
+ **
+ ** start_addr   ->  |                      |
+ ** barrier_addr ->  +----------------------+
+ **                  |/// mprotect area ////+ PAGE SIZE
+ ** safe_addr    ->  +----------------------+
+ **                  |/// approach safe ////|      ^
+ **                  |///   (32Kbytes)  ////|
+ **                  |          ^           | define at config.h.in
+ **                  |      user area       |    STACK_SLOT_SIZE
+ **                  |          v           |    (default 256Kbytes)
+ ** end_addr     ->  +----------------------+      v
+ ** (initial stack top)
+ **
+ **/
 static struct _cstack {
     int number_of_slot;
     int slot_size;

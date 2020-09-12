@@ -220,7 +220,6 @@ cstack_clear(int slot_id) {
 	   CStack.stack_slot[slot_id].end_addr - CStack.stack_slot[slot_id].barrier_addr);
 }
 
-
 static void
 cstack_clear_all(int slot_id) {
     memset((void*)CStack.stack_slot[slot_id].start_addr, 0,
@@ -443,4 +442,9 @@ int  cstack_isalive(int slot) {
     } else {
 	return 0;
     }
+}
+
+void*
+cstack_get_safe_addr() {
+    return (void*)CStack.stack_slot[Current_coroutine].safe_addr;
 }

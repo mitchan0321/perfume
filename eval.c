@@ -40,6 +40,11 @@ toy_eval_script(Toy_Interp* interp, Toy_Type *script) {
     int script_id;
     extern volatile sig_atomic_t CStack_in_baria;
     result = const_Nil;
+    volatile int baria_dist;
+
+    if ((((unsigned long)(&baria_dist)) - ((unsigned long)cstack_get_safe_addr())) < (MP_PAGESIZE*8)) {
+	return new_exception(TE_STACKOVERFLOW, L"C stack approaches the barrier.", interp);
+    }
 
     SIG_ACTION();
 
