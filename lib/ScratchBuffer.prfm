@@ -1,0 +1,31 @@
+class ScratchBuffer BufferBase;
+
+ScratchBuffer method init () {
+    init-constructor;
+};
+
+ScratchBuffer method init-constructor () {
+    sets Src [vector ("This is a '*Scratch*' buffer.")];
+    sets File <nil>;
+    sets BufferName <nil>;
+};
+
+ScratchBuffer method load-content (path) {
+    true;
+};
+
+ScratchBuffer method buffer-select (from to block) {
+    $from each to: $to do: {| i |
+	if {and [$i < [$Src len]] [$i >= 0]}
+	then: {
+	    yield $block $Src,$i;
+	}
+	else: {
+	    yield $block "";
+	};
+    };
+};
+
+ScratchBuffer method get-buffer-length () {
+    return [$Src ??? [$Src len] 0];
+};
