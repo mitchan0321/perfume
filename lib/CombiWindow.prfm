@@ -22,18 +22,21 @@ CombiWindow method init (main y x line column) {
 			   $y 		 	[$x + $column : - 1]
 			   [$line - 1] 		1
 	];
+    sets Activate <nil>;
 };
 
 CombiWindow method activate () {
     set-window-color-default $BufferCurs EDIT_BUFFER;
     set-window-color-default $StatusLineCurs ACTIVE_STATUS_LINE;
-    set-window-color-default $VerticalLineCurs ACTIVE_VERT_LINE;    
+    set-window-color-default $VerticalLineCurs ACTIVE_VERT_LINE;
+    sets Activate <t>;
 };
 
 CombiWindow method diactivate () {
     set-window-color-default $BufferCurs EDIT_BUFFER;
     set-window-color-default $StatusLineCurs INACTIVE_STATUS_LINE;
-    set-window-color-default $VerticalLineCurs INACTIVE_VERT_LINE;    
+    set-window-color-default $VerticalLineCurs INACTIVE_VERT_LINE;
+    sets Activate <nil>;
 };
 
 CombiWindow method refresh () {
@@ -120,7 +123,12 @@ CombiWindow method render-vertical-line () {
     };
 
     0 each to: $lines do: {| i |
-	curs-print $VerticalLineCurs "+" $DISPLAY_ENCODING [$i + $start] 0;
+	curs-print $VerticalLineCurs "|" $DISPLAY_ENCODING [$i + $start] 0;
+	if $Activate {
+	    curs-color $VerticalLineCurs [$i + $start] 0 1 $ColorDB,ACTIVE_VERT_LINE_HILIGHT 0;
+	} {
+	    curs-color $VerticalLineCurs [$i + $start] 0 1 $ColorDB,INACTIVE_VERT_LINE_HILIGHT 0;
+	};
     };
 };
 
