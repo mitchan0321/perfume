@@ -14,12 +14,18 @@ Window method init-constructor () {
 	s := "";
 	[self] each do: {| i |
 	    $s append! [$i string];
-	    $s append! "/";
+	    $s append! "(";
+	    $s append! [$i get-buffer : get-buffer-name];
+	    $s append! ")";
+	    $s append! " ";
 	};
+	return $s;
     };
     (y x) ::= curs-get-screen-size $RootWin;
     sets CursWin [curs-create-window $RootWin 0 0 [$y - 1] $x];
-    sets CursWinMini [curs-create-window $RootWin [$y - 1] 0 1 $x];
+    sets CursWinMini <nil>;
+    sets CreateWindowHook <nil>;
+    sets BufferBinding [dict];
 };
 
 Window method get-curs () {
@@ -31,6 +37,9 @@ Window method get-curs-mini () {
 };
 
 Window method create-minibuffer-window () {
+    (y x) ::= curs-get-screen-size $RootWin;
+    sets CursWinMini [curs-create-window $RootWin [$y - 1] 0 1 $x];
+
     (l c) ::= curs-get-screen-size $CursWinMini;
     win ::= new MiniWindow init: ([self] 0 0 $l $c);
 
@@ -39,10 +48,8 @@ Window method create-minibuffer-window () {
     $MiniWindow activate;
 };
 
-Window method add-window-resize-hook () {
-};
-
 Window method create-full-window () {
+    sets WindowList ();
     (l c) ::= curs-get-screen-size $CursWin;
     win ::= new CombiWindow init: ([self] 0 0 $l $c);
     $win set-window-name "Window#1";
@@ -51,6 +58,7 @@ Window method create-full-window () {
 };
 
 Window method create-split-vertical-window (div: ndivs) {
+    sets WindowList ();
     if {set? ndivs} else: {set ndivs 2};
     if {$ndivs < 2} then: {set ndivs 2};
     if {$ndivs > $MAX_WINDOW_DIVS} then: {set ndivs $MAX_WINDOW_DIVS};
@@ -77,6 +85,7 @@ Window method create-split-vertical-window (div: ndivs) {
 };
 
 Window method create-split-horizontal-window (div: ndivs) {
+    sets WindowList ();
     if {set? ndivs} else: {set ndivs 2};
     if {$ndivs < 2} then: {set ndivs 2};
     if {$ndivs > $MAX_WINDOW_DIVS} then: {set ndivs $MAX_WINDOW_DIVS};
@@ -98,6 +107,34 @@ Window method create-split-horizontal-window (div: ndivs) {
 	
 	w ::= $w + $l;
     };
+    $WindowList car : activate;
+    $WindowList cdr : each do: {| i | $i diactivate};
+};
+
+Window method create-split-cross-window () {
+    sets WindowList ();
+    (l c) ::= curs-get-screen-size $CursWin;
+    y0 := 0;
+    y1 ::= $l / 2;
+    x0 := 0;
+    x1 ::= $c / 2;
+
+    win ::= new CombiWindow init: ([self] 0 0 $y1 $x1);
+    $win set-window-name "Window#1";
+    $WindowList <<- $win;
+
+    win ::= new CombiWindow init: ([self] 0 $x1 $y1 [$c - $x1]);
+    $win set-window-name "Window#2";
+    $WindowList <<- $win;
+
+    win ::= new CombiWindow init: ([self] $y1 0 [$l - $y1] $x1);
+    $win set-window-name "Window#3";
+    $WindowList <<- $win;
+    
+    win ::= new CombiWindow init: ([self] $y1 $x1 [$l - $y1] [$c - $x1]);
+    $win set-window-name "Window#4";
+    $WindowList <<- $win;
+
     $WindowList car : activate;
     $WindowList cdr : each do: {| i | $i diactivate};
 };
@@ -143,6 +180,21 @@ Window method roll-current-window () {
     return [$WindowList car];
 };
 
+Window method roll-to-window (window-name) {
+    n ::= $WindowList map {| i | $i get-window-name} : find $window-name;
+    $n ?? {return};
+
+    if {$n = 0} else: {
+        1 each to: $n do: {
+	    win ::= $WindowList >>;
+	    $WindowList <<- $win;
+	};
+    };
+    $WindowList car : activate;
+    try {$WindowList cdr : each do: {| i | $i diactivate}} catch: {};
+    return [$WindowList car];
+};
+
 Window method roll-buffer () {
     win := $WindowList,0;
 
@@ -164,19 +216,16 @@ Window method bind-buffer (window-name buffer) {
     # Save window buffer geometory
     orig-buff ::= $window get-buffer;
     if $orig-buff {
-	BufferManager set-buffer-geom $window-name [$orig-buff get-buffer-name]
-	    $window,CursorLine $window,CursorColumn;
+	BufferManager set-buffer-geom $window-name [$orig-buff get-buffer-name];
+	# $window,CursorLine $window,CursorColumn;
     };
 
     # Restore window buffer geometory
+    $buffer ?? {return};
+
     $window set-buffer $buffer;
     geom ::= BufferManager get-buffer-geom $window-name [$buffer get-buffer-name];
-    if $geom {
-	$window set! CursorLine $geom,CursorLine;
-	$window set! CursorColumn $geom,CursorColumn;
-    };
-    BufferManager set-buffer-geom $window-name [$buffer get-buffer-name]
-	$window,CursorLine $window,CursorColumn;
+    BufferManager set-buffer-geom $window-name [$buffer get-buffer-name];
 };
 
 Window method render-all () {
@@ -193,8 +242,41 @@ Window method render (window-name) {
 	    break;
 	};
     };
-    ##### $window ?? {throw ErrNoSuchWindow ["No such window name '" . $window-name "'"]};
     $window ?? {return};
     
     $window render;
+};
+
+Window method add-create-window-hook (hook) {
+    sets CreateWindowHook $hook;
+};
+
+Window method resize-window () {
+    $MiniWindow destroy;
+    sets MiniWindow <nil>;
+    $WindowList each do: {| w |
+        $BufferBinding set [$w get-window-name] [$w get-buffer];
+	$w destroy;
+    };
+    roll-to ::= $WindowList car : get-window-name;
+    sets WindowList ();
+    curs-destroy-window $CursWin;
+
+    (y x) ::= curs-get-screen-size $RootWin;
+    sets CursWin [curs-create-window $RootWin 0 0 [$y - 1] $x];
+    create-minibuffer-window;
+    if {block? $CreateWindowHook} {
+	$CreateWindowHook eval;
+    } {
+	create-full-window;
+    };
+    debug-message [$WindowList string];
+    $WindowList each do: {| w |
+	win ::= $w get-window-name;
+	$win ?? {return};
+	buff ::= $BufferBinding get $win;
+	$buff ?? {return};
+	bind-buffer $win $buff;
+    };
+    roll-to-window $roll-to;
 };

@@ -14,7 +14,8 @@ MiniWindow method init (main y x line column)  {
 
 MiniWindow method activate () {
     set-window-color-default $MiniCurs MINI_WINDOW;
-};
+}
+;
 
 MiniWindow method diactivate () {
     set-window-color-default $MiniCurs MINI_WINDOW;
@@ -31,4 +32,13 @@ MiniWindow method display (msg) {
 
 MiniWindow method clear () {
     curs-clear $MiniCurs;
+};
+
+MiniWindow method get-curs () {
+    return $MiniCurs;
+};
+
+MiniWindow method destroy () {
+    curs-destroy-window $MiniCurs;
+    sets MiniCurs <nil>;
 };

@@ -1,4 +1,4 @@
-class EditBuffer;
+class EditBuffer BufferBase;
 
 EditBuffer method init () {
     init-constructor;
@@ -24,14 +24,6 @@ EditBuffer method load-content (path) {
 
     sets File $path;
     BufferManager regist-buffer [self] [$path split sep: "/" : last : car];
-};
-
-EditBuffer method set-buffer-name (name) {
-    sets BufferName $name;
-};
-
-EditBuffer method get-buffer-name () {
-    return $BufferName;
 };
 
 EditBuffer method buffer-select (from to block) {

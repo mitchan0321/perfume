@@ -18,7 +18,17 @@ WindowBase method set-buffer (buff) {
 };
 
 WindowBase method get-buffer () {
+    $Buffer ?? {
+	sets Buffer [BufferManager get-buffer "*Scratch*"];
+    };
     return $Buffer;
+};
+
+WindowBase method get-geom () {
+    win ::= get-window-name;
+    buff ::= get-buffer;
+    buff-name ::= $buff get-buffer-name;
+    return [BufferManager get-buffer-geom $win $buff-name];
 };
 
 WindowBase method activate (*) {
@@ -51,6 +61,10 @@ WindowBase method set-cursor (*) {
 
 WindowBase method get-curs (*) {
     throw ErrNoMethodImpl ["No Impliment method '" . $@name "::get-curs'."];
+};
+
+WindowBase method destroy (*) {
+    throw ErrNoMethodImpl ["No Impliment method '" . $@name "::destroy'."];
 };
 
 WindowBase method string () {

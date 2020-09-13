@@ -807,7 +807,6 @@ toy_add_func_ncurses(Toy_Interp* interp) {
     toy_add_func(interp, L"curs-move",		func_curses_move,		L"window,y,x");
     toy_add_func(interp, L"curs-add-color",	func_curses_add_color,		L"pair,fg-color,bg-color");
     toy_add_func(interp, L"curs-keyin",		func_curses_keyin,		L"window,timeout,encoding");
-    
     return 0;
 }
 

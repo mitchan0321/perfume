@@ -1,9 +1,11 @@
 load-class :force BufferManager;
+load-class :force BufferGeom;
+load-class :force BufferBase;
 load-class :force EditBuffer;
+load-class :force ScratchBuffer;
 load-class :force Window;
 load-class :force WindowBase;
 load-class :force WUtil;
-load-class :force BufferGeom;
 
 defun pmacs (trace: t) {
     if {true? t} {
@@ -15,15 +17,17 @@ defun pmacs (trace: t) {
 	defvar MainWindow [new Window init: ([curs-init])];
 	BufferManager init;
 	WUtil init;
-	
 	$MainWindow create-minibuffer-window;
+
+	$MainWindow create-full-window;
+	$MainWindow add-create-window-hook {$MainWindow create-full-window};
+	# $MainWindow create-split-cross-window;
+	# $MainWindow add-create-window-hook  {$MainWindow create-split-cross-window};
 	
-	# $MainWindow create-full-window;
 	# $MainWindow create-split-vertical-window;
-        $MainWindow create-split-vertical-window div: 3;
+        # $MainWindow create-split-vertical-window div: 3;
 	# $MainWindow create-split-horizontal-window;
 	# $MainWindow create-split-horizontal-window div: 3;
-	
 
         # $MainWindow display-window-message "MiniBuffer" "Hello";
 	# $MainWindow display-window-message "Window#1" "Hello Window#1\nabcdeあいうえお";
@@ -32,22 +36,21 @@ defun pmacs (trace: t) {
 	# $MainWindow display-window-message "Window#1" [$MainWindow get WindowList : string];
 
 	# USE CASE: "file open"
-
 	b ::= new EditBuffer;
 	$b load-content "/home/mit-sato/perfume/eval.c";
-        $MainWindow bind-buffer "Window#1" $b;
+	$MainWindow bind-buffer "Window#1" $b;
 
 	b ::= new EditBuffer;
 	$b load-content "/home/mit-sato/perfume/methods.c";
-	$MainWindow bind-buffer "Window#2" $b;
+	# $MainWindow bind-buffer "Window#2" $b;
 
 	b ::= new EditBuffer;
 	$b load-content "/home/mit-sato/perfume/testfile";
-	$MainWindow bind-buffer "Window#3" $b;
+	# $MainWindow bind-buffer "Window#3" $b;
 
 	b ::= new EditBuffer;
 	$b load-content "/home/mit-sato/eval.c";
-	$MainWindow bind-buffer "Window#4" $b;
+	# $MainWindow bind-buffer "Window#4" $b;
 
 	$MainWindow render-all;
 	$MainWindow refresh;
@@ -106,6 +109,47 @@ REM {
 		    $MainWindow roll-buffer;
 		    $MainWindow get-current-window : apply {render; set-cursor; refresh};
 		}
+		{eq? $k KEY_RESIZE} {
+		    $MainWindow resize-window;
+		    $MainWindow apply {render-all; refresh};
+		}
+		{eq? $k KEY_F2} {
+		    $MainWindow add-create-window-hook {$MainWindow create-full-window};
+		    $MainWindow apply {resize-window; render-all; refresh};
+		}
+		{eq? $k KEY_F3} {
+		    $MainWindow add-create-window-hook {$MainWindow create-split-vertical-window};
+		    $MainWindow apply {resize-window; render-all; refresh};
+		}
+		{eq? $k KEY_F4} {
+		    $MainWindow add-create-window-hook {$MainWindow create-split-vertical-window div: 3};
+		    $MainWindow apply {resize-window; render-all; refresh};
+		}
+		{eq? $k KEY_F5} {
+		    $MainWindow add-create-window-hook {$MainWindow create-split-vertical-window div: 4};
+		    $MainWindow apply {resize-window; render-all; refresh};
+		}
+		{eq? $k KEY_F6} {
+		    $MainWindow add-create-window-hook {$MainWindow create-split-horizontal-window};
+		    $MainWindow apply {resize-window; render-all; refresh};
+		}
+		{eq? $k KEY_F7} {
+		    $MainWindow add-create-window-hook {$MainWindow create-split-horizontal-window div: 3};
+		    $MainWindow apply {resize-window; render-all; refresh};
+		}
+		{eq? $k KEY_F8} {
+		    $MainWindow add-create-window-hook {$MainWindow create-split-horizontal-window div: 4};
+		    $MainWindow apply {resize-window; render-all; refresh};
+		}
+		{eq? $k KEY_F9} {
+		    $MainWindow add-create-window-hook {$MainWindow create-split-cross-window};
+		    $MainWindow apply {resize-window; render-all; refresh};
+		}
+		{eq? $k KEY_F11} {
+		    w ::= $MainWindow get-current-window;
+		    debug-message [BufferManager get-buffer-geom [$w get-window-name]
+				    [$w get-buffer : get-buffer-name] : string];
+		}
 		;
 	    };
 	};
@@ -132,4 +176,13 @@ REM {
     ;
 
     if {set? __error_info__} then: {println file: $stderr $__error_info__};
+};
+
+defun debug-message (msg) {
+    if $MainWindow {
+	[$MainWindow get-minibuffer-window] ?? {throw ErrNoMiniBuffer "No MiniBuffer for debugging."};
+	$MainWindow display-window-message "MiniBuffer" ["DEBUG(Press any key): %-80v" fmt $msg];
+	$MainWindow get-minibuffer-window : refresh;
+	curs-keyin [$MainWindow get-minibuffer-window : get-curs] 0 $INPUT_ENCODING;
+    };
 };

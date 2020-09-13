@@ -17,7 +17,15 @@ BufferManager method regist-buffer (buff name) {
 };
 
 BufferManager method get-buffer (name) {
-    return [$BufferList get $name];
+    buff ::= $BufferList get $name;
+    $buff ?? {
+	buff ::= $BufferList get "*Scratch*";
+	$buff ?? {
+	    buff ::= new ScratchBuffer;
+	    regist-buffer $buff "*Scratch*";
+	};
+    };
+    return $buff;
 };
 
 BufferManager method get-next-buffer (buff) {
@@ -27,15 +35,13 @@ BufferManager method get-next-buffer (buff) {
     $BufferList get [$r ?? $l,0];
 };
 
-BufferManager method set-buffer-geom (window-name buffer-name cursor-y cursor-x) {
+BufferManager method set-buffer-geom (window-name buffer-name) {
 
     [$BufferGeom set? ($window-name $buffer-name)] ?? {
 	$BufferGeom each do: {| k v |
 	    (w b g) := $v;
 	    if {$b = $buffer-name} {
 		geom ::= $g clone;
-		$geom set! CursorLine $cursor-y;
-		$geom set! CursorColumn $cursor-x;
 		$BufferGeom set
 		    ($window-name $buffer-name)
 		    ($window-name $buffer-name $geom);
@@ -48,13 +54,6 @@ BufferManager method set-buffer-geom (window-name buffer-name cursor-y cursor-x)
 	    ($window-name $buffer-name [new BufferGeom]);
 	return;
     };
-
-    (_dumy _dumy geom) ::= $BufferGeom get ($window-name $buffer-name);
-    $geom set! CursorLine $cursor-y;
-    $geom set! CursorColumn $cursor-x;
-    $BufferGeom set
-	($window-name $buffer-name)
-	($window-name $buffer-name $geom);
 };
 
 BufferManager method get-buffer-geom (window-name buffer-name) {
