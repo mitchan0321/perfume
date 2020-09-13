@@ -270,7 +270,7 @@ Window method resize-window () {
     } {
 	create-full-window;
     };
-    debug-message [$WindowList string];
+
     $WindowList each do: {| w |
 	win ::= $w get-window-name;
 	$win ?? {return};

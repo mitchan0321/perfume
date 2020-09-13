@@ -147,8 +147,8 @@ REM {
 		}
 		{eq? $k KEY_F11} {
 		    w ::= $MainWindow get-current-window;
-		    debug-message [BufferManager get-buffer-geom [$w get-window-name]
-				    [$w get-buffer : get-buffer-name] : string];
+		    #debug-message [BufferManager get-buffer-geom [$w get-window-name]
+		    #	    [$w get-buffer : get-buffer-name] : string];
 		}
 		;
 	    };
