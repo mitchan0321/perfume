@@ -77,11 +77,11 @@ CombiWindow method render () {
     (cy cx) ::= get-source-index $buff $geom;
 
     curs-print $StatusLineCurs [
-	  "-- %v %v [%d,%d] G=(%d,%d) V=(%d,%d) " fmt
+	  "-- %v %v [%d,%d] V=(%d,%d) C=(%d,%d,%d) " fmt
 	  $buff-name $win
 	  $cy $cx
 	  $geom,ViewLine $geom,ViewColumn
-	  $geom,CursorLine $geom,CursorColumn
+	  $geom,CursorLine $geom,CursorColumn $geom,CursorColumn.SAVE
 	]
 	$DISPLAY_ENCODING 0 0;
     
@@ -118,7 +118,13 @@ CombiWindow method fit-to-geom () {
     buff ::= get-buffer;
     (cy cx) ::= get-source-index $buff $geom;
     (line col) ::= get-cursor-index $buff $cy $cx;
-    $geom set! CursorColumn [$col - $geom,ViewColumn];
+    new-col ::= $col - $geom,ViewColumn;
+    if {$new-col < 0} {
+	$geom set! ViewColumn $col;
+	$geom set! CursorColumn 0;
+    } {
+	$geom set! CursorColumn [$col - $geom,ViewColumn];
+    };
     
     if {$geom,CursorLine >= $l} {
 	y ::= $geom,CursorLine - $l : + 1 : + $geom,ViewLine;
@@ -230,13 +236,12 @@ CombiWindow method move-right () {
     cx ::= $cx + 1;
     (_dumy col) ::= get-cursor-index $buff $cy $cx;
     
-    if {$col >= $x} {
-	set col [$col - 1];
-	new-x ::= $geom,ViewColumn + 1;
+    if {[$col - $geom,ViewColumn] >= $x} {
+	new-x ::= $col - $x : + 1;
 	$geom set! ViewColumn $new-x;
     };
-    $geom set! CursorColumn $col;
-    $geom set! CursorColumn.SAVE $col;
+    $geom set! CursorColumn [$col - $geom,ViewColumn];
+    $geom set! CursorColumn.SAVE [$col - $geom,ViewColumn];
 };
 
 CombiWindow method move-left () {
@@ -245,17 +250,14 @@ CombiWindow method move-left () {
     geom ::= get-geom;
     buff ::= get-buffer;
     (cy cx) ::= get-source-index $buff $geom;
-    cx ::= $cx - 1;
+    if {$cx > 0} {cx ::= $cx - 1};
     (_dumy col) ::= get-cursor-index $buff $cy $cx;
 
-    if {$col < 0} {
-	set col 0;
-	new-x ::= $geom,ViewColumn - 1;
-	if {$new-x < 0} {new-x := 0};
-	$geom set! ViewColumn $new-x;
+    if {[$col - $geom,ViewColumn] < 0} {
+	$geom set! ViewColumn $col;
     };
-    $geom set! CursorColumn $col;
-    $geom set! CursorColumn.SAVE $col;
+    $geom set! CursorColumn [$col - $geom,ViewColumn];
+    $geom set! CursorColumn.SAVE [$col - $geom,ViewColumn];
 };
 
 CombiWindow method destroy () {
