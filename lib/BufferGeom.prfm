@@ -5,6 +5,7 @@ BufferGeom method init () {
     sets ViewColumn 0;
     sets CursorLine 0;
     sets CursorColumn 0;
+    sets CursorColumn.SAVE 0;
 };
 
 BufferGeom method clone () {
@@ -13,6 +14,7 @@ BufferGeom method clone () {
     $b set! ViewColumn $ViewColumn;
     $b set! CursorLine $CursorLine;
     $b set! CursorColumn $CursorColumn;
+    $b set! CursorColumn.SAVE $CursorColumn;
     return $b;
 };
 

@@ -100,7 +100,7 @@ CombiWindow method render () {
 
 CombiWindow method get-source-index (buff geom) {
     y ::= $geom,ViewLine + $geom,CursorLine;
-    x ::= $geom,ViewColumn + $geom,CursorColumn;
+    x ::= $geom,ViewColumn + $geom,CursorColumn.SAVE;
     src ::= $buff get-buffer-line $y;
     $src ?? {return ($y 0)};
     return ($y [curs-pos-to-index $src $x $DEFAULT_TAB_WIDTH]);
@@ -236,6 +236,7 @@ CombiWindow method move-right () {
 	$geom set! ViewColumn $new-x;
     };
     $geom set! CursorColumn $col;
+    $geom set! CursorColumn.SAVE $col;
 };
 
 CombiWindow method move-left () {
@@ -253,7 +254,8 @@ CombiWindow method move-left () {
 	if {$new-x < 0} {new-x := 0};
 	$geom set! ViewColumn $new-x;
     };
-    $geom set! CursorColumn $col;    
+    $geom set! CursorColumn $col;
+    $geom set! CursorColumn.SAVE $col;
 };
 
 CombiWindow method destroy () {
