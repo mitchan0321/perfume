@@ -23,13 +23,14 @@ Vector method insert-string-at (str line at) {
     $l each do: {| elem |
 	if {$line < [[self] len]} {
 	    s ::= [self] get $line;
+	    if {$at > [$s len]} {at := [$s len]};
 	    s1 ::= $s sub 0 $at;
 	    s2 ::= $s sub $at;
 	    [self] set $line [$s1 . $elem $s2];
 	    $at ++ [$elem len];
 	} {
 	    [self] append! $elem;
-	    $at ++ [$elem len];
+	    at ::= $elem len;
 	};
 	if {$i = $times} {break};
 	[self] append! "";
