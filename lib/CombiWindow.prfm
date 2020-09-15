@@ -271,11 +271,15 @@ CombiWindow method move-left () {
     $geom set! IndexColumn.SAVE $col;
 };
 
-CombiWindow method toggle-freecursor () {
-    if $FreeCursor {
-	sets FreeCursor <nil>;
+CombiWindow method toggle-freecursor (force: flag) {
+    if {set? flag} {
+	sets FreeCursor $flag;
     } {
-	sets FreeCursor <t>;
+	if $FreeCursor {
+	    sets FreeCursor <nil>;
+	} {
+	    sets FreeCursor <t>;
+	}
     };
     $MainWindow display-window-message "MiniBuffer" ["set to FreeCursor mode to %v" fmt $FreeCursor];
 };
