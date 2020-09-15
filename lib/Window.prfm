@@ -48,11 +48,15 @@ Window method create-minibuffer-window () {
     $MiniWindow activate;
 };
 
-Window method create-full-window () {
+Window method create-full-window (window-name: win-name) {
     sets WindowList ();
     (l c) ::= curs-get-screen-size $CursWin;
     win ::= new CombiWindow init: ([self] 0 0 $l $c);
-    $win set-window-name "Window#1";
+    if {true? win-name} {
+	$win set-window-name $win-name;
+    } {
+	$win set-window-name "Window#1";
+    };
     $WindowList <<- $win;
     $WindowList car : activate;
 
@@ -62,7 +66,13 @@ Window method create-full-window () {
     };
 };
 
-Window method create-split-vertical-window (div: ndivs) {
+Window method next-window-name (win) {
+    n ::= $win split sep: "#" : get 1 : int : + 1;
+    if {$n > 4} {n := 1};
+    return ["Window#" . $n];
+};
+
+Window method create-split-vertical-window (div: ndivs window-name: win-name) {
     sets WindowList ();
     if {set? ndivs} else: {set ndivs 2};
     if {$ndivs < 2} then: {set ndivs 2};
@@ -80,7 +90,12 @@ Window method create-split-vertical-window (div: ndivs) {
 	else: {
 	    win ::= new CombiWindow init: ([self] 0 $w $l [$c-orig - [$c * [$ndivs - 1]]]);
 	};
-	$win set-window-name ["Window#" . $win-ord];
+	if {true? win-name} {
+	    $win set-window-name $win-name;
+	    win-name ::= next-window-name $win-name;
+	} {
+	    $win set-window-name ["Window#" . $win-ord];
+	};
 	$WindowList <<- $win;
 	
 	w ::= $w + $c;
@@ -94,7 +109,7 @@ Window method create-split-vertical-window (div: ndivs) {
     };
 };
 
-Window method create-split-horizontal-window (div: ndivs) {
+Window method create-split-horizontal-window (div: ndivs window-name: win-name) {
     sets WindowList ();
     if {set? ndivs} else: {set ndivs 2};
     if {$ndivs < 2} then: {set ndivs 2};
@@ -112,7 +127,12 @@ Window method create-split-horizontal-window (div: ndivs) {
 	else: {
 	    win ::= new CombiWindow init: ([self] $w 0 [$l-orig - [$l * [$ndivs - 1]]] $c);
 	};
-	$win set-window-name ["Window#" . $win-ord];
+	if {true? win-name} {
+	    $win set-window-name $win-name;
+	    win-name ::= next-window-name $win-name;
+	} {
+	    $win set-window-name ["Window#" . $win-ord];
+	};
 	$WindowList <<- $win;
 	
 	w ::= $w + $l;
@@ -126,7 +146,7 @@ Window method create-split-horizontal-window (div: ndivs) {
     };
 };
 
-Window method create-split-cross-window () {
+Window method create-split-cross-window (window-name: win-name) {
     sets WindowList ();
     (l c) ::= curs-get-screen-size $CursWin;
     y0 := 0;
@@ -135,19 +155,39 @@ Window method create-split-cross-window () {
     x1 ::= $c / 2;
 
     win ::= new CombiWindow init: ([self] 0 0 $y1 $x1);
-    $win set-window-name "Window#1";
+    if {set? win-name} {
+	$win set-window-name $win-name;
+	win-name ::= next-window-name $win-name;
+    } {
+	$win set-window-name "Window#1";
+    };
     $WindowList <<- $win;
 
     win ::= new CombiWindow init: ([self] 0 $x1 $y1 [$c - $x1]);
-    $win set-window-name "Window#2";
+    if {set? win-name} {
+	$win set-window-name $win-name;
+	win-name ::= next-window-name $win-name;
+    } {
+	$win set-window-name "Window#2";
+    };
     $WindowList <<- $win;
 
     win ::= new CombiWindow init: ([self] $y1 0 [$l - $y1] $x1);
-    $win set-window-name "Window#3";
+    if {set? win-name} {
+	$win set-window-name $win-name;
+	win-name ::= next-window-name $win-name;
+    } {
+	$win set-window-name "Window#3";
+    };
     $WindowList <<- $win;
     
     win ::= new CombiWindow init: ([self] $y1 $x1 [$l - $y1] [$c - $x1]);
-    $win set-window-name "Window#4";
+    if {set? win-name} {
+	$win set-window-name $win-name;
+	win-name ::= next-window-name $win-name;
+    } {
+	$win set-window-name "Window#4";
+    };
     $WindowList <<- $win;
 
     $WindowList car : activate;
@@ -169,6 +209,7 @@ Window method display-window-message (win msg) {
     $WindowList . $MiniWindow : each do: {| i |
 	if {[$i get-window-name] = $win} {
 	    $i display $msg;
+	    refresh;
 	    return;
 	};
     };

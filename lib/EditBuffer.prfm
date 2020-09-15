@@ -50,3 +50,10 @@ EditBuffer method get-buffer-line (line) {
 EditBuffer method get-buffer-length () {
     return [$Src ??? [$Src len] 0];
 };
+
+EditBuffer method insert-string-at (input y x) {
+    if {true? Src} {
+	return [$Src insert-string-at $input $y $x];
+    };
+    return (0 0);
+};

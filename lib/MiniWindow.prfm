@@ -27,7 +27,9 @@ MiniWindow method refresh () {
 };
 
 MiniWindow method display (msg) {
+    clear;
     curs-print $MiniCurs $msg $DISPLAY_ENCODING 0 0;
+    refresh;
 };
 
 MiniWindow method clear () {

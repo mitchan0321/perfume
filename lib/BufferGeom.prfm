@@ -5,7 +5,7 @@ BufferGeom method init () {
     sets ViewColumn 0;
     sets CursorLine 0;
     sets CursorColumn 0;
-    sets CursorColumn.SAVE 0;
+    sets IndexColumn.SAVE 0;
 };
 
 BufferGeom method clone () {
@@ -14,10 +14,10 @@ BufferGeom method clone () {
     $b set! ViewColumn $ViewColumn;
     $b set! CursorLine $CursorLine;
     $b set! CursorColumn $CursorColumn;
-    $b set! CursorColumn.SAVE $CursorColumn;
+    $b set! IndexColumn.SAVE $IndexColumn.SAVE;
     return $b;
 };
 
 BufferGeom method string () {
-    return ["[vl:%v,vc:%v,cl:%v,cc:%v]" fmt $ViewLine $ViewColumn $CursorLine $CursorColumn];
+    return ["[vl:%v,vc:%v,cl:%v,cc:%v,ic:%v]" fmt $ViewLine $ViewColumn $CursorLine $CursorColumn $IndexColumn.SAVE];
 };

@@ -114,58 +114,59 @@ REM {
 		    $MainWindow apply {render-all; refresh};
 		}
 		{eq? $k KEY_F2} {
-		    $MainWindow add-create-window-hook {$MainWindow create-full-window};
+		    win ::= $MainWindow get-current-window : get-window-name;
+		    $MainWindow add-create-window-hook {$MainWindow create-full-window window-name: $win};
 		    $MainWindow apply {resize-window; render-all; refresh};
 		}
 		{eq? $k KEY_F3} {
-		    $MainWindow add-create-window-hook {$MainWindow create-split-vertical-window};
+		    win ::= $MainWindow get-current-window : get-window-name;
+		    $MainWindow add-create-window-hook {$MainWindow create-split-vertical-window window-name: $win};
 		    $MainWindow apply {resize-window; render-all; refresh};
 		}
 		{eq? $k KEY_F4} {
-		    $MainWindow add-create-window-hook {$MainWindow create-split-vertical-window div: 3};
+		    win ::= $MainWindow get-current-window : get-window-name;
+		    $MainWindow add-create-window-hook {$MainWindow create-split-vertical-window div: 3 window-name: $win};
 		    $MainWindow apply {resize-window; render-all; refresh};
 		}
 		{eq? $k KEY_F5} {
-		    $MainWindow add-create-window-hook {$MainWindow create-split-vertical-window div: 4};
+		    win ::= $MainWindow get-current-window : get-window-name;
+		    $MainWindow add-create-window-hook {$MainWindow create-split-vertical-window div: 4 window-name: $win};
 		    $MainWindow apply {resize-window; render-all; refresh};
 		}
 		{eq? $k KEY_F6} {
-		    $MainWindow add-create-window-hook {$MainWindow create-split-horizontal-window};
+		    win ::= $MainWindow get-current-window : get-window-name;
+		    $MainWindow add-create-window-hook {$MainWindow create-split-horizontal-window window-name: $win};
 		    $MainWindow apply {resize-window; render-all; refresh};
 		}
 		{eq? $k KEY_F7} {
-		    $MainWindow add-create-window-hook {$MainWindow create-split-horizontal-window div: 3};
+		    win ::= $MainWindow get-current-window : get-window-name;
+		    $MainWindow add-create-window-hook {$MainWindow create-split-horizontal-window div: 3 window-name: $win};
 		    $MainWindow apply {resize-window; render-all; refresh};
 		}
 		{eq? $k KEY_F8} {
-		    $MainWindow add-create-window-hook {$MainWindow create-split-horizontal-window div: 4};
+		    win ::= $MainWindow get-current-window : get-window-name;
+		    $MainWindow add-create-window-hook {$MainWindow create-split-horizontal-window div: 4 window-name: $win};
 		    $MainWindow apply {resize-window; render-all; refresh};
 		}
 		{eq? $k KEY_F9} {
-		    $MainWindow add-create-window-hook {$MainWindow create-split-cross-window};
+		    win ::= $MainWindow get-current-window : get-window-name;
+		    $MainWindow add-create-window-hook {$MainWindow create-split-cross-window window-name: $win};
 		    $MainWindow apply {resize-window; render-all; refresh};
 		}
 		{eq? $k KEY_F11} {
 		    w ::= $MainWindow get-current-window;
 		    #debug-message [BufferManager get-buffer-geom [$w get-window-name]
 		    #	    [$w get-buffer : get-buffer-name] : string];
+		    $w toggle-freecursor;
+		}
+		{string? $k} {
+		    w ::= $MainWindow get-current-window;
+		    $w insert-string $k;
+		    $MainWindow apply {render-all; refresh};
 		}
 		;
 	    };
 	};
-
-REM {
-	$MainWindow roll-current-window;
-	$MainWindow roll-current-window;
-	$MainWindow bind-buffer
-	    [$MainWindow get-current-window : get-window-name]
-	    [BufferManager get-buffer "eval.c[2]"];
-	
-	$MainWindow render-all;
-	$MainWindow refresh;
-	sleep 500000;
-};
-	
     }
     fin: {
 	curs-terminate;
