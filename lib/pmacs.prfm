@@ -153,12 +153,6 @@ REM {
 		    $MainWindow add-create-window-hook {$MainWindow create-split-cross-window window-name: $win};
 		    $MainWindow apply {resize-window; render-all; refresh};
 		}
-		{eq? $k KEY_F11} {
-		    w ::= $MainWindow get-current-window;
-		    #debug-message [BufferManager get-buffer-geom [$w get-window-name]
-		    #	    [$w get-buffer : get-buffer-name] : string];
-		    $w toggle-freecursor;
-		}
 		{string? $k} {
 		    w ::= $MainWindow get-current-window;
 		    $w insert-string $k;
