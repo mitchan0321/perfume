@@ -35,7 +35,7 @@ CombiWindow method activate () {
 };
 
 CombiWindow method diactivate () {
-    set-window-color-default $BufferCurs EDIT_BUFFER;
+    set-window-color-default $BufferCurs INACTIVE_EDIT_BUFFER;
     set-window-color-default $StatusLineCurs INACTIVE_STATUS_LINE;
     set-window-color-default $VerticalLineCurs INACTIVE_VERT_LINE;
     sets Activate <nil>;

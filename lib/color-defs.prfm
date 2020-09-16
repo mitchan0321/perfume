@@ -15,8 +15,9 @@ $ColorDB set EDIT_BUFFER                [WUtil color-pair BLACK  WHITE   ];
 $ColorDB set ACTIVE_STATUS_LINE         [WUtil color-pair BLACK  CYAN    ];
 $ColorDB set ACTIVE_VERT_LINE           [WUtil color-pair BLACK  CYAN    ];
 $ColorDB set ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair WHITE  BLUE    ];
-$ColorDB set INACTIVE_STATUS_LINE       [WUtil color-pair CYAN   BLACK   ];
-$ColorDB set INACTIVE_VERT_LINE         [WUtil color-pair CYAN   BLACK   ];
+$ColorDB set INACTIVE_EDIT_BUFFER       [WUtil color-pair WHITE  BLACK   ];
+$ColorDB set INACTIVE_STATUS_LINE       [WUtil color-pair CYAN   BLUE    ];
+$ColorDB set INACTIVE_VERT_LINE         [WUtil color-pair CYAN   BLUE    ];
 $ColorDB set INACTIVE_VERT_LINE_HILIGHT [WUtil color-pair CYAN   BLACK   ];
 $ColorDB set MINI_WINDOW                [WUtil color-pair WHITE  BLACK   ];
 
