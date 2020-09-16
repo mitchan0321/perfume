@@ -182,6 +182,8 @@ CombiWindow method render-vertical-line () {
 };
 
 CombiWindow method page-down () {
+    sets FreeCursor <t>;
+
     buff ::= get-buffer;
     geom ::= get-geom;
     (y x) ::= curs-get-screen-size $BufferCurs;
@@ -193,6 +195,8 @@ CombiWindow method page-down () {
 };
 
 CombiWindow method page-up () {
+    sets FreeCursor <t>;
+
     geom ::= get-geom;
     (y x) ::= curs-get-screen-size $BufferCurs;
 
@@ -202,6 +206,8 @@ CombiWindow method page-up () {
 };
 
 CombiWindow method move-down () {
+    sets FreeCursor <nil>;
+
     buff ::= get-buffer;
     geom ::= get-geom;
     (y x) ::= curs-get-screen-size $BufferCurs;
@@ -218,6 +224,8 @@ CombiWindow method move-down () {
 };
 
 CombiWindow method move-up () {
+    sets FreeCursor <nil>;
+
     geom ::= get-geom;
     (y x) ::= curs-get-screen-size $BufferCurs;
 
@@ -232,43 +240,50 @@ CombiWindow method move-up () {
 };
 
 CombiWindow method move-right () {
-    (y x) ::= curs-get-screen-size $BufferCurs;
+    sets FreeCursor <nil>;
 
     geom ::= get-geom;
     buff ::= get-buffer;
     (cy cx) ::= get-source-index $buff $geom;
-    cx ::= $cx + 1;
-    (_dumy col) ::= get-cursor-index $buff $cy $cx;
+    r ::= $buff get-buffer-line $cy;
+    if $r {
+	if {$cx >= [$r len]} {
+            cx := 0;
+	    cy ::= $cy + 1;
+	} {
+	    cx ::= $cx + 1;
+	};
+    };
+    (line col) ::= get-cursor-index $buff $cy $cx;
     
-    if {[$col - $geom,ViewColumn] >= $x} {
-	new-x ::= $col - $x : + 1;
-	$geom set! ViewColumn $new-x;
-    };
+    $geom set! CursorLine [$line - $geom,ViewLine];
     $geom set! CursorColumn [$col - $geom,ViewColumn];
-    if {$geom,CursorColumn < 0} {
-	$geom set! CursorColumn 0;
-	$geom set! ViewColumn $col;
-    };
-    if {$geom,CursorColumn >= $x} {
-	$geom set! CursorColumn [$x - 1];
-    };
     $geom set! IndexColumn.SAVE $col;
+    (sy sx) ::= curs-get-screen-size $BufferCurs;
+    fit-to-cursor $geom $sy $sx;
 };
 
 CombiWindow method move-left () {
-    (y x) ::= curs-get-screen-size $BufferCurs;
+    sets FreeCursor <nil>;
 
     geom ::= get-geom;
     buff ::= get-buffer;
     (cy cx) ::= get-source-index $buff $geom;
-    if {$cx > 0} {cx ::= $cx - 1};
-    (_dumy col) ::= get-cursor-index $buff $cy $cx;
-
-    if {[$col - $geom,ViewColumn] < 0} {
-	$geom set! ViewColumn $col;
+    if {$cx > 0} {
+	cx ::= $cx - 1;
+    } {
+	if {$cy > 0} {
+	    cy ::= $cy - 1;
+	    cx ::= $buff get-buffer-line $cy : len;
+	};
     };
+    (line col) ::= get-cursor-index $buff $cy $cx;
+
+    $geom set! CursorLine [$line - $geom,ViewLine];
     $geom set! CursorColumn [$col - $geom,ViewColumn];
     $geom set! IndexColumn.SAVE $col;
+    (sy sx) ::= curs-get-screen-size $BufferCurs;
+    fit-to-cursor $geom $sy $sx;
 };
 
 CombiWindow method toggle-freecursor (force: flag) {
@@ -294,6 +309,42 @@ CombiWindow method insert-string (input) {
     (new-y new-x) ::= get-cursor-index $buff $y $x;
     $geom set! IndexColumn.SAVE $new-x;
     $geom set! CursorLine [$new-y - $geom,ViewLine];
+    $geom set! CursorColumn [$new-x - $geom,ViewColumn];
+    (sy sx) ::= curs-get-screen-size $BufferCurs;
+    fit-to-cursor $geom $sy $sx;
+};
+
+CombiWindow method delete-character () {
+    sets FreeCursor <nil>;
+
+    buff ::= get-buffer;
+    geom ::= get-geom;
+    (y x) ::= get-source-index $buff $geom;
+    (iy ix c) ::= $buff delete-character-at $y $x;
+    (new-y new-x) ::= get-cursor-index $buff $iy $ix;
+    $geom set! IndexColumn.SAVE $new-x;
+    $geom set! CursorLine [$new-y - $geom,ViewLine];
+    $geom set! CursorColumn [$new-x - $geom,ViewColumn];
+    (sy sx) ::= curs-get-screen-size $BufferCurs;
+    fit-to-cursor $geom $sy $sx;
+};
+
+CombiWindow method backdelete-character () {
+    sets FreeCursor <nil>;
+
+    buff ::= get-buffer;
+    geom ::= get-geom;
+    (y x) ::= get-source-index $buff $geom;
+    (iy ix c) ::= $buff backdelete-character-at $y $x;
+    (new-y new-x) ::= get-cursor-index $buff $iy $ix;
+    $geom set! IndexColumn.SAVE $new-x;
+    $geom set! CursorLine [$new-y - $geom,ViewLine];
+    $geom set! CursorColumn [$new-x - $geom,ViewColumn];
+    (sy sx) ::= curs-get-screen-size $BufferCurs;
+    fit-to-cursor $geom $sy $sx;
+};
+
+CombiWindow method fit-to-cursor (geom y x) {
     if {$geom,CursorLine < 0} {
 	$geom set! ViewLine [$geom,ViewLine + $geom,CursorLine];
 	$geom set! CoursorLine 0;
@@ -301,7 +352,10 @@ CombiWindow method insert-string (input) {
 	    $geom set! ViewLine 0;	    
 	}
     };
-    $geom set! CursorColumn [$new-x - $geom,ViewColumn];
+    if {$geom,CursorLine >= $y} {
+	$geom set! ViewLine [$geom,ViewLine + $geom,CursorLine : - $y];
+    };
+    
     if {$geom,CursorColumn < 0} {
 	$geom set! ViewColumn [$geom,ViewColumn + $geom,CursorColumn];
 	$geom set! CoursorColumn 0;
@@ -309,7 +363,9 @@ CombiWindow method insert-string (input) {
 	    $geom set! ViewColumn 0;	    
 	}
     };
-    # move-cursor-index $new-y $new-x;
+    if {$geom,CursorColumn >= $x} {
+	$geom set! ViewColumn [$geom,ViewColumn + $geom,CursorColumn : - $x];
+    };
 };
 
 #CombiWindow method move-cursor-index (y x) {

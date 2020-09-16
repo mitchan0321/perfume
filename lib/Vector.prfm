@@ -15,39 +15,3 @@ Vector method fill (val) {
 	$v set $i $val;
     };
 };
-
-Vector method insert-string-at (str line at) {
-    l ::= $str split sep: "\r";
-    times ::= $l len;
-    i := 1;
-    $l each do: {| elem |
-	if {$line < [[self] len]} {
-	    s ::= [self] get $line;
-	    if {$at > [$s len]} {at := [$s len]};
-	    s1 ::= $s sub 0 $at;
-	    s2 ::= $s sub $at;
-	    [self] set $line [$s1 . $elem $s2];
-	    $at ++ [$elem len];
-	} {
-	    [self] append! $elem;
-	    at ::= $elem len;
-	};
-	if {$i = $times} {break};
-	[self] append! "";
-	[[self] len : - 2] each to: $line do: {
-	    | j |
-	    if {$line = $j} {
-		s1 ::= [self] get $j : sub 0 $at;
-		s2 ::= [self] get $j : sub $at;
-		[self] set [$j + 1] $s2;
-		[self] set $j $s1;
-	    } {
-		[self] set [$j + 1] [[self] get $j];
-	    };
-	};
-	$i ++;
-	$line ++;
-	at := 0;
-    };
-    return ($line $at);
-};

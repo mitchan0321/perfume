@@ -90,3 +90,87 @@ defun set-window-color-default (curs name) {
     curs-set-bgcolor $curs [$ColorDB get $name];
     curs-set-color   $curs [$ColorDB get $name];
 };
+
+##
+## define Vector method for EditBuffer operations.
+##
+Vector method insert-string-at (str line at) {
+    l ::= $str split sep: "\r";
+    times ::= $l len;
+    self ::= self;
+    i := 1;
+    $l each do: {| elem |
+	if {$line < [$self len]} {
+	    s ::= $self get $line;
+	    if {$at > [$s len]} {at := [$s len]};
+	    s1 ::= $s sub 0 $at;
+	    s2 ::= $s sub $at;
+	    $self set $line [$s1 . $elem $s2];
+	    $at ++ [$elem len];
+	} {
+	    $self append! $elem;
+	    at ::= $elem len;
+	};
+	if {$i = $times} {break};
+	$self append! "";
+	[$self len : - 2] each to: $line do: {
+	    | j |
+	    if {$line = $j} {
+		s1 ::= $self get $j : sub 0 $at;
+		s2 ::= $self get $j : sub $at;
+		$self set [$j + 1] $s2;
+		$self set $j $s1;
+	    } {
+		$self set [$j + 1] [$self get $j];
+	    };
+	};
+	$i ++;
+	$line ++;
+	at := 0;
+    };
+    return ($line $at);
+};
+
+Vector method delete-character-at (line at) {
+    self ::= self;
+    if {$line >= [$self len]} {
+	if {[$self len] = 0} {return (0 0 "")};
+	return ([$self len] 0 "");
+    };
+    s ::= $self get $line;
+    len ::= $s len;
+    if {$at >= $len} {
+	if {[$line + 1] = [$self len]} {
+	    return ($line $len "");
+	};
+	$self set $line [$self,$line . [$self get [$line + 1]]];
+	if {$line = [$self len : - 2]} {
+	    $self resize [$self len : - 1];
+	    return ($line $len "\r");
+	};
+	[$line + 1] each to: [$self len : - 2] do: {| i |
+	    $self set $i [$self get [$i + 1]];
+	};
+	$self resize [$self len : - 1];
+	return ($line $len "\r");
+    };
+    s1 ::= $s sub 0 $at;
+    c ::= $s sub $at [$at + 1];
+    s2 ::= $s sub [$at + 1];
+    $self set $line [$s1 . $s2];
+    return ($line $at $c);
+};
+
+Vector method backdelete-character-at (line at) {
+    self ::= self;
+    if {$at = 0} {
+	if {$line = 0} {
+	    return (0 0 "");
+	};
+	line ::= $line - 1;
+	at ::= [$self get $line] len;
+	return [delete-character-at $line $at];
+    };
+    at ::= $at - 1;
+    return [delete-character-at $line $at];    
+};

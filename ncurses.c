@@ -705,16 +705,76 @@ error:
     return new_exception(TE_SYNTAX, L"Syntax error at 'curs-add-color', syntax: curs-add-color pair fg-color bg-color", interp);
 }
 
+static Toy_Type*
+key_conv(int in) {
+    wchar_t buff[32];
+    static Toy_Type *ctrlkey_defs[32] = {NULL,NULL,};
+    Cell *c;
+
+    if (ctrlkey_defs[0] == NULL) {
+	ctrlkey_defs[0]  = new_symbol(L"CTRL_SP");
+	ctrlkey_defs[1]  = new_symbol(L"CTRL_A");
+	ctrlkey_defs[2]  = new_symbol(L"CTRL_B");
+	ctrlkey_defs[3]  = new_symbol(L"CTRL_C");
+	ctrlkey_defs[4]  = new_symbol(L"CTRL_D");
+	ctrlkey_defs[5]  = new_symbol(L"CTRL_E");
+	ctrlkey_defs[6]  = new_symbol(L"CTRL_F");
+	ctrlkey_defs[7]  = new_symbol(L"CTRL_G");
+	ctrlkey_defs[8]  = new_symbol(L"CTRL_H");
+	ctrlkey_defs[9]  = new_symbol(L"CTRL_I");
+	ctrlkey_defs[10] = new_symbol(L"CTRL_J");
+	ctrlkey_defs[11] = new_symbol(L"CTRL_K");
+	ctrlkey_defs[12] = new_symbol(L"CTRL_L");
+	ctrlkey_defs[13] = new_symbol(L"CTRL_M");
+	ctrlkey_defs[14] = new_symbol(L"CTRL_N");
+	ctrlkey_defs[15] = new_symbol(L"CTRL_O");
+	ctrlkey_defs[16] = new_symbol(L"CTRL_P");
+	ctrlkey_defs[17] = new_symbol(L"CTRL_Q");
+	ctrlkey_defs[18] = new_symbol(L"CTRL_R");
+	ctrlkey_defs[19] = new_symbol(L"CTRL_S");
+	ctrlkey_defs[20] = new_symbol(L"CTRL_T");
+	ctrlkey_defs[21] = new_symbol(L"CTRL_U");
+	ctrlkey_defs[22] = new_symbol(L"CTRL_V");
+	ctrlkey_defs[23] = new_symbol(L"CTRL_W");
+	ctrlkey_defs[24] = new_symbol(L"CTRL_X");
+	ctrlkey_defs[25] = new_symbol(L"CTRL_Y");
+	ctrlkey_defs[26] = new_symbol(L"CTRL_Z");
+	ctrlkey_defs[27] = new_symbol(L"KEY_ESC");
+	ctrlkey_defs[28] = new_symbol(L"KEY_FS");
+	ctrlkey_defs[29] = new_symbol(L"KEY_GS");
+	ctrlkey_defs[30] = new_symbol(L"KEY_RS");
+	ctrlkey_defs[31] = new_symbol(L"KEY_US");
+    }
+    
+    if (in > 256) {
+	// detect function key input
+	if ((in >= KEY_F(0)) && (in <= KEY_F(63))) {
+	    swprintf(buff, 32, L"KEY_F%d", in - KEY_F(0));	    
+	} else {
+	    swprintf(buff, 32, L"%s", keyname(in));
+	}
+	return new_symbol(buff);
+    }
+
+    if ((in >= 0) && (in < 0x20)) {
+	return ctrlkey_defs[in];
+    }
+
+    c = new_cell(L"");
+    cell_add_char(c, in);
+    return new_string_cell(c);
+}
+
 Toy_Type*
 func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     WINDOW *w;
     Toy_Type *container, *encoding;
     int itimeout, in, iencoder;
     Toy_Type *arg;
-    wchar_t buff[32];
     Cell *incell, *dstr;
     Toy_Type *inlist, *result;
     encoder_error_info *enc_error_info;
+    static int pending_key = -1;
 
     if (hash_get_length(nameargs) > 0) goto error;
     if (arglen != 3) goto error;
@@ -748,43 +808,72 @@ func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 
     wtimeout(w, itimeout);
 
-    in = wgetch(w);
-    while (in != -1) {
-	if (in >= 256) {
-	    // detect function key input
-	    if ((in >= KEY_F(0)) && (in <= KEY_F(63))) {
-		swprintf(buff, 32, L"KEY_F%d", in-KEY_F(0));	    
-		inlist = list_append(inlist, new_symbol(buff));
-	    } else {
-		swprintf(buff, 32, L"%s", keyname(in));
-		inlist = list_append(inlist, new_symbol(buff));
-	    }
-
-	    // if function key detect, return to caller soon.
-	    break;
-	    
-	} else {
-	    // detect character input
-	    cell_add_char(incell, in);
-
-	    // read remain character
-	    wtimeout(w, itimeout / 4);
+    if (pending_key != -1) {
+	in = pending_key;
+	pending_key = -1;
+    } else {
+	in = wgetch(w);
+    }
+    if (in == -1) return result;
+    
+    //
+    // detect function character.
+    //
+    if (in >= 256) {
+	//
+	// KEY_RESIZE onece occured.
+	//
+	if (in == KEY_RESIZE) {
+	    wtimeout(w, 500);
 	    in = wgetch(w);
-	    while (in != -1) {
-		cell_add_char(incell, in);
+	    while (in == KEY_RESIZE) {
 		in = wgetch(w);
 	    }
-	    // decode encoding
-	    dstr = decode_raw_to_unicode(incell, iencoder, enc_error_info);
-	    if (NULL == dstr) {
-		return new_exception(TE_BADENCODEBYTE, enc_error_info->message, interp);
+	    if (in == -1) {
+		pending_key = -1;
+	    } else {
+		pending_key = in;
 	    }
-	    inlist = list_append(inlist, new_string_cell(dstr));
-	    incell = new_cell(L"");
-	    break;
+	    inlist = list_append(inlist, key_conv(KEY_RESIZE));
+	    return result;
 	}
-
+	
+	// if function key, return to caller soon.
+	inlist = list_append(inlist, key_conv(in));
+	return result;
+	
+    } else {
+	//
+	// detect character input
+	//
+	if ((in >= 0) && (in < 0x20)) {
+	    // detect control caracter, return to caller soon.
+	    inlist = list_append(inlist, key_conv(in));
+	    return result;
+	}
+	
+	// assemble sequential character string.
+	cell_add_char(incell, in);
+	
+	// read remain character
+	wtimeout(w, itimeout / 4);
 	in = wgetch(w);
+	while (in != -1) {
+	    if (((in >= 0) && (in < 0x20)) || (in >= 256))  {
+		pending_key = in;
+		in = -1;
+		break;
+	    } {
+		cell_add_char(incell, in);
+	    }
+	    in = wgetch(w);
+	}
+	// decode encoding
+	dstr = decode_raw_to_unicode(incell, iencoder, enc_error_info);
+	if (NULL == dstr) {
+	    return new_exception(TE_BADENCODEBYTE, enc_error_info->message, interp);
+	}
+	inlist = list_append(inlist, new_string_cell(dstr));
     }
 
     return result;

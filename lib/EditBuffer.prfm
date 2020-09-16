@@ -57,3 +57,17 @@ EditBuffer method insert-string-at (input y x) {
     };
     return (0 0);
 };
+
+EditBuffer method delete-character-at (y x) {
+    if {true? Src} {
+	return [$Src delete-character-at $y $x];
+    };
+    return (0 0 "");
+};
+
+EditBuffer method backdelete-character-at (y x) {
+    if {true? Src} {
+	return [$Src backdelete-character-at $y $x];
+    };
+    return (0 0 "");
+};
