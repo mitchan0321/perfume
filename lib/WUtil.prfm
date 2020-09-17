@@ -91,6 +91,43 @@ defun set-window-color-default (curs name) {
     curs-set-color   $curs [$ColorDB get $name];
 };
 
+defun line-input (curs disp-line disp-col input-len cur-index cur-val key-in) {
+    ### debug-message ["%v,%v,%v,%v,%v,%v,%v" fmt $curs $disp-line $disp-col $input-len $cur-index $cur-val $key-in];
+    curs-print $curs ["%-" . $input-len "v" : fmt ""] $DISPLAY_ENCODING $disp-line $disp-col;
+    curs-render-line $curs $disp-line 0 $disp-col $cur-val $DEFAULT_TAB_WIDTH $DISPLAY_ENCODING;
+    v ::= vector($InputValue);
+    new-x := $cur-index;
+    cond
+    {string? $key-in} {
+	(new-y new-x) ::= $v insert-string-at $key-in 0 $cur-index;
+    }
+    {eq? $key-in KEY_RIGHT} {
+	new-x ::= $cur-index + 1;
+	if {$new-x >= $input-len} {new-x ::= $cur-index - 1}
+    }
+    {eq? $key-in KEY_LEFT} {
+	new-x ::= $cur-index - 1;
+	if {$new-x < 0} {new-x := 0};
+    }
+    {or [eq? $key-in KEY_BACKSPACE] [eq? $key-in CTRL_H]} {
+	(new-y new-x char) ::= $v backdelete-character-at 0 $cur-index;
+    }
+    {eq? $key-in KEY_DC} {
+	(new-y new-x char) ::= $v delete-character-at 0 $cur-index;
+    }
+    ;
+
+    return ($key-in $new-x [if {[$v len] = 0} "" {$v get 0}]);
+};
+
+defun show-message (msg) {
+    if $MainWindow {
+	[$MainWindow get-minibuffer-window] ?? {throw ErrNoMiniBuffer "No MiniBuffer for debugging."};
+	$MainWindow display-window-message "MiniBuffer" $msg;
+	$MainWindow get-minibuffer-window : refresh;
+    };
+};
+
 ##
 ## define Vector method for EditBuffer operations.
 ##
@@ -139,6 +176,10 @@ Vector method delete-character-at (line at) {
     };
     s ::= $self get $line;
     len ::= $s len;
+    if {and [[$self len] = 1] [$len = 0]} {
+	$self resize 0;
+	return (0 0 "\r");
+    };
     if {$at >= $len} {
 	if {[$line + 1] = [$self len]} {
 	    return ($line $len "");
@@ -173,4 +214,9 @@ Vector method backdelete-character-at (line at) {
     };
     at ::= $at - 1;
     return [delete-character-at $line $at];    
+};
+
+Vector method append-string (str) {
+    [self] append! $str;
+    return ([[self] len] 0 $str);
 };

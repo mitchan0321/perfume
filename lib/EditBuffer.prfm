@@ -71,3 +71,10 @@ EditBuffer method backdelete-character-at (y x) {
     };
     return (0 0 "");
 };
+
+EditBuffer method append-string (str) {
+    if {true? Src} {
+	return [$Src append-string $str];
+    };
+    return (0 0 "");
+};

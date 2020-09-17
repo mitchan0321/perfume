@@ -1,17 +1,19 @@
 class MiniWindow WindowBase;
 
-MiniWindow method init (main y x line column)  {
+MiniWindow method init (main y x line column) {
     apply {WindowBase method? init :};
 
     curs ::= $main get-curs-mini;
+    # curs ::= $main get-curs;
     
     sets MiniCurs [curs-new-window
 			   $curs
 			   $y 		 	$x
 			   $line 		$column
 	];
-
     sets PromptMessage "";
+    sets InputValue "";
+    sets InputIndex 0;
 };
 
 MiniWindow method activate () {
@@ -30,7 +32,12 @@ MiniWindow method refresh () {
 
 MiniWindow method display (msg) {
     clear;
-    curs-print $MiniCurs $msg $DISPLAY_ENCODING 0 0;
+    curs-render-line
+	$MiniCurs
+	0 0 0
+	$msg
+	$DEFAULT_TAB_WIDTH
+	$DISPLAY_ENCODING;
     refresh;
 };
 
@@ -42,8 +49,10 @@ MiniWindow method get-curs () {
     return $MiniCurs;
 };
 
-MiniWindow method mini-input-start (prompt) {
+MiniWindow method mini-input-start (prompt init-value) {
     display-prompt $prompt;
+    sets InputValue $init-value;
+    sets InputIndex 0;
 };
 
 MiniWindow method display-prompt (prompt) {
@@ -52,11 +61,40 @@ MiniWindow method display-prompt (prompt) {
 };
 
 MiniWindow method set-cursor () {
-    curs-move $MiniCurs 0 [$PromptMessage len];
+    curs-x ::= curs-index-to-pos $InputValue $InputIndex $DEFAULT_TAB_WIDTH;    
+    curs-move $MiniCurs 0 [$PromptMessage len : + $curs-x];
+};
+
+MiniWindow method apply-keybind (main window key) {
+    (y x) ::= curs-get-screen-size $MiniCurs;
+    input-len ::= $x - [$PromptMessage len];
+    (key new-index new-value) ::= line-input $MiniCurs 0 [$PromptMessage len] $input-len $InputIndex $InputValue $key;
+    ### stub
+    # (key new-index new-value) ::= line-input $MiniCurs 0 [$PromptMessage len] $input-len $InputIndex $InputValue $key;
+    # new-value := $InputValue;
+    # if {string? $key} {
+    # $new-value append! $key;
+    # };
+    # new-index := 0;
+    #### end
+    sets InputIndex $new-index;
+    sets InputValue $new-value;
+    $main mini-input-callback $key $new-value;
+
+    return ALL;
+};
+
+MiniWindow method render () {
+    curs-clear $MiniCurs;
+    curs-render-line
+	$MiniCurs
+	0 0 0
+	[$PromptMessage . $InputValue]
+	$DEFAULT_TAB_WIDTH
+	$DISPLAY_ENCODING;
 };
 
 MiniWindow method destroy () {
     curs-destroy-window $MiniCurs;
     sets MiniCurs <nil>;
 };
-

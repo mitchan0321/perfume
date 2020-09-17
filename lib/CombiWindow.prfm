@@ -100,6 +100,16 @@ CombiWindow method render () {
 	    $DEFAULT_TAB_WIDTH $DISPLAY_ENCODING;
 	$i ++;
     };
+    if {[$geom,ViewLine + $y : - 1] >= [$buff get-buffer-length]} {
+	if {[[$buff get-buffer-length] - $geom,ViewLine] < $y} {
+	    curs-render-line
+		$BufferCurs
+		[[$buff get-buffer-length] - $geom,ViewLine] 0 0
+		"[eof]"
+		$DEFAULT_TAB_WIDTH $DISPLAY_ENCODING;
+	    curs-color $BufferCurs [[$buff get-buffer-length] - $geom,ViewLine] 0 5 $ColorDB,EOF_MARK 0;
+	};
+    };
 };
 
 CombiWindow method get-source-index (buff geom) {

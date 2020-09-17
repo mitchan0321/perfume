@@ -911,12 +911,18 @@ func_curses_pos_to_index(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, 
     posargs = list_next(posargs);
 
     slen = cell_get_length(disp_string->u.string);
-    rendaring_data = GC_MALLOC(sizeof(Render_Encode) * (slen+1));
-    ALLOC_SAFE(rendaring_data);
+    if (slen <= 0) {
+	return new_integer_si(0);
+    }
     slen ++;
+    rendaring_data = GC_MALLOC(sizeof(Render_Encode) * slen);
+    ALLOC_SAFE(rendaring_data);
 
-    p = cell_get_addr(disp_string->u.string);
+    p = GC_MALLOC((sizeof(wchar_t)) * slen);
+    ALLOC_SAFE(p);
+    wcsncpy(p, cell_get_addr(disp_string->u.string), slen);
     p[slen-1] = -1;
+
     for (i=0; i<slen; i++) {
 	if (p[i] == -1) {
 	    /* string last character (dummy data) */
@@ -991,12 +997,18 @@ func_curses_index_to_pos(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, 
     posargs = list_next(posargs);
 
     slen = cell_get_length(disp_string->u.string);
-    rendaring_data = GC_MALLOC(sizeof(Render_Encode) * (slen+1));
+    if (slen <= 0) {
+	return new_integer_si(0);
+    }
     slen ++;
+    rendaring_data = GC_MALLOC(sizeof(Render_Encode) * slen);
     ALLOC_SAFE(rendaring_data);
 
-    p = cell_get_addr(disp_string->u.string);
+    p = GC_MALLOC((sizeof(wchar_t)) * slen);
+    ALLOC_SAFE(p);
+    wcsncpy(p, cell_get_addr(disp_string->u.string), slen);
     p[slen-1] = -1;
+
     for (i=0; i<slen; i++) {
 	if (p[i] == -1) {
 	    /* string last character (dummy data) */

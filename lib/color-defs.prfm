@@ -20,4 +20,4 @@ $ColorDB set INACTIVE_STATUS_LINE       [WUtil color-pair CYAN   BLUE    ];
 $ColorDB set INACTIVE_VERT_LINE         [WUtil color-pair CYAN   BLUE    ];
 $ColorDB set INACTIVE_VERT_LINE_HILIGHT [WUtil color-pair CYAN   BLACK   ];
 $ColorDB set MINI_WINDOW                [WUtil color-pair WHITE  BLACK   ];
-
+$ColorDB set EOF_MARK			[WUtil color-pair BLACK  GREEN	 ];
