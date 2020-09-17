@@ -25,6 +25,8 @@ CombiWindow method init (main y x line column) {
 
     sets Activate <nil>;
     sets FreeCursor <nil>;
+    sets KeyBinding [dict()];
+    load-keybind;
 };
 
 CombiWindow method activate () {
@@ -126,7 +128,7 @@ CombiWindow method geom-trimming () {
 	    $geom set! ViewColumn $col;
 	    $geom set! CursorColumn 0;
 	} {
-	    $geom set! CursorColumn [$col - $geom,ViewColumn];
+	    $geom set! CursorColumn $new-col;
 	};
     };
 
@@ -342,6 +344,32 @@ CombiWindow method fit-to-cursor (geom l c) {
 	$geom set! ViewColumn [$geom,ViewColumn + $geom,CursorColumn];
 	$geom set! CursorColumn 0;
     };
+};
+
+CombiWindow method load-keybind () {
+    $LIB_PATH each do: {| i |
+	if {file exists? [$i . "/" $COMBIWINDOW_BINDFILE]} {
+	    try {load [$i . "/" $COMBIWINDOW_BINDFILE]} catch: {| e | throw $e};
+	    break;
+	};
+    };
+};
+
+CombiWindow method apply-keybind (main window key) {
+    if {string? $key} {
+	body ::= $KeyBinding get KEY_INPUT_CHAR;
+	if {block? $body} {
+	    result ::= yield $body $main $window $key;
+	    return $result;
+	};
+	return <nil>;
+    };
+    body ::= $KeyBinding get $key;
+    if {block? $body} {
+	result ::= yield $body $main $window;
+	return $result;
+    };
+    return <nil>;
 };
 
 CombiWindow method destroy () {

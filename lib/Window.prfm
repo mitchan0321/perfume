@@ -1,10 +1,9 @@
-load-class :force CombiWindow;
-load-class :force MiniWindow;
-
 class Window;
 
 Window method init (curs) {
     sets RootWin $curs;
+    sets KeyEvent ();
+    sets MiniInputCallback ();	#### MiniInputCallback list form is: (window closure)
     init-constructor;
 };
 
@@ -26,6 +25,7 @@ Window method init-constructor () {
     sets CursWinMini <nil>;
     sets CreateWindowHook <nil>;
     sets BufferBinding [dict];
+    sets MiniInput <nil>;
 };
 
 Window method get-curs () {
@@ -68,7 +68,7 @@ Window method create-full-window (window-name: win-name) {
 
 Window method next-window-name (win) {
     n ::= $win split sep: "#" : get 1 : int : + 1;
-    if {$n > 4} {n := 1};
+    if {$n > $MAX_WINDOW_DIVS} {n := 1};
     return ["Window#" . $n];
 };
 
@@ -230,6 +230,7 @@ Window method get-minibuffer-window () {
 };
 
 Window method get-current-window () {
+    if $MiniInput {return $MiniWindow};
     return [$WindowList car];
 };
 
@@ -340,4 +341,71 @@ Window method resize-window () {
 	bind-buffer $win $buff;
     };
     roll-to-window $roll-to;
+};
+
+Window method key-event-loop () {
+    main ::= self;
+    key := "";
+    
+    while {true} do: {
+	window ::= $main get-current-window;
+	if {$KeyEvent null?} {
+	    i ::= curs-keyin [$window get-curs] $INPUT_TIMEOUT $INPUT_ENCODING;
+	} {
+	    i := $KeyEvent;
+	    sets KeyEvent ();
+	};
+	if {$i null?} {continue};
+	
+	if {[$key len] > 80} {key := ""; };
+	$key append! ["" . [[integer? $i] ??? ["%02x" fmt $i] [result $i]] " "];
+	$MainWindow display-window-message "MiniBuffer" ["%-100v" fmt $key];
+	$MainWindow refresh;
+
+	$i each do: {| k |
+	    window ::= $main get-current-window;		
+
+	    if {eq? $k KEY_RESIZE} {
+		$main resize-window;
+		$main apply {render-all; refresh};
+		window ::= $main get-current-window;		
+		$window set-cursor;
+		continue;
+	    };
+		
+	    result ::= $window apply-keybind $main $window $k;
+	    cond
+	    {eq? $result ALL} {
+		$main apply {render-all; refresh}
+	    }
+	    {eq? $result SELF} {
+		window ::= $main get-current-window;
+		$window apply {render; refresh}
+	    }
+	    ;
+	    window ::= $main get-current-window;		
+	    $window set-cursor;
+	};
+    };
+};
+
+Window method send-key-event (event-list) {
+    $KeyEvent concat! $event-list;
+};
+
+Window method mini-input-start (prompt: p) {
+    sets MiniInput <t>;
+    if {set? p} {
+	$MiniWindow mini-input-start $p;
+    } {
+	$MiniWindow mini-input-start "";
+    };
+};
+
+Window method mini-input-end () {
+    sets MiniInput <nil>;
+};
+
+Window method add-mini-input-callback (window block) {
+    sets MiniInputCallback ($window $block);
 };

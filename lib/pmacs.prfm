@@ -1,17 +1,28 @@
-load-class :force BufferManager;
-load-class :force BufferGeom;
-load-class :force BufferBase;
-load-class :force EditBuffer;
-load-class :force ScratchBuffer;
-load-class :force Window;
-load-class :force WindowBase;
-load-class :force WUtil;
+modules := (
+    BufferManager
+    BufferGeom
+    BufferBase
+    EditBuffer
+    ScratchBuffer
+    Window
+    WindowBase
+    CombiWindow
+    MiniWindow
+    WUtil
+);
 
 defun pmacs (trace: t) {
     if {true? t} {
 	f := `File ("./trace.pmacs" mode: o);
 	trace 1 out: [$f fd?];
     };
+
+    fun (modules) {
+	$modules each do: {| m |
+	    try    {load-class :force $m}
+	    catch: {| e | println ["Module load error at '" . $m "', error=" $e]};
+	};
+    } : $modules;
     
     try {
 	defvar MainWindow [new Window init: ([curs-init])];
@@ -42,146 +53,19 @@ defun pmacs (trace: t) {
 
 	b ::= new EditBuffer;
 	$b load-content "/home/mit-sato/perfume/methods.c";
-	# $MainWindow bind-buffer "Window#2" $b;
+	$MainWindow bind-buffer "Window#2" $b;
 
 	b ::= new EditBuffer;
 	$b load-content "/home/mit-sato/perfume/misc/testfile";
-	# $MainWindow bind-buffer "Window#3" $b;
+	$MainWindow bind-buffer "Window#3" $b;
 
 	b ::= new EditBuffer;
 	$b load-content "/home/mit-sato/eval.c";
-	# $MainWindow bind-buffer "Window#4" $b;
+	$MainWindow bind-buffer "Window#4" $b;
 
 	$MainWindow render-all;
 	$MainWindow refresh;
-	sleep 1000;
-
-REM {
-	1 each to: 10 do: {
-		$MainWindow roll-current-window;
-		$MainWindow render-all;
-		$MainWindow refresh;
-		sleep 500;
-	};
-};
-
-        key := "";
-
-	while {true} do: {
-	    i ::= curs-keyin [$MainWindow get-current-window : get-curs] 100 $INPUT_ENCODING;
-	    if {$i null?} {continue};
-	    if {[$key len] > 80} {key := ""; };
-	    $key append! ["" . [[integer? $i] ??? ["%02x" fmt $i] [result $i]] " "];
-	    $MainWindow display-window-message "MiniBuffer" ["%-100v" fmt $key];
-	    $MainWindow refresh;
-
-	    $i each do: {| k |
-		cond
-		{eq? $k KEY_F1} {
-		    $MainWindow roll-current-window;
-		    $MainWindow apply {render-all; refresh};
-		}
-		{eq? $k KEY_NPAGE} {
-		    $MainWindow get-current-window : page-down;
-		    $MainWindow get-current-window : apply {render; set-cursor; refresh};
-		}
-		{eq? $k KEY_PPAGE} {
-		    $MainWindow get-current-window : page-up;
-		    $MainWindow get-current-window : apply {render; set-cursor; refresh};		    
-		}
-		{eq? $k KEY_DOWN} {
-		    $MainWindow get-current-window : move-down;
-		    $MainWindow get-current-window : apply {render; set-cursor; refresh};
-		}
-		{eq? $k KEY_UP} {
-		    $MainWindow get-current-window : move-up;
-		    $MainWindow get-current-window : apply {render; set-cursor; refresh};
-		}
-		{eq? $k KEY_RIGHT} {
-		    $MainWindow get-current-window : move-right;
-		    $MainWindow get-current-window : apply {render; set-cursor; refresh};
-		}
-		{eq? $k KEY_LEFT} {
-		    $MainWindow get-current-window : move-left;
-		    $MainWindow get-current-window : apply {render; set-cursor; refresh};
-		}
-		{eq? $k KEY_F12} {
-		    $MainWindow roll-buffer;
-		    $MainWindow get-current-window : apply {render; set-cursor; refresh};
-		}
-		{eq? $k KEY_RESIZE} {
-		    $MainWindow resize-window;
-		    $MainWindow apply {render-all; refresh};
-		}
-		{eq? $k KEY_F2} {
-		    win ::= $MainWindow get-current-window : get-window-name;
-		    $MainWindow add-create-window-hook {$MainWindow create-full-window window-name: $win};
-		    $MainWindow apply {resize-window; render-all; refresh};
-		}
-		{eq? $k KEY_F3} {
-		    win ::= $MainWindow get-current-window : get-window-name;
-		    $MainWindow add-create-window-hook {$MainWindow create-split-vertical-window window-name: $win};
-		    $MainWindow apply {resize-window; render-all; refresh};
-		}
-		{eq? $k KEY_F4} {
-		    win ::= $MainWindow get-current-window : get-window-name;
-		    $MainWindow add-create-window-hook {$MainWindow create-split-vertical-window div: 3 window-name: $win};
-		    $MainWindow apply {resize-window; render-all; refresh};
-		}
-		{eq? $k KEY_F5} {
-		    win ::= $MainWindow get-current-window : get-window-name;
-		    $MainWindow add-create-window-hook {$MainWindow create-split-vertical-window div: 4 window-name: $win};
-		    $MainWindow apply {resize-window; render-all; refresh};
-		}
-		{eq? $k KEY_F6} {
-		    win ::= $MainWindow get-current-window : get-window-name;
-		    $MainWindow add-create-window-hook {$MainWindow create-split-horizontal-window window-name: $win};
-		    $MainWindow apply {resize-window; render-all; refresh};
-		}
-		{eq? $k KEY_F7} {
-		    win ::= $MainWindow get-current-window : get-window-name;
-		    $MainWindow add-create-window-hook {$MainWindow create-split-horizontal-window div: 3 window-name: $win};
-		    $MainWindow apply {resize-window; render-all; refresh};
-		}
-		{eq? $k KEY_F8} {
-		    win ::= $MainWindow get-current-window : get-window-name;
-		    $MainWindow add-create-window-hook {$MainWindow create-split-horizontal-window div: 4 window-name: $win};
-		    $MainWindow apply {resize-window; render-all; refresh};
-		}
-		{eq? $k KEY_F9} {
-		    win ::= $MainWindow get-current-window : get-window-name;
-		    $MainWindow add-create-window-hook {$MainWindow create-split-cross-window window-name: $win};
-		    $MainWindow apply {resize-window; render-all; refresh};
-		}
-		{string? $k} {
-		    w ::= $MainWindow get-current-window;
-		    $w insert-string $k;
-		    $MainWindow apply {render-all; refresh};
-		}
-		{eq? $k CTRL_I} {
-		    w ::= $MainWindow get-current-window;
-		    $w insert-string "\t"
-			;
-		    $MainWindow apply {render-all; refresh};
-		}
-		{eq? $k CTRL_M} {
-		    w ::= $MainWindow get-current-window;
-		    $w insert-string "\r";
-		    $MainWindow apply {render-all; refresh};
-		}
-		{eq? $k KEY_DC} {
-		    w ::= $MainWindow get-current-window;
-		    $w delete-character;
-		    $MainWindow apply {render-all; refresh};
-		}
-		{eq? $k KEY_BACKSPACE} {
-		    w ::= $MainWindow get-current-window;
-		    $w backdelete-character;
-		    $MainWindow apply {render-all; refresh};
-		}
-		;
-	    };
-	};
+	$MainWindow key-event-loop;
     }
     fin: {
 	curs-terminate;
@@ -199,6 +83,5 @@ defun debug-message (msg) {
 	[$MainWindow get-minibuffer-window] ?? {throw ErrNoMiniBuffer "No MiniBuffer for debugging."};
 	$MainWindow display-window-message "MiniBuffer" ["DEBUG: %-80v" fmt $msg];
 	$MainWindow get-minibuffer-window : refresh;
-	#### curs-keyin [$MainWindow get-minibuffer-window : get-curs] 0 $INPUT_ENCODING;
     };
 };

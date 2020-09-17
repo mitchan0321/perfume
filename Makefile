@@ -31,6 +31,7 @@ CFLAGS		= -Wall -O3 -c -g $(OPTIONS)
 INCLUDE		= -I/usr/local/include -I.
 LIB		= -L/usr/lib -L/lib -L/usr/local/lib \
 		  -lm -lpthread -lgmp -lgc -lonigmo -lpcl $(OPTLIBS)
+
 ### for normaly link option (BSD and Linux)
 #		  -lm -lpthread -lgmp -lgc -lonigmo -lpcl $(OPTLIBS)
 ### for Linux static link options
