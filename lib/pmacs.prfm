@@ -53,15 +53,19 @@ defun pmacs (trace: t) {
 
 	b ::= new EditBuffer;
 	$b load-content "/home/mit-sato/perfume/methods.c";
-	$MainWindow bind-buffer "Window#2" $b;
+	# $MainWindow bind-buffer "Window#2" $b;
 
 	b ::= new EditBuffer;
 	$b load-content "/home/mit-sato/perfume/misc/testfile";
-	$MainWindow bind-buffer "Window#3" $b;
+	# $MainWindow bind-buffer "Window#3" $b;
 
 	b ::= new EditBuffer;
 	$b load-content "/home/mit-sato/eval.c";
-	$MainWindow bind-buffer "Window#4" $b;
+	# $MainWindow bind-buffer "Window#4" $b;
+
+	b ::= new EditBuffer;
+	$b load-content "/home/mit-sato/perfume/lib/null.text";
+	# $MainWindow bind-buffer "Window#4" $b;
 
 	$MainWindow render-all;
 	$MainWindow refresh;
