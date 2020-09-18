@@ -81,11 +81,16 @@ CombiWindow method render () {
     (cy cx) ::= get-source-index $buff $geom;
 
     curs-print $StatusLineCurs [
-	  "-- %v %v [%d,%d] V=(%d,%d) C=(%d,%d,%d) " fmt
-	  $buff-name $win
-	  $cy $cx
-	  $geom,ViewLine $geom,ViewColumn
-	  $geom,CursorLine $geom,CursorColumn $geom,IndexColumn.SAVE
+	  "--[%v%v]#%v - (%d,%d) - %v <%v> %v" fmt
+	  [[$buff modify?] ??? "*" " "]
+	  [$FreeCursor ??? "F" " "]
+	  [$win split sep: "#" : get 1]
+	  [$geom,ViewLine + $geom,CursorLine] [$geom,ViewColumn + $geom,CursorColumn]
+	  $buff-name 
+	  [[$buff get-path] ?? "*no file*"]
+	  ["-" repeat $x]
+#	  $cy $cx
+#	  $geom,CursorLine $geom,CursorColumn $geom,IndexColumn.SAVE
 	]
 	$DISPLAY_ENCODING 0 0;
     
@@ -386,8 +391,7 @@ CombiWindow method destroy () {
     curs-destroy-window $BufferCurs;
     curs-destroy-window $StatusLineCurs;
     curs-destroy-window $VerticalLineCurs;
-    sets BufferCurs 0;
-    sets StatusLineCurs 0;
-    sets VerticalLineCurs 0;
+    sets BufferCurs <nil>;
+    sets StatusLineCurs <nil>;
+    sets VerticalLineCurs <nil>;
 };
-

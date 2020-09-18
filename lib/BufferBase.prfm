@@ -19,3 +19,7 @@ BufferBase method buffer-select (from to block) {
 BufferBase method get-buffer-length () {
     throw ErrNoMethodImpl ["No Impliment method '" . $@name "::get-buffer-length'."];
 };
+
+BufferBase method modify? () {
+    throw ErrNoMethodImpl ["No Impliment method '" . $@name "::modify?'."];
+};

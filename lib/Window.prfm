@@ -319,6 +319,7 @@ Window method add-create-window-hook (hook) {
 Window method resize-window () {
     $MiniWindow destroy;
     sets MiniWindow <nil>;
+    curs-destroy-window $CursWinMini;
     $WindowList each do: {| w |
         $BufferBinding set [$w get-window-name] [$w get-buffer];
 	$w destroy;
@@ -360,10 +361,10 @@ Window method key-event-loop () {
 	};
 	if {$i null?} {continue};
 	
-	# if {[$key len] > 80} {key := ""; };
-	# $key append! ["" . [[integer? $i] ??? ["%02x" fmt $i] [result $i]] " "];
-	# $MainWindow display-window-message "MiniBuffer" ["%-100v" fmt $key];
-	# $MainWindow refresh;
+	if {[$key len] > 80} {key := ""; };
+	$key append! ["" . [[integer? $i] ??? ["%02x" fmt $i] [result $i]] " "];
+	$MainWindow display-window-message "MiniBuffer" ["%-100v" fmt $key];
+	$MainWindow get-minibuffer-window : refresh;
 
 	$i each do: {| k |
 	    window ::= $main get-current-window;		

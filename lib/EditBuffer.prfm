@@ -26,6 +26,10 @@ EditBuffer method load-content (path) {
     BufferManager regist-buffer [self] [$path split sep: "/" : last : car];
 };
 
+EditBuffer method get-path () {
+    return $File;
+};
+
 EditBuffer method buffer-select (from to block) {
     $from each to: $to do: {| i |
 	if {and [$i < [$Src len]] [$i >= 0]}
@@ -77,4 +81,9 @@ EditBuffer method append-string (str) {
 	return [$Src append-string $str];
     };
     return (0 0 "");
+};
+
+EditBuffer method modify? () {
+    ### not yet
+    true;
 };

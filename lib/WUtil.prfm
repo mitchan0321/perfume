@@ -92,18 +92,21 @@ defun set-window-color-default (curs name) {
 };
 
 defun line-input (curs disp-line disp-col input-len cur-index cur-val key-in) {
-    ### debug-message ["%v,%v,%v,%v,%v,%v,%v" fmt $curs $disp-line $disp-col $input-len $cur-index $cur-val $key-in];
     curs-print $curs ["%-" . $input-len "v" : fmt ""] $DISPLAY_ENCODING $disp-line $disp-col;
     curs-render-line $curs $disp-line 0 $disp-col $cur-val $DEFAULT_TAB_WIDTH $DISPLAY_ENCODING;
     v ::= vector($InputValue);
     new-x := $cur-index;
     cond
     {string? $key-in} {
-	(new-y new-x) ::= $v insert-string-at $key-in 0 $cur-index;
+	curs-x ::= curs-index-to-pos $cur-val [$cur-val len] $DEFAULT_TAB_WIDTH;
+	if {$curs-x < $input-len} {
+	    (new-y new-x) ::= $v insert-string-at $key-in 0 $cur-index;
+	};
     }
     {eq? $key-in KEY_RIGHT} {
-	new-x ::= $cur-index + 1;
-	if {$new-x >= $input-len} {new-x ::= $cur-index - 1}
+	if {$new-x < $input-len} {
+	    new-x ::= $cur-index + 1;
+	};
     }
     {eq? $key-in KEY_LEFT} {
 	new-x ::= $cur-index - 1;
@@ -219,4 +222,13 @@ Vector method backdelete-character-at (line at) {
 Vector method append-string (str) {
     [self] append! $str;
     return ([[self] len] 0 $str);
+};
+
+String method repeat (times) {
+    result := "";
+    self ::= self;
+    1 each to: $times do: {
+	$result append! $self;
+    };
+    return $result;
 };
