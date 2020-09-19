@@ -118,11 +118,10 @@ defcommand move-half-up
 
     $window set-freecursor <t>;
     new-y ::= $geom,ViewLine + [$y / 2];
-    if {[$new-y + $y] > [$buff get-buffer-length]} {
-	new-y ::= [$buff get-buffer-length] - $y;
-    };
+    if {$new-y > [[$buff get-buffer-length] - $y : + 1]} {new-y ::= [$buff get-buffer-length] - $y : + 1};
+    if {$new-y < 0} {new-y := 0};
     $geom set! ViewLine $new-y;
-
+    
     result SELF;
 };
 
@@ -138,7 +137,7 @@ defcommand move-half-down
         new-y := 0;
     };
     $geom set! ViewLine $new-y;
-
+    
     result SELF;
 };
 
@@ -149,7 +148,7 @@ defcommand move-half-right
     (y x) ::= $window get-screen-size;
 
     $window set-freecursor <t>;
-    new-x ::= $geom,ViewColumn + [$x / 3];
+    new-x ::= $geom,ViewColumn + [$x / 4];
     $geom set! ViewColumn $new-x;
 
     result SELF;
@@ -162,13 +161,44 @@ defcommand move-half-left
     (y x) ::= $window get-screen-size;
 
     $window set-freecursor <t>;
-    new-x ::= $geom,ViewColumn - [$x / 3];
+    new-x ::= $geom,ViewColumn - [$x / 4];
     if {$new-x < 0} {new-x := 0};
     $geom set! ViewColumn $new-x;
 
     result SELF;
 };
 
+defcommand cursor-top-of-line
+{   | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+
+    $window set-freecursor <nil>;
+    $geom set! ViewColumn 0;
+    $geom set! CursorColumn 0;
+    $geom set! IndexColumn.SAVE 0;
+    (y x) ::= $window get-screen-size;
+    $window fit-to-cursor $geom $y $x;    
+
+    result SELF;
+};
+
+defcommand cursor-end-of-line
+{   | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (cy cx) ::= $window get-source-index $buff $geom;
+    cx ::= $buff get-buffer-line $cy : len;
+    (line col) ::= $window get-cursor-index $buff $cy $cx;
+
+    $window set-freecursor <nil>;
+    $geom set! CursorColumn [$col - $geom,ViewColumn];
+    $geom set! IndexColumn.SAVE $col;
+    (y x) ::= $window get-screen-size;
+    $window fit-to-cursor $geom $y $x;
+    
+    result SELF;
+};
 
 defcommand insert-character
 {   | main window key |
@@ -204,9 +234,12 @@ defcommand execute-command
 {   | main window |
     $main mini-input-start "" prompt: "Command: ";
     $main add-mini-input-callback $window {| main window in-key value |
+        if {eq? $in-key KEY_ESC} {
+	    $main mini-input-end;
+	    show-message "Canceled.";
+	};
         if {eq? $in-key CTRL_M} {
 	    $main mini-input-end;
-
 	    try {
 	        result ::= $value eval;
 	        show-message ["Command result: " . [$result string]];
@@ -223,6 +256,28 @@ defcommand refresh-screen
     $main send-key-event (KEY_RESIZE);
 };
 
+defcommand open-file
+{   | main window |
+    $main mini-input-start "" prompt: "Open file: ";
+    $main add-mini-input-callback $window {| main window in-key value |
+        if {eq? $in-key KEY_ESC} {
+	    $main mini-input-end;
+	    show-message "Canceled.";
+	};
+        if {eq? $in-key CTRL_M} {
+	    $main mini-input-end;
+	    if {[$value len] = 0} {
+		show-message "No file name specified.";
+	    };
+	    buff ::= new EditBuffer;
+	    result ::= $buff load-content [pwd : . "/" $value];
+	    $MainWindow bind-buffer [$window get-window-name] $buff;
+	    $result ?? {show-message ["New file: " . $value]};
+	};
+    };
+    result ALL;
+};
+
 defcommand miniwindow-input-sample
 {   | main window |
     $main mini-input-start "" prompt: "test prompt: ";
@@ -235,31 +290,15 @@ defcommand miniwindow-input-sample
     result ALL;
 };
 
-
 ###
-### START REMARK, for spare
-###
+### REMARK, Spare for new editor command making.
 REM {
-defcommand 
-{   | main window |
-};
 
 defcommand 
 {   | main window |
 };
 
-defcommand 
-{   | main window |
 };
-
-defcommand 
-{   | main window |
-};
-
-defcommand 
-{   | main window |
-};
-};
-###
 ### END REMARK
 ###
+

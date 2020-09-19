@@ -8,6 +8,8 @@ ScratchBuffer method init-constructor () {
     sets Src [vector ("This is a '*Scratch*' buffer.")];
     sets File <nil>;
     sets BufferName <nil>;
+    sets Modify <nil>;
+    sets NewFile <nil>;
 };
 
 ScratchBuffer method load-content (path) {

@@ -26,7 +26,7 @@ func_curses_init(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     setlocale(LC_ALL, "");
     wmain = initscr();
     start_color();
-    cbreak();
+    raw();
     noecho();
     nonl();
     intrflush(stdscr, FALSE);

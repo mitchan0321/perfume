@@ -4,6 +4,13 @@ WUtil method init () {
     init-config;
     init-color-DB;
     init-command-DB;
+
+    # Ommit exit command.
+    d ::= dict-func;
+    f ::= $d get exit;
+    $d unset exit;
+    $d set _exit $f;
+    defun exit () {$MainWindow exit-event-loop};
 };
 
 WUtil method color-pair (fg bg) {

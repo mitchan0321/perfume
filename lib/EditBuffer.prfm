@@ -8,22 +8,37 @@ EditBuffer method init-constructor () {
     sets Src <nil>;
     sets File <nil>;
     sets BufferName <nil>;
+    sets Modify <nil>;
+    sets NewFile <nil>;
 };
 
 EditBuffer method load-content (path) {
-    f := `File($path mode: i);
+    result := <nil>;
+    f ::= new File;
+    sets NewFile <nil>;
     sets Src [vector];
     try {
+        $f open $path mode: i;
 	$f each do: {| r |
 	    $Src append! $r;
 	};
+        result := <t>;
+    }
+    catch: {| e |
+        sets NewFile <t>;
+	result := <nil>;
     }
     fin: {
 	$f close;
     };
 
     sets File $path;
-    BufferManager regist-buffer [self] [$path split sep: "/" : last : car];
+    if {$path = ""} {sets File "anonymous.pmacs"};
+    buff-name ::= $path split sep: "/" : last : car;
+    $buff-name ?? {buff-name := "*no named*"};
+    BufferManager regist-buffer [self] $buff-name;
+
+    return $result;
 };
 
 EditBuffer method get-path () {
@@ -44,11 +59,13 @@ EditBuffer method buffer-select (from to block) {
 
 EditBuffer method get-buffer-line (line) {
     $Src ?? {return <nil>};
+    if {$line < 0} {return <nil>};
     if {$line >= [$Src len]} {
 	return <nil>;
     } {
+	if {[$Src len] <= 0} {return <nil>};
 	return [$Src get $line];
-    }
+    };
 };
 
 EditBuffer method get-buffer-length () {
@@ -56,6 +73,7 @@ EditBuffer method get-buffer-length () {
 };
 
 EditBuffer method insert-string-at (input y x) {
+    sets Modify <t>;
     if {true? Src} {
 	return [$Src insert-string-at $input $y $x];
     };
@@ -63,6 +81,7 @@ EditBuffer method insert-string-at (input y x) {
 };
 
 EditBuffer method delete-character-at (y x) {
+    sets Modify <t>;
     if {true? Src} {
 	return [$Src delete-character-at $y $x];
     };
@@ -70,6 +89,7 @@ EditBuffer method delete-character-at (y x) {
 };
 
 EditBuffer method backdelete-character-at (y x) {
+    sets Modify <t>;
     if {true? Src} {
 	return [$Src backdelete-character-at $y $x];
     };
@@ -77,6 +97,7 @@ EditBuffer method backdelete-character-at (y x) {
 };
 
 EditBuffer method append-string (str) {
+    sets Modify <t>;
     if {true? Src} {
 	return [$Src append-string $str];
     };
@@ -84,6 +105,9 @@ EditBuffer method append-string (str) {
 };
 
 EditBuffer method modify? () {
-    ### not yet
-    true;
+    return $Modify;
+};
+
+EditBuffer method newfile? () {
+    return $NewFile;
 };

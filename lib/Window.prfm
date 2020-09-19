@@ -29,6 +29,9 @@ Window method init-constructor () {
     ## Callback for MiniWindow input method.
     ## MiniInputCallback list form is: (window closure)
     sets MiniInputCallback ();
+
+    ## Event loop exit flag
+    sets EventLoopDone <nil>;
 };
 
 Window method get-curs () {
@@ -352,6 +355,8 @@ Window method key-event-loop () {
     key := "";
     
     while {true} do: {
+	if $EventLoopDone {break};
+
 	window ::= $main get-current-window;
 	if {$KeyEvent null?} {
 	    i ::= curs-keyin [$window get-curs] $INPUT_TIMEOUT $INPUT_ENCODING;
@@ -361,10 +366,14 @@ Window method key-event-loop () {
 	};
 	if {$i null?} {continue};
 	
-	if {[$key len] > 80} {key := ""; };
-	$key append! ["" . [[integer? $i] ??? ["%02x" fmt $i] [result $i]] " "];
-	$MainWindow display-window-message "MiniBuffer" ["%-100v" fmt $key];
-	$MainWindow get-minibuffer-window : refresh;
+	#######
+	####### for debug display key in
+        #######
+	### if {[$key len] > 80} {key := ""; };
+	### $key append! ["" . [[integer? $i] ??? ["%02x" fmt $i] [result $i]] " "];
+	### $MainWindow display-window-message "MiniBuffer" ["%-100v" fmt $key];
+	### $MainWindow get-minibuffer-window : refresh;
+        #######
 
 	$i each do: {| k |
 	    window ::= $main get-current-window;		
@@ -409,7 +418,13 @@ Window method mini-input-start (prompt: p init-value) {
 
 Window method mini-input-callback (in-key value) {
     if {! [$MiniInputCallback null?]} {
-	yield $MiniInputCallback,1 $MainWindow $MiniInputCallback,0 $in-key $value;
+	try {
+	    yield $MiniInputCallback,1 $MainWindow $MiniInputCallback,0 $in-key $value;
+	}
+	catch: {| e |
+	    show-message ["Error happend at mini window input callback, <" . [$e car] "># " [$e cdr]];
+	    return <nil>;
+	};
     };
 };
 
@@ -420,4 +435,8 @@ Window method mini-input-end () {
 
 Window method add-mini-input-callback (window block) {
     sets MiniInputCallback ($window $block);
+};
+
+Window method exit-event-loop () {
+    sets EventLoopDone <t>;
 };

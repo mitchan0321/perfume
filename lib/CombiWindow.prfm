@@ -81,8 +81,9 @@ CombiWindow method render () {
     (cy cx) ::= get-source-index $buff $geom;
 
     curs-print $StatusLineCurs [
-	  "--[%v%v]#%v - (%d,%d) - %v <%v> %v" fmt
+	  "[%v%v%v]#%v - (%d,%d) - %v <%v> %v" fmt
 	  [[$buff modify?] ??? "*" " "]
+	  [[$buff newfile?] ??? "N" " "]
 	  [$FreeCursor ??? "F" " "]
 	  [$win split sep: "#" : get 1]
 	  [$geom,ViewLine + $geom,CursorLine] [$geom,ViewColumn + $geom,CursorColumn]
@@ -105,6 +106,7 @@ CombiWindow method render () {
 	    $DEFAULT_TAB_WIDTH $DISPLAY_ENCODING;
 	$i ++;
     };
+
     if {[$geom,ViewLine + $y : - 1] >= [$buff get-buffer-length]} {
 	if {[[$buff get-buffer-length] - $geom,ViewLine] < $y} {
 	    curs-render-line
@@ -379,19 +381,37 @@ CombiWindow method apply-keybind (main window key) {
 	command ::= $KeyBinding get KEY_INPUT_CHAR;
 	body ::= get-command $command;
 	if {block? $body} {
-	    result ::= yield $body $main $window $key;
+	    try {
+		result ::= yield $body $main $window $key;
+	    }
+	    catch: {| e |
+		show-message ["Error happend at editor command: " . $command ", <" [$e car] "># " [$e cdr]];
+		return <nil>;
+	    };
 	    return $result;
 	};
+	show-message ["Incorrect command at: " . $command];
 	return <nil>;
     };
     command ::= $KeyBinding get $key;
+    if {eq? <nil> $command} {
+	show-message ["Not binding key: " . $key];
+	return <nil>;
+    };
     body ::= get-command $command;
     if {block? $body} {
-	result ::= yield $body $main $window;
+	try {
+	    result ::= yield $body $main $window;
+	}
+	catch: {| e |
+	    show-message ["Error happend at editor command: " . $command ", <" [$e car] "># " [$e cdr]];
+	    return <nil>;
+	};
 	return $result;
     } {
-	show-message ["Not binding key: " . $key];
+	show-message ["editor command not defined: " . $command];
     };
+    show-message ["Incorrect command at: " . $command];
     return <nil>;
 };
 
