@@ -86,7 +86,7 @@ CombiWindow method render () {
 	  [[$buff newfile?] ??? "N" " "]
 	  [$FreeCursor ??? "F" " "]
 	  [$win split sep: "#" : get 1]
-	  [$geom,ViewLine + $geom,CursorLine] [$geom,ViewColumn + $geom,CursorColumn]
+	  $cy $cx
 	  $buff-name 
 	  [[$buff get-path] ?? "*no file*"]
 	  ["-" repeat $x]

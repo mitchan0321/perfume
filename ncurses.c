@@ -363,6 +363,14 @@ typedef struct _render_encode {
     int display_position;
 } Render_Encode;
 
+static wchar_t *control_character_font [33] = {
+    L"\x2400", L"\x2401", L"\x2402", L"\x2403", L"\x2404", L"\x2405", L"\x2406", L"\x2407",
+    L"\x2408", L" ",      L"\x240a", L"\x240b", L"\x240c", L"\x240d", L"\x240e", L"\x240f",
+    L"\x2410", L"\x2411", L"\x2412", L"\x2413", L"\x2414", L"\x2415", L"\x2416", L"\x2417",
+    L"\x2418", L"\x2419", L"\x241a", L"\x241b", L"\x241c", L"\x241d", L"\x241e", L"\x241f",
+    L"\x2421"
+};
+
 Toy_Type*
 func_curses_render_line(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     WINDOW *w;
@@ -372,7 +380,7 @@ func_curses_render_line(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, i
     int win_size_y, win_size_x;
     int iencoder;
     int i, slen;
-    wchar_t *p;
+    wchar_t *p, *cp;
     Render_Encode *rendaring_data;
     encoder_error_info *enc_error_info;
     Cell *codep;
@@ -435,8 +443,20 @@ func_curses_render_line(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, i
     for (i=0; i<slen; i++) {
 	if ((p[i] < 0x20) || (p[i] == 0x7f)) {
 	    /* control character encoding */
-	    rendaring_data[i].display_char = L" ";
-	    rendaring_data[i].display_width = 1;
+	    if (p[i] != 0x7f) {
+		cp = control_character_font[p[i]];
+		rendaring_data[i].display_width = 1;
+	    } else {
+		cp = control_character_font[32];
+		rendaring_data[i].display_width = 1;
+	    }
+	    codep = new_cell(NULL);
+	    cell_add_char(codep, cp[0]);
+	    result = encode_unicode_to_raw(codep, iencoder, enc_error_info);
+	    if (NULL == result) {
+		return new_exception(TE_BADENCODEBYTE, enc_error_info->message, interp);
+	    }
+	    rendaring_data[i].display_char = cell_get_addr(result);
 	}
 	else if (p[i] < 0x7f) {
 	    /* ASCII character encoding */

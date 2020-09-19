@@ -200,6 +200,47 @@ defcommand cursor-end-of-line
     result SELF;
 };
 
+defcommand show-character-code
+{   | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (cy cx) ::= $window get-source-index $buff $geom;
+    s ::= $buff get-buffer-line $cy;
+    $s ?? {
+	show-message "No character.";
+	return SELF;
+    };
+    c ::= $s sub $cx [$cx + 1];
+    if {$c != ""} {
+	i ::= $c uexport : car;
+	show-message ["Code: %v[u+%x]" fmt $i $i];
+    } {
+	show-message "No character."
+    };
+    
+    result SELF;
+};
+
+defcommand input-character-code
+{   | main window |
+    $main mini-input-start "" prompt: "Input character code: u+";
+    $main add-mini-input-callback $window {| main window in-key value |
+        if {eq? $in-key KEY_ESC} {
+	    $main mini-input-end;
+	    show-message "Canceled.";
+	};
+        if {eq? $in-key CTRL_M} {
+	    $main mini-input-end;
+	    try {i ::= ["0x" . $value] int} catch: {
+		show-message "Bad hexadecimal.";
+		return SELF;
+	    };
+	    $window insert-string ["" uimport! ($i)];
+	};
+    };
+    result SELF;
+};
+
 defcommand insert-character
 {   | main window key |
     $window insert-string $key;
