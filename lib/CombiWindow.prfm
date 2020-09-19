@@ -212,7 +212,7 @@ CombiWindow method page-up () {
 };
 
 CombiWindow method move-down () {
-    sets FreeCursor <t>;
+    # sets FreeCursor <t>;
 
     buff ::= get-buffer;
     geom ::= get-geom;
@@ -230,7 +230,7 @@ CombiWindow method move-down () {
 };
 
 CombiWindow method move-up () {
-    sets FreeCursor <t>;
+    # sets FreeCursor <t>;
 
     geom ::= get-geom;
     (y x) ::= curs-get-screen-size $BufferCurs;
@@ -370,21 +370,37 @@ CombiWindow method load-keybind () {
     };
 };
 
+CombiWindow method setkey (key command) {
+    $KeyBinding set $key $command;
+};
+
 CombiWindow method apply-keybind (main window key) {
     if {string? $key} {
-	body ::= $KeyBinding get KEY_INPUT_CHAR;
+	command ::= $KeyBinding get KEY_INPUT_CHAR;
+	body ::= get-command $command;
 	if {block? $body} {
 	    result ::= yield $body $main $window $key;
 	    return $result;
 	};
 	return <nil>;
     };
-    body ::= $KeyBinding get $key;
+    command ::= $KeyBinding get $key;
+    body ::= get-command $command;
     if {block? $body} {
 	result ::= yield $body $main $window;
 	return $result;
+    } {
+	show-message ["Not binding key: " . $key];
     };
     return <nil>;
+};
+
+CombiWindow method get-screen-size () {
+    return [curs-get-screen-size $BufferCurs];
+};
+
+CombiWindow method set-freecursor (flag) {
+    sets FreeCursor $flag;
 };
 
 CombiWindow method destroy () {

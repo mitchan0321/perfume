@@ -3,6 +3,7 @@ class WUtil;
 WUtil method init () {
     init-config;
     init-color-DB;
+    init-command-DB;
 };
 
 WUtil method color-pair (fg bg) {
@@ -60,6 +61,19 @@ WUtil method get-fgcolor (name) {
     return $fg;
 };
 
+defun init-config () {
+    if {defvar? PMACS_INIT}
+    else: {
+	$LIB_PATH each do: {| i |
+	    if {file exists? [$i . "/pmacs.conf"]} {
+		load [$i . "/pmacs.conf"];
+		break;
+	    };
+	};
+	defvar PMACS_INIT <t>;
+    };
+};
+
 defun init-color-DB () {
     if [defvar? ColorDB] else: {
 	defvar ColorDB [dict];
@@ -73,17 +87,26 @@ defun init-color-DB () {
     };
 };
 
-defun init-config () {
-    if {defvar? PMACS_INIT}
+defun init-command-DB () {
+    if {defvar? EditorCommand}
     else: {
-	$LIB_PATH each do: {| i |
-	    if {file exists? [$i . "/pmacs.conf"]} {
-		load [$i . "/pmacs.conf"];
-		break;
-	    };
-	};
-	defvar PMACS_INIT <t>;
+	defvar EditorCommand [dict];
     };
+
+    $LIB_PATH each do: {| i |
+	if {file exists? [$i . "/EditorCommandDefs.prfm"]} {
+	    load [$i . "/EditorCommandDefs.prfm"];
+	    break;
+	};
+    };
+};
+
+defun defcommand (name block) {
+    $EditorCommand set $name $block;
+};
+
+defun get-command (name) {
+    $EditorCommand get $name;
 };
 
 defun set-window-color-default (curs name) {
