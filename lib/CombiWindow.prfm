@@ -365,8 +365,8 @@ CombiWindow method fit-to-cursor (geom l c) {
 
 CombiWindow method load-keybind () {
     $LIB_PATH each do: {| i |
-	if {file exists? [$i . "/" $COMBIWINDOW_BINDFILE]} {
-	    try {load [$i . "/" $COMBIWINDOW_BINDFILE]} catch: {| e | throw $e};
+	if {file exists? [$i . "/" $COMBIWINDOW_KEYBINDFILE]} {
+	    try {load [$i . "/" $COMBIWINDOW_KEYBINDFILE]} catch: {| e | throw $e};
 	    break;
 	};
     };
@@ -395,7 +395,7 @@ CombiWindow method apply-keybind (main window key) {
     };
     command ::= $KeyBinding get $key;
     if {eq? <nil> $command} {
-	show-message ["Not binding key: " . $key];
+	show-message ["No binding key: " . $key];
 	return <nil>;
     };
     body ::= get-command $command;

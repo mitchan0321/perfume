@@ -364,11 +364,11 @@ typedef struct _render_encode {
 } Render_Encode;
 
 static wchar_t *control_character_font [33] = {
-    L"\x2400", L"\x2401", L"\x2402", L"\x2403", L"\x2404", L"\x2405", L"\x2406", L"\x2407",
-    L"\x2408", L" ",      L"\x240a", L"\x240b", L"\x240c", L"\x240d", L"\x240e", L"\x240f",
-    L"\x2410", L"\x2411", L"\x2412", L"\x2413", L"\x2414", L"\x2415", L"\x2416", L"\x2417",
-    L"\x2418", L"\x2419", L"\x241a", L"\x241b", L"\x241c", L"\x241d", L"\x241e", L"\x241f",
-    L"\x2421"
+    L"\u2400", L"\u2401", L"\u2402", L"\u2403", L"\u2404", L"\u2405", L"\u2406", L"\u2407",
+    L"\u2408", L" ",      L"\u240a", L"\u240b", L"\u240c", L"\u240d", L"\u240e", L"\u240f",
+    L"\u2410", L"\u2411", L"\u2412", L"\u2413", L"\u2414", L"\u2415", L"\u2416", L"\u2417",
+    L"\u2418", L"\u2419", L"\u241a", L"\u241b", L"\u241c", L"\u241d", L"\u241e", L"\u241f",
+    L"\u2421"
 };
 
 Toy_Type*
@@ -827,6 +827,7 @@ func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     inlist = result = new_list(NULL);
 
     wtimeout(w, itimeout);
+    curs_set(1);
 
     if (pending_key != -1) {
 	in = pending_key;
@@ -1078,6 +1079,20 @@ error:
     return new_exception(TE_SYNTAX, L"Syntax error at 'curs-index-to-pos', syntax: curs-index-to-pos string index", interp);
 }
 
+Toy_Type*
+func_curses_flash(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (arglen != 0) goto error;
+
+    flash();
+    beep();
+
+    return const_T;
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'curs-flash', syntax: curs-flash", interp);
+}
+
 int
 toy_add_func_ncurses(Toy_Interp* interp) {
     toy_add_func(interp, L"curs-init",		func_curses_init,		NULL);
@@ -1100,6 +1115,7 @@ toy_add_func_ncurses(Toy_Interp* interp) {
     toy_add_func(interp, L"curs-keyin",		func_curses_keyin,		L"window,timeout,encoding");
     toy_add_func(interp, L"curs-pos-to-index",	func_curses_pos_to_index,	L"string,pos,tab-width");
     toy_add_func(interp, L"curs-index-to-pos",	func_curses_index_to_pos,	L"string,index,tab-width");
+    toy_add_func(interp, L"curs-flash",		func_curses_flash,		NULL);    
     return 0;
 }
 

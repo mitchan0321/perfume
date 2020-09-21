@@ -38,7 +38,70 @@ EditBuffer method load-content (path) {
     $buff-name ?? {buff-name := "*no named*"};
     BufferManager regist-buffer [self] $buff-name;
 
+    sets Modify <nil>;
     return $result;
+};
+
+EditBuffer method save-content (path: path) {
+    if {! [set? path]} {
+	path ::= get-path;
+    } {
+	sets File $path;
+    };
+    if {or {nil? $path} {$path = ""}} {return (<nil> ErrNoPathSpacified)};
+
+    l ::= $path split sep: "/";
+    backup-path ::= $l <<- ["%" . [$l ->>] "%"] : join sep: "/";
+    mode := $DEFAULT_FILE_MODE;
+    if {file exists? $path} {
+	try {
+	    d ::= dict [file stat $path];
+	    mode ::= $d get mode;
+	} catch: {| e |
+	    return (<nil>
+		["<" . [$e car] "># " [$e cdr] ", at file mode get."]);
+	};
+    } {
+	backup-path := <nil>;
+    };
+    
+    f ::= new File;
+    try {
+	if $backup-path {
+	    $f open $backup-path mode: o;
+	} {
+	    $f open $path mode: o;
+	};
+    } catch: {| e |
+	$f close;
+	return (<nil>
+	    ["<" . [$e car] "># " [$e cdr] ", at create new file, "
+	     [$backup-path ??? $backup-path $path] "."]);
+    };
+
+    try {
+	if $Src {
+	    $Src each do: {| r |
+		$f puts $r;
+	    }
+	};
+	$f close;
+	if $backup-path {
+	    file chmod $backup-path $mode;
+        };
+    } catch: {| e |
+	$f close;
+	return (<nil>
+	    ["<" . [$e car] "># " [$e cdr] ", at file write."]);
+    };
+
+    if $backup-path {
+	file rm $path;
+	file rename $backup-path $path;
+    };
+
+    sets Modify <nil>;
+    return (<t> Success);
 };
 
 EditBuffer method get-path () {

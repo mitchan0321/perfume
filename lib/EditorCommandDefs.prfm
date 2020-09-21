@@ -183,6 +183,99 @@ defcommand cursor-top-of-line
     result SELF;
 };
 
+defcommand smooth-scroll-down
+{   | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+
+    (y x) ::= $window get-screen-size;
+    new-y ::= $geom,ViewLine + 2;
+    if {$new-y > [[$buff get-buffer-length] - $y : + 1]} {new-y ::= [$buff get-buffer-length] - $y : + 1};
+    if {$new-y < 0} {new-y := 0};
+    $geom set! ViewLine $new-y;
+
+    result SELF;
+};
+
+defcommand smooth-scroll-up
+{   | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+
+    (y x) ::= $window get-screen-size;
+    new-y ::= $geom,ViewLine - 2;
+    if {$new-y < 0} {new-y := 0};
+    $geom set! ViewLine $new-y;
+
+    result SELF;
+};
+
+defcommand smooth-scroll-right
+{   | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (y x) ::= $window get-screen-size;
+
+    $window set-freecursor <t>;
+    new-x ::= $geom,ViewColumn + 2;
+    $geom set! ViewColumn $new-x;
+
+    result SELF;
+};
+
+defcommand smooth-scroll-left
+{   | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (y x) ::= $window get-screen-size;
+
+    $window set-freecursor <t>;
+    new-x ::= $geom,ViewColumn - 2;
+    if {$new-x < 0} {new-x := 0};
+    $geom set! ViewColumn $new-x;
+
+    result SELF;
+};
+
+defcommand top-of-buffer
+{   | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (y x) ::= $window get-screen-size;
+
+    $window set-freecursor <nil>;
+    $geom set! ViewLine 0;
+    $geom set! ViewColumn 0;
+    $geom set! CursorLine 0;
+    $geom set! CursorColumn 0;
+    $geom set! IndexColumn.SAVE 0;
+
+    result SELF;
+};
+
+defcommand bottom-of-buffer
+{   | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (y x) ::= $window get-screen-size;
+    buff-len ::= $buff get-buffer-length;
+
+    $window set-freecursor <nil>;
+    $geom set! ViewLine 0;
+    $geom set! ViewColumn 0;
+    $geom set! CursorLine 0;
+    $geom set! CursorColumn 0;
+    $geom set! IndexColumn.SAVE 0;
+    if {$buff-len < $y} {
+	$geom set! CursorLine $buff-len;
+    } {
+	$geom set! ViewLine [$buff-len - $y : + 1];
+	$geom set! CursorLine [$y - 1];
+    };
+    
+    result SELF;
+};
+
 defcommand cursor-end-of-line
 {   | main window |
     buff ::= $window get-buffer;
@@ -213,7 +306,7 @@ defcommand show-character-code
     c ::= $s sub $cx [$cx + 1];
     if {$c != ""} {
 	i ::= $c uexport : car;
-	show-message ["Code: %v[u+%x]" fmt $i $i];
+	show-message ["Code: %v[u+%06x]" fmt $i $i];
     } {
 	show-message "No character."
     };
@@ -297,9 +390,15 @@ defcommand refresh-screen
     $main send-key-event (KEY_RESIZE);
 };
 
+defcommand flash
+{   | main window |
+    curs-flash;
+    result ALL;
+};
+
 defcommand open-file
 {   | main window |
-    $main mini-input-start "" prompt: "Open file: ";
+    $main mini-input-start "" prompt: ["Open file: " . [pwd] "/"];
     $main add-mini-input-callback $window {| main window in-key value |
         if {eq? $in-key KEY_ESC} {
 	    $main mini-input-end;
@@ -311,9 +410,143 @@ defcommand open-file
 		show-message "No file name specified.";
 	    };
 	    buff ::= new EditBuffer;
-	    result ::= $buff load-content [pwd : . "/" $value];
+	    result ::= $buff load-content [
+		{[$value sub 0 1] = "/"} ???
+		    $value
+		    [pwd : . "/" $value]
+	    ];
 	    $MainWindow bind-buffer [$window get-window-name] $buff;
 	    $result ?? {show-message ["New file: " . $value]};
+	};
+    };
+    result SELF;
+};
+
+##
+## Nested callback sample.
+## $value was save to path variable in 1st callback, because $value is override by 2nd callback.
+##
+defcommand nest-test
+{   | main window |
+    $main mini-input-start "" prompt: "test [y(es)/n(o)]";
+    $main add-mini-input-callback $window {| main window in-key value |
+	if {eq? $in-key "y"} {
+	    $main mini-input-end;
+	    path := $value;
+	    $main mini-input-start "" prompt: "test 2 [o(k)/n(g)]";
+	    $main add-mini-input-callback $window {| main window in-key value |
+		if {eq? $in-key "o"} {
+		    $main mini-input-end;
+		    debug-message ["path value is: " . $path ", value is: " $value];
+		};
+	    };
+	};
+    };
+};
+
+defcommand save-buffer
+{   | main window |
+    buff ::= $window get-buffer;
+    path ::= $buff get-path;
+
+    if {or {nil? $path} {$path = ""}} {
+	$main mini-input-start "" prompt: ["Save file name: " . [pwd] "/"];
+	$main add-mini-input-callback $window {| main window in-key value |
+	    if {eq? $in-key KEY_ESC} {
+		$main mini-input-end;
+		show-message "Canceled.";
+	    };
+	    if {eq? $in-key CTRL_M} {
+		$main mini-input-end;
+		path ::= {[$value sub 0 1] = "/"} ???
+		    $value
+		    [pwd : . "/" $value];
+
+		if [file exists? $path] {
+		    $main mini-input-start "" prompt: "File already exist, overwrite? [y/n]";
+		    $main add-mini-input-callback $window {| main window in-key value |
+			if {or {eq? $in-key KEY_ESC} {eq? $in-key "n"} {eq? $in-key "N"}} {
+			    $main mini-input-end;
+			    show-message "Canceled.";
+			    continue := <nil>;
+			    return SELF;
+			};
+			if {or {eq? $in-key "y"} {eq? $in-key "Y"}} {
+			    $main mini-input-end;
+			    (result err) ::= $buff save-content path: $path;
+			    if $result {
+				show-message "Save Done.";
+			    } {
+				show-message ["Save Failed, path: " . $path ". (" $err ")"];
+			    };
+			    return SELF;
+			};
+		    };
+		};
+	    };
+	};
+	return SELF
+    };
+
+    $main mini-input-start "" prompt: ["Save file? (" . $path ") [y/n]: "];
+    $main add-mini-input-callback $window {| main window in-key value |
+	    if {or {eq? $in-key KEY_ESC} {eq? $in-key "n"} {eq? $in-key "N"}} {
+	    $main mini-input-end;
+	    show-message "Canceled.";
+	};
+        if {or {$value = "y"} {$value = "Y"}} {
+	    $main mini-input-end;
+	    (result err) ::= $buff save-content;
+	    if $result {
+		show-message "Save Done.";
+	    } {
+		show-message ["Save Failed, path: " . $path ". (" $err ")"];
+	    };
+	    return SELF;
+	};
+    };
+    
+    result ALL;
+};
+
+defcommand save-buffer-as
+{   | main window |
+    buff ::= $window get-buffer;
+    path ::= $buff get-path;
+
+    $main mini-input-start "" prompt: ["Save file name: " . [pwd] "/"];
+    $main add-mini-input-callback $window {| main window in-key value |
+	if {eq? $in-key KEY_ESC} {
+	    $main mini-input-end;
+	    show-message "Canceled.";
+	};
+	if {eq? $in-key CTRL_M} {
+	    $main mini-input-end;
+	    path ::= {[$value sub 0 1] = "/"} ???
+		$value
+		[pwd : . "/" $value];
+
+	    if [file exists? $path] {
+	       $main mini-input-start "" prompt: "File already exist, overwrite? [y/n]";
+	       $main add-mini-input-callback $window {| main window in-key value |
+		   if {or {eq? $in-key KEY_ESC} {eq? $in-key "n"} {eq? $in-key "N"}} {
+		       $main mini-input-end;
+		       show-message "Canceled.";
+		       continue := <nil>;
+		       return SELF;
+		   };
+		   if {or {eq? $in-key "y"} {eq? $in-key "Y"}} {
+		       $main mini-input-end;
+		       (result err) ::= $buff save-content path: $path;
+		       if $result {
+			   show-message "Save Done.";
+		       } {
+			   show-message ["Save Failed, path: " . $path ". (" $err ")"];
+		       };
+		       return SELF;
+		   };
+	       };
+	    };
 	};
     };
     result ALL;
