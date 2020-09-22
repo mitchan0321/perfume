@@ -134,8 +134,9 @@ defun line-input (curs disp-line disp-col input-len cur-index cur-val key-in) {
 	};
     }
     {eq? $key-in KEY_RIGHT} {
-	if {$new-x < $input-len} {
-	    new-x ::= $cur-index + 1;
+	new-x ::= $cur-index + 1;
+	if {$new-x > [$v get 0 : len]} {
+	    new-x := [$v get 0 : len];
 	};
     }
     {eq? $key-in KEY_LEFT} {
@@ -159,6 +160,19 @@ defun show-message (msg) {
 	$MainWindow display-window-message "MiniBuffer" $msg;
 	$MainWindow get-minibuffer-window : refresh;
     };
+};
+
+defun path-adjust (path) {
+    l ::= $path split sep: "/";
+    r := ();
+    $l each do: {| i |
+	cond
+	    {$i = ".."} {if {[$r len] > 1} {$r ->>}; break;}
+	    {$i = "."}  {break;}
+	    <t>         {$r <<- $i}
+	;
+    };
+    return [$r join sep: "/"];
 };
 
 ##

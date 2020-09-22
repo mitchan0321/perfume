@@ -263,10 +263,18 @@ Window method roll-to-window (window-name) {
     return [$WindowList car];
 };
 
-Window method roll-buffer () {
+Window method next-buffer () {
     win := $WindowList,0;
 
     buff ::= BufferManager get-next-buffer [$win get-buffer];
+    win-name ::= $win get-window-name;
+    bind-buffer $win-name $buff;
+};
+
+Window method previous-buffer () {
+    win := $WindowList,0;
+
+    buff ::= BufferManager get-previous-buffer [$win get-buffer];
     win-name ::= $win get-window-name;
     bind-buffer $win-name $buff;
 };
@@ -294,6 +302,19 @@ Window method bind-buffer (window-name buffer) {
     $window set-buffer $buffer;
     geom ::= BufferManager get-buffer-geom $window-name [$buffer get-buffer-name];
     BufferManager set-buffer-geom $window-name [$buffer get-buffer-name];
+};
+
+Window method unbind-buffer () {
+    kill-buff ::= get-current-window : get-buffer;
+    kill-buff-name ::= $kill-buff get-buffer-name;
+    next-buff ::= BufferManager get-next-buffer $kill-buff;
+    $kill-buff unregist-buffer;
+
+    $WindowList each do: {| i |
+	if {[$i get-buffer : get-buffer-name] = $kill-buff-name} {
+	    bind-buffer [$i get-window-name] $next-buff;
+	};
+    };
 };
 
 Window method render-all () {

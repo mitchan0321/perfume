@@ -17,6 +17,7 @@ EditBuffer method load-content (path) {
     f ::= new File;
     sets NewFile <nil>;
     sets Src [vector];
+    if {[$path sub 0 1] = "/"} {path ::= path-adjust $path};
     try {
         $f open $path mode: i;
 	$f each do: {| r |
@@ -45,11 +46,11 @@ EditBuffer method load-content (path) {
 EditBuffer method save-content (path: path) {
     if {! [set? path]} {
 	path ::= get-path;
-    } {
-	sets File $path;
     };
     if {or {nil? $path} {$path = ""}} {return (<nil> ErrNoPathSpacified)};
-
+    if {[$path sub 0 1] = "/"} {path ::= path-adjust $path};
+    sets File $path;
+    
     l ::= $path split sep: "/";
     backup-path ::= $l <<- ["%" . [$l ->>] "%"] : join sep: "/";
     mode := $DEFAULT_FILE_MODE;
@@ -102,6 +103,10 @@ EditBuffer method save-content (path: path) {
 
     sets Modify <nil>;
     return (<t> Success);
+};
+
+EditBuffer method unregist-buffer () {
+    BufferManager unregist-buffer $BufferName;
 };
 
 EditBuffer method get-path () {

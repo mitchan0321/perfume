@@ -7,6 +7,7 @@ BufferManager method init () {
 
 BufferManager method regist-buffer (buff name) {
     i := 1;
+    if {$name = ""} {name := "*no named*"};
     name-orig := $name;
     while {$BufferList set? $name} do: {
 	$i ++;
@@ -14,6 +15,11 @@ BufferManager method regist-buffer (buff name) {
     };
     $buff set-buffer-name $name;
     $BufferList set $name $buff;
+};
+
+BufferManager method unregist-buffer (name) {
+    if {$name = "*Scratch*"} {return [$BufferList get $name]};
+    return [$BufferList unset $name];
 };
 
 BufferManager method get-buffer (name) {
@@ -29,9 +35,34 @@ BufferManager method get-buffer (name) {
 };
 
 BufferManager method get-next-buffer (buff) {
+    if {[$BufferList len] = 0} {
+	buff ::= new ScratchBuffer;
+	regist-buffer $buff "*Scratch*";
+	return $buff;
+    };
     l ::= msort [$BufferList keys :string];
     i ::= $l find [$buff get-buffer-name];
-    r ::= $l get [$i + 1];
+    if $i {
+        r ::= $l get [$i + 1];
+    } {
+        r := "*Scratch*";
+    };
+    $BufferList get [$r ?? $l,0];
+};
+
+BufferManager method get-previous-buffer (buff) {
+    if {[$BufferList len] = 0} {
+	buff ::= new ScratchBuffer;
+	regist-buffer $buff "*Scratch*";
+	return $buff;
+    };
+    l ::= msort [$BufferList keys :string] : reverse;
+    i ::= $l find [$buff get-buffer-name];
+    if $i {
+        r ::= $l get [$i + 1];
+    } {
+        r := "*Scratch*";
+    };
     $BufferList get [$r ?? $l,0];
 };
 

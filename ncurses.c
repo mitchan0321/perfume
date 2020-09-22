@@ -834,6 +834,7 @@ func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 	pending_key = -1;
     } else {
 	in = wgetch(w);
+	curs_set(0);
     }
     if (in == -1) return result;
     
@@ -847,8 +848,10 @@ func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 	if (in == KEY_RESIZE) {
 	    wtimeout(w, 500);
 	    in = wgetch(w);
+	    curs_set(0);
 	    while (in == KEY_RESIZE) {
 		in = wgetch(w);
+		curs_set(0);
 	    }
 	    if (in == -1) {
 		pending_key = -1;
@@ -879,6 +882,7 @@ func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 	// read remain character
 	wtimeout(w, itimeout / 4);
 	in = wgetch(w);
+	curs_set(0);	
 	while (in != -1) {
 	    if (((in >= 0) && (in < 0x20)) || (in >= 256))  {
 		pending_key = in;
@@ -888,6 +892,7 @@ func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 		cell_add_char(incell, in);
 	    }
 	    in = wgetch(w);
+	    curs_set(0);	
 	}
 	// decode encoding
 	dstr = decode_raw_to_unicode(incell, iencoder, enc_error_info);

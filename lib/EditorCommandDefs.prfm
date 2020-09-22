@@ -68,9 +68,15 @@ defcommand split-cross-window
     result ALL;
 };
 
-defcommand roll-buffer
+defcommand next-buffer
 {   | main window |
-    $main roll-buffer;
+    $main next-buffer;
+    result ALL;
+};
+
+defcommand previous-buffer
+{   | main window |
+    $main previous-buffer;
     result ALL;
 };
 
@@ -183,6 +189,23 @@ defcommand cursor-top-of-line
     result SELF;
 };
 
+defcommand cursor-end-of-line
+{   | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (cy cx) ::= $window get-source-index $buff $geom;
+    cx ::= $buff get-buffer-line $cy : len;
+    (line col) ::= $window get-cursor-index $buff $cy $cx;
+
+    $window set-freecursor <nil>;
+    $geom set! CursorColumn [$col - $geom,ViewColumn];
+    $geom set! IndexColumn.SAVE $col;
+    (y x) ::= $window get-screen-size;
+    $window fit-to-cursor $geom $y $x;
+    
+    result SELF;
+};
+
 defcommand smooth-scroll-down
 {   | main window |
     buff ::= $window get-buffer;
@@ -272,23 +295,6 @@ defcommand bottom-of-buffer
 	$geom set! ViewLine [$buff-len - $y : + 1];
 	$geom set! CursorLine [$y - 1];
     };
-    
-    result SELF;
-};
-
-defcommand cursor-end-of-line
-{   | main window |
-    buff ::= $window get-buffer;
-    geom ::= $window get-geom;
-    (cy cx) ::= $window get-source-index $buff $geom;
-    cx ::= $buff get-buffer-line $cy : len;
-    (line col) ::= $window get-cursor-index $buff $cy $cx;
-
-    $window set-freecursor <nil>;
-    $geom set! CursorColumn [$col - $geom,ViewColumn];
-    $geom set! IndexColumn.SAVE $col;
-    (y x) ::= $window get-screen-size;
-    $window fit-to-cursor $geom $y $x;
     
     result SELF;
 };
@@ -398,7 +404,7 @@ defcommand flash
 
 defcommand open-file
 {   | main window |
-    $main mini-input-start "" prompt: ["Open file: " . [pwd] "/"];
+    $main mini-input-start [pwd : . "/"] prompt: "Open file: ";
     $main add-mini-input-callback $window {| main window in-key value |
         if {eq? $in-key KEY_ESC} {
 	    $main mini-input-end;
@@ -450,7 +456,7 @@ defcommand save-buffer
     path ::= $buff get-path;
 
     if {or {nil? $path} {$path = ""}} {
-	$main mini-input-start "" prompt: ["Save file name: " . [pwd] "/"];
+	$main mini-input-start [pwd : . "/"] prompt: "Save file name: ";
 	$main add-mini-input-callback $window {| main window in-key value |
 	    if {eq? $in-key KEY_ESC} {
 		$main mini-input-end;
@@ -463,15 +469,14 @@ defcommand save-buffer
 		    [pwd : . "/" $value];
 
 		if [file exists? $path] {
-		    $main mini-input-start "" prompt: "File already exist, overwrite? [y/n]";
+		    $main mini-input-start "" prompt: "File already exist, overwrite? [yes or ESC]: ";
 		    $main add-mini-input-callback $window {| main window in-key value |
-			if {or {eq? $in-key KEY_ESC} {eq? $in-key "n"} {eq? $in-key "N"}} {
+			if {eq? $in-key KEY_ESC} {
 			    $main mini-input-end;
 			    show-message "Canceled.";
-			    continue := <nil>;
 			    return SELF;
 			};
-			if {or {eq? $in-key "y"} {eq? $in-key "Y"}} {
+			if {and {eq? $in-key CTRL_M} {eq? $value "yes"}} {
 			    $main mini-input-end;
 			    (result err) ::= $buff save-content path: $path;
 			    if $result {
@@ -482,6 +487,15 @@ defcommand save-buffer
 			    return SELF;
 			};
 		    };
+		} {
+		    $main mini-input-end;
+		    (result err) ::= $buff save-content path: $path;
+		    if $result {
+			show-message "Save Done.";
+		    } {
+			show-message ["Save Failed, path: " . $path ". (" $err ")"];
+		    };
+		    return SELF;
 		};
 	    };
 	};
@@ -490,7 +504,7 @@ defcommand save-buffer
 
     $main mini-input-start "" prompt: ["Save file? (" . $path ") [y/n]: "];
     $main add-mini-input-callback $window {| main window in-key value |
-	    if {or {eq? $in-key KEY_ESC} {eq? $in-key "n"} {eq? $in-key "N"}} {
+	    if {or {eq? $in-key KEY_ESC} {eq? $value "n"} {eq? $value "N"}} {
 	    $main mini-input-end;
 	    show-message "Canceled.";
 	};
@@ -514,7 +528,7 @@ defcommand save-buffer-as
     buff ::= $window get-buffer;
     path ::= $buff get-path;
 
-    $main mini-input-start "" prompt: ["Save file name: " . [pwd] "/"];
+    $main mini-input-start [pwd : . "/"] prompt: "Save file name: ";
     $main add-mini-input-callback $window {| main window in-key value |
 	if {eq? $in-key KEY_ESC} {
 	    $main mini-input-end;
@@ -527,15 +541,14 @@ defcommand save-buffer-as
 		[pwd : . "/" $value];
 
 	    if [file exists? $path] {
-	       $main mini-input-start "" prompt: "File already exist, overwrite? [y/n]";
+	       $main mini-input-start "" prompt: "File already exist, overwrite? [yes or ESC]: ";
 	       $main add-mini-input-callback $window {| main window in-key value |
-		   if {or {eq? $in-key KEY_ESC} {eq? $in-key "n"} {eq? $in-key "N"}} {
+		   if {eq? $in-key KEY_ESC} {
 		       $main mini-input-end;
 		       show-message "Canceled.";
-		       continue := <nil>;
 		       return SELF;
 		   };
-		   if {or {eq? $in-key "y"} {eq? $in-key "Y"}} {
+		   if {and {eq? $in-key CTRL_M} {eq? $value "yes"}} {
 		       $main mini-input-end;
 		       (result err) ::= $buff save-content path: $path;
 		       if $result {
@@ -546,11 +559,44 @@ defcommand save-buffer-as
 		       return SELF;
 		   };
 	       };
+	    } {
+		$main mini-input-end;
+		(result err) ::= $buff save-content path: $path;
+		if $result {
+		    show-message "Save Done.";
+		    } {
+		show-message ["Save Failed, path: " . $path ". (" $err ")"];
+		};
+		return SELF;
 	    };
 	};
     };
     result ALL;
 };
+
+defcommand kill-buffer
+{   | main window |
+    buff ::= $window get-buffer;
+    if [$buff modify?] {
+	$main mini-input-start "" prompt: "This buffer is modified, realy kill? [yes or ESC]: ";
+	$main add-mini-input-callback $window {| main window in-key value |
+	    if {eq? $in-key KEY_ESC} {
+		$main mini-input-end;
+		show-message "Canceled.";
+		return ALL;
+	    };
+	    if {and {eq? $in-key CTRL_M} {eq? $value "yes"}} {
+		$main mini-input-end;
+		$main unbind-buffer;
+		return ALL;
+	    };
+	};
+	return ALL;
+    };
+    $main unbind-buffer;
+    result ALL;
+};
+
 
 defcommand miniwindow-input-sample
 {   | main window |

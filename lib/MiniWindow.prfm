@@ -52,7 +52,7 @@ MiniWindow method get-curs () {
 MiniWindow method mini-input-start (prompt init-value) {
     display-prompt $prompt;
     sets InputValue $init-value;
-    sets InputIndex 0;
+    sets InputIndex [$init-value len];
 };
 
 MiniWindow method display-prompt (prompt) {
@@ -79,6 +79,7 @@ MiniWindow method apply-keybind (main window key) {
     #### end
     sets InputIndex $new-index;
     sets InputValue $new-value;
+    refresh;
     $main mini-input-callback $key $new-value;
 
     return ALL;
