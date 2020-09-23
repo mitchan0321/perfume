@@ -12,31 +12,40 @@ EditBuffer method init-constructor () {
     sets NewFile <nil>;
 };
 
-EditBuffer method load-content (path) {
+EditBuffer method load-content (path init-only: init-flag buffer-name: buff-name) {
     result := <nil>;
     f ::= new File;
     sets NewFile <nil>;
     sets Src [vector];
+    sets File $path;
     if {[$path sub 0 1] = "/"} {path ::= path-adjust $path};
-    try {
-        $f open $path mode: i;
-	$f each do: {| r |
-	    $Src append! $r;
+
+    if {! [set? init-flag]} {
+	try {
+	    $f open $path mode: i;
+	    $f each do: {| r |
+		$Src append! $r;
+	    };
+            result := <t>;
+	}
+	catch: {| e |
+	    sets NewFile <t>;
+	    result := <nil>;
+	}
+        fin: {
+	    $f close;
 	};
+    } {
         result := <t>;
-    }
-    catch: {| e |
-        sets NewFile <t>;
-	result := <nil>;
-    }
-    fin: {
-	$f close;
+	sets NewFile <nil>;
+	sets File <nil>;
     };
 
-    sets File $path;
     if {$path = ""} {sets File "anonymous.pmacs"};
-    buff-name ::= $path split sep: "/" : last : car;
-    $buff-name ?? {buff-name := "*no named*"};
+    if {! [set? buff-name]} {
+	buff-name ::= $path split sep: "/" : last : car;
+	$buff-name ?? {buff-name := "*no named*"};
+    };
     BufferManager regist-buffer [self] $buff-name;
 
     sets Modify <nil>;
@@ -103,6 +112,10 @@ EditBuffer method save-content (path: path) {
 
     sets Modify <nil>;
     return (<t> Success);
+};
+
+EditBuffer method clear-all () {
+    sets Src [vector];
 };
 
 EditBuffer method unregist-buffer () {
@@ -174,6 +187,10 @@ EditBuffer method append-string (str) {
 
 EditBuffer method modify? () {
     return $Modify;
+};
+
+EditBuffer method no-modify () {
+    sets Modify <nil>;
 };
 
 EditBuffer method newfile? () {

@@ -167,12 +167,36 @@ defun path-adjust (path) {
     r := ();
     $l each do: {| i |
 	cond
-	    {$i = ".."} {if {[$r len] > 1} {$r ->>}; break;}
-	    {$i = "."}  {break;}
+	    {$i = ".."} {if {[$r len] > 1} {$r ->>}; break}
+	    {$i = "."}  {break}
+	    {$i = ""}   {if {[$r len] > 1} {break}}
 	    <t>         {$r <<- $i}
 	;
     };
     return [$r join sep: "/"];
+};
+
+defun show-files-in-window (main window dir) {
+    BufferManager unregist-buffer "*Directory*";
+    buff ::= new EditBuffer;
+    $buff load-content $dir :init-only buffer-name: "*Directory*";
+    $buff clear-all;
+    try {
+	l ::= msort [file list $dir];
+	while {! [$l null?]} do: {
+	    v1 ::= $l >>;
+	    v2 ::= $l >>;
+	    v3 ::= $l >>;
+	    v4 ::= $l >>;
+	    $buff append-string ["%-20v\t%-20v\t%-20v\t%-20v" fmt [$v1 ?? ""] [$v2 ?? ""] [$v3 ?? ""] [$v4 ?? ""]];
+	};
+    } catch: {| e |
+	$buff append-string ["Can't read directory '" . $dir "', <" [$e car] "># " [$e cdr]];
+    };
+    $buff no-modify;
+
+    $main bind-buffer [$window get-window-name] $buff;
+    $window apply {render; refresh};
 };
 
 ##

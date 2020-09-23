@@ -293,7 +293,6 @@ Window method bind-buffer (window-name buffer) {
     orig-buff ::= $window get-buffer;
     if $orig-buff {
 	BufferManager set-buffer-geom $window-name [$orig-buff get-buffer-name];
-	# $window,CursorLine $window,CursorColumn;
     };
 
     # Restore window buffer geometory
@@ -397,8 +396,6 @@ Window method key-event-loop () {
         #######
 
 	$i each do: {| k |
-	    window ::= $main get-current-window;		
-
 	    if {eq? $k KEY_RESIZE} {
 		$main resize-window;
 		$main apply {render-all; refresh};
@@ -407,6 +404,7 @@ Window method key-event-loop () {
 		continue;
 	    };
 		
+	    window ::= $main get-current-window;		
 	    result ::= $window apply-keybind $main $window $k;
 	    cond
 	    {eq? $result ALL} {
@@ -430,6 +428,7 @@ Window method send-key-event (event-list) {
 
 Window method mini-input-start (prompt: p init-value) {
     sets MiniInput <t>;
+    sets MiniInputSave ([$WindowList,0 get-window-name] [$WindowList,0 get-buffer]);
     if {set? p} {
 	$MiniWindow mini-input-start $p $init-value;
     } {
@@ -452,6 +451,9 @@ Window method mini-input-callback (in-key value) {
 Window method mini-input-end () {
     sets MiniInput <nil>;
     sets MiniInputCallback ();
+    if {list? $MiniInputSave} {
+	bind-buffer $MiniInputSave,0 $MiniInputSave,1;
+    };
 };
 
 Window method add-mini-input-callback (window block) {

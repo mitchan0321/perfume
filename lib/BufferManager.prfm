@@ -22,6 +22,10 @@ BufferManager method unregist-buffer (name) {
     return [$BufferList unset $name];
 };
 
+BufferManager method get-buffer-list () {
+    return [$BufferList keys :string];
+};
+
 BufferManager method get-buffer (name) {
     buff ::= $BufferList get $name;
     $buff ?? {
@@ -30,6 +34,14 @@ BufferManager method get-buffer (name) {
 	    buff ::= new ScratchBuffer;
 	    regist-buffer $buff "*Scratch*";
 	};
+    };
+    return $buff;
+};
+
+BufferManager method get-buffer-create (name) {
+    buff ::= $BufferList get $name;
+    $buff ?? {
+	buff ::= new EditBuffer;
     };
     return $buff;
 };

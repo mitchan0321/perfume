@@ -424,6 +424,10 @@ defcommand open-file
 	    $MainWindow bind-buffer [$window get-window-name] $buff;
 	    $result ?? {show-message ["New file: " . $value]};
 	};
+	if {eq? $in-key CTRL_I} {
+	    show-files-in-window $main $window $value;
+	    return ALL;
+	};
     };
     result SELF;
 };
@@ -461,6 +465,10 @@ defcommand save-buffer
 	    if {eq? $in-key KEY_ESC} {
 		$main mini-input-end;
 		show-message "Canceled.";
+	    };
+	    if {eq? $in-key CTRL_I} {
+		show-files-in-window $main $window $value;
+		return ALL;
 	    };
 	    if {eq? $in-key CTRL_M} {
 		$main mini-input-end;
@@ -519,8 +527,7 @@ defcommand save-buffer
 	    return SELF;
 	};
     };
-    
-    result ALL;
+    result SELF;
 };
 
 defcommand save-buffer-as
@@ -533,6 +540,10 @@ defcommand save-buffer-as
 	if {eq? $in-key KEY_ESC} {
 	    $main mini-input-end;
 	    show-message "Canceled.";
+	};
+	if {eq? $in-key CTRL_I} {
+	    show-files-in-window $main $window $value;
+	    return ALL;
 	};
 	if {eq? $in-key CTRL_M} {
 	    $main mini-input-end;
@@ -571,7 +582,7 @@ defcommand save-buffer-as
 	    };
 	};
     };
-    result ALL;
+    result SELF;
 };
 
 defcommand kill-buffer
@@ -597,6 +608,56 @@ defcommand kill-buffer
     result ALL;
 };
 
+defcommand describe-key
+{   | main window |
+    BufferManager unregist-buffer "*Describe Key*";
+    buff ::= new EditBuffer;
+    $buff load-content "describe key" :init-only buffer-name: "*Describe Key*";
+    $buff clear-all;
+
+    $buff append-string ["%-15v\t%-v" fmt "Key" "Command"];
+    $buff append-string ["%-15v\t%-v" fmt "---" "-------"];
+    d ::= $window get KeyBinding;
+    l := ();
+    $d each do: {| k v |
+	if {nil? $v} {continue};
+	$l << ["%-15v\t%-v" fmt $k $v];
+    };
+    msort $l : each do: {| i |
+	$buff append-string $i;
+    };
+    $buff no-modify;
+    
+    $main bind-buffer [$window get-window-name] $buff;
+    result SELF;
+};
+
+defcommand buffer-list
+{   | main window |
+    BufferManager unregist-buffer "*Buffer List*";
+    buff ::= new EditBuffer;
+    $buff load-content "buffer list" :init-only buffer-name: "*Buffer List*";
+    $buff clear-all;
+
+    $buff append-string ["%1v %-3v %-16v %6v %-v" fmt " " "New" "Buffer Name" "Length" "File Path"];
+    $buff append-string ["%1v %-3v %-16v %6v %-v" fmt "-" "---" "-----------" "------" "---------"];
+    l ::= msort [BufferManager get-buffer-list];
+    $l each do: {| buff-name |
+	display-buffer ::= BufferManager get-buffer $buff-name;
+	$buff append-string [
+	    "%1v %-3v %-16v %6d %-v" fmt
+	    [[$display-buffer modify?] ??? "*" " "]
+	    [[$display-buffer newfile?] ??? "new" "   "]
+	    $buff-name
+	    [$display-buffer get-buffer-length]
+	    [$display-buffer get-path]
+	    ];
+    };
+    $buff no-modify;
+    
+    $main bind-buffer [$window get-window-name] $buff;
+    result SELF;
+};
 
 defcommand miniwindow-input-sample
 {   | main window |

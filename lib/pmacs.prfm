@@ -33,43 +33,6 @@ defun pmacs (trace: t) {
 	$MainWindow create-full-window;
 	$MainWindow add-create-window-hook {$MainWindow create-full-window};
 
-REM {
-	# $MainWindow create-split-cross-window;
-	# $MainWindow add-create-window-hook  {$MainWindow create-split-cross-window};
-	
-	# $MainWindow create-split-vertical-window;
-        # $MainWindow create-split-vertical-window div: 3;
-	# $MainWindow create-split-horizontal-window;
-	# $MainWindow create-split-horizontal-window div: 3;
-
-        # $MainWindow display-window-message "MiniBuffer" "Hello";
-	# $MainWindow display-window-message "Window#1" "Hello Window#1\nabcdeあいうえお";
-	# $MainWindow display-window-message "Window#2" "Hello Window#2\nabcdeあいうえお";
-	# $MainWindow display-window-message "Window#3" "Hello Window#3\nabcdeあいうえお";
-	# $MainWindow display-window-message "Window#1" [$MainWindow get WindowList : string];
-
-	# USE CASE: "file open"
-	b ::= new EditBuffer;
-	$b load-content "/home/mit-sato/perfume/eval.c";
-	$MainWindow bind-buffer "Window#1" $b;
-
-	b ::= new EditBuffer;
-	$b load-content "/home/mit-sato/perfume/methods.c";
-	# $MainWindow bind-buffer "Window#2" $b;
-
-	b ::= new EditBuffer;
-	$b load-content "/home/mit-sato/perfume/misc/testfile";
-	# $MainWindow bind-buffer "Window#3" $b;
-
-	b ::= new EditBuffer;
-	$b load-content "/home/mit-sato/eval.c";
-	# $MainWindow bind-buffer "Window#4" $b;
-
-	b ::= new EditBuffer;
-	$b load-content "/home/mit-sato/perfume/lib/null.text";
-	# $MainWindow bind-buffer "Window#4" $b;
-};
-
 	$MainWindow render-all;
 	$MainWindow refresh;
 	$MainWindow key-event-loop;
@@ -85,10 +48,11 @@ REM {
     if {set? __error_info__} then: {println file: $stderr $__error_info__};
 };
 
-defun debug-message (msg) {
+defun debug-message (msg wait: msec) {
     if $MainWindow {
 	[$MainWindow get-minibuffer-window] ?? {throw ErrNoMiniBuffer "No MiniBuffer for debugging."};
 	$MainWindow display-window-message "MiniBuffer" ["DEBUG: %-80v" fmt $msg];
 	$MainWindow get-minibuffer-window : refresh;
+	if {set? msec} {sleep $msec};
     };
 };
