@@ -417,9 +417,9 @@ defcommand open-file
 	    };
 	    buff ::= new EditBuffer;
 	    result ::= $buff load-content [
-		{[$value sub 0 1] = "/"} ???
+		path-adjust [{[$value sub 0 1] = "/"} ???
 		    $value
-		    [pwd : . "/" $value]
+		    [pwd : . "/" $value]]
 	    ];
 	    $MainWindow bind-buffer [$window get-window-name] $buff;
 	    $result ?? {show-message ["New file: " . $value]};
@@ -472,9 +472,9 @@ defcommand save-buffer
 	    };
 	    if {eq? $in-key CTRL_M} {
 		$main mini-input-end;
-		path ::= {[$value sub 0 1] = "/"} ???
+		path ::= path-adjust [{[$value sub 0 1] = "/"} ???
 		    $value
-		    [pwd : . "/" $value];
+		    [pwd : . "/" $value]];
 
 		if [file exists? $path] {
 		    $main mini-input-start "" prompt: "File already exist, overwrite? [yes or ESC]: ";
@@ -547,9 +547,9 @@ defcommand save-buffer-as
 	};
 	if {eq? $in-key CTRL_M} {
 	    $main mini-input-end;
-	    path ::= {[$value sub 0 1] = "/"} ???
+	    path ::= path-adjust [{[$value sub 0 1] = "/"} ???
 		$value
-		[pwd : . "/" $value];
+		[pwd : . "/" $value]];
 
 	    if [file exists? $path] {
 	       $main mini-input-start "" prompt: "File already exist, overwrite? [yes or ESC]: ";
