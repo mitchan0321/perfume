@@ -207,7 +207,7 @@ Window method create-split-cross-window (window-name: win-name) {
 
 Window method refresh () {
     $MiniWindow refresh;
-    try {$WindowList cdr : each do: {| w | $w refresh}} catch: {};
+    try {$WindowList each do: {| w | $w refresh}} catch: {};
     get-current-window : apply {set-cursor; refresh};
 };
 

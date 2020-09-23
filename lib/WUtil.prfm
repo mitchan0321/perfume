@@ -196,7 +196,7 @@ defun show-files-in-window (main window dir) {
     $buff no-modify;
 
     $main bind-buffer [$window get-window-name] $buff;
-    $window apply {render; refresh};
+    #### $window apply {render; refresh};
 };
 
 ##
