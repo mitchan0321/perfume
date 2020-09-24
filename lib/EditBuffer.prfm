@@ -12,6 +12,7 @@ EditBuffer method init-constructor () {
     sets NewFile <nil>;
     sets UndoBuffer ();
     sets RedoBuffer ();
+    sets Region <nil>;
 };
 
 EditBuffer method load-content (path init-only: init-flag buffer-name: buff-name) {
@@ -164,7 +165,7 @@ EditBuffer method insert-string-at (input y x) {
     sets Modify <t>;
     if {true? Src} {
 	result ::= $Src insert-string-at $input $y $x;
-	$UndoBuffer << $result;
+	if $result,0 {$UndoBuffer << $result};
 	return ($result,3 $result,4);
     };
     return (0 0);
@@ -174,7 +175,7 @@ EditBuffer method delete-character-at (y x) {
     sets Modify <t>;
     if {true? Src} {
 	result ::= $Src delete-character-at $y $x;
-	$UndoBuffer << $result;
+	if $result,0 {$UndoBuffer << $result};
 	return ($result,2 $result,3 $result,1);
     };
     return (0 0 "");
@@ -184,7 +185,7 @@ EditBuffer method backdelete-character-at (y x) {
     sets Modify <t>;
     if {true? Src} {
 	result ::= $Src backdelete-character-at $y $x;
-	$UndoBuffer << $result;
+	if $result,0 {$UndoBuffer << $result};
 	return ($result,2 $result,3 $result,1);
     };
     return (0 0 "");
@@ -194,7 +195,7 @@ EditBuffer method append-string (str) {
     sets Modify <t>;
     if {true? Src} {
 	result ::= $Src append-string $str;
-	$UndoBuffer << $result;
+	if $result,0 {$UndoBuffer << $result};
 	return ($result,1 $result,2)
     };
     return (0 0);
@@ -206,19 +207,48 @@ EditBuffer method undo () {
 	    o ::= $UndoBuffer >>;
 	    result ::= call $Src $o;
 	    $RedoBuffer << $result;
+	    
+	    cmd := $o,0;
 
-	    cmd := $result,0;
 	    cond
 	    {eq? $cmd delete-region} {
-		return ($result,1 $result,2);
+		return ($o,1 $o,2);
 	    }
 	    {eq? $cmd insert-string-at} {
-		return ($result,2 $result,3);
+		return ($o,2 $o,3);
+	    }
+	    {eq? $cmd insert-string-at-next} {
+		return ($o,2 [$o,3 + 1]);
 	    }
 	};
     };
     return (<nil> <nil>);
 };
+
+EditBuffer method redo () {
+    if {true? Src} {
+	if {! [$RedoBuffer null?]} {
+	    o ::= $RedoBuffer >>;
+	    result ::= call $Src $o;
+	    $UndoBuffer << $result;
+	    
+	    cmd := $o,0;
+
+	    cond
+	    {eq? $cmd delete-region} {
+		return ($o,1 $o,2);
+	    }
+	    {eq? $cmd insert-string-at} {
+		return ($o,2 $o,3);
+	    }
+	    {eq? $cmd insert-string-at-next} {
+		return ($o,2 [$o,3 + 1]);
+	    }
+	};
+    };
+    return (<nil> <nil>);
+};
+
 
 EditBuffer method modify? () {
     return $Modify;
@@ -230,4 +260,39 @@ EditBuffer method no-modify () {
 
 EditBuffer method newfile? () {
     return $NewFile;
+};
+
+EditBuffer method start-region (y x) {
+    sets Region ($y $x);
+};
+
+EditBuffer method end-region () {
+    reg := $Region;
+    sets Region <nil>;
+    return $reg;
+};
+
+EditBuffer method get-region () {
+    return $Region;
+};
+
+EditBuffer method copy-region (sy sx ey ex) {
+    if {true? Src} {
+	setvar CopyBuffer [[$Src copy-region $sy $sx $ey $ex] get 1];
+    };
+};
+
+EditBuffer method cut-region (sy sx ey ex) {
+    if {true? Src} {
+	setvar CopyBuffer [[$Src copy-region $sy $sx $ey $ex] get 1];
+	result ::= $Src delete-region $sy $sx $ey $ex;
+	if $result,0 {$UndoBuffer << $result};
+	return ($result,2 $result,3);
+    };
+    return (0 0);
+};
+
+EditBuffer method get-copy-buffer () {
+    ### CAUTION: this variable CopyBuffer is global.
+    return $CopyBuffer;
 };

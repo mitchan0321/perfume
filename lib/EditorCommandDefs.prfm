@@ -679,6 +679,103 @@ defcommand undo-buffer
     result ALL;
 };
 
+defcommand redo-buffer
+{   | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (new-y new-x) ::= $buff redo;
+    $new-y ?? {
+	show-message "Redo buffer is empty.";
+	return SELF;
+    };
+    (line col) ::= $window get-cursor-index $buff $new-y $new-x;
+    $window set-freecursor <nil>;
+    $geom set! IndexColumn.SAVE $col;
+    $geom set! CursorLine [$line - $geom,ViewLine];
+    $geom set! CursorColumn [$col - $geom,ViewColumn];
+
+    (y x) ::= $window get-screen-size;
+    $window fit-to-cursor $geom $y $x;
+    result ALL;
+};
+
+defcommand start-region
+{   | main window |
+    buff ::= $window get-buffer;
+    if [$buff get-region] {
+	show-message "End region.";
+	$buff end-region;
+	return SELF;
+    };
+    geom ::= $window get-geom;
+    (cy cx) ::= $window get-source-index $buff $geom;
+    $buff start-region $cy $cx;
+    show-message "Start region.";
+    result SELF;
+};
+
+defcommand copy-region
+{   | main window |
+    buff ::= $window get-buffer;
+    [$buff get-region] ?? {
+	show-message "Not start region. Press CTRL-SP to start region.";
+	$buff end-region;
+	return SELF;
+    };
+    geom ::= $window get-geom;
+    (sy sx) ::= $buff end-region;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    $buff copy-region $sy $sx $ey $ex;
+    show-message "Copied.";
+    result SELF;
+};
+
+defcommand cut-region
+{   | main window |
+    buff ::= $window get-buffer;
+    [$buff get-region] ?? {
+	show-message "Not start region. Press CTRL-SP to start region.";
+	$buff end-region;
+	return SELF;
+    };
+    geom ::= $window get-geom;
+    (sy sx) ::= $buff end-region;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    (line col) ::= $buff cut-region $sy $sx $ey $ex;
+    show-message "Cut.";
+    $window set-freecursor <nil>;
+    $geom set! IndexColumn.SAVE $col;
+    $geom set! CursorLine [$line - $geom,ViewLine];
+    $geom set! CursorColumn [$col - $geom,ViewColumn];
+
+    (y x) ::= $window get-screen-size;
+    $window fit-to-cursor $geom $y $x;
+    result ALL;
+};
+
+defcommand paste-buffer
+{   | main window |
+    buff ::= $window get-buffer;
+    str ::= $buff get-copy-buffer;
+    if {$str = ""} {
+	show-message "Copy buffer is empty.";
+	return SELF;
+    };
+    geom ::= $window get-geom;
+    (sy sx) ::= $window get-source-index $buff $geom;
+    (cy cx) ::= $buff insert-string-at $str $sy $sx;
+    show-message "Paste.";
+    (line col) ::= $window get-cursor-index $buff $cy $cx;
+    $window set-freecursor <nil>;
+    $geom set! IndexColumn.SAVE $col;
+    $geom set! CursorLine [$line - $geom,ViewLine];
+    $geom set! CursorColumn [$col - $geom,ViewColumn];
+
+    (y x) ::= $window get-screen-size;
+    $window fit-to-cursor $geom $y $x;
+    result ALL;
+};
+
 defcommand miniwindow-input-sample
 {   | main window |
     $main mini-input-start "" prompt: "test prompt: ";

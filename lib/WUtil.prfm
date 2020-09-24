@@ -11,6 +11,10 @@ WUtil method init () {
     $d unset exit;
     $d set _exit $f;
     defun exit () {$MainWindow exit-event-loop};
+
+    if {! [defvar? CopyBuffer]} {
+	defvar CopyBuffer "";
+    };
 };
 
 WUtil method color-pair (fg bg) {
@@ -203,7 +207,62 @@ defun show-files-in-window (main window dir) {
 ## define Vector method for EditBuffer operations.
 ##
 Vector method insert-string-at (str line at) {
+    l ::= $str split sep: "";
+    result := (delete-region [$line + 0] [$at + 0]);
+    self ::= self;
+
+    if {$line > [$self len]} {line ::= $self len};
+    if {$line < [$self len]} {
+	if {$at > [$self get $line : len]} {at ::= [$self get $line : len]};
+    } {
+        at := 0;
+    };
+
+    $l each do: {| c |
+	(line at) ::= insert-character-at $c $line $at;
+    };
+
+    $result <<- [$line + 0];
+    $result <<- [$at + 0];
+    return $result;
+};
+
+Vector method insert-string-at-next (char line at) {
+    (command ay ax by bx) ::= insert-string-at $char $line $at;
+    return ($command $ay $ax $by $bx);
+};
+
+Vector method insert-character-at (char line at) {
+    self ::= self;
+    if {$char = "\r"} {
+	$self append! "";
+        i ::= $self len : - 2;
+        while {$i >= [$line + 1]}  do: {
+	    $self set [$i + 1] [$self get $i];
+	    i ::= $i - 1;
+	};
+	s ::= $self get $line;
+	s1 ::= $s sub 0 $at;
+	s2 ::= $s sub $at;
+	$self set $line $s1;
+	if {$line < [$self len : - 1]} {$self set [$line + 1] $s2};
+        at := 0;
+	line ::= $line + 1;
+	return ($line $at);
+    };
+
+    if {[$self len] <= $line} {$self append! ""};
+    s ::= $self get $line;
+    s1 ::= $s sub 0 $at;
+    s2 ::= $s sub $at;
+    $self set $line [$s1 . $char $s2];
+    at ::= $at + 1;
+    return ($line $at);
+};
+
+Vector method insert-string-at___orig (str line at) {
     l ::= $str split sep: "\r";
+    if {and {[self : len] = 0} {$l,0 = ""}} {$l >>};
     times ::= $l len;
     self ::= self;
     i := 1;
@@ -245,8 +304,8 @@ Vector method insert-string-at (str line at) {
 Vector method delete-character-at (line at) {
     self ::= self;
     if {$line >= [$self len]} {
-	if {[$self len] = 0} {return (insert-string-at "" 0 0)};
-	return (insert-string-at "" [$self len] 0);
+	if {[$self len] = 0} {return (<nil> "" 0 0)};
+	return (<nil> "" [$self len] 0);
     };
     s ::= $self get $line;
     len ::= $s len;
@@ -256,7 +315,7 @@ Vector method delete-character-at (line at) {
     };
     if {$at >= $len} {
 	if {[$line + 1] = [$self len]} {
-	    return (insert-string-at "" $line $len);
+	    return (<nil> "" $line $len);
 	};
 	$self set $line [$self,$line . [$self get [$line + 1]]];
 	if {$line = [$self len : - 2]} {
@@ -280,16 +339,16 @@ Vector method backdelete-character-at (line at) {
     self ::= self;
     if {$at = 0} {
 	if {$line = 0} {
-	    return (insert-string-at "" 0 0);
+	    return (<nil> "" 0 0);
 	};
 	line ::= $line - 1;
 	at ::= [$self get $line] len;
 	(command char line at) ::= delete-character-at $line $at;
-	return ($command "\r" $line $at);
+	return (insert-string-at-next "\r" $line $at);
     };
     at ::= $at - 1;
     (command char line at) ::= delete-character-at $line $at;
-    return ($command $char $line $at);
+    return (insert-string-at-next $char $line $at);
 };
 
 ##
@@ -321,6 +380,15 @@ Vector method append-string (str) {
 };
 
 Vector method delete-region (start-line start-column end-line end-column) {
+    if {$start-line > $end-line} {
+	(start-line end-line) := ($end-line $start-line);
+	(start-column end-column) := ($end-column $start-column);
+    };
+    if {$start-line = $end-line} {
+	if {$start-column > $end-column} {
+	    (start-column end-column) := ($end-column $start-column);
+	};
+    };
     if {$start-line < 0} {
 	start-line := 0;
     };
@@ -335,15 +403,6 @@ Vector method delete-region (start-line start-column end-line end-column) {
     };
     if {$end-column > [self : get $end-line : len]} {
 	end-column := [self : get $end-line : len];
-    };
-    if {$start-line > $end-line} {
-	(start-line end-line) := ($end-line $start-line);
-	(start-column end-column) := ($end-column $start-column);
-    };
-    if {$start-line = $end-line} {
-	if {$start-column > $end-column} {
-	    (start-column end-column) := ($end-column $start-column);
-	};
     };
 
     result-start-line := $start-line;
@@ -401,6 +460,15 @@ Vector method delete-region (start-line start-column end-line end-column) {
 };
 
 Vector method copy-region (start-line start-column end-line end-column) {
+    if {$start-line > $end-line} {
+	(start-line end-line) := ($end-line $start-line);
+	(start-column end-column) := ($end-column $start-column);
+    };
+    if {$start-line = $end-line} {
+	if {$start-column > $end-column} {
+	    (start-column end-column) := ($end-column $start-column);
+	};
+    };
     if {$start-line < 0} {
 	start-line := 0;
     };
@@ -415,15 +483,6 @@ Vector method copy-region (start-line start-column end-line end-column) {
     };
     if {$end-column > [self : get $end-line : len]} {
 	end-column := [self : get $end-line : len];
-    };
-    if {$start-line > $end-line} {
-	(start-line end-line) := ($end-line $start-line);
-	(start-column end-column) := ($end-column $start-column);
-    };
-    if {$start-line = $end-line} {
-	if {$start-column > $end-column} {
-	    (start-column end-column) := ($end-column $start-column);
-	};
     };
 
     result-str := "";

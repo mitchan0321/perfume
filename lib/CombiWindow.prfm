@@ -81,10 +81,11 @@ CombiWindow method render () {
     (cy cx) ::= get-source-index $buff $geom;
 
     curs-print $StatusLineCurs [
-	  "[%v%v%v]#%v - (%d,%d) - %v <%v> %v" fmt
+	  "[%v%v%v%v]#%v - (%d,%d) - %v <%v> %v" fmt
 	  [[$buff modify?] ??? "*" " "]
 	  [[$buff newfile?] ??? "N" " "]
 	  [$FreeCursor ??? "F" " "]
+	  [[$buff get-region] ??? "R" " "]
 	  [$win split sep: "#" : get 1]
 	  $cy $cx
 	  $buff-name 
