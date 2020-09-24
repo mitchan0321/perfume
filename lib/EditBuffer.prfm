@@ -10,6 +10,8 @@ EditBuffer method init-constructor () {
     sets BufferName <nil>;
     sets Modify <nil>;
     sets NewFile <nil>;
+    sets UndoBuffer ();
+    sets RedoBuffer ();
 };
 
 EditBuffer method load-content (path init-only: init-flag buffer-name: buff-name) {
@@ -48,6 +50,8 @@ EditBuffer method load-content (path init-only: init-flag buffer-name: buff-name
     };
     BufferManager regist-buffer [self] $buff-name;
 
+    sets UndoBuffer ();
+    sets RedoBuffer ();
     sets Modify <nil>;
     return $result;
 };
@@ -110,7 +114,10 @@ EditBuffer method save-content (path: path) {
 	file rename $backup-path $path;
     };
 
+    sets UndoBuffer ();
+    sets RedoBuffer ();
     sets Modify <nil>;
+    sets NewFile <nil>;
     return (<t> Success);
 };
 
@@ -156,7 +163,9 @@ EditBuffer method get-buffer-length () {
 EditBuffer method insert-string-at (input y x) {
     sets Modify <t>;
     if {true? Src} {
-	return [$Src insert-string-at $input $y $x];
+	result ::= $Src insert-string-at $input $y $x;
+	$UndoBuffer << $result;
+	return ($result,3 $result,4);
     };
     return (0 0);
 };
@@ -164,7 +173,9 @@ EditBuffer method insert-string-at (input y x) {
 EditBuffer method delete-character-at (y x) {
     sets Modify <t>;
     if {true? Src} {
-	return [$Src delete-character-at $y $x];
+	result ::= $Src delete-character-at $y $x;
+	$UndoBuffer << $result;
+	return ($result,2 $result,3 $result,1);
     };
     return (0 0 "");
 };
@@ -172,7 +183,9 @@ EditBuffer method delete-character-at (y x) {
 EditBuffer method backdelete-character-at (y x) {
     sets Modify <t>;
     if {true? Src} {
-	return [$Src backdelete-character-at $y $x];
+	result ::= $Src backdelete-character-at $y $x;
+	$UndoBuffer << $result;
+	return ($result,2 $result,3 $result,1);
     };
     return (0 0 "");
 };
@@ -180,9 +193,31 @@ EditBuffer method backdelete-character-at (y x) {
 EditBuffer method append-string (str) {
     sets Modify <t>;
     if {true? Src} {
-	return [$Src append-string $str];
+	result ::= $Src append-string $str;
+	$UndoBuffer << $result;
+	return ($result,1 $result,2)
     };
-    return (0 0 "");
+    return (0 0);
+};
+
+EditBuffer method undo () {
+    if {true? Src} {
+	if {! [$UndoBuffer null?]} {
+	    o ::= $UndoBuffer >>;
+	    result ::= call $Src $o;
+	    $RedoBuffer << $result;
+
+	    cmd := $result,0;
+	    cond
+	    {eq? $cmd delete-region} {
+		return ($result,1 $result,2);
+	    }
+	    {eq? $cmd insert-string-at} {
+		return ($result,2 $result,3);
+	    }
+	};
+    };
+    return (<nil> <nil>);
 };
 
 EditBuffer method modify? () {

@@ -659,6 +659,26 @@ defcommand buffer-list
     result SELF;
 };
 
+defcommand undo-buffer
+{   | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (new-y new-x) ::= $buff undo;
+    $new-y ?? {
+	show-message "Undo buffer is empty.";
+	return SELF;
+    };
+    (line col) ::= $window get-cursor-index $buff $new-y $new-x;
+    $window set-freecursor <nil>;
+    $geom set! IndexColumn.SAVE $col;
+    $geom set! CursorLine [$line - $geom,ViewLine];
+    $geom set! CursorColumn [$col - $geom,ViewColumn];
+
+    (y x) ::= $window get-screen-size;
+    $window fit-to-cursor $geom $y $x;
+    result ALL;
+};
+
 defcommand miniwindow-input-sample
 {   | main window |
     $main mini-input-start "" prompt: "test prompt: ";

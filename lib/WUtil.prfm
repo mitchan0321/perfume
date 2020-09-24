@@ -130,7 +130,7 @@ defun line-input (curs disp-line disp-col input-len cur-index cur-val key-in) {
     {string? $key-in} {
 	curs-x ::= curs-index-to-pos $cur-val [$cur-val len] $DEFAULT_TAB_WIDTH;
 	if {$curs-x < $input-len} {
-	    (new-y new-x) ::= $v insert-string-at $key-in 0 $cur-index;
+	    (command start-y start-x new-y new-x) ::= $v insert-string-at $key-in 0 $cur-index;
 	};
     }
     {eq? $key-in KEY_RIGHT} {
@@ -144,10 +144,10 @@ defun line-input (curs disp-line disp-col input-len cur-index cur-val key-in) {
 	if {$new-x < 0} {new-x := 0};
     }
     {or [eq? $key-in KEY_BACKSPACE] [eq? $key-in CTRL_H]} {
-	(new-y new-x char) ::= $v backdelete-character-at 0 $cur-index;
+	(command char new-y new-x) ::= $v backdelete-character-at 0 $cur-index;
     }
     {eq? $key-in KEY_DC} {
-	(new-y new-x char) ::= $v delete-character-at 0 $cur-index;
+	(command char new-y new-x) ::= $v delete-character-at 0 $cur-index;
     }
     ;
 
@@ -207,6 +207,7 @@ Vector method insert-string-at (str line at) {
     times ::= $l len;
     self ::= self;
     i := 1;
+    result := (delete-region [$line + 0] [$at + 0]);
     $l each do: {| elem |
 	if {$line < [$self len]} {
 	    s ::= $self get $line;
@@ -236,60 +237,223 @@ Vector method insert-string-at (str line at) {
 	$line ++;
 	at := 0;
     };
-    return ($line $at);
+    $result <<- [$line + 0];
+    $result <<- [$at + 0];
+    return $result;
 };
 
 Vector method delete-character-at (line at) {
     self ::= self;
     if {$line >= [$self len]} {
-	if {[$self len] = 0} {return (0 0 "")};
-	return ([$self len] 0 "");
+	if {[$self len] = 0} {return (insert-string-at "" 0 0)};
+	return (insert-string-at "" [$self len] 0);
     };
     s ::= $self get $line;
     len ::= $s len;
     if {and [[$self len] = 1] [$len = 0]} {
 	$self resize 0;
-	return (0 0 "\r");
+	return (insert-string-at "\r" 0 0);
     };
     if {$at >= $len} {
 	if {[$line + 1] = [$self len]} {
-	    return ($line $len "");
+	    return (insert-string-at "" $line $len);
 	};
 	$self set $line [$self,$line . [$self get [$line + 1]]];
 	if {$line = [$self len : - 2]} {
 	    $self resize [$self len : - 1];
-	    return ($line $len "\r");
+	    return (insert-string-at "\r" $line $len);
 	};
 	[$line + 1] each to: [$self len : - 2] do: {| i |
 	    $self set $i [$self get [$i + 1]];
 	};
 	$self resize [$self len : - 1];
-	return ($line $len "\r");
+	return (insert-string-at "\r" $line $len);
     };
     s1 ::= $s sub 0 $at;
     c ::= $s sub $at [$at + 1];
     s2 ::= $s sub [$at + 1];
     $self set $line [$s1 . $s2];
-    return ($line $at $c);
+    return (insert-string-at $c $line $at);
 };
 
 Vector method backdelete-character-at (line at) {
     self ::= self;
     if {$at = 0} {
 	if {$line = 0} {
-	    return (0 0 "");
+	    return (insert-string-at "" 0 0);
 	};
 	line ::= $line - 1;
 	at ::= [$self get $line] len;
-	return [delete-character-at $line $at];
+	(command char line at) ::= delete-character-at $line $at;
+	return ($command "\r" $line $at);
     };
     at ::= $at - 1;
-    return [delete-character-at $line $at];    
+    (command char line at) ::= delete-character-at $line $at;
+    return ($command $char $line $at);
 };
 
+##
+## This method (Vector::append-string) same as following this:
+## if [$Src len] > 0
+## then
+##   Vector:: insert-string-at
+##	["\r" . $str]
+##	[[self] len : - 1]
+##	[[self] get [$Src len : -1] : len]
+## else
+##   Vector:: insert-string-at
+##     $str 0 0
+##
 Vector method append-string (str) {
     [self] append! $str;
-    return ([[self] len] 0 $str);
+    if {[self : len] > 1} {
+	return (
+	    delete-region
+	      [self : len : - 2] [self : get [self : len : - 2] : len]
+	      [self : len : - 1] [self : get [self : len : - 1] : len]
+	    );
+    } {
+	return (
+	    delete-region
+	      0 0 0 [self : get 0 : len]
+	    );
+    };
+};
+
+Vector method delete-region (start-line start-column end-line end-column) {
+    if {$start-line < 0} {
+	start-line := 0;
+    };
+    if {$end-line >= [self : len]} {
+	end-line := [self : len : - 1];
+	if {$end-line < 0} {
+	    end-line := 0;
+	};
+    };
+    if {$start-column > [self : get $start-line : len]} {
+	start-column := [self : get $start-line : len];
+    };
+    if {$end-column > [self : get $end-line : len]} {
+	end-column := [self : get $end-line : len];
+    };
+    if {$start-line > $end-line} {
+	(start-line end-line) := ($end-line $start-line);
+	(start-column end-column) := ($end-column $start-column);
+    };
+    if {$start-line = $end-line} {
+	if {$start-column > $end-column} {
+	    (start-column end-column) := ($end-column $start-column);
+	};
+    };
+
+    result-start-line := $start-line;
+    result-start-column := $start-column;
+    result-str := "";
+
+    ## Region into same line.
+    if {$start-line = $end-line} {
+	r ::= self : get $start-line;
+	s1 ::= $r sub 0 $start-column;
+	str ::= $r sub $start-column $end-column;
+	s2 ::= $r sub $end-column;
+        self : set $start-line [$s1 . $s2];
+	$result-str append! $str;
+	return (insert-string-at $result-str $result-start-line $result-start-column);
+    };
+
+    ## Regin into 2 lines.
+    if {$start-line = [$end-line - 1]} {
+	s1 ::= self : get $start-line : sub 0 $start-column;
+	$result-str append! [self : get $start-line : sub $start-column];
+	$result-str append! "\r";
+	$result-str append! [self : get $end-line : sub 0 $end-column];
+	s2 ::= self : get $end-line : sub  $end-column;
+        self : set $start-line [$s1 . $s2];
+	if {[self : len : - 1] <= $end-line} {
+	    self : resize [self : len : - 1];
+	} {
+	    $end-line each to: [self : len : - 2] do: {| i |
+	        self : set $i [self : get [$i + 1]];
+	    };
+	    self : resize [self : len : - 1];
+	};
+	return (insert-string-at $result-str $result-start-line $result-start-column);
+    };
+
+    ## Regin over 3 lines.
+    s1 ::= self : get $start-line : sub 0 $start-column;
+    $result-str append! [self : get $start-line : sub $start-column];
+    $result-str append! "\r";
+    [$start-line + 1] each to: [$end-line - 1] do: {| i |
+	$result-str append! [self : get $i];
+	$result-str append! "\r";
+    };
+    $result-str append! [self : get $end-line : sub 0 $end-column];
+    s2 ::= self : get $end-line : sub  $end-column;
+    self : set $start-line [$s1 . $s2];
+    n ::= $end-line - $start-line;
+    [$end-line + 1] each to: [self : len : - 1] do: {| i |
+	if {$i >= [self : len]} {break};
+	self : set [$i - $n] [self : get $i];
+    };
+    self : resize [self : len : - $n];
+    return (insert-string-at $result-str $result-start-line $result-start-column);
+};
+
+Vector method copy-region (start-line start-column end-line end-column) {
+    if {$start-line < 0} {
+	start-line := 0;
+    };
+    if {$end-line >= [self : len]} {
+	end-line := [self : len : - 1];
+	if {$end-line < 0} {
+	    end-line := 0;
+	};
+    };
+    if {$start-column > [self : get $start-line : len]} {
+	start-column := [self : get $start-line : len];
+    };
+    if {$end-column > [self : get $end-line : len]} {
+	end-column := [self : get $end-line : len];
+    };
+    if {$start-line > $end-line} {
+	(start-line end-line) := ($end-line $start-line);
+	(start-column end-column) := ($end-column $start-column);
+    };
+    if {$start-line = $end-line} {
+	if {$start-column > $end-column} {
+	    (start-column end-column) := ($end-column $start-column);
+	};
+    };
+
+    result-str := "";
+
+    ## Region into same line.
+    if {$start-line = $end-line} {
+	r ::= self : get $start-line;
+	str ::= $r sub $start-column $end-column;
+	$result-str append! $str;
+	return (insert-string-at $result-str $start-line $start-column);
+    };
+
+    ## Regin into 2 lines.
+    if {$start-line = [$end-line - 1]} {
+	self ::= self;
+	$result-str append! [$self get $start-line : sub $start-column];
+	$result-str append! "\r";
+	$result-str append! [$self get $end-line : sub 0 $end-column];
+	return (insert-string-at $result-str $start-line $start-column);
+    };
+
+    ## Regin over 3 lines.
+    $result-str append! [self : get $start-line : sub $start-column];
+    $result-str append! "\r";
+    [$start-line + 1] each to: [$end-line - 1] do: {| i |
+	$result-str append! [self : get $i];
+	$result-str append! "\r";
+    };
+    $result-str append! [self : get $end-line : sub 0 $end-column];
+    return (insert-string-at $result-str $start-line $start-column);
 };
 
 String method repeat (times) {

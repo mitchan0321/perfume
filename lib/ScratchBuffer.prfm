@@ -10,6 +10,8 @@ ScratchBuffer method init-constructor () {
     sets BufferName <nil>;
     sets Modify <nil>;
     sets NewFile <nil>;
+    sets UndoBuffer ();
+    sets RedoBuffer ();
 };
 
 ScratchBuffer method load-content (path) {

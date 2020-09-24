@@ -377,6 +377,7 @@ CombiWindow method setkey (key command) {
 };
 
 CombiWindow method apply-keybind (main window key) {
+    show-message "";
     if {string? $key} {
 	command ::= $KeyBinding get KEY_INPUT_CHAR;
 	body ::= get-command $command;
