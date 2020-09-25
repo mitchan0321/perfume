@@ -27,9 +27,13 @@ defun pmacs (trace: t) {
     defvar stdin_orig  $stdin;
     defvar stdout_orig $stdout;
     defvar stderr_orig $stderr;
+
     setvar stdin  [new Stream];
     setvar stdout [new Stream];
     setvar stderr [new Stream];
+    $stdin set-nolimit;
+    $stdout set-nolimit;
+    $stderr set-nolimit;
     
     try {
 	defvar MainWindow [new Window init: ([curs-init])];
@@ -39,6 +43,11 @@ defun pmacs (trace: t) {
 
 	$MainWindow create-full-window;
 	$MainWindow add-create-window-hook {$MainWindow create-full-window};
+	$MainWindow add-background {
+	    | main window |
+	    $window apply-command $main $window "" bottom-of-buffer;
+	    $window apply-command $main $window "" start-region;
+	};
 
 	$MainWindow render-all;
 	$MainWindow refresh;

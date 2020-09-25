@@ -405,6 +405,7 @@ defcommand eval-region
     str ::= $buff get-region-string $sy $sx $ey $ex;
     if {! [defvar? INTERP_LOCAL]} {defvar INTERP_LOCAL [dict]};
     try {
+	unset result;
 	result ::= begin {
 	    if {! [exists? str]} {
 		alias up: 1 str str;
@@ -412,9 +413,9 @@ defcommand eval-region
 	    result ([$str eval]);
 	} local: $INTERP_LOCAL;
     } catch: {| e |
-	result := (["<" . [$e car] "># " [$e cdr]]);
+	result := (["EXCEPTION: <" . [$e car] "># " [$e cdr]]);
     };
-    $window display-evaluation ["" . [$result car]];
+    $window display-evaluation ["Result[" . [type? [$result car]] "]=> " [$result car]];
     result SELF;
 };
 

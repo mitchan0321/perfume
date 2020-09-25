@@ -119,8 +119,13 @@ EditBuffer method save-content (path: path) {
     };
 
     if $backup-path {
-	file rm $path;
-	file rename $backup-path $path;
+        try {
+	    file rm $path;
+	    file rename $backup-path $path;
+	} catch: {| e |
+		return (<nil>
+		    ["<" . [$e car] "># " [$e cdr] ", at file write."]);
+	};
     };
 
     sets UndoBuffer ();

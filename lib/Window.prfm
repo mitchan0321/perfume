@@ -32,6 +32,9 @@ Window method init-constructor () {
 
     ## Event loop exit flag
     sets EventLoopDone <nil>;
+
+    ### Background
+    sets Background ();
 };
 
 Window method get-curs () {
@@ -384,7 +387,17 @@ Window method key-event-loop () {
 	    i := $KeyEvent;
 	    sets KeyEvent ();
 	};
-	if {$i null?} {continue};
+	if {$i null?} {
+	    if {background-exists?} {
+		try {
+		    exec-background;
+		    $main apply {render-all; refresh};
+		} catch: {| e |
+		    show-message ["Error at background: <" . [$e car] "># " [$e cdr]];
+		};
+	    };
+	    continue;
+	};
 	
 	#######
 	####### for debug display key in
@@ -404,7 +417,7 @@ Window method key-event-loop () {
 		continue;
 	    };
 		
-	    window ::= $main get-current-window;		
+	    window ::= $main get-current-window;
 	    result ::= $window apply-keybind $main $window $k;
 	    cond
 	    {eq? $result ALL} {
@@ -416,7 +429,7 @@ Window method key-event-loop () {
 		$window apply {render; refresh};
 	    }
 	    ;
-	    window ::= $main get-current-window;		
+	    window ::= $main get-current-window;
 	    $window set-cursor;
 	};
     };
@@ -467,4 +480,24 @@ Window method add-mini-input-callback (window block) {
 
 Window method exit-event-loop () {
     sets EventLoopDone <t>;
+};
+
+Window method add-background (body) {
+    if {block? $body} {
+	$Background <<- $body;
+    };
+};
+
+Window method exec-background () {
+    body ::= $Background ->>;
+    if {block? $body} {
+        yield $body [self] [get-current-window];
+    };
+};
+
+Window method background-exists? () {
+    if {[$Background len] > 0} {
+	return <t>;
+    };
+    return <nil>;
 };
