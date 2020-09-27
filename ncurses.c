@@ -205,6 +205,7 @@ func_curses_clear(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     w = container->u.container.data;
     posargs = list_next(posargs);
 
+    curs_set(0);
     werase(w);
     getmaxyx(w, y, x);
     for (i=0; i<y; i++) {

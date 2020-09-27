@@ -454,6 +454,11 @@ Window method mini-input-end () {
     if {list? $MiniInputSave} {
 	bind-buffer $MiniInputSave,0 $MiniInputSave,1;
     };
+    $MiniWindow clear;
+};
+
+Window method mini-input-value-override (val index) {
+    $MiniWindow mini-input-value $val $index;
 };
 
 Window method add-mini-input-callback (window block) {

@@ -23,6 +23,13 @@ defun pmacs (trace: t) {
 	    catch: {| e | println ["Module load error at '" . $m "', error=" $e]};
 	};
     } : $modules;
+
+    defvar stdin_orig  $stdin;
+    defvar stdout_orig $stdout;
+    defvar stderr_orig $stderr;
+    setvar stdin  [new Stream];
+    setvar stdout [new Stream];
+    setvar stderr [new Stream];
     
     try {
 	defvar MainWindow [new Window init: ([curs-init])];
@@ -39,6 +46,9 @@ defun pmacs (trace: t) {
     }
     fin: {
 	curs-terminate;
+	setvar stdin  $stdin_orig;
+	setvar stdout $stdout_orig;
+	setvar stderr $stderr_orig;
     }
     catch: {| e |
 	__error_info__ ::= "ERROR: <%v># %v\n\n%v" fmt [$e car] [$e cdr] $@stack-trace;

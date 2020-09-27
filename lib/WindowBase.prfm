@@ -70,3 +70,7 @@ WindowBase method destroy (*) {
 WindowBase method string () {
     return ["<" . [get-window-name] ">"];
 };
+
+WindowBase method display-evaluation () {
+    throw ErrNoMethodImpl ["No Impliment method '" . $@name "::display-evaluation'."];
+};

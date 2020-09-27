@@ -16,35 +16,43 @@ EditBuffer method init-constructor () {
 };
 
 EditBuffer method load-content (path init-only: init-flag buffer-name: buff-name) {
-    result := <nil>;
+    result := (<nil> "");
     f ::= new File;
     sets NewFile <nil>;
     sets Src [vector];
-    sets File $path;
     if {[$path sub 0 1] = "/"} {path ::= path-adjust $path};
+    sets File $path;
 
     if {! [set? init-flag]} {
 	try {
-	    $f open $path mode: i;
-	    $f each do: {| r |
-		$Src append! $r;
+	    if {or {file dir? $path} {and {file exists? $path} {! [file read? $path]}}} {
+		throw ErrFileSpec "File is directory or unreadable.";
 	    };
-            result := <t>;
+	    if {file read? $path} {
+		$f open $path mode: i;
+		$f each do: {| r |
+		    $Src append! $r;
+		};
+		$f close;
+	        result := (<t> "");
+	    } {
+		sets NewFile <t>;
+	        result := (<t> "");		
+	    };
 	}
 	catch: {| e |
-	    sets NewFile <t>;
-	    result := <nil>;
+	    result := (<nil> ["<" . [$e car] "># " [$e cdr]]);
 	}
         fin: {
 	    $f close;
 	};
     } {
-        result := <t>;
+        result := (<t> "");
 	sets NewFile <nil>;
 	sets File <nil>;
     };
 
-    if {$path = ""} {sets File "anonymous.pmacs"};
+    if {$path = ""} {sets File "EDITOR_SAVE.pmacs"};
     if {! [set? buff-name]} {
 	buff-name ::= $path split sep: "/" : last : car;
 	$buff-name ?? {buff-name := "*no named*"};
@@ -218,7 +226,13 @@ EditBuffer method undo () {
 		return ($o,2 $o,3);
 	    }
 	    {eq? $cmd insert-string-at-next} {
-		return ($o,2 [$o,3 + 1]);
+	        line := $o,2;
+		col ::= $o,3 + 1;
+		if {$col > [$Src get $line : len]} {
+		    col := 0;
+		    line ::= $line + 1;
+		};
+		return ($line $col);
 	    }
 	};
     };
@@ -242,7 +256,13 @@ EditBuffer method redo () {
 		return ($o,2 $o,3);
 	    }
 	    {eq? $cmd insert-string-at-next} {
-		return ($o,2 [$o,3 + 1]);
+	        line := $o,2;
+		col ::= $o,3 + 1;
+		if {$col > [$Src get $line : len]} {
+		    col := 0;
+		    line ::= $line + 1;
+		};
+		return ($line $col);
 	    }
 	};
     };
@@ -280,6 +300,14 @@ EditBuffer method copy-region (sy sx ey ex) {
     if {true? Src} {
 	setvar CopyBuffer [[$Src copy-region $sy $sx $ey $ex] get 1];
     };
+    return <nil>;
+};
+
+EditBuffer method get-region-string (sy sx ey ex) {
+    if {true? Src} {
+	return [[$Src copy-region $sy $sx $ey $ex] get 1];
+    };
+    return <nil>;
 };
 
 EditBuffer method cut-region (sy sx ey ex) {

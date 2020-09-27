@@ -395,6 +395,7 @@ CombiWindow method apply-keybind (main window key) {
 	show-message ["Incorrect command at: " . $command];
 	return <nil>;
     };
+
     command ::= $KeyBinding get $key;
     if {eq? <nil> $command} {
 	show-message ["No binding key: " . $key];
@@ -412,6 +413,30 @@ CombiWindow method apply-keybind (main window key) {
 	return $result;
     } {
 	show-message ["editor command not defined: " . $command];
+	return <nil>;
+    };
+    show-message ["Incorrect command at: " . $command];
+    return <nil>;
+};
+
+CombiWindow method apply-command (main window key command) {
+    body ::= get-command $command;
+    if {block? $body} {
+	try {
+	    if {eq? $command insert-character} {
+		result ::= yield $body $main $window $key;
+	    } {
+		result ::= yield $body $main $window;
+	    };
+	}
+	catch: {| e |
+	    show-message ["Error happend at editor command: " . $command ", <" [$e car] "># " [$e cdr]];
+	    return <nil>;
+	};
+	return $result;
+    } {
+	show-message ["editor command not defined: " . $command];
+	return <nil>;
     };
     show-message ["Incorrect command at: " . $command];
     return <nil>;
@@ -432,4 +457,28 @@ CombiWindow method destroy () {
     sets BufferCurs <nil>;
     sets StatusLineCurs <nil>;
     sets VerticalLineCurs <nil>;
+};
+
+CombiWindow method display-evaluation (o) {
+    buff ::= get-buffer;
+    if {eq? ScratchBuffer [$buff get @name]} {
+	apply-command $MainWindow [self] "" bottom-of-buffer;
+
+	$stdout close;
+	$stdout each do: {| r |
+		$buff append-string ["" . $r];
+	};
+	$stdout clear;
+
+	$stderr close;
+	$stderr each do: {| r |
+		$buff append-string ["ERR> " . $r];
+	};
+	$stderr clear;
+
+	$buff append-string ["Result: " . [$o string]];
+	apply-command $MainWindow [self] "" bottom-of-buffer;
+    } {
+	show-message ["Eval result: " . $o];
+    };
 };

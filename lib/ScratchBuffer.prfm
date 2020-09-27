@@ -16,7 +16,7 @@ ScratchBuffer method init-constructor () {
 };
 
 ScratchBuffer method load-content (path) {
-    true;
+    return (<t> "");
 };
 
 ScratchBuffer method buffer-select (from to block) {

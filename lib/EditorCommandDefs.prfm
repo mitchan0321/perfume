@@ -391,6 +391,33 @@ defcommand execute-command
     result ALL;
 };
 
+defcommand eval-region
+{   | main window |
+    buff ::= $window get-buffer;
+    [$buff get-region] ?? {
+	show-message "Not start region. Press CTRL-SP to start region.";
+	$buff end-region;
+	return SELF;
+    };
+    geom ::= $window get-geom;
+    (sy sx) ::= $buff end-region;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    str ::= $buff get-region-string $sy $sx $ey $ex;
+    if {! [defvar? INTERP_LOCAL]} {defvar INTERP_LOCAL [dict]};
+    try {
+	result ::= begin {
+	    if {! [exists? str]} {
+		alias up: 1 str str;
+	    };
+	    result ([$str eval]);
+	} local: $INTERP_LOCAL;
+    } catch: {| e |
+	result := (["<" . [$e car] "># " [$e cdr]]);
+    };
+    $window display-evaluation ["" . [$result car]];
+    result SELF;
+};
+
 defcommand refresh-screen
 {   | main window |
     $main send-key-event (KEY_RESIZE);
@@ -409,6 +436,7 @@ defcommand open-file
         if {eq? $in-key KEY_ESC} {
 	    $main mini-input-end;
 	    show-message "Canceled.";
+	    BufferManager unregist-buffer "*Directory*";	
 	};
         if {eq? $in-key CTRL_M} {
 	    $main mini-input-end;
@@ -416,17 +444,27 @@ defcommand open-file
 		show-message "No file name specified.";
 	    };
 	    buff ::= new EditBuffer;
-	    result ::= $buff load-content [
+	    (result err) ::= $buff load-content [
 		path-adjust [{[$value sub 0 1] = "/"} ???
 		    $value
 		    [pwd : . "/" $value]]
 	    ];
 	    $MainWindow bind-buffer [$window get-window-name] $buff;
-	    $result ?? {show-message ["New file: " . $value]};
+	    $result ?? {show-message ["Open Failed, path: " . $value " ("  $err ")"]};
+	    BufferManager unregist-buffer "*Directory*";
 	};
 	if {eq? $in-key CTRL_I} {
-	    show-files-in-window $main $window $value;
+	    fname ::= show-files-in-window $main $window $value;
+	    $main mini-input-value-override $fname [$fname len];
 	    return ALL;
+	};
+	if {eq? $in-key KEY_DOWN} {
+	    $window apply-command $main $window "" move-half-up;
+	    return SELF;
+	};
+	if {eq? $in-key KEY_UP} {
+	    $window apply-command $main $window "" move-half-down;
+	    return SELF;
 	};
     };
     result SELF;
@@ -465,10 +503,20 @@ defcommand save-buffer
 	    if {eq? $in-key KEY_ESC} {
 		$main mini-input-end;
 		show-message "Canceled.";
+		BufferManager unregist-buffer "*Directory*";	
 	    };
 	    if {eq? $in-key CTRL_I} {
-		show-files-in-window $main $window $value;
+		fname ::= show-files-in-window $main $window $value;
+		$main mini-input-value-override $fname [$fname len];
 		return ALL;
+	    };
+	    if {eq? $in-key KEY_DOWN} {
+		$window apply-command $main $window "" move-half-up;
+		return SELF;
+	    };
+	    if {eq? $in-key KEY_UP} {
+		$window apply-command $main $window "" move-half-down;
+		return SELF;
 	    };
 	    if {eq? $in-key CTRL_M} {
 		$main mini-input-end;
@@ -482,6 +530,7 @@ defcommand save-buffer
 			if {eq? $in-key KEY_ESC} {
 			    $main mini-input-end;
 			    show-message "Canceled.";
+			    BufferManager unregist-buffer "*Directory*";
 			    return SELF;
 			};
 			if {and {eq? $in-key CTRL_M} {eq? $value "yes"}} {
@@ -490,8 +539,9 @@ defcommand save-buffer
 			    if $result {
 				show-message "Save Done.";
 			    } {
-				show-message ["Save Failed, path: " . $path ". (" $err ")"];
+				show-message ["Save Failed, path: " . $path " (" $err ")"];
 			    };
+			    BufferManager unregist-buffer "*Directory*";
 			    return SELF;
 			};
 		    };
@@ -501,8 +551,9 @@ defcommand save-buffer
 		    if $result {
 			show-message "Save Done.";
 		    } {
-			show-message ["Save Failed, path: " . $path ". (" $err ")"];
+			show-message ["Save Failed, path: " . $path " (" $err ")"];
 		    };
+		    BufferManager unregist-buffer "*Directory*";
 		    return SELF;
 		};
 	    };
@@ -515,6 +566,7 @@ defcommand save-buffer
 	    if {or {eq? $in-key KEY_ESC} {eq? $value "n"} {eq? $value "N"}} {
 	    $main mini-input-end;
 	    show-message "Canceled.";
+	    BufferManager unregist-buffer "*Directory*";	
 	};
         if {or {$value = "y"} {$value = "Y"}} {
 	    $main mini-input-end;
@@ -522,9 +574,10 @@ defcommand save-buffer
 	    if $result {
 		show-message "Save Done.";
 	    } {
-		show-message ["Save Failed, path: " . $path ". (" $err ")"];
+		show-message ["Save Failed, path: " . $path " (" $err ")"];
 	    };
 	    return SELF;
+	    BufferManager unregist-buffer "*Directory*";	
 	};
     };
     result SELF;
@@ -540,10 +593,20 @@ defcommand save-buffer-as
 	if {eq? $in-key KEY_ESC} {
 	    $main mini-input-end;
 	    show-message "Canceled.";
+	    BufferManager unregist-buffer "*Directory*";	
 	};
 	if {eq? $in-key CTRL_I} {
-	    show-files-in-window $main $window $value;
+	    fname ::= show-files-in-window $main $window $value;
+	    $main mini-input-value-override $fname [$fname len];
 	    return ALL;
+	};
+	if {eq? $in-key KEY_DOWN} {
+	    $window apply-command $main $window "" move-half-up;
+	    return SELF;
+	};
+	if {eq? $in-key KEY_UP} {
+	    $window apply-command $main $window "" move-half-down;
+	    return SELF;
 	};
 	if {eq? $in-key CTRL_M} {
 	    $main mini-input-end;
@@ -557,6 +620,7 @@ defcommand save-buffer-as
 		   if {eq? $in-key KEY_ESC} {
 		       $main mini-input-end;
 		       show-message "Canceled.";
+		       BufferManager unregist-buffer "*Directory*";
 		       return SELF;
 		   };
 		   if {and {eq? $in-key CTRL_M} {eq? $value "yes"}} {
@@ -565,8 +629,9 @@ defcommand save-buffer-as
 		       if $result {
 			   show-message "Save Done.";
 		       } {
-			   show-message ["Save Failed, path: " . $path ". (" $err ")"];
+			   show-message ["Save Failed, path: " . $path " (" $err ")"];
 		       };
+		       BufferManager unregist-buffer "*Directory*";
 		       return SELF;
 		   };
 	       };
@@ -576,8 +641,9 @@ defcommand save-buffer-as
 		if $result {
 		    show-message "Save Done.";
 		    } {
-		show-message ["Save Failed, path: " . $path ". (" $err ")"];
+		show-message ["Save Failed, path: " . $path " (" $err ")"];
 		};
+		BufferManager unregist-buffer "*Directory*";
 		return SELF;
 	    };
 	};
@@ -641,7 +707,7 @@ defcommand buffer-list
 
     $buff append-string ["%1v %-3v %-16v %6v %-v" fmt " " "New" "Buffer Name" "Length" "File Path"];
     $buff append-string ["%1v %-3v %-16v %6v %-v" fmt "-" "---" "-----------" "------" "---------"];
-    l ::= msort [BufferManager get-buffer-list];
+    l ::= BufferManager get-buffer-list;
     $l each do: {| buff-name |
 	display-buffer ::= BufferManager get-buffer $buff-name;
 	$buff append-string [

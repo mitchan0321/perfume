@@ -22,8 +22,14 @@ BufferManager method unregist-buffer (name) {
     return [$BufferList unset $name];
 };
 
+BufferManager method buffer-order-list () {
+    msort [$BufferList keys :string : filter {| i | [$i at 0] != "*"}] :
+    concat
+    [msort [$BufferList keys :string : filter {| i | [$i at 0] = "*"}]];
+};
+
 BufferManager method get-buffer-list () {
-    return [$BufferList keys :string];
+    return [buffer-order-list];
 };
 
 BufferManager method get-buffer (name) {
@@ -52,7 +58,7 @@ BufferManager method get-next-buffer (buff) {
 	regist-buffer $buff "*Scratch*";
 	return $buff;
     };
-    l ::= msort [$BufferList keys :string];
+    l ::= buffer-order-list;
     i ::= $l find [$buff get-buffer-name];
     if $i {
         r ::= $l get [$i + 1];
@@ -68,7 +74,7 @@ BufferManager method get-previous-buffer (buff) {
 	regist-buffer $buff "*Scratch*";
 	return $buff;
     };
-    l ::= msort [$BufferList keys :string] : reverse;
+    l ::= buffer-order-list : reverse;
     i ::= $l find [$buff get-buffer-name];
     if $i {
         r ::= $l get [$i + 1];

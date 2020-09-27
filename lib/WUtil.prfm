@@ -8,6 +8,7 @@ WUtil method init () {
     # Ommit exit command.
     d ::= dict-func;
     f ::= $d get exit;
+
     $d unset exit;
     $d set _exit $f;
     defun exit () {$MainWindow exit-event-loop};
@@ -185,28 +186,93 @@ defun show-files-in-window (main window dir) {
     buff ::= new EditBuffer;
     $buff load-content $dir :init-only buffer-name: "*Directory*";
     $buff clear-all;
-    try {
-	l ::= msort [file list $dir];
-	while {! [$l null?]} do: {
-	    v1 ::= $l >>;
-	    v2 ::= $l >>;
-	    v3 ::= $l >>;
-	    v4 ::= $l >>;
-	    $buff append-string ["%-20v\t%-20v\t%-20v\t%-20v" fmt [$v1 ?? ""] [$v2 ?? ""] [$v3 ?? ""] [$v4 ?? ""]];
-	};
-    } catch: {| e |
-	$buff append-string ["Can't read directory '" . $dir "', <" [$e car] "># " [$e cdr]];
-    };
-    $buff no-modify;
 
+    if {file dir? $dir} {
+
+	### display directory
+
+	dir ::= path-adjust $dir;
+	if {$dir != "/"} {dir ::= $dir . "/"};
+	$buff append-string ["<< In directory: %v >>" fmt $dir];
+	$buff append-string "";
+
+	try {
+	    l ::= msort [file list $dir];
+	    while {! [$l null?]} do: {
+		v1 ::= $l >>;
+		if {and $v1 {file dir? [$dir . $v1]}} {$v1 append! "/"};
+		v2 ::= $l >>;
+		if {and $v2 {file dir? [$dir . $v2]}} {$v2 append! "/"};
+		# v3 ::= $l >>;
+		# if {and $v3 {file dir? [$dir . $v3]}} {$v3 append! "/"};		
+		# v4 ::= $l >>;
+		# if {and $v4 {file dir? [$dir . $v4]}} {$v4 append! "/"};
+		# $buff append-string ["%-20v\t%-20v\t%-20v\t%-20v" fmt [$v1 ?? ""] [$v2 ?? ""] [$v3 ?? ""] [$v4 ?? ""]];
+		$buff append-string ["%-40v%-40v" fmt [$v1 ?? ""] [$v2 ?? ""]];
+	    };
+	} catch: {| e |
+	    $buff append-string ["Can't read directory. <" [$e car] "># " [$e cdr]];
+	};
+    } {
+
+	### display files and mathchies
+
+	flist ::= path-adjust $dir : split sep: "/";
+	fname ::= $flist ->>;
+
+	try {
+	    dir ::= $flist join sep: "/";
+	    if {$dir != "/"} {dir ::= $dir . "/"};
+	    $buff append-string ["<< In directory matchies: %v >>" fmt $dir];
+	    $buff append-string "";
+	
+	    l ::= file list $dir : filter {| i |
+	        $i =~ ["^" . $fname ".*" : rquote];
+	    };
+	    l ::= msort $l;
+	    file-count ::= $l len;
+	    if {$file-count >= 1} {
+		while {! [$l null?]} do: {
+		    v1 ::= $l >>;
+		    if {and $v1 {file dir? [$dir . $v1]}} {$v1 append! "/"};
+		    v2 ::= $l >>;
+		    if {and $v2 {file dir? [$dir . $v2]}} {$v2 append! "/"};
+		    # v3 ::= $l >>;
+		    # if {and $v3 {file dir? [$dir . $v3]}} {$v3 append! "/"};		
+		    # v4 ::= $l >>;
+		    # if {and $v4 {file dir? [$dir . $v4]}} {$v4 append! "/"};
+		    # $buff append-string ["%-20v\t%-20v\t%-20v\t%-20v" fmt [$v1 ?? ""] [$v2 ?? ""] [$v3 ?? ""] [$v4 ?? ""]];
+		    $buff append-string ["%-40v%-40v" fmt [$v1 ?? ""] [$v2 ?? ""]];
+		};
+		if {$file-count = 1} {
+		    $buff append-string "--";
+		    $buff append-string "File match solo complete.";
+		    fname := $v1;
+		} { 
+		    $buff append-string "--";
+		    $buff append-string ["%v files match." fmt $file-count];
+		};
+	    } {
+		$buff append-string "--";
+		$buff append-string "No file match.";
+	    };
+
+	    dir ::= $dir . $fname;
+
+	} catch: {| e |
+	    $buff append-string ["Can't read directory. <" [$e car] "># " [$e cdr]];
+	};
+    };
+
+    $buff no-modify;
     $main bind-buffer [$window get-window-name] $buff;
-    #### $window apply {render; refresh};
+    return $dir;
 };
 
 ##
 ## define Vector method for EditBuffer operations.
 ##
-Vector method insert-string-at (str line at) {
+Vector method insert-string-at___new (str line at) {
     l ::= $str split sep: "";
     result := (delete-region [$line + 0] [$at + 0]);
     self ::= self;
@@ -260,9 +326,9 @@ Vector method insert-character-at (char line at) {
     return ($line $at);
 };
 
-Vector method insert-string-at___orig (str line at) {
+Vector method insert-string-at (str line at) {
     l ::= $str split sep: "\r";
-    if {and {[self : len] = 0} {$l,0 = ""}} {$l >>};
+#    if {and {[self : len] = 0} {$l,0 = ""}} {$l >>};
     times ::= $l len;
     self ::= self;
     i := 1;
@@ -278,6 +344,7 @@ Vector method insert-string-at___orig (str line at) {
 	} {
 	    $self append! $elem;
 	    at ::= $elem len;
+	    line ::= $self len : - 1;
 	};
 	if {$i = $times} {break};
 	$self append! "";
@@ -309,9 +376,18 @@ Vector method delete-character-at (line at) {
     };
     s ::= $self get $line;
     len ::= $s len;
-    if {and [[$self len] = 1] [$len = 0]} {
+    if {and {[$self len] = 1} {$len = 0}} {
 	$self resize 0;
 	return (insert-string-at "\r" 0 0);
+    };
+    if {$len = 0} {
+	i := $line;
+	while {$i < [$self len : - 1]} do: {
+	    $self set $i [$self get [$i + 1]];
+	    i ::= $i + 1;
+        };
+	$self resize [$self len : - 1];
+	return (insert-string-at "\r" $line 0);
     };
     if {$at >= $len} {
 	if {[$line + 1] = [$self len]} {
@@ -393,16 +469,21 @@ Vector method delete-region (start-line start-column end-line end-column) {
 	start-line := 0;
     };
     if {$end-line >= [self : len]} {
-	end-line := [self : len : - 1];
+	end-line ::= self : len : - 1;
 	if {$end-line < 0} {
 	    end-line := 0;
 	};
+	end-column ::= self : get [self : len : - 1] : len;
     };
     if {$start-column > [self : get $start-line : len]} {
 	start-column := [self : get $start-line : len];
     };
     if {$end-column > [self : get $end-line : len]} {
 	end-column := [self : get $end-line : len];
+    };
+    at-last := <nil>;
+    if {and {$end-line = [self : len : - 1]} {$end-column = [self : get $end-line : len]}} {
+	at-last := <t>;
     };
 
     result-start-line := $start-line;
@@ -417,6 +498,9 @@ Vector method delete-region (start-line start-column end-line end-column) {
 	s2 ::= $r sub $end-column;
         self : set $start-line [$s1 . $s2];
 	$result-str append! $str;
+	if {and $at-last {[self : len] >= 1} {[self : get [self : len : - 1]] = ""}} {
+	    self : resize [self : len : - 1];
+	};
 	return (insert-string-at $result-str $result-start-line $result-start-column);
     };
 
@@ -434,6 +518,9 @@ Vector method delete-region (start-line start-column end-line end-column) {
 	    $end-line each to: [self : len : - 2] do: {| i |
 	        self : set $i [self : get [$i + 1]];
 	    };
+	    self : resize [self : len : - 1];
+	};
+	if {and $at-last {[self : len] >= 1} {[self : get [self : len : - 1]] = ""}} {
 	    self : resize [self : len : - 1];
 	};
 	return (insert-string-at $result-str $result-start-line $result-start-column);
@@ -456,6 +543,9 @@ Vector method delete-region (start-line start-column end-line end-column) {
 	self : set [$i - $n] [self : get $i];
     };
     self : resize [self : len : - $n];
+    if {and $at-last {[self : len] >= 1} {[self : get [self : len : - 1]] = ""}} {
+        self : resize [self : len : - 1];
+    };
     return (insert-string-at $result-str $result-start-line $result-start-column);
 };
 
@@ -473,10 +563,11 @@ Vector method copy-region (start-line start-column end-line end-column) {
 	start-line := 0;
     };
     if {$end-line >= [self : len]} {
-	end-line := [self : len : - 1];
+	end-line ::= self : len : - 1;
 	if {$end-line < 0} {
 	    end-line := 0;
 	};
+	end-column ::= self : get [self : len : - 1] : len;
     };
     if {$start-column > [self : get $start-line : len]} {
 	start-column := [self : get $start-line : len];
