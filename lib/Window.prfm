@@ -248,6 +248,7 @@ Window method roll-current-window () {
     $WindowList <<- $win;
     $WindowList car : activate;
     try {$WindowList cdr : each do: {| i | $i diactivate}} catch: {};
+    $WindowList car : get-buffer : end-region;
     return [$WindowList car];
 };
 

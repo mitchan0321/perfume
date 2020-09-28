@@ -118,6 +118,64 @@ CombiWindow method render () {
 	    curs-color $BufferCurs [[$buff get-buffer-length] - $geom,ViewLine] 0 5 $ColorDB,EOF_MARK 0;
 	};
     };
+
+    region ::= $buff get-region;
+    if {and $region $Activate} {
+	(sy sx) := $region;
+	(ey ex) ::= get-source-index $buff $geom;
+	if {$sy > $ey} {
+	    (sy ey sx ex) := ($ey $sy $ex $sx);
+	};
+	i := 0;
+	line := $geom,ViewLine;
+	$buff buffer-select $geom,ViewLine [$geom,ViewLine + $y : - 1] {
+	    | src |
+	    in-region := <nil>;
+	    cond
+	    {and {$line = $sy} {$line = $ey}} {
+		start-col ::= curs-index-to-pos $src $sx $DEFAULT_TAB_WIDTH;		
+		end-col ::= curs-index-to-pos $src $ex $DEFAULT_TAB_WIDTH;
+		in-region := <t>;
+		break;
+	    }
+	    {$line = $sy} {
+		start-col ::= curs-index-to-pos $src $sx $DEFAULT_TAB_WIDTH;
+		end-col ::= curs-index-to-pos $src [$src len] $DEFAULT_TAB_WIDTH;
+		in-region := <t>;
+		break;
+	    }
+	    {$line = $ey} {
+		start-col ::= curs-index-to-pos $src 0 $DEFAULT_TAB_WIDTH;
+		end-col ::= curs-index-to-pos $src $ex $DEFAULT_TAB_WIDTH;
+		in-region := <t>;
+		break;
+	    }
+	    {and {$line > $sy} {$line < $ey}} {
+		start-col ::= curs-index-to-pos $src 0 $DEFAULT_TAB_WIDTH;
+		end-col ::= curs-index-to-pos $src [$src len] $DEFAULT_TAB_WIDTH;
+		in-region := <t>;
+		break;
+	    };
+
+	    if $in-region {
+		start-col ::= $start-col - $geom,ViewColumn;
+		end-col ::= $end-col - $geom,ViewColumn;
+		if {$start-col > $end-col} {
+		    (start-col end-col) := ($end-col $start-col);
+		};
+		if {$start-col < 0} {start-col := 0};
+		if {$start-col >= $x} {start-col := $x};
+		if {$end-col < 0} {start-col := 0};
+		if {$end-col >= $x} {end-col := $x};
+		if {[$end-col - $start-col] > 0} {
+		    curs-color $BufferCurs $i $start-col [$end-col - $start-col] $ColorDB,REGION_HILIGHT 0;
+		};
+	    };
+
+	    $i ++;
+	    $line ++;
+	};
+    };
 };
 
 CombiWindow method get-source-index (buff geom) {
