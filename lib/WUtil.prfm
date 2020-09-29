@@ -274,8 +274,7 @@ defun show-files-in-window (main window dir) {
 defun path-longest-match (list fname) {
     result := $fname;
     from ::= $fname len;
-    to := 999999;
-    $list each do: {| i | if {[$i len] < $to} {to := [$i len]}};
+    to ::= $list map {| i | $i len} : min;
     $from each to: $to do: {| i |
 	m ::= $list car : at $i;
 	match := <t>;
