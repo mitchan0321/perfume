@@ -129,7 +129,7 @@ defun set-window-color-default (curs name) {
 defun line-input (curs disp-line disp-col input-len cur-index cur-val key-in) {
     curs-print $curs ["%-" . $input-len "v" : fmt ""] $DISPLAY_ENCODING $disp-line $disp-col;
     curs-render-line $curs $disp-line 0 $disp-col $cur-val $DEFAULT_TAB_WIDTH $DISPLAY_ENCODING;
-    v ::= vector($InputValue);
+    v ::= vector($cur-val);
     new-x := $cur-index;
     cond
     {string? $key-in} {
@@ -230,6 +230,7 @@ defun show-files-in-window (main window dir) {
 	        $i =~ ["^" . $fname ".*" : rquote];
 	    };
 	    l ::= msort $l;
+	    src-list ::= $l clone;
 	    file-count ::= $l len;
 	    if {$file-count >= 1} {
 		while {! [$l null?]} do: {
@@ -251,6 +252,7 @@ defun show-files-in-window (main window dir) {
 		} { 
 		    $buff append-string "--";
 		    $buff append-string ["%v files match." fmt $file-count];
+		    fname ::= path-longest-match $src-list $fname;
 		};
 	    } {
 		$buff append-string "--";
@@ -267,6 +269,26 @@ defun show-files-in-window (main window dir) {
     $buff no-modify;
     $main bind-buffer [$window get-window-name] $buff;
     return $dir;
+};
+
+defun path-longest-match (list fname) {
+    result := $fname;
+    from ::= $fname len;
+    to := 999999;
+    $list each do: {| i | if {[$i len] < $to} {to := [$i len]}};
+    $from each to: $to do: {| i |
+	m ::= $list car : at $i;
+	match := <t>;
+	[$list cdr] each do: {| x |
+	    if {$m != [$x at $i]} {
+	        match := <nil>;
+		break;
+	    };
+	};
+	if $match {$result append! $m};
+    };
+    
+    return $result;
 };
 
 ##

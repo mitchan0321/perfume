@@ -394,28 +394,33 @@ defcommand execute-command
 defcommand eval-region
 {   | main window |
     buff ::= $window get-buffer;
-    [$buff get-region] ?? {
+    [$window get-region] ?? {
 	show-message "Not start region. Press CTRL-SP to start region.";
-	$buff end-region;
+	$window end-region;
 	return SELF;
     };
     geom ::= $window get-geom;
-    (sy sx) ::= $buff end-region;
+    (sy sx) ::= $window end-region;
     (ey ex) ::= $window get-source-index $buff $geom;
-    str ::= $buff get-region-string $sy $sx $ey $ex;
+    str ::= $window get-region-string $sy $sx $ey $ex;
     if {! [defvar? INTERP_LOCAL]} {defvar INTERP_LOCAL [dict]};
     try {
+	unset e;
 	unset result;
 	result ::= begin {
 	    if {! [exists? str]} {
 		alias up: 1 str str;
 	    };
 	    result ([$str eval]);
-	} local: $INTERP_LOCAL;
+	} local: $INTERP_LOCAL :rebase;
     } catch: {| e |
-	result := (["EXCEPTION: <" . [$e car] "># " [$e cdr]]);
+	result ::= "EXCEPTION: <" . [$e car] "># " [$e cdr];
     };
-    $window display-evaluation ["Result[" . [type? [$result car]] "]=> " [$result car]];
+    if {set? e} {
+	$window display-evaluation $result;
+    } {
+	$window display-evaluation ["Result[" . [type? [$result car]] "]=> " [$result car]];
+    };
     result SELF;
 };
 
@@ -456,6 +461,7 @@ defcommand open-file
 	};
 	if {eq? $in-key CTRL_I} {
 	    fname ::= show-files-in-window $main $window $value;
+	    $window apply-command $main $window "" top-of-buffer;
 	    $main mini-input-value-override $fname [$fname len];
 	    return ALL;
 	};
@@ -508,6 +514,7 @@ defcommand save-buffer
 	    };
 	    if {eq? $in-key CTRL_I} {
 		fname ::= show-files-in-window $main $window $value;
+	        $window apply-command $main $window "" top-of-buffer;
 		$main mini-input-value-override $fname [$fname len];
 		return ALL;
 	    };
@@ -598,6 +605,7 @@ defcommand save-buffer-as
 	};
 	if {eq? $in-key CTRL_I} {
 	    fname ::= show-files-in-window $main $window $value;
+	    $window apply-command $main $window "" top-of-buffer;
 	    $main mini-input-value-override $fname [$fname len];
 	    return ALL;
 	};
@@ -769,14 +777,14 @@ defcommand redo-buffer
 defcommand start-region
 {   | main window |
     buff ::= $window get-buffer;
-    if [$buff get-region] {
+    if [$window get-region] {
 	show-message "End region.";
-	$buff end-region;
+	$window end-region;
 	return SELF;
     };
     geom ::= $window get-geom;
     (cy cx) ::= $window get-source-index $buff $geom;
-    $buff start-region $cy $cx;
+    $window start-region $cy $cx;
     show-message "Start region.";
     result SELF;
 };
@@ -784,15 +792,15 @@ defcommand start-region
 defcommand copy-region
 {   | main window |
     buff ::= $window get-buffer;
-    [$buff get-region] ?? {
+    [$window get-region] ?? {
 	show-message "Not start region. Press CTRL-SP to start region.";
-	$buff end-region;
+	$window end-region;
 	return SELF;
     };
     geom ::= $window get-geom;
-    (sy sx) ::= $buff end-region;
+    (sy sx) ::= $window end-region;
     (ey ex) ::= $window get-source-index $buff $geom;
-    $buff copy-region $sy $sx $ey $ex;
+    $window copy-region $sy $sx $ey $ex;
     show-message "Copied.";
     result SELF;
 };
@@ -800,15 +808,15 @@ defcommand copy-region
 defcommand cut-region
 {   | main window |
     buff ::= $window get-buffer;
-    [$buff get-region] ?? {
+    [$window get-region] ?? {
 	show-message "Not start region. Press CTRL-SP to start region.";
-	$buff end-region;
+	$window end-region;
 	return SELF;
     };
     geom ::= $window get-geom;
-    (sy sx) ::= $buff end-region;
+    (sy sx) ::= $window end-region;
     (ey ex) ::= $window get-source-index $buff $geom;
-    (line col) ::= $buff cut-region $sy $sx $ey $ex;
+    (line col) ::= $window cut-region $sy $sx $ey $ex;
     show-message "Cut.";
     $window set-freecursor <nil>;
     $geom set! IndexColumn.SAVE $col;
@@ -823,7 +831,7 @@ defcommand cut-region
 defcommand paste-buffer
 {   | main window |
     buff ::= $window get-buffer;
-    str ::= $buff get-copy-buffer;
+    str ::= $window get-copy-buffer;
     if {$str = ""} {
 	show-message "Copy buffer is empty.";
 	return SELF;

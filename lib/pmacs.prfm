@@ -28,6 +28,7 @@ defun pmacs (trace: t) {
     defvar stdout_orig $stdout;
     defvar stderr_orig $stderr;
 
+    ### setvar stdin  [new InterpInputStream];
     setvar stdin  [new Stream];
     setvar stdout [new Stream];
     setvar stderr [new Stream];

@@ -6,6 +6,7 @@ BufferGeom method init () {
     sets CursorLine 0;
     sets CursorColumn 0;
     sets IndexColumn.SAVE 0;
+    sets Region <nil>;
 };
 
 BufferGeom method clone () {

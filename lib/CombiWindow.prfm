@@ -85,7 +85,7 @@ CombiWindow method render () {
 	  [[$buff modify?] ??? "*" " "]
 	  [[$buff newfile?] ??? "N" " "]
 	  [$FreeCursor ??? "F" " "]
-	  [[$buff get-region] ??? "R" " "]
+	  [[get-region] ??? "R" " "]
 	  [$win split sep: "#" : get 1]
 	  $cy $cx
 	  $buff-name 
@@ -119,7 +119,7 @@ CombiWindow method render () {
 	};
     };
 
-    region ::= $buff get-region;
+    region ::= get-region;
     if {and $region $Activate} {
 	(sy sx) := $region;
 	(ey ex) ::= get-source-index $buff $geom;
@@ -540,4 +540,48 @@ CombiWindow method display-evaluation (o) {
     } {
 	show-message ["Eval result: " . $o];
     };
+};
+
+CombiWindow method start-region (y x) {
+    geom ::= get-geom;
+    $geom set! Region ($y $x);
+};
+
+CombiWindow method end-region () {
+    geom ::= get-geom;
+    reg := $geom,Region;
+    $geom set! Region <nil>;
+    return $reg;
+};
+
+CombiWindow method get-region () {
+    geom ::= get-geom;
+    return $geom,Region;
+};
+
+
+CombiWindow method copy-region (sy sx ey ex) {
+    buff ::= get-buffer;
+    setvar CopyBuffer [$buff get-region-string $sy $sx $ey $ex];
+};
+
+CombiWindow method get-region-string (sy sx ey ex) {
+    buff ::= get-buffer;
+    return [$buff get-region-string $sy $sx $ey $ex];
+};
+
+CombiWindow method cut-region (sy sx ey ex) {
+    buff ::= get-buffer;
+    ret ::= $buff cut-region $sy $sx $ey $ex;
+    setvar CopyBuffer [$ret get 0];
+    result ::= $ret get 1;
+    if $result,0 {
+	return ($result,2 $result,3);
+    };
+    return (0 0);
+};
+
+CombiWindow method get-copy-buffer () {
+    ### CAUTION: this variable CopyBuffer is global.
+    return $CopyBuffer;
 };

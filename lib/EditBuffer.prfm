@@ -12,7 +12,6 @@ EditBuffer method init-constructor () {
     sets NewFile <nil>;
     sets UndoBuffer ();
     sets RedoBuffer ();
-    sets Region <nil>;
 };
 
 EditBuffer method load-content (path init-only: init-flag buffer-name: buff-name) {
@@ -287,27 +286,6 @@ EditBuffer method newfile? () {
     return $NewFile;
 };
 
-EditBuffer method start-region (y x) {
-    sets Region ($y $x);
-};
-
-EditBuffer method end-region () {
-    reg := $Region;
-    sets Region <nil>;
-    return $reg;
-};
-
-EditBuffer method get-region () {
-    return $Region;
-};
-
-EditBuffer method copy-region (sy sx ey ex) {
-    if {true? Src} {
-	setvar CopyBuffer [[$Src copy-region $sy $sx $ey $ex] get 1];
-    };
-    return <nil>;
-};
-
 EditBuffer method get-region-string (sy sx ey ex) {
     if {true? Src} {
 	return [[$Src copy-region $sy $sx $ey $ex] get 1];
@@ -317,15 +295,10 @@ EditBuffer method get-region-string (sy sx ey ex) {
 
 EditBuffer method cut-region (sy sx ey ex) {
     if {true? Src} {
-	setvar CopyBuffer [[$Src copy-region $sy $sx $ey $ex] get 1];
+	str ::= [$Src copy-region $sy $sx $ey $ex] get 1;
 	result ::= $Src delete-region $sy $sx $ey $ex;
 	if $result,0 {$UndoBuffer << $result};
-	return ($result,2 $result,3);
+	return ($str $result);
     };
-    return (0 0);
-};
-
-EditBuffer method get-copy-buffer () {
-    ### CAUTION: this variable CopyBuffer is global.
-    return $CopyBuffer;
+    return ("" (<nil> 0 0));
 };
