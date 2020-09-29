@@ -536,7 +536,7 @@ CombiWindow method display-evaluation (o) {
 
 	$buff append-string ["" . [$o string]];
 	apply-command $MainWindow [self] "" bottom-of-buffer;
-	apply-command $MainWindow [self] "" start-region;
+	### apply-command $MainWindow [self] "" start-region;
     } {
 	show-message ["Eval result: " . $o];
     };

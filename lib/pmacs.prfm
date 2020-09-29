@@ -47,7 +47,7 @@ defun pmacs (trace: t) {
 	$MainWindow add-background {
 	    | main window |
 	    $window apply-command $main $window "" bottom-of-buffer;
-	    $window apply-command $main $window "" start-region;
+	    ### $window apply-command $main $window "" start-region;
 	};
 
 	$MainWindow render-all;
