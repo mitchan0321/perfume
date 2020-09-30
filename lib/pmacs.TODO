@@ -17,6 +17,11 @@
 ・ヘルプ表示
 ・バッファリストの保存
 
+
+--- Memo ---
+<>文字列の正規表現
+'"[^"]+"'
+
 <>カラーパターン1
 - アクティブウィンドウだけ明るい
 $ColorDB set EDIT_BUFFER                [WUtil color-pair BLACK   WHITE   ];
