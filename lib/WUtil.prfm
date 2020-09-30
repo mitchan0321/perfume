@@ -272,9 +272,12 @@ defun show-files-in-window (main window dir) {
 };
 
 defun path-longest-match (list fname) {
+    if {$list null?} {return ""};
+    if {$list len : = 1} {return [$list car]};
+
     result := $fname;
     from ::= $fname len;
-    to ::= $list map {| i | $i len} : min;
+    to ::= $list map {| i | $i len} : min : - 1;
     $from each to: $to do: {| i |
 	m ::= $list car : at $i;
 	match := <t>;
@@ -284,7 +287,11 @@ defun path-longest-match (list fname) {
 		break;
 	    };
 	};
-	if $match {$result append! $m};
+	if $match {
+            $result append! $m
+        } {
+	    break;
+	};
     };
     
     return $result;
