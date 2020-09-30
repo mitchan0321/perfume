@@ -8,6 +8,8 @@
 #define EOF	(-1)
 #endif
 
+#define IS_NEWLINE(x)	((x == L'\n') || (x == L'\r'))
+
 typedef struct _bulk {
     int length;
     int allocsize;

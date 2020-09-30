@@ -176,7 +176,7 @@ toy_parse_statement(Bulk *src, wchar_t endc) {
 	    c = bulk_getchar(src);
 	    while (1) {
 		if (EOF == c) goto parse_end;
-		if (L'\n' == c) break;
+		if (IS_NEWLINE(c)) break;
 		c = bulk_getchar(src);
 	    }
 	    bulk_ungetchar(src);
