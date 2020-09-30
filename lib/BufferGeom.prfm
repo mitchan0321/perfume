@@ -16,7 +16,18 @@ BufferGeom method clone () {
     $b set! CursorLine $CursorLine;
     $b set! CursorColumn $CursorColumn;
     $b set! IndexColumn.SAVE $IndexColumn.SAVE;
+    $b set! Region $Region;
     return $b;
+};
+
+BufferGeom method restore-geom (geom) {
+    b ::= self;
+    $b set! ViewLine $geom,ViewLine;
+    $b set! ViewColumn $geom,ViewColumn;
+    $b set! CursorLine $geom,CursorLine;
+    $b set! CursorColumn $geom,CursorColumn;
+    $b set! IndexColumn.SAVE $geom,IndexColumn.SAVE;
+    $b set! Region $geom,Region;
 };
 
 BufferGeom method string () {

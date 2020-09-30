@@ -302,3 +302,26 @@ EditBuffer method cut-region (sy sx ey ex) {
     };
     return ("" (<nil> 0 0));
 };
+
+EditBuffer method search (str) {
+    if {$str = ""} {return ()};
+    
+    result := ();
+    last := $result;
+    i := -1;
+    rstr ::= $str rquote;
+    if {[get-buffer-length] = 0} {return $result};
+    $Src each do: {| r |
+	i ::= $i + 1;
+	try {
+	    slist ::= $r =~ $rstr :all;
+	} catch: {
+	    return ();
+	};
+	$slist ?? {continue};
+	$slist each do: {| e |
+	    last ::= $last append! ($i $e);
+	};
+    };
+    return $result;
+};

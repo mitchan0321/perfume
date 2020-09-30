@@ -11,6 +11,7 @@
 #	$ColorName set CYAN    6;
 #	$ColorName set WHITE   7;
 
+REM {
 $ColorDB set EDIT_BUFFER                [WUtil color-pair BLACK   WHITE   ];
 $ColorDB set ACTIVE_STATUS_LINE         [WUtil color-pair BLACK   CYAN    ];
 $ColorDB set ACTIVE_VERT_LINE           [WUtil color-pair BLACK   CYAN    ];
@@ -22,6 +23,7 @@ $ColorDB set INACTIVE_VERT_LINE_HILIGHT [WUtil color-pair CYAN    BLACK   ];
 $ColorDB set MINI_WINDOW                [WUtil color-pair WHITE   BLACK   ];
 $ColorDB set EOF_MARK			[WUtil color-pair BLACK   GREEN   ];
 $ColorDB set REGION_HILIGHT		[WUtil color-pair WHITE   BLUE    ];
+};
 
 REM {
 $ColorDB set EDIT_BUFFER                [WUtil color-pair WHITE   BLACK   ];
@@ -36,3 +38,15 @@ $ColorDB set MINI_WINDOW                [WUtil color-pair WHITE   BLACK   ];
 $ColorDB set EOF_MARK			[WUtil color-pair BLACK   GREEN   ];
 $ColorDB set REGION_HILIGHT		[WUtil color-pair WHITE   BLUE    ];
 };
+
+$ColorDB set EDIT_BUFFER                [WUtil color-pair BLACK   WHITE   ];
+$ColorDB set ACTIVE_STATUS_LINE         [WUtil color-pair BLACK   CYAN    ];
+$ColorDB set ACTIVE_VERT_LINE           [WUtil color-pair CYAN    BLUE    ];
+$ColorDB set ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair BLACK   CYAN    ];
+$ColorDB set INACTIVE_EDIT_BUFFER       [WUtil color-pair BLACK   WHITE   ];
+$ColorDB set INACTIVE_STATUS_LINE       [WUtil color-pair YELLOW  BLACK   ];
+$ColorDB set INACTIVE_VERT_LINE         [WUtil color-pair BLUE    BLACK   ];
+$ColorDB set INACTIVE_VERT_LINE_HILIGHT [WUtil color-pair YELLOW  BLUE    ];
+$ColorDB set MINI_WINDOW                [WUtil color-pair WHITE   BLACK   ];
+$ColorDB set EOF_MARK			[WUtil color-pair BLACK   GREEN   ];
+$ColorDB set REGION_HILIGHT		[WUtil color-pair WHITE   BLUE    ];

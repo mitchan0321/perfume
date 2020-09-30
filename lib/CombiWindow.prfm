@@ -26,6 +26,8 @@ CombiWindow method init (main y x line column) {
     sets Activate <nil>;
     sets FreeCursor <nil>;
     sets KeyBinding [dict()];
+    sets SearchSave <nil>;
+    sets SearchResult ();
     load-keybind;
 };
 
@@ -470,7 +472,7 @@ CombiWindow method apply-keybind (main window key) {
 	};
 	return $result;
     } {
-	show-message ["editor command not defined: " . $command];
+	show-message ["Editor command not defined: " . $command];
 	return <nil>;
     };
     show-message ["Incorrect command at: " . $command];
@@ -493,7 +495,7 @@ CombiWindow method apply-command (main window key command) {
 	};
 	return $result;
     } {
-	show-message ["editor command not defined: " . $command];
+	show-message ["Editor command not defined: " . $command];
 	return <nil>;
     };
     show-message ["Incorrect command at: " . $command];
@@ -584,4 +586,79 @@ CombiWindow method cut-region (sy sx ey ex) {
 CombiWindow method get-copy-buffer () {
     ### CAUTION: this variable CopyBuffer is global.
     return $CopyBuffer;
+};
+
+CombiWindow method get-search-string () {
+    ### CAUTION: this variable SearchString is global.
+    return $SearchString;
+};
+
+CombiWindow method start-search () {
+    buff ::= get-buffer;
+    geom ::= get-geom;
+    sets SearchSave [$geom clone];
+};
+
+CombiWindow method cancel-search (str) {
+    setvar SearchString $str;
+    geom ::= get-geom;
+    if $SearchSave {
+	$geom restore-geom $SearchSave;
+    };
+    sets SearchSave <nil>;
+    sets SearchResult ();
+};
+
+CombiWindow method end-search (str) {
+    setvar SearchString $str;
+    sets SearchSave <nil>;
+    sets SearchResult ();
+};
+
+CombiWindow method set-search-result (list) {
+    sets SearchResult $list;
+};
+
+CombiWindow method move-to-next-search () {
+    $SearchResult ?? {return <nil>};
+
+    buff ::= get-buffer;
+    geom ::= get-geom;
+    (y x) ::= get-source-index $buff $geom;
+    (sy sx) ::= get-screen-size;
+    start := $geom,ViewLine;
+    end ::= $start + $sy : - 1;
+    l ::= $SearchResult filter {| i | and {[$i car] >= $start} {[$i car] <= $end}};
+
+    elem := <nil>; ### $elem is search and move target element
+    if {$l null?} {
+	l ::= $SearchResult filter {| i | $i > $end};
+	elem ::= $l car;
+    } {
+	$l each do: {| elem |
+	    if {[$elem car] = $y} {
+		if {[$elem cdr : car : car] >= $x} {break};
+	    };
+	    if {[$elem car] > $y} {break};
+	};
+    };
+    $elem ?? {return <nil>};
+    
+    ey ::= $elem car;
+    ex ::= $elem cdr : car : car;
+    
+    move-to $geom $ey $sx;
+};
+
+CombiWindow method move-to-previous-search () {
+    
+};
+
+CombiWindow method move-to (geom y x) {
+
+    $geom set! ViewLine $new-line;
+    $geom set! CursorLine [$ey - $new-line];
+    $geom set! ViewColumn 0;
+    $geom set! CursorColumn $ex;
+    $geom set! IndexColumn.SAVE $ex;
 };

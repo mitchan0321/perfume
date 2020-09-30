@@ -16,6 +16,9 @@ WUtil method init () {
     if {! [defvar? CopyBuffer]} {
 	defvar CopyBuffer "";
     };
+    if {! [defvar? SearchString]} {
+	defvar SearchString "";
+    };
 };
 
 WUtil method color-pair (fg bg) {

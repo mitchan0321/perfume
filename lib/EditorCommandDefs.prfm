@@ -421,7 +421,7 @@ defcommand eval-region
     } {
 	$window display-evaluation ["Result[" . [type? [$result car]] "]=> " [$result car]];
     };
-    result SELF;
+    result ALL;
 };
 
 defcommand refresh-screen
@@ -861,6 +861,41 @@ defcommand miniwindow-input-sample
 	};
     };
     result ALL;
+};
+
+defcommand search
+{   | main window |
+    str ::= $window get-search-string;
+    $window start-search;
+    $main mini-input-start $str prompt: "Search: ";
+    $window set-search-result [$buff search $str];
+    
+    $main add-mini-input-callback $window {| main window in-key value |
+        if {eq? $in-key KEY_ESC} {
+	    $main mini-input-end;
+	    $window cancel-search $value;
+	    show-message "Search canceled.";
+	    return SELF;
+	};
+        if {eq? $in-key CTRL_M} {
+	    $main mini-input-end;
+	    $window end-search $value;
+	    show-message "Search complite.";
+	    return SELF;	    
+	};
+	if {eq? $in-key KEY_DOWN} {
+	    $window move-to-next-search;
+	};
+	if {eq? $in-key KEY_UP} {
+	    $window move-to-previous-search;
+	};
+	if {string? $in-key} {
+	    buff ::= $window get-buffer;
+	    $window set-search-result [$buff search $value];
+	    $window move-to-next-search;
+	};
+    };
+    result SELF;
 };
 
 ###
