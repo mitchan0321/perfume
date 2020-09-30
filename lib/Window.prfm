@@ -1,0 +1,503 @@
+class Window;
+
+Window method init (curs) {
+    sets RootWin $curs;
+    init-constructor;
+};
+
+Window method init-constructor () {
+    sets WindowList ();
+    $WindowList method string () {
+	s := "";
+	[self] each do: {| i |
+	    $s append! [$i string];
+	    $s append! "(";
+	    $s append! [$i get-buffer : get-buffer-name];
+	    $s append! ")";
+	    $s append! " ";
+	};
+	return $s;
+    };
+    (y x) ::= curs-get-screen-size $RootWin;
+    sets CursWin [curs-create-window $RootWin 0 0 [$y - 1] $x];
+    sets CursWinMini <nil>;
+    sets CreateWindowHook <nil>;
+    sets BufferBinding [dict];
+    sets MiniInput <nil>;
+    sets KeyEvent ();
+
+    ## Callback for MiniWindow input method.
+    ## MiniInputCallback list form is: (window closure)
+    sets MiniInputCallback ();
+
+    ## Event loop exit flag
+    sets EventLoopDone <nil>;
+
+    ### Background
+    sets Background ();
+};
+
+Window method get-curs () {
+    return $CursWin;
+};
+
+Window method get-curs-mini () {
+    return $CursWinMini;
+};
+
+Window method create-minibuffer-window () {
+    (y x) ::= curs-get-screen-size $RootWin;
+    sets CursWinMini [curs-new-window $RootWin [$y - 1] 0 1 $x];
+
+    (l c) ::= curs-get-screen-size $CursWinMini;
+    win ::= new MiniWindow init: ([self] 0 0 $l $c);
+
+    sets MiniWindow $win;
+    $MiniWindow set-window-name "MiniBuffer";
+    $MiniWindow activate;
+};
+
+Window method create-full-window (window-name: win-name) {
+    sets WindowList ();
+    (l c) ::= curs-get-screen-size $CursWin;
+    win ::= new CombiWindow init: ([self] 0 0 $l $c);
+    if {true? win-name} {
+	$win set-window-name $win-name;
+    } {
+	$win set-window-name "Window#1";
+    };
+    $WindowList <<- $win;
+    $WindowList car : activate;
+
+    $WindowList each do: {| w |
+	buff ::= $w get-buffer;
+	$MainWindow bind-buffer [$w get-window-name] $buff;
+    };
+};
+
+Window method next-window-name (win) {
+    n ::= $win split sep: "#" : get 1 : int : + 1;
+    if {$n > $MAX_WINDOW_DIVS} {n := 1};
+    return ["Window#" . $n];
+};
+
+Window method create-split-vertical-window (div: ndivs window-name: win-name) {
+    sets WindowList ();
+    if {set? ndivs} else: {set ndivs 2};
+    if {$ndivs < 2} then: {set ndivs 2};
+    if {$ndivs > $MAX_WINDOW_DIVS} then: {set ndivs $MAX_WINDOW_DIVS};
+    
+    (l c) ::= curs-get-screen-size $CursWin;
+    c-orig := $c;
+    c ::= $c / $ndivs;
+    w := 0;
+    1 each to: $ndivs do: {| win-ord |
+	if {$win-ord != $ndivs}
+	then: {
+	    win ::= new CombiWindow init: ([self] 0 $w $l $c);
+	}
+	else: {
+	    win ::= new CombiWindow init: ([self] 0 $w $l [$c-orig - [$c * [$ndivs - 1]]]);
+	};
+	if {true? win-name} {
+	    $win set-window-name $win-name;
+	    win-name ::= next-window-name $win-name;
+	} {
+	    $win set-window-name ["Window#" . $win-ord];
+	};
+	$WindowList <<- $win;
+	
+	w ::= $w + $c;
+    };
+    $WindowList car : activate;
+    $WindowList cdr : each do: {| i | $i diactivate};
+
+    $WindowList each do: {| w |
+	buff ::= $w get-buffer;
+	$MainWindow bind-buffer [$w get-window-name] $buff;
+    };
+};
+
+Window method create-split-horizontal-window (div: ndivs window-name: win-name) {
+    sets WindowList ();
+    if {set? ndivs} else: {set ndivs 2};
+    if {$ndivs < 2} then: {set ndivs 2};
+    if {$ndivs > $MAX_WINDOW_DIVS} then: {set ndivs $MAX_WINDOW_DIVS};
+    
+    (l c) ::= curs-get-screen-size $CursWin;
+    l-orig := $l;
+    l ::= $l / $ndivs;
+    w := 0;
+    1 each to: $ndivs do: {| win-ord |
+	if {$win-ord != $ndivs}
+	then: {
+	    win ::= new CombiWindow init: ([self] $w 0 $l $c);
+	}
+	else: {
+	    win ::= new CombiWindow init: ([self] $w 0 [$l-orig - [$l * [$ndivs - 1]]] $c);
+	};
+	if {true? win-name} {
+	    $win set-window-name $win-name;
+	    win-name ::= next-window-name $win-name;
+	} {
+	    $win set-window-name ["Window#" . $win-ord];
+	};
+	$WindowList <<- $win;
+	
+	w ::= $w + $l;
+    };
+    $WindowList car : activate;
+    $WindowList cdr : each do: {| i | $i diactivate};
+
+    $WindowList each do: {| w |
+	buff ::= $w get-buffer;
+	$MainWindow bind-buffer [$w get-window-name] $buff;
+    };
+};
+
+Window method create-split-cross-window (window-name: win-name) {
+    sets WindowList ();
+    (l c) ::= curs-get-screen-size $CursWin;
+    y0 := 0;
+    y1 ::= $l / 2;
+    x0 := 0;
+    x1 ::= $c / 2;
+
+    win ::= new CombiWindow init: ([self] 0 0 $y1 $x1);
+    if {set? win-name} {
+	$win set-window-name $win-name;
+	win-name ::= next-window-name $win-name;
+    } {
+	$win set-window-name "Window#1";
+    };
+    $WindowList <<- $win;
+
+    win ::= new CombiWindow init: ([self] 0 $x1 $y1 [$c - $x1]);
+    if {set? win-name} {
+	$win set-window-name $win-name;
+	win-name ::= next-window-name $win-name;
+    } {
+	$win set-window-name "Window#2";
+    };
+    $WindowList <<- $win;
+
+    win ::= new CombiWindow init: ([self] $y1 0 [$l - $y1] $x1);
+    if {set? win-name} {
+	$win set-window-name $win-name;
+	win-name ::= next-window-name $win-name;
+    } {
+	$win set-window-name "Window#3";
+    };
+    $WindowList <<- $win;
+    
+    win ::= new CombiWindow init: ([self] $y1 $x1 [$l - $y1] [$c - $x1]);
+    if {set? win-name} {
+	$win set-window-name $win-name;
+	win-name ::= next-window-name $win-name;
+    } {
+	$win set-window-name "Window#4";
+    };
+    $WindowList <<- $win;
+
+    $WindowList car : activate;
+    $WindowList cdr : each do: {| i | $i diactivate};
+
+    $WindowList each do: {| w |
+	buff ::= $w get-buffer;
+	$MainWindow bind-buffer [$w get-window-name] $buff;
+    };
+};
+
+Window method refresh () {
+    $MiniWindow refresh;
+    try {$WindowList each do: {| w | $w refresh}} catch: {};
+    get-current-window : apply {set-cursor; refresh};
+};
+
+Window method display-window-message (win msg) {
+    $WindowList . $MiniWindow : each do: {| i |
+	if {[$i get-window-name] = $win} {
+	    $i display $msg;
+	    refresh;
+	    return;
+	};
+    };
+    ##### throw ErrNoSuchWindow ["No such window name '" . $win "'"];
+};
+
+Window method clear-window (win) {
+    $WindowList . $MiniWindow : each do: {| i |
+	if {[$i get-window-name] = $win} {
+	    $i clear;
+	    return;
+	};
+    };
+};
+
+Window method get-minibuffer-window () {
+    return $MiniWindow;
+};
+
+Window method get-current-window () {
+    if $MiniInput {return $MiniWindow};
+    return [$WindowList car];
+};
+
+Window method roll-current-window () {
+    win ::= $WindowList >>;
+    $WindowList <<- $win;
+    $WindowList car : activate;
+    try {$WindowList cdr : each do: {| i | $i diactivate}} catch: {};
+    return [$WindowList car];
+};
+
+Window method roll-to-window (window-name) {
+    n ::= $WindowList map {| i | $i get-window-name} : find $window-name;
+    $n ?? {return};
+
+    if {$n = 0} else: {
+        1 each to: $n do: {
+	    win ::= $WindowList >>;
+	    $WindowList <<- $win;
+	};
+    };
+    $WindowList car : activate;
+    try {$WindowList cdr : each do: {| i | $i diactivate}} catch: {};
+    return [$WindowList car];
+};
+
+Window method next-buffer () {
+    win := $WindowList,0;
+
+    buff ::= BufferManager get-next-buffer [$win get-buffer];
+    win-name ::= $win get-window-name;
+    bind-buffer $win-name $buff;
+};
+
+Window method previous-buffer () {
+    win := $WindowList,0;
+
+    buff ::= BufferManager get-previous-buffer [$win get-buffer];
+    win-name ::= $win get-window-name;
+    bind-buffer $win-name $buff;
+};
+
+Window method bind-buffer (window-name buffer) {
+    window := <nil>;
+    $WindowList each do: {| i |
+	if {[$i get-window-name] = $window-name} {
+	    window := $i;
+	    break;
+	};
+    };
+    $window ?? {return};
+
+    # Save window buffer geometory
+    orig-buff ::= $window get-buffer;
+    if $orig-buff {
+	BufferManager set-buffer-geom $window-name [$orig-buff get-buffer-name];
+    };
+
+    # Restore window buffer geometory
+    $buffer ?? {return};
+
+    $window set-buffer $buffer;
+    geom ::= BufferManager get-buffer-geom $window-name [$buffer get-buffer-name];
+    BufferManager set-buffer-geom $window-name [$buffer get-buffer-name];
+};
+
+Window method unbind-buffer () {
+    kill-buff ::= get-current-window : get-buffer;
+    kill-buff-name ::= $kill-buff get-buffer-name;
+    next-buff ::= BufferManager get-next-buffer $kill-buff;
+    $kill-buff unregist-buffer;
+
+    $WindowList each do: {| i |
+	if {[$i get-buffer : get-buffer-name] = $kill-buff-name} {
+	    bind-buffer [$i get-window-name] $next-buff;
+	};
+    };
+};
+
+Window method render-all () {
+    $WindowList each do: {| i |
+	$i render;
+    };
+};
+
+Window method render (window-name) {
+    window := <nil>;
+    $WindowList each do: {| i |
+	if {[$i get-window-name] = $window-name} {
+	    window := $i;
+	    break;
+	};
+    };
+    $window ?? {return};
+    
+    $window render;
+};
+
+Window method add-create-window-hook (hook) {
+    sets CreateWindowHook $hook;
+};
+
+Window method resize-window () {
+    $MiniWindow destroy;
+    sets MiniWindow <nil>;
+    curs-destroy-window $CursWinMini;
+    $WindowList each do: {| w |
+        $BufferBinding set [$w get-window-name] [$w get-buffer];
+	$w destroy;
+    };
+    roll-to ::= $WindowList car : get-window-name;
+    sets WindowList ();
+    curs-destroy-window $CursWin;
+
+    (y x) ::= curs-get-screen-size $RootWin;
+    sets CursWin [curs-create-window $RootWin 0 0 [$y - 1] $x];
+    create-minibuffer-window;
+    if {block? $CreateWindowHook} {
+	$CreateWindowHook eval;
+    } {
+	create-full-window;
+    };
+
+    $WindowList each do: {| w |
+	win ::= $w get-window-name;
+	$win ?? {return};
+	buff ::= $BufferBinding get $win;
+	$buff ?? {return};
+	bind-buffer $win $buff;
+    };
+    roll-to-window $roll-to;
+};
+
+Window method key-event-loop () {
+    main ::= self;
+    key := "";
+    
+    while {true} do: {
+	if $EventLoopDone {break};
+
+	window ::= $main get-current-window;
+	if {$KeyEvent null?} {
+	    i ::= curs-keyin [$window get-curs] $INPUT_TIMEOUT $INPUT_ENCODING;
+	} {
+	    i := $KeyEvent;
+	    sets KeyEvent ();
+	};
+	if {$i null?} {
+	    if {background-exists?} {
+		try {
+		    exec-background;
+		    $main apply {render-all; refresh};
+		} catch: {| e |
+		    show-message ["Error at background: <" . [$e car] "># " [$e cdr]];
+		};
+	    };
+	    continue;
+	};
+	
+	#######
+	####### for debug display key in
+        #######
+	### if {[$key len] > 80} {key := ""; };
+	### $key append! ["" . [[integer? $i] ??? ["%02x" fmt $i] [result $i]] " "];
+	### $MainWindow display-window-message "MiniBuffer" ["%-100v" fmt $key];
+	### $MainWindow get-minibuffer-window : refresh;
+        #######
+
+	$i each do: {| k |
+	    if {eq? $k KEY_RESIZE} {
+		$main resize-window;
+		$main apply {render-all; refresh};
+		window ::= $main get-current-window;		
+		$window set-cursor;
+		continue;
+	    };
+		
+	    window ::= $main get-current-window;
+	    result ::= $window apply-keybind $main $window $k;
+	    cond
+	    {eq? $result ALL} {
+		$main apply {render-all; refresh};
+		if $MiniInput {$MiniWindow apply {render; refresh}};
+	    }
+	    {eq? $result SELF} {
+		window ::= $main get-current-window;
+		$window apply {render; refresh};
+	    }
+	    ;
+	    window ::= $main get-current-window;
+	    $window set-cursor;
+	};
+    };
+};
+
+Window method send-key-event (event-list) {
+    $KeyEvent concat! $event-list;
+};
+
+Window method mini-input-start (prompt: p init-value) {
+    sets MiniInput <t>;
+    sets MiniInputSave ([$WindowList,0 get-window-name] [$WindowList,0 get-buffer]);
+    if {set? p} {
+	$MiniWindow mini-input-start $p $init-value;
+    } {
+	$MiniWindow mini-input-start "" $init-value;
+    };
+};
+
+Window method mini-input-callback (in-key value) {
+    if {! [$MiniInputCallback null?]} {
+	try {
+	    yield $MiniInputCallback,1 $MainWindow $MiniInputCallback,0 $in-key $value;
+	}
+	catch: {| e |
+	    show-message ["Error happend at mini window input callback, <" . [$e car] "># " [$e cdr]];
+	    return <nil>;
+	};
+    };
+};
+
+Window method mini-input-end () {
+    sets MiniInput <nil>;
+    sets MiniInputCallback ();
+    if {list? $MiniInputSave} {
+	bind-buffer $MiniInputSave,0 $MiniInputSave,1;
+    };
+    $MiniWindow clear;
+};
+
+Window method mini-input-value-override (val index) {
+    $MiniWindow mini-input-value $val $index;
+};
+
+Window method add-mini-input-callback (window block) {
+    sets MiniInputCallback ($window $block);
+};
+
+Window method exit-event-loop () {
+    sets EventLoopDone <t>;
+};
+
+Window method add-background (body) {
+    if {block? $body} {
+	$Background <<- $body;
+    };
+};
+
+Window method exec-background () {
+    body ::= $Background ->>;
+    if {block? $body} {
+        yield $body [self] [get-current-window];
+    };
+};
+
+Window method background-exists? () {
+    if {[$Background len] > 0} {
+	return <t>;
+    };
+    return <nil>;
+};

@@ -1,85 +1,78 @@
-load-class :force BufferManager;
-load-class :force EditBuffer;
-load-class :force Window;
-load-class :force WindowBase;
-load-class :force WUtil;
-load-class :force BufferGeom;
+modules := (
+    BufferManager
+    BufferGeom
+    BufferBase
+    EditBuffer
+    ScratchBuffer
+    Window
+    WindowBase
+    CombiWindow
+    MiniWindow
+    WUtil
+);
 
-defun pmacs () {
+defun pmacs (trace: t) {
+    if {true? t} {
+	f := `File ("./trace.pmacs" mode: o);
+	trace 1 out: [$f fd?];
+    };
+
+    fun (modules) {
+	$modules each do: {| m |
+	    try    {load-class :force $m}
+	    catch: {| e | println ["Module load error at '" . $m "', error=" $e]};
+	};
+    } : $modules;
+
+    defvar stdin_orig  $stdin;
+    defvar stdout_orig $stdout;
+    defvar stderr_orig $stderr;
+
+    ### setvar stdin  [new InterpInputStream];
+    setvar stdin  [new Stream];
+    setvar stdout [new Stream];
+    setvar stderr [new Stream];
+    $stdin set-nolimit;
+    $stdout set-nolimit;
+    $stderr set-nolimit;
+    
     try {
 	defvar MainWindow [new Window init: ([curs-init])];
 	BufferManager init;
 	WUtil init;
-	
 	$MainWindow create-minibuffer-window;
-	
-	# $MainWindow create-full-window;
-	# $MainWindow create-split-vertical-window;
-        $MainWindow create-split-vertical-window div: 2;
-	# $MainWindow create-split-horizontal-window;
-	# $MainWindow create-split-horizontal-window div: 4;
 
-	$MainWindow roll-current-window;
-
-        $MainWindow display-window-message "MiniBuffer" "Hello";
-	# $MainWindow display-window-message "Window#1" "Hello Window#1\nabcdeあいうえお";
-	# $MainWindow display-window-message "Window#2" "Hello Window#2\nabcdeあいうえお";
-	# $MainWindow display-window-message "Window#3" "Hello Window#3\nabcdeあいうえお";
-	# $MainWindow display-window-message "Window#1" [$MainWindow get WindowList : string];
-
-	# USE CASE: "file open"
-
-	b ::= new EditBuffer;
-	$b load-content "/home/mit-sato/perfume/eval.c";
-        $MainWindow bind-buffer "Window#1" $b;
-
-	b ::= new EditBuffer;
-	$b load-content "/home/mit-sato/perfume/methods.c";
-	$MainWindow bind-buffer "Window#2" $b;
-
-	b ::= new EditBuffer;
-	$b load-content "/home/mit-sato/eval.c";
-	$MainWindow bind-buffer "Window#3" $b;
-
-	#b ::= new EditBuffer;
-	#$b load-content "/home/mit-sato/eval.c";
-	$MainWindow bind-buffer "Window#4" $b;
-
-	$MainWindow render-all;
-	$MainWindow refresh;
-	sleep 1000;
-        key := "";
-
-	while {true} do: {
-	    i ::= curs-keyin [$MainWindow get-current-window : get-curs] 100 $INPUT_ENCODING;
-	    if {$i null?} {continue};
-	    if {[$key len] > 80} {key := ""};
-	    $key append! ["" . [[integer? $i] ??? ["%02x" fmt $i] [result $i]] " "];
-	    $MainWindow display-window-message "MiniBuffer" ["%-89v" fmt $key];
-	    # $MainWindow render-all;
-	    $MainWindow refresh;
+	$MainWindow create-full-window;
+	$MainWindow add-create-window-hook {$MainWindow create-full-window};
+	$MainWindow add-background {
+	    | main window |
+	    $window apply-command $main $window "" bottom-of-buffer;
+	    ### $window apply-command $main $window "" start-region;
 	};
 
-REM {
-	$MainWindow roll-current-window;
-	$MainWindow roll-current-window;
-	$MainWindow bind-buffer
-	    [$MainWindow get-current-window : get-window-name]
-	    [BufferManager get-buffer "eval.c[2]"];
-	
 	$MainWindow render-all;
 	$MainWindow refresh;
-	sleep 500000;
-};
-	
+	$MainWindow key-event-loop;
     }
     fin: {
 	curs-terminate;
+	setvar stdin  $stdin_orig;
+	setvar stdout $stdout_orig;
+	setvar stderr $stderr_orig;
     }
     catch: {| e |
-	__error_info__ ::= "ERROR: <" . [$e car] "># " [$e cdr] "\n\n" $@stack-trace;
+	__error_info__ ::= "ERROR: <%v># %v\n\n%v" fmt [$e car] [$e cdr] $@stack-trace;
     }
     ;
 
     if {set? __error_info__} then: {println file: $stderr $__error_info__};
+};
+
+defun debug-message (msg wait: msec) {
+    if $MainWindow {
+	[$MainWindow get-minibuffer-window] ?? {throw ErrNoMiniBuffer "No MiniBuffer for debugging."};
+	$MainWindow display-window-message "MiniBuffer" ["DEBUG: %-80v" fmt $msg];
+	$MainWindow get-minibuffer-window : refresh;
+	if {set? msec} {sleep $msec};
+    };
 };

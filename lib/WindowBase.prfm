@@ -1,0 +1,76 @@
+class WindowBase;
+
+WindowBase method init () {
+    sets WinName <nil>;
+    sets Buffer <nil>;
+};
+
+WindowBase method set-window-name (name) {
+    sets WinName $name;
+};
+
+WindowBase method get-window-name () {
+    return $WinName;
+};
+
+WindowBase method set-buffer (buff) {
+    sets Buffer $buff;
+};
+
+WindowBase method get-buffer () {
+    $Buffer ?? {
+	sets Buffer [BufferManager get-buffer "*Scratch*"];
+    };
+    return $Buffer;
+};
+
+WindowBase method get-geom () {
+    win ::= get-window-name;
+    buff ::= get-buffer;
+    buff-name ::= $buff get-buffer-name;
+    return [BufferManager get-buffer-geom $win $buff-name];
+};
+
+WindowBase method activate (*) {
+    throw ErrNoMethodImpl ["No Impliment method '" . $@name "::activate'."];
+};
+
+WindowBase method diactivate (*) {
+    throw ErrNoMethodImpl ["No Impliment method '" . $@name "::diactivate'."];
+};
+
+WindowBase method refresh (*) {
+    throw ErrNoMethodImpl ["No Impliment method '" . $@name "::refresh'."];
+};
+
+WindowBase method display (*) {
+    throw ErrNoMethodImpl ["No Impliment method '" . $@name "::display'."];
+};
+
+WindowBase method render (*) {
+    throw ErrNoMethodImpl ["No Impliment method '" . $@name "::render'."];
+};
+
+WindowBase method clear (*) {
+    throw ErrNoMethodImpl ["No Impliment method '" . $@name "::clear'."];
+};
+
+WindowBase method set-cursor (*) {
+    throw ErrNoMethodImpl ["No Impliment method '" . $@name "::set-cursor'."];
+};
+
+WindowBase method get-curs (*) {
+    throw ErrNoMethodImpl ["No Impliment method '" . $@name "::get-curs'."];
+};
+
+WindowBase method destroy (*) {
+    throw ErrNoMethodImpl ["No Impliment method '" . $@name "::destroy'."];
+};
+
+WindowBase method string () {
+    return ["<" . [get-window-name] ">"];
+};
+
+WindowBase method display-evaluation () {
+    throw ErrNoMethodImpl ["No Impliment method '" . $@name "::display-evaluation'."];
+};

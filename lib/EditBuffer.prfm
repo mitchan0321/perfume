@@ -1,0 +1,304 @@
+class EditBuffer BufferBase;
+
+EditBuffer method init () {
+    init-constructor;
+};
+
+EditBuffer method init-constructor () {
+    sets Src <nil>;
+    sets File <nil>;
+    sets BufferName <nil>;
+    sets Modify <nil>;
+    sets NewFile <nil>;
+    sets UndoBuffer ();
+    sets RedoBuffer ();
+};
+
+EditBuffer method load-content (path init-only: init-flag buffer-name: buff-name) {
+    result := (<nil> "");
+    f ::= new File;
+    sets NewFile <nil>;
+    sets Src [vector];
+    if {[$path sub 0 1] = "/"} {path ::= path-adjust $path};
+    sets File $path;
+
+    if {! [set? init-flag]} {
+	try {
+	    if {or {file dir? $path} {and {file exists? $path} {! [file read? $path]}}} {
+		throw ErrFileSpec "File is directory or unreadable.";
+	    };
+	    if {file read? $path} {
+		$f open $path mode: i;
+		$f each do: {| r |
+		    $Src append! $r;
+		};
+		$f close;
+	        result := (<t> "");
+	    } {
+		sets NewFile <t>;
+	        result := (<t> "");		
+	    };
+	}
+	catch: {| e |
+	    result := (<nil> ["<" . [$e car] "># " [$e cdr]]);
+	}
+        fin: {
+	    $f close;
+	};
+    } {
+        result := (<t> "");
+	sets NewFile <nil>;
+	sets File <nil>;
+    };
+
+    if {$path = ""} {sets File "EDITOR_SAVE.pmacs"};
+    if {! [set? buff-name]} {
+	buff-name ::= $path split sep: "/" : last : car;
+	$buff-name ?? {buff-name := "*no named*"};
+    };
+    BufferManager regist-buffer [self] $buff-name;
+
+    sets UndoBuffer ();
+    sets RedoBuffer ();
+    sets Modify <nil>;
+    return $result;
+};
+
+EditBuffer method save-content (path: path) {
+    if {! [set? path]} {
+	path ::= get-path;
+    };
+    if {or {nil? $path} {$path = ""}} {return (<nil> ErrNoPathSpacified)};
+    if {[$path sub 0 1] = "/"} {path ::= path-adjust $path};
+    sets File $path;
+    
+    l ::= $path split sep: "/";
+    backup-path ::= $l <<- ["%" . [$l ->>] "%"] : join sep: "/";
+    mode := $DEFAULT_FILE_MODE;
+    if {file exists? $path} {
+	try {
+	    d ::= dict [file stat $path];
+	    mode ::= $d get mode;
+	} catch: {| e |
+	    return (<nil>
+		["<" . [$e car] "># " [$e cdr] ", at file mode get."]);
+	};
+    } {
+	backup-path := <nil>;
+    };
+    
+    f ::= new File;
+    try {
+	if $backup-path {
+	    $f open $backup-path mode: o;
+	} {
+	    $f open $path mode: o;
+	};
+    } catch: {| e |
+	$f close;
+	return (<nil>
+	    ["<" . [$e car] "># " [$e cdr] ", at create new file, "
+	     [$backup-path ??? $backup-path $path] "."]);
+    };
+
+    try {
+	if $Src {
+	    $Src each do: {| r |
+		$f puts $r;
+	    }
+	};
+	$f close;
+	if $backup-path {
+	    file chmod $backup-path $mode;
+        };
+    } catch: {| e |
+	$f close;
+	return (<nil>
+	    ["<" . [$e car] "># " [$e cdr] ", at file write."]);
+    };
+
+    if $backup-path {
+        try {
+	    file rm $path;
+	    file rename $backup-path $path;
+	} catch: {| e |
+		return (<nil>
+		    ["<" . [$e car] "># " [$e cdr] ", at file write."]);
+	};
+    };
+
+    sets UndoBuffer ();
+    sets RedoBuffer ();
+    sets Modify <nil>;
+    sets NewFile <nil>;
+    return (<t> Success);
+};
+
+EditBuffer method clear-all () {
+    sets Src [vector];
+};
+
+EditBuffer method unregist-buffer () {
+    BufferManager unregist-buffer $BufferName;
+};
+
+EditBuffer method get-path () {
+    return $File;
+};
+
+EditBuffer method buffer-select (from to block) {
+    $from each to: $to do: {| i |
+	if {and [$i < [$Src len]] [$i >= 0]}
+	then: {
+	    yield $block $Src,$i;
+	}
+	else: {
+	    yield $block "";
+	};
+    };
+};
+
+EditBuffer method get-buffer-line (line) {
+    $Src ?? {return <nil>};
+    if {$line < 0} {return <nil>};
+    if {$line >= [$Src len]} {
+	return <nil>;
+    } {
+	if {[$Src len] <= 0} {return <nil>};
+	return [$Src get $line];
+    };
+};
+
+EditBuffer method get-buffer-length () {
+    return [$Src ??? [$Src len] 0];
+};
+
+EditBuffer method insert-string-at (input y x) {
+    sets Modify <t>;
+    if {true? Src} {
+	result ::= $Src insert-string-at $input $y $x;
+	if $result,0 {$UndoBuffer << $result};
+	return ($result,3 $result,4);
+    };
+    return (0 0);
+};
+
+EditBuffer method delete-character-at (y x) {
+    sets Modify <t>;
+    if {true? Src} {
+	result ::= $Src delete-character-at $y $x;
+	if $result,0 {$UndoBuffer << $result};
+	return ($result,2 $result,3 $result,1);
+    };
+    return (0 0 "");
+};
+
+EditBuffer method backdelete-character-at (y x) {
+    sets Modify <t>;
+    if {true? Src} {
+	result ::= $Src backdelete-character-at $y $x;
+	if $result,0 {$UndoBuffer << $result};
+	return ($result,2 $result,3 $result,1);
+    };
+    return (0 0 "");
+};
+
+EditBuffer method append-string (str) {
+    sets Modify <t>;
+    if {true? Src} {
+	result ::= $Src append-string $str;
+	if $result,0 {$UndoBuffer << $result};
+	return ($result,1 $result,2)
+    };
+    return (0 0);
+};
+
+EditBuffer method undo () {
+    if {true? Src} {
+	if {! [$UndoBuffer null?]} {
+	    o ::= $UndoBuffer >>;
+	    result ::= call $Src $o;
+	    $RedoBuffer << $result;
+	    
+	    cmd := $o,0;
+
+	    cond
+	    {eq? $cmd delete-region} {
+		return ($o,1 $o,2);
+	    }
+	    {eq? $cmd insert-string-at} {
+		return ($o,2 $o,3);
+	    }
+	    {eq? $cmd insert-string-at-next} {
+	        line := $o,2;
+		col ::= $o,3 + 1;
+		if {$col > [$Src get $line : len]} {
+		    col := 0;
+		    line ::= $line + 1;
+		};
+		return ($line $col);
+	    }
+	};
+    };
+    return (<nil> <nil>);
+};
+
+EditBuffer method redo () {
+    if {true? Src} {
+	if {! [$RedoBuffer null?]} {
+	    o ::= $RedoBuffer >>;
+	    result ::= call $Src $o;
+	    $UndoBuffer << $result;
+	    
+	    cmd := $o,0;
+
+	    cond
+	    {eq? $cmd delete-region} {
+		return ($o,1 $o,2);
+	    }
+	    {eq? $cmd insert-string-at} {
+		return ($o,2 $o,3);
+	    }
+	    {eq? $cmd insert-string-at-next} {
+	        line := $o,2;
+		col ::= $o,3 + 1;
+		if {$col > [$Src get $line : len]} {
+		    col := 0;
+		    line ::= $line + 1;
+		};
+		return ($line $col);
+	    }
+	};
+    };
+    return (<nil> <nil>);
+};
+
+
+EditBuffer method modify? () {
+    return $Modify;
+};
+
+EditBuffer method no-modify () {
+    sets Modify <nil>;
+};
+
+EditBuffer method newfile? () {
+    return $NewFile;
+};
+
+EditBuffer method get-region-string (sy sx ey ex) {
+    if {true? Src} {
+	return [[$Src copy-region $sy $sx $ey $ex] get 1];
+    };
+    return <nil>;
+};
+
+EditBuffer method cut-region (sy sx ey ex) {
+    if {true? Src} {
+	str ::= [$Src copy-region $sy $sx $ey $ex] get 1;
+	result ::= $Src delete-region $sy $sx $ey $ex;
+	if $result,0 {$UndoBuffer << $result};
+	return ($str $result);
+    };
+    return ("" (<nil> 0 0));
+};

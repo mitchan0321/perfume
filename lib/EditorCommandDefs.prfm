@@ -1,0 +1,877 @@
+defcommand roll-current-window
+{   | main window |
+    $main roll-current-window;
+    result ALL;
+};
+
+defcommand full-window
+{   | main window |
+    name ::= $window get-window-name;
+    $main add-create-window-hook {$main create-full-window window-name: $name};
+    $main send-key-event (KEY_RESIZE);
+    result ALL;
+};
+
+defcommand split-vertical-window
+{   | main window |
+    name ::= $window get-window-name;
+    $main add-create-window-hook {$main create-split-vertical-window window-name: $name};
+    $main send-key-event (KEY_RESIZE);
+    result ALL;
+};
+
+defcommand split-vertical-window-3
+{   | main window |
+    name ::= $window get-window-name;
+    $main add-create-window-hook {$main create-split-vertical-window window-name: $name div: 3};
+    $main send-key-event (KEY_RESIZE);
+    result ALL;
+};
+
+defcommand split-vertical-window-4
+{   | main window |
+    name ::= $window get-window-name;
+    $main add-create-window-hook {$main create-split-vertical-window window-name: $name div: 4};
+    $main send-key-event (KEY_RESIZE);
+    result ALL;
+};
+
+defcommand split-horizontal-window
+{   | main window |
+    name ::= $window get-window-name;
+    $main add-create-window-hook {$main create-split-horizontal-window window-name: $name};
+    $main send-key-event (KEY_RESIZE);
+    result ALL;
+};
+
+defcommand split-horizontal-window-3
+{   | main window |
+    name ::= $window get-window-name;
+    $main add-create-window-hook {$main create-split-horizontal-window window-name: $name div: 3};
+    $main send-key-event (KEY_RESIZE);
+    result ALL;
+};
+
+defcommand split-horizontal-window-4
+{   | main window |
+    name ::= $window get-window-name;
+    $main add-create-window-hook {$main create-split-horizontal-window window-name: $name div: 4};
+    $main send-key-event (KEY_RESIZE);
+    result ALL;
+};
+
+defcommand split-cross-window
+{   | main window |
+    name ::= $window get-window-name;
+    $main add-create-window-hook {$main create-split-cross-window window-name: $name};
+    $main send-key-event (KEY_RESIZE);
+    result ALL;
+};
+
+defcommand next-buffer
+{   | main window |
+    $main next-buffer;
+    result ALL;
+};
+
+defcommand previous-buffer
+{   | main window |
+    $main previous-buffer;
+    result ALL;
+};
+
+defcommand next-page
+{   | main window |
+    $window page-down;
+    result SELF;
+};
+
+defcommand previous-page
+{   | main window |
+    $window page-up;
+    result SELF;
+};
+
+defcommand cursor-down
+{   | main window |
+    $window move-down;
+    result SELF;
+};
+
+defcommand cursor-up
+{   | main window |
+    $window move-up;
+    result SELF;
+};
+
+defcommand cursor-right
+{   | main window |
+    $window move-right;
+    result SELF;
+};
+
+defcommand cursor-left
+{   | main window |
+    $window move-left;
+    result SELF;
+};
+
+defcommand move-half-up
+{   | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (y x) ::= $window get-screen-size;
+
+    $window set-freecursor <t>;
+    new-y ::= $geom,ViewLine + [$y / 2];
+    if {$new-y > [[$buff get-buffer-length] - $y : + 1]} {new-y ::= [$buff get-buffer-length] - $y : + 1};
+    if {$new-y < 0} {new-y := 0};
+    $geom set! ViewLine $new-y;
+    
+    result SELF;
+};
+
+defcommand move-half-down
+{   | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (y x) ::= $window get-screen-size;
+
+    $window set-freecursor <t>;
+    new-y ::= $geom,ViewLine - [$y / 2];
+    if {$new-y < 0} {
+        new-y := 0;
+    };
+    $geom set! ViewLine $new-y;
+    
+    result SELF;
+};
+
+defcommand move-half-right
+{   | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (y x) ::= $window get-screen-size;
+
+    $window set-freecursor <t>;
+    new-x ::= $geom,ViewColumn + [$x / 4];
+    $geom set! ViewColumn $new-x;
+
+    result SELF;
+};
+
+defcommand move-half-left
+{   | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (y x) ::= $window get-screen-size;
+
+    $window set-freecursor <t>;
+    new-x ::= $geom,ViewColumn - [$x / 4];
+    if {$new-x < 0} {new-x := 0};
+    $geom set! ViewColumn $new-x;
+
+    result SELF;
+};
+
+defcommand cursor-top-of-line
+{   | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+
+    $window set-freecursor <nil>;
+    $geom set! ViewColumn 0;
+    $geom set! CursorColumn 0;
+    $geom set! IndexColumn.SAVE 0;
+    (y x) ::= $window get-screen-size;
+    $window fit-to-cursor $geom $y $x;    
+
+    result SELF;
+};
+
+defcommand cursor-end-of-line
+{   | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (cy cx) ::= $window get-source-index $buff $geom;
+    cx ::= $buff get-buffer-line $cy : len;
+    (line col) ::= $window get-cursor-index $buff $cy $cx;
+
+    $window set-freecursor <nil>;
+    $geom set! CursorColumn [$col - $geom,ViewColumn];
+    $geom set! IndexColumn.SAVE $col;
+    (y x) ::= $window get-screen-size;
+    $window fit-to-cursor $geom $y $x;
+    
+    result SELF;
+};
+
+defcommand smooth-scroll-down
+{   | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+
+    (y x) ::= $window get-screen-size;
+    new-y ::= $geom,ViewLine + 2;
+    if {$new-y > [[$buff get-buffer-length] - $y : + 1]} {new-y ::= [$buff get-buffer-length] - $y : + 1};
+    if {$new-y < 0} {new-y := 0};
+    $geom set! ViewLine $new-y;
+
+    result SELF;
+};
+
+defcommand smooth-scroll-up
+{   | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+
+    (y x) ::= $window get-screen-size;
+    new-y ::= $geom,ViewLine - 2;
+    if {$new-y < 0} {new-y := 0};
+    $geom set! ViewLine $new-y;
+
+    result SELF;
+};
+
+defcommand smooth-scroll-right
+{   | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (y x) ::= $window get-screen-size;
+
+    $window set-freecursor <t>;
+    new-x ::= $geom,ViewColumn + 2;
+    $geom set! ViewColumn $new-x;
+
+    result SELF;
+};
+
+defcommand smooth-scroll-left
+{   | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (y x) ::= $window get-screen-size;
+
+    $window set-freecursor <t>;
+    new-x ::= $geom,ViewColumn - 2;
+    if {$new-x < 0} {new-x := 0};
+    $geom set! ViewColumn $new-x;
+
+    result SELF;
+};
+
+defcommand top-of-buffer
+{   | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (y x) ::= $window get-screen-size;
+
+    $window set-freecursor <nil>;
+    $geom set! ViewLine 0;
+    $geom set! ViewColumn 0;
+    $geom set! CursorLine 0;
+    $geom set! CursorColumn 0;
+    $geom set! IndexColumn.SAVE 0;
+
+    result SELF;
+};
+
+defcommand bottom-of-buffer
+{   | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (y x) ::= $window get-screen-size;
+    buff-len ::= $buff get-buffer-length;
+
+    $window set-freecursor <nil>;
+    $geom set! ViewLine 0;
+    $geom set! ViewColumn 0;
+    $geom set! CursorLine 0;
+    $geom set! CursorColumn 0;
+    $geom set! IndexColumn.SAVE 0;
+    if {$buff-len < $y} {
+	$geom set! CursorLine $buff-len;
+    } {
+	$geom set! ViewLine [$buff-len - $y : + 1];
+	$geom set! CursorLine [$y - 1];
+    };
+    
+    result SELF;
+};
+
+defcommand show-character-code
+{   | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (cy cx) ::= $window get-source-index $buff $geom;
+    s ::= $buff get-buffer-line $cy;
+    $s ?? {
+	show-message "No character.";
+	return SELF;
+    };
+    c ::= $s sub $cx [$cx + 1];
+    if {$c != ""} {
+	i ::= $c uexport : car;
+	show-message ["Code: %v[u+%06x]" fmt $i $i];
+    } {
+	show-message "No character."
+    };
+    
+    result SELF;
+};
+
+defcommand input-character-code
+{   | main window |
+    $main mini-input-start "" prompt: "Input character code: u+";
+    $main add-mini-input-callback $window {| main window in-key value |
+        if {eq? $in-key KEY_ESC} {
+	    $main mini-input-end;
+	    show-message "Canceled.";
+	};
+        if {eq? $in-key CTRL_M} {
+	    $main mini-input-end;
+	    try {i ::= ["0x" . $value] int} catch: {
+		show-message "Bad hexadecimal.";
+		return SELF;
+	    };
+	    $window insert-string ["" uimport! ($i)];
+	};
+    };
+    result SELF;
+};
+
+defcommand insert-character
+{   | main window key |
+    $window insert-string $key;
+    result ALL;
+};
+
+defcommand insert-tab
+{   | main window |
+    $window insert-string "\t";
+    result ALL;
+};
+
+defcommand insert-return
+{   | main window |
+    $window insert-string "\r";
+    result ALL;
+};
+
+defcommand delete-character
+{   | main window |
+    $window delete-character;
+    result ALL;
+};
+
+defcommand backdelete-character
+{   | main window |
+    $window backdelete-character;
+    result ALL;
+};
+
+defcommand execute-command
+{   | main window |
+    $main mini-input-start "" prompt: "Command: ";
+    $main add-mini-input-callback $window {| main window in-key value |
+        if {eq? $in-key KEY_ESC} {
+	    $main mini-input-end;
+	    show-message "Canceled.";
+	};
+        if {eq? $in-key CTRL_M} {
+	    $main mini-input-end;
+	    try {
+	        result ::= $value eval;
+	        show-message ["Command result: " . [$result string]];
+            } catch: {| e |
+		show-message ["<" . [$e car ] "># " [$e cdr]];
+	    };
+	};
+    };
+    result ALL;
+};
+
+defcommand eval-region
+{   | main window |
+    buff ::= $window get-buffer;
+    [$window get-region] ?? {
+	show-message "Not start region. Press CTRL-SP to start region.";
+	$window end-region;
+	return SELF;
+    };
+    geom ::= $window get-geom;
+    (sy sx) ::= $window end-region;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    str ::= $window get-region-string $sy $sx $ey $ex;
+    if {! [defvar? INTERP_LOCAL]} {defvar INTERP_LOCAL [dict]};
+    try {
+	unset e;
+	unset result;
+	result ::= begin {
+	    if {! [exists? str]} {
+		alias up: 1 str str;
+	    };
+	    result ([$str eval]);
+	} local: $INTERP_LOCAL :rebase;
+    } catch: {| e |
+	result ::= "EXCEPTION: <" . [$e car] "># " [$e cdr];
+    };
+    if {set? e} {
+	$window display-evaluation $result;
+    } {
+	$window display-evaluation ["Result[" . [type? [$result car]] "]=> " [$result car]];
+    };
+    result SELF;
+};
+
+defcommand refresh-screen
+{   | main window |
+    $main send-key-event (KEY_RESIZE);
+};
+
+defcommand flash
+{   | main window |
+    curs-flash;
+    result ALL;
+};
+
+defcommand open-file
+{   | main window |
+    $main mini-input-start [pwd : . "/"] prompt: "Open file: ";
+    $main add-mini-input-callback $window {| main window in-key value |
+        if {eq? $in-key KEY_ESC} {
+	    $main mini-input-end;
+	    show-message "Canceled.";
+	    BufferManager unregist-buffer "*Directory*";	
+	};
+        if {eq? $in-key CTRL_M} {
+	    $main mini-input-end;
+	    if {[$value len] = 0} {
+		show-message "No file name specified.";
+	    };
+	    buff ::= new EditBuffer;
+	    (result err) ::= $buff load-content [
+		path-adjust [{[$value sub 0 1] = "/"} ???
+		    $value
+		    [pwd : . "/" $value]]
+	    ];
+	    $MainWindow bind-buffer [$window get-window-name] $buff;
+	    $result ?? {show-message ["Open Failed, path: " . $value " ("  $err ")"]};
+	    BufferManager unregist-buffer "*Directory*";
+	};
+	if {eq? $in-key CTRL_I} {
+	    fname ::= show-files-in-window $main $window $value;
+	    $window apply-command $main $window "" top-of-buffer;
+	    $main mini-input-value-override $fname [$fname len];
+	    return ALL;
+	};
+	if {eq? $in-key KEY_DOWN} {
+	    $window apply-command $main $window "" move-half-up;
+	    return SELF;
+	};
+	if {eq? $in-key KEY_UP} {
+	    $window apply-command $main $window "" move-half-down;
+	    return SELF;
+	};
+    };
+    result SELF;
+};
+
+##
+## Nested callback sample.
+## $value was save to path variable in 1st callback, because $value is override by 2nd callback.
+##
+defcommand nest-test
+{   | main window |
+    $main mini-input-start "" prompt: "test [y(es)/n(o)]";
+    $main add-mini-input-callback $window {| main window in-key value |
+	if {eq? $in-key "y"} {
+	    $main mini-input-end;
+	    path := $value;
+	    $main mini-input-start "" prompt: "test 2 [o(k)/n(g)]";
+	    $main add-mini-input-callback $window {| main window in-key value |
+		if {eq? $in-key "o"} {
+		    $main mini-input-end;
+		    debug-message ["path value is: " . $path ", value is: " $value];
+		};
+	    };
+	};
+    };
+};
+
+defcommand save-buffer
+{   | main window |
+    buff ::= $window get-buffer;
+    path ::= $buff get-path;
+
+    if {or {nil? $path} {$path = ""}} {
+	$main mini-input-start [pwd : . "/"] prompt: "Save file name: ";
+	$main add-mini-input-callback $window {| main window in-key value |
+	    if {eq? $in-key KEY_ESC} {
+		$main mini-input-end;
+		show-message "Canceled.";
+		BufferManager unregist-buffer "*Directory*";	
+	    };
+	    if {eq? $in-key CTRL_I} {
+		fname ::= show-files-in-window $main $window $value;
+	        $window apply-command $main $window "" top-of-buffer;
+		$main mini-input-value-override $fname [$fname len];
+		return ALL;
+	    };
+	    if {eq? $in-key KEY_DOWN} {
+		$window apply-command $main $window "" move-half-up;
+		return SELF;
+	    };
+	    if {eq? $in-key KEY_UP} {
+		$window apply-command $main $window "" move-half-down;
+		return SELF;
+	    };
+	    if {eq? $in-key CTRL_M} {
+		$main mini-input-end;
+		path ::= path-adjust [{[$value sub 0 1] = "/"} ???
+		    $value
+		    [pwd : . "/" $value]];
+
+		if [file exists? $path] {
+		    $main mini-input-start "" prompt: "File already exist, overwrite? [yes or ESC]: ";
+		    $main add-mini-input-callback $window {| main window in-key value |
+			if {eq? $in-key KEY_ESC} {
+			    $main mini-input-end;
+			    show-message "Canceled.";
+			    BufferManager unregist-buffer "*Directory*";
+			    return SELF;
+			};
+			if {and {eq? $in-key CTRL_M} {eq? $value "yes"}} {
+			    $main mini-input-end;
+			    (result err) ::= $buff save-content path: $path;
+			    if $result {
+				show-message "Save Done.";
+			    } {
+				show-message ["Save Failed, path: " . $path " (" $err ")"];
+			    };
+			    BufferManager unregist-buffer "*Directory*";
+			    return SELF;
+			};
+		    };
+		} {
+		    $main mini-input-end;
+		    (result err) ::= $buff save-content path: $path;
+		    if $result {
+			show-message "Save Done.";
+		    } {
+			show-message ["Save Failed, path: " . $path " (" $err ")"];
+		    };
+		    BufferManager unregist-buffer "*Directory*";
+		    return SELF;
+		};
+	    };
+	};
+	return SELF
+    };
+
+    $main mini-input-start "" prompt: ["Save file? (" . $path ") [y/n]: "];
+    $main add-mini-input-callback $window {| main window in-key value |
+	    if {or {eq? $in-key KEY_ESC} {eq? $value "n"} {eq? $value "N"}} {
+	    $main mini-input-end;
+	    show-message "Canceled.";
+	    BufferManager unregist-buffer "*Directory*";	
+	};
+        if {or {$value = "y"} {$value = "Y"}} {
+	    $main mini-input-end;
+	    (result err) ::= $buff save-content;
+	    if $result {
+		show-message "Save Done.";
+	    } {
+		show-message ["Save Failed, path: " . $path " (" $err ")"];
+	    };
+	    return SELF;
+	    BufferManager unregist-buffer "*Directory*";	
+	};
+    };
+    result SELF;
+};
+
+defcommand save-buffer-as
+{   | main window |
+    buff ::= $window get-buffer;
+    path ::= $buff get-path;
+
+    $main mini-input-start [pwd : . "/"] prompt: "Save file name: ";
+    $main add-mini-input-callback $window {| main window in-key value |
+	if {eq? $in-key KEY_ESC} {
+	    $main mini-input-end;
+	    show-message "Canceled.";
+	    BufferManager unregist-buffer "*Directory*";	
+	};
+	if {eq? $in-key CTRL_I} {
+	    fname ::= show-files-in-window $main $window $value;
+	    $window apply-command $main $window "" top-of-buffer;
+	    $main mini-input-value-override $fname [$fname len];
+	    return ALL;
+	};
+	if {eq? $in-key KEY_DOWN} {
+	    $window apply-command $main $window "" move-half-up;
+	    return SELF;
+	};
+	if {eq? $in-key KEY_UP} {
+	    $window apply-command $main $window "" move-half-down;
+	    return SELF;
+	};
+	if {eq? $in-key CTRL_M} {
+	    $main mini-input-end;
+	    path ::= path-adjust [{[$value sub 0 1] = "/"} ???
+		$value
+		[pwd : . "/" $value]];
+
+	    if [file exists? $path] {
+	       $main mini-input-start "" prompt: "File already exist, overwrite? [yes or ESC]: ";
+	       $main add-mini-input-callback $window {| main window in-key value |
+		   if {eq? $in-key KEY_ESC} {
+		       $main mini-input-end;
+		       show-message "Canceled.";
+		       BufferManager unregist-buffer "*Directory*";
+		       return SELF;
+		   };
+		   if {and {eq? $in-key CTRL_M} {eq? $value "yes"}} {
+		       $main mini-input-end;
+		       (result err) ::= $buff save-content path: $path;
+		       if $result {
+			   show-message "Save Done.";
+		       } {
+			   show-message ["Save Failed, path: " . $path " (" $err ")"];
+		       };
+		       BufferManager unregist-buffer "*Directory*";
+		       return SELF;
+		   };
+	       };
+	    } {
+		$main mini-input-end;
+		(result err) ::= $buff save-content path: $path;
+		if $result {
+		    show-message "Save Done.";
+		    } {
+		show-message ["Save Failed, path: " . $path " (" $err ")"];
+		};
+		BufferManager unregist-buffer "*Directory*";
+		return SELF;
+	    };
+	};
+    };
+    result SELF;
+};
+
+defcommand kill-buffer
+{   | main window |
+    buff ::= $window get-buffer;
+    if [$buff modify?] {
+	$main mini-input-start "" prompt: "This buffer is modified, realy kill? [yes or ESC]: ";
+	$main add-mini-input-callback $window {| main window in-key value |
+	    if {eq? $in-key KEY_ESC} {
+		$main mini-input-end;
+		show-message "Canceled.";
+		return ALL;
+	    };
+	    if {and {eq? $in-key CTRL_M} {eq? $value "yes"}} {
+		$main mini-input-end;
+		$main unbind-buffer;
+		return ALL;
+	    };
+	};
+	return ALL;
+    };
+    $main unbind-buffer;
+    result ALL;
+};
+
+defcommand describe-key
+{   | main window |
+    BufferManager unregist-buffer "*Describe Key*";
+    buff ::= new EditBuffer;
+    $buff load-content "describe key" :init-only buffer-name: "*Describe Key*";
+    $buff clear-all;
+
+    $buff append-string ["%-15v\t%-v" fmt "Key" "Command"];
+    $buff append-string ["%-15v\t%-v" fmt "---" "-------"];
+    d ::= $window get KeyBinding;
+    l := ();
+    $d each do: {| k v |
+	if {nil? $v} {continue};
+	$l << ["%-15v\t%-v" fmt $k $v];
+    };
+    msort $l : each do: {| i |
+	$buff append-string $i;
+    };
+    $buff no-modify;
+    
+    $main bind-buffer [$window get-window-name] $buff;
+    result SELF;
+};
+
+defcommand buffer-list
+{   | main window |
+    BufferManager unregist-buffer "*Buffer List*";
+    buff ::= new EditBuffer;
+    $buff load-content "buffer list" :init-only buffer-name: "*Buffer List*";
+    $buff clear-all;
+
+    $buff append-string ["%1v %-3v %-16v %6v %-v" fmt " " "New" "Buffer Name" "Length" "File Path"];
+    $buff append-string ["%1v %-3v %-16v %6v %-v" fmt "-" "---" "-----------" "------" "---------"];
+    l ::= BufferManager get-buffer-list;
+    $l each do: {| buff-name |
+	display-buffer ::= BufferManager get-buffer $buff-name;
+	$buff append-string [
+	    "%1v %-3v %-16v %6d %-v" fmt
+	    [[$display-buffer modify?] ??? "*" " "]
+	    [[$display-buffer newfile?] ??? "new" "   "]
+	    $buff-name
+	    [$display-buffer get-buffer-length]
+	    [$display-buffer get-path]
+	    ];
+    };
+    $buff no-modify;
+    
+    $main bind-buffer [$window get-window-name] $buff;
+    result SELF;
+};
+
+defcommand undo-buffer
+{   | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (new-y new-x) ::= $buff undo;
+    $new-y ?? {
+	show-message "Undo buffer is empty.";
+	return SELF;
+    };
+    (line col) ::= $window get-cursor-index $buff $new-y $new-x;
+    $window set-freecursor <nil>;
+    $geom set! IndexColumn.SAVE $col;
+    $geom set! CursorLine [$line - $geom,ViewLine];
+    $geom set! CursorColumn [$col - $geom,ViewColumn];
+
+    (y x) ::= $window get-screen-size;
+    $window fit-to-cursor $geom $y $x;
+    result ALL;
+};
+
+defcommand redo-buffer
+{   | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (new-y new-x) ::= $buff redo;
+    $new-y ?? {
+	show-message "Redo buffer is empty.";
+	return SELF;
+    };
+    (line col) ::= $window get-cursor-index $buff $new-y $new-x;
+    $window set-freecursor <nil>;
+    $geom set! IndexColumn.SAVE $col;
+    $geom set! CursorLine [$line - $geom,ViewLine];
+    $geom set! CursorColumn [$col - $geom,ViewColumn];
+
+    (y x) ::= $window get-screen-size;
+    $window fit-to-cursor $geom $y $x;
+    result ALL;
+};
+
+defcommand start-region
+{   | main window |
+    buff ::= $window get-buffer;
+    if [$window get-region] {
+	show-message "End region.";
+	$window end-region;
+	return SELF;
+    };
+    geom ::= $window get-geom;
+    (cy cx) ::= $window get-source-index $buff $geom;
+    $window start-region $cy $cx;
+    show-message "Start region.";
+    result SELF;
+};
+
+defcommand copy-region
+{   | main window |
+    buff ::= $window get-buffer;
+    [$window get-region] ?? {
+	show-message "Not start region. Press CTRL-SP to start region.";
+	$window end-region;
+	return SELF;
+    };
+    geom ::= $window get-geom;
+    (sy sx) ::= $window end-region;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    $window copy-region $sy $sx $ey $ex;
+    show-message "Copied.";
+    result SELF;
+};
+
+defcommand cut-region
+{   | main window |
+    buff ::= $window get-buffer;
+    [$window get-region] ?? {
+	show-message "Not start region. Press CTRL-SP to start region.";
+	$window end-region;
+	return SELF;
+    };
+    geom ::= $window get-geom;
+    (sy sx) ::= $window end-region;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    (line col) ::= $window cut-region $sy $sx $ey $ex;
+    show-message "Cut.";
+    $window set-freecursor <nil>;
+    $geom set! IndexColumn.SAVE $col;
+    $geom set! CursorLine [$line - $geom,ViewLine];
+    $geom set! CursorColumn [$col - $geom,ViewColumn];
+
+    (y x) ::= $window get-screen-size;
+    $window fit-to-cursor $geom $y $x;
+    result ALL;
+};
+
+defcommand paste-buffer
+{   | main window |
+    buff ::= $window get-buffer;
+    str ::= $window get-copy-buffer;
+    if {$str = ""} {
+	show-message "Copy buffer is empty.";
+	return SELF;
+    };
+    geom ::= $window get-geom;
+    (sy sx) ::= $window get-source-index $buff $geom;
+    (cy cx) ::= $buff insert-string-at $str $sy $sx;
+    show-message "Paste.";
+    (line col) ::= $window get-cursor-index $buff $cy $cx;
+    $window set-freecursor <nil>;
+    $geom set! IndexColumn.SAVE $col;
+    $geom set! CursorLine [$line - $geom,ViewLine];
+    $geom set! CursorColumn [$col - $geom,ViewColumn];
+
+    (y x) ::= $window get-screen-size;
+    $window fit-to-cursor $geom $y $x;
+    result ALL;
+};
+
+defcommand miniwindow-input-sample
+{   | main window |
+    $main mini-input-start "" prompt: "test prompt: ";
+    $main add-mini-input-callback $window {| main window in-key value |
+        if {eq? $in-key KEY_ESC} {
+	    $main mini-input-end;
+	    debug-message ["input data: " . $value];
+	};
+    };
+    result ALL;
+};
+
+###
+### REMARK, Spare for new editor command making.
+REM {
+
+defcommand 
+{   | main window |
+};
+
+};
+### END REMARK
+###
+

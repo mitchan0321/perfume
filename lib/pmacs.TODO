@@ -1,0 +1,48 @@
+<><><><><><><><><><><><><>
+<><>    pmacs TODO    <><>
+<><><><><><><><><><><><><>
+
+これから pmacs で実現したいこと。
+
+・【済】2020/09/26 リージョン選択
+・【済】2020/09/26 Cut/Copy/Paste
+・【済】2020/09/26 Undo/Redo
+・リージョン選択時のハイライト
+・インクリメンタルサーチ
+・予約語ハイライト
+・【済】2020/09/28 ウィンドウ内でのPerfumeインタプリタの実行
+・ファイル名入力補完
+・メニュー
+・バッファリスト
+・ヘルプ表示
+・バッファリストの保存
+
+<>カラーパターン1
+- アクティブウィンドウだけ明るい
+$ColorDB set EDIT_BUFFER                [WUtil color-pair BLACK   WHITE   ];
+$ColorDB set ACTIVE_STATUS_LINE         [WUtil color-pair BLACK   CYAN    ];
+$ColorDB set ACTIVE_VERT_LINE           [WUtil color-pair BLACK   CYAN    ];
+$ColorDB set ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair CYAN    BLUE    ];
+$ColorDB set INACTIVE_EDIT_BUFFER       [WUtil color-pair WHITE   BLACK   ];
+$ColorDB set INACTIVE_STATUS_LINE       [WUtil color-pair CYAN    BLUE    ];
+$ColorDB set INACTIVE_VERT_LINE         [WUtil color-pair CYAN    BLUE    ];
+$ColorDB set INACTIVE_VERT_LINE_HILIGHT [WUtil color-pair CYAN    BLACK   ];
+$ColorDB set MINI_WINDOW                [WUtil color-pair WHITE   BLACK   ];
+$ColorDB set EOF_MARK			[WUtil color-pair BLACK   GREEN   ];
+$ColorDB set REGION_HILIGHT		[WUtil color-pair WHITE   BLUE    ];
+
+<>カラーパターン2
+- 全部黒い
+$ColorDB set EDIT_BUFFER                [WUtil color-pair WHITE   BLACK   ];
+$ColorDB set ACTIVE_STATUS_LINE         [WUtil color-pair BLACK   WHITE   ];
+$ColorDB set ACTIVE_VERT_LINE           [WUtil color-pair BLACK   WHITE   ];
+$ColorDB set ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair BLACK   CYAN    ];
+$ColorDB set INACTIVE_EDIT_BUFFER       [WUtil color-pair CYAN    BLACK   ];
+$ColorDB set INACTIVE_STATUS_LINE       [WUtil color-pair CYAN    BLUE    ];
+$ColorDB set INACTIVE_VERT_LINE         [WUtil color-pair CYAN    BLUE    ];
+$ColorDB set INACTIVE_VERT_LINE_HILIGHT [WUtil color-pair CYAN    BLACK   ];
+$ColorDB set MINI_WINDOW                [WUtil color-pair WHITE   BLACK   ];
+$ColorDB set EOF_MARK			[WUtil color-pair BLACK   GREEN   ];
+$ColorDB set REGION_HILIGHT		[WUtil color-pair WHITE   BLUE    ];
+
+#eof

@@ -700,6 +700,8 @@ search_method(Toy_Interp *interp, Toy_Type *object, Toy_Type *method) {
 
 error:
     msg = new_cell(L"No such method, '");
+    cell_add_str(msg, to_string(object));
+    cell_add_str(msg, L"::");
     cell_add_str(msg, to_string(method));
     cell_add_str(msg, L"'.");
 

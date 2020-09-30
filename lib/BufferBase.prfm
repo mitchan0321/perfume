@@ -1,0 +1,25 @@
+class BufferBase;
+
+BufferBase method set-buffer-name (name) {
+    sets BufferName $name;
+};
+
+BufferBase method get-buffer-name () {
+    return $BufferName;
+};
+
+BufferBase method load-content (path) {
+    throw ErrNoMethodImpl ["No Impliment method '" . $@name "::load-content'."];
+};
+
+BufferBase method buffer-select (from to block) {
+    throw ErrNoMethodImpl ["No Impliment method '" . $@name "::buffer-select'."];
+};
+
+BufferBase method get-buffer-length () {
+    throw ErrNoMethodImpl ["No Impliment method '" . $@name "::get-buffer-length'."];
+};
+
+BufferBase method modify? () {
+    throw ErrNoMethodImpl ["No Impliment method '" . $@name "::modify?'."];
+};

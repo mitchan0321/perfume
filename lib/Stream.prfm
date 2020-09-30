@@ -20,6 +20,7 @@
 #     Stream::set-limit ---- set buffer length limit.
 #     Stream::set-nolimit -- set buffer length nolimit.
 #     Stream::get-count ---- get buffer length.
+#     Stream::set-itemlimit -- set buffer item limit.
 #     -- Thease methods are Stream clases special methods.
 #
 
@@ -31,10 +32,12 @@ Stream method init (args: a) {
     sets co <nil>;
     sets name "";
     if [and [set? a] [! [$a null?]]] then: {sets name [$a item]};
-    sets limit 512;
+    sets limit 2048;
 #    sets limit 5;	# for debug
     sets count 0;
     sets newline <nil>;
+    sets itemlimit 4096;
+    sets itemcount 0;
 };
 
 Stream method eof? () {
@@ -47,6 +50,8 @@ Stream method close () {
 };
 
 Stream method clear () {
+    sets count 0;
+    sets itemcount 0;
     sets eof <nil>;
 };
 
@@ -55,14 +60,16 @@ Stream method ready? (timeout: timeout) {
 };
 
 Stream method puts (nonewline: nonewline args: r) {
+    lnewline := <t>;
+    if {set? nonewline} {lnewline := <nil>};
     if {[$r len] = 0} then: {throw ErrSyntax "Syntax error at 'puts', syntax: Stream puts [:nonewline] val ..."};
-    $r each do: {| i | puts-sub $i};
+    $r each do: {| i | puts-sub $i $lnewline};
 };
 
-Stream method puts-sub (i) {
+Stream method puts-sub (i lnewline) {
     if [eof?] then: {throw ErrFileAccess "Stream is closed."};
 
-    while {$count >= $limit} do: {
+    while {or {$itemcount >= $itemlimit} {$count >= $limit}} do: {
 	if $co then: {
 	    pause @WRITE;
         } else: {
@@ -72,11 +79,29 @@ Stream method puts-sub (i) {
     };
    
     if {sets? shortcut} then: {
-	sets shortcut [$shortcut append! $i];
+	if $lnewline {
+	    sets shortcut [$shortcut append! $i];
+	    $count ++;
+	} {
+	    if {string? [$shortcut last : car]} {
+		$shortcut last : car : append! $i;
+		$itemcount ++;
+	    } {
+		sets shortcut [$shortcut append! ["" . $i]];
+		$count ++;
+		$itemcount ++;
+	    };
+	};
     } else: {
-	sets shortcut [$queue append! $i];
+	if $lnewline {
+	    sets shortcut [$queue append! $i];
+	    $count ++;
+	} {
+	    sets shortcut [$queue append! ["" . $i]];
+	    $count ++;
+	    $itemcount ++;
+	};
     };
-    $count ++;
 
     return <t>;
 };
@@ -94,6 +119,7 @@ Stream method gets (nonewline: nonewline) {
     };
     
     $count --;
+    itemcount := 0;
     if {$count = 0} then: {unsets shortcut};
     $queue >>;
 };
@@ -103,8 +129,11 @@ Stream method flush () {
 };
 
 Stream method stat () {
-    return ((fd . <nil>) (mode . io) (path . $name) (eof . $eof)
-	    (limit . $limit) (count . $count) (newline . $newline));
+    return (
+	    (fd . <nil>) (mode . io) (path . $name) (eof . $eof)
+	    (limit . $limit) (count . $count) (newline . $newline)
+	    (itemlimit . $itemlimit) (itemcount . $itemcount)
+	   );
 };
 
 Stream method each (do: body) {
@@ -125,6 +154,10 @@ Stream method set-limit (l) {
 
 Stream method set-nolimit () {
     sets limit [2 ^ 32 : - 1];
+};
+
+Stream method set-itemlimit (l) {
+    sets itemlimit $l;
 };
 
 Stream method get-count () {

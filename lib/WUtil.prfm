@@ -1,0 +1,637 @@
+class WUtil;
+
+WUtil method init () {
+    init-config;
+    init-color-DB;
+    init-command-DB;
+
+    # Ommit exit command.
+    d ::= dict-func;
+    f ::= $d get exit;
+
+    $d unset exit;
+    $d set _exit $f;
+    defun exit () {$MainWindow exit-event-loop};
+
+    if {! [defvar? CopyBuffer]} {
+	defvar CopyBuffer "";
+    };
+};
+
+WUtil method color-pair (fg bg) {
+    if {sets? ColorPair} else: {
+	sets ColorPair [dict];
+	$ColorPair set count 0;
+    };
+    if {sets? ColorName} else: {
+	sets ColorName [dict];
+	$ColorName set BLACK   0;
+	$ColorName set RED     1;
+	$ColorName set GREEN   2;
+	$ColorName set YELLOW  3;
+	$ColorName set BLUE    4;
+	$ColorName set MAGENTA 5;
+	$ColorName set CYAN    6;
+	$ColorName set WHITE   7;
+    };
+
+    if {$ColorName set? $fg} else: {throw ErrNoSuchColorName "No such foreground color name."};
+    if {$ColorName set? $bg} else: {throw ErrNoSuchColorName "No such background color name."};    
+
+    if {$ColorPair set? ($ColorName,$fg $ColorName,$bg)}
+    then: {
+	return [$ColorPair get ($ColorName,$fg $ColorName,$bg)];
+    }
+    else: {
+	p ::= $ColorPair get count;
+	p ::= $p + 1;
+	curs-add-color $p $ColorName,$fg $ColorName,$bg;
+	$ColorPair set ($ColorName,$fg $ColorName,$bg) $p;
+	$ColorPair set $p ($ColorName,$fg $ColorName,$bg);
+	$ColorPair set count $p;
+	return $p;
+    };
+};
+
+WUtil method get-bgcolor (name) {
+    n ::= $ColorDB get $name;
+    $n ?? {throw ErrNoSuchColor ["WUtil::get-bgcolor: No such color DB name, " . $name]};
+    try {
+	(fg bg) ::= $ColorPair get $n;
+    }
+    catch: {throw ErrNoSuchColor ["WUtil::get-bgcolor: No color pair no, " . $n]};
+    return $bg;
+};
+
+WUtil method get-fgcolor (name) {
+    n ::= $ColorDB get $name;
+    $n ?? {throw ErrNoSuchColor ["WUtil::get-fgcolor: No such color DB name, " . $name]};
+    try {
+	(fg bg) ::= $ColorPair get $n;
+    }
+    catch: {throw ErrNoSuchColor ["WUtil::get-fgcolor: No color pair no, " . $n]};
+    return $fg;
+};
+
+defun init-config () {
+    if {defvar? PMACS_INIT}
+    else: {
+	$LIB_PATH each do: {| i |
+	    if {file exists? [$i . "/pmacs.conf"]} {
+		load [$i . "/pmacs.conf"];
+		break;
+	    };
+	};
+	defvar PMACS_INIT <t>;
+    };
+};
+
+defun init-color-DB () {
+    if [defvar? ColorDB] else: {
+	defvar ColorDB [dict];
+    };
+
+    $LIB_PATH each do: {| i |
+	if {file exists? [$i . "/color-defs.prfm"]} {
+	   load [$i . "/color-defs.prfm"];
+	   break;
+	};
+    };
+};
+
+defun init-command-DB () {
+    if {defvar? EditorCommand}
+    else: {
+	defvar EditorCommand [dict];
+    };
+
+    $LIB_PATH each do: {| i |
+	if {file exists? [$i . "/EditorCommandDefs.prfm"]} {
+	    load [$i . "/EditorCommandDefs.prfm"];
+	    break;
+	};
+    };
+};
+
+defun defcommand (name block) {
+    $EditorCommand set $name $block;
+};
+
+defun get-command (name) {
+    $EditorCommand get $name;
+};
+
+defun set-window-color-default (curs name) {
+    curs-set-bgcolor $curs [$ColorDB get $name];
+    curs-set-color   $curs [$ColorDB get $name];
+};
+
+defun line-input (curs disp-line disp-col input-len cur-index cur-val key-in) {
+    curs-print $curs ["%-" . $input-len "v" : fmt ""] $DISPLAY_ENCODING $disp-line $disp-col;
+    curs-render-line $curs $disp-line 0 $disp-col $cur-val $DEFAULT_TAB_WIDTH $DISPLAY_ENCODING;
+    v ::= vector($cur-val);
+    new-x := $cur-index;
+    cond
+    {string? $key-in} {
+	curs-x ::= curs-index-to-pos $cur-val [$cur-val len] $DEFAULT_TAB_WIDTH;
+	if {$curs-x < $input-len} {
+	    (command start-y start-x new-y new-x) ::= $v insert-string-at $key-in 0 $cur-index;
+	};
+    }
+    {eq? $key-in KEY_RIGHT} {
+	new-x ::= $cur-index + 1;
+	if {$new-x > [$v get 0 : len]} {
+	    new-x := [$v get 0 : len];
+	};
+    }
+    {eq? $key-in KEY_LEFT} {
+	new-x ::= $cur-index - 1;
+	if {$new-x < 0} {new-x := 0};
+    }
+    {or [eq? $key-in KEY_BACKSPACE] [eq? $key-in CTRL_H]} {
+	(command char new-y new-x) ::= $v backdelete-character-at 0 $cur-index;
+    }
+    {eq? $key-in KEY_DC} {
+	(command char new-y new-x) ::= $v delete-character-at 0 $cur-index;
+    }
+    ;
+
+    return ($key-in $new-x [if {[$v len] = 0} "" {$v get 0}]);
+};
+
+defun show-message (msg) {
+    if $MainWindow {
+	[$MainWindow get-minibuffer-window] ?? {throw ErrNoMiniBuffer "No MiniBuffer for debugging."};
+	$MainWindow display-window-message "MiniBuffer" $msg;
+	$MainWindow get-minibuffer-window : refresh;
+    };
+};
+
+defun path-adjust (path) {
+    l ::= $path split sep: "/";
+    r := ();
+    $l each do: {| i |
+	cond
+	    {$i = ".."} {if {[$r len] > 1} {$r ->>}; break}
+	    {$i = "."}  {break}
+	    {$i = ""}   {if {[$r len] > 1} {break}}
+	    <t>         {$r <<- $i}
+	;
+    };
+    return [$r join sep: "/"];
+};
+
+defun show-files-in-window (main window dir) {
+    BufferManager unregist-buffer "*Directory*";
+    buff ::= new EditBuffer;
+    $buff load-content $dir :init-only buffer-name: "*Directory*";
+    $buff clear-all;
+
+    if {file dir? $dir} {
+
+	### display directory
+
+	dir ::= path-adjust $dir;
+	if {$dir != "/"} {dir ::= $dir . "/"};
+	$buff append-string ["<< In directory: %v >>" fmt $dir];
+	$buff append-string "";
+
+	try {
+	    l ::= msort [file list $dir];
+	    while {! [$l null?]} do: {
+		v1 ::= $l >>;
+		if {and $v1 {file dir? [$dir . $v1]}} {$v1 append! "/"};
+		v2 ::= $l >>;
+		if {and $v2 {file dir? [$dir . $v2]}} {$v2 append! "/"};
+		# v3 ::= $l >>;
+		# if {and $v3 {file dir? [$dir . $v3]}} {$v3 append! "/"};		
+		# v4 ::= $l >>;
+		# if {and $v4 {file dir? [$dir . $v4]}} {$v4 append! "/"};
+		# $buff append-string ["%-20v\t%-20v\t%-20v\t%-20v" fmt [$v1 ?? ""] [$v2 ?? ""] [$v3 ?? ""] [$v4 ?? ""]];
+		$buff append-string ["%-40v%-40v" fmt [$v1 ?? ""] [$v2 ?? ""]];
+	    };
+	} catch: {| e |
+	    $buff append-string ["Can't read directory. <" [$e car] "># " [$e cdr]];
+	};
+    } {
+
+	### display files and mathchies
+
+	flist ::= path-adjust $dir : split sep: "/";
+	fname ::= $flist ->>;
+
+	try {
+	    dir ::= $flist join sep: "/";
+	    if {$dir != "/"} {dir ::= $dir . "/"};
+	    $buff append-string ["<< In directory matchies: %v >>" fmt $dir];
+	    $buff append-string "";
+	
+	    l ::= file list $dir : filter {| i |
+	        $i =~ ["^" . $fname ".*" : rquote];
+	    };
+	    l ::= msort $l;
+	    src-list ::= $l clone;
+	    file-count ::= $l len;
+	    if {$file-count >= 1} {
+		while {! [$l null?]} do: {
+		    v1 ::= $l >>;
+		    if {and $v1 {file dir? [$dir . $v1]}} {$v1 append! "/"};
+		    v2 ::= $l >>;
+		    if {and $v2 {file dir? [$dir . $v2]}} {$v2 append! "/"};
+		    # v3 ::= $l >>;
+		    # if {and $v3 {file dir? [$dir . $v3]}} {$v3 append! "/"};		
+		    # v4 ::= $l >>;
+		    # if {and $v4 {file dir? [$dir . $v4]}} {$v4 append! "/"};
+		    # $buff append-string ["%-20v\t%-20v\t%-20v\t%-20v" fmt [$v1 ?? ""] [$v2 ?? ""] [$v3 ?? ""] [$v4 ?? ""]];
+		    $buff append-string ["%-40v%-40v" fmt [$v1 ?? ""] [$v2 ?? ""]];
+		};
+		if {$file-count = 1} {
+		    $buff append-string "--";
+		    $buff append-string "File match solo complete.";
+		    fname := $v1;
+		} { 
+		    $buff append-string "--";
+		    $buff append-string ["%v files match." fmt $file-count];
+		    fname ::= path-longest-match $src-list $fname;
+		};
+	    } {
+		$buff append-string "--";
+		$buff append-string "No file match.";
+	    };
+
+	    dir ::= $dir . $fname;
+
+	} catch: {| e |
+	    $buff append-string ["Can't read directory. <" [$e car] "># " [$e cdr]];
+	};
+    };
+
+    $buff no-modify;
+    $main bind-buffer [$window get-window-name] $buff;
+    return $dir;
+};
+
+defun path-longest-match (list fname) {
+    result := $fname;
+    from ::= $fname len;
+    to ::= $list map {| i | $i len} : min;
+    $from each to: $to do: {| i |
+	m ::= $list car : at $i;
+	match := <t>;
+	[$list cdr] each do: {| x |
+	    if {$m != [$x at $i]} {
+	        match := <nil>;
+		break;
+	    };
+	};
+	if $match {$result append! $m};
+    };
+    
+    return $result;
+};
+
+##
+## define Vector method for EditBuffer operations.
+##
+Vector method insert-string-at___new (str line at) {
+    l ::= $str split sep: "";
+    result := (delete-region [$line + 0] [$at + 0]);
+    self ::= self;
+
+    if {$line > [$self len]} {line ::= $self len};
+    if {$line < [$self len]} {
+	if {$at > [$self get $line : len]} {at ::= [$self get $line : len]};
+    } {
+        at := 0;
+    };
+
+    $l each do: {| c |
+	(line at) ::= insert-character-at $c $line $at;
+    };
+
+    $result <<- [$line + 0];
+    $result <<- [$at + 0];
+    return $result;
+};
+
+Vector method insert-string-at-next (char line at) {
+    (command ay ax by bx) ::= insert-string-at $char $line $at;
+    return ($command $ay $ax $by $bx);
+};
+
+Vector method insert-character-at (char line at) {
+    self ::= self;
+    if {$char = "\r"} {
+	$self append! "";
+        i ::= $self len : - 2;
+        while {$i >= [$line + 1]}  do: {
+	    $self set [$i + 1] [$self get $i];
+	    i ::= $i - 1;
+	};
+	s ::= $self get $line;
+	s1 ::= $s sub 0 $at;
+	s2 ::= $s sub $at;
+	$self set $line $s1;
+	if {$line < [$self len : - 1]} {$self set [$line + 1] $s2};
+        at := 0;
+	line ::= $line + 1;
+	return ($line $at);
+    };
+
+    if {[$self len] <= $line} {$self append! ""};
+    s ::= $self get $line;
+    s1 ::= $s sub 0 $at;
+    s2 ::= $s sub $at;
+    $self set $line [$s1 . $char $s2];
+    at ::= $at + 1;
+    return ($line $at);
+};
+
+Vector method insert-string-at (str line at) {
+    l ::= $str split sep: "\r";
+#    if {and {[self : len] = 0} {$l,0 = ""}} {$l >>};
+    times ::= $l len;
+    self ::= self;
+    i := 1;
+    result := (delete-region [$line + 0] [$at + 0]);
+    $l each do: {| elem |
+	if {$line < [$self len]} {
+	    s ::= $self get $line;
+	    if {$at > [$s len]} {at := [$s len]};
+	    s1 ::= $s sub 0 $at;
+	    s2 ::= $s sub $at;
+	    $self set $line [$s1 . $elem $s2];
+	    $at ++ [$elem len];
+	} {
+	    $self append! $elem;
+	    at ::= $elem len;
+	    line ::= $self len : - 1;
+	};
+	if {$i = $times} {break};
+	$self append! "";
+	[$self len : - 2] each to: $line do: {
+	    | j |
+	    if {$line = $j} {
+		s1 ::= $self get $j : sub 0 $at;
+		s2 ::= $self get $j : sub $at;
+		$self set [$j + 1] $s2;
+		$self set $j $s1;
+	    } {
+		$self set [$j + 1] [$self get $j];
+	    };
+	};
+	$i ++;
+	$line ++;
+	at := 0;
+    };
+    $result <<- [$line + 0];
+    $result <<- [$at + 0];
+    return $result;
+};
+
+Vector method delete-character-at (line at) {
+    self ::= self;
+    if {$line >= [$self len]} {
+	if {[$self len] = 0} {return (<nil> "" 0 0)};
+	return (<nil> "" [$self len] 0);
+    };
+    s ::= $self get $line;
+    len ::= $s len;
+    if {and {[$self len] = 1} {$len = 0}} {
+	$self resize 0;
+	return (insert-string-at "\r" 0 0);
+    };
+    if {$len = 0} {
+	i := $line;
+	while {$i < [$self len : - 1]} do: {
+	    $self set $i [$self get [$i + 1]];
+	    i ::= $i + 1;
+        };
+	$self resize [$self len : - 1];
+	return (insert-string-at "\r" $line 0);
+    };
+    if {$at >= $len} {
+	if {[$line + 1] = [$self len]} {
+	    return (<nil> "" $line $len);
+	};
+	$self set $line [$self,$line . [$self get [$line + 1]]];
+	if {$line = [$self len : - 2]} {
+	    $self resize [$self len : - 1];
+	    return (insert-string-at "\r" $line $len);
+	};
+	[$line + 1] each to: [$self len : - 2] do: {| i |
+	    $self set $i [$self get [$i + 1]];
+	};
+	$self resize [$self len : - 1];
+	return (insert-string-at "\r" $line $len);
+    };
+    s1 ::= $s sub 0 $at;
+    c ::= $s sub $at [$at + 1];
+    s2 ::= $s sub [$at + 1];
+    $self set $line [$s1 . $s2];
+    return (insert-string-at $c $line $at);
+};
+
+Vector method backdelete-character-at (line at) {
+    self ::= self;
+    if {$at = 0} {
+	if {$line = 0} {
+	    return (<nil> "" 0 0);
+	};
+	line ::= $line - 1;
+	at ::= [$self get $line] len;
+	(command char line at) ::= delete-character-at $line $at;
+	return (insert-string-at-next "\r" $line $at);
+    };
+    at ::= $at - 1;
+    (command char line at) ::= delete-character-at $line $at;
+    return (insert-string-at-next $char $line $at);
+};
+
+##
+## This method (Vector::append-string) same as following this:
+## if [$Src len] > 0
+## then
+##   Vector:: insert-string-at
+##	["\r" . $str]
+##	[[self] len : - 1]
+##	[[self] get [$Src len : -1] : len]
+## else
+##   Vector:: insert-string-at
+##     $str 0 0
+##
+Vector method append-string (str) {
+    [self] append! $str;
+    if {[self : len] > 1} {
+	return (
+	    delete-region
+	      [self : len : - 2] [self : get [self : len : - 2] : len]
+	      [self : len : - 1] [self : get [self : len : - 1] : len]
+	    );
+    } {
+	return (
+	    delete-region
+	      0 0 0 [self : get 0 : len]
+	    );
+    };
+};
+
+Vector method delete-region (start-line start-column end-line end-column) {
+    if {$start-line > $end-line} {
+	(start-line end-line) := ($end-line $start-line);
+	(start-column end-column) := ($end-column $start-column);
+    };
+    if {$start-line = $end-line} {
+	if {$start-column > $end-column} {
+	    (start-column end-column) := ($end-column $start-column);
+	};
+    };
+    if {$start-line < 0} {
+	start-line := 0;
+    };
+    if {$end-line >= [self : len]} {
+	end-line ::= self : len : - 1;
+	if {$end-line < 0} {
+	    end-line := 0;
+	};
+	end-column ::= self : get [self : len : - 1] : len;
+    };
+    if {$start-column > [self : get $start-line : len]} {
+	start-column := [self : get $start-line : len];
+    };
+    if {$end-column > [self : get $end-line : len]} {
+	end-column := [self : get $end-line : len];
+    };
+    at-last := <nil>;
+    if {and {$end-line = [self : len : - 1]} {$end-column = [self : get $end-line : len]}} {
+	at-last := <t>;
+    };
+
+    result-start-line := $start-line;
+    result-start-column := $start-column;
+    result-str := "";
+
+    ## Region into same line.
+    if {$start-line = $end-line} {
+	r ::= self : get $start-line;
+	s1 ::= $r sub 0 $start-column;
+	str ::= $r sub $start-column $end-column;
+	s2 ::= $r sub $end-column;
+        self : set $start-line [$s1 . $s2];
+	$result-str append! $str;
+	if {and $at-last {[self : len] >= 1} {[self : get [self : len : - 1]] = ""}} {
+	    self : resize [self : len : - 1];
+	};
+	return (insert-string-at $result-str $result-start-line $result-start-column);
+    };
+
+    ## Regin into 2 lines.
+    if {$start-line = [$end-line - 1]} {
+	s1 ::= self : get $start-line : sub 0 $start-column;
+	$result-str append! [self : get $start-line : sub $start-column];
+	$result-str append! "\r";
+	$result-str append! [self : get $end-line : sub 0 $end-column];
+	s2 ::= self : get $end-line : sub  $end-column;
+        self : set $start-line [$s1 . $s2];
+	if {[self : len : - 1] <= $end-line} {
+	    self : resize [self : len : - 1];
+	} {
+	    $end-line each to: [self : len : - 2] do: {| i |
+	        self : set $i [self : get [$i + 1]];
+	    };
+	    self : resize [self : len : - 1];
+	};
+	if {and $at-last {[self : len] >= 1} {[self : get [self : len : - 1]] = ""}} {
+	    self : resize [self : len : - 1];
+	};
+	return (insert-string-at $result-str $result-start-line $result-start-column);
+    };
+
+    ## Regin over 3 lines.
+    s1 ::= self : get $start-line : sub 0 $start-column;
+    $result-str append! [self : get $start-line : sub $start-column];
+    $result-str append! "\r";
+    [$start-line + 1] each to: [$end-line - 1] do: {| i |
+	$result-str append! [self : get $i];
+	$result-str append! "\r";
+    };
+    $result-str append! [self : get $end-line : sub 0 $end-column];
+    s2 ::= self : get $end-line : sub  $end-column;
+    self : set $start-line [$s1 . $s2];
+    n ::= $end-line - $start-line;
+    [$end-line + 1] each to: [self : len : - 1] do: {| i |
+	if {$i >= [self : len]} {break};
+	self : set [$i - $n] [self : get $i];
+    };
+    self : resize [self : len : - $n];
+    if {and $at-last {[self : len] >= 1} {[self : get [self : len : - 1]] = ""}} {
+        self : resize [self : len : - 1];
+    };
+    return (insert-string-at $result-str $result-start-line $result-start-column);
+};
+
+Vector method copy-region (start-line start-column end-line end-column) {
+    if {$start-line > $end-line} {
+	(start-line end-line) := ($end-line $start-line);
+	(start-column end-column) := ($end-column $start-column);
+    };
+    if {$start-line = $end-line} {
+	if {$start-column > $end-column} {
+	    (start-column end-column) := ($end-column $start-column);
+	};
+    };
+    if {$start-line < 0} {
+	start-line := 0;
+    };
+    if {$end-line >= [self : len]} {
+	end-line ::= self : len : - 1;
+	if {$end-line < 0} {
+	    end-line := 0;
+	};
+	end-column ::= self : get [self : len : - 1] : len;
+    };
+    if {$start-column > [self : get $start-line : len]} {
+	start-column := [self : get $start-line : len];
+    };
+    if {$end-column > [self : get $end-line : len]} {
+	end-column := [self : get $end-line : len];
+    };
+
+    result-str := "";
+
+    ## Region into same line.
+    if {$start-line = $end-line} {
+	r ::= self : get $start-line;
+	str ::= $r sub $start-column $end-column;
+	$result-str append! $str;
+	return (insert-string-at $result-str $start-line $start-column);
+    };
+
+    ## Regin into 2 lines.
+    if {$start-line = [$end-line - 1]} {
+	self ::= self;
+	$result-str append! [$self get $start-line : sub $start-column];
+	$result-str append! "\r";
+	$result-str append! [$self get $end-line : sub 0 $end-column];
+	return (insert-string-at $result-str $start-line $start-column);
+    };
+
+    ## Regin over 3 lines.
+    $result-str append! [self : get $start-line : sub $start-column];
+    $result-str append! "\r";
+    [$start-line + 1] each to: [$end-line - 1] do: {| i |
+	$result-str append! [self : get $i];
+	$result-str append! "\r";
+    };
+    $result-str append! [self : get $end-line : sub 0 $end-column];
+    return (insert-string-at $result-str $start-line $start-column);
+};
+
+String method repeat (times) {
+    result := "";
+    self ::= self;
+    1 each to: $times do: {
+	$result append! $self;
+    };
+    return $result;
+};

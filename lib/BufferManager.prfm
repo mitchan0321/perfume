@@ -1,0 +1,114 @@
+class BufferManager;
+
+BufferManager method init () {
+    [sets? BufferList] ?? {sets BufferList [dict ()]};
+    [sets? BufferGeom] ?? {sets BufferGeom [dict ()]};
+};
+
+BufferManager method regist-buffer (buff name) {
+    i := 1;
+    if {$name = ""} {name := "*no named*"};
+    name-orig := $name;
+    while {$BufferList set? $name} do: {
+	$i ++;
+	name ::= $name-orig . "[" $i "]";
+    };
+    $buff set-buffer-name $name;
+    $BufferList set $name $buff;
+};
+
+BufferManager method unregist-buffer (name) {
+    if {$name = "*Scratch*"} {return [$BufferList get $name]};
+    return [$BufferList unset $name];
+};
+
+BufferManager method buffer-order-list () {
+    msort [$BufferList keys :string : filter {| i | [$i at 0] != "*"}] :
+    concat
+    [msort [$BufferList keys :string : filter {| i | [$i at 0] = "*"}]];
+};
+
+BufferManager method get-buffer-list () {
+    return [buffer-order-list];
+};
+
+BufferManager method get-buffer (name) {
+    buff ::= $BufferList get $name;
+    $buff ?? {
+	buff ::= $BufferList get "*Scratch*";
+	$buff ?? {
+	    buff ::= new ScratchBuffer;
+	    regist-buffer $buff "*Scratch*";
+	};
+    };
+    return $buff;
+};
+
+BufferManager method get-buffer-create (name) {
+    buff ::= $BufferList get $name;
+    $buff ?? {
+	buff ::= new EditBuffer;
+    };
+    return $buff;
+};
+
+BufferManager method get-next-buffer (buff) {
+    if {[$BufferList len] = 0} {
+	buff ::= new ScratchBuffer;
+	regist-buffer $buff "*Scratch*";
+	return $buff;
+    };
+    l ::= buffer-order-list;
+    i ::= $l find [$buff get-buffer-name];
+    if $i {
+        r ::= $l get [$i + 1];
+    } {
+        r := "*Scratch*";
+    };
+    $BufferList get [$r ?? $l,0];
+};
+
+BufferManager method get-previous-buffer (buff) {
+    if {[$BufferList len] = 0} {
+	buff ::= new ScratchBuffer;
+	regist-buffer $buff "*Scratch*";
+	return $buff;
+    };
+    l ::= buffer-order-list : reverse;
+    i ::= $l find [$buff get-buffer-name];
+    if $i {
+        r ::= $l get [$i + 1];
+    } {
+        r := "*Scratch*";
+    };
+    $BufferList get [$r ?? $l,0];
+};
+
+BufferManager method set-buffer-geom (window-name buffer-name) {
+
+    [$BufferGeom set? ($window-name $buffer-name)] ?? {
+	$BufferGeom each do: {| k v |
+	    (w b g) := $v;
+	    if {$b = $buffer-name} {
+		geom ::= $g clone;
+		$BufferGeom set
+		    ($window-name $buffer-name)
+		    ($window-name $buffer-name $geom);
+		return;
+	    };
+	};
+
+	$BufferGeom set
+	    ($window-name $buffer-name)
+	    ($window-name $buffer-name [new BufferGeom]);
+	return;
+    };
+};
+
+BufferManager method get-buffer-geom (window-name buffer-name) {
+    geom ::= $BufferGeom get ($window-name $buffer-name);
+    if $geom {
+	return $geom,2;
+    };
+    return [new BufferGeom];
+};
