@@ -1,28 +1,37 @@
-<><><><><><><><><><><><><>
-<><>    pmacs TODO    <><>
-<><><><><><><><><><><><><>
+<><><><><><><><><><><><><>><><><><>><><><>
+<><><><>        pmacs TODO        <><><><>
+<><><><><><><><><><><><><>><><><><>><><><>
 
 これから pmacs で実現したいこと。
 
 ・【済】2020/09/26 リージョン選択
 ・【済】2020/09/26 Cut/Copy/Paste
 ・【済】2020/09/26 Undo/Redo
-・リージョン選択時のハイライト
+・【済】2020/10/01 リージョン選択時のハイライト
 ・インクリメンタルサーチ
 ・予約語ハイライト
 ・【済】2020/09/28 ウィンドウ内でのPerfumeインタプリタの実行
-・ファイル名入力補完
+・Perfumeインタプリタのコルーチン化、IOの仮想化
+・【済】2020/09/30 ファイル名入力補完
 ・メニュー
-・バッファリスト
+・【済】2020/09/29 バッファリスト
+・バッファリストの選択可能化
 ・ヘルプ表示
-・バッファリストの保存
-
+・バッファリストの保存・起動時の再生
+・モード化（ファイルサフィックスやバッファの種類によってキーバインドを変更可能にする）
+・特定のワイド文字についての表示不具合修正
+・入力のサポート
+　- オートインデント
+　- ソフトタブ化
+　- 対応括弧ジャンプ
+　- ワードジャンプ、パラグラフジャンプ
+・ファンクションキーに関する環境依存の対応
 
 --- Memo ---
-<>文字列の正規表現
+<> 文字列の正規表現
 '"[^"]+"'
 
-<>カラーパターン1
+<> カラーパターン1
 - アクティブウィンドウだけ明るい
 $ColorDB set EDIT_BUFFER                [WUtil color-pair BLACK   WHITE   ];
 $ColorDB set ACTIVE_STATUS_LINE         [WUtil color-pair BLACK   CYAN    ];
@@ -36,7 +45,7 @@ $ColorDB set MINI_WINDOW                [WUtil color-pair WHITE   BLACK   ];
 $ColorDB set EOF_MARK			[WUtil color-pair BLACK   GREEN   ];
 $ColorDB set REGION_HILIGHT		[WUtil color-pair WHITE   BLUE    ];
 
-<>カラーパターン2
+<> カラーパターン2
 - 全部黒い
 $ColorDB set EDIT_BUFFER                [WUtil color-pair WHITE   BLACK   ];
 $ColorDB set ACTIVE_STATUS_LINE         [WUtil color-pair BLACK   WHITE   ];
