@@ -28,6 +28,7 @@ CombiWindow method init (main y x line column) {
     sets KeyBinding [dict()];
     sets SearchSave <nil>;
     sets SearchResult ();
+    sets SearchHilight <nil>;
     load-keybind;
 };
 
@@ -177,6 +178,9 @@ CombiWindow method render () {
 	    $i ++;
 	    $line ++;
 	};
+    };
+    if $SearchHilight {
+	search-hilight $geom $SearchHilight;
     };
 };
 
@@ -600,19 +604,29 @@ CombiWindow method start-search () {
 };
 
 CombiWindow method cancel-search (str) {
-    setvar SearchString $str;
     geom ::= get-geom;
     if $SearchSave {
 	$geom restore-geom $SearchSave;
     };
     sets SearchSave <nil>;
     sets SearchResult ();
+    sets SearchHilight <nil>;
+};
+
+CombiWindow method reset-search () {
+    geom ::= get-geom;
+    if $SearchSave {
+	$geom restore-geom $SearchSave;
+    };
+    sets SearchResult ();
+    sets SearchHilight <nil>;
 };
 
 CombiWindow method end-search (str) {
     setvar SearchString $str;
     sets SearchSave <nil>;
     sets SearchResult ();
+    sets SearchHilight <nil>;
 };
 
 CombiWindow method set-search-result (list) {
@@ -627,38 +641,125 @@ CombiWindow method move-to-next-search () {
     (y x) ::= get-source-index $buff $geom;
     (sy sx) ::= get-screen-size;
     start := $geom,ViewLine;
-    end ::= $start + $sy : - 1;
+    end ::= $start + $sy;
     l ::= $SearchResult filter {| i | and {[$i car] >= $start} {[$i car] <= $end}};
 
     elem := <nil>; ### $elem is search and move target element
     if {$l null?} {
-	l ::= $SearchResult filter {| i | $i > $end};
+	l ::= $SearchResult filter {| i | [$i car] > $end};
 	elem ::= $l car;
     } {
-	$l each do: {| elem |
-	    if {[$elem car] = $y} {
-		if {[$elem cdr : car : car] >= $x} {break};
+        elem := <nil>;
+	$l each do: {| i |
+	    if {[$i car] = $y} {
+		if {[$i cdr : car : car] > $x} {
+		    elem := $i;
+		    break;
+		};
 	    };
-	    if {[$elem car] > $y} {break};
+	    if {[$i car] > $y} {
+	        elem := $i;
+		break;
+	    };
+	};
+	$elem ?? {
+	    l ::= $SearchResult filter {| i | [$i car] > $end};
+	    elem ::= $l car;
 	};
     };
-    $elem ?? {return <nil>};
-    
-    ey ::= $elem car;
-    ex ::= $elem cdr : car : car;
-    
-    move-to $geom $ey $sx;
+    if $elem {
+	ey ::= $elem car;
+	ex ::= $elem cdr : car : car;
+	cursor-move-to $geom $ey $ex;
+    };
+
+    ### search result hilight
+    start := $geom,ViewLine;
+    end ::= $start + $sy;
+    sets SearchHilight [$SearchResult filter {| i | and {[$i car] >= $start} {[$i car] < $end}}];
 };
 
 CombiWindow method move-to-previous-search () {
-    
+    $SearchResult ?? {return <nil>};
+
+    buff ::= get-buffer;
+    geom ::= get-geom;
+    (y x) ::= get-source-index $buff $geom;
+    (sy sx) ::= get-screen-size;
+    start := $geom,ViewLine;
+    end ::= $start + $sy;
+    l ::= $SearchResult filter {| i | and {[$i car] >= $start} {[$i car] <= $end}} : reverse;
+
+    elem := <nil>; ### $elem is search and move target element
+    if {$l null?} {
+	l ::= $SearchResult filter {| i | [$i car] < $start};
+	elem ::= $l last : car;
+    } {
+        elem := <nil>;
+	$l each do: {| i |
+	    if {[$i car] = $y} {
+		if {[$i cdr : car : car] < $x} {
+		    elem := $i;
+		    break;
+		};
+	    };
+	    if {[$i car] < $y} {
+	        elem := $i;
+		break;
+	    };
+	};
+	$elem ?? {
+	    l ::= $SearchResult filter {| i | [$i car] < $start};
+	    elem ::= $l last : car;
+	};
+    };
+    if $elem {
+	ey ::= $elem car;
+	ex ::= $elem cdr : car : car;
+	cursor-move-to $geom $ey $ex;
+    };
+
+    ### search result hilight
+    start := $geom,ViewLine;
+    end ::= $start + $sy;
+    sets SearchHilight [$SearchResult filter {| i | and {[$i car] >= $start} {[$i car] < $end}}];
 };
 
-CombiWindow method move-to (geom y x) {
+CombiWindow method cursor-move-to (geom y x) {
+    sets FreeCursor <nil>;
+    
+    buff ::= get-buffer;
+    (new-y new-x) ::= get-cursor-index $buff $y $x;
+    $geom set! IndexColumn.SAVE $new-x;
+    $geom set! CursorLine [$new-y - $geom,ViewLine];
+    $geom set! CursorColumn [$new-x - $geom,ViewColumn];
+    (sy sx) ::= get-screen-size;
+    fit-to-cursor $geom $sy $sx;
+};
 
-    $geom set! ViewLine $new-line;
-    $geom set! CursorLine [$ey - $new-line];
-    $geom set! ViewColumn 0;
-    $geom set! CursorColumn $ex;
-    $geom set! IndexColumn.SAVE $ex;
+CombiWindow method search-hilight (geom list) {
+    buff ::= get-buffer;
+    (scr-y scr-x) ::= get-screen-size;
+    (idx-y idx-x) ::= get-source-index $buff $geom;
+    ### debug-message ["scr-y: " . $scr-y ", scr-x: " $scr-x ", idx-y: " $idx-y ", idx-x: " $idx-x] wait: 3000;
+    $list each do: {| e |
+	py ::= $e car;
+	pxs ::= $e cdr : car : car;
+	pxe ::= $e cdr : car : cdr : car;
+	y ::= $py - $geom,ViewLine;
+	(sy sx) ::= get-cursor-index $buff $py [$pxs - $geom,ViewColumn];
+	(ey ex) ::= get-cursor-index $buff $py [$pxe - $geom,ViewColumn];
+	len ::= $ex - $sx;
+	if {$ex <= 0} {continue};
+	if {$sx < 0} {sx := 0};
+	if {$sx > $scr-x} {continue};
+	if {$ex >= $scr-x} {ex := $scr-x};
+	len ::= $ex - $sx;
+	if {$len <= 0} {continue};
+	if {and {$idx-y = $py} {$idx-x = $pxs}} {
+	    curs-color $BufferCurs $y $sx $len $ColorDB,SEARCH_CURRENT_HILIGHT 0;
+	} {
+	    curs-color $BufferCurs $y $sx $len $ColorDB,SEARCH_HILIGHT 0;
+	};
+    };
 };

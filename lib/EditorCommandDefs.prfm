@@ -865,10 +865,9 @@ defcommand miniwindow-input-sample
 
 defcommand search
 {   | main window |
-    str ::= $window get-search-string;
     $window start-search;
-    $main mini-input-start $str prompt: "Search: ";
-    $window set-search-result [$buff search $str];
+    $main mini-input-start "" prompt: "Search: ";
+    $window set-search-result [$buff search ""];
     
     $main add-mini-input-callback $window {| main window in-key value |
         if {eq? $in-key KEY_ESC} {
@@ -889,7 +888,21 @@ defcommand search
 	if {eq? $in-key KEY_UP} {
 	    $window move-to-previous-search;
 	};
+	if {eq? $in-key CTRL_V} {
+	    str ::= $window get-search-string;
+	    $main mini-input-value-override $str [$str len];
+	    $window set-search-result [$buff search $str];
+	    $window move-to-next-search;
+	};
+	if {or {eq? $in-key CTRL_H} {eq? $in-key KEY_DC}
+	       {eq? $in-key KEY_BACKSPACE}} {
+	    $window reset-search;
+	    buff ::= $window get-buffer;
+	    $window set-search-result [$buff search $value];
+	    $window move-to-next-search;
+	};
 	if {string? $in-key} {
+	    $window reset-search;
 	    buff ::= $window get-buffer;
 	    $window set-search-result [$buff search $value];
 	    $window move-to-next-search;
