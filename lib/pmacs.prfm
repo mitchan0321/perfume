@@ -48,6 +48,7 @@ defun pmacs (trace: t) {
 	    | main window |
 	    $window apply-command $main $window "" bottom-of-buffer;
 	    $window apply-command $main $window "" start-region;
+	    result ALL;
 	};
 
 	$MainWindow render-all;

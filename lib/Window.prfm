@@ -34,7 +34,8 @@ Window method init-constructor () {
     sets EventLoopDone <nil>;
 
     ### Background
-    sets Background ();
+    sets Background [dict];
+    $Background set @id 0;
 };
 
 Window method get-curs () {
@@ -208,8 +209,30 @@ Window method create-split-cross-window (window-name: win-name) {
     };
 };
 
+Window method get-window-by-name (window-name) {
+    window := <nil>;
+    $WindowList each do: {| i |
+	if {[$i get-window-name] = $window-name} {
+	    window := $i;
+	    break;
+	};
+    };
+    return $window;
+};
+
 Window method refresh () {
-    $MiniWindow refresh;
+    if $MiniInput {
+	try {$WindowList each do: {| w | $w refresh}} catch: {};
+	get-current-window : apply {set-cursor; refresh};
+	$MiniWindow refresh;
+    } {
+	$MiniWindow refresh;
+	try {$WindowList each do: {| w | $w refresh}} catch: {};
+	get-current-window : apply {set-cursor; refresh};
+    };
+};
+
+Window method refresh-without-mini-window () {
     try {$WindowList each do: {| w | $w refresh}} catch: {};
     get-current-window : apply {set-cursor; refresh};
 };
@@ -390,8 +413,15 @@ Window method key-event-loop () {
 	if {$i null?} {
 	    if {background-exists?} {
 		try {
-		    exec-background;
-		    $main apply {render-all; refresh};
+		    result ::= exec-background;
+		    cond
+		    {eq? $result ALL} { 
+			$main apply {render-all; refresh};
+		    }
+		    {eq? $result REFRESH-ONLY} {
+			$main apply {refresh};
+		    }
+		    ;
 		} catch: {| e |
 		    show-message ["Error at background: <" . [$e car] "># " [$e cdr]];
 		};
@@ -482,21 +512,32 @@ Window method exit-event-loop () {
     sets EventLoopDone <t>;
 };
 
-Window method add-background (body) {
+Window method add-background (body job-id: id) {
+    if {! [set? id]} {
+	int-id ::= $Background get @id : + 1;
+	$Background set @id $int-id ;
+	id ::= "%010d" fmt $int-id;
+    };
+
     if {block? $body} {
-	$Background <<- $body;
+	$Background set $id $body;
     };
 };
 
 Window method exec-background () {
-    body ::= $Background ->>;
+    # execute only one background,
+    # order is sorted ascending by Background key.
+
+    key ::= msort [$Background keys :string] : filter {| i | $i != "@id"} : car;
+    body ::= $Background get $key;
+    $Background unset $key;
     if {block? $body} {
-        yield $body [self] [get-current-window];
+        return [yield $body [self] [get-current-window]];
     };
 };
 
 Window method background-exists? () {
-    if {[$Background len] > 0} {
+    if {[$Background len] > 1} {
 	return <t>;
     };
     return <nil>;

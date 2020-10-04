@@ -7,7 +7,8 @@ CombiWindow method init (main y x line column) {
 
     sets BufferCurs	  [curs-new-window
 			   $curs
-			   $y 		 	$x
+#			   $y 		 	$x
+			   $y 		 	[$x + 1]
 			   [$line - 1]  	[$column - 1]
 	];
 
@@ -19,10 +20,12 @@ CombiWindow method init (main y x line column) {
     
     sets VerticalLineCurs [curs-new-window
 			   $curs
-			   $y 		 	[$x + $column : - 1]
+#			   $y 		 	[$x + $column : - 1]
+			   $y 		 	$x
 			   [$line - 1] 		1
 	];
 
+    sets Parent $main;
     sets Activate <nil>;
     sets FreeCursor <nil>;
     sets KeyBinding [dict()];
@@ -84,7 +87,7 @@ CombiWindow method render () {
     (cy cx) ::= get-source-index $buff $geom;
 
     curs-print $StatusLineCurs [
-	  "[%v%v%v%v]#%v - (%d,%d) - %v <%v> %v" fmt
+	  " -- [%v%v%v%v]#%v - (%d,%d) - %v <%v> %v" fmt
 	  [[$buff modify?] ??? "*" " "]
 	  [[$buff newfile?] ??? "N" " "]
 	  [$FreeCursor ??? "F" " "]
@@ -179,9 +182,28 @@ CombiWindow method render () {
 	    $line ++;
 	};
     };
-    if $SearchHilight {
-	search-hilight $geom $SearchHilight;
+
+    ###
+    ### if run word and search hilight at background, following this:
+    ###
+    REM {
+    job-id ::= "ZH" . [$win split sep: "#" : get 1];
+    $Parent add-background job-id: $job-id {
+	| main window |
+	target-win ::= $main get-window-by-name $win;
+	if $target-win {
+	    $target-win set-word-hilight;
+	    $target-win set-search-hilight;
+	};
+	result REFRESH-ONLY;
     };
+    }; ### END REM
+
+    ###
+    ### if run word and search hilight at immediately, following this:
+    ###
+    set-word-hilight;
+    set-search-hilight;
 };
 
 CombiWindow method get-source-index (buff geom) {
@@ -737,11 +759,16 @@ CombiWindow method cursor-move-to (geom y x) {
     fit-to-cursor $geom $sy $sx;
 };
 
-CombiWindow method search-hilight (geom list) {
+CombiWindow method set-search-hilight () {
+    $Activate ?? {return};
+    
+    list := $SearchHilight;
+    $list ?? {return};
+    geom ::= get-geom;
     buff ::= get-buffer;
+
     (scr-y scr-x) ::= get-screen-size;
     (idx-y idx-x) ::= get-source-index $buff $geom;
-    ### debug-message ["scr-y: " . $scr-y ", scr-x: " $scr-x ", idx-y: " $idx-y ", idx-x: " $idx-x] wait: 3000;
     $list each do: {| e |
 	py ::= $e car;
 	pxs ::= $e cdr : car : car;
@@ -762,4 +789,8 @@ CombiWindow method search-hilight (geom list) {
 	    curs-color $BufferCurs $y $sx $len $ColorDB,SEARCH_HILIGHT 0;
 	};
     };
+};
+
+CombiWindow method set-word-hilight () {
+    ##curs-color $BufferCurs 0 0 40 $ColorDB,TEST_COLOR 0;
 };

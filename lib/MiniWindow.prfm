@@ -11,6 +11,7 @@ MiniWindow method init (main y x line column) {
 			   $line 		$column
 	];
 
+    sets Parent $main;
     sets PromptMessage "";
     sets InputValue "";
     sets InputIndex 0;
@@ -27,7 +28,7 @@ MiniWindow method diactivate () {
 
 MiniWindow method refresh () {
     curs-refresh $MiniCurs;
-    curs-move $MiniCurs 0 0;
+    ### curs-move $MiniCurs 0 0;
 };
 
 MiniWindow method display (msg) {
