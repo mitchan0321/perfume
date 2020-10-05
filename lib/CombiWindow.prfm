@@ -826,7 +826,6 @@ CombiWindow method set-word-hilight () {
 
 CombiWindow method set-word-hilight-color (geom buff list color) {
     (scr-y scr-x) ::= get-screen-size;
-    (idx-y idx-x) ::= get-source-index $buff $geom;
 
     $list each do: {| e |
 	py ::= $e car;

@@ -51,7 +51,7 @@ $ColorDB set INACTIVE_EDIT_BUFFER       [WUtil color-pair BLACK   WHITE   ];
 $ColorDB set INACTIVE_STATUS_LINE       [WUtil color-pair YELLOW  BLACK   ];
 $ColorDB set INACTIVE_VERT_LINE         [WUtil color-pair BLUE    BLACK   ];
 $ColorDB set INACTIVE_VERT_LINE_HILIGHT [WUtil color-pair YELLOW  BLUE    ];
-$ColorDB set MINI_WINDOW                [WUtil color-pair WHITE   BLACK   ];
+$ColorDB set MINI_WINDOW                [WUtil color-pair GREEN   BLACK   ];
 $ColorDB set EOF_MARK			[WUtil color-pair BLACK   GREEN   ];
 $ColorDB set REGION_HILIGHT		[WUtil color-pair WHITE   BLUE    ];
 $ColorDB set SEARCH_CURRENT_HILIGHT     [WUtil color-pair WHITE   RED     ];
