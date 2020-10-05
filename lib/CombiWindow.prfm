@@ -125,6 +125,32 @@ CombiWindow method render () {
 	};
     };
 
+
+    ###
+    ### if run word and search hilight at background, following this:
+    ###
+    REM {
+    job-id ::= "ZH" . [$win split sep: "#" : get 1];
+    $Parent add-background job-id: $job-id {
+	| main window |
+	target-win ::= $main get-window-by-name $win;
+	if $target-win {
+	    $target-win set-word-hilight;
+	    $target-win set-search-hilight;
+	};
+	result REFRESH-ONLY;
+    };
+    }; ### END REM
+
+    ###
+    ### if run word and search hilight at immediately, following this:
+    ###
+    set-word-hilight;
+    set-search-hilight;
+
+    ###
+    ### region selection hilight
+    ###
     region ::= get-region;
     if {and $region $Activate} {
 	(sy sx) := $region;
@@ -182,28 +208,6 @@ CombiWindow method render () {
 	    $line ++;
 	};
     };
-
-    ###
-    ### if run word and search hilight at background, following this:
-    ###
-    REM {
-    job-id ::= "ZH" . [$win split sep: "#" : get 1];
-    $Parent add-background job-id: $job-id {
-	| main window |
-	target-win ::= $main get-window-by-name $win;
-	if $target-win {
-	    $target-win set-word-hilight;
-	    $target-win set-search-hilight;
-	};
-	result REFRESH-ONLY;
-    };
-    }; ### END REM
-
-    ###
-    ### if run word and search hilight at immediately, following this:
-    ###
-    set-word-hilight;
-    set-search-hilight;
 };
 
 CombiWindow method get-source-index (buff geom) {
@@ -792,5 +796,52 @@ CombiWindow method set-search-hilight () {
 };
 
 CombiWindow method set-word-hilight () {
-    ##curs-color $BufferCurs 0 0 40 $ColorDB,TEST_COLOR 0;
+    if {! [defvar? HILIGHT_REGEXP]} {return};
+
+    buff ::= get-buffer;
+    geom ::= get-geom;
+    (y x) ::= get-source-index $buff $geom;
+    (sy sx) ::= get-screen-size;
+    start := $geom,ViewLine;
+    end ::= $start + $sy : - 1;
+
+    $HILIGHT_REGEXP each do: {| i |
+	regex ::= $i car;
+	color ::= $i cdr : car;
+	result := ();
+	last := $result;
+	line := $start;
+	$buff buffer-select $start $end {| src |
+	    l ::= $src =~ :all $regex;
+	    if $l {
+		$l each do: {| m |
+		    $last append! ([$line + 0] $m);
+		};
+	    };
+	    $line ++;
+	};
+	set-word-hilight-color $geom $buff $result $color;
+    };
+};
+
+CombiWindow method set-word-hilight-color (geom buff list color) {
+    (scr-y scr-x) ::= get-screen-size;
+    (idx-y idx-x) ::= get-source-index $buff $geom;
+
+    $list each do: {| e |
+	py ::= $e car;
+	pxs ::= $e cdr : car : car;
+	pxe ::= $e cdr : car : cdr : car;
+	y ::= $py - $geom,ViewLine;
+	(sy sx) ::= get-cursor-index $buff $py [$pxs - $geom,ViewColumn];
+	(ey ex) ::= get-cursor-index $buff $py [$pxe - $geom,ViewColumn];
+	len ::= $ex - $sx;
+	if {$ex <= 0} {continue};
+	if {$sx < 0} {sx := 0};
+	if {$sx > $scr-x} {continue};
+	if {$ex >= $scr-x} {ex := $scr-x};
+	len ::= $ex - $sx;
+	if {$len <= 0} {continue};
+	curs-color $BufferCurs $y $sx $len $ColorDB,$color 0;
+    };
 };
