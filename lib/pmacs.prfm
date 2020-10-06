@@ -41,7 +41,6 @@ defun pmacs (trace: t) {
 	BufferManager init;
 	WUtil init;
 	$MainWindow create-minibuffer-window;
-
 	$MainWindow create-full-window;
 	$MainWindow add-create-window-hook {$MainWindow create-full-window};
 	$MainWindow add-background {
@@ -50,7 +49,6 @@ defun pmacs (trace: t) {
 	    $window apply-command $main $window "" start-region;
 	    result ALL;
 	};
-
 	$MainWindow render-all;
 	$MainWindow refresh;
 	$MainWindow key-event-loop;
