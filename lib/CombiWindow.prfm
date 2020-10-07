@@ -753,6 +753,52 @@ CombiWindow method move-to-next-search () {
     sets SearchHilight [$SearchResult filter {| i | and {[$i car] >= $start} {[$i car] < $end}}];
 };
 
+CombiWindow method stay-search () {
+    $SearchResult ?? {return <nil>};
+
+    buff ::= get-buffer;
+    geom ::= get-geom;
+    (y x) ::= get-source-index $buff $geom;
+    (sy sx) ::= get-screen-size;
+    start := $geom,ViewLine;
+    end ::= $start + $sy;
+    l ::= $SearchResult filter {| i | and {[$i car] >= $start} {[$i car] <= $end}};
+
+    elem := <nil>; ### $elem is search and move target element
+    if {$l null?} {
+	l ::= $SearchResult filter {| i | [$i car] > $end};
+	elem ::= $l car;
+    } {
+        elem := <nil>;
+	$l each do: {| i |
+	    if {[$i car] = $y} {
+		if {[$i cdr : car : car] >= $x} {
+		    elem := $i;
+		    break;
+		};
+	    };
+	    if {[$i car] > $y} {
+	        elem := $i;
+		break;
+	    };
+	};
+	$elem ?? {
+	    l ::= $SearchResult filter {| i | [$i car] > $end};
+	    elem ::= $l car;
+	};
+    };
+    if $elem {
+	ey ::= $elem car;
+	ex ::= $elem cdr : car : car;
+	cursor-move-to $geom $ey $ex;
+    };
+
+    ### search result hilight
+    start := $geom,ViewLine;
+    end ::= $start + $sy;
+    sets SearchHilight [$SearchResult filter {| i | and {[$i car] >= $start} {[$i car] < $end}}];
+};
+
 CombiWindow method move-to-previous-search () {
     $SearchResult ?? {return <nil>};
 

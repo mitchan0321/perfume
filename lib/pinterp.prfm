@@ -1,11 +1,16 @@
 defun pinterp () {
-    $stdout puts "Start perfume/pmacs interpriter.";
-    $stdin each do: {| line |
-        if {[$line clean] = ""} {continue};
+    $stdout puts "Start Perfume/pmacs interpriter.";
+    $stdin each do: {| exec-command |
+        if {[$exec-command clean] = ""} {continue};
 	unset e;
+	unset result;
 
 	try {
-	    result := ([$line eval]);
+	    result ::= begin {
+		    unset exec-command;
+		    alias up: 1 exec-command exec-command;
+		    result ([$exec-command eval]);
+	    } local: $PINTERP_LOCAL :rebase;
 	} catch: {| e |
 	    result ::= "EXCEPTION: <" . [$e car] "># " [$e cdr];
 	};

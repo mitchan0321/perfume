@@ -35,8 +35,10 @@ defun pmacs (trace: t) {
     $stdin set-nolimit;
     $stdin set-comode;
     $stdout set-nolimit;
+    $stdout set-itemlimit 80;
     $stdout set-comode;
     $stderr set-nolimit;
+    $stderr set-itemlimit 80;
     $stderr set-comode;
     
     try {
@@ -52,6 +54,9 @@ defun pmacs (trace: t) {
 	    ### $window apply-command $main $window "" start-region;
 	    result ALL;
 	};
+        if {defvar? PINTERP_LOCAL} else: {
+	    defvar PINTERP_LOCAL [dict];
+        };
 	$MainWindow add-background job-id: "PINTERP-WATCHDOG" {
 	    c ::= coro {pinterp};
 	    if {defvar? PINTERP} {
@@ -68,11 +73,13 @@ defun pmacs (trace: t) {
 		};
 
 	        buff := <nil>;
-		if $window {buff ::= $window get-buffer};
+		if $window {
+		    if {eq? CombiWindow [$window get @name]} {buff ::= $window get-buffer};
+		};
 		if $buff {
 		    if {eq? ScratchBuffer [$buff get @name]} {
 			if {$window method? display-evaluation} {
-			    try {$window display-evaluation} catch: {};
+			    $window display-evaluation;
 			};
 		    };
 		};

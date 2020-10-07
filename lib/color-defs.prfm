@@ -61,3 +61,5 @@ $ColorDB set STRING_LITERAL_HILIGHT     [WUtil color-pair RED     WHITE   ];
 $ColorDB set VALUE_LITERAL_HILIGHT      [WUtil color-pair MAGENTA WHITE   ];
 $ColorDB set DATATYPE_HILIGHT           [WUtil color-pair GREEN   WHITE   ];
 $ColorDB set COMMENT_HILIGHT            [WUtil color-pair YELLOW  WHITE   ];
+$ColorDB set ALERT_HILIGHT              [WUtil color-pair RED     WHITE   ];
+

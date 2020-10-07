@@ -1614,7 +1614,7 @@ cmd_load(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     sscript->path = tpath;
     sscript->src = src;
     sscript->script = script;
-    cont = new_container(sscript,L"SCRIPT");
+    cont = new_container(sscript, L"SCRIPT");
 
     hash_set_t(shash, const_atscriptid, nid);
     hash_set(shash, to_string(nid), cont);
