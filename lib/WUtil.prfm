@@ -81,7 +81,7 @@ defun init-config () {
     else: {
 	$LIB_PATH each do: {| i |
 	    if {file exists? [$i . "/pmacs.conf"]} {
-		load [$i . "/pmacs.conf"];
+	        load :notrace [$i . "/pmacs.conf"];
 		break;
 	    };
 	};
@@ -96,8 +96,8 @@ defun init-color-DB () {
 
     $LIB_PATH each do: {| i |
 	if {file exists? [$i . "/color-defs.prfm"]} {
-	   load [$i . "/color-defs.prfm"];
-	   break;
+	    load :notrace [$i . "/color-defs.prfm"];
+	    break;
 	};
     };
 };
@@ -110,7 +110,7 @@ defun init-command-DB () {
 
     $LIB_PATH each do: {| i |
 	if {file exists? [$i . "/EditorCommandDefs.prfm"]} {
-	    load [$i . "/EditorCommandDefs.prfm"];
+	    load :notrace [$i . "/EditorCommandDefs.prfm"];
 	    break;
 	};
     };

@@ -1563,7 +1563,9 @@ cmd_load(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *enc;
     int iencoder;
     encoder_error_info *error_info;
+    Toy_Type *notrace;
 
+    notrace = hash_get_and_unset_t(nameargs, new_symbol(L"notrace:"));
     if (hash_get_length(nameargs) > 0) goto error;
     if (arglen != 1) goto error;
 
@@ -1600,25 +1602,27 @@ cmd_load(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	return script;
     }
 
-    shash = interp->scripts;
-    tid = hash_get_t(shash, const_atscriptid);
-    id = mpz_get_si(tid->u.biginteger);
-    id++;
-    nid = new_integer_si(id);
-    SET_SCRIPT_ID(script, id);
+    if (notrace == NULL) {
+        shash = interp->scripts;
+        tid = hash_get_t(shash, const_atscriptid);
+        id = mpz_get_si(tid->u.biginteger);
+        id++;
+        nid = new_integer_si(id);
+        SET_SCRIPT_ID(script, id);
 
-    sscript = GC_MALLOC(sizeof(struct _toy_script));
-    ALLOC_SAFE(sscript);
+        sscript = GC_MALLOC(sizeof(struct _toy_script));
+        ALLOC_SAFE(sscript);
 
-    sscript->id = id;
-    sscript->path = tpath;
-    sscript->src = src;
-    sscript->script = script;
-    cont = new_container(sscript, L"SCRIPT");
+        sscript->id = id;
+        sscript->path = tpath;
+        sscript->src = src;
+        sscript->script = script;
+        cont = new_container(sscript, L"SCRIPT");
 
-    hash_set_t(shash, const_atscriptid, nid);
-    hash_set(shash, to_string(nid), cont);
-    hash_set(shash, to_wchar(path), cont);
+        hash_set_t(shash, const_atscriptid, nid);
+        hash_set(shash, to_string(nid), cont);
+        hash_set(shash, to_wchar(path), cont);
+    }
 
     result = toy_eval_script(interp, script);
 
@@ -1629,7 +1633,7 @@ cmd_load(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     return result;
 
 error:
-    return new_exception(TE_SYNTAX, L"Syntax error, syntax: load \"path\"", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error, syntax: load [:notrace] \"path\"", interp);
 }
 
 Toy_Type*
