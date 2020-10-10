@@ -14,6 +14,10 @@ EditBuffer method init-constructor () {
     sets RedoBuffer ();
 };
 
+EditBuffer method string () {
+    return ["name=" . $BufferName ", path=" $File];
+};
+
 EditBuffer method load-content (path init-only: init-flag buffer-name: buff-name) {
     result := (<nil> "");
     f ::= new File;

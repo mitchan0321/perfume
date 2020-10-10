@@ -33,6 +33,7 @@ CombiWindow method init (main y x line column) {
     sets SearchResult ();
     sets SearchHilight <nil>;
     load-keybind;
+    sets Mode <nil>;
 };
 
 CombiWindow method activate () {
@@ -87,14 +88,15 @@ CombiWindow method render () {
     (cy cx) ::= get-source-index $buff $geom;
 
     curs-print $StatusLineCurs [
-	  " -- [%v%v%v%v]#%v - (%d,%d) - %v <%v> %v" fmt
+	  " -- [%v%v%v%v]#%v - (%d,%d) - <%v> {%v} %v %v" fmt
 	  [[$buff modify?] ??? "*" " "]
 	  [[$buff newfile?] ??? "N" " "]
 	  [$FreeCursor ??? "F" " "]
 	  [[get-region] ??? "R" " "]
 	  [$win split sep: "#" : get 1]
 	  $cy $cx
-	  $buff-name 
+	  $buff-name
+	  $Mode
 	  [[$buff get-path] ?? "*no file*"]
 	  ["-" repeat $x]
 #	  $cy $cx
@@ -455,9 +457,14 @@ CombiWindow method fit-to-cursor (geom l c) {
 };
 
 CombiWindow method load-keybind () {
+    sets KeyBinding [dict()];
     $LIB_PATH each do: {| i |
 	if {file exists? [$i . "/" $COMBIWINDOW_KEYBINDFILE]} {
-	    try {load [$i . "/" $COMBIWINDOW_KEYBINDFILE]} catch: {| e | throw $e};
+	    try {
+		load [$i . "/" $COMBIWINDOW_KEYBINDFILE]
+	    } catch: {| e |
+		throw ErrConfiguration ["Error at key-bind file: " . $COMBIWINDOW_KEYBINDFILE ", <" [$e car] "># " [$e cdr]];
+	    };
 	    break;
 	};
     };
@@ -465,6 +472,37 @@ CombiWindow method load-keybind () {
 
 CombiWindow method setkey (key command) {
     $KeyBinding set $key $command;
+};
+
+CombiWindow method load-keybind-override (mode) {
+    load-keybind;
+    key-path := $MODE_FILE,$mode;
+    $key-path ?? {
+	show-message ["No such mode: " . $mode];
+	return;
+    };
+    
+    $LIB_PATH each do: {| i |
+	if {file exists? [$i . "/" $key-path]} {
+	    try {
+		load [$i . "/" $key-path]
+	    } catch: {| e |
+		show-message ["Error at mode file: " . $key-path ", <" [$e car] "># " [$e cdr]];
+		return;
+	    };
+	    return;
+	};
+    };
+    show-message ["No such mode file: " . $key-path];
+};
+
+CombiWindow method set-mode (mode) {
+    sets Mode $mode;
+    load-keybind-override $mode;
+};
+
+CombiWindow method get-mode () {
+    return $Mode;
 };
 
 CombiWindow method apply-keybind (main window key) {
@@ -796,7 +834,7 @@ CombiWindow method set-search-hilight () {
 };
 
 CombiWindow method set-word-hilight () {
-    if {! [defvar? HILIGHT_REGEXP]} {return};
+    if {false? HILIGHT_REGEXP} {return};
 
     buff ::= get-buffer;
     geom ::= get-geom;

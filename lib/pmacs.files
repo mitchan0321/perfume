@@ -21,6 +21,11 @@ pmacs.conf
 pmacs.prfm
 pmacs.files
 pmacs.TODO
+Mode-BufferList.key
+Mode-C.key
+Mode-Interp.key
+Mode-Prfm.key
+Mode-Text.key
 
 );
 

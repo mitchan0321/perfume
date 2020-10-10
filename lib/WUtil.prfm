@@ -164,9 +164,11 @@ defun line-input (curs disp-line disp-col input-len cur-index cur-val key-in) {
 
 defun show-message (msg) {
     if $MainWindow {
-	[$MainWindow get-minibuffer-window] ?? {throw ErrNoMiniBuffer "No MiniBuffer for debugging."};
-	$MainWindow display-window-message "MiniBuffer" $msg;
-	$MainWindow get-minibuffer-window : refresh;
+	try {
+	    [$MainWindow get-minibuffer-window] ?? {throw ErrNoMiniBuffer "No MiniBuffer for debugging."};
+	    $MainWindow display-window-message "MiniBuffer" $msg;
+	    $MainWindow get-minibuffer-window : refresh;
+	} catch: {};
     };
 };
 

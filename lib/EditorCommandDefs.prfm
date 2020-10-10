@@ -501,8 +501,8 @@ defcommand nest-test
 
 defcommand save-buffer
 {   | main window |
-    buff ::= $window get-buffer;
-    path ::= $buff get-path;
+    __buff_in_clojure__ ::= $window get-buffer;
+    path ::= $__buff_in_clojure__ get-path;
 
     if {or {nil? $path} {$path = ""}} {
 	$main mini-input-start [pwd : . "/"] prompt: "Save file name: ";
@@ -543,25 +543,27 @@ defcommand save-buffer
 			};
 			if {and {eq? $in-key CTRL_M} {eq? $value "yes"}} {
 			    $main mini-input-end;
-			    (result err) ::= $buff save-content path: $path;
+			    (result err) ::= $__buff_in_clojure__ save-content path: $path;
 			    if $result {
 				show-message "Save Done.";
 			    } {
 				show-message ["Save Failed, path: " . $path " (" $err ")"];
 			    };
 			    BufferManager unregist-buffer "*Directory*";
+			    $MainWindow bind-buffer [$window get-window-name] $__buff_in_clojure__;
 			    return SELF;
 			};
 		    };
 		} {
 		    $main mini-input-end;
-		    (result err) ::= $buff save-content path: $path;
+		    (result err) ::= $__buff_in_clojure__ save-content path: $path;
 		    if $result {
 			show-message "Save Done.";
 		    } {
 			show-message ["Save Failed, path: " . $path " (" $err ")"];
 		    };
 		    BufferManager unregist-buffer "*Directory*";
+		    $MainWindow bind-buffer [$window get-window-name] $__buff_in_clojure__;		    
 		    return SELF;
 		};
 	    };
@@ -593,8 +595,8 @@ defcommand save-buffer
 
 defcommand save-buffer-as
 {   | main window |
-    buff ::= $window get-buffer;
-    path ::= $buff get-path;
+    __buff_in_clojure__ ::= $window get-buffer;
+    path ::= $__buff_in_clojure__ get-path;
 
     $main mini-input-start [pwd : . "/"] prompt: "Save file name: ";
     $main add-mini-input-callback $window {| main window in-key value |
@@ -634,25 +636,27 @@ defcommand save-buffer-as
 		   };
 		   if {and {eq? $in-key CTRL_M} {eq? $value "yes"}} {
 		       $main mini-input-end;
-		       (result err) ::= $buff save-content path: $path;
+		       (result err) ::= $__buff_in_clojure__ save-content path: $path;
 		       if $result {
 			   show-message "Save Done.";
 		       } {
 			   show-message ["Save Failed, path: " . $path " (" $err ")"];
 		       };
 		       BufferManager unregist-buffer "*Directory*";
+		       $MainWindow bind-buffer [$window get-window-name] $__buff_in_clojure__;
 		       return SELF;
 		   };
 	       };
 	    } {
 		$main mini-input-end;
-		(result err) ::= $buff save-content path: $path;
+		(result err) ::= $__buff_in_clojure__ save-content path: $path;
 		if $result {
 		    show-message "Save Done.";
 		    } {
 		show-message ["Save Failed, path: " . $path " (" $err ")"];
 		};
 		BufferManager unregist-buffer "*Directory*";
+		$MainWindow bind-buffer [$window get-window-name] $__buff_in_clojure__;
 		return SELF;
 	    };
 	};
@@ -714,16 +718,17 @@ defcommand buffer-list
     $buff load-content "buffer list" :init-only buffer-name: "*Buffer List*";
     $buff clear-all;
 
-    $buff append-string ["%1v %-3v %-16v %6v %-v" fmt " " "New" "Buffer Name" "Length" "File Path"];
-    $buff append-string ["%1v %-3v %-16v %6v %-v" fmt "-" "---" "-----------" "------" "---------"];
+    $buff append-string "!! Hint !!  Move cursor to buffer and Enter, jump to buffer.";
+    $buff append-string ["%1v%-3v %-26v %6v %-v" fmt "M" "N" "Buffer Name" "Length" "File Path"];
+    $buff append-string ["%1v%-3v %-26v %6v %-v" fmt "-" "-" "-----------" "------" "---------"];
     l ::= BufferManager get-buffer-list;
     $l each do: {| buff-name |
 	display-buffer ::= BufferManager get-buffer $buff-name;
 	$buff append-string [
-	    "%1v %-3v %-16v %6d %-v" fmt
+	    "%1v%-3v %-26v %6d %-v" fmt
 	    [[$display-buffer modify?] ??? "*" " "]
-	    [[$display-buffer newfile?] ??? "new" "   "]
-	    $buff-name
+	    [[$display-buffer newfile?] ??? "N" "   "]
+	    ["<" . $buff-name ">"]
 	    [$display-buffer get-buffer-length]
 	    [$display-buffer get-path]
 	    ];
@@ -731,6 +736,33 @@ defcommand buffer-list
     $buff no-modify;
     
     $main bind-buffer [$window get-window-name] $buff;
+    result SELF;
+};
+
+defcommand jump-to-buffer
+{   | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (line col) ::= $window get-source-index $buff $geom;
+    r ::= $buff get-buffer-line $line;
+    $r ?? {
+	show-message "No buffer name specified.";
+	return SELF;
+    };
+    l ::= $r =~ '\<[^\>]+\>';
+    if {nil? $l} {
+	show-message "No buffer name specified.";
+	return SELF;
+    };
+
+    s ::= $l car : get 2;
+    s ::= $s sub 1 [$s len : - 1];
+    target-buff ::= BufferManager get-buffer $s;
+    $target-buff ?? {
+	show-message "No buffer name specified.";
+	return SELF;
+    };
+    $main bind-buffer [$window get-window-name] $target-buff;
     result SELF;
 };
 
@@ -865,9 +897,10 @@ defcommand miniwindow-input-sample
 
 defcommand search
 {   | main window |
+    __buff_in_clojure__ ::= $window get-buffer;
     $window start-search;
     $main mini-input-start "" prompt: "Search: ";
-    $window set-search-result [$buff search ""];
+    $window set-search-result [$__buff_in_clojure__ search ""];
     
     $main add-mini-input-callback $window {| main window in-key value |
         if {eq? $in-key KEY_ESC} {
@@ -891,20 +924,18 @@ defcommand search
 	if {eq? $in-key CTRL_V} {
 	    str ::= $window get-search-string;
 	    $main mini-input-value-override $str [$str len];
-	    $window set-search-result [$buff search $str];
+	    $window set-search-result [$__buff_in_clojure__ search $str];
 	    $window move-to-next-search;
 	};
 	if {or {eq? $in-key CTRL_H} {eq? $in-key KEY_DC}
 	       {eq? $in-key KEY_BACKSPACE}} {
 	    $window reset-search;
-	    buff ::= $window get-buffer;
-	    $window set-search-result [$buff search $value];
+	    $window set-search-result [$__buff_in_clojure__ search $value];
 	    $window move-to-next-search;
 	};
 	if {string? $in-key} {
 	    $window reset-search;
-	    buff ::= $window get-buffer;
-	    $window set-search-result [$buff search $value];
+	    $window set-search-result [$__buff_in_clojure__ search $value];
 	    $window move-to-next-search;
 	};
     };
