@@ -34,6 +34,7 @@ CombiWindow method init (main y x line column) {
     sets SearchHilight <nil>;
     load-keybind;
     sets Mode <nil>;
+    sets HILIGHT_REGEXP <nil>;
 };
 
 CombiWindow method activate () {
@@ -475,6 +476,7 @@ CombiWindow method setkey (key command) {
 };
 
 CombiWindow method load-keybind-override (mode) {
+    sets HILIGHT_REGEXP <nil>;
     load-keybind;
     key-path := $MODE_FILE,$mode;
     $key-path ?? {
@@ -587,7 +589,7 @@ CombiWindow method destroy () {
     sets VerticalLineCurs <nil>;
 };
 
-CombiWindow method display-evaluation (o) {
+CombiWindow method display-evaluation () {
     buff ::= get-buffer;
     if {eq? ScratchBuffer [$buff get @name]} {
 	apply-command $MainWindow [self] "" bottom-of-buffer;
@@ -604,11 +606,10 @@ CombiWindow method display-evaluation (o) {
 	};
 	$stderr clear;
 
-	$buff append-string ["" . [$o string]];
 	apply-command $MainWindow [self] "" bottom-of-buffer;
 	apply-command $MainWindow [self] "" start-region;
     } {
-	show-message ["Eval result: " . $o];
+	show-message "Evaled. See \'*Scratch*\' buffer.";
     };
 };
 

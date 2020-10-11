@@ -33,8 +33,11 @@ defun pmacs (trace: t) {
     setvar stdout [new Stream];
     setvar stderr [new Stream];
     $stdin set-nolimit;
+    $stdin set-comode;
     $stdout set-nolimit;
+    $stdout set-comode;
     $stderr set-nolimit;
+    $stderr set-comode;
     
     try {
 	defvar MainWindow [new Window init: ([curs-init])];
@@ -49,6 +52,19 @@ defun pmacs (trace: t) {
 	    $window apply-command $main $window "" start-region;
 	    result ALL;
 	};
+	$MainWindow add-background job-id: "PINTERP" {
+	    c ::= coro {pinterp};
+	    body := {| main window |
+		$c next;
+		if {eq? [$c stat] DONE} {
+		    $c release;
+		    setc [coro {pinterp}];
+		};
+		$MainWindow add-background job-id: "PINTERP" $body;
+	    };
+	    yield $body $MainWindow <nil>;
+	};
+
 	$MainWindow render-all;
 	$MainWindow refresh;
 	$MainWindow key-event-loop;

@@ -403,6 +403,12 @@ defcommand eval-region
     (sy sx) ::= $window end-region;
     (ey ex) ::= $window get-source-index $buff $geom;
     str ::= $window get-region-string $sy $sx $ey $ex;
+    $stdin puts $str;
+    $window display-evaluation;
+    
+### REMMARC ################################
+### This comment block is old interpriter code.
+REM {
     if {! [defvar? INTERP_LOCAL]} {defvar INTERP_LOCAL [dict]};
     try {
 	unset e;
@@ -421,6 +427,9 @@ defcommand eval-region
     } {
 	$window display-evaluation ["Result[" . [type? [$result car]] "]=> " [$result car]];
     };
+};
+### END REM ################################
+
     result ALL;
 };
 
@@ -475,28 +484,6 @@ defcommand open-file
 	};
     };
     result SELF;
-};
-
-##
-## Nested callback sample.
-## $value was save to path variable in 1st callback, because $value is override by 2nd callback.
-##
-defcommand nest-test
-{   | main window |
-    $main mini-input-start "" prompt: "test [y(es)/n(o)]";
-    $main add-mini-input-callback $window {| main window in-key value |
-	if {eq? $in-key "y"} {
-	    $main mini-input-end;
-	    path := $value;
-	    $main mini-input-start "" prompt: "test 2 [o(k)/n(g)]";
-	    $main add-mini-input-callback $window {| main window in-key value |
-		if {eq? $in-key "o"} {
-		    $main mini-input-end;
-		    debug-message ["path value is: " . $path ", value is: " $value];
-		};
-	    };
-	};
-    };
 };
 
 defcommand save-buffer
@@ -580,7 +567,7 @@ defcommand save-buffer
 	};
         if {or {$value = "y"} {$value = "Y"}} {
 	    $main mini-input-end;
-	    (result err) ::= $buff save-content;
+	    (result err) ::= $__buff_in_clojure__ save-content;
 	    if $result {
 		show-message "Save Done.";
 	    } {
@@ -849,6 +836,7 @@ defcommand cut-region
     (sy sx) ::= $window end-region;
     (ey ex) ::= $window get-source-index $buff $geom;
     (line col) ::= $window cut-region $sy $sx $ey $ex;
+    (line col) ::= $window get-cursor-index $buff $line $col;
     show-message "Cut.";
     $window set-freecursor <nil>;
     $geom set! IndexColumn.SAVE $col;
@@ -883,18 +871,6 @@ defcommand paste-buffer
     result ALL;
 };
 
-defcommand miniwindow-input-sample
-{   | main window |
-    $main mini-input-start "" prompt: "test prompt: ";
-    $main add-mini-input-callback $window {| main window in-key value |
-        if {eq? $in-key KEY_ESC} {
-	    $main mini-input-end;
-	    debug-message ["input data: " . $value];
-	};
-    };
-    result ALL;
-};
-
 defcommand search
 {   | main window |
     __buff_in_clojure__ ::= $window get-buffer;
@@ -921,6 +897,24 @@ defcommand search
 	if {eq? $in-key KEY_UP} {
 	    $window move-to-previous-search;
 	};
+	if {eq? $in-key KEY_SF} {
+	    buff ::= $window get-buffer;
+	    geom ::= $window get-geom;
+	    (sy sx) ::= $window get-source-index $buff $geom;
+	    $window apply-command $main $window "" smooth-scroll-down;
+	    (ey ex) ::= $window get-source-index $buff $geom;
+	    $window set-search-hilight;
+	    ### $window move-to-next-search;
+	};
+	if {eq? $in-key KEY_SR} {
+	    buff ::= $window get-buffer;
+	    geom ::= $window get-geom;
+	    (sy sx) ::= $window get-source-index $buff $geom;
+	    $window apply-command $main $window "" smooth-scroll-up;
+	    (ey ex) ::= $window get-source-index $buff $geom;
+	    $geom set! CursorLine [$geom,CursorLine - [$ey - $sy]];
+	    ### $window move-to-previous-search;
+	};
 	if {eq? $in-key CTRL_V} {
 	    str ::= $window get-search-string;
 	    $main mini-input-value-override $str [$str len];
@@ -942,15 +936,65 @@ defcommand search
     result SELF;
 };
 
-###
-### REMARK, Spare for new editor command making.
+######
+###### REMARK, Spare for new editor command making.
+######
 REM {
 
 defcommand 
 {   | main window |
 };
 
+defcommand miniwindow-input-sample
+{   | main window |
+    $main mini-input-start "" prompt: "test prompt: ";
+    $main add-mini-input-callback $window {| main window in-key value |
+        if {eq? $in-key KEY_ESC} {
+	    $main mini-input-end;
+	    debug-message ["input data: " . $value];
+	};
+    };
+    result ALL;
 };
-### END REMARK
-###
 
+##
+## Nested callback sample.
+## $value was save to path variable in 1st callback, because $value is override by 2nd callback.
+##
+defcommand nest-test
+{   | main window |
+    $main mini-input-start "" prompt: "test [y(es)/n(o)]";
+    $main add-mini-input-callback $window {| main window in-key value |
+	if {eq? $in-key "y"} {
+	    $main mini-input-end;
+	    path := $value;
+	    $main mini-input-start "" prompt: "test 2 [o(k)/n(g)]";
+	    $main add-mini-input-callback $window {| main window in-key value |
+		if {eq? $in-key "o"} {
+		    $main mini-input-end;
+		    debug-message ["path value is: " . $path ", value is: " $value];
+		};
+	    };
+	};
+    };
+};
+
+defcommand test
+{   | main window |
+#    debug-message ["info local: " . [info local]] wait: 3000;
+    $main mini-input-start "" prompt: "test prompt: ";
+    $main add-mini-input-callback $window {| main window in-key value |
+        if {eq? $in-key KEY_ESC} {
+	    $main mini-input-end;
+	    debug-message ["closure: " . [info closure]];
+	};
+        if {eq? $in-key CTRL_I} {
+	    fname ::= show-files-in-window $main $window $value;
+	};
+    };
+    result ALL;
+};
+
+######
+}; ### END REMARK
+######
