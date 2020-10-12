@@ -592,22 +592,31 @@ CombiWindow method destroy () {
 CombiWindow method display-evaluation () {
     buff ::= get-buffer;
     if {eq? ScratchBuffer [$buff get @name]} {
-	apply-command $MainWindow [self] "" bottom-of-buffer;
+        try {$PINTERP next} catch: {};
 
-	$stdout close;
-	$stdout each do: {| r |
-		$buff append-string ["" . $r];
-	};
-	$stdout clear;
+	update-display := <nil>;
 
 	$stderr close;
 	$stderr each do: {| r |
-		$buff append-string ["ERR> " . $r];
+	    $buff append-string ["ERR> " . $r];
+	    update-display := <t>;
 	};
 	$stderr clear;
 
-	apply-command $MainWindow [self] "" bottom-of-buffer;
-	apply-command $MainWindow [self] "" start-region;
+	$stdout close;
+	$stdout each do: {| r |
+	    $buff append-string ["" . $r];
+	    update-display := <t>;
+	};
+	$stdout clear;
+
+	if $update-display {
+	    apply-command $MainWindow [self] "" bottom-of-buffer;
+	    render;
+	    refresh;
+	    set-cursor;
+	};
+	### if $update-display {apply-command $MainWindow [self] "" start-region};
     } {
 	show-message "Evaled. See \'*Scratch*\' buffer.";
     };

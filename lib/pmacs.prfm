@@ -49,18 +49,35 @@ defun pmacs (trace: t) {
 	$MainWindow add-background {
 	    | main window |
 	    $window apply-command $main $window "" bottom-of-buffer;
-	    $window apply-command $main $window "" start-region;
+	    ### $window apply-command $main $window "" start-region;
 	    result ALL;
 	};
-	$MainWindow add-background job-id: "PINTERP" {
+	$MainWindow add-background job-id: "PINTERP-WATCHDOG" {
 	    c ::= coro {pinterp};
+	    if {defvar? PINTERP} {
+		setvar PINTERP $c;
+	    } {
+		defvar PINTERP $c;
+	    };
+	      
 	    body := {| main window |
-		$c next;
-		if {eq? [$c stat] DONE} {
-		    $c release;
-		    setc [coro {pinterp}];
+		if {eq? [$PINTERP stat] DONE} {
+		    try {$PINTERP release} catch: {};
+		    c ::= coro {pinterp};
+		    setvar PINTERP $c;
 		};
-		$MainWindow add-background job-id: "PINTERP" $body;
+
+	        buff := <nil>;
+		if $window {buff ::= $window get-buffer};
+		if $buff {
+		    if {eq? ScratchBuffer [$buff get @name]} {
+			if {$window method? display-evaluation} {
+			    try {$window display-evaluation} catch: {};
+			};
+		    };
+		};
+
+		$MainWindow add-background job-id: "PINTERP-WATCHDOG" $body;
 	    };
 	    yield $body $MainWindow <nil>;
 	};

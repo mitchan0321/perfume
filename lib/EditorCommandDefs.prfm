@@ -403,7 +403,11 @@ defcommand eval-region
     (sy sx) ::= $window end-region;
     (ey ex) ::= $window get-source-index $buff $geom;
     str ::= $window get-region-string $sy $sx $ey $ex;
-    $stdin puts $str;
+    if {$str = "abort!"} {
+	if {defvar? PINTERP} {$PINTERP release};
+    } {
+	$stdin puts $str;
+    };
     $window display-evaluation;
     
 ### REMMARC ################################
@@ -430,6 +434,15 @@ REM {
 };
 ### END REM ################################
 
+    result ALL;
+};
+
+defcommand kill-interp
+{   | main window |
+    if {defvar? PINTERP} {
+	try {$PINTERP release} catch: {};
+    };
+    $stderr puts "Interpriter killed.";
     result ALL;
 };
 

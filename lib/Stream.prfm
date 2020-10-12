@@ -36,7 +36,7 @@ Stream method init (args: a) {
 #    sets limit 5;	# for debug
     sets count 0;
     sets newline <nil>;
-    sets itemlimit 4096;
+    sets itemlimit 512;
     sets itemcount 0;
 };
 

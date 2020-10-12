@@ -1,0 +1,18 @@
+defun pinterp () {
+    $stdout puts "Start perfume/pmacs interpriter.";
+    $stdin each do: {| line |
+        if {[$line clean] = ""} {continue};
+	unset e;
+
+	try {
+	    result := ([$line eval]);
+	} catch: {| e |
+	    result ::= "EXCEPTION: <" . [$e car] "># " [$e cdr];
+	};
+	if {set? e} {
+	    $stderr puts $result;
+	} {
+	    $stdout puts ["Result[" . [type? [$result car]] "]=> " [$result car]];
+	};
+    };
+};
