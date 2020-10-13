@@ -3885,7 +3885,7 @@ cmd_where(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     int top;
 
     if (arglen != 0) goto error;
-    top = interp->cur_func_stack-1;
+    top = interp->cur_func_stack;
     if (hash_get_and_unset_t(nameargs, new_symbol(L"top:"))) {
 	top = interp->cur_func_stack;
     }
@@ -3895,6 +3895,7 @@ cmd_where(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     for (i=top; i>=0; i--) {
 	elem = new_list(NULL);
 
+/*
 	list_append(elem, new_cons(new_symbol(L"index"), 
 				   new_integer_si(i)));
 	list_append(elem, new_cons(new_symbol(L"line"),
@@ -3911,6 +3912,21 @@ cmd_where(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	list_append(elem, new_cons(new_symbol(L"path"),
 				   i>=1 ? new_string_str(get_script_path(interp, interp->func_stack[i-1]->script_id)) 
 				        : new_string_str(L"-")));
+*/
+	list_append(elem, new_cons(new_symbol(L"index"), 
+				   new_integer_si(i)));
+	list_append(elem, new_cons(new_symbol(L"line"),
+				   new_integer_si(interp->func_stack[i]->trace_info->line)));
+	list_append(elem, new_cons(new_symbol(L"object"),
+				   toy_clone(interp->func_stack[i]->trace_info->object_name)));
+	list_append(elem, new_cons(new_symbol(L"function"),
+				   toy_clone(interp->func_stack[i]->trace_info->func_name)));
+	list_append(elem, new_cons(new_symbol(L"statement"),
+				   toy_clone(interp->func_stack[i]->trace_info->statement)));
+	list_append(elem, new_cons(new_symbol(L"local"),
+				   new_dict(interp->func_stack[i]->localvar)));
+	list_append(elem, new_cons(new_symbol(L"path"),
+				   new_string_str(get_script_path(interp, interp->func_stack[i]->script_id))));
 
 	list_append(result, elem);
     }
