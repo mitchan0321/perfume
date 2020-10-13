@@ -517,11 +517,12 @@ get_stack_trace(Toy_Interp *interp, Cell *stack) {
     wchar_t *buff;
     int i;
 
-    buff = GC_MALLOC(256*sizeof(wchar_t));
+    buff = GC_MALLOC(1024*sizeof(wchar_t));
     ALLOC_SAFE(buff);
 
+/*
     if (interp->trace_info) {
-	swprintf(buff, 256, L"%ls:%d: %ls in %ls::%ls\n",
+	swprintf(buff, 1024, L"%ls:%d: %ls in %ls::%ls\n",
 		 get_script_path(interp, interp->func_stack[interp->cur_func_stack]->script_id),
 		 interp->trace_info->line,
 		 to_print(interp->trace_info->statement),
@@ -529,12 +530,11 @@ get_stack_trace(Toy_Interp *interp, Cell *stack) {
 		     to_string(interp->func_stack[interp->cur_func_stack]->trace_info->object_name) : L"self"),
 		 (interp->func_stack[interp->cur_func_stack]->trace_info->func_name ?
 		     to_string(interp->func_stack[interp->cur_func_stack]->trace_info->func_name) : L"???"));
-	buff[255] = 0;
+	buff[1023] = 0;
 	cell_add_str(stack, buff);
     }
-/*
     for (i=interp->cur_func_stack; i>0; i--) {
-	swprintf(buff, 256, L"%ls:%d: %ls in %ls::%ls\n",
+	swprintf(buff, 1024, L"%ls:%d: %ls in %ls::%ls\n",
 		 get_script_path(interp, interp->func_stack[i-1]->script_id),
 		 interp->func_stack[i]->trace_info->line,
 		 to_print(interp->func_stack[i]->trace_info->statement),
@@ -542,12 +542,12 @@ get_stack_trace(Toy_Interp *interp, Cell *stack) {
 		  		to_string(interp->func_stack[i-1]->trace_info->object_name) : L"self"),
 		 (interp->func_stack[i-1]->trace_info->func_name ?
 		  		to_string(interp->func_stack[i-1]->trace_info->func_name) : L"???"));
-	buff[255] = 0;
+	buff[1023] = 0;
 	cell_add_str(stack, buff);
     }
 */
-    for (i=interp->cur_func_stack; i>0; i--) {
-	swprintf(buff, 256, L"%ls:%d: %ls in %ls::%ls\n",
+    for (i=interp->cur_func_stack; i>=0; i--) {
+	swprintf(buff, 1024, L"%ls:%d: %ls in %ls::%ls\n",
 		 get_script_path(interp, interp->func_stack[i]->script_id),
 		 interp->func_stack[i]->trace_info->line,
 		 to_print(interp->func_stack[i]->trace_info->statement),
@@ -555,7 +555,7 @@ get_stack_trace(Toy_Interp *interp, Cell *stack) {
 		  		to_string(interp->func_stack[i]->trace_info->object_name) : L"self"),
 		 (interp->func_stack[i]->trace_info->func_name ?
 		  		to_string(interp->func_stack[i]->trace_info->func_name) : L"???"));
-	buff[255] = 0;
+	buff[1023] = 0;
 	cell_add_str(stack, buff);
     }
 

@@ -1602,6 +1602,7 @@ cmd_load(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	return script;
     }
 
+    nid = new_integer_si(0);
     if (notrace == NULL) {
         shash = interp->scripts;
         tid = hash_get_t(shash, const_atscriptid);
@@ -3885,7 +3886,7 @@ cmd_where(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     int top;
 
     if (arglen != 0) goto error;
-    top = interp->cur_func_stack;
+    top = interp->cur_func_stack - 1;
     if (hash_get_and_unset_t(nameargs, new_symbol(L"top:"))) {
 	top = interp->cur_func_stack;
     }

@@ -443,12 +443,18 @@ defcommand open-file
 	    if {[$value len] = 0} {
 		show-message "No file name specified.";
 	    };
-	    buff ::= new EditBuffer;
-	    (result err) ::= $buff load-content [
-		path-adjust [{[$value sub 0 1] = "/"} ???
+            path ::= path-adjust [
+		{[$value sub 0 1] = "/"} ???
 		    $value
-		    [pwd : . "/" $value]]
+		    [pwd : . "/" $value]
 	    ];
+	    buff ::= BufferManager get-buffer-by-path $path;
+            if $buff {
+		$MainWindow bind-buffer [$window get-window-name] $buff;
+		return SELF;
+            };
+	    buff ::= new EditBuffer;
+	    (result err) ::= $buff load-content $path;
 	    $MainWindow bind-buffer [$window get-window-name] $buff;
 	    $result ?? {show-message ["Open Failed, path: " . $value " ("  $err ")"]};
 	    BufferManager unregist-buffer "*Directory*";
