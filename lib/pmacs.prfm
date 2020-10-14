@@ -34,10 +34,10 @@ defun pmacs (trace: t) {
     setvar stderr [new Stream];
     $stdin set-nolimit;
     $stdin set-comode;
-    $stdout set-nolimit;
+    $stdout set-limit 128;
     $stdout set-itemlimit 80;
     $stdout set-comode;
-    $stderr set-nolimit;
+    $stderr set-limit 128;
     $stderr set-itemlimit 80;
     $stderr set-comode;
     

@@ -520,7 +520,6 @@ get_stack_trace(Toy_Interp *interp, Cell *stack) {
     buff = GC_MALLOC(1024*sizeof(wchar_t));
     ALLOC_SAFE(buff);
 
-/*
     if (interp->trace_info) {
 	swprintf(buff, 1024, L"%ls:%d: %ls in %ls::%ls\n",
 		 get_script_path(interp, interp->func_stack[interp->cur_func_stack]->script_id),
@@ -533,6 +532,7 @@ get_stack_trace(Toy_Interp *interp, Cell *stack) {
 	buff[1023] = 0;
 	cell_add_str(stack, buff);
     }
+/*
     for (i=interp->cur_func_stack; i>0; i--) {
 	swprintf(buff, 1024, L"%ls:%d: %ls in %ls::%ls\n",
 		 get_script_path(interp, interp->func_stack[i-1]->script_id),

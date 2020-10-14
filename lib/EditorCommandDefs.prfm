@@ -927,6 +927,14 @@ defcommand search
     result SELF;
 };
 
+defcommand test
+{   | main window |
+    w : each do: {| i |
+        $stdout puts $i;
+    };
+    result ALL;
+};
+
 ######
 ###### REMARK, Spare for new editor command making.
 ######
@@ -944,6 +952,14 @@ defcommand miniwindow-input-sample
 	    $main mini-input-end;
 	    debug-message ["input data: " . $value];
 	};
+    };
+    result ALL;
+};
+
+defcommand test
+{   | main window |
+    w : each do: {| i |
+        $stdout puts $i;
     };
     result ALL;
 };

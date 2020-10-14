@@ -3886,14 +3886,32 @@ cmd_where(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     int top;
 
     if (arglen != 0) goto error;
-    top = interp->cur_func_stack - 1;
+
+    result = new_list(NULL);
+    top = interp->cur_func_stack;
+    
     if (hash_get_and_unset_t(nameargs, new_symbol(L"top:"))) {
-	top = interp->cur_func_stack;
+	elem = new_list(NULL);
+	list_append(elem, new_cons(new_symbol(L"index"), 
+				   new_integer_si(top)));
+	list_append(elem, new_cons(new_symbol(L"line"),
+				   new_integer_si(interp->trace_info->line)));
+	list_append(elem, new_cons(new_symbol(L"object"),
+				   toy_clone(interp->trace_info->object_name)));
+	list_append(elem, new_cons(new_symbol(L"function"),
+				   toy_clone(interp->trace_info->func_name)));
+	list_append(elem, new_cons(new_symbol(L"statement"),
+				   toy_clone(interp->trace_info->statement)));
+	list_append(elem, new_cons(new_symbol(L"local"),
+				   new_dict(interp->func_stack[interp->cur_func_stack]->localvar)));
+	list_append(elem, new_cons(new_symbol(L"path"),
+				   new_string_str(get_script_path(interp, interp->script_id))));
+
+	list_append(result, elem);
     }
     if (hash_get_length(nameargs) != 0) goto error;
 
-    result = new_list(NULL);
-    for (i=top; i>=0; i--) {
+    for (i=top - 1; i>=0; i--) {
 	elem = new_list(NULL);
 
 /*

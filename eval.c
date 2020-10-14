@@ -404,10 +404,11 @@ control_goto:
 	goto exit_eval;
 
     default:
-	msg = new_cell(L"No runnable object, '");
-	cell_add_str(msg, to_string(first));
-	cell_add_str(msg, L"'.");
-	ret = new_exception(TE_NORUNNABLE, cell_get_addr(msg), interp);
+	// msg = new_cell(L"No runnable object, '");
+	// cell_add_str(msg, to_string(first));
+	// cell_add_str(msg, L"'.");
+	// ret = new_exception(TE_NORUNNABLE, cell_get_addr(msg), interp);
+	ret = new_exception(TE_NORUNNABLE, L"No runnable object.", interp);
     }
 
 exit_eval:
@@ -955,15 +956,16 @@ error4:
 Toy_Type*
 eval_closure(Toy_Interp *interp, Toy_Type *closure, Toy_Func_Trace_Info *trace_info) {
     Toy_Env *env;
-    Cell *c;
+    // Cell *c;
     Toy_Type *result;
     int func_flag = 0, obj_flag = 0;
 
     if (GET_TAG(closure) != CLOSURE) {
-	c = new_cell(L"Not a closure, '");
-	cell_add_str(c, to_string(closure));
-	c = new_cell(L"'.");
-	return new_exception(TE_NORUNNABLE, cell_get_addr(c), interp);
+	// c = new_cell(L"Not a closure, '");
+	// cell_add_str(c, to_string(closure));
+	// c = new_cell(L"'.");
+	// return new_exception(TE_NORUNNABLE, cell_get_addr(c), interp);
+	return new_exception(TE_NORUNNABLE, L"No closure specified.", interp);
     }
 
     env = closure->u.closure.env;
@@ -1181,13 +1183,14 @@ toy_yield(Toy_Interp *interp, Toy_Type *closure, Toy_Type *args) {
     /* this utility function used only command functions */
     
     Toy_Env *env;
-    Cell *c;
+    // Cell *c;
 
     if (GET_TAG(closure) != CLOSURE) {
-	c = new_cell(L"Not a closure, '");
-	cell_add_str(c, to_string(closure));
-	c = new_cell(L"'.");
-	return new_exception(TE_NORUNNABLE, cell_get_addr(c), interp);
+	// c = new_cell(L"Not a closure, '");
+	// cell_add_str(c, to_string(closure));
+	// c = new_cell(L"'.");
+	// return new_exception(TE_NORUNNABLE, cell_get_addr(c), interp);
+	return new_exception(TE_NORUNNABLE, L"No closure specified at yield", interp);
     }
     
     env = closure->u.closure.env;

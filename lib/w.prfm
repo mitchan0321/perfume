@@ -1,4 +1,4 @@
-defun w (wide: wide) {
+defun w (wide: wide top: top) {
     if {true? wide} then: {
 	println ["%3v %-18v %v" fmt "Idx" "Path" "Statement/Local"];
 	println ["%3v %-18v %v" fmt "===" "====" "==============="];
@@ -6,7 +6,13 @@ defun w (wide: wide) {
 	println ["%3v %-18v %!-20v %v" fmt "Idx" "Path" "Statement" "Local"];
 	println ["%3v %-18v %!-20v %v" fmt "===" "====" "=========" "====="];
     };
-    where :top : each do: {| i |
+
+    if {set? top} 
+      {l ::= where :top}
+      {l ::= where}
+    ;
+    
+    $l each do: {| i |
 	d ::= dict $i;
 	if {true? wide} then: {
 	    println ["%3d %-18v %v" fmt 
