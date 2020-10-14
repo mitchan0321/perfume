@@ -110,7 +110,7 @@ defun init-command-DB () {
 
     $LIB_PATH each do: {| i |
 	if {file exists? [$i . "/EditorCommandDefs.prfm"]} {
-	    load :notrace [$i . "/EditorCommandDefs.prfm"];
+	    load [$i . "/EditorCommandDefs.prfm"];
 	    break;
 	};
     };

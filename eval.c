@@ -294,7 +294,7 @@ control_goto:
 	}
 	list_append(cmd, new_string_str((get_script_path(interp, interp->script_id))));
 	list_append(cmd, new_dict(interp->func_stack[interp->cur_func_stack]->localvar));
-	list_append(cmd, new_integer_si(interp->cur_func_stack + 1));
+	list_append(cmd, new_integer_si(interp->cur_func_stack));
 	list_append(cmd, interp->func_stack[interp->cur_func_stack]->trace_info->func_name);
 
 	toy_eval_script(interp, new_script(new_list(new_statement(cmd, trace_info->line))));
@@ -396,7 +396,14 @@ control_goto:
 	lstack_use = 1;
 
 	interp->current_func = first;
-	ret = toy_eval_script(interp, first->u.func.closure->u.closure.block_body);
+	/* for save trace_info for command functions */
+	{
+	    Toy_Func_Trace_Info *orig_trace_info;
+	    orig_trace_info = interp->trace_info;
+	    interp->trace_info = trace_info;
+	    ret = toy_eval_script(interp, first->u.func.closure->u.closure.block_body);
+	    interp->trace_info = orig_trace_info;
+	}
 //	if ((GET_TAG(ret) == CONTROL) && (ret->u.control.code != CTRL_GOTO)) {
 	if ((GET_TAG(ret) == CONTROL) && (ret->u.control.code == CTRL_RETURN)) {	    
 	    ret = ret->u.control.ret_value;

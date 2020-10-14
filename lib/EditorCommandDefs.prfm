@@ -929,9 +929,8 @@ defcommand search
 
 defcommand test
 {   | main window |
-    w : each do: {| i |
-        $stdout puts $i;
-    };
+    w;
+    stack-trace : split sep: "\n" : each do: {| i | $stdout puts $i};
     result ALL;
 };
 
@@ -952,14 +951,6 @@ defcommand miniwindow-input-sample
 	    $main mini-input-end;
 	    debug-message ["input data: " . $value];
 	};
-    };
-    result ALL;
-};
-
-defcommand test
-{   | main window |
-    w : each do: {| i |
-        $stdout puts $i;
     };
     result ALL;
 };
