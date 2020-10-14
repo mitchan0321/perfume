@@ -87,6 +87,7 @@
 typedef struct _toy_func_trace_info {
     int line;
     struct _toy_type *object_name;
+    struct _toy_type *func_name_caller;
     struct _toy_type *func_name;
     struct _toy_type *statement;
 } Toy_Func_Trace_Info;

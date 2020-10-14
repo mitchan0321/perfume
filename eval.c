@@ -142,6 +142,11 @@ control_goto:
     trace_info = GC_MALLOC(sizeof(Toy_Func_Trace_Info));
     ALLOC_SAFE(trace_info);
     trace_info->line = statement->u.statement.trace_info->line;
+    if (interp->cur_func_stack >= 0) {
+	trace_info->func_name_caller = interp->func_stack[interp->cur_func_stack]->trace_info->func_name;
+    } else {
+	trace_info->func_name_caller = new_symbol(L"(unknown)");
+    }
     trace_info->func_name = list_get_item(l);
     trace_info->object_name = const_Nil;
     trace_info->statement = statement;
@@ -282,7 +287,7 @@ control_goto:
 	}
 	
 	if (trace_info->func_name) {
-	    list_append(cmd, trace_info->func_name);
+	    list_append(cmd, trace_info->func_name_caller);
 	} else {
 	    list_append(cmd, const_Nil);
 	}
@@ -297,7 +302,14 @@ control_goto:
 	list_append(cmd, new_integer_si(interp->cur_func_stack));
 	list_append(cmd, interp->func_stack[interp->cur_func_stack]->trace_info->func_name);
 
-	toy_eval_script(interp, new_script(new_list(new_statement(cmd, trace_info->line))));
+	/* for save trace_info for command functions */
+	{
+	    Toy_Func_Trace_Info *orig_trace_info;
+	    orig_trace_info = interp->trace_info;
+	    interp->trace_info = trace_info;
+	    toy_eval_script(interp, new_script(new_list(new_statement(cmd, trace_info->line))));
+	    interp->trace_info = orig_trace_info;
+	}
 	
 	interp->debug_in = 0;
     }

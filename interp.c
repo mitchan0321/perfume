@@ -200,7 +200,8 @@ interp_setup(Toy_Interp* interp, int argc, char **argv, char **envp) {
     ALLOC_SAFE(trace_info);
     trace_info->line = 0;
     trace_info->object_name = obj;
-    trace_info->func_name = new_symbol(L"Main");
+    trace_info->func_name = new_symbol(L"main");
+    trace_info->func_name_caller = new_symbol(L"toplevel");
     trace_info->statement = new_statement(new_list(new_symbol(L"(perfumesh)")), 0);
     interp->trace_info = trace_info;
 
