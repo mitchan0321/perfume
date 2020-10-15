@@ -3952,7 +3952,7 @@ cmd_where(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     
 error:
     return new_exception(TE_SYNTAX,
-			 L"Syntax error at 'where', syntax: where [:top]", interp);
+			 L"Syntax error at 'where', syntax: where", interp);
 }
 
 Toy_Type*
