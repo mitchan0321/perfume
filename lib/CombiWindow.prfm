@@ -487,7 +487,7 @@ CombiWindow method load-keybind-override (mode) {
     $LIB_PATH each do: {| i |
 	if {file exists? [$i . "/" $key-path]} {
 	    try {
-	        load :notrace [$i . "/" $key-path]
+	        load :notrace [$i . "/" $key-path];
 	    } catch: {| e |
 		show-message ["Error at mode file: " . $key-path ", <" [$e car] "># " [$e cdr]];
 		return;
