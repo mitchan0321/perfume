@@ -175,7 +175,9 @@ typedef struct _toy_interp {
 
     /* current function */
     struct _toy_type *current_func;
-    
+
+    /* itimer enable */
+    int itimer_enable;
 } Toy_Interp;
 
 typedef struct _toy_coroutine {

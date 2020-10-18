@@ -39,6 +39,7 @@ toy_eval_script(Toy_Interp* interp, Toy_Type *script) {
     int t;
     int script_id;
     extern volatile sig_atomic_t CStack_in_baria;
+    extern volatile int SigAlrm;
     result = const_Nil;
     volatile int baria_dist;
 
@@ -75,6 +76,13 @@ toy_eval_script(Toy_Interp* interp, Toy_Type *script) {
 	    result = new_exception(TE_STACKOVERFLOW, L"C stack overflow.", interp);
 	}
 
+	if (interp->itimer_enable && SigAlrm) {
+	    SigAlrm = 0;
+	    if (interp->coroid != 0) {
+		co_resume();
+	    }
+	}
+	
 	SIG_ACTION();
 
 	t = GET_TAG(result);
@@ -1112,9 +1120,9 @@ eval_sig_handl(Toy_Interp *interp, int code) {
     case SIGPIPE:
 	sig = const_SIGPIPE;
 	break;
-    case SIGALRM:
-	sig = const_SIGALRM;
-	break;
+//    case SIGALRM:
+//	sig = const_SIGALRM;
+//	break;
     case SIGTERM:
 	sig = const_SIGTERM;
 	break;

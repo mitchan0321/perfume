@@ -794,6 +794,7 @@ cmd_while(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     cond_block = list_get_item(posargs);
     do_block = hash_get_and_unset_t(nameargs, const_do);
     if (hash_get_length(nameargs) > 0) goto error;
+    if (GET_TAG(cond_block) != CLOSURE) goto error;
     if ((do_block == NULL) ||
 	(GET_TAG(do_block) != CLOSURE)) goto error;
 
@@ -1438,8 +1439,8 @@ cmd_trap(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	isig = SIGQUIT;
     } else if (wcscmp(psig, L"SIGPIPE") == 0) {
 	isig = SIGPIPE;
-    } else if (wcscmp(psig, L"SIGALRM") == 0) {
-	isig = SIGALRM;
+//    } else if (wcscmp(psig, L"SIGALRM") == 0) {
+//	isig = SIGALRM;
     } else if (wcscmp(psig, L"SIGTERM") == 0) {
 	isig = SIGTERM;
     } else if (wcscmp(psig, L"SIGURG") == 0) {
@@ -1480,8 +1481,12 @@ cmd_trap(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     return sig;
 
 error:
+/*
     return new_exception(TE_SYNTAX, L"Syntax error, syntax: trap signal [{block}]\n\t\
 signal: SIGHUP|SIGINT|SIGQUIT|SIGPIPE|SIGALRM|SIGTERM|SIGURG|SIGCHLD|SIGUSR1|SIGUSR2", interp);
+*/
+    return new_exception(TE_SYNTAX, L"Syntax error, syntax: trap signal [{block}]\n\t\
+signal: SIGHUP|SIGINT|SIGQUIT|SIGPIPE|SIGTERM|SIGURG|SIGCHLD|SIGUSR1|SIGUSR2", interp);
 }
 
 Toy_Type*
@@ -4174,9 +4179,59 @@ cmd_selffunc(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
     
     return interp->current_func;
 
-    error:
+error:
     return new_exception(TE_SYNTAX,
-			 L"Syntax error at 'bulk', syntax: bulk", interp);
+			 L"Syntax error at 'self-func', syntax: self-func", interp);
+}
+
+int SigAlrm = 0;
+static void
+sig_alrm_handl(int signum) {
+    SigAlrm = 1;
+}
+
+Toy_Type*
+cmd_setitimer(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *tmsec;
+    int msec, result;
+    struct itimerval new_t;
+
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) != 0) goto error;
+
+    tmsec = list_get_item(posargs);
+    if (GET_TAG(tmsec) != INTEGER) goto error;
+    msec = mpz_get_si(tmsec->u.biginteger);
+
+    new_t.it_interval.tv_sec = msec / 1000;
+    new_t.it_interval.tv_usec = (msec % 1000) * 1000;
+    new_t.it_value.tv_sec = new_t.it_interval.tv_sec;
+    new_t.it_value.tv_usec = new_t.it_interval.tv_usec;
+
+    signal(SIGALRM, sig_alrm_handl);
+    result = setitimer(ITIMER_REAL, &new_t, NULL);
+    if (-1 == result) {
+	return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+    }
+    return const_T;
+
+error:
+    return new_exception(TE_SYNTAX,
+			 L"Syntax error at 'set-itimer', syntax: set-itimer msec", interp);
+}
+
+Toy_Type*
+cmd_enableitimer(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    if (arglen != 0) goto error;
+    if (hash_get_length(nameargs) != 0) goto error;
+
+    interp->itimer_enable = 1;
+
+    return const_T;
+
+error:
+    return new_exception(TE_SYNTAX,
+			 L"Syntax error at 'enable-itimer', syntax: enable-itimer msec", interp);
 }
 
 
@@ -4297,7 +4352,9 @@ int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, L"argspec", 	cmd_getargspec, 	L"func");
     toy_add_func(interp, L"bulk", 	cmd_newbulk, 		L"val-list");
     toy_add_func(interp, L"self-func", 	cmd_selffunc, 		NULL);
- 
+    toy_add_func(interp, L"set-itimer",	cmd_setitimer, 		L"msec");
+    toy_add_func(interp, L"enable-itimer",cmd_enableitimer,	NULL);
+    
 #ifdef NCURSES
     int toy_add_func_ncurses(Toy_Interp* interp);
     toy_add_func_ncurses(interp);

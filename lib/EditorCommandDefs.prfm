@@ -906,6 +906,24 @@ defcommand search
 	    $geom set! CursorLine [$geom,CursorLine - [$ey - $sy]];
 	    $window stay-search;
 	};
+	if {eq? $in-key KEY_SRIGHT} {
+	    buff ::= $window get-buffer;
+	    geom ::= $window get-geom;
+	    (sy sx) ::= $window get-source-index $buff $geom;
+	    $window apply-command $main $window "" smooth-scroll-right;
+	    (ey ex) ::= $window get-source-index $buff $geom;
+	    $geom set! CursorColumn [$geom,CursorColumn - [$ex - $sx]];
+	    $window stay-search;
+	};
+	if {eq? $in-key KEY_SLEFT} {
+	    buff ::= $window get-buffer;
+	    geom ::= $window get-geom;
+	    (sy sx) ::= $window get-source-index $buff $geom;
+	    $window apply-command $main $window "" smooth-scroll-left;
+	    (ey ex) ::= $window get-source-index $buff $geom;
+	    $geom set! CursorColumn [$geom,CursorColumn - [$ex - $sx]];
+	    $window stay-search;
+	};
 	if {eq? $in-key CTRL_V} {
 	    str ::= $window get-search-string;
 	    $main mini-input-value-override $str [$str len];

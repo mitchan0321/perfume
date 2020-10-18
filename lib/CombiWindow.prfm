@@ -872,19 +872,21 @@ CombiWindow method set-search-hilight () {
 	pxs ::= $e cdr : car : car;
 	pxe ::= $e cdr : car : cdr : car;
 	y ::= $py - $geom,ViewLine;
-	(sy sx) ::= get-cursor-index $buff $py [$pxs - $geom,ViewColumn];
-	(ey ex) ::= get-cursor-index $buff $py [$pxe - $geom,ViewColumn];
-	len ::= $ex - $sx;
-	if {$ex <= 0} {continue};
-	if {$sx < 0} {sx := 0};
-	if {$sx > $scr-x} {continue};
-	if {$ex >= $scr-x} {ex := $scr-x};
-	len ::= $ex - $sx;
+
+	src ::= $buff get-buffer-line $py;
+	start-x ::= curs-index-to-pos $src $pxs $DEFAULT_TAB_WIDTH : - $geom,ViewColumn;
+	if {$start-x < 0} {start-x := 0};
+	end-x ::= curs-index-to-pos $src $pxe $DEFAULT_TAB_WIDTH : - $geom,ViewColumn;
+	if {$end-x <= 0} {continue};
+	len ::= $end-x - $start-x;
+	if {$start-x > $scr-x} {continue};
+	if {$end-x >= $scr-x} {end-x := $scr-x};
 	if {$len <= 0} {continue};
+
 	if {and {$idx-y = $py} {$idx-x = $pxs}} {
-	    curs-color $BufferCurs $y $sx $len $ColorDB,SEARCH_CURRENT_HILIGHT 0;
+	    curs-color $BufferCurs $y $start-x $len $ColorDB,SEARCH_CURRENT_HILIGHT 0;
 	} {
-	    curs-color $BufferCurs $y $sx $len $ColorDB,SEARCH_HILIGHT 0;
+	    curs-color $BufferCurs $y $start-x $len $ColorDB,SEARCH_HILIGHT 0;
 	};
     };
 };
@@ -926,15 +928,17 @@ CombiWindow method set-word-hilight-color (geom buff list color) {
 	pxs ::= $e cdr : car : car;
 	pxe ::= $e cdr : car : cdr : car;
 	y ::= $py - $geom,ViewLine;
-	(sy sx) ::= get-cursor-index $buff $py [$pxs - $geom,ViewColumn];
-	(ey ex) ::= get-cursor-index $buff $py [$pxe - $geom,ViewColumn];
-	len ::= $ex - $sx;
-	if {$ex <= 0} {continue};
-	if {$sx < 0} {sx := 0};
-	if {$sx > $scr-x} {continue};
-	if {$ex >= $scr-x} {ex := $scr-x};
-	len ::= $ex - $sx;
+
+	src ::= $buff get-buffer-line $py;
+	start-x ::= curs-index-to-pos $src $pxs $DEFAULT_TAB_WIDTH : - $geom,ViewColumn;
+	if {$start-x < 0} {start-x := 0};
+	end-x ::= curs-index-to-pos $src $pxe $DEFAULT_TAB_WIDTH : - $geom,ViewColumn;
+	if {$end-x <= 0} {continue};
+	len ::= $end-x - $start-x;
+	if {$start-x > $scr-x} {continue};
+	if {$end-x >= $scr-x} {end-x := $scr-x};
 	if {$len <= 0} {continue};
-	curs-color $BufferCurs $y $sx $len $ColorDB,$color 0;
+
+	curs-color $BufferCurs $y $start-x $len $ColorDB,$color 0;
     };
 };
