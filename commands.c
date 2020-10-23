@@ -4186,7 +4186,7 @@ error:
 
 int SigAlrm = 0;
 static void
-sig_alrm_handl(int signum) {
+sig_alrm_handl(int flag, siginfo_t* siginfo, void* ptr) {
     SigAlrm = 1;
 }
 
@@ -4195,6 +4195,7 @@ cmd_setitimer(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     Toy_Type *tmsec;
     int msec, result;
     struct itimerval new_t;
+    struct sigaction newsig, oldsig;
 
     if (arglen != 1) goto error;
     if (hash_get_length(nameargs) != 0) goto error;
@@ -4203,12 +4204,24 @@ cmd_setitimer(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     if (GET_TAG(tmsec) != INTEGER) goto error;
     msec = mpz_get_si(tmsec->u.biginteger);
 
+    if (-1 == sigaction(SIGSEGV, NULL, &oldsig)) {
+	return new_exception(TE_SYSCALL,
+			     L"Can't save sigaction.", interp);
+    }
+    sigemptyset(&newsig.sa_mask);
+    sigaddset(&newsig.sa_mask, SIGALRM);
+    newsig.sa_sigaction = sig_alrm_handl;
+    newsig.sa_flags = SA_SIGINFO | SA_RESTART | SA_ONSTACK;
+    if (-1 == sigaction(SIGALRM, &newsig, NULL)) {
+	return new_exception(TE_SYSCALL,
+			     L"Can't set sigaction.", interp);
+    }
+
     new_t.it_interval.tv_sec = msec / 1000;
     new_t.it_interval.tv_usec = (msec % 1000) * 1000;
     new_t.it_value.tv_sec = new_t.it_interval.tv_sec;
     new_t.it_value.tv_usec = new_t.it_interval.tv_usec;
 
-    signal(SIGALRM, sig_alrm_handl);
     result = setitimer(ITIMER_REAL, &new_t, NULL);
     if (-1 == result) {
 	return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
