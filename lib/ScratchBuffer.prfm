@@ -12,6 +12,7 @@ ScratchBuffer method init-constructor () {
         "  2) Select region Perfume command, you want execute: press CTRL_SP"
         "  3) Execute Perfume command: press CTRL_J"
         "  4) If you want restart Perfume interpriter: press CTRL_K"
+        "  5) If you want send eof to application/interpriter: press CTRL_G"
 	""
     )];
     sets File <nil>;

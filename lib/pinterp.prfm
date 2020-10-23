@@ -1,23 +1,26 @@
 defun pinterp () {
     $stdout puts "Start Perfume/pmacs interpriter.";
-    $stdin each do: {| exec-command |
-        if {[$exec-command clean] = ""} {continue};
-	unset e;
-	unset result;
+    loop do: {
+	$stdin each do: {| exec-command |
+	    if {[$exec-command clean] = ""} {continue};
+	    unset e;
+	    unset result;
 
-	try {
-	    result ::= begin {
+	    try {
+		result ::= begin {
 		    unset exec-command;
 		    alias up: 1 exec-command exec-command;
 		    result ([$exec-command eval]);
-	    } local: $PINTERP_LOCAL :rebase;
-	} catch: {| e |
-	    result ::= "EXCEPTION: <" . [$e car] "># " [$e cdr];
+		} local: $PINTERP_LOCAL :rebase;
+	    } catch: {| e |
+		result ::= "EXCEPTION: <" . [$e car] "># " [$e cdr];
+	    };
+	    if {set? e} {
+		$stderr puts $result;
+	    } {
+		$stdout puts ["Result[" . [type? [$result car]] "]=> " [$result car]];
+	    };
 	};
-	if {set? e} {
-	    $stderr puts $result;
-	} {
-	    $stdout puts ["Result[" . [type? [$result car]] "]=> " [$result car]];
-	};
+	$stdin clear;
     };
 };

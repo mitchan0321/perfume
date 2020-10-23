@@ -34,42 +34,63 @@ defun exec (args: args) {
 
     status := 255;
     try {
-	poll ::= new PollingManager;
-	$poll set-exit-condition-block {
-	    and [$stdin eof?] [$IN eof?] [$ERR eof?];
+	loop {
+	    loop {
+		if {and [$stdin ready? timeout: 50] 
+			[$OUT   ready? timeout: 50]} then: {
+		    r ::= $stdin gets;
+		    if [nil? $r] else: {
+			println file: $OUT $r;
+			$OUT flush;
+		    };
+		} else: {
+		    break;
+		};
+		if {$stdin eof?} then: {
+		    $OUT close;
+		    break;
+		};
+	    };
+	    if {$stdin eof?} then: {
+		$OUT close
+	    };
+	    
+	    loop {
+		if {$IN ready? timeout: 50} then: {
+		    try {
+			r ::= $IN gets;
+		    } catch: {| e |
+			if {eq? [$e car] ErrIOAgain}
+		        then: {
+			    pause @WRITE; 
+			    continue;
+			}
+			else: {
+			    throw $e
+			};
+		    };
+		    if [nil? $r] else: {
+			println $r;
+			$stdout flush;
+		    };
+		} else: {
+		    break;
+		};
+		if {$IN eof?} then: {break};
+	    };
+
+	    if {$IN eof?} then: {break};
+	    if {true? CO-MODE} then: {
+		pause @WRITE
+	    };
 	};
-	$poll set-wait-block {
-	    (in out exp) ::= select ([$stdin fd?] [$IN fd?] [$ERR fd?]) () () 100;
-	    if {$in null?} <nil> <t>;
-	};
-	$poll add-event-queue (
-	    {
-		$stdin ready?
-	    } {
-		$OUT puts [$stdin gets]
-	    }
-	);
-	$poll add-event-queue (
-	    {
-		$IN ready?
-	    } {
-		$stdout puts [$IN gets]
-	    }
-	);
-	$poll add-event-queue (
-	    {
-		$ERR ready?
-	    } {
-		$stderr puts [$ERR gets]
-	    }
-	);
-	$poll event-loop;
+	
+        $OUT close;
     }
     
     fin: {
 	$OUT close;
-	$IN  close;
-	$ERR close;
+	$IN close;
 	status ::= wait $pid;
 	if {$status = 255} then: {
 	    throw ErrExecProgram "Can\'t execute program."

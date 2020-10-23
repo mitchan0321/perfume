@@ -59,6 +59,7 @@ defun pmacs (trace: t) {
         };
 	$MainWindow add-background job-id: "PINTERP-WATCHDOG" {
 	    c ::= coro {pinterp};
+	    $c eval {defvar CO-MODE <t>};
 	    $c eval {enable-itimer};
 	    set-itimer $INTERP_ITIMER_INTERVAL;
 	    
@@ -72,6 +73,7 @@ defun pmacs (trace: t) {
 		if {eq? [$PINTERP stat] DONE} {
 		    try {$PINTERP release} catch: {};
 		    c ::= coro {pinterp};
+		    $c eval {defvar CO-MODE <t>};
 		    $c eval {enable-itimer};
 		    setvar PINTERP $c;
 		};

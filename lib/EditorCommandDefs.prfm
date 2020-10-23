@@ -418,6 +418,12 @@ defcommand kill-interp
     result ALL;
 };
 
+defcommand send-eof
+{   | main window |
+    $stderr puts "Send eof.";
+    $stdin close;
+};
+
 defcommand refresh-screen
 {   | main window |
     $main send-key-event (KEY_RESIZE);

@@ -1,0 +1,130 @@
+# exec external process
+
+load-class PollingManager;
+
+defun execn (args: args) {
+    args ::= $args map {| i | "" . $i};
+    command ::= $args >>;
+
+    d ::= dict [fork-exec $command $args];
+
+    pid := $d,pid;
+
+    out := $d,left;
+    OUT ::= new File;
+    $OUT set! $out mode: o;
+    $OUT set-newline <t>;
+    $OUT set-nobuffer;
+
+    in := $d,right;
+    IN ::= new File;
+    $IN set! $in mode: i;
+    $IN set-newline <nil>;
+    $IN set-nobuffer;
+    if {true? CO-MODE} then: {$IN set-noblock t};
+
+    err := $d,error;
+    ERR ::= new File;
+    $ERR set! $err mode: i;
+    $ERR set-newline <nil>;
+    $ERR set-nobuffer;
+    if {true? CO-MODE} then: {$ERR set-noblock t};
+
+    if {true? PipeObject} then: {
+	$PipeObject set-term-hook [fun () {$IN close; $OUT close; $ERR close}];
+    };
+
+    status := 255;
+    try {
+	poll ::= new PollingManager;
+
+	$poll set-exit-condition-block {
+	    and [$IN eof?] [$ERR eof?];
+	};
+
+	$poll set-wait-block {
+	    if {and [$stdin ready?] [$OUT ready?]} {
+		result <t>;
+	    } {
+		(in out exp) ::= select ([$IN fd?] [$ERR fd?]) () () 100;
+		if {$in null?} {
+		    result <nil>;
+		} {
+		    result <t>;
+		};
+	    };
+	};
+	
+	$poll add-event-queue (
+	    {and [$stdin ready?] [$OUT ready?]} {
+		i ::= $stdin gets;
+		if $i {
+		    $OUT puts $i;
+		    $OUT flush;
+		} {
+		    $OUT close;
+		};
+	    }
+	);
+	
+	$poll add-event-queue (
+	    {$IN ready?} {
+		try {
+		    i ::= $IN gets;
+		} catch: {| e |
+		    if {eq? [$e car] ErrIOAgain} {
+			if {true? CO-MODE} {
+			    pause @WRITE;
+			    continue;
+			} {
+			    throw $e;
+			};
+		    } {
+			throw $e;
+		    };
+		};
+		if $i {
+		    $stdout puts $i;
+		    $stdout flush;
+		};
+	    }
+	);
+	
+	$poll add-event-queue (
+	    {$ERR ready?} {
+		try {
+		    i ::= $ERR gets;
+		} catch: {| e |
+		    if {eq? [$e car] ErrIOAgain} {
+			if {true? CO-MODE} {
+			    pause @WRITE;
+			    continue;
+			} {
+			    throw $e;
+			};
+		    } {
+			throw $e;
+		    };
+		};
+		if $i {
+		    $stderr puts $i;
+		    $stderr flush;
+		};
+	    }
+	);
+	
+	$poll event-loop;
+    }
+    
+    fin: {
+	try {$OUT close} catch: {};
+	try {$IN  close} catch: {};
+	try {$ERR close} catch: {};
+	status ::= wait $pid;
+	if {$status = 255} then: {
+	    throw ErrExecProgram "Can\'t execute program."
+	};
+    };
+
+    return $status;
+};
