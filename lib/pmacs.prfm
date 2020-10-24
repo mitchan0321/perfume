@@ -68,7 +68,7 @@ defun pmacs (trace: t) {
 	    } {
 		defvar PINTERP $c;
 	    };
-	      
+
 	    body := {| main window |
 		if {eq? [$PINTERP stat] DONE} {
 		    try {$PINTERP release} catch: {};

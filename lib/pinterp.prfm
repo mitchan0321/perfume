@@ -2,6 +2,7 @@ defun pinterp () {
     $stdout puts "Start Perfume/pmacs interpriter.";
     loop do: {
 	$stdin each do: {| exec-command |
+	    exec-command ::= "" . $exec-command;
 	    if {[$exec-command clean] = ""} {continue};
 	    unset e;
 	    unset result;

@@ -122,5 +122,14 @@ BufferManager method get-buffer-geom (window-name buffer-name) {
     if $geom {
 	return $geom,2;
     };
+
+    $BufferGeom each do: {| k v |
+	(w b g) := $v;
+	if {$b = $buffer-name} {
+	    geom ::= $g clone;
+	    return $geom;
+	};
+    };
+
     return [new BufferGeom];
 };

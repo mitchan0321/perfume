@@ -39,20 +39,27 @@ defun execn (args: args) {
 	poll ::= new PollingManager;
 
 	$poll set-exit-condition-block {
-	    and [$IN eof?] [$ERR eof?];
+	    result [and [$IN eof?] [$ERR eof?]];
 	};
 
 	$poll set-wait-block {
+	    if [$stdin eof?] {$OUT close};
+	    sts := <nil>;
 	    if {and [$stdin ready?] [$OUT ready?]} {
-		result <t>;
+		sts := <t>;
 	    } {
-		(in out exp) ::= select ([$IN fd?] [$ERR fd?]) () () 100;
-		if {$in null?} {
-		    result <nil>;
-		} {
-		    result <t>;
+		try {
+		    (in out exp) ::= select ([$IN fd?] [$ERR fd?]) () () 50;
+		    if {$in null?} {
+		        sts := <nil>;
+		    } {
+		        sts := <t>;
+		    };
+		} catch: {
+		    sts := <nil>;
 		};
 	    };
+	    result $sts;
 	};
 	
 	$poll add-event-queue (
@@ -69,6 +76,7 @@ defun execn (args: args) {
 	
 	$poll add-event-queue (
 	    {$IN ready?} {
+		i := <nil>;
 		try {
 		    i ::= $IN gets;
 		} catch: {| e |
@@ -92,6 +100,7 @@ defun execn (args: args) {
 	
 	$poll add-event-queue (
 	    {$ERR ready?} {
+		i := <nil>;
 		try {
 		    i ::= $ERR gets;
 		} catch: {| e |

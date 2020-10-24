@@ -22,7 +22,7 @@ PollingManager method event-loop () {
     loop do: {
 	e := $ExitConditionBlock;
         if {block? $e} {e ::= yield $e};
-        if $e {return};
+        if $e {break};
 
 	w := $WaitBlock;
         if {block? $w} {w ::= yield $w};
