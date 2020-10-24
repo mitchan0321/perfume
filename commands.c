@@ -3325,7 +3325,18 @@ cmd_select(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     }
 
     if (-1 == result) {
-	return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+        if (errno == EAGAIN) {
+	    read_result_l = new_list(NULL);
+	    write_result_l = new_list(NULL);
+	    except_result_l = new_list(NULL);
+	    result_l = new_list(NULL);
+	    list_append(result_l, read_result_l);
+	    list_append(result_l, write_result_l);
+	    list_append(result_l, except_result_l);
+	    return result_l;
+	} else {
+	    return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+	}
     }
 
     l = read_result_l = new_list(NULL);
