@@ -1,6 +1,8 @@
 # exec external process
 
-defun exec (args: args) {
+load-class PollingManager;
+
+defun execn (args: args) {
     args ::= $args map {| i | "" . $i};
     command ::= $args >>;
 
@@ -34,63 +36,99 @@ defun exec (args: args) {
 
     status := 255;
     try {
-	loop {
-	    loop {
-		if {and [$stdin ready? timeout: 50] 
-			[$OUT   ready? timeout: 50]} then: {
-		    r ::= $stdin gets;
-		    if [nil? $r] else: {
-			println file: $OUT $r;
-			$OUT flush;
-		    };
-		} else: {
-		    break;
-		};
-		if {$stdin eof?} then: {
-		    $OUT close;
-		    break;
-		};
-	    };
-	    if {$stdin eof?} then: {
-		$OUT close
-	    };
-	    
-	    loop {
-		if {$IN ready? timeout: 50} then: {
-		    try {
-			r ::= $IN gets;
-		    } catch: {| e |
-			if {eq? [$e car] ErrIOAgain}
-		        then: {
-			    pause @WRITE; 
-			    continue;
-			}
-			else: {
-			    throw $e
-			};
-		    };
-		    if [nil? $r] else: {
-			println $r;
-			$stdout flush;
-		    };
-		} else: {
-		    break;
-		};
-		if {$IN eof?} then: {break};
-	    };
+	poll ::= new PollingManager;
 
-	    if {$IN eof?} then: {break};
-	    if {true? CO-MODE} then: {
-		pause @WRITE
+	$poll set-exit-condition-block {
+	    result [and [$IN eof?] [$ERR eof?]];
+	};
+
+	$poll set-wait-block {
+	    if [$stdin eof?] {$OUT close};
+	    sts := <nil>;
+	    if {and [$stdin ready?] [$OUT ready?]} {
+		sts := <t>;
+	    } {
+		try {
+		    (in out exp) ::= select ([$IN fd?] [$ERR fd?]) () () 50;
+		    if {$in null?} {
+		        sts := <nil>;
+		    } {
+		        sts := <t>;
+		    };
+		} catch: {
+		    sts := <nil>;
+		};
 	    };
+	    result $sts;
 	};
 	
-        $OUT close;
+	$poll add-event-queue (
+	    {and [$stdin ready?] [$OUT ready?]} {
+		i ::= $stdin gets;
+		if $i {
+		    $OUT puts $i;
+		    $OUT flush;
+		} {
+		    $OUT close;
+		};
+	    }
+	);
+	
+	$poll add-event-queue (
+	    {$IN ready?} {
+		i := <nil>;
+		try {
+		    i ::= $IN gets;
+		} catch: {| e |
+		    if {eq? [$e car] ErrIOAgain} {
+			if {true? CO-MODE} {
+			    pause @WRITE;
+			    continue;
+			} {
+			    throw $e;
+			};
+		    } {
+			throw $e;
+		    };
+		};
+		if $i {
+		    $stdout puts $i;
+		    $stdout flush;
+		};
+	    }
+	);
+	
+	$poll add-event-queue (
+	    {$ERR ready?} {
+		i := <nil>;
+		try {
+		    i ::= $ERR gets;
+		} catch: {| e |
+		    if {eq? [$e car] ErrIOAgain} {
+			if {true? CO-MODE} {
+			    pause @WRITE;
+			    continue;
+			} {
+			    throw $e;
+			};
+		    } {
+			throw $e;
+		    };
+		};
+		if $i {
+		    $stderr puts $i;
+		    $stderr flush;
+		};
+	    }
+	);
+	
+	$poll event-loop;
     }
     
     fin: {
-	$OUT close;
-	$IN close;
+	try {$OUT close} catch: {};
+	try {$IN  close} catch: {};
+	try {$ERR close} catch: {};
 	status ::= wait $pid;
 	if {$status = 255} then: {
 	    throw ErrExecProgram "Can\'t execute program."
