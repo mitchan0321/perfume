@@ -77,11 +77,14 @@ toy_eval_script(Toy_Interp* interp, Toy_Type *script) {
 	}
 
 	if (interp->itimer_enable && SigAlrm) {
-	    
 	    SigAlrm = 0;
-	    if ((interp->coroid != 0) && (interp->co_calling != 0) && cstack_isalive(interp->cstack_id)) {
-		co_resume();
-		SigAlrm = 0;
+	    if ((interp->coroid != 0) && cstack_isalive(interp->cstack_id)) {
+		if (interp->co_parent) {
+		    if (interp->co_parent->co_calling) {
+			co_resume();
+			SigAlrm = 0;
+		    }
+		}
 	    }
 	}
 	
