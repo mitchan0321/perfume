@@ -99,15 +99,19 @@ BufferManager method get-previous-buffer (buff) {
 BufferManager method set-buffer-geom (window-name buffer-name) {
 
     [$BufferGeom set? ($window-name $buffer-name)] ?? {
+	geom := <nil>;
 	$BufferGeom each do: {| k v |
 	    (w b g) := $v;
 	    if {$b = $buffer-name} {
 		geom ::= $g clone;
-		$BufferGeom set
-		    ($window-name $buffer-name)
-		    ($window-name $buffer-name $geom);
-		return;
+		break;
 	    };
+	};
+	if $geom {
+	    $BufferGeom set
+		($window-name $buffer-name)
+		($window-name $buffer-name $geom);
+	    return;
 	};
 
 	$BufferGeom set
@@ -127,6 +131,7 @@ BufferManager method get-buffer-geom (window-name buffer-name) {
 	(w b g) := $v;
 	if {$b = $buffer-name} {
 	    geom ::= $g clone;
+	    ### debug-message ["*** geom clone: " . $buffer-name ", " $window-name ", " [$geom string]];
 	    return $geom;
 	};
     };
