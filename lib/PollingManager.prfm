@@ -1,0 +1,41 @@
+class PollingManager;
+
+PollingManager method init () {
+    sets WaitBlock <nil>;
+    sets ExitConditionBlock <nil>;
+    sets EventQueue ();
+};
+
+PollingManager method set-wait-block (b) {
+    sets WaitBlock $b;
+};
+
+PollingManager method set-exit-condition-block (b) {
+    sets ExitConditionBlock $b;
+};
+
+PollingManager method add-event-queue (q) {
+    $EventQueue <<- $q;
+};
+
+PollingManager method event-loop () {
+    loop do: {
+	e := $ExitConditionBlock;
+        if {block? $e} {e ::= yield $e};
+        if $e {return};
+
+	w := $WaitBlock;
+        if {block? $w} {w ::= yield $w};
+        if {nil? $w} {continue};
+
+	eval-queue;
+    };
+};
+
+PollingManager method eval-queue () {
+    $EventQueue each do: {| item |
+	(cond body) := $item;
+        if {block? $cond} {cond ::= yield $cond};
+        if $cond {yield $body};
+    };
+};
