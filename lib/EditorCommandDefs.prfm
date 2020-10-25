@@ -394,15 +394,18 @@ defcommand execute-command
 defcommand eval-region
 {   | main window |
     buff ::= $window get-buffer;
-    [$window get-region] ?? {
-	show-message "Not start region. Press CTRL-SP to start region.";
-	$window end-region;
-	return SELF;
-    };
     geom ::= $window get-geom;
-    (sy sx) ::= $window end-region;
-    (ey ex) ::= $window get-source-index $buff $geom;
-    str ::= $window get-region-string $sy $sx $ey $ex;
+    if [$window get-region] {
+	### eval region
+        (sy sx) ::= $window end-region;
+        (ey ex) ::= $window get-source-index $buff $geom;
+        str ::= $window get-region-string $sy $sx $ey $ex;
+    } {
+        ### eval this line
+        (ey ex) ::= $window get-source-index $buff $geom;
+        str ::= $buff get-buffer-line $ey;
+    };
+
     $stdin puts $str;
     $window display-evaluation;
     
