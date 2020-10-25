@@ -2,7 +2,7 @@
 
 load-class PollingManager;
 
-defun execn (args: args) {
+defun exec (args: args) {
     args ::= $args map {| i | "" . $i};
     command ::= $args >>;
 
