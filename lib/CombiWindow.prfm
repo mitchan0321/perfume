@@ -86,6 +86,7 @@ CombiWindow method render () {
     buff ::= get-buffer;
     buff-name ::= $buff get-buffer-name;
     geom ::= get-geom;
+    ### debug-message ["%v, %v, %v" fmt $win $buff-name $geom] wait: 3000;
     (cy cx) ::= get-source-index $buff $geom;
 
     curs-print $StatusLineCurs [
