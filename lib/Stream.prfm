@@ -56,7 +56,21 @@ Stream method clear () {
 };
 
 Stream method ready? (timeout: timeout) {
-    if [$queue null?] then: <nil> else: <t>;
+    if [$queue null?] then: {
+        if {and $co [set? timeout]} {
+            pause @READ;
+            if [$queue null?] {
+                return <nil>;
+            } {
+                return <t>;
+            };
+        } {
+            return <nil>;
+        };
+    }
+    else: {
+        return <t>;
+    };
 };
 
 Stream method puts (nonewline: nonewline args: r) {
