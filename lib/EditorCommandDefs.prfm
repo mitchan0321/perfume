@@ -406,6 +406,9 @@ defcommand eval-region
         str ::= $buff get-buffer-line $ey;
     };
 
+    $window apply-command $main $window "" cursor-top-of-line;
+    $window apply-command $main $window "" cursor-down;
+
     $stdin puts $str;
     $window display-evaluation;
     
