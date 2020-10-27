@@ -1,3 +1,4 @@
+2020/10/27	PRFM_20201027		1.5.0
 2020/09/10	PRFM_20200910		1.4.1
 2020/04/15	PRFM_20200415		1.4.0
 2020/03/18	PRFM_20200318		1.4.0_PRE_2
@@ -1286,5 +1287,45 @@
 		Change to display stacktrace when execute line occurds exception.
 	ncurses.c
 		Add optional feature, curses library wrapper commands.
+
+2020/10/27
+	Makefile
+		Separate option item.
+	bulk.[ch]
+		Add parse source text detect new-line character including '\r'.
+	commands.c
+		Delete signal handling symbol 'SIGALRM'.
+		Add ':notrace' option at load command, if specified :notrace not make the
+		    trace information.
+		Adjust where command output for stack-trace information and
+		    delete ':top' option.
+		Add commands set-itimer and enable-itimer, for interpriter can recieve the
+		    SIGALRM signal at interval. 
+		    If interpriter recieve a SIGALRM, resume the co-routine myself.
+		Change while condition need specified closure block.
+	config.h.in
+		Change default STACK_SLOT_MAX 1024 -> 256.
+	cstack.[ch]
+		Add utility API name is cstack_get_safe_addr.
+	eval.c
+		Add occurs the exception when C stack approaches the barrier address in stack slot.
+		Add co-routine resumed myself when recieve a SIGALRM and set enable-itimer, set-itimer.
+		Adjust making trace-info for debugger.
+		Add object name in exception message when 'No such method' occured.
+		Delete signal SIGALRM handling.
+	interp.c
+		Adjust output stack-trace information at utility API name is get_stack_trace output.
+	perfumesh.c
+		Fix use load command for read the first script. 
+	lib/Stream.prfm
+		Add Stream::set-itemlimit and add limit for output item by 'Stream::puts :nonewline' counts.
+	pmacs
+		Add pmacs text editor suite.
+		New files are (in under lib/): BufferBase.prfm, BufferGeom.prfm, BufferManager.prfm,
+			CombiWindow.key, CombiWindow.prfm, EditBuffer.prfm,
+			EditorCommandDefs.prfm, MiniWindow.prfm, ScratchBuffer.prfm,
+			WUtil.prfm, Window.prfm, WindowBase.prfm, color-defs.prfm,
+			pmacs.conf, pmacs.prfm, pmacs.files, pmacs.TODO, Mode-BufferList.key,
+			Mode-C.key, Mode-Interp.key, Mode-Prfm.key, Mode-Text.key, pinterp.prfm
 
 #eof
