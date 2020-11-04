@@ -309,8 +309,6 @@ CombiWindow method page-up () {
 };
 
 CombiWindow method move-down () {
-    # sets FreeCursor <t>;
-
     buff ::= get-buffer;
     geom ::= get-geom;
     (y x) ::= curs-get-screen-size $BufferCurs;
@@ -327,8 +325,6 @@ CombiWindow method move-down () {
 };
 
 CombiWindow method move-up () {
-    # sets FreeCursor <t>;
-
     geom ::= get-geom;
     (y x) ::= curs-get-screen-size $BufferCurs;
 
@@ -342,12 +338,23 @@ CombiWindow method move-up () {
     $geom set! CursorLine $line;
 };
 
-CombiWindow method move-right () {
-    sets FreeCursor <nil>;
+CombiWindow method free-cursor-turn-off (geom buff) {
+    if $FreeCursor {
+	sets FreeCursor <nil>;
+	$geom set! IndexColumn.SAVE  [$geom,CursorColumn + $geom,ViewColumn];
+	(cy cx) ::= get-source-index $buff $geom;
+	(line col) ::= get-cursor-index $buff $cy $cx;
+	$geom set! CursorColumn [$col - $geom,ViewColumn];
+	$geom set! IndexColumn.SAVE $col;
+    };
+};
 
+CombiWindow method move-right () {
     geom ::= get-geom;
     buff ::= get-buffer;
+    free-cursor-turn-off $geom $buff;
     (cy cx) ::= get-source-index $buff $geom;
+
     r ::= $buff get-buffer-line $cy;
     if $r {
 	if {$cx >= [$r len]} {
@@ -367,11 +374,11 @@ CombiWindow method move-right () {
 };
 
 CombiWindow method move-left () {
-    sets FreeCursor <nil>;
-
     geom ::= get-geom;
     buff ::= get-buffer;
+    free-cursor-turn-off $geom $buff;
     (cy cx) ::= get-source-index $buff $geom;
+
     if {$cx > 0} {
 	cx ::= $cx - 1;
     } {
@@ -390,10 +397,10 @@ CombiWindow method move-left () {
 };
 
 CombiWindow method insert-string (input) {
-    sets FreeCursor <nil>;
-
-    buff ::= get-buffer;
     geom ::= get-geom;
+    buff ::= get-buffer;
+    free-cursor-turn-off $geom $buff;
+
     (y x) ::= get-source-index $buff $geom;
     (y x) ::= $buff insert-string-at $input $y $x;
     (new-y new-x) ::= get-cursor-index $buff $y $x;
@@ -405,10 +412,10 @@ CombiWindow method insert-string (input) {
 };
 
 CombiWindow method delete-character () {
-    sets FreeCursor <nil>;
-
-    buff ::= get-buffer;
     geom ::= get-geom;
+    buff ::= get-buffer;
+    free-cursor-turn-off $geom $buff;
+
     (y x) ::= get-source-index $buff $geom;
     (iy ix c) ::= $buff delete-character-at $y $x;
     (new-y new-x) ::= get-cursor-index $buff $iy $ix;
@@ -420,10 +427,10 @@ CombiWindow method delete-character () {
 };
 
 CombiWindow method backdelete-character () {
-    sets FreeCursor <nil>;
-
-    buff ::= get-buffer;
     geom ::= get-geom;
+    buff ::= get-buffer;
+    free-cursor-turn-off $geom $buff;
+
     (y x) ::= get-source-index $buff $geom;
     (iy ix c) ::= $buff backdelete-character-at $y $x;
     (new-y new-x) ::= get-cursor-index $buff $iy $ix;
