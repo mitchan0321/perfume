@@ -181,7 +181,7 @@ EditBuffer method insert-string-at (input y x) {
     sets Modify <t>;
     if {true? Src} {
 	result ::= $Src insert-string-at $input $y $x;
-	if $result,0 {$UndoBuffer << $result};
+	if $result,0 {$UndoBuffer << $result; sets RedoBuffer ()};
 	return ($result,3 $result,4);
     };
     return (0 0);
@@ -191,7 +191,7 @@ EditBuffer method delete-character-at (y x) {
     sets Modify <t>;
     if {true? Src} {
 	result ::= $Src delete-character-at $y $x;
-	if $result,0 {$UndoBuffer << $result};
+	if $result,0 {$UndoBuffer << $result; sets RedoBuffer ()};
 	return ($result,2 $result,3 $result,1);
     };
     return (0 0 "");
@@ -201,7 +201,7 @@ EditBuffer method backdelete-character-at (y x) {
     sets Modify <t>;
     if {true? Src} {
 	result ::= $Src backdelete-character-at $y $x;
-	if $result,0 {$UndoBuffer << $result};
+	if $result,0 {$UndoBuffer << $result; sets RedoBuffer ()};
 	return ($result,2 $result,3 $result,1);
     };
     return (0 0 "");
@@ -211,7 +211,7 @@ EditBuffer method append-string (str) {
     sets Modify <t>;
     if {true? Src} {
 	result ::= $Src append-string $str;
-	if $result,0 {$UndoBuffer << $result};
+	if $result,0 {$UndoBuffer << $result; sets RedoBuffer ()};
 	return ($result,1 $result,2)
     };
     return (0 0);
@@ -221,6 +221,9 @@ EditBuffer method undo () {
     if {true? Src} {
 	if {! [$UndoBuffer null?]} {
 	    o ::= $UndoBuffer >>;
+ 	    if {$UndoBuffer null?} {
+		sets Modify <nil>;
+	    };
 	    result ::= call $Src $o;
 	    $RedoBuffer << $result;
 	    
@@ -250,6 +253,7 @@ EditBuffer method undo () {
 EditBuffer method redo () {
     if {true? Src} {
 	if {! [$RedoBuffer null?]} {
+	    sets Modify <t>;
 	    o ::= $RedoBuffer >>;
 	    result ::= call $Src $o;
 	    $UndoBuffer << $result;
