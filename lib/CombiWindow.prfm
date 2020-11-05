@@ -80,21 +80,29 @@ CombiWindow method render () {
     clear;
 
     if $Activate {geom-trimming};
-    
-    (y x) ::= curs-get-screen-size $BufferCurs;
+
     win ::= get-window-name;
     buff ::= get-buffer;
     buff-name ::= $buff get-buffer-name;
     geom ::= get-geom;
-    ### debug-message ["%v, %v, %v" fmt $win $buff-name $geom] wait: 3000;
+    (y x) ::= curs-get-screen-size $BufferCurs;
     (cy cx) ::= get-source-index $buff $geom;
+
+    if {$cy > [$buff get-buffer-length]} {
+	$geom set! ViewLine 0;
+	$geom set! CursorLine [$buff get-buffer-length];
+	$geom set! ViewColumn 0;
+	$geom set! CursorColumn 0;
+	$geom set! IndexColumn.SAVE 0;
+	(cy cx) ::= get-source-index $buff $geom;
+    };
 
     curs-print $StatusLineCurs [
 	  " -- [%v%v%v%v]#%v - (%d,%d) - <%v> {%v} %v %v" fmt
 	  [[$buff modify?] ??? "*" " "]
-	  [[$buff newfile?] ??? "N" " "]
-	  [$FreeCursor ??? "F" " "]
-	  [[get-region] ??? "R" " "]
+	  [[$buff newfile?] ??? "?" " "]
+	  [[get-region] ??? "-" " "]
+	  [$FreeCursor ??? "+" " "]
 	  [$win split sep: "#" : get 1]
 	  $cy $cx
 	  $buff-name
