@@ -709,7 +709,7 @@ defcommand buffer-list
     $buff clear-all;
 
     $buff append-string "!! Hint !!  Move cursor to buffer and Enter, jump to buffer.";
-    $buff append-string ["%1v%-3v %-26v %6v %-v" fmt "M" "N" "Buffer Name" "Length" "File Path"];
+    $buff append-string ["%1v%-3v %-26v %6v %-v" fmt " " " " "Buffer Name" "Length" "File Path"];
     $buff append-string ["%1v%-3v %-26v %6v %-v" fmt "-" "-" "-----------" "------" "---------"];
     l ::= BufferManager get-buffer-list;
     $l each do: {| buff-name |
@@ -717,7 +717,7 @@ defcommand buffer-list
 	$buff append-string [
 	    "%1v%-3v %-26v %6d %-v" fmt
 	    [[$display-buffer modify?] ??? "*" " "]
-	    [[$display-buffer newfile?] ??? "N" "   "]
+	    [[$display-buffer newfile?] ??? "?" "   "]
 	    ["<" . $buff-name ">"]
 	    [$display-buffer get-buffer-length]
 	    [$display-buffer get-path]
@@ -936,7 +936,7 @@ defcommand search
 	    $geom set! CursorColumn [$geom,CursorColumn - [$ex - $sx]];
 	    $window stay-search;
 	};
-	if {eq? $in-key CTRL_V} {
+	if {or {eq? $in-key CTRL_V} {eq? $in-key CTRL_F}} {
 	    str ::= $window get-search-string;
 	    $main mini-input-value-override $str [$str len];
 	    $window set-search-result [$__buff_in_clojure__ search $str];
