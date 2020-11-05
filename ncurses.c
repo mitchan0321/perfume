@@ -205,7 +205,6 @@ func_curses_clear(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     w = container->u.container.data;
     posargs = list_next(posargs);
 
-    curs_set(0);
     werase(w);
     getmaxyx(w, y, x);
     for (i=0; i<y; i++) {
@@ -796,6 +795,7 @@ func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     Toy_Type *inlist, *result;
     encoder_error_info *enc_error_info;
     static int pending_key = -1;
+    static unsigned long int curs_blink = 0;
 
     if (hash_get_length(nameargs) > 0) goto error;
     if (arglen != 3) goto error;
@@ -827,7 +827,9 @@ func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     incell = new_cell(L"");
     inlist = result = new_list(NULL);
 
-    curs_set(1);
+    curs_blink ++;
+    // curs_set(((curs_blink >> 2) % 2) ? 0 : 1); // blink even
+    curs_set(((curs_blink >> 1) % 4) ? 1 : 0); // blink 3:1
     wtimeout(w, itimeout);
 
     if (pending_key != -1) {
@@ -835,7 +837,6 @@ func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 	pending_key = -1;
     } else {
 	in = wgetch(w);
-	curs_set(0);
     }
     if (in == -1) return result;
     
@@ -849,10 +850,8 @@ func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 	if (in == KEY_RESIZE) {
 	    wtimeout(w, 500);
 	    in = wgetch(w);
-	    curs_set(0);
 	    while (in == KEY_RESIZE) {
 		in = wgetch(w);
-		curs_set(0);
 	    }
 	    if (in == -1) {
 		pending_key = -1;
@@ -883,7 +882,6 @@ func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 	// read remain character
 	wtimeout(w, itimeout / 4);
 	in = wgetch(w);
-	curs_set(0);	
 	while (in != -1) {
 	    if (((in >= 0) && (in < 0x20)) || (in >= 256))  {
 		pending_key = in;
@@ -893,7 +891,6 @@ func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 		cell_add_char(incell, in);
 	    }
 	    in = wgetch(w);
-	    curs_set(0);	
 	}
 	// decode encoding
 	dstr = decode_raw_to_unicode(incell, iencoder, enc_error_info);
