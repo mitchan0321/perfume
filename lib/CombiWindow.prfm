@@ -178,25 +178,25 @@ CombiWindow method render () {
 	    cond
 	    {and {$line = $sy} {$line = $ey}} {
 		start-col ::= curs-index-to-pos $src $sx $DEFAULT_TAB_WIDTH;		
-		end-col ::= curs-index-to-pos $src $ex $DEFAULT_TAB_WIDTH;
+		end-col ::= curs-index-to-pos $src $ex $DEFAULT_TAB_WIDTH : + 1;
 		in-region := <t>;
 		break;
 	    }
 	    {$line = $sy} {
 		start-col ::= curs-index-to-pos $src $sx $DEFAULT_TAB_WIDTH;
-		end-col ::= curs-index-to-pos $src [$src len] $DEFAULT_TAB_WIDTH;
+		end-col ::= curs-index-to-pos $src [$src len] $DEFAULT_TAB_WIDTH : + 1;
 		in-region := <t>;
 		break;
 	    }
 	    {$line = $ey} {
 		start-col ::= curs-index-to-pos $src 0 $DEFAULT_TAB_WIDTH;
-		end-col ::= curs-index-to-pos $src $ex $DEFAULT_TAB_WIDTH;
+		end-col ::= curs-index-to-pos $src $ex $DEFAULT_TAB_WIDTH : + 1;
 		in-region := <t>;
 		break;
 	    }
 	    {and {$line > $sy} {$line < $ey}} {
 		start-col ::= curs-index-to-pos $src 0 $DEFAULT_TAB_WIDTH;
-		end-col ::= curs-index-to-pos $src [$src len] $DEFAULT_TAB_WIDTH;
+		end-col ::= curs-index-to-pos $src [$src len] $DEFAULT_TAB_WIDTH : + 1;
 		in-region := <t>;
 		break;
 	    };
