@@ -827,8 +827,8 @@ func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     incell = new_cell(L"");
     inlist = result = new_list(NULL);
 
-    wtimeout(w, itimeout);
     curs_set(1);
+    wtimeout(w, itimeout);
 
     if (pending_key != -1) {
 	in = pending_key;
