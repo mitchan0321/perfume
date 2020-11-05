@@ -391,6 +391,22 @@ defcommand execute-command
     result ALL;
 };
 
+defcommand execute-editor-command
+{   | main window |
+    $main mini-input-start "" prompt: "Editor command: ";
+    $main add-mini-input-callback $window {| main window in-key value |
+        if {eq? $in-key KEY_ESC} {
+	    $main mini-input-end;
+	    show-message "Canceled.";
+	};
+        if {eq? $in-key CTRL_M} {
+	    $main mini-input-end;
+	    $window apply-command $main $window "" $value; 
+	};
+    };
+    result ALL;
+};
+
 defcommand eval-region
 {   | main window |
     buff ::= $window get-buffer;
@@ -955,6 +971,26 @@ defcommand search
 	};
     };
     result SELF;
+};
+
+defcommand exit
+{   | main window |
+    l ::= BufferManager get-buffer-list : filter {| i | "*" != [$i at 0]};
+    do_exit := <t>;
+    $l each do: {| buff-name |
+	buffer ::= BufferManager get-buffer $buff-name;
+        if {$buffer modify?} {
+	    do_exit := <nil>;
+        };
+    };
+    if $do_exit {exit};
+    show-message "CAUTION: Modified buffer is exists!! Try again after save the buffer or kill.";
+    result SELF;
+};
+
+defcommand smart-indent
+{   | main window |
+
 };
 
 defcommand test
