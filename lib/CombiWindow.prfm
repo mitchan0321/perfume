@@ -480,7 +480,9 @@ CombiWindow method load-keybind () {
 	    try {
 	        load :notrace [$i . "/" $COMBIWINDOW_KEYBINDFILE]
 	    } catch: {| e |
-		throw ErrConfiguration ["Error at key-bind file: " . $COMBIWINDOW_KEYBINDFILE ", <" [$e car] "># " [$e cdr]];
+		### throw ErrConfiguration ["Error at key-bind file: " . $COMBIWINDOW_KEYBINDFILE ", <" [$e car] "># " [$e cdr]];
+		show-message ["Error at key-bind file: " . $COMBIWINDOW_KEYBINDFILE ", <" [$e car] "># " [$e cdr]];
+		return;
 	    };
 	    break;
 	};

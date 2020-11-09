@@ -709,11 +709,11 @@ defcommand kill-buffer
     result ALL;
 };
 
-defcommand describe-key
+defcommand key-binding-list
 {   | main window |
-    BufferManager unregist-buffer "*Describe Key*";
+    BufferManager unregist-buffer "*Key Binding*";
     buff ::= new EditBuffer;
-    $buff load-content "describe key" :init-only buffer-name: "*Describe Key*";
+    $buff load-content "key binding" :init-only buffer-name: "*Key Binding*";
     $buff clear-all;
 
     $buff append-string ["%-15v\t%-v" fmt "Key" "Command"];
