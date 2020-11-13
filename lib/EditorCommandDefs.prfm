@@ -1006,6 +1006,9 @@ defcommand exit
 
 defcommand smart-indent
 {   | main window |
+    buff ::= $window get-buffer;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    str ::= $buff get-buffer-line $ey;
 
 };
 
@@ -1017,6 +1020,7 @@ defcommand smart-dedent
 defcommand test
 {   | main window |
     w;
+    println "";
     stack-trace : split sep: "\n" : each do: {| i | $stdout puts $i};
     result ALL;
 };
