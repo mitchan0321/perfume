@@ -452,6 +452,9 @@ defcommand kill-interp
     if {defvar? PINTERP} {
 	try {$PINTERP release} catch: {};
     };
+    $stdin clear;
+    $stdout clear;
+    $stderr clear;
     $stderr puts "Interpriter killed.";
     result ALL;
 };
@@ -460,11 +463,13 @@ defcommand send-eof
 {   | main window |
     $stderr puts "Send eof.";
     $stdin close;
+    result ALL;
 };
 
 defcommand refresh-screen
 {   | main window |
     $main send-key-event (KEY_RESIZE);
+    result ALL;
 };
 
 defcommand flash
@@ -1022,6 +1027,13 @@ defcommand test
     w;
     println "";
     stack-trace : split sep: "\n" : each do: {| i | $stdout puts $i};
+    println "";
+    println ["interp stat: " . [$PINTERP stat]];
+    println "";
+    println ["stdin stat:  " . [$stdin stat]];
+    println ["stdout stat: " . [$stdout stat]];
+    println ["stderr stat: " . [$stderr stat]];
+
     result ALL;
 };
 

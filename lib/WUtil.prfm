@@ -2,7 +2,6 @@ class WUtil;
 
 WUtil method init () {
     init-config;
-    init-color-DB;
     init-command-DB;
 
     # Ommit exit command.

@@ -19,7 +19,7 @@ Window method init-constructor () {
 	return $s;
     };
     (y x) ::= curs-get-screen-size $RootWin;
-    sets CursWin [curs-create-window $RootWin 0 0 [$y - 1] $x];
+    sets CursWin [curs-create-window $RootWin 0 0 [$y - 1] [$x - $ROOT_WINDOW_RIGHT_MARGIN]];
     sets CursWinMini <nil>;
     sets CreateWindowHook <nil>;
     sets BufferBinding [dict];
@@ -48,7 +48,7 @@ Window method get-curs-mini () {
 
 Window method create-minibuffer-window () {
     (y x) ::= curs-get-screen-size $RootWin;
-    sets CursWinMini [curs-new-window $RootWin [$y - 1] 0 1 $x];
+    sets CursWinMini [curs-new-window $RootWin [$y - 1] 0 1 [$x - $ROOT_WINDOW_RIGHT_MARGIN]];
 
     (l c) ::= curs-get-screen-size $CursWinMini;
     win ::= new MiniWindow init: ([self] 0 0 $l $c);
@@ -381,7 +381,7 @@ Window method resize-window () {
     curs-destroy-window $CursWin;
 
     (y x) ::= curs-get-screen-size $RootWin;
-    sets CursWin [curs-create-window $RootWin 0 0 [$y - 1] $x];
+    sets CursWin [curs-create-window $RootWin 0 0 [$y - 1] [$x - $ROOT_WINDOW_RIGHT_MARGIN]];
     create-minibuffer-window;
     if {block? $CreateWindowHook} {
 	$CreateWindowHook eval;

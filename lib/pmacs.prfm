@@ -42,9 +42,11 @@ defun pmacs (trace: t) {
     $stderr set-comode;
     
     try {
-	defvar MainWindow [new Window init: ([curs-init])];
-	BufferManager init;
 	WUtil init;
+	BufferManager init;
+	curs ::= curs-init;
+	defvar MainWindow [new Window init: ($curs)];
+	init-color-DB;
 	$MainWindow create-minibuffer-window;
 	$MainWindow create-full-window;
 	$MainWindow add-create-window-hook {$MainWindow create-full-window};
