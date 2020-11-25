@@ -435,7 +435,7 @@ func_curses_render_line(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, i
     }
     
     slen = cell_get_length(disp_string->u.string);
-    rendaring_data = GC_MALLOC(sizeof(Render_Encode) * slen);
+    rendaring_data = GC_MALLOC(sizeof(Render_Encode) * (slen+1));
     ALLOC_SAFE(rendaring_data);
     enc_error_info = GC_MALLOC(sizeof(encoder_error_info));
     ALLOC_SAFE(enc_error_info);
@@ -939,7 +939,7 @@ func_curses_pos_to_index(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, 
 	return new_integer_si(0);
     }
     slen ++;
-    rendaring_data = GC_MALLOC(sizeof(Render_Encode) * slen);
+    rendaring_data = GC_MALLOC(sizeof(Render_Encode) * (slen+1));
     ALLOC_SAFE(rendaring_data);
 
     p = GC_MALLOC((sizeof(wchar_t)) * slen);
@@ -1025,7 +1025,7 @@ func_curses_index_to_pos(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, 
 	return new_integer_si(0);
     }
     slen ++;
-    rendaring_data = GC_MALLOC(sizeof(Render_Encode) * slen);
+    rendaring_data = GC_MALLOC(sizeof(Render_Encode) * (slen+1));
     ALLOC_SAFE(rendaring_data);
 
     p = GC_MALLOC((sizeof(wchar_t)) * slen);

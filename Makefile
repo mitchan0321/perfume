@@ -27,7 +27,7 @@ endif
 
 
 ### for product build. (use BoehmGC)
-CFLAGS		= -Wall -O3 -c -g $(OPTIONS)
+CFLAGS		= -Wall -O2 -c -g $(OPTIONS)
 INCLUDE		= -I/usr/local/include -I.
 LIB		= -L/usr/lib -L/lib -L/usr/local/lib \
 		  -lm -lpthread -lgmp -lgc -lonigmo -lpcl $(OPTLIBS)
@@ -40,12 +40,12 @@ LIB		= -L/usr/lib -L/lib -L/usr/local/lib \
 #		  -static -lm -lpthread -lgmp -lgc -lonigmo -lpcl $(OPTLIBS)
 
 ### for memory debuging build.
-#CFLAGS		= -Wall -c -g -DPROF
+#CFLAGS		= -Wall -c -g -DPROF $(OPTIONS)
 #INCLUDE		= -I/usr/local/include -I.
 #LIB		= -L/usr/local/lib -lm -lonigmo -lpcl -lgmp $(OPTLIBS)
 
 ### for profiling build.
-#CFLAGS		= -Wall -c -g -pg -DPROF
+#CFLAGS		= -Wall -c -g -pg -DPROF $(OPTIONS)
 #INCLUDE		= -I/usr/local/include -I.
 #LIB		= -pg -L/usr/local/lib -lonigmo -lpcl -lgmp $(OPTLIBS)
 
