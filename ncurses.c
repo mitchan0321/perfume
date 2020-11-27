@@ -828,8 +828,8 @@ func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     inlist = result = new_list(NULL);
 
     curs_blink ++;
-    // curs_set(((curs_blink >> 2) % 2) ? 0 : 1); // blink even
-    curs_set(((curs_blink >> 1) % 4) ? 1 : 0); // blink 3:1
+    // curs_set(((curs_blink >> 4) % 2) ? 0 : 1); // blink even
+    curs_set(((curs_blink >> 3) % 4) ? 1 : 0); // blink 3:1
     wtimeout(w, itimeout);
 
     if (pending_key != -1) {

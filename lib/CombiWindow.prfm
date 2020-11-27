@@ -700,6 +700,7 @@ CombiWindow method cancel-search (str) {
     if $SearchSave {
 	$geom restore-geom $SearchSave;
     };
+    setvar SearchString $str;
     sets SearchSave <nil>;
     sets SearchResult ();
     sets SearchHilight <nil>;

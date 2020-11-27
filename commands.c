@@ -4206,6 +4206,7 @@ cmd_setitimer(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     Toy_Type *tmsec;
     int msec, result;
     struct itimerval new_t;
+    static stack_t ss;
     struct sigaction newsig, oldsig;
 
     if (arglen != 1) goto error;
@@ -4215,7 +4216,19 @@ cmd_setitimer(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     if (GET_TAG(tmsec) != INTEGER) goto error;
     msec = mpz_get_si(tmsec->u.biginteger);
 
-    if (-1 == sigaction(SIGSEGV, NULL, &oldsig)) {
+    ss.ss_sp = GC_MALLOC(SIGASTKSZ);
+    if (NULL == ss.ss_sp) {
+	fprintf(stderr, "Can't alloc altinative stack(1).\n");
+	exit(1);
+    }
+    ss.ss_size = SIGASTKSZ;
+    ss.ss_flags = 0;
+    if (-1 == sigaltstack(&ss, NULL)) {
+	fprintf(stderr, "Can't set altinative stack(1).\n");
+	exit(1);
+    }
+
+    if (-1 == sigaction(SIGALRM, NULL, &oldsig)) {
 	return new_exception(TE_SYSCALL,
 			     L"Can't save sigaction.", interp);
     }

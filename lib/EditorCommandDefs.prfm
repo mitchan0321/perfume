@@ -914,10 +914,27 @@ defcommand paste-buffer
 defcommand search
 {   | main window |
     __buff_in_clojure__ ::= $window get-buffer;
+
+    str := "";
+    if [$window get-region] {
+        buff ::= $window get-buffer;
+        geom ::= $window get-geom;
+        (sy sx) ::= $window end-region;
+        (ey ex) ::= $window get-source-index $buff $geom;
+        $window copy-region $sy $sx $ey $ex;
+        str ::= $window get-copy-buffer;
+        setvar SearchString $str;
+    };
+
     $window start-search;
-    $main mini-input-start "" prompt: "Search: ";
-    $window set-search-result [$__buff_in_clojure__ search ""];
-    
+    $main mini-input-start $str prompt: "Search: ";
+    $window reset-search;
+    $window set-search-result [$__buff_in_clojure__ search $str];
+    $window stay-search;
+    if {$str != ""} {
+        $main send-key-event (KEY_UP);
+    };
+
     $main add-mini-input-callback $window {| main window in-key value |
         if {eq? $in-key KEY_ESC} {
 	    $main mini-input-end;
@@ -1027,12 +1044,13 @@ defcommand test
     w;
     println "";
     stack-trace : split sep: "\n" : each do: {| i | $stdout puts $i};
-    println "";
     println ["interp stat: " . [$PINTERP stat]];
     println "";
     println ["stdin stat:  " . [$stdin stat]];
     println ["stdout stat: " . [$stdout stat]];
     println ["stderr stat: " . [$stderr stat]];
+    println "";
+    slist;
 
     result ALL;
 };

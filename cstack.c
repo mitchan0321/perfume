@@ -19,7 +19,7 @@ static sigjmp_buf jmp_env;
 void
 init_cstack() {
     int i, fin;
-    stack_t ss;
+    static stack_t ss;
     struct sigaction newsig, oldsig;
 
     CStack.slot_size = STACK_SLOT_SIZE * sizeof(__PTRDIFF_TYPE__);
