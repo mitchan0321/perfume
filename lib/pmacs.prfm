@@ -70,7 +70,13 @@ defun pmacs (trace: t) {
 		if $result {
 		    $MainWindow bind-buffer "Window#1" $buff;
 		    $MainWindow apply {render-all; refresh};
-	            key ::= curs-keyin [$MainWindow get-curs-mini] 10000 $INPUT_ENCODING;
+		    key := ();
+		    timeout := 10000;
+		    while {$key null?} do: {
+			key ::= curs-keyin [$MainWindow get-current-window : get-curs] $INPUT_TIMEOUT $INPUT_ENCODING;
+			$timeout -- $INPUT_TIMEOUT;
+			if {$timeout < 0} {break};
+		    };
 		    $MainWindow unbind-buffer;
 		};
 	    };
