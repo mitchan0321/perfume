@@ -8,7 +8,7 @@ ScratchBuffer method init-constructor () {
     sets Src [vector (
 	"Welcome to Perfume/pmacs world !!"
 	""
-	"  <<<Using for pmacs editor>>>"
+	"  <<< Using for pmacs editor >>>"
 	"    Exit from pmacs editor:"
 	"       => press F11, type \"exit\" and enter."
 	"    Open file:"
@@ -22,7 +22,7 @@ ScratchBuffer method init-constructor () {
         "    Help for key bindings:"
 	"       => press CTRL_D"
 	""
-	"  <<<Using for Perfume/pmacs interpriter>>>"
+	"  <<< Using for Perfume/pmacs interpriter >>>"
         "    1) Select the '*Scratch*' buffer."
         "    2) Select the line or select the region (press CTRL_SP)"
 	"       if you want to execute."
