@@ -491,6 +491,7 @@ defcommand open-file
 	    $main mini-input-end;
 	    if {[$value len] = 0} {
 		show-message "No file name specified.";
+		return SELF;
 	    };
             path ::= path-adjust [
 		{[$value sub 0 1] = "/"} ???
