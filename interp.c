@@ -119,6 +119,7 @@ new_interp(wchar_t* name, int stack_size, Toy_Interp* parent,
 	interp->current_func = const_Nil;
 	interp->trace_info = NULL;
 	interp->itimer_enable = 0;
+	interp->signal_mask_enable = 0;
 	
 	sig_flag = 0;
 
@@ -177,6 +178,7 @@ new_interp(wchar_t* name, int stack_size, Toy_Interp* parent,
 	interp->current_func = const_Nil;
 	interp->trace_info = NULL;
 	interp->itimer_enable = parent->itimer_enable;
+	interp->signal_mask_enable = 0;
     }
 
     return interp;
