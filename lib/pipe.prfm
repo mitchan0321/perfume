@@ -172,7 +172,7 @@ defun pipe-dispatch (blist) {
 	    s ::= $b stat?;
 	    if {and [or [eq? $s @READ] [eq? $s @WRITE]] [true? CO-MODE]} then: {pause @WRITE};
 	    if {eq? $s @READ} then: {
-		if {[coro-id] != 0}
+		if {true? CO-MODE}
 		  {pause}
 		  {retry}
 		;
