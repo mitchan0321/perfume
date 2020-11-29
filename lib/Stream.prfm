@@ -92,29 +92,31 @@ Stream method puts-sub (i lnewline) {
 	if [eof?] then: {throw ErrFileAccess "Stream is closed."};
     };
    
-    if {sets? shortcut} then: {
-	if $lnewline {
-	    sets shortcut [$shortcut append! $i];
-	    $count ++;
-	} {
-	    if {string? [$shortcut last : car]} {
-		$shortcut last : car : append! $i;
-		$itemcount ++;
+    atomic {
+        if {sets? shortcut} then: {
+	    if $lnewline {
+	        sets shortcut [$shortcut append! $i];
+	        $count ++;
 	    } {
-		sets shortcut [$shortcut append! ["" . $i]];
-		$count ++;
-		$itemcount ++;
+	        if {string? [$shortcut last : car]} {
+		    $shortcut last : car : append! $i;
+		    $itemcount ++;
+	        } {
+		    sets shortcut [$shortcut append! ["" . $i]];
+		    $count ++;
+		    $itemcount ++;
+	        };
 	    };
-	};
-    } else: {
-	if $lnewline {
-	    sets shortcut [$queue append! $i];
-	    $count ++;
-	} {
-	    sets shortcut [$queue append! ["" . $i]];
-	    $count ++;
-	    $itemcount ++;
-	};
+        } else: {
+	    if $lnewline {
+	        sets shortcut [$queue append! $i];
+	        $count ++;
+	    } {
+	        sets shortcut [$queue append! ["" . $i]];
+	        $count ++;
+	        $itemcount ++;
+	    };
+        };
     };
 
     return <t>;
