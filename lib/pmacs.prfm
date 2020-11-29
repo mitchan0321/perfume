@@ -28,7 +28,6 @@ defun pmacs (trace: t) {
     defvar stdout_orig $stdout;
     defvar stderr_orig $stderr;
 
-    ### setvar stdin  [new InterpInputStream];
     setvar stdin  [new Stream];
     setvar stdout [new Stream];
     setvar stderr [new Stream];
@@ -60,7 +59,7 @@ defun pmacs (trace: t) {
 	    defvar PINTERP_LOCAL [dict];
         };
 	$MainWindow add-background job-id: "PINTERP-WATCHDOG" {
-	    c ::= coro {pinterp};
+	    c ::= coro {pinterp $MainWindow};
 	    $c eval {defvar CO-MODE <t>};
 	    $c eval {enable-itimer};
 	    set-itimer $INTERP_ITIMER_INTERVAL;
@@ -74,7 +73,7 @@ defun pmacs (trace: t) {
 	    body := {| main window |
 		if {eq? [$PINTERP stat] DONE} {
 		    try {$PINTERP release} catch: {};
-		    c ::= coro {pinterp};
+		    c ::= coro {pinterp $MainWindow};
 		    $c eval {defvar CO-MODE <t>};
 		    $c eval {enable-itimer};
 		    setvar PINTERP $c;

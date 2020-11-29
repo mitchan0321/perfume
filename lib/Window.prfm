@@ -36,6 +36,9 @@ Window method init-constructor () {
     ### Background
     sets Background [dict];
     $Background set @id 0;
+
+    ### interp state
+    sets InterpBusy <nil>;
 };
 
 Window method get-curs () {
@@ -544,4 +547,18 @@ Window method background-exists? () {
 	return <t>;
     };
     return <nil>;
+};
+
+Window method set-interp-idle () {
+    sets InterpBusy <nil>;
+    refresh;
+};
+
+Window method set-interp-busy () {
+    sets InterpBusy <t>;
+    refresh;
+};
+
+Window method is-interp-busy () {
+    true? InterpBusy;
 };

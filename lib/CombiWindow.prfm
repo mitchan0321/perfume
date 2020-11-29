@@ -98,19 +98,18 @@ CombiWindow method render () {
     };
 
     curs-print $StatusLineCurs [
-	  " -- [%v%v%v%v]#%v - (%d,%d) - <%v> {%v} %v %v" fmt
+	  " -- [%v%v%v%v%v]#%v - (%d,%d) - <%v> {%v} %v %v" fmt
 	  [[$buff modify?] ??? "*" " "]
 	  [[$buff newfile?] ??? "?" " "]
 	  [[get-region] ??? "-" " "]
 	  [$FreeCursor ??? "+" " "]
+	  [[$Parent is-interp-busy] ??? "@" " "]
 	  [$win split sep: "#" : get 1]
 	  $cy $cx
 	  $buff-name
 	  $Mode
 	  [[$buff get-path] ?? "*no file*"]
 	  ["-" repeat $x]
-#	  $cy $cx
-#	  $geom,CursorLine $geom,CursorColumn $geom,IndexColumn.SAVE
 	]
 	$DISPLAY_ENCODING 0 0;
     

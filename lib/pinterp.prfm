@@ -1,5 +1,6 @@
-defun pinterp () {
+defun pinterp (window) {
     $stdout puts "Start Perfume/pmacs interpriter.";
+    $window set-interp-idle;
     loop do: {
 	$stdin each do: {| exec-command |
 	    exec-command ::= "" . $exec-command;
@@ -8,6 +9,7 @@ defun pinterp () {
 	    unset result;
 
 	    try {
+                $window set-interp-busy;
 		result ::= begin {
 		    unset exec-command;
 		    alias up: 1 exec-command exec-command;
@@ -15,6 +17,8 @@ defun pinterp () {
 		} local: $PINTERP_LOCAL :rebase;
 	    } catch: {| e |
 		result ::= "EXCEPTION: <" . [$e car] "># " [$e cdr];
+	    } fin: {
+                $window set-interp-idle;
 	    };
 	    if {set? e} {
 		$stderr puts $result;

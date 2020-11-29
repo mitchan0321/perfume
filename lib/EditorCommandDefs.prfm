@@ -1045,6 +1045,7 @@ defcommand test
     println "";
     stack-trace : split sep: "\n" : each do: {| i | $stdout puts $i};
     println ["interp stat: " . [$PINTERP stat]];
+    println ["interp busy: " . [$MainWindow is-interp-busy]];
     println "";
     println ["stdin stat:  " . [$stdin stat]];
     println ["stdout stat: " . [$stdout stat]];
