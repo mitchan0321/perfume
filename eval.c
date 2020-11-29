@@ -21,7 +21,8 @@ static Toy_Type* toy_yield_bind(Toy_Interp *interp, Toy_Type *bind_var);
 */
 
 #define SIG_ACTION() 							\
-	if (sig_flag && (! interp->co_calling)) {			\
+	if (sig_flag && (! interp->co_calling)				\
+	     && (! interp->signal_mask_enable)) {			\
 		Toy_Type *sig_result;					\
 		int code = sig_flag;					\
 		sig_flag = 0;						\
@@ -76,7 +77,7 @@ toy_eval_script(Toy_Interp* interp, Toy_Type *script) {
 	    result = new_exception(TE_STACKOVERFLOW, L"C stack overflow.", interp);
 	}
 
-	if (interp->itimer_enable && SigAlrm) {
+	if (interp->itimer_enable && SigAlrm && (! interp->signal_mask_enable)) {
 	    SigAlrm = 0;
 	    if ((interp->coroid != 0) && cstack_isalive(interp->cstack_id)) {
 		if (interp->co_parent) {

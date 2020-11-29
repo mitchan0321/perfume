@@ -4271,6 +4271,27 @@ error:
 			 L"Syntax error at 'enable-itimer', syntax: enable-itimer msec", interp);
 }
 
+Toy_Type*
+cmd_atomic(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *body, *result;
+    int atomic_save;
+
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) != 0) goto error;
+    body = list_get_item(posargs);
+    if (GET_TAG(body) != CLOSURE) goto error;
+
+    atomic_save = interp->signal_mask_enable;
+    interp->signal_mask_enable = 1;
+    result = eval_closure(interp, body, interp->trace_info);
+    interp->signal_mask_enable = atomic_save;
+
+    return result;
+
+error:
+    return new_exception(TE_SYNTAX,
+			 L"Syntax error at 'atomic', syntax: atomic {body}", interp);
+}
 
 int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, L"false", 	cmd_false, 		NULL);
@@ -4390,7 +4411,8 @@ int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, L"bulk", 	cmd_newbulk, 		L"val-list");
     toy_add_func(interp, L"self-func", 	cmd_selffunc, 		NULL);
     toy_add_func(interp, L"set-itimer",	cmd_setitimer, 		L"msec");
-    toy_add_func(interp, L"enable-itimer",cmd_enableitimer,	NULL);
+    toy_add_func(interp, L"enable-itimer",cmd_enableitimer, 	NULL);
+    toy_add_func(interp, L"atomic",	cmd_atomic, 		L"body");
     
 #ifdef NCURSES
     int toy_add_func_ncurses(Toy_Interp* interp);

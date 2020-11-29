@@ -178,6 +178,13 @@ typedef struct _toy_interp {
 
     /* itimer enable */
     int itimer_enable;
+
+    /* signal mask
+     * if signal_mask_enable != 0 ... signal masked
+     * if signal_mask_enable == 0 ... signal no masked (enable signal)
+     */ 
+    int signal_mask_enable;
+
 } Toy_Interp;
 
 typedef struct _toy_coroutine {
