@@ -98,10 +98,10 @@ CombiWindow method render () {
     };
 
     curs-print $StatusLineCurs [
-	  " -- [%v%v%v%v%v]#%v - (%d,%d) - <%v> {%v} %v %v" fmt
+	  " -- [%v%v%v%v%v]#%v (%d,%d) <%v> {%v} %v %v" fmt
 	  [[$buff modify?] ??? "*" " "]
 	  [[$buff newfile?] ??? "?" " "]
-	  [[get-region] ??? "-" " "]
+	  [[get-region] ??? "#" " "]
 	  [$FreeCursor ??? "+" " "]
 	  [[$Parent is-interp-busy] ??? "@" " "]
 	  [$win split sep: "#" : get 1]
