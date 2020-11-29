@@ -55,6 +55,27 @@ defun pmacs (trace: t) {
 	    ### $window apply-command $main $window "" start-region;
 	    result ALL;
 	};
+
+	$MainWindow add-background job-id: "00-start-logo" {
+            buff ::= new EditBuffer;
+            path := <nil>;
+       	    $LIB_PATH each do: {| i |
+	        if {file exists? [$i . "/pmacs.logo"]} {
+		    path ::= $i . "/pmacs.logo";
+	            break;
+	        };
+	    };
+	    if $path {
+		(result err) ::= $buff load-content $path;
+		if $result {
+		    $MainWindow bind-buffer "Window#1" $buff;
+		    $MainWindow apply {render-all; refresh};
+	            key ::= curs-keyin [$MainWindow get-curs-mini] 10000 $INPUT_ENCODING;
+		    $MainWindow unbind-buffer;
+		};
+	    };
+	};
+
         if {defvar? PINTERP_LOCAL} else: {
 	    defvar PINTERP_LOCAL [dict];
         };
