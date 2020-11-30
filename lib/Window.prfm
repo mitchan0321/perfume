@@ -577,9 +577,8 @@ Window method is-interp-busy () {
 Window method read-keymaps () {
     $LIB_PATH each do: {| i |
 	if {file exists? [$i . "/pmacs.keymap"]} {
-	    try {load [$i . "/pmacs.keymap"]} catch: {};
+	    try {load :notrace [$i . "/pmacs.keymap"]} catch: {};
 	    break;
 	};
     };
 };
-

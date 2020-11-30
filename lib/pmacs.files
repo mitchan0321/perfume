@@ -21,6 +21,7 @@ pmacs.conf
 pmacs.prfm
 pmacs.files
 pmacs.logo
+pmacs.keymap
 pmacs.TODO
 Mode-BufferList.key
 Mode-C.key
