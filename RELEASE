@@ -1,4 +1,4 @@
-2020/10/27	PRFM_20201027		1.5.0
+2020/12/23	PRFM_20201123_K32	1.5.0
 2020/09/10	PRFM_20200910		1.4.1
 2020/04/15	PRFM_20200415		1.4.0
 2020/03/18	PRFM_20200318		1.4.0_PRE_2
@@ -1327,5 +1327,7 @@
 			WUtil.prfm, Window.prfm, WindowBase.prfm, color-defs.prfm,
 			pmacs.conf, pmacs.prfm, pmacs.files, pmacs.TODO, Mode-BufferList.key,
 			Mode-C.key, Mode-Interp.key, Mode-Prfm.key, Mode-Text.key, pinterp.prfm
+
+2020/12/23
 
 #eof
