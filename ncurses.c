@@ -219,6 +219,39 @@ error:
     return new_exception(TE_SYNTAX, L"Syntax error at 'curs-clear', syntax: curs-clear window", interp);
 }
 
+
+Toy_Type*
+func_curses_wipe(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    WINDOW *w;
+    Toy_Type *container;
+    int i, j;
+    int y, x;
+
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (arglen != 1) goto error;
+
+    container = list_get_item(posargs);
+    if (GET_TAG(container) != CONTAINER) goto error;
+    if (wcscmp(cell_get_addr(container->u.container.desc), L"CURSES") != 0) {
+	return new_exception(TE_CURSES, L"Curses error at 'curs-clear', Bad descriptor.", interp);
+    }
+    w = container->u.container.data;
+    posargs = list_next(posargs);
+
+    wclear(w);
+    getmaxyx(w, y, x);
+    for (i=0; i<y; i++) {
+	for (j=0; j<x; j++) {
+	    wmove(w, i, j);
+	    wprintw(w, " ");
+	}
+    }
+    return const_T;
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'curs-wipe', syntax: curs-wipe window", interp);
+}
+
 Toy_Type*
 func_curses_print(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     WINDOW *w;
@@ -1123,6 +1156,7 @@ toy_add_func_ncurses(Toy_Interp* interp) {
     toy_add_func(interp, L"curs-create-window",	func_curses_createwindow,	L"window,y,x,line,column");
     toy_add_func(interp, L"curs-new-window",	func_curses_newwindow,		L"window,y,x,line,column");
     toy_add_func(interp, L"curs-clear",		func_curses_clear,		L"window");
+    toy_add_func(interp, L"curs-wipe",		func_curses_wipe,		L"window");
     toy_add_func(interp, L"curs-print",		func_curses_print,		L"window,message,encoding,y,x");
     toy_add_func(interp, L"curs-refresh",	func_curses_refresh,		L"window");
     toy_add_func(interp, L"curs-color",		func_curses_color,		L"window,y,x,len,color,attr");

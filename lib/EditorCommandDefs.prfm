@@ -468,6 +468,7 @@ defcommand send-eof
 
 defcommand refresh-screen
 {   | main window |
+    $main wipe-window;
     $main send-key-event (KEY_RESIZE);
     result ALL;
 };

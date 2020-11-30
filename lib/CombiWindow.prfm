@@ -72,6 +72,12 @@ CombiWindow method clear () {
     curs-clear $BufferCurs;
 };
 
+CombiWindow method wipe () {
+    curs-wipe $StatusLineCurs;
+    curs-wipe $VerticalLineCurs;	    
+    curs-wipe $BufferCurs;
+};
+
 CombiWindow method get-curs () {
     return $BufferCurs;
 };
