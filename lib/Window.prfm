@@ -434,7 +434,11 @@ Window method key-event-loop () {
 	    };
 	    continue;
 	};
-	
+
+	#######
+	####### for debug display key in
+        #######
+	### show-message ["key in list: " . $i];
 	#######
 	####### for debug display key in
         #######

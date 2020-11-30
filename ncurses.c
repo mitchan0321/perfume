@@ -843,7 +843,7 @@ func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     //
     // detect function character.
     //
-    if (in >= 256) {
+    if (in >= 256 || in == 27) {
 	//
 	// KEY_RESIZE onece occured.
 	//
@@ -864,6 +864,25 @@ func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 	
 	// if function key, return to caller soon.
 	inlist = list_append(inlist, key_conv(in));
+	wtimeout(w, 1);
+	in = wgetch(w);
+	while (in != ERR) {
+	    if (in >= 256) {
+		pending_key = in;
+		inlist = list_append(inlist, new_symbol(L"KEY_ESC"));
+		return result;
+	    }
+	    if (in < 0x20) {
+		pending_key = in;
+		break;
+	    }
+	    cell_add_char(incell, in);
+	    in = wgetch(w);
+	}
+	if (cell_get_length(incell) > 0) {
+	    inlist = list_append(inlist, new_string_cell(incell));
+	}
+
 	return result;
 	
     } else {

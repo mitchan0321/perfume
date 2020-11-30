@@ -545,7 +545,7 @@ CombiWindow method apply-keybind (main window key) {
 
     command ::= $KeyBinding get $key;
     if {eq? <nil> $command} {
-	show-message ["No binding key: " . $key];
+    show-message ["No binding key: " . $key];
 	return <nil>;
     };
     body ::= get-command $command;
