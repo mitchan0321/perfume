@@ -39,6 +39,10 @@ Window method init-constructor () {
 
     ### interp state
     sets InterpBusy <nil>;
+
+    ### read keymap file
+    sets KeyMaps [dict];
+    read-keymaps;
 };
 
 Window method get-curs () {
@@ -412,6 +416,9 @@ Window method key-event-loop () {
 	window ::= $main get-current-window;
 	if {$KeyEvent null?} {
 	    i ::= curs-keyin [$window get-curs] $INPUT_TIMEOUT $INPUT_ENCODING;
+	    if [$KeyMaps set? $i] {
+		i ::= $KeyMaps get $i;
+	    };
 	} {
 	    i := $KeyEvent;
 	    sets KeyEvent ();
@@ -566,3 +573,13 @@ Window method set-interp-busy () {
 Window method is-interp-busy () {
     true? InterpBusy;
 };
+
+Window method read-keymaps () {
+    $LIB_PATH each do: {| i |
+	if {file exists? [$i . "/pmacs.keymap"]} {
+	    try {load [$i . "/pmacs.keymap"]} catch: {};
+	    break;
+	};
+    };
+};
+

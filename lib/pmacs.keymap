@@ -1,0 +1,9 @@
+$KeyMaps set (KEY_ESC "[1;4S")	(KEY_F64);
+$KeyMaps set (KEY_ESC "[15;4~") (KEY_F65);
+$KeyMaps set (KEY_ESC "[17;4~") (KEY_F66);
+$KeyMaps set (KEY_ESC "[18;4~") (KEY_F67);
+$KeyMaps set (KEY_ESC "[19;4~") (KEY_F68);
+$KeyMaps set (KEY_ESC "[20;4~") (KEY_F69);
+$KeyMaps set (KEY_ESC "[21;4~") (KEY_F70);
+$KeyMaps set (KEY_ESC "[23;4~") (KEY_F71);
+$KeyMaps set (KEY_ESC "[24;4~") (KEY_F72);
