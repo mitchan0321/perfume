@@ -640,6 +640,7 @@ Vector method copy-region (start-line start-column end-line end-column) {
 
 String method repeat (times) {
     result := "";
+    if {$times = 0} {return $result};
     self ::= self;
     1 each to: $times do: {
 	$result append! $self;

@@ -296,6 +296,10 @@ EditBuffer method newfile? () {
 
 EditBuffer method get-region-string (sy sx ey ex) {
     if {true? Src} {
+        len ::= $Src len;
+        if {and [$ey >= $len] [$sy >= $len]} {
+            return "";
+        };
 	return [[$Src copy-region $sy $sx $ey $ex] get 1];
     };
     return <nil>;
@@ -303,6 +307,10 @@ EditBuffer method get-region-string (sy sx ey ex) {
 
 EditBuffer method cut-region (sy sx ey ex) {
     if {true? Src} {
+        len ::= $Src len;
+        if {and [$ey >= $len] [$sy >= $len]} {
+            return ("" (insert-string-at "" $ey 0));
+        };
 	str ::= [$Src copy-region $sy $sx $ey $ex] get 1;
 	result ::= $Src delete-region $sy $sx $ey $ex;
 	if $result,0 {$UndoBuffer << $result};
