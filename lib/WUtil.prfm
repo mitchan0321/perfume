@@ -359,6 +359,11 @@ Vector method insert-character-at (char line at) {
 };
 
 Vector method insert-string-at (str line at) {
+    if {$str = ""} {
+        if {$line >= [self : len]} {self : append! ""};
+        return (delete-region $line 0 $line 0);
+    };
+    
     l ::= $str split sep: "\r";
 #    if {and {[self : len] = 0} {$l,0 = ""}} {$l >>};
     times ::= $l len;
@@ -410,7 +415,7 @@ Vector method delete-character-at (line at) {
     len ::= $s len;
     if {and {[$self len] = 1} {$len = 0}} {
 	$self resize 0;
-	return (insert-string-at "\r" 0 0);
+	return (insert-string-at "" 0 0);
     };
     if {$len = 0} {
 	i := $line;
@@ -419,6 +424,9 @@ Vector method delete-character-at (line at) {
 	    i ::= $i + 1;
         };
 	$self resize [$self len : - 1];
+        if {$line >= [$self len]} {
+            return (insert-string-at "" $line 0);
+        };
 	return (insert-string-at "\r" $line 0);
     };
     if {$at >= $len} {
@@ -427,13 +435,19 @@ Vector method delete-character-at (line at) {
 	};
 	$self set $line [$self,$line . [$self get [$line + 1]]];
 	if {$line = [$self len : - 2]} {
-	    $self resize [$self len : - 1];
+            $self resize [$self len : - 1];
+            if {$line >= [$self len]} {
+                return (insert-string-at "" $line 0);
+            };
 	    return (insert-string-at "\r" $line $len);
 	};
 	[$line + 1] each to: [$self len : - 2] do: {| i |
 	    $self set $i [$self get [$i + 1]];
 	};
 	$self resize [$self len : - 1];
+        if {$line >= [$self len]} {
+            return (insert-string-at "" $line 0);
+        };
 	return (insert-string-at "\r" $line $len);
     };
     s1 ::= $s sub 0 $at;
@@ -452,6 +466,9 @@ Vector method backdelete-character-at (line at) {
 	line ::= $line - 1;
 	at ::= [$self get $line] len;
 	(command char line at) ::= delete-character-at $line $at;
+        if {$line >= [$self len]} {
+            return (insert-string-at-next "" $line 0);
+        };
 	return (insert-string-at-next "\r" $line $at);
     };
     at ::= $at - 1;
@@ -530,9 +547,9 @@ Vector method delete-region (start-line start-column end-line end-column) {
 	s2 ::= $r sub $end-column;
         self : set $start-line [$s1 . $s2];
 	$result-str append! $str;
-	if {and $at-last {[self : len] >= 1} {[self : get [self : len : - 1]] = ""}} {
-	    self : resize [self : len : - 1];
-	};
+#	if {and $at-last {[self : len] >= 1} {[self : get [self : len : - 1]] = ""}} {
+#	    self : resize [self : len : - 1];
+#	};
 	return (insert-string-at $result-str $result-start-line $result-start-column);
     };
 
