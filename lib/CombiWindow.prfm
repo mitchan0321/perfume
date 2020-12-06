@@ -182,26 +182,26 @@ CombiWindow method render () {
 	    in-region := <nil>;
 	    cond
 	    {and {$line = $sy} {$line = $ey}} {
-		start-col ::= curs-index-to-pos $src $sx $DEFAULT_TAB_WIDTH;		
-		end-col ::= curs-index-to-pos $src $ex $DEFAULT_TAB_WIDTH : + 1;
+		start-col ::= curs-index-to-pos $src $sx $DEFAULT_TAB_WIDTH;
+		end-col ::= curs-index-to-pos $src $ex $DEFAULT_TAB_WIDTH;
 		in-region := <t>;
 		break;
 	    }
 	    {$line = $sy} {
 		start-col ::= curs-index-to-pos $src $sx $DEFAULT_TAB_WIDTH;
-		end-col ::= curs-index-to-pos $src [$src len] $DEFAULT_TAB_WIDTH : + 1;
+		end-col ::= curs-index-to-pos $src [$src len] $DEFAULT_TAB_WIDTH;
 		in-region := <t>;
 		break;
 	    }
 	    {$line = $ey} {
 		start-col ::= curs-index-to-pos $src 0 $DEFAULT_TAB_WIDTH;
-		end-col ::= curs-index-to-pos $src $ex $DEFAULT_TAB_WIDTH : + 1;
+		end-col ::= curs-index-to-pos $src $ex $DEFAULT_TAB_WIDTH;
 		in-region := <t>;
 		break;
 	    }
 	    {and {$line > $sy} {$line < $ey}} {
 		start-col ::= curs-index-to-pos $src 0 $DEFAULT_TAB_WIDTH;
-		end-col ::= curs-index-to-pos $src [$src len] $DEFAULT_TAB_WIDTH : + 1;
+		end-col ::= curs-index-to-pos $src [$src len] $DEFAULT_TAB_WIDTH;
 		in-region := <t>;
 		break;
 	    };
@@ -218,7 +218,11 @@ CombiWindow method render () {
 		if {$end-col >= $x} {end-col := $x};
 		if {[$end-col - $start-col] > 0} {
 		    curs-color $BufferCurs $i $start-col [$end-col - $start-col] $ColorDB,REGION_HILIGHT 0;
-		};
+		} {
+                    if {[$src len] = 0} {
+                        curs-color $BufferCurs $i $start-col 1 $ColorDB,REGION_HILIGHT 0;
+                    };
+                };
 	    };
 
 	    $i ++;
@@ -628,6 +632,9 @@ CombiWindow method display-evaluation () {
 
 	$stdout close;
 	$stdout each do: {| r |
+            if {$r =~ '^Result\[FUNC\]=> '} {
+                r ::= [$r sub 0 80] . " ...";
+            };
 	    $buff append-string ["" . $r];
 	    update-display := <t>;
 	};
