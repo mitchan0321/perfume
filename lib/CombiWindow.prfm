@@ -223,6 +223,9 @@ CombiWindow method render () {
                         curs-color $BufferCurs $i $start-col 1 $ColorDB,REGION_HILIGHT 0;
                     };
                 };
+                if {[$end-col - $start-col] < 0} {
+                    curs-color $BufferCurs $i $start-col 1 $ColorDB,REGION_HILIGHT 0;
+                };
 	    };
 
 	    $i ++;
