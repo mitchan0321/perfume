@@ -1118,6 +1118,7 @@ defun get-next-indent-count (str) {
 	  "}" {$kakko-nami --}
 	  "]" {$kakko-kaku --}
 	;
+        if {or [$kakko-maru > 0] [$kakko-nami > 0] [$kakko-kaku > 0]} {break};
     };
     return [$kakko-maru + $kakko-nami : + $kakko-kaku];
 };
@@ -1153,6 +1154,29 @@ defcommand smart-dedent
     result ALL;
 };
 
+defcommand smart-move-forward
+{   | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    str ::= $buff get-buffer-line $ey;
+    str ::= $str ?? "";
+    cur-char ::= $str at $ex;
+    
+};
+
+defcommand smart-move-backward
+{   | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    str ::= $buff get-buffer-line $ey;
+    str ::= $str ?? "";
+    cur-char ::= $str at $ex;
+
+};
+
+defcommand 
 defcommand test
 {   | main window |
     w;

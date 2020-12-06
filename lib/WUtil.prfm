@@ -655,6 +655,58 @@ Vector method copy-region (start-line start-column end-line end-column) {
     return (insert-string-at $result-str $start-line $start-column);
 };
 
+Vector method each-forward-char (sl sc body) {
+    self ::= self;
+    to ::= $self len : - 1;
+    if {$sl > $to} {return};
+    src ::= [$self get $sl] . "\r";
+    if {[$src len] > 0} {
+        if {$sc < [$src len]} {
+            $sc each to: [$src len : - 1] do: {| j |
+                result := ([yield $body $sl $j [$src at $j]]);
+                if [control? [$result car]] {return};
+            };
+        };
+    };
+    $sl ++;
+    if {$sl > $to} {return};
+    $sl each to: $to do: {| i |
+        src ::= [$self get $i] . "\r";
+        if {[$src len] > 0} {
+            0 each to: [$src len : - 1] do: {| j |
+                result := ([yield $body $i $j [$src at $j]]);
+                if [control? [$result car]] {return};
+            };
+        };
+    };
+};
+
+Vector method each-backward-char (sl sc body) {
+    self ::= self;
+    to := 0;
+    if {[$self len] = 0} {return};
+    if {$sl >= [$self len : - 1]} {sl ::= $self len : - 1};
+    src ::= [$self get $sl] . "\r";
+    if {[$src len] > 0} {
+        if {$sc >= [$src len]} {sc ::= $src len : - 1};
+        $sc each to: 0 do: {| j |
+            result := ([yield $body $sl $j [$src at $j]]);
+            if [control? [$result car]] {return};
+        };
+    };
+    $sl --;
+    if {$sl < 0} {return};
+    $sl each to: $to do: {| i |
+        src ::= [$self get $i] . "\r";
+        if {[$src len] > 0} {
+            [$src len : - 1] each to: 0 do: {| j |
+                result := ([yield $body $i $j [$src at $j]]);
+                if [control? [$result car]] {return};
+            };
+        };
+    };
+};
+
 String method repeat (times) {
     result := "";
     if {$times = 0} {return $result};
