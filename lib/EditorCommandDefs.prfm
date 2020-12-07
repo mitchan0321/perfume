@@ -1166,7 +1166,7 @@ defcommand smart-move-forward
     str ::= $str ?? "";
     cur-char ::= $str at $ex;
     if {or [$cur-char = ")"] [$cur-char = "]"] [$cur-char = "}"]} {
-        show-message "Parentheses directions are opposite.";
+        show-message "Bracket directions are opposite.";
         $window cursor-move-to $geom $ey [$ex + 1];
         return SELF;
     };
@@ -1180,14 +1180,14 @@ defcommand smart-move-forward
             "{" {fin-char := "}"; level-nami-kakko := 1}
         ;
         fin := <nil>;
-        quote := <nil>;
+        dquote := <nil>;
         squote := <nil>;
         $vec each-forward-char $ey [$ex + 1] {| last-y last-x c |
             case $c
-                "\"" {quote ::= $quote ??? <nil> <t>}   ### " balanced for smart-move-*
+                "\"" {dquote ::= $dquote ??? <nil> <t>} ### " balanced for smart-move-*
                 "\'" {squote ::= $squote ??? <nil> <t>} ### ' balanced for smart-move-*
             ;
-            if {! [or $quote $squote]} {
+            if {! [or $dquote $squote]} {
                 case $c
                     "(" {$level-maru-kakko ++}
                     "[" {$level-kaku-kakko ++}
@@ -1210,7 +1210,7 @@ defcommand smart-move-forward
         };
         if $fin {$window cursor-move-to $geom $last-y $last-x};
         if {or [$level-maru-kakko != 0] [$level-kaku-kakko != 0] [$level-nami-kakko != 0]} {
-            show-message ["Unbalanced parentheses? " . "hint:"
+            show-message ["Unbalanced brackets? " . "hint:"
                 [if [$level-maru-kakko != 0] " '(' or ')', " ""]
                 [if [$level-kaku-kakko != 0] " '[' or ']', " ""]
                 [if [$level-nami-kakko != 0] " '{' or '}', " ""]
@@ -1246,7 +1246,7 @@ defcommand smart-move-backward
     cur-char ::= $str at $ex;
 
     if {or [$cur-char = "("] [$cur-char = "["] [$cur-char = "{"]} {
-        show-message "Parentheses directions are opposite.";
+        show-message "Bracket directions are opposite.";
         (ey ex) ::= $vec get-prev-pos $ey $ex;
         $window cursor-move-to $geom $ey $ex;
         return SELF;
@@ -1261,15 +1261,15 @@ defcommand smart-move-backward
             "}" {fin-char := "{"; level-nami-kakko := 1}
         ;
         fin := <nil>;
-        quote := <nil>;
+        dquote := <nil>;
         squote := <nil>;
         (ey ex) ::= $vec get-prev-pos $ey $ex;
         $vec each-backward-char $ey $ex {| last-y last-x c |
             case $c
-                "\"" {quote ::= $quote ??? <nil> <t>}   ### " balanced for smart-move-*
+                "\"" {dquote ::= $dquote ??? <nil> <t>} ### " balanced for smart-move-*
                 "\'" {squote ::= $squote ??? <nil> <t>} ### ' balanced for smart-move-*
             ;
-            if {! [or $quote $squote]} {
+            if {! [or $dquote $squote]} {
                 case $c
                     ")" {$level-maru-kakko ++}
                     "]" {$level-kaku-kakko ++}
@@ -1292,7 +1292,7 @@ defcommand smart-move-backward
         };
         if $fin {$window cursor-move-to $geom $last-y $last-x};
         if {or [$level-maru-kakko != 0] [$level-kaku-kakko != 0] [$level-nami-kakko != 0]} {
-            show-message ["Unbalanced parentheses? " . "hint:"
+            show-message ["Unbalanced brackets? " . "hint:"
                 [if [$level-maru-kakko != 0] " '(' or ')', " ""]
                 [if [$level-kaku-kakko != 0] " '[' or ']', " ""]
                 [if [$level-nami-kakko != 0] " '{' or '}', " ""]
