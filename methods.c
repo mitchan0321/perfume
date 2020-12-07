@@ -3461,6 +3461,115 @@ error2:
 }
 
 Toy_Type*
+mth_string_isalpha(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *self;
+    Cell *s;
+    wchar_t *p;
+    int result;
+
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (arglen != 0) goto error;
+    self = SELF(interp);
+    if (GET_TAG(self) != STRING) goto error2;
+
+    s = self->u.string;
+    p = cell_get_addr(s);
+    result = 1;
+    while (*p) {
+        if (*p >= 0x80) {
+            p ++;
+            continue;
+        }
+        if (   ((*p >= 'a') && (*p <= 'z'))
+            || ((*p >= 'A') && (*p <= 'Z'))
+            ||  (*p == '_') ) {
+            p ++;
+            continue;
+        }
+        result = 0;
+        break;
+    }
+    
+    return (result ? const_T : const_Nil);
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'alphabetic?', syntax: String alphabetic?", interp);
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
+mth_string_isnum(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *self;
+    Cell *s;
+    wchar_t *p;
+    int result;
+
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (arglen != 0) goto error;
+    self = SELF(interp);
+    if (GET_TAG(self) != STRING) goto error2;
+
+    s = self->u.string;
+    p = cell_get_addr(s);
+    result = 1;
+    while (*p) {
+        if ((*p >= '0') && (*p <= '9')) {
+            p ++;
+            continue;
+        }
+        result = 0;
+        break;
+    }
+    
+    return (result ? const_T : const_Nil);
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'numeric?', syntax: String numeric?", interp);
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
+mth_string_isalnum(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *self;
+    Cell *s;
+    wchar_t *p;
+    int result;
+
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (arglen != 0) goto error;
+    self = SELF(interp);
+    if (GET_TAG(self) != STRING) goto error2;
+
+    s = self->u.string;
+    p = cell_get_addr(s);
+    result = 1;
+    while (*p) {
+        if (*p >= 0x80) {
+            p ++;
+            continue;
+        }
+        if (   ((*p >= 'a') && (*p <= 'z'))
+            || ((*p >= 'A') && (*p <= 'Z'))
+            || ((*p >= '0') && (*p <= '9'))
+            ||  (*p == '_') ) {
+            p ++;
+            continue;
+        }
+        result = 0;
+        break;
+    }
+    
+    return (result ? const_T : const_Nil);
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'alphanumeric?', syntax: String alphanumeric?", interp);
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
 mth_block_eval(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *closure, *result;
 
@@ -5465,6 +5574,9 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, L"String", L"uexport", 	mth_string_uexport, 	NULL);
     toy_add_method(interp, L"String", L"uimport!", 	mth_string_uimport, 	L"val-list");
     toy_add_method(interp, L"String", L"at", 		mth_string_at, 		L"val");
+    toy_add_method(interp, L"String", L"alphabetic?",	mth_string_isalpha,	NULL);
+    toy_add_method(interp, L"String", L"numeric?",	mth_string_isnum,	NULL);
+    toy_add_method(interp, L"String", L"alphanumeric?",	mth_string_isalnum,	NULL);
 
     toy_add_method(interp, L"File", L"init", 		mth_file_init, 		L"mode:,mode,file-path");
     toy_add_method(interp, L"File", L"open", 		mth_file_open, 		L"mode:,mode,file-path");
