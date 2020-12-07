@@ -1104,9 +1104,9 @@ defun get-indent-level (str) {
 };
 
 defun get-next-indent-count (str) {
-    kakko-maru := 0; ### ( ) balance count
-    kakko-nami := 0; ### { } balance count
-    kakko-kaku := 0; ### [ ] balance count
+    kakko-maru := 0; ### '(' ')' balance count
+    kakko-nami := 0; ### '{' '}' balance count
+    kakko-kaku := 0; ### '[' ']' balance count
     
     [$str len : - 1] each to: 0 do: {| i |
 	c ::= $str at $i;
@@ -1158,25 +1158,185 @@ defcommand smart-move-forward
 {   | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
+    vec ::= $buff get-vector;
+    $vec ?? {return SELF};
+
     (ey ex) ::= $window get-source-index $buff $geom;
     str ::= $buff get-buffer-line $ey;
     str ::= $str ?? "";
     cur-char ::= $str at $ex;
+    if {or [$cur-char = ")"] [$cur-char = "]"] [$cur-char = "}"]} {
+        show-message "Parentheses directions are opposite.";
+        $window cursor-move-to $geom $ey [$ex + 1];
+        return SELF;
+    };
+    if {or [$cur-char = "("] [$cur-char = "["] [$cur-char = "{"]} {
+        level-maru-kakko := 0;
+        level-kaku-kakko := 0;
+        level-nami-kakko := 0;
+        case $cur-char
+            "(" {fin-char := ")"; level-maru-kakko := 1}
+            "[" {fin-char := "]"; level-kaku-kakko := 1}
+            "{" {fin-char := "}"; level-nami-kakko := 1}
+        ;
+        fin := <nil>;
+        quote := <nil>;
+        squote := <nil>;
+        $vec each-forward-char $ey [$ex + 1] {| last-y last-x c |
+            case $c
+                "\"" {quote ::= $quote ??? <nil> <t>}   ### " balanced for smart-move-*
+                "\'" {squote ::= $squote ??? <nil> <t>} ### ' balanced for smart-move-*
+            ;
+            if {! [or $quote $squote]} {
+                case $c
+                    "(" {$level-maru-kakko ++}
+                    "[" {$level-kaku-kakko ++}
+                    "{" {$level-nami-kakko ++}
+                    ")" {
+                        $level-maru-kakko --;
+                        if {and [$fin-char = $c] [$level-maru-kakko = 0]} {fin := <t>};
+                    }
+                    "]" {
+                        $level-kaku-kakko --;
+                        if {and [$fin-char = $c] [$level-kaku-kakko = 0]} {fin := <t>};
+                    }
+                    "}" {
+                        $level-nami-kakko --;
+                        if {and [$fin-char = $c] [$level-nami-kakko = 0]} {fin := <t>};
+                    }
+                ;
+            };
+            if $fin {break};
+        };
+        if $fin {$window cursor-move-to $geom $last-y $last-x};
+        if {or [$level-maru-kakko != 0] [$level-kaku-kakko != 0] [$level-nami-kakko != 0]} {
+            show-message ["Unbalanced parentheses? " . "hint:"
+                [if [$level-maru-kakko != 0] " '(' or ')', " ""]
+                [if [$level-kaku-kakko != 0] " '[' or ']', " ""]
+                [if [$level-nami-kakko != 0] " '{' or '}', " ""]
+                " check their.";
+            ];
+        };
+        return SELF;
+    };
     
+    ### otherwise
+    ### move word forward
+    $vec each-forward-char $ey [$ex + 1] {| last-y last-x c |
+        if {$c alphanumeric?} {break};
+    };
+    $vec each-forward-char $last-y [$last-x + 1] {| last-y last-x c |
+        if {! [$c alphanumeric?]} {break};
+    };
+    $window cursor-move-to $geom $last-y $last-x;
+
+    result SELF;
 };
 
 defcommand smart-move-backward
 {   | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
+    vec ::= $buff get-vector;
+    $vec ?? {return SELF};
+
     (ey ex) ::= $window get-source-index $buff $geom;
     str ::= $buff get-buffer-line $ey;
     str ::= $str ?? "";
     cur-char ::= $str at $ex;
 
+    if {or [$cur-char = "("] [$cur-char = "["] [$cur-char = "{"]} {
+        show-message "Parentheses directions are opposite.";
+        (ey ex) ::= $vec get-prev-pos $ey $ex;
+        $window cursor-move-to $geom $ey $ex;
+        return SELF;
+    };
+    if {or [$cur-char = ")"] [$cur-char = "]"] [$cur-char = "}"]} {
+        level-maru-kakko := 0;
+        level-kaku-kakko := 0;
+        level-nami-kakko := 0;
+        case $cur-char
+            ")" {fin-char := "("; level-maru-kakko := 1}
+            "]" {fin-char := "["; level-kaku-kakko := 1}
+            "}" {fin-char := "{"; level-nami-kakko := 1}
+        ;
+        fin := <nil>;
+        quote := <nil>;
+        squote := <nil>;
+        (ey ex) ::= $vec get-prev-pos $ey $ex;
+        $vec each-backward-char $ey $ex {| last-y last-x c |
+            case $c
+                "\"" {quote ::= $quote ??? <nil> <t>}   ### " balanced for smart-move-*
+                "\'" {squote ::= $squote ??? <nil> <t>} ### ' balanced for smart-move-*
+            ;
+            if {! [or $quote $squote]} {
+                case $c
+                    ")" {$level-maru-kakko ++}
+                    "]" {$level-kaku-kakko ++}
+                    "}" {$level-nami-kakko ++}
+                    "(" {
+                        $level-maru-kakko --;
+                        if {and [$fin-char = $c] [$level-maru-kakko = 0]} {fin := <t>};
+                    }
+                    "[" {
+                        $level-kaku-kakko --;
+                        if {and [$fin-char = $c] [$level-kaku-kakko = 0]} {fin := <t>};
+                    }
+                    "{" {
+                        $level-nami-kakko --;
+                        if {and [$fin-char = $c] [$level-nami-kakko = 0]} {fin := <t>};
+                    }
+                ;
+            };
+            if $fin {break};
+        };
+        if $fin {$window cursor-move-to $geom $last-y $last-x};
+        if {or [$level-maru-kakko != 0] [$level-kaku-kakko != 0] [$level-nami-kakko != 0]} {
+            show-message ["Unbalanced parentheses? " . "hint:"
+                [if [$level-maru-kakko != 0] " '(' or ')', " ""]
+                [if [$level-kaku-kakko != 0] " '[' or ']', " ""]
+                [if [$level-nami-kakko != 0] " '{' or '}', " ""]
+                " check their.";
+            ];
+        };
+        return SELF;
+    };
+    
+    ### otherwise
+    ### move word backward
+    (ey ex) ::= $vec get-prev-pos $ey $ex;
+    $vec each-backward-char $ey $ex {| last-y last-x c |
+        if {$c alphanumeric?} {break};
+    };
+    (ey ex) ::= $vec get-prev-pos $last-y $last-x;
+    $vec each-backward-char $ey $ex {| last-y last-x c |
+        if {! [$c alphanumeric?]} {break};
+    };
+    if {$last-y < 0} {last-y := 0};
+    if {$last-x < 0} {last-x := 0};
+    $window cursor-move-to $geom $last-y $last-x;
+
+    result SELF;
 };
 
-defcommand 
+defcommand mark
+{   | main window |
+    $window mark;
+    result SELF;
+};
+
+defcommand goto-mark
+{   | main window |
+    $window goto-mark;
+    result SELF;
+};
+
+defcommand goto-unmark
+{   | main window |
+    $window unmark;
+    result SELF;
+};
+
 defcommand test
 {   | main window |
     w;
@@ -1239,7 +1399,7 @@ defcommand nest-test
 
 defcommand test
 {   | main window |
-#    debug-message ["info local: " . [info local]] wait: 3000;
+    # debug-message ["info local: " . [info local]] wait: 3000;
     $main mini-input-start "" prompt: "test prompt: ";
     $main add-mini-input-callback $window {| main window in-key value |
         if {eq? $in-key KEY_ESC} {
