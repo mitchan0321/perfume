@@ -12,10 +12,16 @@ EditBuffer method init-constructor () {
     sets NewFile <nil>;
     sets UndoBuffer ();
     sets RedoBuffer ();
+    sets MarkBuffer ();
+    sets UnmarkBuffer ();
 };
 
 EditBuffer method string () {
     return ["name=" . $BufferName ", path=" $File];
+};
+
+EditBuffer method get-vector () {
+    return $Src;
 };
 
 EditBuffer method load-content (path init-only: init-flag buffer-name: buff-name) {
@@ -339,5 +345,23 @@ EditBuffer method search (str) {
 	    last ::= $last append! ($i $e);
 	};
     };
+    return $result;
+};
+
+EditBuffer method mark (y x) {
+    $MarkBuffer << ($y $x);
+};
+
+EditBuffer method get-mark (y x) {
+    result ::= $MarkBuffer >>;
+    $result ?? {return <nil>};
+    $UnmarkBuffer << ($y $x);
+    return $result;
+};
+
+EditBuffer method un-mark (y x) {
+    result ::= $UnmarkBuffer >>;
+    $result ?? {return <nil>};
+    $MarkBuffer << ($y $x);
     return $result;
 };
