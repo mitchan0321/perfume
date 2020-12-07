@@ -430,7 +430,7 @@ control_goto:
 	    ret = toy_eval_script(interp, first->u.func.closure->u.closure.block_body);
 	    interp->trace_info = orig_trace_info;
 	}
-//	if ((GET_TAG(ret) == CONTROL) && (ret->u.control.code != CTRL_GOTO)) {
+//	if ((GET_TAG(ret) == CONTROL) && (ret->u.control.code != CTRL_GOTO)) {      //  } balanced for smart-move-*
 	if ((GET_TAG(ret) == CONTROL) && (ret->u.control.code == CTRL_RETURN)) {	    
 	    ret = ret->u.control.ret_value;
 	}
