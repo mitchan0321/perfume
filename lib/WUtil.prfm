@@ -707,6 +707,20 @@ Vector method each-backward-char (sl sc body) {
     };
 };
 
+Vector method get-prev-pos (y x) {
+    $x --;
+    if {$x < 0} {
+        $y --;
+        if {$y >= 0} {
+            x ::= self : get $y : len;
+        } {
+            y := 0;
+            x := 0;
+        };
+    };
+    return ($y $x);
+};
+
 String method repeat (times) {
     result := "";
     if {$times = 0} {return $result};
