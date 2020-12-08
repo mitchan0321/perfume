@@ -160,10 +160,12 @@ EditBuffer method buffer-select (from to block) {
     $from each to: $to do: {| i |
 	if {and [$i < [$Src len]] [$i >= 0]}
 	then: {
-	    yield $block $Src,$i;
+	    result := ([yield $block $Src,$i $i]);
+            if {control? [$result car]} {return};
 	}
 	else: {
-	    yield $block "";
+	    result := ([yield $block "" $i]);
+            if {control? [$result car]} {return};
 	};
     };
 };

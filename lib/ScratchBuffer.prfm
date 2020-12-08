@@ -49,19 +49,3 @@ ScratchBuffer method init-constructor () {
 ScratchBuffer method load-content (path) {
     return (<t> "");
 };
-
-ScratchBuffer method buffer-select (from to block) {
-    $from each to: $to do: {| i |
-	if {and [$i < [$Src len]] [$i >= 0]}
-	then: {
-	    yield $block $Src,$i;
-	}
-	else: {
-	    yield $block "";
-	};
-    };
-};
-
-ScratchBuffer method get-buffer-length () {
-    return [$Src ??? [$Src len] 0];
-};
