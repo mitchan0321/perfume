@@ -423,6 +423,46 @@ defcommand execute-editor-command
     result ALL;
 };
 
+defcommand trace-editor-command
+{   | main window |
+    if {defvar? EditorCommandList} 
+    then: {setvar EditorCommandList ()}
+    else: {defvar EditorCommandList ()};
+
+    $main mini-input-start "" prompt: "Trace editor command: ";
+    $main add-mini-input-callback $window {| main window in-key value |
+        if {eq? $in-key KEY_ESC} {
+	    $main mini-input-end;
+	    show-message "Canceled.";
+	};
+        if {eq? $in-key CTRL_M} {
+	    $main mini-input-end;
+            f := `File("pmacs-command-trace.txt" mode: a);
+            $f puts  "";
+            $f puts  "***";
+            $f puts  "***";
+            $f puts ["*** Editor command: " . $value];
+	    trace {$window apply-command $main $window "" $value} out: [$f fd?]; 
+            $f puts  "***";
+            $f puts  "";
+            $f close;
+	};
+	if {or {string? $in-key} {eq? $in-key CTRL_H} {eq? $in-key KEY_DC}} {
+	    setvar EditorCommandList [msort [$EditorCommand keys :string : filter {| i | $i =~ [$value rquote]}]];
+	    $EditorCommandList ?? {setvar EditorCommandList ()};
+	};
+        if {eq? $in-key CTRL_I} {
+	    i ::= $EditorCommandList find $value;
+	    if $i {$i ++} {i := 0};
+	    c ::= $EditorCommandList get $i;
+	    $c ?? {c ::= $EditorCommandList get 0};
+	    $c ?? {c := ""};
+	    $main mini-input-value-override $c [$c len];
+	};
+    };
+    result ALL;
+};
+
 defcommand eval-region
 {   | main window |
     buff ::= $window get-buffer;
