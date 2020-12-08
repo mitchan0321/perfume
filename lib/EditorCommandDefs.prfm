@@ -124,8 +124,12 @@ defcommand move-half-up
 
     $window set-freecursor <t>;
     new-y ::= $geom,ViewLine + [$y / 2];
-    if {$new-y > [[$buff get-buffer-length] - $y : + 1]} {new-y ::= [$buff get-buffer-length] - $y : + 1};
-    if {$new-y < 0} {new-y := 0};
+    if {$new-y > [[$buff get-buffer-length] - $y : + 1]} {
+        new-y ::= [$buff get-buffer-length] - $y : + 1;
+    };
+    if {$new-y < 0} {
+        new-y := 0;
+    };
     $geom set! ViewLine $new-y;
     
     result SELF;
@@ -168,7 +172,9 @@ defcommand move-half-left
 
     $window set-freecursor <t>;
     new-x ::= $geom,ViewColumn - [$x / 4];
-    if {$new-x < 0} {new-x := 0};
+    if {$new-x < 0} {
+        new-x := 0
+    };
     $geom set! ViewColumn $new-x;
 
     result SELF;
@@ -213,8 +219,12 @@ defcommand smooth-scroll-down
 
     (y x) ::= $window get-screen-size;
     new-y ::= $geom,ViewLine + 2;
-    if {$new-y > [[$buff get-buffer-length] - $y : + 1]} {new-y ::= [$buff get-buffer-length] - $y : + 1};
-    if {$new-y < 0} {new-y := 0};
+    if {$new-y > [[$buff get-buffer-length] - $y : + 1]} {
+        new-y ::= [$buff get-buffer-length] - $y : + 1;
+    };
+    if {$new-y < 0} {
+        new-y := 0;
+    };
     $geom set! ViewLine $new-y;
 
     result SELF;
@@ -227,7 +237,9 @@ defcommand smooth-scroll-up
 
     (y x) ::= $window get-screen-size;
     new-y ::= $geom,ViewLine - 2;
-    if {$new-y < 0} {new-y := 0};
+    if {$new-y < 0} {
+        new-y := 0;
+    };
     $geom set! ViewLine $new-y;
 
     result SELF;
@@ -254,7 +266,9 @@ defcommand smooth-scroll-left
 
     $window set-freecursor <t>;
     new-x ::= $geom,ViewColumn - 2;
-    if {$new-x < 0} {new-x := 0};
+    if {$new-x < 0} {
+        new-x := 0;
+    };
     $geom set! ViewColumn $new-x;
 
     result SELF;
@@ -1360,7 +1374,7 @@ defcommand smart-move-backward
     result SELF;
 };
 
-defcommand move-paragraph-down
+defcommand move-next-paragraph
 {   | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -1383,7 +1397,7 @@ defcommand move-paragraph-down
     result SELF;
 };
 
-defcommand move-paragraph-up
+defcommand move-previous-paragraph
 {   | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
