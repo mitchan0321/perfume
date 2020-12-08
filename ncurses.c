@@ -897,12 +897,13 @@ func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 	
 	// if function key, return to caller soon.
 	inlist = list_append(inlist, key_conv(in));
-	wtimeout(w, 1);
+        
+	wtimeout(w, itimeout / 4);
 	in = wgetch(w);
 	while (in != ERR) {
 	    if (in >= 256) {
 		pending_key = in;
-		inlist = list_append(inlist, new_symbol(L"KEY_ESC"));
+		// inlist = list_append(inlist, new_symbol(L"KEY_ESC"));
 		return result;
 	    }
 	    if (in < 0x20) {
@@ -915,7 +916,7 @@ func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 	if (cell_get_length(incell) > 0) {
 	    inlist = list_append(inlist, new_string_cell(incell));
 	}
-
+        
 	return result;
 	
     } else {
