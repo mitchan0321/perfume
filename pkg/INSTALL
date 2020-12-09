@@ -1,0 +1,25 @@
+<<< INSTALL perfume/pmacs package >>>
+
+1. Extract downloaded binary package in any directory you want to install.
+   (ex) If you install in your home directory.
+
+	cd $HOME
+	tar xvzf pmacs-install.tar.gz
+
+2. Enter package directory.
+
+	cd pmacs-install
+
+3. Execute installer
+
+	./install.sh
+
+4. Set the shell environment variable PATH
+
+	(ex) PATH=${PATH}:${HOME}/pmacs-install/bin
+
+5. Execute pmacs editor
+
+	pmacs
+
+#eof
