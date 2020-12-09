@@ -46,7 +46,7 @@ free_wrapper(void* ptr, size_t old) {
 
 Toy_Interp*
 new_interp(wchar_t* name, int stack_size, Toy_Interp* parent,
-	   int argc, char **argv, char **envp) {
+	   int argc, char **argv, char **envp, char *dir) {
 
     Toy_Interp *interp;
     Toy_Type *l, *t;
@@ -124,7 +124,7 @@ new_interp(wchar_t* name, int stack_size, Toy_Interp* parent,
 	sig_flag = 0;
 
 	if (argv && envp) {
-	    interp_setup(interp, argc, argv, envp);
+	    interp_setup(interp, argc, argv, envp, dir);
 	}
 
     } else {
@@ -185,7 +185,7 @@ new_interp(wchar_t* name, int stack_size, Toy_Interp* parent,
 }
 
 Toy_Interp*
-interp_setup(Toy_Interp* interp, int argc, char **argv, char **envp) {
+interp_setup(Toy_Interp* interp, int argc, char **argv, char **envp, char *dir) {
     Toy_Type *delegate;
     Hash *gdict;
     int i;
@@ -195,6 +195,7 @@ interp_setup(Toy_Interp* interp, int argc, char **argv, char **envp) {
     Toy_Type *setupl;
     Toy_Type *obj;
     Toy_Func_Trace_Info *trace_info;
+    wchar_t *wdir = NULL;
 
     delegate = new_list(const_Object);
 
@@ -242,7 +243,18 @@ interp_setup(Toy_Interp* interp, int argc, char **argv, char **envp) {
     }
     gdict = interp->globals;
     hash_set_t(gdict, const_ARGV, argl);
-    hash_set_t(gdict, const_LIB_PATH, new_list(new_string_str(LIB_PATH)));
+    if (dir) {
+        wchar_t *p;
+        int plen;
+        wdir = to_wchar(dir);
+        plen = wcslen(wdir) + wcslen(LIB_PATH) + 1;
+        p = GC_MALLOC(plen * sizeof(wchar_t*));
+        swprintf(p, plen, L"%ls%ls", wdir, LIB_PATH);
+        p[plen-1] = 0;
+        hash_set_t(gdict, const_LIB_PATH, new_list(new_string_str(p)));
+    } else {
+        hash_set_t(gdict, const_LIB_PATH, new_list(new_string_str(PREFIX LIB_PATH)));
+    }
     hash_set_t(gdict, const_DEFAULT_FILE_ENCODING, new_symbol(DEFAULT_FILE_ENCODING));
     hash_set_t(gdict, const_DEFAULT_SCRIPT_ENCODING, new_symbol(DEFAULT_SCRIPT_ENCODING));
     hash_set_t(gdict, const_DEFAULT_DIRENT_ENCODING, new_symbol(DEFAULT_DIRENT_ENCODING));
@@ -266,7 +278,19 @@ interp_setup(Toy_Interp* interp, int argc, char **argv, char **envp) {
 
     /* load initial setup file "setup.prfm" */
     setupl = new_list(new_symbol(L"load"));
-    list_append(setupl, new_string_str(SETUP_FILE));
+
+    if (dir) {
+        wchar_t *p;
+        int plen;
+        wdir = to_wchar(dir);
+        plen = wcslen(wdir) + wcslen(SETUP_FILE) + 1;
+        p = GC_MALLOC(plen * sizeof(wchar_t*));
+        swprintf(p, plen, L"%ls%ls", wdir, SETUP_FILE);
+        p[plen-1] = 0;
+        list_append(setupl, new_string_str(p));
+    } else {
+        list_append(setupl, new_string_str(PREFIX SETUP_FILE));
+    }
     any = toy_eval_script(interp,
 			  script_apply_trace_info(new_script(new_list(new_statement(setupl, 0))),
 						  trace_info));

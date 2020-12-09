@@ -6,8 +6,8 @@
 #include "hash.h"
 
 Toy_Interp*	new_interp(wchar_t* name, int stack_size, Toy_Interp* parent,
-			   int argc, char** argv, char** envp);
-Toy_Interp*	interp_setup(Toy_Interp* interp, int argc, char** argv, char** envp);
+			   int argc, char** argv, char** envp, char *dir);
+Toy_Interp*	interp_setup(Toy_Interp* interp, int argc, char** argv, char** envp, char *dir);
 int		toy_add_class(Toy_Interp* interp, wchar_t* name, Hash *slot, Toy_Type *delegate) ;
 void		toy_add_func(Toy_Interp* interp,
 			     wchar_t* name,
