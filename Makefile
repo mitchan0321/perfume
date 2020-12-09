@@ -80,6 +80,10 @@ install:
 	install -m 755 perfumesh $(PREFIX)/bin
 	install -m 644 setup.prfm $(PREFIX)/lib/perfume
 	install -m 644 lib/*.prfm $(PREFIX)/lib/perfume/lib
+	install -m 644 lib/*.conf $(PREFIX)/lib/perfume/lib
+	install -m 644 lib/*.key $(PREFIX)/lib/perfume/lib
+	install -m 644 lib/*.logo $(PREFIX)/lib/perfume/lib
+	install -m 644 lib/*.keymap $(PREFIX)/lib/perfume/lib
 
 perfumesh:	$(OBJS) perfumesh.o
 	$(CC) $(OBJS) perfumesh.o $(LIB) -o perfumesh
@@ -160,7 +164,7 @@ clean:
 	rm -f *.o perfumesh *~ lib/*~ tests/*~ *core* *.gmon config.h tests/setup.prfm a.out tests/test
 	rm -f encoding-set-utoj.h encoding-set-jtou.h
 
-pkg-make:
+build-pkg:
 	make clean
 	make
 	rm -rf $(PKG_TMP)
@@ -177,6 +181,10 @@ pkg-make:
 	install -m 755 perfumesh  $(PKG_DIR)/bin
 	install -m 644 setup.prfm $(PKG_DIR)/lib/perfume
 	install -m 644 lib/*.prfm $(PKG_DIR)/lib/perfume/lib
+	install -m 644 lib/*.conf $(PKG_DIR)/lib/perfume/lib
+	install -m 644 lib/*.key  $(PKG_DIR)/lib/perfume/lib
+	install -m 644 lib/*.logo $(PKG_DIR)/lib/perfume/lib
+	install -m 644 lib/*.keymap $(PKG_DIR)/lib/perfume/lib
 	install -m 755 pkg/install.sh $(PKG_DIR)
 	install -m 644 pkg/INSTALL    $(PKG_DIR)
 	install -m 644 pkg/pmacs.in   $(PKG_DIR)/bin
