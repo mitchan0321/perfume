@@ -1344,6 +1344,7 @@
 
 2020/12/11
 	EditorCommandDefs.prfm
+		Add editor comman trace-editor-command.
 		Add editor commans replace-buffer and replace-region.
 
 #eof
