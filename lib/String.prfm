@@ -104,4 +104,38 @@ String method replace (all: all pattern replace-string) {
     };
 
     return $result;
-}
+};
+
+String method replace-return-times (all: all pattern replace-string) {
+    l := ();
+    count := 0;
+
+    pattern ::= case [type? $pattern]
+		RQUOTE   {result $pattern}
+		default: {result [["" . $pattern] rquote]}
+    ;
+	
+    if {true? all}
+    then: {r ::= [self] =~ :all $pattern}
+    else: {r ::= [self] =~ $pattern}
+    ;
+
+    if {nil? $r} then: {return ([self] $count)};
+    
+    remain := [self];
+    [$r reverse] each do: {| i |
+	(start end match) := $i;
+	$l << [$remain sub $end];
+	$l << $replace-string;
+	remain ::= $remain sub 0 $start;
+        $count ++;
+    };
+    $l << $remain;
+
+    result := "";
+    $l each do: {| i |
+        $result append! $i;
+    };
+
+    return ($result $count);
+};
