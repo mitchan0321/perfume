@@ -460,6 +460,7 @@ defcommand trace-editor-command
             $f puts  "***";
             $f puts  "";
             $f close;
+            show-message ["Wrote tracefile to: " . [pwd] "/" "pmacs-command-trace.txt"];
 	};
 	if {or {string? $in-key} {eq? $in-key CTRL_H} {eq? $in-key KEY_DC}} {
 	    setvar EditorCommandList [msort [$EditorCommand keys :string : filter {| i | $i =~ [$value rquote]}]];
