@@ -304,27 +304,6 @@ defun path-longest-match (list fname) {
 ##
 ## define Vector method for EditBuffer operations.
 ##
-Vector method insert-string-at___new (str line at) {
-    l ::= $str split sep: "";
-    result := (delete-region [$line + 0] [$at + 0]);
-    self ::= self;
-
-    if {$line > [$self len]} {line ::= $self len};
-    if {$line < [$self len]} {
-	if {$at > [$self get $line : len]} {at ::= [$self get $line : len]};
-    } {
-        at := 0;
-    };
-
-    $l each do: {| c |
-	(line at) ::= insert-character-at $c $line $at;
-    };
-
-    $result <<- [$line + 0];
-    $result <<- [$at + 0];
-    return $result;
-};
-
 Vector method insert-string-at-next (char line at) {
     (command ay ax by bx) ::= insert-string-at $char $line $at;
     return ($command $ay $ax $by $bx);
