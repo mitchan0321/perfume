@@ -4,21 +4,21 @@
    (ex) If you install in your home directory.
 
 	cd $HOME
-	tar xvzf pmacs-install.tar.gz
+	tar xvzf pmacs-install-yyyymmdd.tar.gz
 
 2. Enter package directory.
 
 	cd pmacs-install
 
-3. Execute installer
+3. Run installer.
 
 	./install.sh
 
-4. Set the shell environment variable PATH
+4. Set the shell environment variable PATH.
 
 	(ex) PATH=${PATH}:${HOME}/pmacs-install/bin
 
-5. Execute pmacs editor
+5. Start pmacs editor.
 
 	pmacs
 
