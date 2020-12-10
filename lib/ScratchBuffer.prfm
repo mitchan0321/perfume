@@ -2,9 +2,6 @@ class ScratchBuffer EditBuffer;
 
 ScratchBuffer method init () {
     init-constructor;
-};
-
-ScratchBuffer method init-constructor () {
     sets Src [vector (
 	"Welcome to Perfume/pmacs world !!"
 	""
@@ -36,14 +33,6 @@ ScratchBuffer method init-constructor () {
 	"       => press CTRL_G"
 	""
     )];
-    sets File <nil>;
-    sets BufferName <nil>;
-    sets Modify <nil>;
-    sets NewFile <nil>;
-    sets UndoBuffer ();
-    sets RedoBuffer ();
-    sets MarkBuffer ();
-    sets UnmarkBuffer ();
 };
 
 ScratchBuffer method load-content (path) {
