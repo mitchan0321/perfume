@@ -1071,6 +1071,83 @@ defcommand search
     result SELF;
 };
 
+defcommand replace-buffer
+{   | main window |
+    $main mini-input-start "" prompt: "Replace string: ";
+    $main add-mini-input-callback $window {
+        | main window in-key value |
+        if {eq? $in-key CTRL_M} {
+	    $main mini-input-end;
+	    froms := $value;
+	    $main mini-input-start "" prompt: ["Replace string [" . $froms "] to: "];
+	    $main add-mini-input-callback $window {
+                | main window in-key value |
+		if {eq? $in-key CTRL_M} {
+		    $main mini-input-end;
+                    count ::= [$window get-buffer] replace-buffer $froms $value;
+                    show-message ["Replace [" . $froms "] to [" $value "] " $count " times completed."];
+                    return ALL;
+	        };
+                if {eq? $in-key KEY_ESC} {
+                    $main mini-input-end;
+                    show-message "Replace canceled.";
+                    return SELF;
+                };
+            };
+        };
+        if {eq? $in-key KEY_ESC} {
+	    $main mini-input-end;
+            show-message "Replace canceled.";
+            return SELF;
+        };
+    };
+    result SELF;
+};
+
+defcommand replace-region
+{   | main window |
+    [$window get-region] ?? {
+        show-message "Please select a region first.";
+        return SELF;
+    };
+    $main mini-input-start "" prompt: "Region replace string: ";
+    $main add-mini-input-callback $window {
+        | main window in-key value |
+        if {eq? $in-key CTRL_M} {
+	    $main mini-input-end;
+	    froms := $value;
+	    $main mini-input-start "" prompt: ["Region replace string [" . $froms "] to: "];
+	    $main add-mini-input-callback $window {
+                | main window in-key value |
+		if {eq? $in-key CTRL_M} {
+		    $main mini-input-end;
+                    if [$window get-region] {
+                        buff ::= $window get-buffer;
+                        geom ::= $window get-geom;
+                        (sy sx) ::= $window end-region;
+                        (ey ex) ::= $window get-source-index $buff $geom;
+                    };
+                    if {$sy > $ey} {(sy ey) := ($ey $sy)};
+                    count ::= [$window get-buffer] replace-region $froms $value $sy $ey;
+                    show-message ["Region replace [" . $froms "] to [" $value "] " $count " times completed in region (" $sy "," $ey ")."];
+                    return ALL;
+	        };
+                if {eq? $in-key KEY_ESC} {
+                    $main mini-input-end;
+                    show-message "Region replace canceled.";
+                    return SELF;
+                };
+            };
+        };
+        if {eq? $in-key KEY_ESC} {
+	    $main mini-input-end;
+            show-message "Region replace canceled.";
+            return SELF;
+        };
+    };
+    result SELF;
+};
+
 defcommand exit
 {   | main window |
     l ::= BufferManager get-buffer-list : filter {| i | "*" != [$i at 0]};
