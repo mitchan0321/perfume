@@ -391,11 +391,11 @@ EditBuffer method replace-buffer (froms tos) {
 
 EditBuffer method replace-region (froms tos start end) {
     $Src ?? {return 0};
-    len ::= $Src len;
-    if {$len = 0} {return 0};
+    blen ::= $Src len;
+    if {$blen = 0} {return 0};
     if {$start < 0} {start := 0};
-    if {$start >= $len} {return 0};
-    if {$end >= $len} {end ::= $len - 1};
+    if {$start >= $blen} {return 0};
+    if {$end >= $blen} {end ::= $blen - 1};
     
     c := 0;
     $start each to: $end do: {| i |
