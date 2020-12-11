@@ -12,6 +12,12 @@ modules := (
 );
 
 defun pmacs (trace: t) {
+    if {defvar? PMACS} {
+        println "Pmacs already start.";
+        return;
+    };
+    defvar PMACS <t>;
+    
     if {true? t} {
 	f := `File ("./trace.pmacs" mode: o);
 	trace 1 out: [$f fd?];
