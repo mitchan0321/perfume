@@ -29,6 +29,7 @@ CombiWindow method init (main y x line column) {
     sets Activate <nil>;
     sets FreeCursor <nil>;
     sets KeyBinding [dict()];
+    sets KeyDesc [dict()];
     sets SearchSave <nil>;
     sets SearchResult ();
     sets SearchHilight <nil>;
@@ -500,6 +501,7 @@ CombiWindow method fit-to-cursor (geom l c center: center) {
 
 CombiWindow method load-keybind () {
     sets KeyBinding [dict()];
+    sets KeyDesc [dict()];
     $LIB_PATH each do: {| i |
 	if {file exists? [$i . "/" $COMBIWINDOW_KEYBINDFILE]} {
 	    try {
@@ -516,6 +518,10 @@ CombiWindow method load-keybind () {
 
 CombiWindow method setkey (key command) {
     $KeyBinding set $key $command;
+};
+
+CombiWindow method setkeydesc (key desc) {
+    $KeyDesc set $key $desc;
 };
 
 CombiWindow method load-keybind-override (mode) {

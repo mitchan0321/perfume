@@ -803,21 +803,35 @@ defcommand kill-buffer
 
 defcommand key-binding-list
 {   | main window |
+    mode ::= $window get-mode;
     BufferManager unregist-buffer "*Key Binding*";
     buff ::= new EditBuffer;
     $buff load-content "key binding" :init-only buffer-name: "*Key Binding*";
     $buff clear-all;
 
-    $buff append-string ["%-15v\t%-v" fmt "Key" "Command"];
-    $buff append-string ["%-15v\t%-v" fmt "---" "-------"];
+    $buff append-string "<<< Key bindings >>>";
+    $buff append-string ["Buffer mode: " . $mode];
+    $buff append-string ["%-40v\t%-v" fmt "Key" "Command"];
+    $buff append-string ["%-40v\t%-v" fmt "---" "-------"];
     d ::= $window get KeyBinding;
+    desc ::= $window get KeyDesc;
     l := ();
     $d each do: {| k v |
 	if {nil? $v} {continue};
-	$l << ["%-15v\t%-v" fmt $k $v];
+        if [$desc set? $k] {
+            $l << ["%-40v\t%-v" fmt [$desc get $k] $v];
+        } {
+            $l << ["%-40v\t%-v" fmt $k $v];
+        };
     };
     msort $l : each do: {| i |
 	$buff append-string $i;
+    };
+    
+    $buff append-string "";
+    $buff append-string "<<< All editor commands >>>";
+    msort [$EditorCommand keys :string] : each do: {| i |
+        $buff append-string $i;
     };
     $buff no-modify;
     
