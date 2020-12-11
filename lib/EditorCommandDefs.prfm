@@ -846,8 +846,8 @@ defcommand buffer-list
     $buff load-content "buffer list" :init-only buffer-name: "*Buffer List*";
     $buff clear-all;
 
-    $buff append-string "<<< Hint >>>";
-    $buff append-string "  If you want to select the buffer, move cursor to buffer line and press Enter key.";
+    $buff append-string "<<< Buffer list >>>";
+    $buff append-string "  * If you want to select the buffer, move cursor to buffer line and press Enter key.";
     $buff append-string "";
     $buff append-string ["%1v%-3v %-26v %6v %-v" fmt "m" "n" "Buffer Name" "Length" "File Path"];
     $buff append-string ["%1v%-3v %-26v %6v %-v" fmt "-" "-" "-----------" "------" "---------"];

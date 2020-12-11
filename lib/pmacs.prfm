@@ -91,7 +91,7 @@ defun pmacs (trace: t) {
         if {defvar? PINTERP_LOCAL} else: {
 	    defvar PINTERP_LOCAL [dict];
         };
-	$MainWindow add-background job-id: "PINTERP-WATCHDOG" {
+	$MainWindow add-background job-id: "50-PINTERP-WATCHDOG" {
 	    c ::= coro {pinterp $MainWindow};
 	    $c eval {defvar CO-MODE <t>};
 	    $c eval {enable-itimer};
@@ -124,7 +124,7 @@ defun pmacs (trace: t) {
 		    };
 		};
 
-		$MainWindow add-background job-id: "PINTERP-WATCHDOG" $body;
+		$MainWindow add-background job-id: "50-PINTERP-WATCHDOG" $body;
 	    };
 	    yield $body $MainWindow <nil>;
 	};
