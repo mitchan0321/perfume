@@ -60,18 +60,18 @@ $KeyMaps set (KEY_ESC "[20;6~") (KEY_F45);   # shift+ctrl+
 $KeyMaps set (KEY_ESC "[21;6~") (KEY_F46);   # shift+ctrl+
 $KeyMaps set (KEY_ESC "[23;6~") (KEY_F47);   # shift+ctrl+
 $KeyMaps set (KEY_ESC "[24;6~") (KEY_F48);   # shift+ctrl+
-## $KeyMaps set (KEY_ESC "") (KEY_F49);   # alt+  ... Alt key combination is prienptived by system
-## $KeyMaps set (KEY_ESC "") (KEY_F50);   # alt+  ... Alt key combination is prienptived by system
-## $KeyMaps set (KEY_ESC "") (KEY_F51);   # alt+  ... Alt key combination is prienptived by system
-## $KeyMaps set (KEY_ESC "") (KEY_F52);   # alt+  ... Alt key combination is prienptived by system
-## $KeyMaps set (KEY_ESC "") (KEY_F53);   # alt+  ... Alt key combination is prienptived by system
-## $KeyMaps set (KEY_ESC "") (KEY_F54);   # alt+  ... Alt key combination is prienptived by system
-## $KeyMaps set (KEY_ESC "") (KEY_F55);   # alt+  ... Alt key combination is prienptived by system
-## $KeyMaps set (KEY_ESC "") (KEY_F56);   # alt+  ... Alt key combination is prienptived by system
-## $KeyMaps set (KEY_ESC "") (KEY_F57);   # alt+  ... Alt key combination is prienptived by system
-## $KeyMaps set (KEY_ESC "") (KEY_F58);   # alt+  ... Alt key combination is prienptived by system
-## $KeyMaps set (KEY_ESC "") (KEY_F59);   # alt+  ... Alt key combination is prienptived by system
-## $KeyMaps set (KEY_ESC "") (KEY_F60);   # alt+  ... Alt key combination is prienptived by system
+## $KeyMaps set (KEY_ESC "") (KEY_F49);   # alt+  ... Alt key combination is preemptived by system
+## $KeyMaps set (KEY_ESC "") (KEY_F50);   # alt+  ... Alt key combination is preemptived by system
+## $KeyMaps set (KEY_ESC "") (KEY_F51);   # alt+  ... Alt key combination is preemptived by system
+## $KeyMaps set (KEY_ESC "") (KEY_F52);   # alt+  ... Alt key combination is preemptived by system
+## $KeyMaps set (KEY_ESC "") (KEY_F53);   # alt+  ... Alt key combination is preemptived by system
+## $KeyMaps set (KEY_ESC "") (KEY_F54);   # alt+  ... Alt key combination is preemptived by system
+## $KeyMaps set (KEY_ESC "") (KEY_F55);   # alt+  ... Alt key combination is preemptived by system
+## $KeyMaps set (KEY_ESC "") (KEY_F56);   # alt+  ... Alt key combination is preemptived by system
+## $KeyMaps set (KEY_ESC "") (KEY_F57);   # alt+  ... Alt key combination is preemptived by system
+## $KeyMaps set (KEY_ESC "") (KEY_F58);   # alt+  ... Alt key combination is preemptived by system
+## $KeyMaps set (KEY_ESC "") (KEY_F59);   # alt+  ... Alt key combination is preemptived by system
+## $KeyMaps set (KEY_ESC "") (KEY_F60);   # alt+  ... Alt key combination is preemptived by system
 $KeyMaps set (KEY_ESC "[1;4P") (KEY_F61);   # shift+alt+
 $KeyMaps set (KEY_ESC "[1;4Q") (KEY_F62);   # shift+alt+
 $KeyMaps set (KEY_ESC "[1;4R") (KEY_F63);   # shift+alt+
