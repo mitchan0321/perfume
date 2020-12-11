@@ -1,4 +1,4 @@
-2020/12/11	PRFM_20201211		1.5.0_RC_2
+2020/12/14	PRFM_20201214		1.5.0_RC_2
 2020/12/09	PRFM_20201209		1.5.0_RC_1
 2020/09/10	PRFM_20200910		1.4.1
 2020/04/15	PRFM_20200415		1.4.0
@@ -1342,9 +1342,35 @@
 	methods.c
 		Add commands String::alphabetic?, String::numeric? and String::alphanumeric?.
 
-2020/12/11
-	EditorCommandDefs.prfm
+2020/12/14
+	Makefile
+		Fix build-pkg and install file leaked.
+	lib/EditorCommandDefs.prfm
 		Add editor comman trace-editor-command.
 		Add editor commans replace-buffer and replace-region.
+		Change open-file, save-buffer, save-buffer-as initial value
+		  to previous buffer's directory presents.
+		Chagen open-file, save-buffer, save-buffer-as input "***//" meaning
+		  to specify root directory and replace to "/".
+		Change key-binding-list to display key description and all command list.
+		Add editor commands are replace-buffer and replace-region.
+	lib/CombiWindow.{prfm,key}
+		Add setkeydesc and key description.
+	lib/EditBuffer.prfm
+		Change do save-contents UndoBuffer and RedoBuffer not clean.
+		Add replace-buffer and replace-region API.
+	lib/ScratchBuffer.prfm
+		Change initial screen message.
+	lib/String.prfm
+		Add String::replace-return-times for return replace string and 
+		  replaced times list.
+	lib/WUtil.prfm
+		Add functions are open-file and get-current-buffer-dir.
+	lib/pmacs.keymap
+		Add FreeBSD's terminal keymaps.
+	lib/pmacs.prfm
+		Add parse argments for specified initial open files.
+	perfumesh.c
+		Fix arguments parase bug, for specified initial open files.
 
 #eof
