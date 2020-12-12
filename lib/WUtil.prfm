@@ -709,3 +709,13 @@ String method repeat (times) {
     };
     return $result;
 };
+
+defun open-file (name) {
+    path ::= path-adjust [
+        {[$name at 0] = "/"} ???
+            $name
+            [pwd : . "/" $name]
+    ];
+    buff ::= new EditBuffer;
+    (result err) ::= $buff load-content $path;
+};

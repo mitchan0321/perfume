@@ -1,5 +1,5 @@
 #!/bin/sh
 
 PREFIX=@PREFIX@
-LANG=ja_JP.UTF-8 LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/perfumesh -D ${PREFIX} -c pmacs
+LANG=ja_JP.UTF-8 LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/perfumesh -D ${PREFIX} -c pmacs $@
 exit $?

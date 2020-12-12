@@ -42,7 +42,7 @@ int main(int argc, char **argv, char **envp) {
 	/* batch mode */
 
 	if (strcmp(argp[1], "-c") == 0) {
-	    if (argc == 3) {
+	    if (argc >= 3) {
 
 		/* batch command execute */
 		
