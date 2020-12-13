@@ -8,3 +8,70 @@ $KeyMaps set (KEY_ESC "[20;4~") (KEY_F69);
 $KeyMaps set (KEY_ESC "[21;4~") (KEY_F70);
 $KeyMaps set (KEY_ESC "[23;4~") (KEY_F71);
 $KeyMaps set (KEY_ESC "[24;4~") (KEY_F72);
+
+### for FreeBSD mate-terminal settings
+$KeyMaps set (KEY_ESC "[1;2B") (KEY_SF);     # shift+
+$KeyMaps set (KEY_ESC "[1;3B") (kDN3);       # alt+
+$KeyMaps set (KEY_ESC "[1;5B") (kDN5);       # ctrl+
+$KeyMaps set (KEY_ESC "[1;2A") (KEY_SR);     # shift+
+$KeyMaps set (KEY_ESC "[1;3A") (kUP3);       # alt+
+$KeyMaps set (KEY_ESC "[1;5A") (kUP5);       # ctrl+
+$KeyMaps set (KEY_ESC "[1;2C") (KEY_SRIGHT); # shift+
+$KeyMaps set (KEY_ESC "[1;3C") (kRIT3);      # alt+
+$KeyMaps set (KEY_ESC "[1;5C") (kRIT5);      # ctrl+
+$KeyMaps set (KEY_ESC "[1;2D") (KEY_SLEFT);  # shift+
+$KeyMaps set (KEY_ESC "[1;3D") (kLFT3);      # alt+
+$KeyMaps set (KEY_ESC "[1;5D") (kLFT5);      # ctrl+
+$KeyMaps set (KEY_ESC "[1;5H") (kHOM5);      # ctrl+
+$KeyMaps set (KEY_ESC "[1;5F") (kEND5);      # ctrl+
+$KeyMaps set (KEY_ESC "[1;2P") (KEY_F13);    # shift+
+$KeyMaps set (KEY_ESC "[1;2Q") (KEY_F14);    # shift+
+$KeyMaps set (KEY_ESC "[1;2R") (KEY_F15);    # shift+
+$KeyMaps set (KEY_ESC "[1;2S") (KEY_F16);    # shift+
+$KeyMaps set (KEY_ESC "[15;2~") (KEY_F17);   # shift+
+$KeyMaps set (KEY_ESC "[17;2~") (KEY_F18);   # shift+
+$KeyMaps set (KEY_ESC "[18;2~") (KEY_F19);   # shift+
+$KeyMaps set (KEY_ESC "[19;2~") (KEY_F20);   # shift+
+$KeyMaps set (KEY_ESC "[20;2~") (KEY_F21);   # shift+
+$KeyMaps set (KEY_ESC "[21;2~") (KEY_F22);   # shift+
+$KeyMaps set (KEY_ESC "[23;2~") (KEY_F23);   # shift+
+$KeyMaps set (KEY_ESC "[24;2~") (KEY_F24);   # shift+
+$KeyMaps set (KEY_ESC "[1;5P") (KEY_F25);    # ctrl+
+$KeyMaps set (KEY_ESC "[1;5Q") (KEY_F26);    # ctrl+
+$KeyMaps set (KEY_ESC "[1;5R") (KEY_F27);    # ctrl+
+$KeyMaps set (KEY_ESC "[1;5S") (KEY_F28);    # ctrl+
+$KeyMaps set (KEY_ESC "[15;5~") (KEY_F29);   # ctrl+
+$KeyMaps set (KEY_ESC "[17;5~") (KEY_F30);   # ctrl+
+$KeyMaps set (KEY_ESC "[18;5~") (KEY_F31);   # ctrl+
+$KeyMaps set (KEY_ESC "[19;5~") (KEY_F32);   # ctrl+
+$KeyMaps set (KEY_ESC "[20;5~") (KEY_F33);   # ctrl+
+$KeyMaps set (KEY_ESC "[21;5~") (KEY_F34);   # ctrl+
+$KeyMaps set (KEY_ESC "[23;5~") (KEY_F35);   # ctrl+
+$KeyMaps set (KEY_ESC "[24;5~") (KEY_F36);   # ctrl+
+$KeyMaps set (KEY_ESC "[1;6P") (KEY_F37);    # shift+ctrl+
+$KeyMaps set (KEY_ESC "[1;6Q") (KEY_F38);    # shift+ctrl+
+$KeyMaps set (KEY_ESC "[1;6R") (KEY_F39);    # shift+ctrl+
+$KeyMaps set (KEY_ESC "[1;6S") (KEY_F40);    # shift+ctrl+
+$KeyMaps set (KEY_ESC "[15;6~") (KEY_F41);   # shift+ctrl+
+$KeyMaps set (KEY_ESC "[17;6~") (KEY_F42);   # shift+ctrl+
+$KeyMaps set (KEY_ESC "[18;6~") (KEY_F43);   # shift+ctrl+
+$KeyMaps set (KEY_ESC "[19;6~") (KEY_F44);   # shift+ctrl+
+$KeyMaps set (KEY_ESC "[20;6~") (KEY_F45);   # shift+ctrl+
+$KeyMaps set (KEY_ESC "[21;6~") (KEY_F46);   # shift+ctrl+
+$KeyMaps set (KEY_ESC "[23;6~") (KEY_F47);   # shift+ctrl+
+$KeyMaps set (KEY_ESC "[24;6~") (KEY_F48);   # shift+ctrl+
+## $KeyMaps set (KEY_ESC "") (KEY_F49);   # alt+
+## $KeyMaps set (KEY_ESC "") (KEY_F50);   # alt+
+## $KeyMaps set (KEY_ESC "") (KEY_F51);   # alt+
+## $KeyMaps set (KEY_ESC "") (KEY_F52);   # alt+
+## $KeyMaps set (KEY_ESC "") (KEY_F53);   # alt+
+## $KeyMaps set (KEY_ESC "") (KEY_F54);   # alt+
+## $KeyMaps set (KEY_ESC "") (KEY_F55);   # alt+
+## $KeyMaps set (KEY_ESC "") (KEY_F56);   # alt+
+## $KeyMaps set (KEY_ESC "") (KEY_F57);   # alt+
+## $KeyMaps set (KEY_ESC "") (KEY_F58);   # alt+
+## $KeyMaps set (KEY_ESC "") (KEY_F59);   # alt+
+## $KeyMaps set (KEY_ESC "") (KEY_F60);   # alt+
+$KeyMaps set (KEY_ESC "[1;4P") (KEY_F61);   # shift+alt+
+$KeyMaps set (KEY_ESC "[1;4Q") (KEY_F62);   # shift+alt+
+$KeyMaps set (KEY_ESC "[1;4R") (KEY_F63);   # shift+alt+
