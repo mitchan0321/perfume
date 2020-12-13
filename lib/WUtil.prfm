@@ -188,7 +188,7 @@ defun path-adjust (path) {
 defun show-files-in-window (main window dir) {
     BufferManager unregist-buffer "*Directory*";
     buff ::= new EditBuffer;
-    $buff load-content $dir :init-only buffer-name: "*Directory*";
+    $buff load-content [$dir . "/"] :init-only buffer-name: "*Directory*";
     $buff clear-all;
 
     if {file dir? $dir} {
@@ -718,4 +718,17 @@ defun open-file (name) {
     ];
     buff ::= new EditBuffer;
     (result err) ::= $buff load-content $path;
+};
+
+defun get-current-buffer-dir (window) {
+    $window ?? {return [pwd]};
+    
+    buff ::= $window get-buffer;
+    $buff ?? {return [pwd]};
+    path ::= $buff get-path;
+    $path ?? {return [pwd]};
+    dir ::= $path split sep: "/";
+    $dir ->>;
+    path ::= $dir join sep: "/";
+    return $path;
 };

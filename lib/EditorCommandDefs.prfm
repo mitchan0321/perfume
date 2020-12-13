@@ -536,7 +536,7 @@ defcommand flash
 
 defcommand open-file
 {   | main window |
-    $main mini-input-start [pwd : . "/"] prompt: "Open file: ";
+    $main mini-input-start [get-current-buffer-dir $window : . "/"] prompt: "Open file: ";
     $main add-mini-input-callback $window {| main window in-key value |
         if {eq? $in-key KEY_ESC} {
 	    $main mini-input-end;
@@ -552,7 +552,7 @@ defcommand open-file
             path ::= path-adjust [
 		{[$value sub 0 1] = "/"} ???
 		    $value
-		    [pwd : . "/" $value]
+		    [get-current-buffer-dir $window : . "/" $value]
 	    ];
 	    buff ::= BufferManager get-buffer-by-path $path;
             if $buff {
@@ -566,7 +566,11 @@ defcommand open-file
 	    BufferManager unregist-buffer "*Directory*";
 	};
 	if {eq? $in-key CTRL_I} {
-	    fname ::= show-files-in-window $main $window $value;
+            if {$value = ""} {
+                fname ::= show-files-in-window $main $window [get-current-buffer-dir $window];
+            } {
+                fname ::= show-files-in-window $main $window $value;
+            };
 	    $window apply-command $main $window "" top-of-buffer;
 	    $main mini-input-value-override $fname [$fname len];
 	    return ALL;
@@ -579,6 +583,12 @@ defcommand open-file
 	    $window apply-command $main $window "" move-half-down;
 	    return SELF;
 	};
+	if {eq? $in-key "/"} {
+            if {[$value at -2] = "/"} {
+		$main mini-input-value-override "/" 1;
+            };
+	    return SELF;
+	};
     };
     result SELF;
 };
@@ -589,7 +599,7 @@ defcommand save-buffer
     path ::= $__buff_in_clojure__ get-path;
 
     if {or {nil? $path} {$path = ""}} {
-	$main mini-input-start [pwd : . "/"] prompt: "Save file name: ";
+	$main mini-input-start [get-current-buffer-dir $window : . "/"] prompt: "Save file name: ";
 	$main add-mini-input-callback $window {| main window in-key value |
 	    if {eq? $in-key KEY_ESC} {
 		$main mini-input-end;
@@ -597,7 +607,11 @@ defcommand save-buffer
 		BufferManager unregist-buffer "*Directory*";	
 	    };
 	    if {eq? $in-key CTRL_I} {
-		fname ::= show-files-in-window $main $window $value;
+                if {$value = ""} {
+                    fname ::= show-files-in-window $main $window [get-current-buffer-dir $window];
+                } {
+                    fname ::= show-files-in-window $main $window $value;
+                };
 	        $window apply-command $main $window "" top-of-buffer;
 		$main mini-input-value-override $fname [$fname len];
 		return ALL;
@@ -614,7 +628,7 @@ defcommand save-buffer
 		$main mini-input-end;
 		path ::= path-adjust [{[$value sub 0 1] = "/"} ???
 		    $value
-		    [pwd : . "/" $value]];
+		    [get-current-buffer-dir $window : . "/" $value]];
 
 		if [file exists? $path] {
 		    $main mini-input-start "" prompt: "File already exist, overwrite? [yes or ESC]: ";
@@ -651,6 +665,12 @@ defcommand save-buffer
 		    return SELF;
 		};
 	    };
+            if {eq? $in-key "/"} {
+                if {[$value at -2] = "/"} {
+                    $main mini-input-value-override "/" 1;
+                };
+                return SELF;
+            };
 	};
 	return SELF
     };
@@ -682,7 +702,7 @@ defcommand save-buffer-as
     __buff_in_clojure__ ::= $window get-buffer;
     path ::= $__buff_in_clojure__ get-path;
 
-    $main mini-input-start [pwd : . "/"] prompt: "Save file name: ";
+    $main mini-input-start [get-current-buffer-dir $window : . "/"] prompt: "Save file name: ";
     $main add-mini-input-callback $window {| main window in-key value |
 	if {eq? $in-key KEY_ESC} {
 	    $main mini-input-end;
@@ -690,7 +710,11 @@ defcommand save-buffer-as
 	    BufferManager unregist-buffer "*Directory*";	
 	};
 	if {eq? $in-key CTRL_I} {
-	    fname ::= show-files-in-window $main $window $value;
+            if {$value = ""} {
+                fname ::= show-files-in-window $main $window [get-current-buffer-dir $window];
+            } {
+                fname ::= show-files-in-window $main $window $value;
+            };
 	    $window apply-command $main $window "" top-of-buffer;
 	    $main mini-input-value-override $fname [$fname len];
 	    return ALL;
@@ -707,7 +731,7 @@ defcommand save-buffer-as
 	    $main mini-input-end;
 	    path ::= path-adjust [{[$value sub 0 1] = "/"} ???
 		$value
-		[pwd : . "/" $value]];
+		[get-current-buffer-dir $window : . "/" $value]];
 
 	    if [file exists? $path] {
 	       $main mini-input-start "" prompt: "File already exist, overwrite? [yes or ESC]: ";
@@ -743,6 +767,12 @@ defcommand save-buffer-as
 		$MainWindow bind-buffer [$window get-window-name] $__buff_in_clojure__;
 		return SELF;
 	    };
+	};
+        if {eq? $in-key "/"} {
+            if {[$value at -2] = "/"} {
+		$main mini-input-value-override "/" 1;
+            };
+	    return SELF;
 	};
     };
     result SELF;
