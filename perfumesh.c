@@ -17,19 +17,36 @@ int main(int argc, char **argv, char **envp) {
     Cell *c;
     Toy_Interp *interp;
     Toy_Type *cmdl;
+    char *dir = NULL;
+    char **argp;
+    int i;
 
-    interp = new_interp(L"main", STACKSIZE, NULL, argc, argv, envp);
+    /* detect -D configuration argument */
+
+    argp = argv;
+    if ((argc >= 3) && (strcmp(argv[1], "-D") == 0)) {
+        dir = argv[2];
+        argc = argc - 2;
+        argp = malloc(sizeof(char*) * (argc+1));
+        argp[0] = argv[0];
+        argp[argc] = 0;
+        for (i=1 ; i<argc ; i++) {
+            argp[i] = argv[i+2]; 
+        }
+    }
+
+    interp = new_interp(L"main", STACKSIZE, NULL, argc, argp, envp, dir);
     b = new_bulk();
-
-    if ((argc >= 2) && (strcmp(argv[1], "-") != 0)) {
+    
+    if ((argc >= 2) && (strcmp(argp[1], "-") != 0)) {
 	/* batch mode */
 
-	if (strcmp(argv[1], "-c") == 0) {
-	    if (argc == 3) {
+	if (strcmp(argp[1], "-c") == 0) {
+	    if (argc >= 3) {
 
 		/* batch command execute */
 		
-		bulk_set_string(b, to_wchar(argv[2]));
+		bulk_set_string(b, to_wchar(argp[2]));
 		any = toy_parse_start(b);
 		if (NULL == any) {
 		    fwprintf(stderr, L"no memory\n");
@@ -68,7 +85,7 @@ int main(int argc, char **argv, char **envp) {
 	    /* batch file load and execute */
 
 	    cmdl = new_list(new_symbol(L"load"));
-	    list_append(cmdl, new_string_str(to_wchar(argv[1])));
+	    list_append(cmdl, new_string_str(to_wchar(argp[1])));
 	    any = toy_call(interp, cmdl);
 	    if (GET_TAG(any) == EXCEPTION) {
 		fwprintf(stdout, L"EXCEPTION: %ls\n", to_string(any));

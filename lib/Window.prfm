@@ -66,6 +66,8 @@ Window method create-minibuffer-window () {
 };
 
 Window method create-full-window (window-name: win-name) {
+    ### wipe-window;
+
     sets WindowList ();
     (l c) ::= curs-get-screen-size $CursWin;
     win ::= new CombiWindow init: ([self] 0 0 $l $c);
@@ -90,6 +92,8 @@ Window method next-window-name (win) {
 };
 
 Window method create-split-vertical-window (div: ndivs window-name: win-name) {
+    ### wipe-window;
+
     sets WindowList ();
     if {set? ndivs} else: {set ndivs 2};
     if {$ndivs < 2} then: {set ndivs 2};
@@ -127,6 +131,8 @@ Window method create-split-vertical-window (div: ndivs window-name: win-name) {
 };
 
 Window method create-split-horizontal-window (div: ndivs window-name: win-name) {
+    ### wipe-window;
+
     sets WindowList ();
     if {set? ndivs} else: {set ndivs 2};
     if {$ndivs < 2} then: {set ndivs 2};
@@ -164,6 +170,8 @@ Window method create-split-horizontal-window (div: ndivs window-name: win-name) 
 };
 
 Window method create-split-cross-window (window-name: win-name) {
+    ### wipe-window;
+
     sets WindowList ();
     (l c) ::= curs-get-screen-size $CursWin;
     y0 := 0;
@@ -261,6 +269,12 @@ Window method clear-window (win) {
 	    $i clear;
 	    return;
 	};
+    };
+};
+
+Window method wipe-window () {
+    $WindowList . $MiniWindow : each do: {| i |
+	$i wipe;
     };
 };
 
@@ -577,9 +591,8 @@ Window method is-interp-busy () {
 Window method read-keymaps () {
     $LIB_PATH each do: {| i |
 	if {file exists? [$i . "/pmacs.keymap"]} {
-	    try {load [$i . "/pmacs.keymap"]} catch: {};
+	    try {load :notrace [$i . "/pmacs.keymap"]} catch: {};
 	    break;
 	};
     };
 };
-

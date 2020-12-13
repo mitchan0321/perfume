@@ -46,6 +46,10 @@ MiniWindow method clear () {
     curs-clear $MiniCurs;
 };
 
+MiniWindow method wipe () {
+    curs-wipe $MiniCurs;
+};
+
 MiniWindow method get-curs () {
     return $MiniCurs;
 };

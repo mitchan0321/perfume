@@ -304,27 +304,6 @@ defun path-longest-match (list fname) {
 ##
 ## define Vector method for EditBuffer operations.
 ##
-Vector method insert-string-at___new (str line at) {
-    l ::= $str split sep: "";
-    result := (delete-region [$line + 0] [$at + 0]);
-    self ::= self;
-
-    if {$line > [$self len]} {line ::= $self len};
-    if {$line < [$self len]} {
-	if {$at > [$self get $line : len]} {at ::= [$self get $line : len]};
-    } {
-        at := 0;
-    };
-
-    $l each do: {| c |
-	(line at) ::= insert-character-at $c $line $at;
-    };
-
-    $result <<- [$line + 0];
-    $result <<- [$at + 0];
-    return $result;
-};
-
 Vector method insert-string-at-next (char line at) {
     (command ay ax by bx) ::= insert-string-at $char $line $at;
     return ($command $ay $ax $by $bx);
@@ -359,6 +338,11 @@ Vector method insert-character-at (char line at) {
 };
 
 Vector method insert-string-at (str line at) {
+    if {$str = ""} {
+        if {$line >= [self : len]} {self : append! ""};
+        return (delete-region $line 0 $line 0);
+    };
+    
     l ::= $str split sep: "\r";
 #    if {and {[self : len] = 0} {$l,0 = ""}} {$l >>};
     times ::= $l len;
@@ -410,7 +394,7 @@ Vector method delete-character-at (line at) {
     len ::= $s len;
     if {and {[$self len] = 1} {$len = 0}} {
 	$self resize 0;
-	return (insert-string-at "\r" 0 0);
+	return (insert-string-at "" 0 0);
     };
     if {$len = 0} {
 	i := $line;
@@ -419,6 +403,9 @@ Vector method delete-character-at (line at) {
 	    i ::= $i + 1;
         };
 	$self resize [$self len : - 1];
+        if {$line >= [$self len]} {
+            return (insert-string-at "" $line 0);
+        };
 	return (insert-string-at "\r" $line 0);
     };
     if {$at >= $len} {
@@ -427,13 +414,19 @@ Vector method delete-character-at (line at) {
 	};
 	$self set $line [$self,$line . [$self get [$line + 1]]];
 	if {$line = [$self len : - 2]} {
-	    $self resize [$self len : - 1];
+            $self resize [$self len : - 1];
+            if {$line >= [$self len]} {
+                return (insert-string-at "" $line 0);
+            };
 	    return (insert-string-at "\r" $line $len);
 	};
 	[$line + 1] each to: [$self len : - 2] do: {| i |
 	    $self set $i [$self get [$i + 1]];
 	};
 	$self resize [$self len : - 1];
+        if {$line >= [$self len]} {
+            return (insert-string-at "" $line 0);
+        };
 	return (insert-string-at "\r" $line $len);
     };
     s1 ::= $s sub 0 $at;
@@ -452,6 +445,9 @@ Vector method backdelete-character-at (line at) {
 	line ::= $line - 1;
 	at ::= [$self get $line] len;
 	(command char line at) ::= delete-character-at $line $at;
+        if {$line >= [$self len]} {
+            return (insert-string-at-next "" $line 0);
+        };
 	return (insert-string-at-next "\r" $line $at);
     };
     at ::= $at - 1;
@@ -530,9 +526,9 @@ Vector method delete-region (start-line start-column end-line end-column) {
 	s2 ::= $r sub $end-column;
         self : set $start-line [$s1 . $s2];
 	$result-str append! $str;
-	if {and $at-last {[self : len] >= 1} {[self : get [self : len : - 1]] = ""}} {
-	    self : resize [self : len : - 1];
-	};
+#	if {and $at-last {[self : len] >= 1} {[self : get [self : len : - 1]] = ""}} {
+#	    self : resize [self : len : - 1];
+#	};
 	return (insert-string-at $result-str $result-start-line $result-start-column);
     };
 
@@ -638,11 +634,88 @@ Vector method copy-region (start-line start-column end-line end-column) {
     return (insert-string-at $result-str $start-line $start-column);
 };
 
+Vector method each-forward-char (sl sc body) {
+    self ::= self;
+    to ::= $self len : - 1;
+    if {$sl > $to} {return};
+    src ::= [$self get $sl] . "\r";
+    if {[$src len] > 0} {
+        if {$sc < [$src len]} {
+            $sc each to: [$src len : - 1] do: {| j |
+                result := ([yield $body $sl $j [$src at $j]]);
+                if [control? [$result car]] {return};
+            };
+        };
+    };
+    $sl ++;
+    if {$sl > $to} {return};
+    $sl each to: $to do: {| i |
+        src ::= [$self get $i] . "\r";
+        if {[$src len] > 0} {
+            0 each to: [$src len : - 1] do: {| j |
+                result := ([yield $body $i $j [$src at $j]]);
+                if [control? [$result car]] {return};
+            };
+        };
+    };
+};
+
+Vector method each-backward-char (sl sc body) {
+    self ::= self;
+    to := 0;
+    if {[$self len] = 0} {return};
+    if {$sl >= [$self len : - 1]} {sl ::= $self len : - 1};
+    src ::= [$self get $sl] . "\r";
+    if {[$src len] > 0} {
+        if {$sc >= [$src len]} {sc ::= $src len : - 1};
+        $sc each to: 0 do: {| j |
+            result := ([yield $body $sl $j [$src at $j]]);
+            if [control? [$result car]] {return};
+        };
+    };
+    $sl --;
+    if {$sl < 0} {return};
+    $sl each to: $to do: {| i |
+        src ::= [$self get $i] . "\r";
+        if {[$src len] > 0} {
+            [$src len : - 1] each to: 0 do: {| j |
+                result := ([yield $body $i $j [$src at $j]]);
+                if [control? [$result car]] {return};
+            };
+        };
+    };
+};
+
+Vector method get-prev-pos (y x) {
+    $x --;
+    if {$x < 0} {
+        $y --;
+        if {$y >= 0} {
+            x ::= self : get $y : len;
+        } {
+            y := 0;
+            x := 0;
+        };
+    };
+    return ($y $x);
+};
+
 String method repeat (times) {
     result := "";
+    if {$times = 0} {return $result};
     self ::= self;
     1 each to: $times do: {
 	$result append! $self;
     };
     return $result;
+};
+
+defun open-file (name) {
+    path ::= path-adjust [
+        {[$name at 0] = "/"} ???
+            $name
+            [pwd : . "/" $name]
+    ];
+    buff ::= new EditBuffer;
+    (result err) ::= $buff load-content $path;
 };

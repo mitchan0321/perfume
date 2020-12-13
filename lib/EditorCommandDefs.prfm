@@ -124,8 +124,12 @@ defcommand move-half-up
 
     $window set-freecursor <t>;
     new-y ::= $geom,ViewLine + [$y / 2];
-    if {$new-y > [[$buff get-buffer-length] - $y : + 1]} {new-y ::= [$buff get-buffer-length] - $y : + 1};
-    if {$new-y < 0} {new-y := 0};
+    if {$new-y > [[$buff get-buffer-length] - $y : + 1]} {
+        new-y ::= [$buff get-buffer-length] - $y : + 1;
+    };
+    if {$new-y < 0} {
+        new-y := 0;
+    };
     $geom set! ViewLine $new-y;
     
     result SELF;
@@ -168,7 +172,9 @@ defcommand move-half-left
 
     $window set-freecursor <t>;
     new-x ::= $geom,ViewColumn - [$x / 4];
-    if {$new-x < 0} {new-x := 0};
+    if {$new-x < 0} {
+        new-x := 0
+    };
     $geom set! ViewColumn $new-x;
 
     result SELF;
@@ -213,8 +219,12 @@ defcommand smooth-scroll-down
 
     (y x) ::= $window get-screen-size;
     new-y ::= $geom,ViewLine + 2;
-    if {$new-y > [[$buff get-buffer-length] - $y : + 1]} {new-y ::= [$buff get-buffer-length] - $y : + 1};
-    if {$new-y < 0} {new-y := 0};
+    if {$new-y > [[$buff get-buffer-length] - $y : + 1]} {
+        new-y ::= [$buff get-buffer-length] - $y : + 1;
+    };
+    if {$new-y < 0} {
+        new-y := 0;
+    };
     $geom set! ViewLine $new-y;
 
     result SELF;
@@ -227,7 +237,9 @@ defcommand smooth-scroll-up
 
     (y x) ::= $window get-screen-size;
     new-y ::= $geom,ViewLine - 2;
-    if {$new-y < 0} {new-y := 0};
+    if {$new-y < 0} {
+        new-y := 0;
+    };
     $geom set! ViewLine $new-y;
 
     result SELF;
@@ -254,7 +266,9 @@ defcommand smooth-scroll-left
 
     $window set-freecursor <t>;
     new-x ::= $geom,ViewColumn - 2;
-    if {$new-x < 0} {new-x := 0};
+    if {$new-x < 0} {
+        new-x := 0;
+    };
     $geom set! ViewColumn $new-x;
 
     result SELF;
@@ -423,6 +437,47 @@ defcommand execute-editor-command
     result ALL;
 };
 
+defcommand trace-editor-command
+{   | main window |
+    if {defvar? EditorCommandList} 
+    then: {setvar EditorCommandList ()}
+    else: {defvar EditorCommandList ()};
+
+    $main mini-input-start "" prompt: "Trace editor command: ";
+    $main add-mini-input-callback $window {| main window in-key value |
+        if {eq? $in-key KEY_ESC} {
+	    $main mini-input-end;
+	    show-message "Canceled.";
+	};
+        if {eq? $in-key CTRL_M} {
+	    $main mini-input-end;
+            f := `File("pmacs-command-trace.txt" mode: a);
+            $f puts  "";
+            $f puts  "***";
+            $f puts  "***";
+            $f puts ["*** Editor command: " . $value];
+	    trace {$window apply-command $main $window "" $value} out: [$f fd?]; 
+            $f puts  "***";
+            $f puts  "";
+            $f close;
+            show-message ["Wrote tracefile to: " . [pwd] "/" "pmacs-command-trace.txt"];
+	};
+	if {or {string? $in-key} {eq? $in-key CTRL_H} {eq? $in-key KEY_DC}} {
+	    setvar EditorCommandList [msort [$EditorCommand keys :string : filter {| i | $i =~ [$value rquote]}]];
+	    $EditorCommandList ?? {setvar EditorCommandList ()};
+	};
+        if {eq? $in-key CTRL_I} {
+	    i ::= $EditorCommandList find $value;
+	    if $i {$i ++} {i := 0};
+	    c ::= $EditorCommandList get $i;
+	    $c ?? {c ::= $EditorCommandList get 0};
+	    $c ?? {c := ""};
+	    $main mini-input-value-override $c [$c len];
+	};
+    };
+    result ALL;
+};
+
 defcommand eval-region
 {   | main window |
     buff ::= $window get-buffer;
@@ -468,6 +523,7 @@ defcommand send-eof
 
 defcommand refresh-screen
 {   | main window |
+    $main wipe-window;
     $main send-key-event (KEY_RESIZE);
     result ALL;
 };
@@ -1009,7 +1065,85 @@ defcommand search
 	    $window reset-search;
 	    $window set-search-result [$__buff_in_clojure__ search $value];
 	    $window stay-search;
+            $main send-key-event (KEY_DOWN);
 	};
+    };
+    result SELF;
+};
+
+defcommand replace-buffer
+{   | main window |
+    $main mini-input-start "" prompt: "Replace string: ";
+    $main add-mini-input-callback $window {
+        | main window in-key value |
+        if {eq? $in-key CTRL_M} {
+	    $main mini-input-end;
+	    froms := $value;
+	    $main mini-input-start "" prompt: ["Replace string [" . $froms "] to: "];
+	    $main add-mini-input-callback $window {
+                | main window in-key value |
+		if {eq? $in-key CTRL_M} {
+		    $main mini-input-end;
+                    count ::= [$window get-buffer] replace-buffer $froms $value;
+                    show-message ["Replace [" . $froms "] to [" $value "] " $count " times completed."];
+                    return ALL;
+	        };
+                if {eq? $in-key KEY_ESC} {
+                    $main mini-input-end;
+                    show-message "Replace canceled.";
+                    return SELF;
+                };
+            };
+        };
+        if {eq? $in-key KEY_ESC} {
+	    $main mini-input-end;
+            show-message "Replace canceled.";
+            return SELF;
+        };
+    };
+    result SELF;
+};
+
+defcommand replace-region
+{   | main window |
+    [$window get-region] ?? {
+        show-message "Please select a region first.";
+        return SELF;
+    };
+    $main mini-input-start "" prompt: "Region replace string: ";
+    $main add-mini-input-callback $window {
+        | main window in-key value |
+        if {eq? $in-key CTRL_M} {
+	    $main mini-input-end;
+	    froms := $value;
+	    $main mini-input-start "" prompt: ["Region replace string [" . $froms "] to: "];
+	    $main add-mini-input-callback $window {
+                | main window in-key value |
+		if {eq? $in-key CTRL_M} {
+		    $main mini-input-end;
+                    if [$window get-region] {
+                        buff ::= $window get-buffer;
+                        geom ::= $window get-geom;
+                        (sy sx) ::= $window end-region;
+                        (ey ex) ::= $window get-source-index $buff $geom;
+                    };
+                    if {$sy > $ey} {(sy ey) := ($ey $sy)};
+                    count ::= [$window get-buffer] replace-region $froms $value $sy $ey;
+                    show-message ["Region replace [" . $froms "] to [" $value "] " $count " times completed in region (" $sy "," $ey ")."];
+                    return ALL;
+	        };
+                if {eq? $in-key KEY_ESC} {
+                    $main mini-input-end;
+                    show-message "Region replace canceled.";
+                    return SELF;
+                };
+            };
+        };
+        if {eq? $in-key KEY_ESC} {
+	    $main mini-input-end;
+            show-message "Region replace canceled.";
+            return SELF;
+        };
     };
     result SELF;
 };
@@ -1029,17 +1163,357 @@ defcommand exit
     result SELF;
 };
 
+defcommand smart-newline
+{   | main window |
+    $window apply-command $main $window "\r" insert-character;
+    
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    str-prev := "";
+    if {$ey > 0} {
+	str-prev ::= $buff get-buffer-line [$ey - 1];
+    };
+    cur-level ::= get-indent-level $str-prev;
+    next-level-count ::= get-next-indent-count $str-prev;
+
+    if {$cur-level > 0} {
+        $window apply-command $main $window "" smart-indent;
+    } {
+        if {$next-level-count > 0} {
+            $window apply-command $main $window "" smart-indent;
+        };
+    };
+    
+    result ALL;
+};
+
 defcommand smart-indent
 {   | main window |
     buff ::= $window get-buffer;
+    geom ::= $window get-geom;
     (ey ex) ::= $window get-source-index $buff $geom;
     str ::= $buff get-buffer-line $ey;
+    str ::= $str ?? "";
+    str-prev := "";
+    if {$ey > 0} {
+	str-prev ::= $buff get-buffer-line [$ey - 1];
+    };
+    cur-level ::= get-indent-level $str-prev;
+    next-level-count ::= get-next-indent-count $str-prev;
+    next-level-count ::= [$next-level-count > 0] ??? 1 0;
+    next-indent ::= $cur-level + [$next-level-count * $INDENT_WIDTH];
+    next-level-count ::= get-next-indent-count $str;
+    if {$next-level-count < 0} {
+        next-indent ::= $next-indent - $INDENT_WIDTH;
+    };
+    cur-pos ::= curs-index-to-pos $str $ex $DEFAULT_TAB_WIDTH;
 
+    if {$cur-pos < $next-indent} {
+	# smart indent
+	new-str ::= [" " repeat $next-indent] . [$str clean];
+	$buff cut-region $ey 0 $ey [$str len];
+	$buff insert-string-at $new-str $ey 0;
+        $geom set! IndexColumn.SAVE $next-indent;
+    } {
+	# insert indent
+	in ::= $INDENT_WIDTH - [$cur-pos % $INDENT_WIDTH];
+	$buff insert-string-at [" " repeat $in] $ey $ex;
+        $geom set! IndexColumn.SAVE [$geom get IndexColumn.SAVE : + $in];
+    };
+    
+    result ALL;
+};
+
+defun get-indent-level (str) {
+    if {$str = ""} {return 0};
+
+    str ::= $str . "x";
+    0 each to: [$str len : - 1] do: {| i |
+	c ::= $str at $i;
+	if {! [or [$c = " "] [$c = "\t"]]} {break};
+    };
+    return [curs-index-to-pos $str $i $DEFAULT_TAB_WIDTH];
+};
+
+defun get-next-indent-count (str) {
+    kakko-maru := 0; ### '(' ')' balance count
+    kakko-nami := 0; ### '{' '}' balance count
+    kakko-kaku := 0; ### '[' ']' balance count
+    
+    [$str len : - 1] each to: 0 do: {| i |
+	c ::= $str at $i;
+	case $c
+	  "(" {$kakko-maru ++}
+	  "{" {$kakko-nami ++}
+	  "[" {$kakko-kaku ++}
+	  ")" {$kakko-maru --}
+	  "}" {$kakko-nami --}
+	  "]" {$kakko-kaku --}
+	;
+        if {or [$kakko-maru > 0] [$kakko-nami > 0] [$kakko-kaku > 0]} {break};
+    };
+    return [$kakko-maru + $kakko-nami : + $kakko-kaku];
 };
 
 defcommand smart-dedent
 {   | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    str ::= $buff get-buffer-line $ey;
+    str ::= $str ?? "";
+    str-prev := "";
+    if {$ey > 0} {
+	str-prev ::= $buff get-buffer-line [$ey - 1];
+    };
+    cur-level ::= get-indent-level $str-prev;
+    next-indent ::= $cur-level - $INDENT_WIDTH;
+    next-level-count ::= get-next-indent-count $str-prev;
+    if {$next-level-count > 0} {
+        next-indent ::= $next-indent + $INDENT_WIDTH;
+    };
+    next-level-count ::= get-next-indent-count $str;
+    if {$next-level-count < 0} {
+        next-indent ::= $next-indent - $INDENT_WIDTH;
+    };
+    if {$next-indent < 0} {next-indent := 0};
+    
+    new-str ::= [" " repeat $next-indent] . [$str clean];
+    $buff cut-region $ey 0 $ey [$str len];
+    $buff insert-string-at $new-str $ey 0;
+    $geom set! IndexColumn.SAVE [$new-str len];
+    
+    result ALL;
+};
 
+defcommand smart-move-forward
+{   | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    vec ::= $buff get-vector;
+    $vec ?? {return SELF};
+
+    (ey ex) ::= $window get-source-index $buff $geom;
+    str ::= $buff get-buffer-line $ey;
+    str ::= $str ?? "";
+    cur-char ::= $str at $ex;
+    if {or [$cur-char = ")"] [$cur-char = "]"] [$cur-char = "}"]} {
+        show-message "Bracket directions are opposite.";
+        $window cursor-move-to $geom $ey [$ex + 1];
+        return SELF;
+    };
+    if {or [$cur-char = "("] [$cur-char = "["] [$cur-char = "{"]} {
+        level-maru-kakko := 0;
+        level-kaku-kakko := 0;
+        level-nami-kakko := 0;
+        case $cur-char
+            "(" {fin-char := ")"; level-maru-kakko := 1}
+            "[" {fin-char := "]"; level-kaku-kakko := 1}
+            "{" {fin-char := "}"; level-nami-kakko := 1}
+        ;
+        fin := <nil>;
+        dquote := <nil>;
+        squote := <nil>;
+        $vec each-forward-char $ey [$ex + 1] {| last-y last-x c |
+            case $c
+                "\"" {dquote ::= $dquote ??? <nil> <t>} ### " balanced for smart-move-*
+                "\'" {squote ::= $squote ??? <nil> <t>} ### ' balanced for smart-move-*
+            ;
+            if {! [or $dquote $squote]} {
+                case $c
+                    "(" {$level-maru-kakko ++}
+                    "[" {$level-kaku-kakko ++}
+                    "{" {$level-nami-kakko ++}
+                    ")" {
+                        $level-maru-kakko --;
+                        if {and [$fin-char = $c] [$level-maru-kakko = 0]} {fin := <t>};
+                    }
+                    "]" {
+                        $level-kaku-kakko --;
+                        if {and [$fin-char = $c] [$level-kaku-kakko = 0]} {fin := <t>};
+                    }
+                    "}" {
+                        $level-nami-kakko --;
+                        if {and [$fin-char = $c] [$level-nami-kakko = 0]} {fin := <t>};
+                    }
+                ;
+            };
+            if $fin {break};
+        };
+        if $fin {$window cursor-move-to $geom $last-y $last-x};
+        if {or [$level-maru-kakko != 0] [$level-kaku-kakko != 0] [$level-nami-kakko != 0]} {
+            show-message ["Unbalanced brackets? " . "hint:"
+                [if [$level-maru-kakko != 0] " '(' or ')', " ""]
+                [if [$level-kaku-kakko != 0] " '[' or ']', " ""]
+                [if [$level-nami-kakko != 0] " '{' or '}', " ""]
+                " check their.";
+            ];
+        };
+        return SELF;
+    };
+    
+    ### otherwise
+    ### move word forward
+    $vec each-forward-char $ey [$ex + 1] {| last-y last-x c |
+        if {$c alphanumeric?} {break};
+    };
+    $vec each-forward-char $last-y [$last-x + 1] {| last-y last-x c |
+        if {! [$c alphanumeric?]} {break};
+    };
+    $window cursor-move-to $geom $last-y $last-x;
+
+    result SELF;
+};
+
+defcommand smart-move-backward
+{   | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    vec ::= $buff get-vector;
+    $vec ?? {return SELF};
+
+    (ey ex) ::= $window get-source-index $buff $geom;
+    str ::= $buff get-buffer-line $ey;
+    str ::= $str ?? "";
+    cur-char ::= $str at $ex;
+
+    if {or [$cur-char = "("] [$cur-char = "["] [$cur-char = "{"]} {
+        show-message "Bracket directions are opposite.";
+        (ey ex) ::= $vec get-prev-pos $ey $ex;
+        $window cursor-move-to $geom $ey $ex;
+        return SELF;
+    };
+    if {or [$cur-char = ")"] [$cur-char = "]"] [$cur-char = "}"]} {
+        level-maru-kakko := 0;
+        level-kaku-kakko := 0;
+        level-nami-kakko := 0;
+        case $cur-char
+            ")" {fin-char := "("; level-maru-kakko := 1}
+            "]" {fin-char := "["; level-kaku-kakko := 1}
+            "}" {fin-char := "{"; level-nami-kakko := 1}
+        ;
+        fin := <nil>;
+        dquote := <nil>;
+        squote := <nil>;
+        (ey ex) ::= $vec get-prev-pos $ey $ex;
+        $vec each-backward-char $ey $ex {| last-y last-x c |
+            case $c
+                "\"" {dquote ::= $dquote ??? <nil> <t>} ### " balanced for smart-move-*
+                "\'" {squote ::= $squote ??? <nil> <t>} ### ' balanced for smart-move-*
+            ;
+            if {! [or $dquote $squote]} {
+                case $c
+                    ")" {$level-maru-kakko ++}
+                    "]" {$level-kaku-kakko ++}
+                    "}" {$level-nami-kakko ++}
+                    "(" {
+                        $level-maru-kakko --;
+                        if {and [$fin-char = $c] [$level-maru-kakko = 0]} {fin := <t>};
+                    }
+                    "[" {
+                        $level-kaku-kakko --;
+                        if {and [$fin-char = $c] [$level-kaku-kakko = 0]} {fin := <t>};
+                    }
+                    "{" {
+                        $level-nami-kakko --;
+                        if {and [$fin-char = $c] [$level-nami-kakko = 0]} {fin := <t>};
+                    }
+                ;
+            };
+            if $fin {break};
+        };
+        if $fin {$window cursor-move-to $geom $last-y $last-x};
+        if {or [$level-maru-kakko != 0] [$level-kaku-kakko != 0] [$level-nami-kakko != 0]} {
+            show-message ["Unbalanced brackets? " . "hint:"
+                [if [$level-maru-kakko != 0] " '(' or ')', " ""]
+                [if [$level-kaku-kakko != 0] " '[' or ']', " ""]
+                [if [$level-nami-kakko != 0] " '{' or '}', " ""]
+                " check their.";
+            ];
+        };
+        return SELF;
+    };
+    
+    ### otherwise
+    ### move word backward
+    (ey ex) ::= $vec get-prev-pos $ey $ex;
+    $vec each-backward-char $ey $ex {| last-y last-x c |
+        if {$c alphanumeric?} {break};
+    };
+    (ey ex) ::= $vec get-prev-pos $last-y $last-x;
+    $vec each-backward-char $ey $ex {| last-y last-x c |
+        if {! [$c alphanumeric?]} {break};
+    };
+    if {$last-y < 0} {last-y := 0};
+    if {$last-x < 0} {last-x := 0};
+    $window cursor-move-to $geom $last-y $last-x;
+
+    result SELF;
+};
+
+defcommand move-next-paragraph
+{   | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    (line col) ::= $window get-cursor-index $buff $ey $ex;
+    if {[$ey + 1] >= [$buff get-buffer-length]} {return SELF};
+    find := <nil>;
+    $buff buffer-select [$ey + 1] [$buff get-buffer-length : - 1] {
+        | src l |
+        p ::= curs-pos-to-index $src $col $DEFAULT_TAB_WIDTH;
+        if {and [[$src len] > 0] [[$src at $p] != " "] [[$src at $p] != "\t"] [[$src at $p] != ""]} {
+            find := <t>;
+	    break;
+	};
+    };
+    if $find {
+        p ::= curs-pos-to-index $src $col $DEFAULT_TAB_WIDTH;
+        $window cursor-move-to $geom $l $p;
+    };
+    result SELF;
+};
+
+defcommand move-previous-paragraph
+{   | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    (line col) ::= $window get-cursor-index $buff $ey $ex;
+    if {$ey < 1} {return SELF};
+    find := <nil>;
+    $buff buffer-select [$ey - 1] 0 {
+        | src l |
+        p ::= curs-pos-to-index $src $col $DEFAULT_TAB_WIDTH;
+        if {and [[$src len] > 0] [[$src at $p] != " "] [[$src at $p] != "\t"] [[$src at $p] != ""]} {
+            find := <t>;
+	    break;
+	};
+    };
+    if $find {
+        p ::= curs-pos-to-index $src $col $DEFAULT_TAB_WIDTH;
+        $window cursor-move-to $geom $l $p;
+    };
+    result SELF;
+};
+
+defcommand mark
+{   | main window |
+    $window mark;
+    result SELF;
+};
+
+defcommand goto-mark
+{   | main window |
+    $window goto-mark;
+    result SELF;
+};
+
+defcommand goto-unmark
+{   | main window |
+    $window unmark;
+    result SELF;
 };
 
 defcommand test
@@ -1104,7 +1578,7 @@ defcommand nest-test
 
 defcommand test
 {   | main window |
-#    debug-message ["info local: " . [info local]] wait: 3000;
+    # debug-message ["info local: " . [info local]] wait: 3000;
     $main mini-input-start "" prompt: "test prompt: ";
     $main add-mini-input-callback $window {| main window in-key value |
         if {eq? $in-key KEY_ESC} {

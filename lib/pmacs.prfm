@@ -123,6 +123,22 @@ defun pmacs (trace: t) {
 	    yield $body $MainWindow <nil>;
 	};
 
+        files ::= $ARGV clone;
+        $files >>;
+        if {$files,0 = "-c"} {
+            $files >>; $files >>;
+        };
+        $files each do: {| f |
+            open-file $f;
+        };
+        if $files,0 {
+            $MainWindow add-background job-id: "01-file-raise" {
+                target-buff ::= BufferManager get-buffer [$files,0 split sep: "/" : last : car];
+                $MainWindow bind-buffer "Window#1" $target-buff;
+                result ALL;
+            };
+        };
+        
 	$MainWindow render-all;
 	$MainWindow refresh;
 	$MainWindow key-event-loop;

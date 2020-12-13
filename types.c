@@ -498,7 +498,7 @@ new_coroutine(Toy_Interp *interp, Toy_Type* script) {
     o->u.coroutine = GC_MALLOC(sizeof(Toy_Coroutine));
     ALLOC_SAFE(o->u.coroutine);
 
-    o->u.coroutine->interp = new_interp(0, CO_STACKSIZE, interp, 0, 0, 0);
+    o->u.coroutine->interp = new_interp(0, CO_STACKSIZE, interp, 0, 0, 0, 0);
     ALLOC_SAFE(o->u.coroutine->interp);
     o->u.coroutine->script = script;
 

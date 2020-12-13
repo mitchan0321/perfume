@@ -1,3 +1,4 @@
+### Shift+Alt-F4 -- Shift+Alt+F12 ==> KEY_F64 -- KEY_F72
 $KeyMaps set (KEY_ESC "[1;4S")	(KEY_F64);
 $KeyMaps set (KEY_ESC "[15;4~") (KEY_F65);
 $KeyMaps set (KEY_ESC "[17;4~") (KEY_F66);

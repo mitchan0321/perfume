@@ -2,10 +2,11 @@
 #define __CONFIG_H__
 
 #define VERSION			L"@VERSION@"
-#define SETUP_FILE		L"@PREFIX@/lib/perfume/setup.prfm"
+#define PREFIX			L"@PREFIX@"
+#define SETUP_FILE		L"/lib/perfume/setup.prfm"
 #define SETUP_FILE2		L"./setup.prfm"
 
-#define LIB_PATH		L"@PREFIX@/lib/perfume/lib"
+#define LIB_PATH		L"/lib/perfume/lib"
 #define MAXPATHLEN		4096
 
 #define DEFAULT_FILE_ENCODING	L"UTF-8"

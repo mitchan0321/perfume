@@ -72,6 +72,12 @@ CombiWindow method clear () {
     curs-clear $BufferCurs;
 };
 
+CombiWindow method wipe () {
+    curs-wipe $StatusLineCurs;
+    curs-wipe $VerticalLineCurs;	    
+    curs-wipe $BufferCurs;
+};
+
 CombiWindow method get-curs () {
     return $BufferCurs;
 };
@@ -98,20 +104,20 @@ CombiWindow method render () {
     };
 
     curs-print $StatusLineCurs [
-	  " -- [%v%v%v%v%v]#%v (%d,%d) <%v> {%v} %v %v" fmt
-	  [[$buff modify?] ??? "*" " "]
-	  [[$buff newfile?] ??? "?" " "]
-	  [[get-region] ??? "#" " "]
-	  [$FreeCursor ??? "+" " "]
-	  [[$Parent is-interp-busy] ??? "@" " "]
-	  [$win split sep: "#" : get 1]
-	  $cy $cx
-	  $buff-name
-	  $Mode
-	  [[$buff get-path] ?? "*no file*"]
-	  ["-" repeat $x]
-	]
-	$DISPLAY_ENCODING 0 0;
+        " -- [%v%v%v%v%v]#%v (%d,%d) <%v> {%v} %v %v"
+        fmt
+	    [[$buff modify?] ??? "*" " "]
+            [[$buff newfile?] ??? "?" " "]
+            [[get-region] ??? "#" " "]
+            [$FreeCursor ??? "+" " "]
+            [[$Parent is-interp-busy] ??? "@" " "]
+            [$win split sep: "#" : get 1]
+            $cy $cx
+            $buff-name
+            $Mode
+            [[$buff get-path] ?? "*no file*"]
+            ["-" repeat $x]
+    ] $DISPLAY_ENCODING 0 0;
     
     render-vertical-line;
 
@@ -176,26 +182,26 @@ CombiWindow method render () {
 	    in-region := <nil>;
 	    cond
 	    {and {$line = $sy} {$line = $ey}} {
-		start-col ::= curs-index-to-pos $src $sx $DEFAULT_TAB_WIDTH;		
-		end-col ::= curs-index-to-pos $src $ex $DEFAULT_TAB_WIDTH : + 1;
+		start-col ::= curs-index-to-pos $src $sx $DEFAULT_TAB_WIDTH;
+		end-col ::= curs-index-to-pos $src $ex $DEFAULT_TAB_WIDTH;
 		in-region := <t>;
 		break;
 	    }
 	    {$line = $sy} {
 		start-col ::= curs-index-to-pos $src $sx $DEFAULT_TAB_WIDTH;
-		end-col ::= curs-index-to-pos $src [$src len] $DEFAULT_TAB_WIDTH : + 1;
+		end-col ::= curs-index-to-pos $src [$src len] $DEFAULT_TAB_WIDTH;
 		in-region := <t>;
 		break;
 	    }
 	    {$line = $ey} {
 		start-col ::= curs-index-to-pos $src 0 $DEFAULT_TAB_WIDTH;
-		end-col ::= curs-index-to-pos $src $ex $DEFAULT_TAB_WIDTH : + 1;
+		end-col ::= curs-index-to-pos $src $ex $DEFAULT_TAB_WIDTH;
 		in-region := <t>;
 		break;
 	    }
 	    {and {$line > $sy} {$line < $ey}} {
 		start-col ::= curs-index-to-pos $src 0 $DEFAULT_TAB_WIDTH;
-		end-col ::= curs-index-to-pos $src [$src len] $DEFAULT_TAB_WIDTH : + 1;
+		end-col ::= curs-index-to-pos $src [$src len] $DEFAULT_TAB_WIDTH;
 		in-region := <t>;
 		break;
 	    };
@@ -212,7 +218,14 @@ CombiWindow method render () {
 		if {$end-col >= $x} {end-col := $x};
 		if {[$end-col - $start-col] > 0} {
 		    curs-color $BufferCurs $i $start-col [$end-col - $start-col] $ColorDB,REGION_HILIGHT 0;
-		};
+		} {
+                    if {[$src len] = 0} {
+                        curs-color $BufferCurs $i $start-col 1 $ColorDB,REGION_HILIGHT 0;
+                    };
+                };
+                if {[$end-col - $start-col] < 0} {
+                    curs-color $BufferCurs $i $start-col 1 $ColorDB,REGION_HILIGHT 0;
+                };
 	    };
 
 	    $i ++;
@@ -448,7 +461,7 @@ CombiWindow method backdelete-character () {
     fit-to-cursor $geom $sy $sx;
 };
 
-CombiWindow method fit-to-cursor (geom l c) {
+CombiWindow method fit-to-cursor (geom l c center: center) {
     if {$geom,CursorLine >= $l} {
 	y ::= $geom,CursorLine - $l : + 1 : + $geom,ViewLine;
 	if {$y < 0} {y := 0};
@@ -459,7 +472,20 @@ CombiWindow method fit-to-cursor (geom l c) {
 	$geom set! ViewLine [$geom,ViewLine + $geom,CursorLine];
 	$geom set! CursorLine 0;
     };
-	    
+    
+    if {set? center} {
+        if {or [$geom,CursorLine <= 1] [$geom,CursorLine >= [$l - 2]]} {
+            cl ::= $l / 2;
+            d := $geom,CursorLine;
+            $geom set! CursorLine $cl;
+            $geom set! ViewLine [$geom,ViewLine - [$cl - $d]];
+            if {$geom,ViewLine < 0} {
+                $geom set! CursorLine [$geom,ViewLine + $geom,CursorLine];
+                $geom set! ViewLine 0;
+            };
+        };
+    };
+    
     if {$geom,CursorColumn >= $c} {
 	x ::= $geom,CursorColumn - $c : + 1 : + $geom,ViewColumn;
 	if {$x < 0} {x := 0};
@@ -622,6 +648,9 @@ CombiWindow method display-evaluation () {
 
 	$stdout close;
 	$stdout each do: {| r |
+            if {or [$r =~ '^Result\[FUNC\]=> '] [$r =~ '^Result\[CLOSURE\]=> ']} {
+                r ::= [$r sub 0 80] . " ...";
+            };
 	    $buff append-string ["" . $r];
 	    update-display := <t>;
 	};
@@ -715,6 +744,12 @@ CombiWindow method reset-search () {
 };
 
 CombiWindow method end-search (str) {
+    buff ::= get-buffer;
+    geom := $SearchSave;
+    if $geom {
+        (y x) ::= get-source-index $buff $geom;
+        $buff mark $y $x;
+    };
     setvar SearchString $str;
     sets SearchSave <nil>;
     sets SearchResult ();
@@ -808,7 +843,7 @@ CombiWindow method stay-search () {
     if $elem {
 	ey ::= $elem car;
 	ex ::= $elem cdr : car : car;
-	cursor-move-to $geom $ey $ex;
+        # cursor-move-to $geom $ey $ex;
     };
 
     ### search result hilight
@@ -872,7 +907,7 @@ CombiWindow method cursor-move-to (geom y x) {
     $geom set! CursorLine [$new-y - $geom,ViewLine];
     $geom set! CursorColumn [$new-x - $geom,ViewColumn];
     (sy sx) ::= get-screen-size;
-    fit-to-cursor $geom $sy $sx;
+    fit-to-cursor $geom $sy $sx :center;
 };
 
 CombiWindow method set-search-hilight () {
@@ -959,4 +994,36 @@ CombiWindow method set-word-hilight-color (geom buff list color) {
 
 	curs-color $BufferCurs $y $start-x $len $ColorDB,$color 0;
     };
+};
+
+CombiWindow method mark () {
+    buff ::= get-buffer;
+    geom ::= get-geom;
+    (y x) ::= get-source-index $buff $geom;
+    $buff mark $y $x;
+    show-message "Marked.";
+};
+
+CombiWindow method goto-mark () {
+    buff ::= get-buffer;
+    geom ::= get-geom;
+    (y x) ::= get-source-index $buff $geom;
+    result ::= $buff get-mark $y $x;
+    $result ?? {
+        show-message "No mark buffer.";
+        return;
+    };
+    cursor-move-to $geom [$result get 0] [$result get 1];
+};
+
+CombiWindow method unmark () {
+    buff ::= get-buffer;
+    geom ::= get-geom;
+    (y x) ::= get-source-index $buff $geom;
+    result ::= $buff un-mark $y $x;
+    $result ?? {
+        show-message "No unmark buffer.";
+        return;
+    };
+    cursor-move-to $geom [$result get 0] [$result get 1];
 };

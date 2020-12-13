@@ -1,4 +1,5 @@
-2020/10/27	PRFM_20201027		1.5.0
+2020/12/11	PRFM_20201211		1.5.0_RC_2
+2020/12/09	PRFM_20201209		1.5.0_RC_1
 2020/09/10	PRFM_20200910		1.4.1
 2020/04/15	PRFM_20200415		1.4.0
 2020/03/18	PRFM_20200318		1.4.0_PRE_2
@@ -1327,5 +1328,23 @@
 			WUtil.prfm, Window.prfm, WindowBase.prfm, color-defs.prfm,
 			pmacs.conf, pmacs.prfm, pmacs.files, pmacs.TODO, Mode-BufferList.key,
 			Mode-C.key, Mode-Interp.key, Mode-Prfm.key, Mode-Text.key, pinterp.prfm
+
+2020/12/09
+	Makefile, pkg/*
+		Add package installer maker.
+	commands.c, types.h
+		Fix set-itimer signal stack use for static area.
+		Add command atomic.
+	eval.c
+		Add signal masking in atomic block.
+	perfumesh.c, interp.c
+		Add perfumesh command option -D PREFIX for specified system top directory.
+	methods.c
+		Add commands String::alphabetic?, String::numeric? and String::alphanumeric?.
+
+2020/12/11
+	EditorCommandDefs.prfm
+		Add editor comman trace-editor-command.
+		Add editor commans replace-buffer and replace-region.
 
 #eof

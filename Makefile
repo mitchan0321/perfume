@@ -11,6 +11,10 @@ OPTLIBS2 =
 ###
 PREFIX		= /usr/local
 CC		= cc
+PKG_TMP		= $(HOME)/tmp
+PKG_DIR		= $(PKG_TMP)/pmacs-install
+PKG_EXTLIB_DIR	= /usr/local/lib
+PKG_TAR_NAME	= pmacs-install.tar.gz
 
 ###
 ### SET ENABLE FEATURE OPTIONS
@@ -76,6 +80,10 @@ install:
 	install -m 755 perfumesh $(PREFIX)/bin
 	install -m 644 setup.prfm $(PREFIX)/lib/perfume
 	install -m 644 lib/*.prfm $(PREFIX)/lib/perfume/lib
+	install -m 644 lib/*.conf $(PREFIX)/lib/perfume/lib
+	install -m 644 lib/*.key $(PREFIX)/lib/perfume/lib
+	install -m 644 lib/*.logo $(PREFIX)/lib/perfume/lib
+	install -m 644 lib/*.keymap $(PREFIX)/lib/perfume/lib
 
 perfumesh:	$(OBJS) perfumesh.o
 	$(CC) $(OBJS) perfumesh.o $(LIB) -o perfumesh
@@ -155,5 +163,31 @@ config.h:	config.h.in
 clean:
 	rm -f *.o perfumesh *~ lib/*~ tests/*~ *core* *.gmon config.h tests/setup.prfm a.out tests/test
 	rm -f encoding-set-utoj.h encoding-set-jtou.h
+
+build-pkg:
+	make clean
+	make
+	rm -rf $(PKG_TMP)
+	mkdir -p $(PKG_DIR)
+	mkdir -p $(PKG_DIR)/lib
+	cp -r $(PKG_EXTLIB_DIR)/libgc*     $(PKG_DIR)/lib
+	cp -r $(PKG_EXTLIB_DIR)/libgmp*    $(PKG_DIR)/lib
+	cp -r $(PKG_EXTLIB_DIR)/libonigmo* $(PKG_DIR)/lib
+	cp -r $(PKG_EXTLIB_DIR)/libpcl*    $(PKG_DIR)/lib
+	chmod 644 $(PKG_DIR)/lib/lib*
+	mkdir -p $(PKG_DIR)/bin
+	mkdir -p $(PKG_DIR)/lib/perfume
+	mkdir -p $(PKG_DIR)/lib/perfume/lib
+	install -m 755 perfumesh  $(PKG_DIR)/bin
+	install -m 644 setup.prfm $(PKG_DIR)/lib/perfume
+	install -m 644 lib/*.prfm $(PKG_DIR)/lib/perfume/lib
+	install -m 644 lib/*.conf $(PKG_DIR)/lib/perfume/lib
+	install -m 644 lib/*.key  $(PKG_DIR)/lib/perfume/lib
+	install -m 644 lib/*.logo $(PKG_DIR)/lib/perfume/lib
+	install -m 644 lib/*.keymap $(PKG_DIR)/lib/perfume/lib
+	install -m 755 pkg/install.sh $(PKG_DIR)
+	install -m 644 pkg/INSTALL    $(PKG_DIR)
+	install -m 644 pkg/pmacs.in   $(PKG_DIR)/bin
+	(cd $(PKG_TMP); tar cvzf $(PKG_TAR_NAME) ./pmacs-install)
 
 #eof

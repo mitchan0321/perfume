@@ -12,10 +12,16 @@ EditBuffer method init-constructor () {
     sets NewFile <nil>;
     sets UndoBuffer ();
     sets RedoBuffer ();
+    sets MarkBuffer ();
+    sets UnmarkBuffer ();
 };
 
 EditBuffer method string () {
     return ["name=" . $BufferName ", path=" $File];
+};
+
+EditBuffer method get-vector () {
+    return $Src;
 };
 
 EditBuffer method load-content (path init-only: init-flag buffer-name: buff-name) {
@@ -131,8 +137,8 @@ EditBuffer method save-content (path: path) {
 	};
     };
 
-    sets UndoBuffer ();
-    sets RedoBuffer ();
+    ### sets UndoBuffer ();
+    ### sets RedoBuffer ();
     sets Modify <nil>;
     sets NewFile <nil>;
     return (<t> Success);
@@ -154,10 +160,12 @@ EditBuffer method buffer-select (from to block) {
     $from each to: $to do: {| i |
 	if {and [$i < [$Src len]] [$i >= 0]}
 	then: {
-	    yield $block $Src,$i;
+	    result := ([yield $block $Src,$i $i]);
+            if {control? [$result car]} {return};
 	}
 	else: {
-	    yield $block "";
+	    result := ([yield $block "" $i]);
+            if {control? [$result car]} {return};
 	};
     };
 };
@@ -221,30 +229,32 @@ EditBuffer method undo () {
     if {true? Src} {
 	if {! [$UndoBuffer null?]} {
 	    o ::= $UndoBuffer >>;
- 	    if {$UndoBuffer null?} {
-		sets Modify <nil>;
+            if {$UndoBuffer null?} {
+                sets Modify <nil>;
 	    };
 	    result ::= call $Src $o;
 	    $RedoBuffer << $result;
 	    
 	    cmd := $o,0;
+            sets Modify <t>;
 
 	    cond
-	    {eq? $cmd delete-region} {
-		return ($o,1 $o,2);
-	    }
-	    {eq? $cmd insert-string-at} {
-		return ($o,2 $o,3);
-	    }
-	    {eq? $cmd insert-string-at-next} {
-	        line := $o,2;
-		col ::= $o,3 + 1;
-		if {$col > [$Src get $line : len]} {
-		    col := 0;
-		    line ::= $line + 1;
-		};
-		return ($line $col);
-	    }
+	        {eq? $cmd delete-region} {
+                    return ($o,1 $o,2);
+                }
+                {eq? $cmd insert-string-at} {
+                    return ($o,2 $o,3);
+                }
+                {eq? $cmd insert-string-at-next} {
+                    line := $o,2;
+                    col ::= $o,3 + 1;
+                    if {$col > [$Src get $line : len]} {
+                        col := 0;
+                        line ::= $line + 1;
+                    };
+                    return ($line $col);
+                }
+            ;
 	};
     };
     return (<nil> <nil>);
@@ -253,12 +263,12 @@ EditBuffer method undo () {
 EditBuffer method redo () {
     if {true? Src} {
 	if {! [$RedoBuffer null?]} {
-	    sets Modify <t>;
 	    o ::= $RedoBuffer >>;
 	    result ::= call $Src $o;
 	    $UndoBuffer << $result;
 	    
 	    cmd := $o,0;
+	    sets Modify <t>;
 
 	    cond
 	    {eq? $cmd delete-region} {
@@ -296,6 +306,10 @@ EditBuffer method newfile? () {
 
 EditBuffer method get-region-string (sy sx ey ex) {
     if {true? Src} {
+        len ::= $Src len;
+        if {and [$ey >= $len] [$sy >= $len]} {
+            return "";
+        };
 	return [[$Src copy-region $sy $sx $ey $ex] get 1];
     };
     return <nil>;
@@ -303,6 +317,10 @@ EditBuffer method get-region-string (sy sx ey ex) {
 
 EditBuffer method cut-region (sy sx ey ex) {
     if {true? Src} {
+        len ::= $Src len;
+        if {and [$ey >= $len] [$sy >= $len]} {
+            return ("" (insert-string-at "" $ey 0));
+        };
 	str ::= [$Src copy-region $sy $sx $ey $ex] get 1;
 	result ::= $Src delete-region $sy $sx $ey $ex;
 	if $result,0 {$UndoBuffer << $result};
@@ -332,4 +350,64 @@ EditBuffer method search (str) {
 	};
     };
     return $result;
+};
+
+EditBuffer method mark (y x) {
+    $MarkBuffer << ($y $x);
+};
+
+EditBuffer method get-mark (y x) {
+    result ::= $MarkBuffer >>;
+    $result ?? {return <nil>};
+    $UnmarkBuffer << ($y $x);
+    return $result;
+};
+
+EditBuffer method un-mark (y x) {
+    result ::= $UnmarkBuffer >>;
+    $result ?? {return <nil>};
+    $MarkBuffer << ($y $x);
+    return $result;
+};
+
+EditBuffer method replace-buffer (froms tos) {
+    $Src ?? {return 0};
+    if {[$Src len] = 0} {return 0};
+    
+    c := 0;
+    0 each to: [$Src len : - 1] do: {| i |
+        s ::= $Src get $i;
+        if {$s = ""} {continue};
+        
+        len ::= $s len;
+        (result n) ::= $s replace-return-times :all $froms $tos;
+        if {$n = 0} {continue};
+        [self] cut-region $i 0 $i $len;
+        [self] insert-string-at $result $i 0;
+        $c ++ $n;
+    };
+    return $c;
+};
+
+EditBuffer method replace-region (froms tos start end) {
+    $Src ?? {return 0};
+    blen ::= $Src len;
+    if {$blen = 0} {return 0};
+    if {$start < 0} {start := 0};
+    if {$start >= $blen} {return 0};
+    if {$end >= $blen} {end ::= $blen - 1};
+    
+    c := 0;
+    $start each to: $end do: {| i |
+        s ::= $Src get $i;
+        if {$s = ""} {continue};
+        
+        len ::= $s len;
+        (result n) ::= $s replace-return-times :all $froms $tos;
+        if {$n = 0} {continue};
+        [self] cut-region $i 0 $i $len;
+        [self] insert-string-at $result $i 0;
+        $c ++ $n;
+    };
+    return $c;
 };
