@@ -1566,6 +1566,12 @@ defcommand goto-unmark
     result SELF;
 };
 
+defcommand grep
+{   | main window |
+    
+    result SELF;
+};
+
 defcommand test
 {   | main window |
     w;
