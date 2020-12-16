@@ -456,7 +456,13 @@ defcommand trace-editor-command
             $f puts  "***";
             $f puts  "***";
             $f puts ["*** Editor command: " . $value];
-	    trace {$window apply-command $main $window "" $value} out: [$f fd?]; 
+            err := <nil>;
+	    try {
+                trace {$window apply-command $main $window "" $value} out: [$f fd?];
+            } catch: {| err |};
+            if $err {
+                $f puts ["ERROR: " $err];
+            };
             $f puts  "***";
             $f puts  "";
             $f close;
