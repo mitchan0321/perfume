@@ -1,4 +1,4 @@
-2020/12/14	PRFM_20201214		1.5.0_RC_2
+2020/12/23	PRFM_20201223_K32	1.5.0
 2020/12/09	PRFM_20201209		1.5.0_RC_1
 2020/09/10	PRFM_20200910		1.4.1
 2020/04/15	PRFM_20200415		1.4.0
@@ -1342,7 +1342,7 @@
 	methods.c
 		Add commands String::alphabetic?, String::numeric? and String::alphanumeric?.
 
-2020/12/14
+2020/12/23
 	Makefile
 		Fix build-pkg and install file leaked.
 	lib/EditorCommandDefs.prfm
