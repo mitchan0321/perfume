@@ -16,11 +16,11 @@ LIGHT {
     $ColorDB set EDIT_BUFFER                [WUtil color-pair BLACK   WHITE   ];
     $ColorDB set ACTIVE_STATUS_LINE         [WUtil color-pair BLACK   CYAN    ];
     $ColorDB set ACTIVE_VERT_LINE           [WUtil color-pair BLACK   CYAN    ];
-    $ColorDB set ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair YELLOW  MAGENTA ];
+    $ColorDB set ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair YELLOW  BLUE    ];
     $ColorDB set INACTIVE_EDIT_BUFFER       [WUtil color-pair BLACK   WHITE   ];
     $ColorDB set INACTIVE_STATUS_LINE       [WUtil color-pair YELLOW  BLACK   ];
     $ColorDB set INACTIVE_VERT_LINE         [WUtil color-pair BLUE    BLACK   ];
-    $ColorDB set INACTIVE_VERT_LINE_HILIGHT [WUtil color-pair YELLOW  BLUE    ];
+    $ColorDB set INACTIVE_VERT_LINE_HILIGHT [WUtil color-pair YELLOW  BLACK   ];
     $ColorDB set MINI_WINDOW                [WUtil color-pair WHITE   BLACK   ];
     $ColorDB set EOF_MARK                   [WUtil color-pair BLACK   GREEN   ];
     $ColorDB set REGION_HILIGHT             [WUtil color-pair WHITE   BLUE    ];
@@ -50,7 +50,7 @@ DARK {
     $ColorDB set SEARCH_HILIGHT             [WUtil color-pair BLACK   YELLOW  ];
     $ColorDB set RESERVED_WORD_HILIGHT      [WUtil color-pair YELLOW  BLACK   ];
     $ColorDB set STRING_LITERAL_HILIGHT     [WUtil color-pair RED     BLACK   ];
-    $ColorDB set VALUE_LITERAL_HILIGHT      [WUtil color-pair MAGENTA BLACK   ];
+    $ColorDB set VALUE_LITERAL_HILIGHT      [WUtil color-pair CYAN    BLACK   ];
     $ColorDB set DATATYPE_HILIGHT           [WUtil color-pair GREEN   BLACK   ];
     $ColorDB set COMMENT_HILIGHT            [WUtil color-pair BLUE    BLACK   ];
     $ColorDB set ALERT_HILIGHT              [WUtil color-pair RED     BLACK   ];
