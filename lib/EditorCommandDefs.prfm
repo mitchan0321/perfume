@@ -7,64 +7,56 @@ defcommand roll-current-window
 defcommand full-window
 {   | main window |
     name ::= $window get-window-name;
-    $main add-create-window-hook {$main create-full-window window-name: $name};
-    $main send-key-event (KEY_RESIZE);
+    $main create-full-window window-name: $name;
     result ALL;
 };
 
 defcommand split-vertical-window
 {   | main window |
     name ::= $window get-window-name;
-    $main add-create-window-hook {$main create-split-vertical-window window-name: $name};
-    $main send-key-event (KEY_RESIZE);
+    $main create-split-vertical-window window-name: $name;
     result ALL;
 };
 
 defcommand split-vertical-window-3
 {   | main window |
     name ::= $window get-window-name;
-    $main add-create-window-hook {$main create-split-vertical-window window-name: $name div: 3};
-    $main send-key-event (KEY_RESIZE);
+    $main create-split-vertical-window window-name: $name div: 3;
     result ALL;
 };
 
 defcommand split-vertical-window-4
 {   | main window |
     name ::= $window get-window-name;
-    $main add-create-window-hook {$main create-split-vertical-window window-name: $name div: 4};
-    $main send-key-event (KEY_RESIZE);
+    $main create-split-vertical-window window-name: $name div: 4;
     result ALL;
 };
 
 defcommand split-horizontal-window
 {   | main window |
     name ::= $window get-window-name;
-    $main add-create-window-hook {$main create-split-horizontal-window window-name: $name};
-    $main send-key-event (KEY_RESIZE);
+    $main create-split-horizontal-window window-name: $name;
     result ALL;
 };
 
 defcommand split-horizontal-window-3
 {   | main window |
     name ::= $window get-window-name;
-    $main add-create-window-hook {$main create-split-horizontal-window window-name: $name div: 3};
-    $main send-key-event (KEY_RESIZE);
+    $main create-split-horizontal-window window-name: $name div: 3;
     result ALL;
 };
 
 defcommand split-horizontal-window-4
 {   | main window |
     name ::= $window get-window-name;
-    $main add-create-window-hook {$main create-split-horizontal-window window-name: $name div: 4};
-    $main send-key-event (KEY_RESIZE);
+    $main create-split-horizontal-window window-name: $name div: 4;
     result ALL;
 };
 
 defcommand split-cross-window
 {   | main window |
     name ::= $window get-window-name;
-    $main add-create-window-hook {$main create-split-cross-window window-name: $name};
-    $main send-key-event (KEY_RESIZE);
+    $main create-split-cross-window window-name: $name;
     result ALL;
 };
 

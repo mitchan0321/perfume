@@ -66,23 +66,32 @@ Window method create-minibuffer-window () {
 };
 
 Window method create-full-window (window-name: win-name) {
-    ### wipe-window;
+    if {set? win-name} else: {
+        win-name := "Window#1";
+    };
+    main ::= self;
+    hook := {$main create-full-window-sub $win-name};
+    add-create-window-hook $hook;
+    $hook eval;
+};
 
+Window method create-full-window-sub (win-name) {
+    orig-win ::= $WindowList clone;
     sets WindowList ();
+
     (l c) ::= curs-get-screen-size $CursWin;
     win ::= new CombiWindow init: ([self] 0 0 $l $c);
-    if {true? win-name} {
-	$win set-window-name $win-name;
-    } {
-	$win set-window-name "Window#1";
-    };
+    $win set-window-name $win-name;
     $WindowList <<- $win;
     $WindowList car : activate;
 
-    $WindowList each do: {| w |
-	buff ::= $w get-buffer;
-	$MainWindow bind-buffer [$w get-window-name] $buff;
+    if [$orig-win null?] {
+        buff ::= $win get-buffer;
+    } {
+        buff ::= $orig-win car : get-buffer;
+        $buff ?? {buff ::= $win get-buffer};
     };
+    $MainWindow bind-buffer [$win get-window-name] $buff;
 };
 
 Window method next-window-name (win) {
@@ -92,12 +101,23 @@ Window method next-window-name (win) {
 };
 
 Window method create-split-vertical-window (div: ndivs window-name: win-name) {
-    ### wipe-window;
-
-    sets WindowList ();
     if {set? ndivs} else: {set ndivs 2};
     if {$ndivs < 2} then: {set ndivs 2};
     if {$ndivs > $MAX_WINDOW_DIVS} then: {set ndivs $MAX_WINDOW_DIVS};
+
+    if {set? win-name} else: {
+        win-name := "Window#1";
+    };
+
+    main ::= self;
+    hook := {$main create-split-vertical-window-sub $ndivs $win-name};
+    add-create-window-hook $hook;
+    $hook eval;
+};
+
+Window method create-split-vertical-window-sub (ndivs win-name) {
+    buff-list ::= get-buffer-list $win-name;
+    sets WindowList ();
     
     (l c) ::= curs-get-screen-size $CursWin;
     c-orig := $c;
@@ -111,32 +131,41 @@ Window method create-split-vertical-window (div: ndivs window-name: win-name) {
 	else: {
 	    win ::= new CombiWindow init: ([self] 0 $w $l [$c-orig - [$c * [$ndivs - 1]]]);
 	};
-	if {true? win-name} {
-	    $win set-window-name $win-name;
-	    win-name ::= next-window-name $win-name;
-	} {
-	    $win set-window-name ["Window#" . $win-ord];
-	};
-	$WindowList <<- $win;
+        $win set-window-name $win-name;
+        $WindowList <<- $win;
+        win-name ::= next-window-name $win-name;
 	
 	w ::= $w + $c;
     };
+
     $WindowList car : activate;
     $WindowList cdr : each do: {| i | $i diactivate};
 
     $WindowList each do: {| w |
-	buff ::= $w get-buffer;
+        buff ::= $buff-list >>;
+        $buff ?? {buff ::= $w get-buffer};
 	$MainWindow bind-buffer [$w get-window-name] $buff;
     };
 };
 
 Window method create-split-horizontal-window (div: ndivs window-name: win-name) {
-    ### wipe-window;
-
-    sets WindowList ();
     if {set? ndivs} else: {set ndivs 2};
     if {$ndivs < 2} then: {set ndivs 2};
     if {$ndivs > $MAX_WINDOW_DIVS} then: {set ndivs $MAX_WINDOW_DIVS};
+
+    if {set? win-name} else: {
+        win-name := "Window#1";
+    };
+
+    main ::= self;
+    hook := {$main create-split-horizontal-window-sub $ndivs $win-name};
+    add-create-window-hook $hook;
+    $hook eval;
+};
+
+Window method create-split-horizontal-window-sub (ndivs win-name) {
+    buff-list ::= get-buffer-list $win-name;
+    sets WindowList ();
     
     (l c) ::= curs-get-screen-size $CursWin;
     l-orig := $l;
@@ -150,29 +179,57 @@ Window method create-split-horizontal-window (div: ndivs window-name: win-name) 
 	else: {
 	    win ::= new CombiWindow init: ([self] $w 0 [$l-orig - [$l * [$ndivs - 1]]] $c);
 	};
-	if {true? win-name} {
-	    $win set-window-name $win-name;
-	    win-name ::= next-window-name $win-name;
-	} {
-	    $win set-window-name ["Window#" . $win-ord];
-	};
-	$WindowList <<- $win;
+        $win set-window-name $win-name;
+        $WindowList <<- $win;
+        win-name ::= next-window-name $win-name;
 	
 	w ::= $w + $l;
     };
+
     $WindowList car : activate;
     $WindowList cdr : each do: {| i | $i diactivate};
 
     $WindowList each do: {| w |
-	buff ::= $w get-buffer;
+        buff ::= $buff-list >>;
+        $buff ?? {buff ::= $w get-buffer};
 	$MainWindow bind-buffer [$w get-window-name] $buff;
     };
 };
 
 Window method create-split-cross-window (window-name: win-name) {
-    ### wipe-window;
+    if {set? win-name} else: {
+        win-name := "Window#1";
+    };
 
+    main ::= self;
+    hook := {$main create-split-cross-window-sub $win-name};
+    add-create-window-hook $hook;
+    $hook eval;
+};
+
+Window method get-buffer-list (win-name) {
+    buff-list := ();
+    1 each to: $MAX_WINDOW_DIVS do: {
+        w ::= get-window-by-name $win-name;
+        if $w {
+            $buff-list <<- [$w get-buffer];
+        } {
+            if {$BufferBinding set? $win-name} {
+                $buff-list <<- [$BufferBinding get $win-name];
+            } {
+                $buff-list <<- <nil>;
+            };
+        };
+        win-name ::= next-window-name $win-name;
+    };
+    
+    return $buff-list;
+};
+    
+Window method create-split-cross-window-sub (win-name) {
+    buff-list ::= get-buffer-list $win-name;
     sets WindowList ();
+
     (l c) ::= curs-get-screen-size $CursWin;
     y0 := 0;
     y1 ::= $l / 2;
@@ -180,46 +237,30 @@ Window method create-split-cross-window (window-name: win-name) {
     x1 ::= $c / 2;
 
     win ::= new CombiWindow init: ([self] 0 0 $y1 $x1);
-    if {set? win-name} {
-	$win set-window-name $win-name;
-	win-name ::= next-window-name $win-name;
-    } {
-	$win set-window-name "Window#1";
-    };
+    $win set-window-name $win-name;
     $WindowList <<- $win;
 
+    win-name ::= next-window-name $win-name;
     win ::= new CombiWindow init: ([self] 0 $x1 $y1 [$c - $x1]);
-    if {set? win-name} {
-	$win set-window-name $win-name;
-	win-name ::= next-window-name $win-name;
-    } {
-	$win set-window-name "Window#2";
-    };
+    $win set-window-name $win-name;
     $WindowList <<- $win;
 
+    win-name ::= next-window-name $win-name;
     win ::= new CombiWindow init: ([self] $y1 0 [$l - $y1] $x1);
-    if {set? win-name} {
-	$win set-window-name $win-name;
-	win-name ::= next-window-name $win-name;
-    } {
-	$win set-window-name "Window#3";
-    };
+    $win set-window-name $win-name;
     $WindowList <<- $win;
     
+    win-name ::= next-window-name $win-name;
     win ::= new CombiWindow init: ([self] $y1 $x1 [$l - $y1] [$c - $x1]);
-    if {set? win-name} {
-	$win set-window-name $win-name;
-	win-name ::= next-window-name $win-name;
-    } {
-	$win set-window-name "Window#4";
-    };
+    $win set-window-name $win-name;
     $WindowList <<- $win;
 
     $WindowList car : activate;
     $WindowList cdr : each do: {| i | $i diactivate};
 
     $WindowList each do: {| w |
-	buff ::= $w get-buffer;
+        buff ::= $buff-list >>;
+        $buff ?? {buff ::= $w get-buffer};
 	$MainWindow bind-buffer [$w get-window-name] $buff;
     };
 };
@@ -336,6 +377,8 @@ Window method bind-buffer (window-name buffer) {
     };
     $window ?? {return};
 
+    $BufferBinding set $window-name $buffer;
+    
     # Save window buffer geometory
     orig-buff ::= $window get-buffer;
     if $orig-buff {
@@ -354,10 +397,13 @@ Window method bind-buffer (window-name buffer) {
 };
 
 Window method unbind-buffer () {
+    win-name ::= get-current-window : get-window-name;
     kill-buff ::= get-current-window : get-buffer;
     kill-buff-name ::= $kill-buff get-buffer-name;
     next-buff ::= BufferManager get-next-buffer $kill-buff;
     $kill-buff unregist-buffer;
+
+    $BufferBinding unset $win-name;
 
     $WindowList each do: {| i |
 	if {[$i get-buffer : get-buffer-name] = $kill-buff-name} {
@@ -390,11 +436,12 @@ Window method add-create-window-hook (hook) {
 };
 
 Window method resize-window () {
+    set buffer-bind [dict ()];
     $MiniWindow destroy;
     sets MiniWindow <nil>;
     curs-destroy-window $CursWinMini;
     $WindowList each do: {| w |
-        $BufferBinding set [$w get-window-name] [$w get-buffer];
+        $buffer-bind set [$w get-window-name] [$w get-buffer];
 	$w destroy;
     };
     roll-to ::= $WindowList car : get-window-name;
@@ -413,7 +460,7 @@ Window method resize-window () {
     $WindowList each do: {| w |
 	win ::= $w get-window-name;
 	$win ?? {return};
-	buff ::= $BufferBinding get $win;
+	buff ::= $buffer-bind get $win;
 	$buff ?? {return};
 	bind-buffer $win $buff;
     };

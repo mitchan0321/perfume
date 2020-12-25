@@ -54,14 +54,13 @@ defun pmacs (trace: t) {
 	init-color-DB;
 	$MainWindow create-minibuffer-window;
 	$MainWindow create-full-window;
-	$MainWindow add-create-window-hook {$MainWindow create-full-window};
-	$MainWindow add-background {
+REM {
+        $MainWindow add-background {
 	    | main window |
 	    $window apply-command $main $window "" bottom-of-buffer;
-	    ### $window apply-command $main $window "" start-region;
 	    result ALL;
 	};
-
+};
 	$MainWindow add-background job-id: "00-start-logo" {
             buff ::= new EditBuffer;
             path := <nil>;
@@ -131,7 +130,7 @@ defun pmacs (trace: t) {
 
         files ::= $ARGV clone;
         $files >>;
-        if {$files,0 = "-c"} {
+        if {and {! [$files null?]} {$files,0 = "-c"}} {
             $files >>; $files >>;
         };
         $files each do: {| f |
