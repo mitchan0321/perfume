@@ -1373,4 +1373,8 @@
 	perfumesh.c
 		Fix arguments parase bug, for specified initial open files.
 
+2020/12/25
+	lib/EditorCommandDefs.prfm, lib/Window.prfm
+		Change editor command split-* and Window.prfm, to redraw window unuse KEY_RESIZE key event.
+
 #eof
