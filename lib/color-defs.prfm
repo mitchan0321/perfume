@@ -52,7 +52,7 @@ DARK {
     $ColorDB set STRING_LITERAL_HILIGHT     [WUtil color-pair RED     BLACK   ];
     $ColorDB set VALUE_LITERAL_HILIGHT      [WUtil color-pair CYAN    BLACK   ];
     $ColorDB set DATATYPE_HILIGHT           [WUtil color-pair GREEN   BLACK   ];
-    $ColorDB set COMMENT_HILIGHT            [WUtil color-pair BLUE    BLACK   ];
+    $ColorDB set COMMENT_HILIGHT            [WUtil color-pair MAGENTA BLACK   ];
     $ColorDB set ALERT_HILIGHT              [WUtil color-pair RED     BLACK   ];
 }
 ;;
