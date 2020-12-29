@@ -94,8 +94,8 @@ defun init-color-DB () {
     };
 
     $LIB_PATH each do: {| i |
-	if {file exists? [$i . "/color-defs.prfm"]} {
-	    load :notrace [$i . "/color-defs.prfm"];
+	if {file exists? [$i . "/theme-color.prfm"]} {
+	    load :notrace [$i . "/theme-color.prfm"];
 	    break;
 	};
     };
@@ -161,12 +161,13 @@ defun line-input (curs disp-line disp-col input-len cur-index cur-val key-in) {
     return ($key-in $new-x [if {[$v len] = 0} "" {$v get 0}]);
 };
 
-defun show-message (msg) {
+defun show-message (msg wait: msec) {
     if $MainWindow {
 	try {
-	    [$MainWindow get-minibuffer-window] ?? {throw ErrNoMiniBuffer "No MiniBuffer for debugging."};
-	    $MainWindow display-window-message "MiniBuffer" $msg;
-	    $MainWindow get-minibuffer-window : refresh;
+            [$MainWindow get-minibuffer-window] ?? {throw ErrNoMiniBuffer "No MiniBuffer for debugging."};
+            $MainWindow display-window-message "MiniBuffer" $msg;
+            $MainWindow get-minibuffer-window : refresh;
+            if {set? msec} {sleep $msec};
 	} catch: {};
     };
 };
