@@ -16,7 +16,7 @@ ScratchBuffer.prfm
 WUtil.prfm
 Window.prfm
 WindowBase.prfm
-color-defs.prfm
+theme-color.prfm
 pmacs.conf
 pmacs.prfm
 pmacs.files
