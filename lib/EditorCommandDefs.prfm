@@ -1564,6 +1564,43 @@ defcommand grep
     result SELF;
 };
 
+defcommand set-theme
+{   | main window |
+    $main mini-input-start "" prompt: "Theme: ";
+    $main add-mini-input-callback $window {| main window in-key value |
+        if {eq? $in-key KEY_ESC} {
+	    $main mini-input-end;
+	    show-message "Canceled.";
+	};
+        if {eq? $in-key CTRL_M} {
+            $main mini-input-end;
+            setvar THEME $value;
+            init-color-DB;
+            $window apply-command $main $window "" refresh-screen;
+            return ALL;
+        };
+    };
+    result ALL;
+};
+
+defcommand set-mode
+{   | main window |
+    $main mini-input-start "" prompt: "Mode: ";
+    $main add-mini-input-callback $window {| main window in-key value |
+        if {eq? $in-key KEY_ESC} {
+	    $main mini-input-end;
+	    show-message "Canceled.";
+	};
+        if {eq? $in-key CTRL_M} {
+            $main mini-input-end;
+            $window set-mode $value;
+            $window apply-command $main $window "" refresh-screen;
+            return ALL;
+        };
+    };
+    result ALL;
+};
+
 defcommand test
 {   | main window |
     w;
