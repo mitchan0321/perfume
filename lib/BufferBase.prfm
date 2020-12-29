@@ -8,6 +8,15 @@ BufferBase method get-buffer-name () {
     return $BufferName;
 };
 
+BufferBase method set-buffer-mode (mode) {
+    sets Mode $mode;
+};
+
+BufferBase method get-buffer-mode () {
+    if {sets? Mode} {return $Mode};
+    return <nil>;
+};
+
 BufferBase method load-content (path) {
     throw ErrNoMethodImpl ["No Impliment method '" . $@name "::load-content'."];
 };
