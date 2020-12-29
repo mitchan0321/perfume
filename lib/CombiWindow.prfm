@@ -529,8 +529,11 @@ CombiWindow method load-keybind-override (mode) {
     load-keybind;
     key-path := $MODE_FILE,$mode;
     $key-path ?? {
-	show-message ["No such mode: " . $mode];
-	return;
+        $Parent add-background after: 200 {
+            show-message ["No such mode: " . $mode];
+            result ALL;
+        };
+	return <nil>;
     };
     
     $LIB_PATH each do: {| i |
@@ -538,18 +541,29 @@ CombiWindow method load-keybind-override (mode) {
 	    try {
 	        load :notrace [$i . "/" $key-path];
 	    } catch: {| e |
-		show-message ["Error at mode file: " . $key-path ", <" [$e car] "># " [$e cdr]];
-		return;
+                $Parent add-background after: 200 {
+                    show-message ["Error at mode file: " . $key-path ", <" [$e car] "># " [$e cdr]];
+                    result ALL;
+                };
+		return <nil>;
 	    };
-	    return;
+	    return <t>;
 	};
     };
-    show-message ["No such mode file: " . $key-path];
+    $Parent add-background after: 200 {
+        show-message ["No such mode file: " . $key-path];
+        result ALL;
+    };
+    return <nil>;
 };
 
 CombiWindow method set-mode (mode) {
+    sts ::= load-keybind-override $mode;
+    $sts ?? {set mode $DEFAULT_MODE};
+    
     sets Mode $mode;
-    load-keybind-override $mode;
+    buff ::= get-buffer;
+    if $buff {$buff set-buffer-mode $mode};
 };
 
 CombiWindow method get-mode () {
