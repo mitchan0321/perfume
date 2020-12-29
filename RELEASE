@@ -1379,7 +1379,7 @@
 
 2020/12/29
 	pmacs:
-		Add theme MONO and MONO-GREEN.
+		Add theme MONO, MONO-GREEN, BLUE-BACK and RETRO.
 		Add editor command set-theme.
 		Add editor command set-mode.
 		Change file name color-defs.prfm -> theme-color.prfm.
