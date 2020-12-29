@@ -4134,7 +4134,9 @@ error:
 Toy_Type*
 cmd_gettimeofday(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     struct timeval tv;
+    Toy_Type *msec;
     
+    msec = hash_get_and_unset_t(nameargs, new_symbol(L"msec:"));
     if (arglen != 0) goto error;
     if (hash_get_length(nameargs) > 0) goto error;
 
@@ -4142,11 +4144,16 @@ cmd_gettimeofday(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     if (-1 == gettimeofday(&tv, NULL)) {
 	return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
     }
-    return new_integer_si(tv.tv_sec);
+    
+    if (NULL == msec) {
+        return new_integer_si(tv.tv_sec);
+    } else {
+        return new_integer_si(tv.tv_sec * 1000 + (tv.tv_usec / 1000));
+    };
 
 error:
     return new_exception(TE_SYNTAX,
-			 L"Syntax error at 'time-of-day', syntax: get-time-of-day", interp);
+			 L"Syntax error at 'time-of-day', syntax: time-of-day [:msec]", interp);
 }
 
 Toy_Type*

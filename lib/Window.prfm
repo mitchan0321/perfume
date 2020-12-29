@@ -605,8 +605,15 @@ Window method add-background (body job-id: id after: msec) {
 Window method exec-background () {
     # execute background execute candidate is
     # the passed remain time BackgroundAfterRemain($id)
+    if {sets? TimeOfDayN1} else: {
+        sets TimeOfDayN1 [time-of-day :msec];
+        return;
+    };
+    
+    dt ::= [time-of-day :msec] - $TimeOfDayN1;
+    sets TimeOfDayN1 [time-of-day :msec];
     $BackgroundAfterRemain each do: {| k v |
-        remain ::= $v - $INPUT_TIMEOUT;
+        remain ::= $v - $dt;
         if {$remain <= 0} {
             $BackgroundAfterRemain unset $k;
         } {

@@ -1,0 +1,13 @@
+defun collatz (n) {
+    c := 0;
+    c ::= collatz-sub $n $c;
+};
+
+defun collatz-sub (n c) {
+    if {$n = 1} {return $c};
+    $c ++;
+    println $n;
+    case [$n % 2]
+    0 {goto collatz-sub [$n / 2] $c}
+    1 {goto collatz-sub [$n * 3 : + 1] $c};
+};
