@@ -1374,7 +1374,16 @@
 		Fix arguments parase bug, for specified initial open files.
 
 2020/12/25
-	lib/EditorCommandDefs.prfm, lib/Window.prfm
+	pmacs:
 		Change editor command split-* and Window.prfm, to redraw window unuse KEY_RESIZE key event.
+
+2020/12/29
+	pmacs:
+		Add theme MONO and MONO-GREEN.
+		Add editor command set-theme.
+		Add editor command set-mode.
+		Change file name color-defs.prfm -> theme-color.prfm.
+		Add Window::add-background specify after: msec property mechanism
+		  that execute body after passed time msec.
 
 #eof
