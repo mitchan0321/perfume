@@ -1385,5 +1385,7 @@
 		Change file name color-defs.prfm -> theme-color.prfm.
 		Add Window::add-background specify after: msec property mechanism
 		  that execute body after passed time msec.
+	commands.c
+		Add :msec option to time-of-day, for retun clocl by m-sec.
 
 #eof
