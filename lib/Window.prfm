@@ -25,6 +25,7 @@ Window method init-constructor () {
     ### Background
     sets Background [dict];
     $Background set @id 0;
+    sets BackgroundAfterRemain [dict];
 
     ### interp state
     sets InterpBusy <nil>;
@@ -304,7 +305,7 @@ Window method clear-window (win) {
 
 Window method wipe-window () {
     $WindowList . $MiniWindow : each do: {| i |
-	$i wipe;
+        $i wipe;
     };
 };
 
@@ -381,7 +382,12 @@ Window method bind-buffer (window-name buffer) {
     #### geom ::= BufferManager get-buffer-geom $window-name [$buffer get-buffer-name];
     BufferManager set-buffer-geom $window-name [$buffer get-buffer-name];
 
-    mode ::= yield $MODE_SELECT $window [$buffer get @name] [$buffer get-buffer-name] [$buffer get-path];
+    mode ::= yield $MODE_SELECT $window 
+        [$buffer get @name]
+        [$buffer get-buffer-name]
+        [$buffer get-buffer-mode]
+        [$buffer get-path]
+    ;;
     $window set-mode $mode;
 };
 
@@ -473,6 +479,7 @@ Window method key-event-loop () {
 	    i := $KeyEvent;
 	    sets KeyEvent ();
 	};
+
 	if {$i null?} {
 	    if {background-exists?} {
 		try {
@@ -491,7 +498,7 @@ Window method key-event-loop () {
 	    };
 	    continue;
 	};
-
+        
 	#######
 	####### for debug display key in
         #######
@@ -579,7 +586,7 @@ Window method exit-event-loop () {
     sets EventLoopDone <t>;
 };
 
-Window method add-background (body job-id: id) {
+Window method add-background (body job-id: id after: msec) {
     if {! [set? id]} {
 	int-id ::= $Background get @id : + 1;
 	$Background set @id $int-id ;
@@ -589,13 +596,35 @@ Window method add-background (body job-id: id) {
     if {block? $body} {
 	$Background set $id $body;
     };
+    
+    if {and {set? msec} {integer? $msec}} {
+        $BackgroundAfterRemain set $id $msec;
+    };
 };
 
 Window method exec-background () {
+    # execute background execute candidate is
+    # the passed remain time BackgroundAfterRemain($id)
+    $BackgroundAfterRemain each do: {| k v |
+        remain ::= $v - $INPUT_TIMEOUT;
+        if {$remain <= 0} {
+            $BackgroundAfterRemain unset $k;
+        } {
+            $BackgroundAfterRemain set $k $remain;
+        };
+    };
+
     # execute only one background,
     # order is sorted ascending by Background key.
-
-    key ::= msort [$Background keys :string] : filter {| i | $i != "@id"} : car;
+    key-list ::= msort [$Background keys :string] : filter {| i | $i != "@id"};
+    key := <nil>;
+    $key-list each do: {| k |
+        if {$BackgroundAfterRemain set? $k} {continue};
+        key := $k;
+        break;
+    };
+    $key ?? {return};
+    
     body ::= $Background get $key;
     $Background unset $key;
     if {block? $body} {
