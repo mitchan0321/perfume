@@ -930,6 +930,17 @@ CombiWindow method cursor-move-to (geom y x) {
     fit-to-cursor $geom $sy $sx :center;
 };
 
+CombiWindow method cursor-fit-to-top (geom) {
+    sets FreeCursor <nil>;
+    
+    view := $geom,ViewLine;
+    cursor := $geom,CursorLine;
+    view ::= $view + $cursor;
+    cursor := 0;
+    $geom set! ViewLine $view;
+    $geom set! CursorLine $cursor;
+};
+
 CombiWindow method set-search-hilight () {
     $Activate ?? {return};
     
