@@ -132,8 +132,8 @@ EditBuffer method save-content (path: path) {
 	    file rm $path;
 	    file rename $backup-path $path;
 	} catch: {| e |
-		return (<nil>
-		    ["<" . [$e car] "># " [$e cdr] ", at file write."]);
+            return (<nil>
+                ["<" . [$e car] "># " [$e cdr] ", at file write."]);
 	};
     };
 
