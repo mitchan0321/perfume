@@ -44,6 +44,11 @@ BufferManager method get-buffer (name) {
     return $buff;
 };
 
+BufferManager method find-buffer (name) {
+    buff ::= $BufferList get $name;
+    return $buff;
+};
+
 BufferManager method get-buffer-by-path (path) {
     buff := <nil>;
     $BufferList each do: {| name buffer |
