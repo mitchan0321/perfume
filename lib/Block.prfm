@@ -21,3 +21,19 @@ Block method <<< (string) {
     $s close;
     pipe in: $s [self];
 };
+
+Block method redirect-out (out err) {
+    sts := 0;
+    try {
+        set _out $stdout;
+        set _err $stderr;
+        setvar stdout $out;
+        setvar stderr $err;
+        sts ::= [self] eval;
+    }
+    fin: {
+        setvar stdout $_out;
+        setvar stderr $_err;
+    };
+    return $sts;
+};
