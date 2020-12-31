@@ -543,26 +543,31 @@ Window method send-key-event (event-list) {
     $KeyEvent concat! $event-list;
 };
 
-Window method mini-input-start (prompt: p init-value) {
+Window method mini-input-start (init-value prompt: p index: index) {
     sets MiniInput <t>;
     sets MiniInputSave ([$WindowList,0 get-window-name] [$WindowList,0 get-buffer]);
+    if {! [set? index]} {
+        index ::= $init-value len;
+    };
+    
     if {set? p} {
-	$MiniWindow mini-input-start $p $init-value;
+	$MiniWindow mini-input-start $p $init-value index: $index;
     } {
-	$MiniWindow mini-input-start "" $init-value;
+	$MiniWindow mini-input-start "" $init-value index: $index;
     };
 };
 
 Window method mini-input-callback (in-key value) {
     if {! [$MiniInputCallback null?]} {
 	try {
-	    yield $MiniInputCallback,1 $MainWindow $MiniInputCallback,0 $in-key $value;
+	    result ::= yield $MiniInputCallback,1 $MainWindow $MiniInputCallback,0 $in-key $value;
 	}
 	catch: {| e |
 	    show-message ["Error happend at mini window input callback, <" . [$e car] "># " [$e cdr]];
 	    return <nil>;
 	};
     };
+    return $result;
 };
 
 Window method mini-input-end () {

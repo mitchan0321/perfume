@@ -1386,7 +1386,7 @@
 		Add Window::add-background specify after: msec property mechanism
 		  that execute body after passed time msec.
 	commands.c
-		Add :msec option to time-of-day, for retun clocl by m-sec.
+		Add :msec option to time-of-day, for retun clock by mili-sec.
 
 2020/12/30
 	lib/Block.prfm
@@ -1394,10 +1394,17 @@
 	pmacs:
 		Add BufferManager::find-buffer method.
 		Add CombiWindow:: cursor-fit-to-top method.
-		Add editor command grep, grep-next and grep-previous,
+		Add editor commands are grep, grep-next and grep-previous,
 		  key bind is KEY_F5 -> grep-next, KEY_F6 -> grep-previous.
 		Add Grep mode and mode file 'Mode-Grep.key'.
 		Change editor command search key bind CTRL_V to use paste buffer.
 		Change LIGHT theme mini window color.
+
+2020/12/31
+	pmacs:
+		Add editor commands are fit-to-top and fit-to-bottom.
+		Add editor command is select-region-all.
+		Add editor command is read-grep-file.
+		Add mini input key bind CTRL+{KEY_RIGHT,LEFT} to line buffer move top or bottom.
 
 #eof

@@ -54,15 +54,19 @@ MiniWindow method get-curs () {
     return $MiniCurs;
 };
 
-MiniWindow method mini-input-start (prompt init-value) {
+MiniWindow method mini-input-start (prompt init-value index: index) {
     display-prompt $prompt;
     sets InputValue $init-value;
-    sets InputIndex [$init-value len];
+    if {set? index} {
+        sets InputIndex $index;
+    } {
+        sets InputIndex [$init-value len];
+    };
 };
 
 MiniWindow method display-prompt (prompt) {
     sets PromptMessage $prompt;
-    display $prompt;
+    ### display $prompt;
 };
 
 MiniWindow method set-cursor () {
@@ -73,9 +77,10 @@ MiniWindow method set-cursor () {
 MiniWindow method apply-keybind (main window key) {
     (y x) ::= curs-get-screen-size $MiniCurs;
     input-len ::= $x - [$PromptMessage len] : - 1;
-    (key new-index new-value) ::= line-input $MiniCurs 0 [$PromptMessage len] $input-len $InputIndex $InputValue $key;
+    ### clear;
+    (key new-index new-value result) ::= line-input $MiniCurs 0 [$PromptMessage len] $input-len $InputIndex $InputValue $key;
     ### stub
-    # (key new-index new-value) ::= line-input $MiniCurs 0 [$PromptMessage len] $input-len $InputIndex $InputValue $key;
+    # (key new-index new-value result) ::= line-input $MiniCurs 0 [$PromptMessage len] $input-len $InputIndex $InputValue $key;
     # new-value := $InputValue;
     # if {string? $key} {
     # $new-value append! $key;

@@ -305,6 +305,18 @@ defcommand bottom-of-buffer
     result SELF;
 };
 
+defcommand fit-to-top
+{   | main window |
+    $window cursor-fit-to-top [$window get-geom];
+    result SELF;
+};
+
+defcommand fit-to-bottom
+{   | main window |
+    $window cursor-fit-to-bottom [$window get-geom];
+    result SELF;
+};
+
 defcommand show-character-code
 {   | main window |
     buff ::= $window get-buffer;
@@ -989,6 +1001,15 @@ defcommand cut-region
     result ALL;
 };
 
+defcommand select-region-all
+{   | main window |
+    $window mark;
+    $window apply-command $main $window "" top-of-buffer;
+    $window apply-command $main $window "" start-region;
+    $window apply-command $main $window "" bottom-of-buffer;
+    result ALL;
+};
+
 defcommand paste-buffer
 {   | main window |
     buff ::= $window get-buffer;
@@ -1587,7 +1608,7 @@ defcommand grep
                 return SELF;
             };
 
-            $main mini-input-start "" prompt: "Files: ";
+            $main mini-input-start "grep -nHe '' *" prompt: "grep command line: " index: 11;
             $main add-mini-input-callback $window {| main window in-key value |
                 if {eq? $in-key KEY_ESC} {
                     $main mini-input-end;
@@ -1597,61 +1618,41 @@ defcommand grep
                 if {eq? $in-key CTRL_M} {
                     $main mini-input-end;
                     if {[$value len] = 0} {
-                        show-message "No file specified.";
+                        show-message "No grep command line specified.";
                         return SELF;
                     };
-                    files := $value;
-
-                    $main mini-input-start "" prompt: "Regex: ";
-                    $main add-mini-input-callback $window {| main window in-key value |
-                        if {eq? $in-key KEY_ESC} {
-                            $main mini-input-end;
-                            show-message "Canceled.";
-                            return SELF;
-                        };
-                        if {eq? $in-key CTRL_M} {
-                            $main mini-input-end;
-                            if {[$value len] = 0} {
-                                show-message "No regex specified.";
-                                return SELF;
-                            };
-                            regex := $value;
-
-                            ###
-                            ### do grep
-                            ###
-                            #show-message ["Directory: " . $directory ", files: " $files ", regex: " $regex];
-                            cd $directory;
-                            fout ::= new Stream;
-                            ferr ::= new Stream;
-                            cmd ::= "grep -nHe" . " '" $regex "' " $files;
-                            sts ::= {exec "/bin/sh" "-c" $cmd} redirect-out $fout $ferr;
-                            $fout close;
-                            $ferr close;
-                            buff ::= new EditBuffer;
-                            BufferManager unregist-buffer "*Grep*";
-                            (result err) ::= $buff load-content  :init-only "grep buffer" buffer-name: "*Grep*";
-                            $buff clear-all;
-                            $buff append-string ["CWD:  " . $directory];
-                            $buff append-string ["EXEC: " . $cmd];
-                            $buff append-string "";
-                            $fout each do: {| r |
-                                $buff append-string $r;
-                            };
-                            $ferr each do: {| r |
-                                $buff append-string ["ERR> " . $r];
-                            };
-                            $buff append-string "";
-                            $buff append-string ["exit(" . $sts ")"];
-
-                            $main create-split-vertical-window;
-                            $main bind-buffer "Window#1" $buff;
-                            window ::= $main get-current-window;
-                            geom ::= $window get-geom;
-                            $window cursor-move-to $geom 0 0;
-                            return SELF;
-                        };
+                    cmd := $value;
+                    
+                    ###
+                    ### do grep
+                    ###
+                    cd $directory;
+                    fout ::= new Stream;
+                    ferr ::= new Stream;
+                    sts ::= {exec "/bin/sh" "-c" $cmd} redirect-out $fout $ferr;
+                    $fout close;
+                    $ferr close;
+                    buff ::= new EditBuffer;
+                    BufferManager unregist-buffer "*Grep*";
+                    (result err) ::= $buff load-content  :init-only "grep buffer" buffer-name: "*Grep*";
+                    $buff clear-all;
+                    $buff append-string ["CWD:  " . $directory];
+                    $buff append-string ["EXEC: " . $cmd];
+                    $buff append-string "";
+                    $fout each do: {| r |
+                        $buff append-string $r;
                     };
+                    $ferr each do: {| r |
+                        $buff append-string ["ERR> " . $r];
+                    };
+                    $buff append-string "";
+                    $buff append-string ["exit(" . $sts ")"];
+                    
+                    $main create-split-vertical-window;
+                    $main bind-buffer "Window#1" $buff;
+                    window ::= $main get-current-window;
+                    geom ::= $window get-geom;
+                    $window cursor-move-to $geom 0 0;
                     return SELF;
                 };
             };
@@ -1783,7 +1784,7 @@ defun show-file-at (window-name path line) {
         buff ::= new EditBuffer;
         (result err) ::= $buff load-content $path;
         $result ?? {
-            show-message ["Open Failed, path: " . $path " ("  $err ")"]
+            show-message ["Open Failed, path: " . $path " ("  $err ")"];
             return;
         };
     };
@@ -1792,6 +1793,72 @@ defun show-file-at (window-name path line) {
     win ::= $MainWindow get-current-window;
     geom ::= $win get-geom;
     $win cursor-move-to $geom [$line - 1] 0;
+};
+
+defcommand read-grep-file
+{   | main window |
+    $main mini-input-start [pwd : . "/"] prompt: "Read grep file: ";
+    $main add-mini-input-callback $window {| main window in-key value |
+        if {eq? $in-key KEY_ESC} {
+            $main mini-input-end;
+            show-message "Canceled.";
+            return SELF;
+        };
+        if {eq? $in-key CTRL_M} {
+            $main mini-input-end;
+            if {[$value len] = 0} {
+                show-message "No grep file specified.";
+                return SELF;
+            };
+            file := $value;
+            if {file read? $file} else: {
+                show-message ["Not readable file: " . $file];
+                return SELF;
+            };
+            ###
+            ### do read grep file
+            ###
+            BufferManager unregist-buffer "*Grep*";
+            buff ::= new EditBuffer;
+            (result err) ::= $buff load-content $file buffer-name: "*Grep*";
+            $result ?? {
+                show-message ["Open Failed, path: " . $file " ("  $err ")"];
+                return SELF;
+            };
+            $main create-split-vertical-window;
+            $main bind-buffer "Window#1" $buff;
+            window ::= $main get-current-window;
+            geom ::= $window get-geom;
+            $window cursor-move-to $geom 0 0;
+            return SELF;
+        };
+
+	if {eq? $in-key CTRL_I} {
+            if {$value = ""} {
+                fname ::= show-files-in-window $main $window [get-current-buffer-dir $window];
+            } {
+                fname ::= show-files-in-window $main $window $value;
+            };
+	    $window apply-command $main $window "" top-of-buffer;
+	    $main mini-input-value-override $fname [$fname len];
+	    return ALL;
+	};
+	if {eq? $in-key KEY_DOWN} {
+	    $window apply-command $main $window "" move-half-up;
+	    return SELF;
+	};
+	if {eq? $in-key KEY_UP} {
+	    $window apply-command $main $window "" move-half-down;
+	    return SELF;
+	};
+	if {eq? $in-key "/"} {
+            if {[$value at -2] = "/"} {
+		$main mini-input-value-override "/" 1;
+            };
+	    return SELF;
+	};
+    };
+    result SELF;
 };
 
 defcommand set-theme

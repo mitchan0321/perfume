@@ -941,6 +941,24 @@ CombiWindow method cursor-fit-to-top (geom) {
     $geom set! CursorLine $cursor;
 };
 
+CombiWindow method cursor-fit-to-bottom (geom) {
+    sets FreeCursor <nil>;
+
+    (sy sx) ::= get-screen-size;
+    view := $geom,ViewLine;
+    cursor := $geom,CursorLine;
+    d ::= [$sy - 1] - $cursor;
+    cursor ::= $sy - 1;
+    view ::= $view - $d;
+    if {$view < 0} {
+        cursor ::= $cursor + $view;
+        view := 0;
+    };
+
+    $geom set! ViewLine $view;
+    $geom set! CursorLine $cursor;
+};
+
 CombiWindow method set-search-hilight () {
     $Activate ?? {return};
     

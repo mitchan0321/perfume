@@ -54,13 +54,6 @@ defun pmacs (trace: t) {
 	init-color-DB;
 	$MainWindow create-minibuffer-window;
 	$MainWindow create-full-window;
-REM {
-        $MainWindow add-background {
-	    | main window |
-	    $window apply-command $main $window "" bottom-of-buffer;
-	    result ALL;
-	};
-};
 	$MainWindow add-background job-id: "00-start-logo" {
             buff ::= new EditBuffer;
             path := <nil>;
