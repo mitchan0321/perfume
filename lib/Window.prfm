@@ -640,8 +640,17 @@ Window method exec-background () {
     body ::= $Background get $key;
     $Background unset $key;
     if {block? $body} {
-        return [yield $body [self] [get-current-window]];
+        try {
+            result ::= yield $body [self] [get-current-window];
+        }
+        catch: {| e |
+            show-message ["Error happend at background: " . $command ", <" [$e car] "># " [$e cdr]];
+	    return <nil>;
+        };
+        return $result;
     };
+    show-message ["Incorrect background at: " . $command];
+    return <nil>;
 };
 
 Window method background-exists? () {

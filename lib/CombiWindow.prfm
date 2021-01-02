@@ -359,6 +359,22 @@ CombiWindow method move-up () {
     $geom set! CursorLine $line;
 };
 
+CombiWindow method move-screen-top () {
+    geom ::= get-geom;
+    $geom set! CursorLine 0; 
+};
+
+CombiWindow method move-screen-bottom () {
+    geom ::= get-geom;
+    buff ::= get-buffer;
+    (y x) ::= curs-get-screen-size $BufferCurs;
+    y ::= $y - 1;
+    if {[$y + $geom,ViewLine] > [$buff get-buffer-length]} {
+        y ::= [$buff get-buffer-length] - $geom,ViewLine
+    };
+    $geom set! CursorLine $y; 
+};
+
 CombiWindow method free-cursor-turn-off (geom buff) {
     if $FreeCursor {
 	sets FreeCursor <nil>;

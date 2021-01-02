@@ -1407,4 +1407,18 @@
 		Add editor command is read-grep-file.
 		Add mini input key bind CTRL+{KEY_RIGHT,LEFT} to line buffer move top or bottom.
 
+2021/01/02
+	pmacs:
+		Add editor commands are:
+			select-region-paragraph, move-screen-top, move-screen-bottom,
+			move-next-paragraph-fit-to-top, fit-previous-paragraph-fit-to-top.
+		Add methods are CombiWindow::move-screen-top and CombiWindow::move-screen-bottom.
+		Fix EditorCommandDefs.prfm coding style.
+		Add execute-editor-command key bind CTRL_V is paste command from copy-buffer.
+		Add trace-editor-command key bind CTRL_V is paste command from copy-buffer.
+		Fix grep, grep-next, grep-previous: window re-build optimized, if "Window#1" and
+		  "Window#2" is alive then don't re-build these window.
+		Add sample editor command mini-move-message.
+		Change LIGHT theme color.
+
 #eof

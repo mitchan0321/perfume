@@ -1,115 +1,115 @@
-defcommand roll-current-window
-{   | main window |
+defcommand roll-current-window {
+    | main window |
     $main roll-current-window;
     result ALL;
 };
 
-defcommand full-window
-{   | main window |
+defcommand full-window {
+    | main window |
     name ::= $window get-window-name;
     $main create-full-window window-name: $name;
     result ALL;
 };
 
-defcommand split-vertical-window
-{   | main window |
+defcommand split-vertical-window {
+    | main window |
     name ::= $window get-window-name;
     $main create-split-vertical-window window-name: $name;
     result ALL;
 };
 
-defcommand split-vertical-window-3
-{   | main window |
+defcommand split-vertical-window-3 {
+    | main window |
     name ::= $window get-window-name;
     $main create-split-vertical-window window-name: $name div: 3;
     result ALL;
 };
 
-defcommand split-vertical-window-4
-{   | main window |
+defcommand split-vertical-window-4 {
+    | main window |
     name ::= $window get-window-name;
     $main create-split-vertical-window window-name: $name div: 4;
     result ALL;
 };
 
-defcommand split-horizontal-window
-{   | main window |
+defcommand split-horizontal-window {
+    | main window |
     name ::= $window get-window-name;
     $main create-split-horizontal-window window-name: $name;
     result ALL;
 };
 
-defcommand split-horizontal-window-3
-{   | main window |
+defcommand split-horizontal-window-3 {
+    | main window |
     name ::= $window get-window-name;
     $main create-split-horizontal-window window-name: $name div: 3;
     result ALL;
 };
 
-defcommand split-horizontal-window-4
-{   | main window |
+defcommand split-horizontal-window-4 {
+    | main window |
     name ::= $window get-window-name;
     $main create-split-horizontal-window window-name: $name div: 4;
     result ALL;
 };
 
-defcommand split-cross-window
-{   | main window |
+defcommand split-cross-window {
+    | main window |
     name ::= $window get-window-name;
     $main create-split-cross-window window-name: $name;
     result ALL;
 };
 
-defcommand next-buffer
-{   | main window |
+defcommand next-buffer{
+    | main window |
     $main next-buffer;
     result ALL;
 };
 
-defcommand previous-buffer
-{   | main window |
+defcommand previous-buffer {
+    | main window |
     $main previous-buffer;
     result ALL;
 };
 
-defcommand next-page
-{   | main window |
+defcommand next-page {
+    | main window |
     $window page-down;
     result SELF;
 };
 
-defcommand previous-page
-{   | main window |
+defcommand previous-page {
+    | main window |
     $window page-up;
     result SELF;
 };
 
-defcommand cursor-down
-{   | main window |
+defcommand cursor-down {
+    | main window |
     $window move-down;
     result SELF;
 };
 
-defcommand cursor-up
-{   | main window |
+defcommand cursor-up {
+    | main window |
     $window move-up;
     result SELF;
 };
 
-defcommand cursor-right
-{   | main window |
+defcommand cursor-right {
+    | main window |
     $window move-right;
     result SELF;
 };
 
-defcommand cursor-left
-{   | main window |
+defcommand cursor-left {
+    | main window |
     $window move-left;
     result SELF;
 };
 
-defcommand move-half-up
-{   | main window |
+defcommand move-half-up {
+    | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     (y x) ::= $window get-screen-size;
@@ -127,8 +127,8 @@ defcommand move-half-up
     result SELF;
 };
 
-defcommand move-half-down
-{   | main window |
+defcommand move-half-down {
+    | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     (y x) ::= $window get-screen-size;
@@ -143,8 +143,8 @@ defcommand move-half-down
     result SELF;
 };
 
-defcommand move-half-right
-{   | main window |
+defcommand move-half-right {
+    | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     (y x) ::= $window get-screen-size;
@@ -156,8 +156,8 @@ defcommand move-half-right
     result SELF;
 };
 
-defcommand move-half-left
-{   | main window |
+defcommand move-half-left {
+    | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     (y x) ::= $window get-screen-size;
@@ -172,8 +172,8 @@ defcommand move-half-left
     result SELF;
 };
 
-defcommand cursor-top-of-line
-{   | main window |
+defcommand cursor-top-of-line {
+    | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
 
@@ -187,8 +187,8 @@ defcommand cursor-top-of-line
     result SELF;
 };
 
-defcommand cursor-end-of-line
-{   | main window |
+defcommand cursor-end-of-line {
+    | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     (cy cx) ::= $window get-source-index $buff $geom;
@@ -204,8 +204,8 @@ defcommand cursor-end-of-line
     result SELF;
 };
 
-defcommand smooth-scroll-down
-{   | main window |
+defcommand smooth-scroll-down {
+    | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
 
@@ -222,8 +222,8 @@ defcommand smooth-scroll-down
     result SELF;
 };
 
-defcommand smooth-scroll-up
-{   | main window |
+defcommand smooth-scroll-up {
+    | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
 
@@ -237,8 +237,8 @@ defcommand smooth-scroll-up
     result SELF;
 };
 
-defcommand smooth-scroll-right
-{   | main window |
+defcommand smooth-scroll-right {
+    | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     (y x) ::= $window get-screen-size;
@@ -250,8 +250,8 @@ defcommand smooth-scroll-right
     result SELF;
 };
 
-defcommand smooth-scroll-left
-{   | main window |
+defcommand smooth-scroll-left {
+    | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     (y x) ::= $window get-screen-size;
@@ -266,8 +266,9 @@ defcommand smooth-scroll-left
     result SELF;
 };
 
-defcommand top-of-buffer
-{   | main window |
+defcommand top-of-buffer {
+    | main window |
+    $window mark;
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     (y x) ::= $window get-screen-size;
@@ -282,8 +283,9 @@ defcommand top-of-buffer
     result SELF;
 };
 
-defcommand bottom-of-buffer
-{   | main window |
+defcommand bottom-of-buffer {
+    | main window |
+    $window mark;
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     (y x) ::= $window get-screen-size;
@@ -305,20 +307,32 @@ defcommand bottom-of-buffer
     result SELF;
 };
 
-defcommand fit-to-top
-{   | main window |
+defcommand fit-to-top {
+    | main window |
     $window cursor-fit-to-top [$window get-geom];
     result SELF;
 };
 
-defcommand fit-to-bottom
-{   | main window |
+defcommand fit-to-bottom {
+    | main window |
     $window cursor-fit-to-bottom [$window get-geom];
     result SELF;
 };
 
-defcommand show-character-code
-{   | main window |
+defcommand move-screen-top {
+    | main window |
+    $window move-screen-top;
+    result SELF;
+};
+
+defcommand move-screen-bottom {
+    | main window |
+    $window move-screen-bottom;
+    result SELF;
+};
+
+defcommand show-character-code {
+    | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     (cy cx) ::= $window get-source-index $buff $geom;
@@ -338,8 +352,8 @@ defcommand show-character-code
     result SELF;
 };
 
-defcommand input-character-code
-{   | main window |
+defcommand input-character-code {
+    | main window |
     $main mini-input-start "" prompt: "Input character code: u+";
     $main add-mini-input-callback $window {| main window in-key value |
         if {eq? $in-key KEY_ESC} {
@@ -358,38 +372,38 @@ defcommand input-character-code
     result SELF;
 };
 
-defcommand insert-character
-{   | main window key |
+defcommand insert-character {
+    | main window key |
     $window insert-string $key;
     result ALL;
 };
 
-defcommand insert-tab
-{   | main window |
+defcommand insert-tab {
+    | main window |
     $window insert-string "\t";
     result ALL;
 };
 
-defcommand insert-return
-{   | main window |
+defcommand insert-return {
+    | main window |
     $window insert-string "\r";
     result ALL;
 };
 
-defcommand delete-character
-{   | main window |
+defcommand delete-character {
+    | main window |
     $window delete-character;
     result ALL;
 };
 
-defcommand backdelete-character
-{   | main window |
+defcommand backdelete-character {
+    | main window |
     $window backdelete-character;
     result ALL;
 };
 
-defcommand execute-command
-{   | main window |
+defcommand execute-command {
+    | main window |
     $main mini-input-start "" prompt: "Command: ";
     $main add-mini-input-callback $window {| main window in-key value |
         if {eq? $in-key KEY_ESC} {
@@ -409,8 +423,8 @@ defcommand execute-command
     result ALL;
 };
 
-defcommand execute-editor-command
-{   | main window |
+defcommand execute-editor-command {
+    | main window |
     if {defvar? EditorCommandList} 
     then: {setvar EditorCommandList ()}
     else: {defvar EditorCommandList ()};
@@ -437,12 +451,18 @@ defcommand execute-editor-command
 	    $c ?? {c := ""};
 	    $main mini-input-value-override $c [$c len];
 	};
+	if {eq? $in-key CTRL_V} {
+            str ::= $window get-copy-buffer;
+            if {$str != ""} {
+                $main mini-input-value-override $str [$str len];
+            };
+	};
     };
     result ALL;
 };
 
-defcommand trace-editor-command
-{   | main window |
+defcommand trace-editor-command {
+    | main window |
     if {defvar? EditorCommandList} 
     then: {setvar EditorCommandList ()}
     else: {defvar EditorCommandList ()};
@@ -484,12 +504,18 @@ defcommand trace-editor-command
 	    $c ?? {c := ""};
 	    $main mini-input-value-override $c [$c len];
 	};
+	if {eq? $in-key CTRL_V} {
+            str ::= $window get-copy-buffer;
+            if {$str != ""} {
+                $main mini-input-value-override $str [$str len];
+            };
+	};
     };
     result ALL;
 };
 
-defcommand eval-region
-{   | main window |
+defcommand eval-region {
+    | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     if [$window get-region] {
@@ -512,8 +538,8 @@ defcommand eval-region
     result ALL;
 };
 
-defcommand kill-interp
-{   | main window |
+defcommand kill-interp {
+    | main window |
     if {defvar? PINTERP} {
 	try {$PINTERP release} catch: {};
     };
@@ -524,28 +550,28 @@ defcommand kill-interp
     result ALL;
 };
 
-defcommand send-eof
-{   | main window |
+defcommand send-eof {
+    | main window |
     $stderr puts "Send eof.";
     $stdin close;
     result ALL;
 };
 
-defcommand refresh-screen
-{   | main window |
+defcommand refresh-screen {
+    | main window |
     $main wipe-window;
     $main send-key-event (KEY_RESIZE);
     result ALL;
 };
 
-defcommand flash
-{   | main window |
+defcommand flash {
+    | main window |
     curs-flash;
     result ALL;
 };
 
-defcommand open-file
-{   | main window |
+defcommand open-file {
+    | main window |
     $main mini-input-start [get-current-buffer-dir $window : . "/"] prompt: "Open file: ";
     $main add-mini-input-callback $window {| main window in-key value |
         if {eq? $in-key KEY_ESC} {
@@ -603,8 +629,8 @@ defcommand open-file
     result SELF;
 };
 
-defcommand save-buffer
-{   | main window |
+defcommand save-buffer {
+    | main window |
     __buff_in_clojure__ ::= $window get-buffer;
     path ::= $__buff_in_clojure__ get-path;
 
@@ -707,8 +733,8 @@ defcommand save-buffer
     result SELF;
 };
 
-defcommand save-buffer-as
-{   | main window |
+defcommand save-buffer-as {
+    | main window |
     __buff_in_clojure__ ::= $window get-buffer;
     path ::= $__buff_in_clojure__ get-path;
 
@@ -788,8 +814,8 @@ defcommand save-buffer-as
     result SELF;
 };
 
-defcommand kill-buffer
-{   | main window |
+defcommand kill-buffer {
+    | main window |
     buff ::= $window get-buffer;
     if [$buff modify?] {
 	$main mini-input-start "" prompt: "This buffer is modified, realy kill? [yes or ESC]: ";
@@ -811,8 +837,8 @@ defcommand kill-buffer
     result ALL;
 };
 
-defcommand key-binding-list
-{   | main window |
+defcommand key-binding-list {
+    | main window |
     mode ::= $window get-mode;
     BufferManager unregist-buffer "*Key Binding*";
     buff ::= new EditBuffer;
@@ -849,8 +875,8 @@ defcommand key-binding-list
     result SELF;
 };
 
-defcommand buffer-list
-{   | main window |
+defcommand buffer-list {
+    | main window |
     BufferManager unregist-buffer "*Buffer List*";
     buff ::= new EditBuffer;
     $buff load-content "buffer list" :init-only buffer-name: "*Buffer List*";
@@ -879,8 +905,8 @@ defcommand buffer-list
     result SELF;
 };
 
-defcommand jump-to-buffer
-{   | main window |
+defcommand jump-to-buffer {
+    | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     (line col) ::= $window get-source-index $buff $geom;
@@ -906,8 +932,8 @@ defcommand jump-to-buffer
     result SELF;
 };
 
-defcommand undo-buffer
-{   | main window |
+defcommand undo-buffer {
+    | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     (new-y new-x) ::= $buff undo;
@@ -926,8 +952,8 @@ defcommand undo-buffer
     result ALL;
 };
 
-defcommand redo-buffer
-{   | main window |
+defcommand redo-buffer {
+    | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     (new-y new-x) ::= $buff redo;
@@ -946,8 +972,8 @@ defcommand redo-buffer
     result ALL;
 };
 
-defcommand start-region
-{   | main window |
+defcommand start-region {
+    | main window |
     buff ::= $window get-buffer;
     if [$window get-region] {
 	show-message "End region.";
@@ -961,8 +987,8 @@ defcommand start-region
     result SELF;
 };
 
-defcommand copy-region
-{   | main window |
+defcommand copy-region {
+    | main window |
     buff ::= $window get-buffer;
     [$window get-region] ?? {
 	show-message "Not start region. Press CTRL-SP to start region.";
@@ -977,8 +1003,8 @@ defcommand copy-region
     result SELF;
 };
 
-defcommand cut-region
-{   | main window |
+defcommand cut-region {
+    | main window |
     buff ::= $window get-buffer;
     [$window get-region] ?? {
 	show-message "Not start region. Press CTRL-SP to start region.";
@@ -1001,8 +1027,8 @@ defcommand cut-region
     result ALL;
 };
 
-defcommand select-region-all
-{   | main window |
+defcommand select-region-all {
+    | main window |
     $window mark;
     $window apply-command $main $window "" top-of-buffer;
     $window apply-command $main $window "" start-region;
@@ -1010,8 +1036,19 @@ defcommand select-region-all
     result ALL;
 };
 
-defcommand paste-buffer
-{   | main window |
+defcommand select-region-paragraph {
+    | main window |
+    $window apply-command $main $window "" cursor-top-of-line;
+    if {! [$window get-region]} {
+        $window apply-command $main $window "" start-region;
+    };
+    $window apply-command $main $window "" move-next-paragraph;
+    $window apply-command $main $window "" cursor-down;
+    result SELF;
+};
+
+defcommand paste-buffer {
+    | main window |
     buff ::= $window get-buffer;
     str ::= $window get-copy-buffer;
     if {$str = ""} {
@@ -1033,8 +1070,8 @@ defcommand paste-buffer
     result ALL;
 };
 
-defcommand search
-{   | main window |
+defcommand search {
+    | main window |
     __buff_in_clojure__ ::= $window get-buffer;
 
     str := "";
@@ -1142,8 +1179,8 @@ defcommand search
     result SELF;
 };
 
-defcommand replace-buffer
-{   | main window |
+defcommand replace-buffer {
+    | main window |
     $main mini-input-start "" prompt: "Replace string: ";
     $main add-mini-input-callback $window {
         | main window in-key value |
@@ -1175,8 +1212,8 @@ defcommand replace-buffer
     result SELF;
 };
 
-defcommand replace-region
-{   | main window |
+defcommand replace-region {
+    | main window |
     [$window get-region] ?? {
         show-message "Please select a region first.";
         return SELF;
@@ -1219,8 +1256,8 @@ defcommand replace-region
     result SELF;
 };
 
-defcommand exit
-{   | main window |
+defcommand exit {
+    | main window |
     l ::= BufferManager get-buffer-list : filter {| i | "*" != [$i at 0]};
     do_exit := <t>;
     $l each do: {| buff-name |
@@ -1234,8 +1271,8 @@ defcommand exit
     result SELF;
 };
 
-defcommand smart-newline
-{   | main window |
+defcommand smart-newline {
+    | main window |
     $window apply-command $main $window "\r" insert-character;
     
     buff ::= $window get-buffer;
@@ -1259,8 +1296,8 @@ defcommand smart-newline
     result ALL;
 };
 
-defcommand smart-indent
-{   | main window |
+defcommand smart-indent {
+    | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     (ey ex) ::= $window get-source-index $buff $geom;
@@ -1327,8 +1364,8 @@ defun get-next-indent-count (str) {
     return [$kakko-maru + $kakko-nami : + $kakko-kaku];
 };
 
-defcommand smart-dedent
-{   | main window |
+defcommand smart-dedent {
+    | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     (ey ex) ::= $window get-source-index $buff $geom;
@@ -1358,8 +1395,8 @@ defcommand smart-dedent
     result ALL;
 };
 
-defcommand smart-move-forward
-{   | main window |
+defcommand smart-move-forward {
+    | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     vec ::= $buff get-vector;
@@ -1437,8 +1474,8 @@ defcommand smart-move-forward
     result SELF;
 };
 
-defcommand smart-move-backward
-{   | main window |
+defcommand smart-move-backward {
+    | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     vec ::= $buff get-vector;
@@ -1523,8 +1560,8 @@ defcommand smart-move-backward
     result SELF;
 };
 
-defcommand move-next-paragraph
-{   | main window |
+defcommand move-next-paragraph {
+    | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     (ey ex) ::= $window get-source-index $buff $geom;
@@ -1546,8 +1583,8 @@ defcommand move-next-paragraph
     result SELF;
 };
 
-defcommand move-previous-paragraph
-{   | main window |
+defcommand move-previous-paragraph {
+    | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     (ey ex) ::= $window get-source-index $buff $geom;
@@ -1569,26 +1606,42 @@ defcommand move-previous-paragraph
     result SELF;
 };
 
-defcommand mark
-{   | main window |
+defcommand move-next-paragraph-fit-to-top {
+    | main window |
+    $window apply-command $main $window "" cursor-top-of-line;
+    $window apply-command $main $window "" move-next-paragraph;
+    $window apply-command $main $window "" fit-to-top;
+    result SELF;
+};
+
+defcommand move-previous-paragraph-fit-to-top {
+    | main window |
+    $window apply-command $main $window "" cursor-top-of-line;
+    $window apply-command $main $window "" move-previous-paragraph;
+    $window apply-command $main $window "" fit-to-top;
+    result SELF;
+};
+
+defcommand mark {
+    | main window |
     $window mark;
     result SELF;
 };
 
-defcommand goto-mark
-{   | main window |
+defcommand goto-mark {
+    | main window |
     $window goto-mark;
     result SELF;
 };
 
-defcommand goto-unmark
-{   | main window |
+defcommand goto-unmark {
+    | main window |
     $window unmark;
     result SELF;
 };
 
-defcommand grep
-{   | main window |
+defcommand grep {
+    | main window |
     $main mini-input-start [pwd : . "/"] prompt: "Directory: ";
     $main add-mini-input-callback $window {| main window in-key value |
         if {eq? $in-key KEY_ESC} {
@@ -1648,7 +1701,10 @@ defcommand grep
                     $buff append-string "";
                     $buff append-string ["exit(" . $sts ")"];
                     
-                    $main create-split-vertical-window;
+                    w1 ::= $main get-window-by-name "Window#1";
+                    if $w1 else: {
+                        $main create-split-vertical-window;
+                    };
                     $main bind-buffer "Window#1" $buff;
                     window ::= $main get-current-window;
                     geom ::= $window get-geom;
@@ -1686,15 +1742,19 @@ defcommand grep
     result SELF;
 };
 
-defcommand grep-next
-{   | main window |
+defcommand grep-next {
+    | main window |
     grep-buff ::= BufferManager find-buffer "*Grep*";
     $grep-buff ?? {
         show-message "No *Grep* buffer, execute 'grep' command first.";
         return ALL;
     };
-    
-    $main create-split-vertical-window;
+
+    w1 ::= $main get-window-by-name "Window#1";
+    w2 ::= $main get-window-by-name "Window#2";
+    if {and $w1 $w2} else: {
+        $main create-split-vertical-window;
+    };
     $main bind-buffer "Window#1" $grep-buff;
     grep-window ::= $main get-window-by-name "Window#1";
     grep-geom ::= $grep-window get-geom;
@@ -1729,15 +1789,19 @@ defcommand grep-next
     return ALL;
 };
 
-defcommand grep-previous
-{   | main window |
+defcommand grep-previous {
+    | main window |
     grep-buff ::= BufferManager find-buffer "*Grep*";
     $grep-buff ?? {
         show-message "No *Grep* buffer, execute 'grep' command first.";
         return ALL;
     };
     
-    $main create-split-vertical-window;
+    w1 ::= $main get-window-by-name "Window#1";
+    w2 ::= $main get-window-by-name "Window#2";
+    if {and $w1 $w2} else: {
+        $main create-split-vertical-window;
+    };
     $main bind-buffer "Window#1" $grep-buff;
     grep-window ::= $main get-window-by-name "Window#1";
     grep-geom ::= $grep-window get-geom;
@@ -1795,8 +1859,8 @@ defun show-file-at (window-name path line) {
     $win cursor-move-to $geom [$line - 1] 0;
 };
 
-defcommand read-grep-file
-{   | main window |
+defcommand read-grep-file {
+    | main window |
     $main mini-input-start [pwd : . "/"] prompt: "Read grep file: ";
     $main add-mini-input-callback $window {| main window in-key value |
         if {eq? $in-key KEY_ESC} {
@@ -1861,8 +1925,8 @@ defcommand read-grep-file
     result SELF;
 };
 
-defcommand set-theme
-{   | main window |
+defcommand set-theme {
+    | main window |
     $main mini-input-start "" prompt: "Theme: ";
     $main add-mini-input-callback $window {| main window in-key value |
         if {eq? $in-key KEY_ESC} {
@@ -1880,8 +1944,8 @@ defcommand set-theme
     result ALL;
 };
 
-defcommand set-mode
-{   | main window |
+defcommand set-mode {
+    | main window |
     $main mini-input-start "" prompt: "Mode: ";
     $main add-mini-input-callback $window {| main window in-key value |
         if {eq? $in-key KEY_ESC} {
@@ -1898,8 +1962,32 @@ defcommand set-mode
     result ALL;
 };
 
-defcommand test
-{   | main window |
+defcommand mini-move-message {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    str ::= $buff get-buffer-line $ey;
+    if {and $str {[$str len] > 0}} {
+        (y x) ::= $window get-screen-size;
+        message ::= [" " repeat $x] . $str;
+        body := {
+            set message [$message sub 1];
+            if {[$message len] > 0} {
+                show-message $message;
+                $main add-background $body after: 100;
+            } {
+                show-message "Done.";
+            };
+            return ALL;
+        };
+        $main add-background $body after: 100;
+    };
+    result SELF;
+};
+
+defcommand test {
+    | main window |
     w;
     println "";
     stack-trace : split sep: "\n" : each do: {| i | $stdout puts $i};
@@ -1915,17 +2003,22 @@ defcommand test
     result ALL;
 };
 
+defcommand test2 {
+    | main window |
+    return ALL;
+};
+
 ######
 ###### REMARK, Spare for new editor command making.
 ######
 REM {
 
-defcommand 
-{   | main window |
+defcommand {
+    | main window |
 };
 
-defcommand miniwindow-input-sample
-{   | main window |
+defcommand miniwindow-input-sample {
+    | main window |
     $main mini-input-start "" prompt: "test prompt: ";
     $main add-mini-input-callback $window {| main window in-key value |
         if {eq? $in-key KEY_ESC} {
@@ -1940,8 +2033,8 @@ defcommand miniwindow-input-sample
 ## Nested callback sample.
 ## $value was save to path variable in 1st callback, because $value is override by 2nd callback.
 ##
-defcommand nest-test
-{   | main window |
+defcommand nest-test {
+    | main window |
     $main mini-input-start "" prompt: "test [y(es)/n(o)]";
     $main add-mini-input-callback $window {| main window in-key value |
 	if {eq? $in-key "y"} {
@@ -1958,8 +2051,8 @@ defcommand nest-test
     };
 };
 
-defcommand test
-{   | main window |
+defcommand test {
+    | main window |
     # debug-message ["info local: " . [info local]] wait: 3000;
     $main mini-input-start "" prompt: "test prompt: ";
     $main add-mini-input-callback $window {| main window in-key value |
