@@ -19,7 +19,7 @@ ScratchBuffer method init () {
 	"    Display buffer list:       Ctrl+B"
 	"    Window split / select:     F01-F04 to window split / F12 to window select"
 	"    Command execute:           F11 and type command name (TAB to completion)"
-	"    Display key-command list:  Ctrl+D"
+	"    Display all key binds and command list:  Ctrl+D"
 	""
 	"  <<< Using for Perfume/pmacs interpriter >>>"
 	"    1) Select the '*Scratch*' buffer."
