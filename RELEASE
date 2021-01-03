@@ -1410,8 +1410,8 @@
 2021/01/02
 	pmacs update:
 		Add editor commands are:
-			select-region-paragraph, move-screen-top, move-screen-bottom,
-			move-next-paragraph-fit-to-top, fit-previous-paragraph-fit-to-top.
+		  select-region-paragraph, move-screen-top, move-screen-bottom,
+		  move-next-paragraph-fit-to-top, fit-previous-paragraph-fit-to-top.
 		Add methods are CombiWindow::move-screen-top and CombiWindow::move-screen-bottom.
 		Fix EditorCommandDefs.prfm coding style.
 		Add execute-editor-command key bind CTRL_V is paste command from copy-buffer.
@@ -1440,6 +1440,10 @@
 		  set mark when enter command (CTRL_J).
 		Add editor commands:
 		  roll-current-window-backward, 
-		  next-page-anothor-window, previous-page-anothor-window, goto.
+		  next-page-anothor-window, previous-page-anothor-window, goto, cd,
+		  previous-smooth-scroll-down-anothor-window, previous-smooth-scroll-up-anothor-window,
+		  delete-word, delete-to-end-of-line.
+		Change grep-next and grep-previous use CWD buffer line when exists this
+		  record, open target file before change directory it.
 
 #eof

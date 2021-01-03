@@ -351,6 +351,22 @@ defcommand previous-page-anothor-window {
     result ALL;
 };
 
+defcommand previous-smooth-scroll-up-anothor-window {
+    | main window |
+    $main roll-current-window;
+    $main get-current-window : apply-command $main [$main get-current-window] "" smooth-scroll-up;
+    $main roll-current-window-backward;
+    result ALL;
+};
+
+defcommand previous-smooth-scroll-down-anothor-window {
+    | main window |
+    $main roll-current-window;
+    $main get-current-window : apply-command $main [$main get-current-window] "" smooth-scroll-down;
+    $main roll-current-window-backward;
+    result ALL;
+};
+
 defcommand show-character-code {
     | main window |
     buff ::= $window get-buffer;
@@ -414,6 +430,26 @@ defcommand insert-return {
 defcommand delete-character {
     | main window |
     $window delete-character;
+    result ALL;
+};
+
+defcommand delete-word {
+    | main window |
+    if {! [$window get-region]} {
+        $window apply-command $main $window "" start-region;
+    };
+    $window apply-command $main $window "" smart-move-forward;
+    $window apply-command $main $window "" cut-region;
+    result ALL;
+};
+
+defcommand delete-to-end-of-line {
+    | main window |
+    if {! [$window get-region]} {
+        $window apply-command $main $window "" start-region;
+    };
+    $window apply-command $main $window "" cursor-end-of-line;
+    $window apply-command $main $window "" cut-region;
     result ALL;
 };
 
@@ -1780,7 +1816,8 @@ defcommand grep-next {
         show-message "No *Grep* buffer, execute 'grep' command first.";
         return ALL;
     };
-
+    chdir-cwd $grep-buff;
+    
     w1 ::= $main get-window-by-name "Window#1";
     w2 ::= $main get-window-by-name "Window#2";
     if {and $w1 $w2} else: {
@@ -1827,6 +1864,7 @@ defcommand grep-previous {
         show-message "No *Grep* buffer, execute 'grep' command first.";
         return ALL;
     };
+    chdir-cwd $grep-buff;
     
     w1 ::= $main get-window-by-name "Window#1";
     w2 ::= $main get-window-by-name "Window#2";
@@ -1890,6 +1928,24 @@ defun show-file-at (window-name path line) {
     $win cursor-move-to $geom [$line - 1] 0;
 };
 
+defun chdir-cwd (buff) {
+    r ::= $buff get-buffer-line 0;
+    if $r {
+        l ::= $r split sep: ":";
+        if {[$l len] < 2} {return};
+        if {[$l get 0] = "CWD"} {
+            cwd ::= $l get 1;
+            if $cwd {
+                try {
+                    cd [$cwd clean];
+                } catch: {| e |
+                    show-message ["Bad CWD line: " . $r];
+                };
+            };
+        };
+    };
+};
+
 defcommand read-grep-file {
     | main window |
     $main mini-input-start [pwd : . "/"] prompt: "Read grep file: ";
@@ -1928,6 +1984,54 @@ defcommand read-grep-file {
             return SELF;
         };
 
+	if {eq? $in-key CTRL_I} {
+            if {$value = ""} {
+                fname ::= show-files-in-window $main $window [get-current-buffer-dir $window];
+            } {
+                fname ::= show-files-in-window $main $window $value;
+            };
+	    $window apply-command $main $window "" top-of-buffer;
+	    $main mini-input-value-override $fname [$fname len];
+	    return ALL;
+	};
+	if {eq? $in-key KEY_DOWN} {
+	    $window apply-command $main $window "" move-half-up;
+	    return SELF;
+	};
+	if {eq? $in-key KEY_UP} {
+	    $window apply-command $main $window "" move-half-down;
+	    return SELF;
+	};
+	if {eq? $in-key "/"} {
+            if {[$value at -2] = "/"} {
+		$main mini-input-value-override "/" 1;
+            };
+	    return SELF;
+	};
+    };
+    result SELF;
+};
+
+defcommand cd {
+    | main window |
+    $main mini-input-start [pwd : . "/"] prompt: "Directory: ";
+    $main add-mini-input-callback $window {| main window in-key value |
+        if {eq? $in-key KEY_ESC} {
+            $main mini-input-end;
+            show-message "Canceled.";
+            return SELF;
+        };
+        if {eq? $in-key CTRL_M} {
+            $main mini-input-end;
+            if {[$value len] = 0} {
+                show-message "No directory specified.";
+                return SELF;
+            };
+            directory := $value;
+            cd $directory;
+            show-message ["Current directory is: " . $directory];
+            return SELF;
+        };
 	if {eq? $in-key CTRL_I} {
             if {$value = ""} {
                 fname ::= show-files-in-window $main $window [get-current-buffer-dir $window];
