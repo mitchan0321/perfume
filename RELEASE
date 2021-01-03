@@ -1320,7 +1320,7 @@
 		Fix use load command for read the first script. 
 	lib/Stream.prfm
 		Add Stream::set-itemlimit and add limit for output item by 'Stream::puts :nonewline' counts.
-	pmacs
+	New added pmacs text editor suite.
 		Add pmacs text editor suite.
 		New files are (in under lib/): BufferBase.prfm, BufferGeom.prfm, BufferManager.prfm,
 			CombiWindow.key, CombiWindow.prfm, EditBuffer.prfm,
@@ -1374,11 +1374,11 @@
 		Fix arguments parase bug, for specified initial open files.
 
 2020/12/25
-	pmacs
+	pmacs update:
 		Change editor command split-* and Window.prfm, to redraw window unuse KEY_RESIZE key event.
 
 2020/12/29
-	pmacs
+	pmacs update:
 		Add theme MONO, MONO-GREEN, BLUE-BACK and RETRO.
 		Add editor command set-theme.
 		Add editor command set-mode.
@@ -1391,7 +1391,7 @@
 2020/12/30
 	lib/Block.prfm
 		Add Block::redirect-out method.
-	pmacs
+	pmacs update:
 		Add BufferManager::find-buffer method.
 		Add CombiWindow:: cursor-fit-to-top method.
 		Add editor commands are grep, grep-next and grep-previous,
@@ -1401,14 +1401,14 @@
 		Change LIGHT theme mini window color.
 
 2020/12/31
-	pmacs
+	pmacs update:
 		Add editor commands are fit-to-top and fit-to-bottom.
 		Add editor command is select-region-all.
 		Add editor command is read-grep-file.
 		Add mini input key bind CTRL+{KEY_RIGHT,LEFT} to line buffer move top or bottom.
 
 2021/01/02
-	pmacs
+	pmacs update:
 		Add editor commands are:
 			select-region-paragraph, move-screen-top, move-screen-bottom,
 			move-next-paragraph-fit-to-top, fit-previous-paragraph-fit-to-top.
@@ -1424,7 +1424,7 @@
 2021/01/03
 	COPYING
 		Add year 2021.
-	pmacs
+	pmacs update:
 		Add new key binds:
 		  F14 -> split-vertical-window-3
 		  F15 -> split-horizontal-window-3
