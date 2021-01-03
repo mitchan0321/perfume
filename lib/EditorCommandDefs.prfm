@@ -1097,6 +1097,9 @@ defcommand cut-region {
 defcommand select-region-all {
     | main window |
     $window mark;
+    if {$window get-region} {
+        $window apply-command $main $window "" start-region;
+    };
     $window apply-command $main $window "" top-of-buffer;
     $window apply-command $main $window "" start-region;
     $window apply-command $main $window "" bottom-of-buffer;
