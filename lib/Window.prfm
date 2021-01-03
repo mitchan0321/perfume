@@ -326,6 +326,14 @@ Window method roll-current-window () {
     return [$WindowList car];
 };
 
+Window method roll-current-window-backward () {
+    win ::= $WindowList ->>;
+    $WindowList << $win;
+    $WindowList car : activate;
+    try {$WindowList cdr : each do: {| i | $i diactivate}} catch: {};
+    return [$WindowList car];
+};
+
 Window method roll-to-window (window-name) {
     n ::= $WindowList map {| i | $i get-window-name} : find $window-name;
     $n ?? {return};

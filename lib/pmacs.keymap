@@ -9,6 +9,48 @@ $KeyMaps set (KEY_ESC "[21;4~") (KEY_F70);
 $KeyMaps set (KEY_ESC "[23;4~") (KEY_F71);
 $KeyMaps set (KEY_ESC "[24;4~") (KEY_F72);
 
+### Control+Alt-F1 -- Control+Alt+F12 ==> KEY_F73 -- KEY_F84
+$KeyMaps set (KEY_ESC "[1;7P") (KEY_F73);
+$KeyMaps set (KEY_ESC "[1;7Q") (KEY_F74);
+$KeyMaps set (KEY_ESC "[1;7R") (KEY_F75);
+$KeyMaps set (KEY_ESC "[1;7S") (KEY_F76);
+$KeyMaps set (KEY_ESC "[15;7~") (KEY_F77);
+$KeyMaps set (KEY_ESC "[17;7~") (KEY_F78);
+$KeyMaps set (KEY_ESC "[18;7~") (KEY_F79);
+$KeyMaps set (KEY_ESC "[19;7~") (KEY_F80);
+$KeyMaps set (KEY_ESC "[20;7~") (KEY_F81);
+$KeyMaps set (KEY_ESC "[21;7~") (KEY_F82);
+$KeyMaps set (KEY_ESC "[23;7~") (KEY_F83);
+$KeyMaps set (KEY_ESC "[24;7~") (KEY_F84);
+
+### Control+Shift+Alt-F1 -- Control+Shift+Alt+F12 ==> KEY_F85 -- KEY_F96
+$KeyMaps set (KEY_ESC "[1;8P") (KEY_F85);
+$KeyMaps set (KEY_ESC "[1;8Q") (KEY_F86);
+$KeyMaps set (KEY_ESC "[1;8R") (KEY_F87);
+$KeyMaps set (KEY_ESC "[1;8S") (KEY_F88);
+$KeyMaps set (KEY_ESC "[15;8~") (KEY_F89);
+$KeyMaps set (KEY_ESC "[17;8~") (KEY_F90);
+$KeyMaps set (KEY_ESC "[18;8~") (KEY_F91);
+$KeyMaps set (KEY_ESC "[19;8~") (KEY_F92);
+$KeyMaps set (KEY_ESC "[20;8~") (KEY_F93);
+$KeyMaps set (KEY_ESC "[21;8~") (KEY_F94);
+$KeyMaps set (KEY_ESC "[23;8~") (KEY_F95);
+$KeyMaps set (KEY_ESC "[24;8~") (KEY_F96);
+
+### Control+Shift+Alt+(Insert,Delete,Home,End,PageUp,PageDown)
+$KeyMaps set (KEY_ESC "[2;8~")  (kIC8);
+$KeyMaps set (KEY_ESC "[3;8~")  (kDC8);
+$KeyMaps set (KEY_ESC "[1;8H")  (kHOM8);
+$KeyMaps set (KEY_ESC "[1;8F")  (kEND8);
+$KeyMaps set (KEY_ESC "[5;8~")  (kPRV8);
+$KeyMaps set (KEY_ESC "[6;8~")  (kNXT8);
+
+### Control+Shift+Alt+(DownAllow,UpAllow,RightAllow,LeftAllow)
+$KeyMaps set (KEY_ESC "[1;8B")  (kDN8);
+$KeyMaps set (KEY_ESC "[1;8A")  (kUP8);
+$KeyMaps set (KEY_ESC "[1;8C")  (kRIT8);
+$KeyMaps set (KEY_ESC "[1;8D")  (kLFT8);
+
 ### for FreeBSD mate-terminal settings
 $KeyMaps set (KEY_ESC "[1;2B") (KEY_SF);     # shift+
 $KeyMaps set (KEY_ESC "[1;3B") (kDN3);       # alt+

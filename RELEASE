@@ -1374,11 +1374,11 @@
 		Fix arguments parase bug, for specified initial open files.
 
 2020/12/25
-	pmacs:
+	pmacs
 		Change editor command split-* and Window.prfm, to redraw window unuse KEY_RESIZE key event.
 
 2020/12/29
-	pmacs:
+	pmacs
 		Add theme MONO, MONO-GREEN, BLUE-BACK and RETRO.
 		Add editor command set-theme.
 		Add editor command set-mode.
@@ -1391,7 +1391,7 @@
 2020/12/30
 	lib/Block.prfm
 		Add Block::redirect-out method.
-	pmacs:
+	pmacs
 		Add BufferManager::find-buffer method.
 		Add CombiWindow:: cursor-fit-to-top method.
 		Add editor commands are grep, grep-next and grep-previous,
@@ -1401,14 +1401,14 @@
 		Change LIGHT theme mini window color.
 
 2020/12/31
-	pmacs:
+	pmacs
 		Add editor commands are fit-to-top and fit-to-bottom.
 		Add editor command is select-region-all.
 		Add editor command is read-grep-file.
 		Add mini input key bind CTRL+{KEY_RIGHT,LEFT} to line buffer move top or bottom.
 
 2021/01/02
-	pmacs:
+	pmacs
 		Add editor commands are:
 			select-region-paragraph, move-screen-top, move-screen-bottom,
 			move-next-paragraph-fit-to-top, fit-previous-paragraph-fit-to-top.
@@ -1420,5 +1420,26 @@
 		  "Window#2" is alive then don't re-build these window.
 		Add sample editor command mini-move-message.
 		Change LIGHT theme color.
+
+2021/01/03
+	COPYING
+		Add year 2021.
+	pmacs
+		Add new key binds:
+		  F14 -> split-vertical-window-3
+		  F15 -> split-horizontal-window-3
+		  F26 -> split-vertical-window-4
+		  F27 -> split-horizontal-window-4
+		Add key maps:
+		  KEY_F73 -- KEY_F96,
+		  kIC6, kIC7, KIC8, kDC6, kDC7, kDC8,
+		  kHOM6, kHOM7, kHOM8, kEND6, kEND7, kEND8,
+		  kPRV6, kPRV7, kPRV8, kNXT6, kNXT7, kNXT8,
+		  kDN8, kUP8, kRIT8, kLFT8.
+		Change CombiWindow::display-evaluation and editor command eval-region
+		  set mark when enter command (CTRL_J).
+		Add editor commands:
+		  roll-current-window-backward, 
+		  next-page-anothor-window, previous-page-anothor-window, goto.
 
 #eof

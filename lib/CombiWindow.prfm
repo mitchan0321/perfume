@@ -669,7 +669,9 @@ CombiWindow method destroy () {
 };
 
 CombiWindow method display-evaluation () {
+    geom ::= get-geom;
     buff ::= get-buffer;
+
     if {eq? ScratchBuffer [$buff get @name]} {
         try {$PINTERP next} catch: {};
 

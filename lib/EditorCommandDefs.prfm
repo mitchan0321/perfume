@@ -4,6 +4,12 @@ defcommand roll-current-window {
     result ALL;
 };
 
+defcommand roll-current-window-backward {
+    | main window |
+    $main roll-current-window-backward;
+    result ALL;
+};
+
 defcommand full-window {
     | main window |
     name ::= $window get-window-name;
@@ -268,7 +274,6 @@ defcommand smooth-scroll-left {
 
 defcommand top-of-buffer {
     | main window |
-    $window mark;
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     (y x) ::= $window get-screen-size;
@@ -285,7 +290,6 @@ defcommand top-of-buffer {
 
 defcommand bottom-of-buffer {
     | main window |
-    $window mark;
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     (y x) ::= $window get-screen-size;
@@ -331,6 +335,22 @@ defcommand move-screen-bottom {
     result SELF;
 };
 
+defcommand next-page-anothor-window {
+    | main window |
+    $main roll-current-window;
+    $main get-current-window : page-down;
+    $main roll-current-window-backward;
+    result ALL;
+};
+
+defcommand previous-page-anothor-window {
+    | main window |
+    $main roll-current-window;
+    $main get-current-window : page-up;
+    $main roll-current-window-backward;
+    result ALL;
+};
+
 defcommand show-character-code {
     | main window |
     buff ::= $window get-buffer;
@@ -359,6 +379,7 @@ defcommand input-character-code {
         if {eq? $in-key KEY_ESC} {
 	    $main mini-input-end;
 	    show-message "Canceled.";
+            return SELF;
 	};
         if {eq? $in-key CTRL_M} {
 	    $main mini-input-end;
@@ -409,6 +430,7 @@ defcommand execute-command {
         if {eq? $in-key KEY_ESC} {
 	    $main mini-input-end;
 	    show-message "Canceled.";
+            return SELF;
 	};
         if {eq? $in-key CTRL_M} {
 	    $main mini-input-end;
@@ -434,6 +456,7 @@ defcommand execute-editor-command {
         if {eq? $in-key KEY_ESC} {
 	    $main mini-input-end;
 	    show-message "Canceled.";
+            return SELF;
 	};
         if {eq? $in-key CTRL_M} {
 	    $main mini-input-end;
@@ -472,6 +495,7 @@ defcommand trace-editor-command {
         if {eq? $in-key KEY_ESC} {
 	    $main mini-input-end;
 	    show-message "Canceled.";
+            return SELF;
 	};
         if {eq? $in-key CTRL_M} {
 	    $main mini-input-end;
@@ -518,6 +542,9 @@ defcommand eval-region {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
+    (y x) ::= $window get-source-index $buff $geom;
+    $window mark;
+
     if [$window get-region] {
 	### eval region
         (sy sx) ::= $window end-region;
@@ -578,6 +605,7 @@ defcommand open-file {
 	    $main mini-input-end;
 	    show-message "Canceled.";
 	    BufferManager unregist-buffer "*Directory*";	
+            return SELF;
 	};
         if {eq? $in-key CTRL_M} {
 	    $main mini-input-end;
@@ -641,6 +669,7 @@ defcommand save-buffer {
 		$main mini-input-end;
 		show-message "Canceled.";
 		BufferManager unregist-buffer "*Directory*";	
+                return SELF;
 	    };
 	    if {eq? $in-key CTRL_I} {
                 if {$value = ""} {
@@ -717,6 +746,7 @@ defcommand save-buffer {
 	    $main mini-input-end;
 	    show-message "Canceled.";
 	    BufferManager unregist-buffer "*Directory*";	
+            return SELF;
 	};
         if {or {$value = "y"} {$value = "Y"}} {
 	    $main mini-input-end;
@@ -744,6 +774,7 @@ defcommand save-buffer-as {
 	    $main mini-input-end;
 	    show-message "Canceled.";
 	    BufferManager unregist-buffer "*Directory*";	
+            return SELF;
 	};
 	if {eq? $in-key CTRL_I} {
             if {$value = ""} {
@@ -1932,6 +1963,7 @@ defcommand set-theme {
         if {eq? $in-key KEY_ESC} {
 	    $main mini-input-end;
 	    show-message "Canceled.";
+            return SELF;
 	};
         if {eq? $in-key CTRL_M} {
             $main mini-input-end;
@@ -1951,6 +1983,7 @@ defcommand set-mode {
         if {eq? $in-key KEY_ESC} {
 	    $main mini-input-end;
 	    show-message "Canceled.";
+            return SELF;
 	};
         if {eq? $in-key CTRL_M} {
             $main mini-input-end;
@@ -1960,6 +1993,35 @@ defcommand set-mode {
         };
     };
     result ALL;
+};
+
+defcommand goto {
+    | main window |
+    $main mini-input-start "" prompt: "Goto line: ";
+    $main add-mini-input-callback $window {| main window in-key value |
+        if {eq? $in-key KEY_ESC} {
+	    $main mini-input-end;
+	    show-message "Canceled.";
+            return SELF;
+	};
+        if {eq? $in-key CTRL_M} {
+            $main mini-input-end;
+            if [$value numeric?] else: {
+                show-message "Enter line number.";
+                return SELF;
+            };
+            geom ::= $window get-geom;
+            buff ::= $window get-buffer;
+            line ::= $value int;
+            if {$line > [$buff get-buffer-length]} {
+                line ::= $buff get-buffer-length
+            };
+            $window cursor-move-to $geom $line 0;
+            return ALL;
+        };
+        return SELF;
+    };
+    result SELF;
 };
 
 defcommand mini-move-message {
