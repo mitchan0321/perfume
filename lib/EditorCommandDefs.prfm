@@ -198,7 +198,12 @@ defcommand cursor-end-of-line {
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     (cy cx) ::= $window get-source-index $buff $geom;
-    cx ::= $buff get-buffer-line $cy : len;
+    r ::= $buff get-buffer-line $cy;
+    if $r {
+        cx ::= $r len;
+    } {
+        cx := 0;
+    };
     (line col) ::= $window get-cursor-index $buff $cy $cx;
 
     $window set-freecursor <nil>;
