@@ -1447,4 +1447,14 @@
 		Change grep-next and grep-previous use CWD buffer line when exists this
 		  record, open target file before change directory it.
 
+2021/01/20
+	pmacs update:
+		Add new editor commands:
+		  search-next, search-previous, insert-newline,
+		  set-protect, no-protect,
+		  pwiki-next-link, pwiki-previous-link, pwiki-click-link.
+		Change key descriptor string and display binding-list format.
+		Add edit buffer protect mode and display window status line this.
+		Add PWiki mode.
+
 #eof

@@ -432,6 +432,14 @@ defcommand insert-return {
     result ALL;
 };
 
+defcommand insert-new-line {
+    | main window |
+    $window apply-command $main $window "" cursor-top-of-line;
+    $window insert-string "\r";
+    $window apply-command $main $window "" cursor-up;
+    result ALL;
+};
+
 defcommand delete-character {
     | main window |
     $window delete-character;
@@ -919,17 +927,21 @@ defcommand key-binding-list {
 
     $buff append-string "<<< Key bindings >>>";
     $buff append-string ["Buffer mode: " . $mode];
-    $buff append-string ["%-40v\t%-v" fmt "Key" "Command"];
-    $buff append-string ["%-40v\t%-v" fmt "---" "-------"];
+    $buff append-string ["%-16v%26v %-v" fmt "Key group" "Key modifier" "Command"];
+    $buff append-string ["%-16v%26v %-v" fmt "------------" "---------------" "----------"];
     d ::= $window get KeyBinding;
     desc ::= $window get KeyDesc;
     l := ();
     $d each do: {| k v |
 	if {nil? $v} {continue};
         if [$desc set? $k] {
-            $l << ["%-40v\t%-v" fmt [$desc get $k] $v];
+            s ::= $desc get $k;
+            ls ::= $s split;
+            grp ::= $ls get 0;
+            modify ::= $ls get 1;
+            $l << ["%-16v%26v %-v" fmt $grp $modify $v];
         } {
-            $l << ["%-40v\t%-v" fmt $k $v];
+            $l << ["%-16v%26v %-v" fmt "***" $k $v];
         };
     };
     msort $l : each do: {| i |
@@ -942,6 +954,7 @@ defcommand key-binding-list {
         $buff append-string $i;
     };
     $buff no-modify;
+    $buff set-protect;
     
     $main bind-buffer [$window get-window-name] $buff;
     result SELF;
@@ -957,21 +970,24 @@ defcommand buffer-list {
     $buff append-string "<<< Buffer list >>>";
     $buff append-string "  * If you want to select the buffer, move cursor to buffer line and press Enter key.";
     $buff append-string "";
-    $buff append-string ["%1v%-3v %-26v %6v %-v" fmt "m" "n" "Buffer Name" "Length" "File Path"];
-    $buff append-string ["%1v%-3v %-26v %6v %-v" fmt "-" "-" "-----------" "------" "---------"];
+    $buff append-string ["%1v%1v%1v %-26v %6v %-6v %-v" fmt "p" "m" "n" "Buffer name" "Length" "Mode" "File path"];
+    $buff append-string ["%1v%1v%1v %-26v %6v %-6v %-v" fmt "-" "-" "-" "-----------" "------" "----" "---------"];
     l ::= BufferManager get-buffer-list;
     $l each do: {| buff-name |
 	display-buffer ::= BufferManager get-buffer $buff-name;
 	$buff append-string [
-	    "%1v%-3v %-26v %6d %-v" fmt
+	    "%1v%1v%1v %-26v %6d %-6v %-v" fmt
+	    [[$display-buffer protect?] ??? "%" " "]
 	    [[$display-buffer modify?] ??? "*" " "]
-	    [[$display-buffer newfile?] ??? "?" "   "]
+	    [[$display-buffer newfile?] ??? "?" " "]
 	    ["<" . $buff-name ">"]
 	    [$display-buffer get-buffer-length]
+            [$display-buffer get-buffer-mode]
 	    [$display-buffer get-path]
 	];
     };
     $buff no-modify;
+    $buff set-protect;
     
     $main bind-buffer [$window get-window-name] $buff;
     result SELF;
@@ -1252,6 +1268,143 @@ defcommand search {
 	};
     };
     result SELF;
+};
+
+defcommand search-next {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    str ::= $window get-search-string;
+    if {$str = ""} {
+        show-message "No set search string, execute 'search' command first.";
+        return SELF;
+    };
+    (y x) ::= get-next-search $ey $ex $str $buff;
+    $window cursor-move-to $geom $y $x;
+    return SELF;
+};
+
+defcommand search-previous {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    str ::= $window get-search-string;
+    if {$str = ""} {
+        show-message "No set search string, execute 'search' command first.";
+        return SELF;
+    };
+    (y x) ::= get-previous-search $ey $ex $str $buff;
+    $window cursor-move-to $geom $y $x;
+    return SELF;
+};
+
+defun get-next-search (y x str buff) {
+    r ::= $buff get-buffer-line $y;
+    $r ?? {return ($y $x)};
+
+    sl ::= $r =~ :all [$str rquote];
+    if $sl {
+        sl ::= $sl filter {| el | [$el get 0] > $x};
+        if {$sl null?} else: {
+            return ($y [$sl car : car]);
+        };
+    };
+    
+    result := <nil>;
+    $buff buffer-select [$y + 1] [$buff get-buffer-length] {
+        | src l |
+        sl ::= $src =~ :all [$str rquote];
+        if $sl {
+            result := ($l [$sl car : car]);
+        };
+        if $result {break};
+    };
+    if $result {
+        return $result;
+    };
+    return ($y $x);
+};
+
+defun get-previous-search (y x str buff) {
+    if {and {$y = 0} {$x = 0}} {return ($y $x)};
+        
+    r ::= $buff get-buffer-line $y;
+    $r ?? {return ($y $x)};
+
+    sl ::= $r =~ :all [$str rquote];
+    if $sl {
+        sl ::= $sl reverse;
+        sl ::= $sl filter {| el | [$el get 0] < $x};
+        if {$sl null?} else: {
+            return ($y [$sl car : car]);
+        };
+    };
+    
+    if {$y = 0} {return ($y $x)};
+    result := <nil>;
+    $buff buffer-select [$y - 1] 0 {
+        | src l |
+        sl ::= $src =~ :all [$str rquote];
+        if $sl {
+            sl ::= $sl reverse;
+            result := ($l [$sl car : car]);
+        };
+        if $result {break};
+    };
+    if $result {
+        return $result;
+    };
+    return ($y $x);
+};
+
+defcommand pwiki-next-link {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    (y x) ::= get-next-search $ey $ex "\\[\\[[^\\[\\] ]+\\]\\]" $buff;
+    $window cursor-move-to $geom $y $x;
+    return SELF;
+};
+
+defcommand pwiki-previous-link {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    (y x) ::= get-previous-search $ey $ex "\\[\\[[^\\[\\] ]+\\]\\]" $buff;
+    $window cursor-move-to $geom $y $x;
+    return SELF;
+};
+
+defcommand pwiki-click-link {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    str ::= cursor-on-search-string $ey $ex "\\[\\[[^\\[\\] ]+\\]\\]" $buff;
+    $str ?? {
+        $window apply-command $main $window "\r" insert-character;
+        return ALL;
+    };
+    link ::= $str sub 2 [$str len : - 4 : + 2];
+    show-message ["link: " . $link];
+    return SELF;
+};
+
+defun cursor-on-search-string (y x str buff) {
+    r ::= $buff get-buffer-line $y;
+    $r ?? {return <nil>};
+    sl ::= $r =~ :all [$str rquote];
+    $sl ?? {return <nil>};
+    $sl each do: {| el |
+        if {and {$x >= [$el get 0]} {$x < [$el get 1]}} {
+            return [$el get 2];
+        };
+    };
+    return <nil>;
 };
 
 defcommand replace-buffer {
@@ -1840,7 +1993,6 @@ defcommand grep-next {
         $ey ++;
         str ::= $grep-buff get-buffer-line $ey;
         if {nil? $str} {
-            str := <nil>; 
             break;
         };
         l ::= $str split sep: ":";
@@ -2134,6 +2286,20 @@ defcommand goto {
         return SELF;
     };
     result SELF;
+};
+
+defcommand set-protect {
+    | main window |
+    buff ::= $window get-buffer;
+    $buff set-protect;
+    result ALL;
+};
+
+defcommand no-protect {
+    | main window |
+    buff ::= $window get-buffer;
+    $buff no-protect;
+    result ALL;
 };
 
 defcommand mini-move-message {

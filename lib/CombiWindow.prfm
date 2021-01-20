@@ -105,9 +105,10 @@ CombiWindow method render () {
     };
 
     curs-print $StatusLineCurs [
-        " #%v [%v%v%v%v%v] (%d,%d) <%v> {%v} %v %v"
+        " #%v [%v%v%v%v%v%v] (%d,%d) <%v> {%v} %v %v"
         fmt
             [$win split sep: "#" : get 1]
+            [[$buff protect?] ??? "%" " "]
             [[$buff modify?] ??? "*" " "]
             [[$buff newfile?] ??? "?" " "]
             [[get-region] ??? "#" " "]

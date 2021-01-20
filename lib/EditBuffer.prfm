@@ -14,6 +14,7 @@ EditBuffer method init-constructor () {
     sets RedoBuffer ();
     sets MarkBuffer ();
     sets UnmarkBuffer ();
+    sets Protect <nil>;
 };
 
 EditBuffer method string () {
@@ -186,6 +187,8 @@ EditBuffer method get-buffer-length () {
 };
 
 EditBuffer method insert-string-at (input y x) {
+    if {true? Protect} {throw ErrReadOnly "Buffer is protected."};
+    
     sets Modify <t>;
     if {true? Src} {
 	result ::= $Src insert-string-at $input $y $x;
@@ -196,6 +199,8 @@ EditBuffer method insert-string-at (input y x) {
 };
 
 EditBuffer method delete-character-at (y x) {
+    if {true? Protect} {throw ErrReadOnly "Buffer is protected."};
+    
     sets Modify <t>;
     if {true? Src} {
 	result ::= $Src delete-character-at $y $x;
@@ -206,6 +211,8 @@ EditBuffer method delete-character-at (y x) {
 };
 
 EditBuffer method backdelete-character-at (y x) {
+    if {true? Protect} {throw ErrReadOnly "Buffer is protected."};
+    
     sets Modify <t>;
     if {true? Src} {
 	result ::= $Src backdelete-character-at $y $x;
@@ -216,6 +223,8 @@ EditBuffer method backdelete-character-at (y x) {
 };
 
 EditBuffer method append-string (str) {
+    if {true? Protect} {throw ErrReadOnly "Buffer is protected."};
+    
     sets Modify <t>;
     if {true? Src} {
 	result ::= $Src append-string $str;
@@ -226,6 +235,8 @@ EditBuffer method append-string (str) {
 };
 
 EditBuffer method undo () {
+    if {true? Protect} {throw ErrReadOnly "Buffer is protected."};
+    
     if {true? Src} {
 	if {! [$UndoBuffer null?]} {
 	    o ::= $UndoBuffer >>;
@@ -261,6 +272,8 @@ EditBuffer method undo () {
 };
 
 EditBuffer method redo () {
+    if {true? Protect} {throw ErrReadOnly "Buffer is protected."};
+    
     if {true? Src} {
 	if {! [$RedoBuffer null?]} {
 	    o ::= $RedoBuffer >>;
@@ -316,6 +329,9 @@ EditBuffer method get-region-string (sy sx ey ex) {
 };
 
 EditBuffer method cut-region (sy sx ey ex) {
+    if {true? Protect} {throw ErrReadOnly "Buffer is protected."};
+    
+    sets Modify <t>;
     if {true? Src} {
         len ::= $Src len;
         if {and [$ey >= $len] [$sy >= $len]} {
@@ -371,6 +387,8 @@ EditBuffer method un-mark (y x) {
 };
 
 EditBuffer method replace-buffer (froms tos) {
+    if {true? Protect} {throw ErrReadOnly "Buffer is protected."};
+    
     $Src ?? {return 0};
     if {[$Src len] = 0} {return 0};
     
@@ -390,6 +408,8 @@ EditBuffer method replace-buffer (froms tos) {
 };
 
 EditBuffer method replace-region (froms tos start end) {
+    if {true? Protect} {throw ErrReadOnly "Buffer is protected."};
+    
     $Src ?? {return 0};
     blen ::= $Src len;
     if {$blen = 0} {return 0};
@@ -410,4 +430,16 @@ EditBuffer method replace-region (froms tos start end) {
         $c ++ $n;
     };
     return $c;
+};
+
+EditBuffer method protect? () {
+    return $Protect;
+};
+
+EditBuffer method set-protect () {
+    sets Protect <t>;
+};
+
+EditBuffer method no-protect () {
+    sets Protect <nil>;
 };

@@ -32,6 +32,7 @@ LIGHT {
     $ColorDB set DATATYPE_HILIGHT           [WUtil color-pair GREEN   WHITE   ];
     $ColorDB set COMMENT_HILIGHT            [WUtil color-pair YELLOW  WHITE   ];
     $ColorDB set ALERT_HILIGHT              [WUtil color-pair RED     WHITE   ];
+    $ColorDB set PWIKI_LINK                 [WUtil color-pair BLUE    YELLOW  ];
 }
 
 DARK {
@@ -54,6 +55,7 @@ DARK {
     $ColorDB set DATATYPE_HILIGHT           [WUtil color-pair GREEN   BLACK   ];
     $ColorDB set COMMENT_HILIGHT            [WUtil color-pair MAGENTA BLACK   ];
     $ColorDB set ALERT_HILIGHT              [WUtil color-pair RED     BLACK   ];
+    $ColorDB set PWIKI_LINK                 [WUtil color-pair BLUE    CYAN    ];
 }
 
 BLUE-BACK {
@@ -76,6 +78,7 @@ BLUE-BACK {
     $ColorDB set DATATYPE_HILIGHT           [WUtil color-pair GREEN   BLUE    ];
     $ColorDB set COMMENT_HILIGHT            [WUtil color-pair BLACK   BLUE    ];
     $ColorDB set ALERT_HILIGHT              [WUtil color-pair RED     BLUE    ];
+    $ColorDB set PWIKI_LINK                 [WUtil color-pair BLACK   CYAN    ];
 }
 
 RETRO {
@@ -98,6 +101,7 @@ RETRO {
     $ColorDB set DATATYPE_HILIGHT           [WUtil color-pair GREEN   BLACK   ];
     $ColorDB set COMMENT_HILIGHT            [WUtil color-pair MAGENTA BLACK   ];
     $ColorDB set ALERT_HILIGHT              [WUtil color-pair RED     BLACK   ];
+    $ColorDB set PWIKI_LINK                 [WUtil color-pair BLACK   GREEN   ];
 }
 
 MONO {
@@ -120,6 +124,7 @@ MONO {
     $ColorDB set DATATYPE_HILIGHT           [WUtil color-pair WHITE   BLACK   ];
     $ColorDB set COMMENT_HILIGHT            [WUtil color-pair WHITE   BLACK   ];
     $ColorDB set ALERT_HILIGHT              [WUtil color-pair BLACK   WHITE   ];
+    $ColorDB set PWIKI_LINK                 [WUtil color-pair BLACK   WHITE   ];
 }
 
 MONO-GREEN {
@@ -142,6 +147,7 @@ MONO-GREEN {
     $ColorDB set DATATYPE_HILIGHT           [WUtil color-pair GREEN   BLACK   ];
     $ColorDB set COMMENT_HILIGHT            [WUtil color-pair GREEN   BLACK   ];
     $ColorDB set ALERT_HILIGHT              [WUtil color-pair BLACK   GREEN   ];
+    $ColorDB set PWIKI_LINK                 [WUtil color-pair BLACK   GREEN   ];
 }
 
 default: {result <nil>}
