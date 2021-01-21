@@ -927,8 +927,8 @@ defcommand key-binding-list {
 
     $buff append-string "<<< Key bindings >>>";
     $buff append-string ["Buffer mode: " . $mode];
-    $buff append-string ["%-16v%26v %-v" fmt "Key group" "Key modifier" "Command"];
-    $buff append-string ["%-16v%26v %-v" fmt "------------" "---------------" "----------"];
+    $buff append-string ["%-18v%26v %-v" fmt "Key group" "Key modifier" "Command"];
+    $buff append-string ["%-18v%26v %-v" fmt "------------" "---------------" "----------"];
     d ::= $window get KeyBinding;
     desc ::= $window get KeyDesc;
     l := ();
@@ -939,9 +939,9 @@ defcommand key-binding-list {
             ls ::= $s split;
             grp ::= $ls get 0;
             modify ::= $ls get 1;
-            $l << ["%-16v%26v %-v" fmt $grp $modify $v];
+            $l << ["%-18v%26v [[%-v]]" fmt $grp $modify $v];
         } {
-            $l << ["%-16v%26v %-v" fmt "***" $k $v];
+            $l << ["%-18v%26v [[%-v]]" fmt "***" $k $v];
         };
     };
     msort $l : each do: {| i |
@@ -951,12 +951,14 @@ defcommand key-binding-list {
     $buff append-string "";
     $buff append-string "<<< All editor commands >>>";
     msort [$EditorCommand keys :string] : each do: {| i |
-        $buff append-string $i;
+        $buff append-string ["[[" . $i "]]"];
     };
     $buff no-modify;
     $buff set-protect;
     
     $main bind-buffer [$window get-window-name] $buff;
+    $window set-mode "PWiki";
+
     result SELF;
 };
 
@@ -1364,7 +1366,7 @@ defcommand pwiki-next-link {
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     (ey ex) ::= $window get-source-index $buff $geom;
-    (y x) ::= get-next-search $ey $ex "\\[\\[[^\\[\\] ]+\\]\\]" $buff;
+    (y x) ::= get-next-search $ey $ex "\\[\\[[^\\[\\] \t]+\\]\\]" $buff;
     $window cursor-move-to $geom $y $x;
     return SELF;
 };
@@ -1374,7 +1376,7 @@ defcommand pwiki-previous-link {
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     (ey ex) ::= $window get-source-index $buff $geom;
-    (y x) ::= get-previous-search $ey $ex "\\[\\[[^\\[\\] ]+\\]\\]" $buff;
+    (y x) ::= get-previous-search $ey $ex "\\[\\[[^\\[\\] \t]+\\]\\]" $buff;
     $window cursor-move-to $geom $y $x;
     return SELF;
 };
@@ -1384,14 +1386,31 @@ defcommand pwiki-click-link {
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     (ey ex) ::= $window get-source-index $buff $geom;
-    str ::= cursor-on-search-string $ey $ex "\\[\\[[^\\[\\] ]+\\]\\]" $buff;
+    str ::= cursor-on-search-string $ey $ex "\\[\\[[^\\[\\] \t]+\\]\\]" $buff;
     $str ?? {
         $window apply-command $main $window "\r" insert-character;
         return ALL;
     };
-    link ::= $str sub 2 [$str len : - 4 : + 2];
-    show-message ["link: " . $link];
-    return SELF;
+    link ::= $str sub 2 [$str len : - 2];
+    path ::= $buff get-path;
+    if $path {
+        dir ::= get-dir $path;
+    } {
+        dir := $DEFAULT_PWIKI_DIR;
+    };
+    new-path ::= $dir . "/" $link ".pwiki";
+    buff ::= BufferManager get-buffer-by-path $new-path;
+    $buff ?? {
+        buff ::= new EditBuffer;
+        (result err) ::= $buff load-content $new-path;
+        $result ?? {
+            show-message ["Open Failed, path: " . $path " ("  $err ")"];
+            return SELF;
+        };
+    };
+    $main bind-buffer [$window get-window-name] $buff;
+    
+    return ALL;
 };
 
 defun cursor-on-search-string (y x str buff) {

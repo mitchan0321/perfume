@@ -202,6 +202,12 @@ defun path-adjust (path) {
     return [$r join sep: "/"];
 };
 
+defun get-dir (path) {
+    l ::= $path split sep: "/";
+    $l ->>;
+    path-adjust [$l join sep: "/"];
+};
+
 defun show-files-in-window (main window dir) {
     BufferManager unregist-buffer "*Directory*";
     buff ::= new EditBuffer;

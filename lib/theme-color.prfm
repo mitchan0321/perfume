@@ -32,7 +32,7 @@ LIGHT {
     $ColorDB set DATATYPE_HILIGHT           [WUtil color-pair GREEN   WHITE   ];
     $ColorDB set COMMENT_HILIGHT            [WUtil color-pair YELLOW  WHITE   ];
     $ColorDB set ALERT_HILIGHT              [WUtil color-pair RED     WHITE   ];
-    $ColorDB set PWIKI_LINK                 [WUtil color-pair BLUE    YELLOW  ];
+    $ColorDB set PWIKI_LINK                 [WUtil color-pair BLUE    WHITE   ];
 }
 
 DARK {
