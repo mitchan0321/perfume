@@ -55,7 +55,7 @@ DARK {
     $ColorDB set DATATYPE_HILIGHT           [WUtil color-pair GREEN   BLACK   ];
     $ColorDB set COMMENT_HILIGHT            [WUtil color-pair MAGENTA BLACK   ];
     $ColorDB set ALERT_HILIGHT              [WUtil color-pair RED     BLACK   ];
-    $ColorDB set PWIKI_LINK                 [WUtil color-pair BLUE    CYAN    ];
+    $ColorDB set PWIKI_LINK                 [WUtil color-pair CYAN    BLACK    ];
 }
 
 BLUE-BACK {

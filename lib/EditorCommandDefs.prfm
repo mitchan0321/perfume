@@ -1333,14 +1333,14 @@ defun get-previous-search (y x str buff) {
     if {and {$y = 0} {$x = 0}} {return ($y $x)};
         
     r ::= $buff get-buffer-line $y;
-    $r ?? {return ($y $x)};
-
-    sl ::= $r =~ :all [$str rquote];
-    if $sl {
-        sl ::= $sl reverse;
-        sl ::= $sl filter {| el | [$el get 0] < $x};
-        if {$sl null?} else: {
-            return ($y [$sl car : car]);
+    if $r {
+        sl ::= $r =~ :all [$str rquote];
+        if $sl {
+            sl ::= $sl reverse;
+            sl ::= $sl filter {| el | [$el get 0] < $x};
+            if {$sl null?} else: {
+                return ($y [$sl car : car]);
+            };
         };
     };
     
