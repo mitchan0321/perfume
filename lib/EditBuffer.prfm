@@ -15,6 +15,8 @@ EditBuffer method init-constructor () {
     sets MarkBuffer ();
     sets UnmarkBuffer ();
     sets Protect <nil>;
+    sets ContentPath <nil>;
+    sets PreviousBuffer <nil>;
 };
 
 EditBuffer method string () {
@@ -442,4 +444,22 @@ EditBuffer method set-protect () {
 
 EditBuffer method no-protect () {
     sets Protect <nil>;
+};
+
+EditBuffer method set-content (path) {
+    sets ContentPath $path;
+};
+
+EditBuffer method get-content () {
+    if $ContentPath {return $ContentPath};
+    if $File        {return $File};
+    return <nil>;
+};
+
+EditBuffer method set-previous-buffer (buffer-name) {
+    sets PreviousBuffer $buffer-name;
+};
+
+EditBuffer method get-previous-buffer () {
+    return $PreviousBuffer;
 };

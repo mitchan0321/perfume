@@ -923,6 +923,7 @@ defcommand key-binding-list {
     BufferManager unregist-buffer "*Key Binding*";
     buff ::= new EditBuffer;
     $buff load-content "key binding" :init-only buffer-name: "*Key Binding*";
+    $buff set-content [$DEFAULT_PWIKI_DIR . "/"];
     $buff clear-all;
 
     $buff append-string "<<< Key bindings >>>";
@@ -967,31 +968,30 @@ defcommand buffer-list {
     BufferManager unregist-buffer "*Buffer List*";
     buff ::= new EditBuffer;
     $buff load-content "buffer list" :init-only buffer-name: "*Buffer List*";
+    $main bind-buffer [$window get-window-name] $buff;
     $buff clear-all;
 
     $buff append-string "<<< Buffer list >>>";
     $buff append-string "  * If you want to select the buffer, move cursor to buffer line and press Enter key.";
     $buff append-string "";
-    $buff append-string ["%1v%1v%1v %-26v %6v %-6v %-v" fmt "p" "m" "n" "Buffer name" "Length" "Mode" "File path"];
-    $buff append-string ["%1v%1v%1v %-26v %6v %-6v %-v" fmt "-" "-" "-" "-----------" "------" "----" "---------"];
+    $buff append-string ["%1v%1v%1v %-26v %6v %-6v %-v" fmt "p" "m" "n" "Buffer name" "Length" "Mode" "Content path"];
+    $buff append-string ["%1v%1v%1v %-26v %6v %-6v %-v" fmt "-" "-" "-" "-----------" "------" "----" "------------"];
     l ::= BufferManager get-buffer-list;
     $l each do: {| buff-name |
 	display-buffer ::= BufferManager get-buffer $buff-name;
 	$buff append-string [
 	    "%1v%1v%1v %-26v %6d %-6v %-v" fmt
 	    [[$display-buffer protect?] ??? "%" " "]
-	    [[$display-buffer modify?] ??? "*" " "]
+	    [[$display-buffer modify?]  ??? "*" " "]
 	    [[$display-buffer newfile?] ??? "?" " "]
 	    ["<" . $buff-name ">"]
 	    [$display-buffer get-buffer-length]
             [$display-buffer get-buffer-mode]
-	    [$display-buffer get-path]
+	    [$display-buffer get-content]
 	];
     };
     $buff no-modify;
     $buff set-protect;
-    
-    $main bind-buffer [$window get-window-name] $buff;
     result SELF;
 };
 
@@ -1013,7 +1013,7 @@ defcommand jump-to-buffer {
 
     s ::= $l car : get 2;
     s ::= $s sub 1 [$s len : - 1];
-    target-buff ::= BufferManager get-buffer $s;
+    target-buff ::= BufferManager find-buffer $s;
     $target-buff ?? {
 	show-message "No buffer name specified.";
 	return SELF;
@@ -1392,25 +1392,43 @@ defcommand pwiki-click-link {
         return ALL;
     };
     link ::= $str sub 2 [$str len : - 2];
-    path ::= $buff get-path;
+    path ::= $buff get-content;
     if $path {
         dir ::= get-dir $path;
     } {
         dir := $DEFAULT_PWIKI_DIR;
     };
     new-path ::= $dir . "/" $link ".pwiki";
-    buff ::= BufferManager get-buffer-by-path $new-path;
-    $buff ?? {
-        buff ::= new EditBuffer;
-        (result err) ::= $buff load-content $new-path;
+    next-buff ::= BufferManager get-buffer-by-path $new-path;
+    $next-buff ?? {
+        next-buff ::= new EditBuffer;
+        (result err) ::= $next-buff load-content $new-path;
         $result ?? {
             show-message ["Open Failed, path: " . $path " ("  $err ")"];
             return SELF;
         };
     };
-    $main bind-buffer [$window get-window-name] $buff;
+    $main bind-buffer [$window get-window-name] $next-buff;
+    $next-buff set-previous-buffer [$buff get-buffer-name];
     
     return ALL;
+};
+
+defcommand pwiki-link-back {
+    | main window |
+    buff ::= $window get-buffer;
+    prev-buff-name ::= $buff get-previous-buffer;
+    if $prev-buff-name {
+        prev-buff ::= BufferManager find-buffer $prev-buff-name;
+        if $prev-buff {
+            $main bind-buffer [$window get-window-name] $prev-buff;
+        } {
+            show-message ["No found previous buffer, \'" . $prev-buff-name "\'."];
+        };
+    } {
+        show-message "No set previous buffer.";
+    };
+    result ALL;
 };
 
 defun cursor-on-search-string (y x str buff) {
