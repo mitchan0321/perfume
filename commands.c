@@ -1869,7 +1869,7 @@ cmd_file(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	println(interp, L"  rm \"file\"            rm \"file\".");
 	println(interp, L"  rmdir \"dir\"          rmdir \"dir\".");
 	println(interp, L"  rename \"from\" \"dest\" rename file \"from\" to \"dest\".");
-	println(interp, L"  mkdir \"dir\"          make directory \"dir\" and mode.");
+	println(interp, L"  mkdir \"dir\" mode     make directory \"dir\" and mode.");
 	println(interp, L"  chmod \"file\" mode    change \"file\" access mode.");
 
 	return const_Nil;

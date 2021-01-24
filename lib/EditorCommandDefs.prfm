@@ -1391,6 +1391,7 @@ defcommand pwiki-click-link {
         $window apply-command $main $window "\r" insert-character;
         return ALL;
     };
+
     link ::= $str sub 2 [$str len : - 2];
     path ::= $buff get-content;
     if $path {
@@ -1398,10 +1399,11 @@ defcommand pwiki-click-link {
     } {
         dir := $DEFAULT_PWIKI_DIR;
     };
-    new-path ::= $dir . "/" $link ".pwiki";
+    new-path ::= path-adjust [$dir . "/" $link ".pwiki"];
     next-buff ::= BufferManager get-buffer-by-path $new-path;
     $next-buff ?? {
         next-buff ::= new EditBuffer;
+        create-directory-if-not-exists $new-path;
         (result err) ::= $next-buff load-content $new-path;
         $result ?? {
             show-message ["Open Failed, path: " . $path " ("  $err ")"];
@@ -1412,6 +1414,23 @@ defcommand pwiki-click-link {
     $next-buff set-previous-buffer [$buff get-buffer-name];
     
     return ALL;
+};
+
+defun create-directory-if-not-exists (path) {
+    l ::= $path split sep: "/";
+    $l ->>;
+    if {[$path at 0] = "/"} {$l >>};
+    dir := "";
+    $l each do: {| e |
+        $dir append! "/";
+        $dir append! $e;
+        if {file dir? $dir} {continue};
+        try {
+            file mkdir $dir $DEFAULT_DIR_MODE;
+        } catch: {| err |
+            throw ErrFileAccess ["Can\'t create directory \'" . $dir "\'."];
+        };
+    };
 };
 
 defcommand pwiki-link-back {

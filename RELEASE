@@ -1447,7 +1447,7 @@
 		Change grep-next and grep-previous use CWD buffer line when exists this
 		  record, open target file before change directory it.
 
-2021/01/22
+2021/01/23
 	pmacs update:
 		Add new editor commands:
 		  search-next, search-previous, insert-newline,
@@ -1460,5 +1460,8 @@
 		Fix jumb-buffer detect buffer name from title line.
 		Add previous buffer name to EditBuffer at pwiki-click-link
 		 and be able to return previous buffer by pwiki-link-back command.
+		Add auto mkdir pwiki document directory.
+	commands.c
+		Fix 'file mkdir' help message.
 
 #eof
