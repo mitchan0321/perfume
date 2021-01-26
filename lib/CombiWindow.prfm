@@ -492,7 +492,7 @@ CombiWindow method fit-to-cursor (geom l c center: center) {
     };
     
     if {set? center} {
-        if {or [$geom,CursorLine <= 1] [$geom,CursorLine >= [$l - 2]]} {
+        if {or [$geom,CursorLine <= 0] [$geom,CursorLine >= [$l - 1]]} {
             cl ::= $l / 2;
             d := $geom,CursorLine;
             $geom set! CursorLine $cl;

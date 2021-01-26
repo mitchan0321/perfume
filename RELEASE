@@ -1464,4 +1464,11 @@
 	commands.c
 		Fix 'file mkdir' help message.
 
+2021/01/27
+	pmacs update:
+		Change fit-to-cursor line limit, top 2->1, bottom 2->1.
+		Change smooth-scroll-up/smooth-scroll-down line count 2 -> 1.
+		Change smooth-scroll-right/smooth-scroll-left column count 2 -> 4.
+
+
 #eof

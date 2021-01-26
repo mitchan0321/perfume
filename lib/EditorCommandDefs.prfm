@@ -221,7 +221,7 @@ defcommand smooth-scroll-down {
     geom ::= $window get-geom;
 
     (y x) ::= $window get-screen-size;
-    new-y ::= $geom,ViewLine + 2;
+    new-y ::= $geom,ViewLine + 1;
     if {$new-y > [[$buff get-buffer-length] - $y : + 1]} {
         new-y ::= [$buff get-buffer-length] - $y : + 1;
     };
@@ -239,7 +239,7 @@ defcommand smooth-scroll-up {
     geom ::= $window get-geom;
 
     (y x) ::= $window get-screen-size;
-    new-y ::= $geom,ViewLine - 2;
+    new-y ::= $geom,ViewLine - 1;
     if {$new-y < 0} {
         new-y := 0;
     };
@@ -255,7 +255,7 @@ defcommand smooth-scroll-right {
     (y x) ::= $window get-screen-size;
 
     $window set-freecursor <t>;
-    new-x ::= $geom,ViewColumn + 2;
+    new-x ::= $geom,ViewColumn + 4;
     $geom set! ViewColumn $new-x;
 
     result SELF;
@@ -268,7 +268,7 @@ defcommand smooth-scroll-left {
     (y x) ::= $window get-screen-size;
 
     $window set-freecursor <t>;
-    new-x ::= $geom,ViewColumn - 2;
+    new-x ::= $geom,ViewColumn - 4;
     if {$new-x < 0} {
         new-x := 0;
     };
