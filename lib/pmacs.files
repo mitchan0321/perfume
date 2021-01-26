@@ -38,7 +38,7 @@ pinterp.prfm
 ##
 ## Do: % perfumesh pmacs.files
 ##
-defun wc (file) {
+defun lc (file) {
     i := 0;
     f := `File($file mode: i);
     $f each do: {$i ++};
@@ -48,7 +48,7 @@ defun wc (file) {
 
 sum := 0;
 $pmacs.files each do: {| f |
-    l ::= wc ["" . $f];
+    l ::= lc ["" . $f];
     $sum ++ $l;
     println ["%5d: %v" fmt $l $f];
 };
