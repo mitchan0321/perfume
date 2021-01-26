@@ -679,14 +679,14 @@ CombiWindow method display-evaluation () {
 	update-display := <nil>;
 
 	$stderr close;
-	$stderr each do: {| r |
+	$stderr each do: {| r | r ::= $r string;
 	    $buff append-string ["ERR> " . $r];
 	    update-display := <t>;
 	};
 	$stderr clear;
 
 	$stdout close;
-	$stdout each do: {| r |
+	$stdout each do: {| r | r ::= $r string;
             if {or [$r =~ '^Result\[FUNC\]=> '] [$r =~ '^Result\[CLOSURE\]=> ']} {
                 r ::= [$r sub 0 80] . " ...";
             };
