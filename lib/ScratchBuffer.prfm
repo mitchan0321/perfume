@@ -29,6 +29,7 @@ ScratchBuffer method init () {
 	"    5) If you want to send eof to application or interpriter: Ctrl+G"
 	""
     )];
+    [self] set-content [$DEFAULT_PWIKI_DIR . "/"];
 };
 
 ScratchBuffer method load-content (path) {
