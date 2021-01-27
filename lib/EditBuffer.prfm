@@ -46,6 +46,9 @@ EditBuffer method load-content (path init-only: init-flag buffer-name: buff-name
 		    $Src append! $r;
 		};
 		$f close;
+                if {! [file write? $path]} {
+                    set-protect;
+                };
 	        result := (<t> "");
 	    } {
 		sets NewFile <t>;
@@ -78,6 +81,10 @@ EditBuffer method load-content (path init-only: init-flag buffer-name: buff-name
 };
 
 EditBuffer method save-content (path: path) {
+    if {protect?} {
+        return (<nil> "Buffer is protected, try after no-protect command executed.");
+    };
+    
     if {! [set? path]} {
 	path ::= get-path;
     };

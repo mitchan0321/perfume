@@ -1859,12 +1859,12 @@ cmd_file(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	println(interp, L"file command [args ...]");
 	println(interp, L"commands are:");
 	println(interp, L"  ?                    Print this message.");
-	println(interp, L"  exists? \"file\"       If \"file\" exist then return t.");
-	println(interp, L"  dir? \"file\"          If \"file\" is directory then return t.");
-	println(interp, L"  read? \"file\"         If \"file\" is readable then return t.");
-	println(interp, L"  write? \"file\"        If \"file\" is writable then return t.");
-	println(interp, L"  exec? \"file\"         If \"file\" is excecutable then return t.");
-	println(interp, L"  list \"directory\"     Return \"directory\"\'s entry list.");
+	println(interp, L"  exists? \"file\"       If \"file\" exist then return <t>.");
+	println(interp, L"  dir? \"file\"          If \"file\" is directory then return <t>.");
+	println(interp, L"  read? \"file\"         If \"file\" is readable then return <t>.");
+	println(interp, L"  write? \"file\"        If \"file\" is writable then return <t>.");
+	println(interp, L"  exec? \"file\"         If \"file\" is excecutable then return <t>.");
+	println(interp, L"  list \"directory\"     Return \"directory\" entry list.");
 	println(interp, L"  stat \"file\"          Return \"file\" status.");
 	println(interp, L"  rm \"file\"            rm \"file\".");
 	println(interp, L"  rmdir \"dir\"          rmdir \"dir\".");
@@ -2062,7 +2062,7 @@ cmd_file(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 
 	sts = lstat(fnames, &fstat);
 	if (-1 == sts) {
-	    return new_exception(TE_FILEACCESS, L"file stat can\'t get.", interp);
+	    return new_exception(TE_FILEACCESS, L"file stat can\'t get.", interp); // '
 	}
 	l = result = new_list(NULL);
 	

@@ -1149,6 +1149,44 @@ error:
     return new_exception(TE_SYNTAX, L"Syntax error at 'curs-flash', syntax: curs-flash", interp);
 }
 
+Toy_Type*
+func_curses_col(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *message;
+    wchar_t *p, *cmessage;
+    int i;
+    
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (arglen != 1) goto error;
+
+    message = list_get_item(posargs);
+    if (GET_TAG(message) != STRING) goto error;
+    
+    p = GC_MALLOC(sizeof(wchar_t) * (cell_get_length(message->u.string) + 1));
+    ALLOC_SAFE(p);
+    cmessage = cell_get_addr(message->u.string);
+    
+    i = 0;
+    while (*cmessage) {
+        switch (*cmessage) {
+        case L'\010':
+            i --;
+            if (i < 0) {i = 0;}
+            break;
+        default:
+            p[i] = *cmessage;
+            i ++;
+            break;
+        }
+        cmessage ++;
+    }
+    p[i] = 0;
+    
+    return new_string_cell(new_cell(p));
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'curs-col', syntax: curs-col string", interp);
+}
+
 int
 toy_add_func_ncurses(Toy_Interp* interp) {
     toy_add_func(interp, L"curs-init",		func_curses_init,		NULL);
@@ -1173,6 +1211,7 @@ toy_add_func_ncurses(Toy_Interp* interp) {
     toy_add_func(interp, L"curs-pos-to-index",	func_curses_pos_to_index,	L"string,pos,tab-width");
     toy_add_func(interp, L"curs-index-to-pos",	func_curses_index_to_pos,	L"string,index,tab-width");
     toy_add_func(interp, L"curs-flash",		func_curses_flash,		NULL);    
+    toy_add_func(interp, L"curs-col",		func_curses_col,		L"string");    
     return 0;
 }
 

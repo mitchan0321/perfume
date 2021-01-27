@@ -1470,5 +1470,16 @@
 		Change smooth-scroll-up/smooth-scroll-down line count 2 -> 1.
 		Change smooth-scroll-right/smooth-scroll-left column count 2 -> 4.
 
+2021/01/28
+	lib/man.prfm
+		Add new utility for show man pages in interp.
+	commands.c
+		Chagen file command help message fix.
+	pmacs update:
+		Add key bindings, F09 -> no-protect, F21 -> set-protect.
+		Add EditBuffer if open content file is read-only file, set buffer to protect.
+		Add EditBuffer if buffer protect at save content, return error to editor command.
+	ncurses.c
+		Add curs-col command for man page line arrangement utility.
 
 #eof
