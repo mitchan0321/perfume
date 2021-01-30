@@ -1168,9 +1168,43 @@ func_curses_col(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     i = 0;
     while (*cmessage) {
         switch (*cmessage) {
-        case L'\010':
+        case 0x8:
             i --;
             if (i < 0) {i = 0;}
+            break;
+        case 0x2010:
+            p[i] = L'-';
+            i ++;
+            break;
+        case 0x2500:
+            p[i] = L'-';
+            i ++;
+            break;
+        case 0x2502:
+            p[i] = L'|';
+            i ++;
+            break;
+        case 0x250c:
+        case 0x252c:
+        case 0x2510:
+        case 0x251c:
+        case 0x253c:
+        case 0x2524:
+        case 0x2514:
+        case 0x2534:
+        case 0x2518:
+            p[i] = L'+';
+            i ++;
+            break;
+        case 0x201c:
+        case 0x201d:
+            p[i] = L'\"';
+            i ++;
+            break;
+        case 0x2018:
+        case 0x2019:
+            p[i] = L'\'';
+            i ++;
             break;
         default:
             p[i] = *cmessage;
