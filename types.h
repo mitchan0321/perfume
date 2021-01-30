@@ -117,7 +117,7 @@ struct _toy_argspec {
     int posarg_len;
     Array *posarg_array;
     Hash *namedarg;
-} Toy_Argspec;
+};
 
 typedef struct _toy_interp {
     /* interpriter name */

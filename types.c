@@ -278,7 +278,7 @@ Toy_Type*
 new_func(Toy_Type *argspec_list, int posarglen, Array *posargarray, Hash *namedarg, Toy_Type *closure) {
     struct _toy_argspec *argspec;
 
-    argspec = GC_MALLOC(sizeof(Toy_Argspec));
+    argspec = GC_MALLOC(sizeof(struct _toy_argspec));
     ALLOC_SAFE(argspec);
 
     argspec->list = argspec_list;
