@@ -16,5 +16,6 @@ char	*to_char(const wchar_t *src);
 void	 println(Toy_Interp *interp, wchar_t *msg);
 char	*encode_dirent(Toy_Interp *interp, wchar_t *name, encoder_error_info **info);
 Cell	*decode_dirent(Toy_Interp *interp, char *name, encoder_error_info **info);
+wchar_t *decode_error(Toy_Interp *interp, char *str);
 
 #endif /* __UTIL__ */

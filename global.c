@@ -60,6 +60,7 @@ void def_global() {
     const_DEFAULT_FILE_ENCODING = new_symbol(L"DEFAULT_FILE_ENCODING");
     const_DEFAULT_SCRIPT_ENCODING = new_symbol(L"DEFAULT_SCRIPT_ENCODING");
     const_DEFAULT_DIRENT_ENCODING = new_symbol(L"DEFAULT_DIRENT_ENCODING");
+    const_DEFAULT_ERRSTR_ENCODING = new_symbol(L"DEFAULT_ERRSTR_ENCODING");
     const_up = new_symbol(L"up:");
     const_VERSION = new_symbol(L"VERSION");
     const_nocase = new_symbol(L"nocase:");

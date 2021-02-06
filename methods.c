@@ -3741,7 +3741,7 @@ mth_file_open(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 		   "a");
 
     if (NULL == f->fd) {
-	return new_exception(TE_FILENOTOPEN, to_wchar(strerror(errno)), interp);
+	return new_exception(TE_FILENOTOPEN, decode_error(interp, strerror(errno)), interp);
     }
 
     flag = fcntl(fileno(f->fd), F_GETFD, 0);
@@ -3940,7 +3940,7 @@ mth_file_puts(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 	fflush(f->fd);
 
 	if (EOF == c) {
-	    return new_exception(TE_FILEACCESS, to_wchar(strerror(errno)), interp);
+	    return new_exception(TE_FILEACCESS, decode_error(interp, strerror(errno)), interp);
 	}
 
 	posargs = list_next(posargs);
@@ -4177,7 +4177,7 @@ mth_file_set(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
     f->path = const_Nil;
 
     if (NULL == f->fd) {
-	return new_exception(TE_FILENOTOPEN, to_wchar(strerror(errno)), interp);
+	return new_exception(TE_FILENOTOPEN, decode_error(interp, strerror(errno)), interp);
     }
 
     return const_T;
@@ -5310,7 +5310,7 @@ mth_bulk_read(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 
     if ((size = binbulk_read(bulk, fd)) == -1) {
 	if (errno != 0) {
-	    return new_exception(TE_FILEACCESS, to_wchar(strerror(errno)), interp);
+	    return new_exception(TE_FILEACCESS, decode_error(interp, strerror(errno)), interp);
 	}
 	return new_exception(TE_FILEACCESS, L"Bad file type.", interp);	
     }
@@ -5352,7 +5352,7 @@ mth_bulk_write(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
 
     if ((size = binbulk_write(bulk, fd, from, to)) == -1) {
 	if (errno != 0) {
-	    return new_exception(TE_FILEACCESS, to_wchar(strerror(errno)), interp);
+	    return new_exception(TE_FILEACCESS, decode_error(interp, strerror(errno)), interp);
 	}
 	return new_exception(TE_FILEACCESS, L"Bad file type or bad parameter specified.", interp);	
     }

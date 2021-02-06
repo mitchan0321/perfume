@@ -258,6 +258,7 @@ interp_setup(Toy_Interp* interp, int argc, char **argv, char **envp, char *dir) 
     hash_set_t(gdict, const_DEFAULT_FILE_ENCODING, new_symbol(DEFAULT_FILE_ENCODING));
     hash_set_t(gdict, const_DEFAULT_SCRIPT_ENCODING, new_symbol(DEFAULT_SCRIPT_ENCODING));
     hash_set_t(gdict, const_DEFAULT_DIRENT_ENCODING, new_symbol(DEFAULT_DIRENT_ENCODING));
+    hash_set_t(gdict, const_DEFAULT_ERRSTR_ENCODING, new_symbol(DEFAULT_ERRSTR_ENCODING));
     
     /* set ENV */
     l = envl = new_list(new_symbol(L"dict"));

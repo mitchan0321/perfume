@@ -157,3 +157,34 @@ decode_dirent(Toy_Interp *interp, char *name, encoder_error_info **info) {
 
     return unicode;
 }
+
+wchar_t*
+decode_error(Toy_Interp *interp, char *str) {
+    int iencoder;
+    Cell *c;
+    encoder_error_info *enc_error_info;
+    Toy_Type *enc;
+    
+    enc = hash_get_t(interp->globals, const_DEFAULT_DIRENT_ENCODING);
+    if (NULL == enc) {
+        iencoder = get_encoding_index(DEFAULT_ERRSTR_ENCODING);
+    } else {
+        if (GET_TAG(enc) == SYMBOL) {
+            iencoder = get_encoding_index(cell_get_addr(enc->u.symbol.cell));
+        } else {
+            iencoder = get_encoding_index(DEFAULT_ERRSTR_ENCODING);
+        }
+    }
+    if (-1 == iencoder) {
+        return to_wchar(str);
+    }
+    
+    enc_error_info = GC_MALLOC(sizeof(encoder_error_info));
+    ALLOC_SAFE(enc_error_info);
+    c = decode_raw_to_unicode(new_cell(to_wchar(str)), iencoder, enc_error_info);
+    if (c == NULL) {
+        return to_wchar(str);
+    }
+    
+    return cell_get_addr(c);
+}

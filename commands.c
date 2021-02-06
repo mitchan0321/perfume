@@ -1719,7 +1719,7 @@ cmd_pwd(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     if (hash_get_length(nameargs) > 0) goto error;
 
     if (NULL == getcwd(buff, MAXPATHLEN)) {
-	return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+	return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
     }
 
     cwd = decode_dirent(interp, buff, &error_info);
@@ -1777,7 +1777,7 @@ cmd_chdir(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	return cmd_pwd(interp, new_list(NULL), new_hash(), 0);
     }
 
-    return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+    return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
 
 error:
     return new_exception(TE_SYNTAX, L"Syntax error, syntax: cd [dir]", interp);
@@ -2161,7 +2161,7 @@ cmd_file(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	}
 
 	if (-1 == unlink(fnames)) {
-	    return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+	    return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
 	}
 
 	return const_T;
@@ -2183,7 +2183,7 @@ cmd_file(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	}
 
 	if (-1 == rmdir(fnames)) {
-	    return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+	    return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
 	}
 
 	return const_T;
@@ -2214,7 +2214,7 @@ cmd_file(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	}
 
 	if (-1 == rename(fnames, dnames)) {
-	    return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+	    return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
 	}
 
 	return const_T;
@@ -2242,7 +2242,7 @@ cmd_file(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	imode = mpz_get_si(mode->u.biginteger);
 
 	if (-1 == mkdir(dirnames, imode)) {
-	    return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+	    return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
 	}
 
 	return const_T;
@@ -2269,7 +2269,7 @@ cmd_file(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	modei = mpz_get_ui(mode->u.biginteger);
 
 	if (-1 == chmod(fnames, modei)) {
-	    return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+	    return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
 	}
 
 	return const_T;
@@ -2488,7 +2488,7 @@ cmd_fork(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 
     pid = fork();
     if (-1 == pid) {
-	return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+	return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
     }
 
     return new_integer_si(pid);
@@ -2647,19 +2647,19 @@ cmd_forkandexec(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     argv[i] = NULL;
 
     if (-1 == pipe(left_ch)) {
-	return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+	return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
     }
     if (-1 == pipe(right_ch)) {
-	return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+	return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
     }
     if (-1 == pipe(err_ch)) {
-	return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+	return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
     }
     
     pid = fork();
     
     if (-1 == pid) {
-	return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+	return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
     }
 
     if (0 == pid) {
@@ -2759,7 +2759,7 @@ cmd_spawn(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     pid = fork();
     
     if (-1 == pid) {
-	return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+	return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
     }
 
     if (0 == pid) {
@@ -2771,7 +2771,7 @@ cmd_spawn(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     /* I am a parent */
     wsts = waitpid(pid, &status, 0);
     if (-1 == wsts) {
-	return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+	return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
     }
     
     return new_integer_si(WEXITSTATUS(status));
@@ -2794,7 +2794,7 @@ cmd_wait(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     pid = mpz_get_si(tpid->u.biginteger);
     ssts = waitpid(pid, &wsts, 0);
     if (-1 == ssts) {
-	return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+	return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
     }
 	
     return new_integer_si(WEXITSTATUS(wsts));
@@ -3172,7 +3172,7 @@ cmd_connect(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     socket_fd = socket(PF_INET, SOCK_STREAM, 0);
     
     if (-1 == socket_fd) {
-	return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+	return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
     }
 
     if ((bindport != 0) || (bindhostaddr != 0)) {
@@ -3183,7 +3183,7 @@ cmd_connect(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	bind_addr_in.sin_addr.s_addr = htonl((uint32_t)bindhostaddr);
 	sts = bind(socket_fd, (const struct sockaddr*)&bind_addr_in, sizeof(bind_addr_in));
 	if (-1 == sts) {
-	    return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+	    return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
 	}
     }
 
@@ -3193,7 +3193,7 @@ cmd_connect(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     
     sts = connect(socket_fd, (const struct sockaddr*)&serv_addr_in, sizeof(serv_addr_in));
     if (-1 == sts) {
-	return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+	return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
     }
 
     return new_integer_si(socket_fd);
@@ -3228,7 +3228,7 @@ cmd_socket_server(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     socket_fd = socket(PF_INET, SOCK_STREAM, 0);
 
     if (-1 == socket_fd) {
-	return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+	return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
     }
 
     val = 1;
@@ -3239,12 +3239,12 @@ cmd_socket_server(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     serv_addr_in.sin_addr.s_addr = htonl((uint32_t)hostaddr);
     sts = bind(socket_fd, (const struct sockaddr*)&serv_addr_in, sizeof(serv_addr_in));
     if (-1 == sts) {
-	return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+	return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
     }
 
     sts = listen(socket_fd, SOMAXCONN);
     if (-1 == sts) {
-	return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+	return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
     }
 
     return new_integer_si(socket_fd);
@@ -3335,7 +3335,7 @@ cmd_select(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	    list_append(result_l, except_result_l);
 	    return result_l;
 	} else {
-	    return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+	    return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
 	}
     }
 
@@ -3394,7 +3394,7 @@ cmd_accept(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     client_addr_in_size = (socklen_t)sizeof(client_addr_in);
     sts = accept(fd, (struct sockaddr*)&client_addr_in, &client_addr_in_size);
     if (-1 == sts) {
-	return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+	return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
     }
 
     result = new_list(NULL);
@@ -3423,7 +3423,7 @@ cmd_close(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 
     sts = close(fd);
     if (-1 == sts) {
-	return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+	return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
     }
 
     return new_integer_si(sts);
@@ -4142,7 +4142,7 @@ cmd_gettimeofday(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
 
     memset(&tv, 0, sizeof(tv));
     if (-1 == gettimeofday(&tv, NULL)) {
-	return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+	return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
     }
     
     if (NULL == msec) {
@@ -4255,7 +4255,7 @@ cmd_setitimer(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 
     result = setitimer(ITIMER_REAL, &new_t, NULL);
     if (-1 == result) {
-	return new_exception(TE_SYSCALL, to_wchar(strerror(errno)), interp);
+	return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
     }
     return const_T;
 
