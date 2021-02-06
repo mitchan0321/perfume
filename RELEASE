@@ -1482,4 +1482,12 @@
 	ncurses.c
 		Add curs-col command for man page line arrangement utility.
 
+2021/02/08
+	util.[ch], commands.c, methods.c
+		Fix if return UTF-8 string from strerror(3), decode to unicode and return to caller.
+	ncurses.c
+		Add some character to arrangement at curs-col.
+	pmacs update:
+		Add show-message at set-protect and no-protect.
+
 #eof
