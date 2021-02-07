@@ -1173,6 +1173,7 @@ func_curses_col(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
             if (i < 0) {i = 0;}
             break;
         case 0x2010:
+        case 0x2014:
             p[i] = L'-';
             i ++;
             break;
