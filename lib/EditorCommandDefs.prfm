@@ -2503,6 +2503,103 @@ defcommand man-previous-link {
     return SELF;
 };
 
+defcommand compile {
+    | main window |
+    $main mini-input-start [pwd : . "/"] prompt: "Directory: ";
+    $main add-mini-input-callback $window {| main window in-key value |
+        if {eq? $in-key KEY_ESC} {
+            $main mini-input-end;
+            show-message "Canceled.";
+            return SELF;
+        };
+        if {eq? $in-key CTRL_M} {
+            $main mini-input-end;
+            if {[$value len] = 0} {
+                show-message "No directory specified.";
+                return SELF;
+            };
+            directory := $value;
+            if {file dir? $directory} else: {
+                show-message ["Not directory: " . $directory];
+                return SELF;
+            };
+
+            $main mini-input-start "make -f Makefile " prompt: "Compile: " index: 17;
+            $main add-mini-input-callback $window {| main window in-key value |
+                if {eq? $in-key KEY_ESC} {
+                    $main mini-input-end;
+                    show-message "Canceled.";
+                    return SELF;
+                };
+                if {eq? $in-key CTRL_M} {
+                    $main mini-input-end;
+                    if {[$value len] = 0} {
+                        show-message "No compile command specified.";
+                        return SELF;
+                    };
+                    cmd := $value;
+                    
+                    ###
+                    ### do compile
+                    ###
+                    cd $directory;
+                    fout ::= new Stream;
+                    sts ::= {exec "/bin/sh" "-c" $cmd} redirect-out $fout $fout;
+                    $fout close;
+                    buff ::= new EditBuffer;
+                    BufferManager unregist-buffer "*Grep*";
+                    (result err) ::= $buff load-content  :init-only "grep buffer" buffer-name: "*Grep*";
+                    $buff clear-all;
+                    $buff append-string ["CWD:  " . $directory];
+                    $buff append-string ["EXEC: " . $cmd];
+                    $buff append-string "";
+                    $fout each do: {| r |
+                        $buff append-string $r;
+                    };
+                    $buff append-string "";
+                    $buff append-string ["exit(" . $sts ")"];
+                    
+                    w1 ::= $main get-window-by-name "Window#1";
+                    if $w1 else: {
+                        $main create-split-vertical-window;
+                    };
+                    $main bind-buffer "Window#1" $buff;
+                    window ::= $main get-current-window;
+                    geom ::= $window get-geom;
+                    $window cursor-move-to $geom 0 0;
+                    return SELF;
+                };
+            };
+            return SELF;
+        };
+	if {eq? $in-key CTRL_I} {
+            if {$value = ""} {
+                fname ::= show-files-in-window $main $window [get-current-buffer-dir $window];
+            } {
+                fname ::= show-files-in-window $main $window $value;
+            };
+	    $window apply-command $main $window "" top-of-buffer;
+	    $main mini-input-value-override $fname [$fname len];
+	    return ALL;
+	};
+	if {eq? $in-key KEY_DOWN} {
+	    $window apply-command $main $window "" move-half-up;
+	    return SELF;
+	};
+	if {eq? $in-key KEY_UP} {
+	    $window apply-command $main $window "" move-half-down;
+	    return SELF;
+	};
+	if {eq? $in-key "/"} {
+            if {[$value at -2] = "/"} {
+		$main mini-input-value-override "/" 1;
+            };
+	    return SELF;
+	};
+    };
+    result SELF;
+};
+
 defcommand mini-move-message {
     | main window |
     buff ::= $window get-buffer;
