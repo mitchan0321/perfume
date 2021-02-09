@@ -2348,7 +2348,7 @@ defcommand set-line-limit {
     | main window |
     $main mini-input-start "" prompt: [
         "Line length limit (current=" .
-            [[true? INTERP_LIMIT_LEN] ??? $INTERP_LIMIT_LEN "(none)"] "): "
+            [[true? INTERP_LIMIT_LEN] ??? $INTERP_LIMIT_LEN "none"] "): "
     ];
     $main add-mini-input-callback $window {| main window in-key value |
         if {eq? $in-key KEY_ESC} {
@@ -2359,11 +2359,11 @@ defcommand set-line-limit {
         if {eq? $in-key CTRL_M} {
             $main mini-input-end;
             if {$value = ""} {
-                show-message "Enter line number.";
+                show-message "Enter line length limit.";
                 return SELF;
             };
             if [$value numeric?] else: {
-                show-message "Enter line number.";
+                show-message "Enter line length limit.";
                 return SELF;
             };
             if {defvar? INTERP_LIMIT_LEN} {
