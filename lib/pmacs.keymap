@@ -54,15 +54,19 @@ $KeyMaps set (KEY_ESC "[1;8D")  (kLFT8);
 ### for FreeBSD mate-terminal settings
 $KeyMaps set (KEY_ESC "[1;2B") (KEY_SF);     # shift+
 $KeyMaps set (KEY_ESC "[1;3B") (kDN3);       # alt+
+$KeyMaps set (KEY_ESC "[1;4B") (kDN4);       # shift+alt+
 $KeyMaps set (KEY_ESC "[1;5B") (kDN5);       # ctrl+
 $KeyMaps set (KEY_ESC "[1;2A") (KEY_SR);     # shift+
 $KeyMaps set (KEY_ESC "[1;3A") (kUP3);       # alt+
+$KeyMaps set (KEY_ESC "[1;4A") (kUP4);       # shift+alt+
 $KeyMaps set (KEY_ESC "[1;5A") (kUP5);       # ctrl+
 $KeyMaps set (KEY_ESC "[1;2C") (KEY_SRIGHT); # shift+
 $KeyMaps set (KEY_ESC "[1;3C") (kRIT3);      # alt+
+$KeyMaps set (KEY_ESC "[1;4C") (kRIT4);      # shift+alt+
 $KeyMaps set (KEY_ESC "[1;5C") (kRIT5);      # ctrl+
 $KeyMaps set (KEY_ESC "[1;2D") (KEY_SLEFT);  # shift+
 $KeyMaps set (KEY_ESC "[1;3D") (kLFT3);      # alt+
+$KeyMaps set (KEY_ESC "[1;4D") (kLFT4);      # shift+alt+
 $KeyMaps set (KEY_ESC "[1;5D") (kLFT5);      # ctrl+
 $KeyMaps set (KEY_ESC "[1;5H") (kHOM5);      # ctrl+
 $KeyMaps set (KEY_ESC "[1;5F") (kEND5);      # ctrl+
