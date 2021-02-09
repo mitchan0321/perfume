@@ -2446,7 +2446,7 @@ defcommand man-click-link {
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     (ey ex) ::= $window get-source-index $buff $geom;
-    str ::= cursor-on-search-string $ey $ex "[A-z_][A-z0-9\\-_]*\\([0-9]\\)" $buff;
+    str ::= cursor-on-search-string $ey $ex "[a-z_][a-z0-9\\-_]*\\([0-9]\\)" $buff;
     $str ?? {
         show-message "No man topic.";
         return ALL;
@@ -2488,7 +2488,7 @@ defcommand man-next-link {
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     (ey ex) ::= $window get-source-index $buff $geom;
-    (y x) ::= get-next-search $ey $ex "[A-z_][A-z0-9\\-_]*\\([0-9]\\)" $buff;
+    (y x) ::= get-next-search $ey $ex "[a-z_][a-z0-9\\-_]*\\([0-9]\\)" $buff;
     $window cursor-move-to $geom $y $x;
     return SELF;
 };
@@ -2498,7 +2498,7 @@ defcommand man-previous-link {
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     (ey ex) ::= $window get-source-index $buff $geom;
-    (y x) ::= get-previous-search $ey $ex "[A-z_][A-z0-9\\-_]*\\([0-9]\\)" $buff;
+    (y x) ::= get-previous-search $ey $ex "[a-z_][a-z0-9\\-_]*\\([0-9]\\)" $buff;
     $window cursor-move-to $geom $y $x;
     return SELF;
 };
