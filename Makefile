@@ -165,8 +165,8 @@ clean:
 	rm -f encoding-set-utoj.h encoding-set-jtou.h
 
 build-pkg:
-	make clean
-	make
+	gmake clean
+	gmake
 	rm -rf $(PKG_TMP)
 	mkdir -p $(PKG_DIR)
 	mkdir -p $(PKG_DIR)/lib

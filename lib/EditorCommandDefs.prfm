@@ -2358,6 +2358,10 @@ defcommand set-line-limit {
 	};
         if {eq? $in-key CTRL_M} {
             $main mini-input-end;
+            if {$value = ""} {
+                show-message "Enter line number.";
+                return SELF;
+            };
             if [$value numeric?] else: {
                 show-message "Enter line number.";
                 return SELF;
