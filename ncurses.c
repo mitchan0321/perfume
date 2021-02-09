@@ -1207,6 +1207,16 @@ func_curses_col(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
             p[i] = L'\'';
             i ++;
             break;
+        case 0x27e8:
+        case 0x27ea:
+            p[i] = L'<';
+            i ++;
+            break;
+        case 0x27e9:
+        case 0x27eb:
+            p[i] = L'>';
+            i ++;
+            break;
         default:
             p[i] = *cmessage;
             i ++;
