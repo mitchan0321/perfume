@@ -689,8 +689,16 @@ CombiWindow method display-evaluation () {
 	$stdout each do: {| r | r ::= $r string;
             if {or [$r =~ '^Result\[FUNC\]=> '] [$r =~ '^Result\[CLOSURE\]=> ']} {
                 r ::= [$r sub 0 80] . " ...";
+                $buff append-string $r;
+            } {
+                if {$INTERP_LIMIT_LEN > 0} {
+                    while {[$r len] > $INTERP_LIMIT_LEN} do: {
+                        $buff append-string [[$r sub 0 $INTERP_LIMIT_LEN] . " \\"];
+                        r ::= $r sub $INTERP_LIMIT_LEN;
+                    };
+                };
+                $buff append-string $r;
             };
-	    $buff append-string ["" . $r];
 	    update-display := <t>;
 	};
 	$stdout clear;

@@ -2344,6 +2344,33 @@ defcommand goto {
     result SELF;
 };
 
+defcommand set-line-limit {
+    | main window |
+    $main mini-input-start "" prompt: "Line length limit: ";
+    $main add-mini-input-callback $window {| main window in-key value |
+        if {eq? $in-key KEY_ESC} {
+	    $main mini-input-end;
+	    show-message "Canceled.";
+            return SELF;
+	};
+        if {eq? $in-key CTRL_M} {
+            $main mini-input-end;
+            if [$value numeric?] else: {
+                show-message "Enter line number.";
+                return SELF;
+            };
+            if {defvar? INTERP_LIMIT_LEN} {
+                setvar INTERP_LIMIT_LEN [$value int];
+            } {
+                devvar INTERP_LIMIT_LEN [$value int];
+            };
+            return SELF;
+        };
+        return SELF;
+    };
+    result SELF;
+};
+
 defcommand set-protect {
     | main window |
     buff ::= $window get-buffer;
