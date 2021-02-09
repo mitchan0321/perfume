@@ -1494,5 +1494,8 @@
 	pmacs update:
 		Change Interp line length limit by value $INTERP_LIMIT_LEN.
 		Add set-line-limit editor command.
+		Add man reading suite. New editor commands are:
+		  man, man-click-link, man-link-back, man-next-link and man-previous-link.
+		Add Man mode and Mode-Man.key file.
 
 #eof
