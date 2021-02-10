@@ -1499,4 +1499,13 @@
 		Add Man mode and Mode-Man.key file.
 		Add compile editor command.
 
+2021/02/10
+	pmacs update:
+		Change if buffer is protected key-in is string but go to key binding mode.
+		Add Man mode key binding " " is next-page, "b" is previous-page and
+		  KEY_BACKSPACE is man-link-back.
+		Change default INTERP_LIMIT_LEN value 80 -> 128.
+	methods.c
+		Fix String::{alphabetic?|numeric?|alphanumeric?} if it's "" return <nil>.
+
 #eof
