@@ -3474,6 +3474,11 @@ mth_string_isalpha(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int ar
 
     s = self->u.string;
     p = cell_get_addr(s);
+
+    if (! *p) {
+        return const_Nil;
+    }
+
     result = 1;
     while (*p) {
         if (*p >= 0x80) {
@@ -3512,6 +3517,11 @@ mth_string_isnum(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
 
     s = self->u.string;
     p = cell_get_addr(s);
+
+    if (! *p) {
+        return const_Nil;
+    }
+
     result = 1;
     while (*p) {
         if ((*p >= '0') && (*p <= '9')) {
@@ -3544,6 +3554,11 @@ mth_string_isalnum(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int ar
 
     s = self->u.string;
     p = cell_get_addr(s);
+
+    if (! *p) {
+        return const_Nil;
+    }
+
     result = 1;
     while (*p) {
         if (*p >= 0x80) {
