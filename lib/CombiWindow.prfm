@@ -589,7 +589,7 @@ CombiWindow method get-mode () {
 
 CombiWindow method apply-keybind (main window key) {
     show-message "";
-    if {string? $key} {
+    if {and [string? $key] [! [get-buffer : protect?]]} {
 	command ::= $KeyBinding get KEY_INPUT_CHAR;
 	body ::= get-command $command;
 	if {block? $body} {
