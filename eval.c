@@ -32,6 +32,13 @@ static Toy_Type* toy_yield_bind(Toy_Interp *interp, Toy_Type *bind_var);
 		}							\
 	}
 
+#ifdef EVAL_STAT
+unsigned long long int count_eval_script = 0;
+unsigned long long int count_eval = 0;
+unsigned long long int count_eval_lazyed = 0;
+unsigned long long int count_lazy_expand = 0;
+#endif /* EVAL_STAT */
+
 Toy_Type*
 toy_eval_script(Toy_Interp* interp, Toy_Type *script) {
     Toy_Type *l;
@@ -43,6 +50,10 @@ toy_eval_script(Toy_Interp* interp, Toy_Type *script) {
     extern volatile int SigAlrm;
     result = const_Nil;
     volatile int baria_dist;
+
+#ifdef EVAL_STAT
+    count_eval_script ++;
+#endif /* EVAL_STAT */
 
     if ((((unsigned long)(&baria_dist)) - ((unsigned long)cstack_get_safe_addr())) < (MP_PAGESIZE*8)) {
 	return new_exception(TE_STACKOVERFLOW, L"C stack approaches the barrier.", interp);
@@ -150,6 +161,10 @@ control_goto:
     ostack_use = 0;
     arglen = 0;
     script_id = -1;
+
+#ifdef EVAL_STAT
+    count_eval ++;
+#endif /* EVAL_STAT */
 
     l = statement->u.statement.item_list;
 
@@ -590,6 +605,9 @@ toy_resolv_var(Toy_Interp* interp, Toy_Type* var, int stack_trace, Toy_Func_Trac
     val = hash_get_t(h, var);
     if (NULL != val) {
 	if (IS_LAZY(val) && (GET_TAG(val) == CLOSURE)) {
+#ifdef EVAL_STAT
+            count_lazy_expand ++;
+#endif /* EVAL_STAT */
 	    val = eval_closure(interp, val, trace_info);
 	    hash_set_t(h, var, val);
 	}
@@ -603,6 +621,9 @@ toy_resolv_var(Toy_Interp* interp, Toy_Type* var, int stack_trace, Toy_Func_Trac
 	    val = hash_get_t(h, var);
 	    if (NULL != val) {
 		if (IS_LAZY(val) && (GET_TAG(val) == CLOSURE)) {
+#ifdef EVAL_STAT
+                    count_lazy_expand ++;
+#endif /* EVAL_STAT */
 		    val = eval_closure(interp, val, trace_info);
 		    hash_set_t(h, var, val);
 		}
@@ -616,6 +637,9 @@ toy_resolv_var(Toy_Interp* interp, Toy_Type* var, int stack_trace, Toy_Func_Trac
     val = hash_get_t(h, var);
     if (NULL != val) {
 	if (IS_LAZY(val) && (GET_TAG(val) == CLOSURE)) {
+#ifdef EVAL_STAT
+            count_lazy_expand ++;
+#endif /* EVAL_STAT */
 	    val = eval_closure(interp, val, trace_info);
 	    hash_set_t(h, var, val);
 	}
@@ -626,6 +650,9 @@ toy_resolv_var(Toy_Interp* interp, Toy_Type* var, int stack_trace, Toy_Func_Trac
     val = hash_get_t(h, var);
     if (NULL != val) {
 	if (IS_LAZY(val) && (GET_TAG(val) == CLOSURE)) {
+#ifdef EVAL_STAT
+            count_lazy_expand ++;
+#endif /* EVAL_STAT */
 	    val = eval_closure(interp, val, trace_info);
 	    hash_set_t(h, var, val);
 	}
@@ -809,7 +836,31 @@ error:
     return new_exception(TE_NOOBJECT, cell_get_addr(msg), interp);
 }
 
-#define PARAM_BIND(n) {							\
+#ifdef EVAL_STAT
+    #define PARAM_BIND(n) {					        \
+	val = list_get_item(l);						\
+	var = &(a->array[n]);						\
+	if (GET_TAG(val) == EVAL) {					\
+	    if (*env == NULL) {						\
+		*env = new_closure_env(interp);				\
+	    }								\
+	    val = new_closure(val->u.eval_body, *env, interp->script_id);\
+	    if (GET_TAG(val) == EXCEPTION) {return val;}		\
+	    SET_LAZY(val);						\
+            count_eval_lazyed ++;                                       \
+	} else {							\
+	    val = toy_expand(interp, val, env, trace_info);		\
+	    if (GET_TAG(val) == EXCEPTION) {return val;}		\
+	    if (IS_LAZY(var)) {                                         \
+                SET_LAZY(val);                                          \
+                count_eval_lazyed ++;                                   \
+            }           				                \
+	}								\
+	hash_set_t(args, var, toy_clone(val));				\
+	l = list_next(l);						\
+    }
+#else
+    #define PARAM_BIND(n) {					        \
 	val = list_get_item(l);						\
 	var = &(a->array[n]);						\
 	if (GET_TAG(val) == EVAL) {					\
@@ -822,11 +873,14 @@ error:
 	} else {							\
 	    val = toy_expand(interp, val, env, trace_info);		\
 	    if (GET_TAG(val) == EXCEPTION) {return val;}		\
-	    if (IS_LAZY(var)) {SET_LAZY(val);}				\
+	    if (IS_LAZY(var)) {                                         \
+                SET_LAZY(val);                                          \
+            }           				                \
 	}								\
 	hash_set_t(args, var, toy_clone(val));				\
 	l = list_next(l);						\
-}
+    }
+#endif /* EVAL_STAT */
 
 static Toy_Type*
 bind_args(Toy_Interp *interp, Toy_Type *arglist, struct _toy_argspec *aspec,
