@@ -4300,6 +4300,35 @@ error:
 			 L"Syntax error at 'atomic', syntax: atomic {body}", interp);
 }
 
+#ifdef EVAL_STAT
+Toy_Type*
+cmd_evalstat(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    extern unsigned long long int count_eval_script;
+    extern unsigned long long int count_eval;
+    extern unsigned long long int count_eval_lazyed;
+    extern unsigned long long int count_lazy_expand;
+    Toy_Type *result;
+    
+    if (arglen != 0) goto error;
+    if (hash_get_length(nameargs) != 0) goto error;
+    
+    result = new_list(NULL);
+    list_append(result, new_cons(new_symbol(L"COUNT_EVAL_SCRIPT"),
+                                 new_integer_ullsi(count_eval_script)));
+    list_append(result, new_cons(new_symbol(L"COUNT_EVAL"),
+                                 new_integer_ullsi(count_eval)));
+    list_append(result, new_cons(new_symbol(L"COUNT_EVAL_LAZYED"),
+                                 new_integer_ullsi(count_eval_lazyed)));
+    list_append(result, new_cons(new_symbol(L"COUNT_LAZY_EXPAND"),
+                                 new_integer_ullsi(count_lazy_expand)));
+    return result;
+
+error:
+    return new_exception(TE_SYNTAX,
+			 L"Syntax error at 'eval-stat', syntax: eval-stat", interp);
+}
+#endif /* EVAL_STAT */
+
 int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, L"false", 	cmd_false, 		NULL);
     toy_add_func(interp, L"true", 	cmd_true, 		NULL);
@@ -4420,6 +4449,7 @@ int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, L"set-itimer",	cmd_setitimer, 		L"msec");
     toy_add_func(interp, L"enable-itimer",cmd_enableitimer, 	NULL);
     toy_add_func(interp, L"atomic",	cmd_atomic, 		L"body");
+    toy_add_func(interp, L"eval-stat",	cmd_evalstat, 		NULL);
     
 #ifdef NCURSES
     int toy_add_func_ncurses(Toy_Interp* interp);
