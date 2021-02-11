@@ -606,6 +606,11 @@ CombiWindow method apply-keybind (main window key) {
 	return <nil>;
     };
 
+    if {and {string? $key} {[$key len] > 1}} {
+        $main send-key-event ([$key sub 1]);
+        key ::= $key at 0;
+    };
+    
     command ::= $KeyBinding get $key;
     if {eq? <nil> $command} {
     show-message ["No binding key: " . $key];
