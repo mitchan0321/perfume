@@ -22,6 +22,7 @@ PKG_TAR_NAME	= pmacs-install.tar.gz
 
 ### Enable curses library (for use in perfume intepriter execute curs-* commands)
 NCURSES = yes
+EVAL_STAT = yes
 
 ifeq ($(NCURSES),yes)
   OPTIONS	+= -DNCURSES
@@ -29,6 +30,9 @@ ifeq ($(NCURSES),yes)
   OPTLIBS2	+= -lncursesw
 endif
 
+ifeq ($(EVAL_STAT),yes)
+  OPTIONS	+= -DEVAL_STAT
+endif
 
 ### for product build. (use BoehmGC)
 CFLAGS		= -Wall -O2 -c -g $(OPTIONS)
