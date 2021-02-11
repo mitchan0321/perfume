@@ -1508,4 +1508,10 @@
 	methods.c
 		Fix String::{alphabetic?|numeric?|alphanumeric?} if it's "" return <nil>.
 
+2021/02/11
+	commands.c, eval.c
+		Add command eval-stat for statistics evaluator count.
+	Makefile
+		Add compile option EVAL_STAT.
+
 #eof
