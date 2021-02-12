@@ -270,7 +270,6 @@ to_real(Toy_Interp *interp, Toy_Type *v) {
     return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
-
 Toy_Type*
 mth_integer_plus(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *arg;

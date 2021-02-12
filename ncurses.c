@@ -14,6 +14,7 @@
 #include "cstack.h"
 #include "util.h"
 #include "encoding.h"
+#include "sys/time.h"
 
 Toy_Type*
 func_curses_init(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
@@ -818,17 +819,30 @@ key_conv(int in) {
     return new_string_cell(c);
 }
 
+static double
+get_now_time() {
+    struct timeval s;
+    double r;
+
+    gettimeofday(&s, NULL);
+    r = (double)s.tv_sec + ((double)s.tv_usec)/1000000.0;
+    return r;
+}
+
 Toy_Type*
 func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     WINDOW *w;
     Toy_Type *container, *encoding;
-    int itimeout, in, iencoder;
+    int itimeout, iencoder;
+    int in, cur_in;
     Toy_Type *arg;
     Cell *incell, *dstr;
-    Toy_Type *inlist, *result;
+    Toy_Type *inlist, *result, *result_list;
     encoder_error_info *enc_error_info;
     static int pending_key = -1;
     static unsigned long int curs_blink = 0;
+    static double time_prev=0.0, time_now=0.0, time_on_repeat=0.0;
+    static int no_input_count = 0;
 
     if (hash_get_length(nameargs) > 0) goto error;
     if (arglen != 3) goto error;
@@ -865,13 +879,17 @@ func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     curs_set(((curs_blink >> 3) % 4) ? 1 : 0); // blink 3:1
     wtimeout(w, itimeout);
 
+    cur_in = -1;
     if (pending_key != -1) {
 	in = pending_key;
 	pending_key = -1;
     } else {
 	in = wgetch(w);
     }
-    if (in == -1) return result;
+    if (in == -1) {
+	goto valid_return;
+    }
+    cur_in = in;
     
     //
     // detect function character.
@@ -892,7 +910,9 @@ func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 		pending_key = in;
 	    }
 	    inlist = list_append(inlist, key_conv(KEY_RESIZE));
-	    return result;
+            cur_in = -1;
+	    
+            goto valid_return;
 	}
 	
 	// if function key, return to caller soon.
@@ -903,21 +923,21 @@ func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 	while (in != ERR) {
 	    if (in >= 256) {
 		pending_key = in;
-		// inlist = list_append(inlist, new_symbol(L"KEY_ESC"));
-		return result;
-	    }
+                goto valid_return;
+    	    }
 	    if (in < 0x20) {
 		pending_key = in;
 		break;
 	    }
 	    cell_add_char(incell, in);
+	    cur_in = in;
 	    in = wgetch(w);
 	}
 	if (cell_get_length(incell) > 0) {
 	    inlist = list_append(inlist, new_string_cell(incell));
 	}
         
-	return result;
+        goto valid_return;
 	
     } else {
 	//
@@ -926,11 +946,13 @@ func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 	if ((in >= 0) && (in < 0x20)) {
 	    // detect control caracter, return to caller soon.
 	    inlist = list_append(inlist, key_conv(in));
-	    return result;
+	    cur_in = in;
+            goto valid_return;
 	}
 	
 	// assemble sequential character string.
 	cell_add_char(incell, in);
+	cur_in = in;
 	
 	// read remain character
 	wtimeout(w, itimeout / 4);
@@ -942,6 +964,7 @@ func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 		break;
 	    } {
 		cell_add_char(incell, in);
+	        cur_in = in;
 	    }
 	    in = wgetch(w);
 	}
@@ -953,7 +976,28 @@ func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 	inlist = list_append(inlist, new_string_cell(dstr));
     }
 
-    return result;
+valid_return:
+    if (cur_in != -1) {
+        time_prev = time_now;
+        time_now = get_now_time();
+        if ((time_now - time_prev) < 0.1) {
+            time_on_repeat += (time_now - time_prev);
+        } else {
+            time_on_repeat = 0.0;
+        }
+        no_input_count = 0;
+    } else {
+	no_input_count ++;
+	if (no_input_count >= 3) {
+            time_on_repeat = 0.0;
+	}
+    }
+    
+    result_list = new_list(NULL);
+    list_append(result_list, new_real(time_on_repeat));
+    list_append(result_list, result);
+    
+    return result_list;
     
 error:
     return new_exception(TE_SYNTAX, L"Syntax error at 'curs-keyin', syntax: curs-keyin window timeout encoding", interp);

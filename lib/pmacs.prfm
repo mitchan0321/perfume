@@ -73,7 +73,7 @@ defun pmacs (trace: t) {
 		    key := ();
 		    timeout := 10000;
 		    while {$key null?} do: {
-			key ::= curs-keyin [$MainWindow get-current-window : get-curs] $INPUT_TIMEOUT $INPUT_ENCODING;
+			(repeat-time key) ::= curs-keyin [$MainWindow get-current-window : get-curs] $INPUT_TIMEOUT $INPUT_ENCODING;
 			$timeout -- $INPUT_TIMEOUT;
 			if {$timeout < 0} {break};
 		    };

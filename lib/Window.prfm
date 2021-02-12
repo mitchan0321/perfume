@@ -1,3 +1,4 @@
+
 class Window;
 
 Window method init (curs) {
@@ -479,7 +480,8 @@ Window method key-event-loop () {
 
 	window ::= $main get-current-window;
 	if {$KeyEvent null?} {
-	    i ::= curs-keyin [$window get-curs] $INPUT_TIMEOUT $INPUT_ENCODING;
+	    (rtime i) ::= curs-keyin [$window get-curs] $INPUT_TIMEOUT $INPUT_ENCODING;
+            ### if {$rtime > 0.0} {show-message ["repeat time: " . $rtime]};
 	    if [$KeyMaps set? $i] {
 		i ::= $KeyMaps get $i;
 	    };
