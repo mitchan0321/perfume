@@ -1514,4 +1514,8 @@
 	Makefile
 		Add compile option EVAL_STAT.
 
+2021/02/12
+	ncurses.c
+		Add key repeat value on curs-keyin returns.
+
 #eof
