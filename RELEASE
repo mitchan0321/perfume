@@ -1514,8 +1514,10 @@
 	Makefile
 		Add compile option EVAL_STAT.
 
-2021/02/12
+2021/02/13
 	ncurses.c
 		Add key repeat value on curs-keyin returns.
+	pmacs update:
+		Add key move acceleration when up/down key repeat.
 
 #eof
