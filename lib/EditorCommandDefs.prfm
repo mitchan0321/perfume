@@ -221,7 +221,8 @@ defcommand smooth-scroll-down {
     geom ::= $window get-geom;
 
     (y x) ::= $window get-screen-size;
-    new-y ::= $geom,ViewLine + 1;
+    acc ::= 1 * $KEY_REPEAT_ACCEL;
+    new-y ::= $geom,ViewLine + $acc;
     if {$new-y > [[$buff get-buffer-length] - $y : + 1]} {
         new-y ::= [$buff get-buffer-length] - $y : + 1;
     };
@@ -239,7 +240,8 @@ defcommand smooth-scroll-up {
     geom ::= $window get-geom;
 
     (y x) ::= $window get-screen-size;
-    new-y ::= $geom,ViewLine - 1;
+    acc ::= 1 * $KEY_REPEAT_ACCEL;
+    new-y ::= $geom,ViewLine - $acc;
     if {$new-y < 0} {
         new-y := 0;
     };

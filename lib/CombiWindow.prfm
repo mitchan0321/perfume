@@ -336,12 +336,21 @@ CombiWindow method move-down () {
     (y x) ::= curs-get-screen-size $BufferCurs;
 
     if {[$geom,ViewLine + $geom,CursorLine] >= [$buff get-buffer-length]} {return};
-    set line [$geom,CursorLine + 1];
+
+    acc ::= 1 * $KEY_REPEAT_ACCEL;
+    set line [$geom,CursorLine + $acc];
     if {$line >= $y} {
-	set line [$line - 1];
-	new-y ::= $geom,ViewLine + 1;
-	if {$new-y > [$buff get-buffer-length]} {new-y ::= $buff get-buffer-length};
-	$geom set! ViewLine $new-y;
+#	set line [$line - $acc];
+#	new-y ::= $geom,ViewLine + $acc;
+	set line [$y - 1];
+	new-y ::= $geom,ViewLine + $acc;
+	if {$new-y > [[$buff get-buffer-length] - $y : + 1]} {
+            new-y ::= [$buff get-buffer-length] - $y : + 1;
+        };
+        if {$new-y < 0} {
+            new-y := 0;
+        };
+        $geom set! ViewLine $new-y;
     };
     $geom set! CursorLine $line;    
 };
@@ -350,10 +359,11 @@ CombiWindow method move-up () {
     geom ::= get-geom;
     (y x) ::= curs-get-screen-size $BufferCurs;
 
-    set line [$geom,CursorLine - 1];
+    acc ::= 1 * $KEY_REPEAT_ACCEL;
+    set line [$geom,CursorLine - $acc];
     if {$line < 0} {
 	set line 0;
-	new-y ::= $geom,ViewLine - 1;
+	new-y ::= $geom,ViewLine - $acc;
 	if {$new-y < 0} {new-y := 0};
 	$geom set! ViewLine $new-y;
     };
@@ -390,8 +400,7 @@ CombiWindow method free-cursor-turn-off (geom buff) {
 CombiWindow method move-right () {
     geom ::= get-geom;
     buff ::= get-buffer;
-    free-cursor-turn-off $geom $buff;
-    (cy cx) ::= get-source-index $buff $geom;
+    free-cursor-turn-off $geom $buff;    (cy cx) ::= get-source-index $buff $geom;
 
     r ::= $buff get-buffer-line $cy;
     if $r {
