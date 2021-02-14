@@ -2343,7 +2343,6 @@ loop:
     }
 
 loop_continue:
-    
     l = list_next(l);
     goto loop;
     
