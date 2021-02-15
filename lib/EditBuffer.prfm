@@ -294,6 +294,9 @@ EditBuffer method undo () {
                     };
                     return ($line $col);
                 }
+                {eq? $cmd backdelete-character-at} {
+                    return ($o,1 $o,2);
+                }
                 {eq? $cmd line-update} {
                     return ($o,2 0);
                 }
@@ -331,6 +334,9 @@ EditBuffer method redo () {
 		};
 		return ($line $col);
 	    }
+            {eq? $cmd backdelete-character-at} {
+                return ($o,1 $o,2);
+            }
             {eq? $cmd line-update} {
                 return ($o,2 0);
             }
