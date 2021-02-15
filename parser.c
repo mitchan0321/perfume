@@ -378,7 +378,7 @@ toy_parse_string(Bulk *src, wchar_t endc) {
 
 	if (0 != c) {
 	    if (NULL == cell_add_char(newcell, c)) goto assert;
-	};
+	}
 	c = bulk_getchar(src);
     }
     return str;
@@ -422,13 +422,18 @@ toy_parse_rquote(Bulk *src, wchar_t endc) {
 	    case L'\'':
 		c = L'\'';
 		break;
+            case L'\n':
+                c = 0;
+                break;
 	    default:
 		bulk_ungetchar(src);
 		c = L'\\';
 	    }
 	}
 
-	if (NULL == cell_add_char(newcell, c)) goto assert;
+        if (0 != c) {
+            if (NULL == cell_add_char(newcell, c)) goto assert;
+        }
 	c = bulk_getchar(src);
     }
     return str;
