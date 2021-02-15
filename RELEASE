@@ -1524,5 +1524,14 @@
 	pmacs update:
 		Change key binding at mode pwiki and man, *-link-back assign to KEY_BTAB.
 		Change to pwiki link and man link regex defined at pmacs.conf.
+		Fix insert character reverse execution (ex. undo) when cursor at buffers bottom,
+		  add insert backdelete-character-at command before.
+		Add line-insert interface at EditBuffer.
+		Change to use EditBuffer::line-insert editor commands is:
+		  replace-buffer, replace-region, smart-indent, smart-dedent.
+		Change coding style use RQuote '\' at line tail.
+		Change key repeat factor caluculate algorithm.
+	parser.c
+		Add RQuote can use '\' character at line tail.
 
 #eof
