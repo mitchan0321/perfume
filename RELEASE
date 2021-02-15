@@ -1520,4 +1520,9 @@
 	pmacs update:
 		Add key move acceleration when up/down key repeat.
 
+2021/02/15
+	pmacs update:
+		Change key binding at mode pwiki and man, *-link-back assign to KEY_BTAB.
+		Change to pwiki link and man link regex defined at pmacs.conf.
+
 #eof

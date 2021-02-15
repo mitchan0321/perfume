@@ -1284,7 +1284,7 @@ defcommand search-next {
         show-message "No set search string, execute 'search' command first.";
         return SELF;
     };
-    (y x) ::= get-next-search $ey $ex $str $buff;
+    (y x) ::= get-next-search $ey $ex [$str rquote] $buff;
     $window cursor-move-to $geom $y $x;
     return SELF;
 };
@@ -1299,7 +1299,7 @@ defcommand search-previous {
         show-message "No set search string, execute 'search' command first.";
         return SELF;
     };
-    (y x) ::= get-previous-search $ey $ex $str $buff;
+    (y x) ::= get-previous-search $ey $ex [$str rquote] $buff;
     $window cursor-move-to $geom $y $x;
     return SELF;
 };
@@ -1308,7 +1308,7 @@ defun get-next-search (y x str buff) {
     r ::= $buff get-buffer-line $y;
     $r ?? {return ($y $x)};
 
-    sl ::= $r =~ :all [$str rquote];
+    sl ::= $r =~ :all $str;
     if $sl {
         sl ::= $sl filter {| el | [$el get 0] > $x};
         if {$sl null?} else: {
@@ -1319,7 +1319,7 @@ defun get-next-search (y x str buff) {
     result := <nil>;
     $buff buffer-select [$y + 1] [$buff get-buffer-length] {
         | src l |
-        sl ::= $src =~ :all [$str rquote];
+        sl ::= $src =~ :all $str;
         if $sl {
             result := ($l [$sl car : car]);
         };
@@ -1336,7 +1336,7 @@ defun get-previous-search (y x str buff) {
         
     r ::= $buff get-buffer-line $y;
     if $r {
-        sl ::= $r =~ :all [$str rquote];
+        sl ::= $r =~ :all $str;
         if $sl {
             sl ::= $sl reverse;
             sl ::= $sl filter {| el | [$el get 0] < $x};
@@ -1350,7 +1350,7 @@ defun get-previous-search (y x str buff) {
     result := <nil>;
     $buff buffer-select [$y - 1] 0 {
         | src l |
-        sl ::= $src =~ :all [$str rquote];
+        sl ::= $src =~ :all $str;
         if $sl {
             sl ::= $sl reverse;
             result := ($l [$sl car : car]);
@@ -1368,7 +1368,7 @@ defcommand pwiki-next-link {
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     (ey ex) ::= $window get-source-index $buff $geom;
-    (y x) ::= get-next-search $ey $ex "\\[\\[[^\\[\\] \t]+\\]\\]" $buff;
+    (y x) ::= get-next-search $ey $ex $PWIKI_LINK $buff;
     $window cursor-move-to $geom $y $x;
     return SELF;
 };
@@ -1378,7 +1378,7 @@ defcommand pwiki-previous-link {
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     (ey ex) ::= $window get-source-index $buff $geom;
-    (y x) ::= get-previous-search $ey $ex "\\[\\[[^\\[\\] \t]+\\]\\]" $buff;
+    (y x) ::= get-previous-search $ey $ex $PWIKI_LINK $buff;
     $window cursor-move-to $geom $y $x;
     return SELF;
 };
@@ -1388,7 +1388,7 @@ defcommand pwiki-click-link {
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     (ey ex) ::= $window get-source-index $buff $geom;
-    str ::= cursor-on-search-string $ey $ex "\\[\\[[^\\[\\] \t]+\\]\\]" $buff;
+    str ::= cursor-on-search-regex $ey $ex $PWIKI_LINK $buff;
     $str ?? {
         $window apply-command $main $window "\r" insert-character;
         return ALL;
@@ -1452,10 +1452,10 @@ defcommand pwiki-link-back {
     result ALL;
 };
 
-defun cursor-on-search-string (y x str buff) {
+defun cursor-on-search-regex (y x str buff) {
     r ::= $buff get-buffer-line $y;
     $r ?? {return <nil>};
-    sl ::= $r =~ :all [$str rquote];
+    sl ::= $r =~ :all $str;
     $sl ?? {return <nil>};
     $sl each do: {| el |
         if {and {$x >= [$el get 0]} {$x < [$el get 1]}} {
@@ -2454,7 +2454,7 @@ defcommand man-click-link {
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     (ey ex) ::= $window get-source-index $buff $geom;
-    str ::= cursor-on-search-string $ey $ex "[a-z_][a-z0-9\\-_]*\\([0-9]\\)" $buff;
+    str ::= cursor-on-search-regex $ey $ex $MAN_LINK $buff;
     $str ?? {
         show-message "No man topic.";
         return ALL;
@@ -2465,7 +2465,7 @@ defcommand man-click-link {
     
     topic ::= $str split sep: "(" : get 0 : lower;
     section ::= $str split sep: "(" : get 1 : at 0;
-    show-message ["Topic: " . $section " " $topic];
+    show-message ["Man topic: " . $section " " $topic];
     exec-man $main $window [$section . " " $topic];
 
     next-buff ::= $window get-buffer;
@@ -2496,7 +2496,7 @@ defcommand man-next-link {
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     (ey ex) ::= $window get-source-index $buff $geom;
-    (y x) ::= get-next-search $ey $ex "[a-z_][a-z0-9\\-_]*\\([0-9]\\)" $buff;
+    (y x) ::= get-next-search $ey $ex $MAN_LINK $buff;
     $window cursor-move-to $geom $y $x;
     return SELF;
 };
@@ -2506,7 +2506,7 @@ defcommand man-previous-link {
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     (ey ex) ::= $window get-source-index $buff $geom;
-    (y x) ::= get-previous-search $ey $ex "[a-z_][a-z0-9\\-_]*\\([0-9]\\)" $buff;
+    (y x) ::= get-previous-search $ey $ex $MAN_LINK $buff;
     $window cursor-move-to $geom $y $x;
     return SELF;
 };
