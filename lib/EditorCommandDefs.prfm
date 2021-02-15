@@ -1606,8 +1606,9 @@ defcommand smart-indent {
     if {$cur-pos < $next-indent} {
 	# smart indent
 	new-str ::= [" " repeat $next-indent] . [$str clean];
-	$buff cut-region $ey 0 $ey [$str len];
-	$buff insert-string-at $new-str $ey 0;
+##	$buff cut-region $ey 0 $ey [$str len];
+##	$buff insert-string-at $new-str $ey 0;
+        $buff line-update $new-str $ey;
         $geom set! IndexColumn.SAVE $next-indent;
     } {
 	# insert indent
@@ -1674,8 +1675,9 @@ defcommand smart-dedent {
     if {$next-indent < 0} {next-indent := 0};
     
     new-str ::= [" " repeat $next-indent] . [$str clean];
-    $buff cut-region $ey 0 $ey [$str len];
-    $buff insert-string-at $new-str $ey 0;
+##    $buff cut-region $ey 0 $ey [$str len];
+##    $buff insert-string-at $new-str $ey 0;
+    $buff line-update $new-str $ey;
     $geom set! IndexColumn.SAVE [$new-str len];
     
     result ALL;

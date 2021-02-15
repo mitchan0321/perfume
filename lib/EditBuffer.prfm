@@ -200,6 +200,9 @@ EditBuffer method insert-string-at (input y x) {
     
     sets Modify <t>;
     if {true? Src} {
+        if {$y >= [$Src len]} {
+            $UndoBuffer << (backdelete-character-at [$Src len : + 1] 0);
+        };
 	result ::= $Src insert-string-at $input $y $x;
 	if $result,0 {$UndoBuffer << $result; sets RedoBuffer ()};
 	return ($result,3 $result,4);
@@ -243,6 +246,23 @@ EditBuffer method append-string (str) {
     return (0 0);
 };
 
+EditBuffer method line-update (str y) {
+    if {true? Protect} {throw ErrReadOnly "Buffer is protected."};
+
+    sets Modify <t>;
+    if {and {true? Src} {$y >= 0} {$y < [$Src len]}} {
+        result ::= $Src line-update $str $y;
+        $UndoBuffer << $result; sets RedoBuffer ();
+        return $result;
+    } {
+        if {$y >= [$Src len]} {
+            result ::= $Src append-string $str;
+            return $result;
+        };
+    };
+    return (<nil> 0 0);
+};
+
 EditBuffer method undo () {
     if {true? Protect} {throw ErrReadOnly "Buffer is protected."};
     
@@ -273,6 +293,9 @@ EditBuffer method undo () {
                         line ::= $line + 1;
                     };
                     return ($line $col);
+                }
+                {eq? $cmd line-update} {
+                    return ($o,2 0);
                 }
             ;
 	};
@@ -308,11 +331,13 @@ EditBuffer method redo () {
 		};
 		return ($line $col);
 	    }
+            {eq? $cmd line-update} {
+                return ($o,2 0);
+            }
 	};
     };
     return (<nil> <nil>);
 };
-
 
 EditBuffer method modify? () {
     return $Modify;
@@ -409,8 +434,9 @@ EditBuffer method replace-buffer (froms tos) {
         len ::= $s len;
         (result n) ::= $s replace-return-times :all $froms $tos;
         if {$n = 0} {continue};
-        [self] cut-region $i 0 $i $len;
-        [self] insert-string-at $result $i 0;
+##        [self] cut-region $i 0 $i $len;
+##        [self] insert-string-at $result $i 0;
+        [self] line-update $result $i;
         $c ++ $n;
     };
     return $c;
@@ -434,8 +460,9 @@ EditBuffer method replace-region (froms tos start end) {
         len ::= $s len;
         (result n) ::= $s replace-return-times :all $froms $tos;
         if {$n = 0} {continue};
-        [self] cut-region $i 0 $i $len;
-        [self] insert-string-at $result $i 0;
+##        [self] cut-region $i 0 $i $len;
+##        [self] insert-string-at $result $i 0;
+        [self] line-update $result $i;
         $c ++ $n;
     };
     return $c;

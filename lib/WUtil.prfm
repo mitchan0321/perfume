@@ -506,6 +506,13 @@ Vector method append-string (str) {
     };
 };
 
+Vector method line-update (str y) {
+    r ::= [self] get $y;
+    [self] set $y $str;
+    result := (line-update $r $y);
+    return $result;
+};
+
 Vector method delete-region (start-line start-column end-line end-column) {
     if {$start-line > $end-line} {
 	(start-line end-line) := ($end-line $start-line);

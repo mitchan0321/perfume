@@ -481,14 +481,17 @@ Window method key-event-loop () {
 	window ::= $main get-current-window;
 	if {$KeyEvent null?} {
 	    (rtime i) ::= curs-keyin [$window get-curs] $INPUT_TIMEOUT $INPUT_ENCODING;
-            cond 
-                $KEY_REPEAT_ACCEL_OFF {setvar KEY_REPEAT_ACCEL  1; break;}
-                {$rtime < 0.50}       {setvar KEY_REPEAT_ACCEL  1; break;}
-                {$rtime < 1.00}       {setvar KEY_REPEAT_ACCEL  2; break;}
-                {$rtime < 1.50}       {setvar KEY_REPEAT_ACCEL  4; break;}
-                {$rtime < 2.00}       {setvar KEY_REPEAT_ACCEL  8; break;}
-                <t>                   {setvar KEY_REPEAT_ACCEL 16; break;}
-            ;;
+            if $KEY_REPEAT_ACCEL_OFF {
+                setvar KEY_REPEAT_ACCEL 1;
+            } {
+                setvar KEY_REPEAT_ACCEL [
+                    if {$rtime > 2.0} 
+                        16
+                        [$rtime / 2.0 : * 15.0 : int : + 1]
+                    ;;
+                ];
+            };
+            
 	    if [$KeyMaps set? $i] {
 		i ::= $KeyMaps get $i;
 	    };
