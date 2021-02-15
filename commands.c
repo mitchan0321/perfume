@@ -4449,7 +4449,10 @@ int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, L"set-itimer",	cmd_setitimer, 		L"msec");
     toy_add_func(interp, L"enable-itimer",cmd_enableitimer, 	NULL);
     toy_add_func(interp, L"atomic",	cmd_atomic, 		L"body");
+
+#ifdef EVAL_STAT
     toy_add_func(interp, L"eval-stat",	cmd_evalstat, 		NULL);
+#endif /* EVAL_STAT */
     
 #ifdef NCURSES
     int toy_add_func_ncurses(Toy_Interp* interp);

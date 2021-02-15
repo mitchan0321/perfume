@@ -22,7 +22,7 @@ PKG_TAR_NAME	= pmacs-install.tar.gz
 
 ### Enable curses library (for use in perfume intepriter execute curs-* commands)
 NCURSES = yes
-EVAL_STAT = yes
+EVAL_STAT = no
 
 ifeq ($(NCURSES),yes)
   OPTIONS	+= -DNCURSES
