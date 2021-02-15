@@ -17,11 +17,13 @@ PKG_EXTLIB_DIR	= /usr/local/lib
 PKG_TAR_NAME	= pmacs-install.tar.gz
 ifeq ($(shell uname),Linux)
   MAKE		= make
+else
+  ifeq ($(shell uname),FreeBSD)
+    MAKE	= gmake
+  else
+    MAKE	= make
+  endif
 endif
-ifeq ($(shell uname),FreeBSD)
-  MAKE		= gmake
-endif
-
 
 ###
 ### SET ENABLE FEATURE OPTIONS
