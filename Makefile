@@ -15,6 +15,13 @@ PKG_TMP		= $(HOME)/tmp
 PKG_DIR		= $(PKG_TMP)/pmacs-install
 PKG_EXTLIB_DIR	= /usr/local/lib
 PKG_TAR_NAME	= pmacs-install.tar.gz
+ifeq ($(shell uname),Linux)
+  MAKE		= make
+endif
+ifeq ($(shell uname),FreeBSD)
+  MAKE		= gmake
+endif
+
 
 ###
 ### SET ENABLE FEATURE OPTIONS
@@ -169,8 +176,8 @@ clean:
 	rm -f encoding-set-utoj.h encoding-set-jtou.h
 
 build-pkg:
-	make clean
-	make
+	$(MAKE) clean
+	$(MAKE)
 	rm -rf $(PKG_TMP)
 	mkdir -p $(PKG_DIR)
 	mkdir -p $(PKG_DIR)/lib
