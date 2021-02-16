@@ -1538,4 +1538,8 @@
 	pmacs update:
 		Change Editor command no-protect -> set-noprotect.
 
+2021/02/19
+	pmacs update:
+		Add help editor command.
+
 #eof
