@@ -1534,4 +1534,8 @@
 	parser.c
 		Add RQuote can use '\' character at line tail.
 
+2021/02/17
+	pmacs update:
+		Change Editor command no-protect -> set-noprotect.
+
 #eof
