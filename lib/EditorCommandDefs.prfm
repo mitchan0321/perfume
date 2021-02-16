@@ -2390,7 +2390,7 @@ defcommand set-protect {
     result ALL;
 };
 
-defcommand no-protect {
+defcommand set-noprotect {
     | main window |
     buff ::= $window get-buffer;
     $buff no-protect;
