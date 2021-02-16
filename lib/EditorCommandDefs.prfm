@@ -2610,6 +2610,24 @@ defcommand compile {
     result SELF;
 };
 
+defcommand help {
+    | main window |
+    help-path ::= $DEFAULT_PWIKI_DIR . "/00start.pwiki";
+    buff ::= BufferManager get-buffer-by-path $help-path;
+    $buff ?? {
+        buff ::= new EditBuffer;
+        create-directory-if-not-exists $help-path;
+        (result err) ::= $buff load-content $help-path;
+        $result ?? {
+            show-message ["Open Failed, path: " . $help-path " ("  $err ")"];
+            return SELF;
+        };
+    };
+    $main bind-buffer [$window get-window-name] $buff;
+    
+    return ALL;
+};
+
 defcommand mini-move-message {
     | main window |
     buff ::= $window get-buffer;
