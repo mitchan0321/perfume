@@ -358,7 +358,7 @@ defcommand previous-page-anothor-window {
     result ALL;
 };
 
-defcommand previous-smooth-scroll-up-anothor-window {
+defcommand smooth-scroll-up-anothor-window {
     | main window |
     $main roll-current-window;
     $main get-current-window : apply-command $main [$main get-current-window] "" smooth-scroll-up;
@@ -366,7 +366,7 @@ defcommand previous-smooth-scroll-up-anothor-window {
     result ALL;
 };
 
-defcommand previous-smooth-scroll-down-anothor-window {
+defcommand smooth-scroll-down-anothor-window {
     | main window |
     $main roll-current-window;
     $main get-current-window : apply-command $main [$main get-current-window] "" smooth-scroll-down;
