@@ -1,0 +1,80 @@
+....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+....0
+
+目次に戻る: [[00start]]
+----------
+
+X1. 複数のキーの組み合わせによるカーソル移動
+
+矢印キー、HOME、END、PageUp、PageDownとShift、Ctrl、Altキーの組み合わせによるカーソルの動きを
+以下に示します。
+なお、キーバインドはモードによって異なるため、各モード毎に記載します。
+
+
+【Textモード, Cモード, Prfmモード, Grepモード, BListモード】
+キー  単独                   Shift                   Ctrl                   Alt                                    Ctrl+Alt
+----  ----                   -----                   ----                   ---                                    --------
+上    [[cursor-up]]          [[smooth-scroll-up]]    [[previous-page]]      [[move-previous-paragraph]]            [[smooth-scroll-up-anothor-window]]
+下    [[cursor-down]]        [[smooth-scroll-down]]  [[next-page]]          [[move-next-paragraph]]                [[smooth-scroll-down-anothor-window]]
+左    [[cursor-left]]        [[smooth-scroll-left]]  [[cursor-top-of-line]] [[smart-move-backward]]                ---
+右    [[cursor-right]]       [[smooth-scroll-right]] [[cursor-end-of-line]] [[smart-move-forward]]                 ---
+HOME  [[cursor-top-of-line]] [[move-screen-top]]     [[top-of-buffer]]      ---                                    ---
+END   [[cursor-end-of-line]] [[move-screen-bottom]]  [[bottom-of-buffer]]   ---                                    ---
+PgUp  [[previous-page]]      [[fit-to-bottom]]       ---                    [[move-previous-paragraph-fit-to-top]] [[previous-page-anothor-window]]
+PgDn  [[next-page]]          [[fit-to-top]]          ---                    [[move-next-paragraph-fit-to-top]]     [[next-page-anothor-window]]
+
+
+【Interpモード】
+キー  単独                   Shift                   Ctrl                   Alt                                    Ctrl+Alt
+----  ----                   -----                   ----                   ---                                    --------
+上    [[cursor-up]]          [[smooth-scroll-up]]    [[previous-page]]      [[move-previous-paragraph]]            [[smooth-scroll-up-anothor-window]]
+下    [[cursor-down]]        [[smooth-scroll-down]]  [[next-page]]          [[move-next-paragraph]]                [[smooth-scroll-down-anothor-window]]
+左    [[cursor-left]]       *[[pwiki-previous-link]] [[cursor-top-of-line]] [[smart-move-backward]]                ---
+右    [[cursor-right]]      *[[pwiki-next-link]]     [[cursor-end-of-line]] [[smart-move-forward]]                 ---
+HOME  [[cursor-top-of-line]] [[move-screen-top]]     [[top-of-buffer]]      ---                                    ---
+END   [[cursor-end-of-line]] [[move-screen-bottom]]  [[bottom-of-buffer]]   ---                                    ---
+PgUp  [[previous-page]]      [[fit-to-bottom]]       ---                    [[move-previous-paragraph-fit-to-top]] [[previous-page-anothor-window]]
+PgDn  [[next-page]]          [[fit-to-top]]          ---                    [[move-next-paragraph-fit-to-top]]     [[next-page-anothor-window]]
+
+(*印はデフォルトのTextモードから変更がある部分)
+
+
+【PWikiモード】
+キー  単独                   Shift                   Ctrl                   Alt                                    Ctrl+Alt
+----  ----                   -----                   ----                   ---                                    --------
+上    [[cursor-up]]          [[smooth-scroll-up]]    [[previous-page]]      [[move-previous-paragraph]]            [[smooth-scroll-up-anothor-window]]
+下    [[cursor-down]]        [[smooth-scroll-down]]  [[next-page]]          [[move-next-paragraph]]                [[smooth-scroll-down-anothor-window]]
+左    [[cursor-left]]       *[[pwiki-previous-link]] [[cursor-top-of-line]] [[smart-move-backward]]                ---
+右    [[cursor-right]]      *[[pwiki-next-link]]     [[cursor-end-of-line]] [[smart-move-forward]]                 ---
+HOME  [[cursor-top-of-line]] [[move-screen-top]]     [[top-of-buffer]]      ---                                    ---
+END   [[cursor-end-of-line]] [[move-screen-bottom]]  [[bottom-of-buffer]]   ---                                    ---
+PgUp  [[previous-page]]      [[fit-to-bottom]]       ---                    [[move-previous-paragraph-fit-to-top]] [[previous-page-anothor-window]]
+PgDn  [[next-page]]          [[fit-to-top]]          ---                    [[move-next-paragraph-fit-to-top]]     [[next-page-anothor-window]]
+(以下はバッファにプロテクト[[set-protect]]が設定されている場合に有効となります)
+"b"   [[previous-page]]
+" "   [[next-page]]
+
+(*印はデフォルトのTextモードから変更がある部分)
+
+
+【Manモード】
+キー  単独                   Shift                   Ctrl                   Alt                                    Ctrl+Alt
+----  ----                   -----                   ----                   ---                                    --------
+上    [[cursor-up]]          [[smooth-scroll-up]]    [[previous-page]]      [[move-previous-paragraph]]            [[smooth-scroll-up-anothor-window]]
+下    [[cursor-down]]        [[smooth-scroll-down]]  [[next-page]]          [[move-next-paragraph]]                [[smooth-scroll-down-anothor-window]]
+左    [[cursor-left]]       *[[man-previous-link]]   [[cursor-top-of-line]] [[smart-move-backward]]                ---
+右    [[cursor-right]]      *[[man-next-link]]       [[cursor-end-of-line]] [[smart-move-forward]]                 ---
+HOME  [[cursor-top-of-line]] [[move-screen-top]]     [[top-of-buffer]]      ---                                    ---
+END   [[cursor-end-of-line]] [[move-screen-bottom]]  [[bottom-of-buffer]]   ---                                    ---
+PgUp  [[previous-page]]      [[fit-to-bottom]]       ---                    [[move-previous-paragraph-fit-to-top]] [[previous-page-anothor-window]]
+PgDn  [[next-page]]          [[fit-to-top]]          ---                    [[move-next-paragraph-fit-to-top]]     [[next-page-anothor-window]]
+(以下はバッファにプロテクト[[set-protect]]が設定されている場合に有効となります)
+"b"   [[previous-page]]
+" "   [[next-page]]
+
+(*印はデフォルトのTextモードから変更がある部分)
+
+
+----------
+目次に戻る: [[00start]]
+
+....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+....0
