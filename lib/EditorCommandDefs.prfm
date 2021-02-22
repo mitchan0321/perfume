@@ -662,6 +662,7 @@ defcommand open-file {
 	    $main mini-input-end;
 	    if {[$value len] = 0} {
 		show-message "No file name specified.";
+                BufferManager unregist-buffer "*Directory*";
 		return SELF;
 	    };
             path ::= path-adjust [
@@ -672,10 +673,75 @@ defcommand open-file {
 	    buff ::= BufferManager get-buffer-by-path $path;
             if $buff {
 		$MainWindow bind-buffer [$window get-window-name] $buff;
+                BufferManager unregist-buffer "*Directory*";
 		return SELF;
             };
 	    buff ::= new EditBuffer;
 	    (result err) ::= $buff load-content $path;
+	    $MainWindow bind-buffer [$window get-window-name] $buff;
+	    $result ?? {show-message ["Open Failed, path: " . $value " ("  $err ")"]};
+	    BufferManager unregist-buffer "*Directory*";
+	};
+	if {eq? $in-key CTRL_I} {
+            if {$value = ""} {
+                fname ::= show-files-in-window $main $window [get-current-buffer-dir $window];
+            } {
+                fname ::= show-files-in-window $main $window $value;
+            };
+	    $window apply-command $main $window "" top-of-buffer;
+	    $main mini-input-value-override $fname [$fname len];
+	    return ALL;
+	};
+	if {eq? $in-key KEY_DOWN} {
+	    $window apply-command $main $window "" move-half-up;
+	    return SELF;
+	};
+	if {eq? $in-key KEY_UP} {
+	    $window apply-command $main $window "" move-half-down;
+	    return SELF;
+	};
+	if {eq? $in-key "/"} {
+            if {[$value at -2] = "/"} {
+		$main mini-input-value-override "/" 1;
+            };
+	    return SELF;
+	};
+    };
+    result SELF;
+};
+
+defcommand view-file {
+    | main window |
+    $main mini-input-start [get-current-buffer-dir $window : . "/"] prompt: "View file: ";
+    $main add-mini-input-callback $window {| main window in-key value |
+        if {eq? $in-key KEY_ESC} {
+	    $main mini-input-end;
+	    show-message "Canceled.";
+	    BufferManager unregist-buffer "*Directory*";	
+            return SELF;
+	};
+        if {eq? $in-key CTRL_M} {
+	    $main mini-input-end;
+	    if {[$value len] = 0} {
+		show-message "No file name specified.";
+                BufferManager unregist-buffer "*Directory*";
+		return SELF;
+	    };
+            path ::= path-adjust [
+		{[$value sub 0 1] = "/"} ???
+		    $value
+		    [get-current-buffer-dir $window : . "/" $value]
+	    ];
+	    buff ::= BufferManager get-buffer-by-path $path;
+            if $buff {
+                $buff set-protect;
+		$MainWindow bind-buffer [$window get-window-name] $buff;
+                BufferManager unregist-buffer "*Directory*";
+		return SELF;
+            };
+	    buff ::= new EditBuffer;
+	    (result err) ::= $buff load-content $path;
+            $buff set-protect;
 	    $MainWindow bind-buffer [$window get-window-name] $buff;
 	    $result ?? {show-message ["Open Failed, path: " . $value " ("  $err ")"]};
 	    BufferManager unregist-buffer "*Directory*";
@@ -793,12 +859,12 @@ defcommand save-buffer {
 
     $main mini-input-start "" prompt: ["Save file? (" . $path ") [y/n]: "];
     $main add-mini-input-callback $window {| main window in-key value |
-	    if {or {eq? $in-key KEY_ESC} {eq? $value "n"} {eq? $value "N"}} {
-	    $main mini-input-end;
+        if {or {eq? $in-key KEY_ESC} {eq? $value "n"} {eq? $value "N"}} {
+            $main mini-input-end;
 	    show-message "Canceled.";
 	    BufferManager unregist-buffer "*Directory*";	
             return SELF;
-	};
+        };
         if {or {$value = "y"} {$value = "Y"}} {
 	    $main mini-input-end;
 	    (result err) ::= $__buff_in_clojure__ save-content;
