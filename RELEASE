@@ -1542,4 +1542,8 @@
 	pmacs update:
 		Add help editor command.
 
+2021/02/22
+	pmacs update:
+		Add editor command view-file for file open for protect mode.
+
 #eof
