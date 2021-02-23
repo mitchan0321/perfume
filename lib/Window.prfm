@@ -1,4 +1,3 @@
-
 class Window;
 
 Window method init (curs) {
