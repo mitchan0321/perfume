@@ -1546,4 +1546,10 @@
 	pmacs update:
 		Add editor command view-file for file open for protect mode.
 
+2021/02/27
+	pmacs update:
+		Add PWiki document link form, execute editor command when if link 1st character is '&'.
+		Change start message at ScratchBuffer.
+		Fix key description, Ctrl+| -> Ctrl+\.
+
 #eof
