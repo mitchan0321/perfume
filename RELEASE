@@ -1552,4 +1552,8 @@
 		Change start message at ScratchBuffer.
 		Fix key description, Ctrl+| -> Ctrl+\.
 
+2021/03/05
+	pmacs update:
+		Add editor command 'suspend' for run shell under pmacs sub-prosess.
+
 #eof

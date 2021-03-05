@@ -2700,6 +2700,15 @@ defcommand help {
     return ALL;
 };
 
+defcommand suspend {
+    | main window |
+    curs-terminate;
+    spawn "bash";
+    cur ::= curs-init;
+    $MainWindow set-curs $cur;
+    result ALL;
+};
+
 defcommand mini-move-message {
     | main window |
     buff ::= $window get-buffer;

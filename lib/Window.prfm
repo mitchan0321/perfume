@@ -39,6 +39,12 @@ Window method get-curs () {
     return $CursWin;
 };
 
+Window method set-curs (curs) {
+    sets RootWin $curs;
+    (y x) ::= curs-get-screen-size $RootWin;
+    sets CursWin [curs-create-window $RootWin 0 0 [$y - 1] [$x - $ROOT_WINDOW_RIGHT_MARGIN]];
+};
+
 Window method get-curs-mini () {
     return $CursWinMini;
 };

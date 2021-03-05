@@ -56,31 +56,34 @@ defun pmacs (trace: t) {
 	init-color-DB;
 	$MainWindow create-minibuffer-window;
 	$MainWindow create-full-window;
-	$MainWindow add-background job-id: "00-start-logo" {
-            buff ::= new EditBuffer;
-            path := <nil>;
-       	    $LIB_PATH each do: {| i |
-	        if {file exists? [$i . "/pmacs.logo"]} {
-		    path ::= $i . "/pmacs.logo";
-	            break;
-	        };
-	    };
-	    if $path {
-		(result err) ::= $buff load-content $path;
-		if $result {
-		    $MainWindow bind-buffer "Window#1" $buff;
-		    $MainWindow apply {render-all; refresh};
-		    key := ();
-		    timeout := 10000;
-		    while {$key null?} do: {
-			(repeat-time key) ::= curs-keyin [$MainWindow get-current-window : get-curs] $INPUT_TIMEOUT $INPUT_ENCODING;
-			$timeout -- $INPUT_TIMEOUT;
-			if {$timeout < 0} {break};
-		    };
-		    $MainWindow unbind-buffer;
-		};
-	    };
-	};
+        
+        if {[$ARGV len] <= 3} {
+            $MainWindow add-background job-id: "00-start-logo" {
+                buff ::= new EditBuffer;
+                path := <nil>;
+                $LIB_PATH each do: {| i |
+                    if {file exists? [$i . "/pmacs.logo"]} {
+                        path ::= $i . "/pmacs.logo";
+                        break;
+                    };
+                };
+                if $path {
+                    (result err) ::= $buff load-content $path;
+                    if $result {
+                        $MainWindow bind-buffer "Window#1" $buff;
+                        $MainWindow apply {render-all; refresh};
+                        key := ();
+                        timeout := 10000;
+                        while {$key null?} do: {
+                            (repeat-time key) ::= curs-keyin [$MainWindow get-current-window : get-curs] $INPUT_TIMEOUT $INPUT_ENCODING;
+                            $timeout -- $INPUT_TIMEOUT;
+                            if {$timeout < 0} {break};
+                        };
+                        $MainWindow unbind-buffer;
+                    };
+                };
+            };
+        };
 
         if {defvar? PINTERP_LOCAL} else: {
 	    defvar PINTERP_LOCAL [dict];
