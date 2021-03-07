@@ -1,14 +1,12 @@
 class Window;
 
 Window method init (curs) {
-    sets RootWin $curs;
+    set-curs $curs;
     init-constructor;
 };
 
 Window method init-constructor () {
     sets WindowList ();
-    (y x) ::= curs-get-screen-size $RootWin;
-    sets CursWin [curs-create-window $RootWin 0 0 [$y - 1] [$x - $ROOT_WINDOW_RIGHT_MARGIN]];
     sets CursWinMini <nil>;
     sets CreateWindowHook <nil>;
     sets BufferBinding [dict];
