@@ -88,12 +88,6 @@ Window method create-full-window-sub (win-name) {
     $MainWindow bind-buffer [$win get-window-name] $buff;
 };
 
-Window method next-window-name (win) {
-    n ::= $win split sep: "#" : get 1 : int : + 1;
-    if {$n > $MAX_WINDOW_DIVS} {n := 1};
-    return ["Window#" . $n];
-};
-
 Window method create-split-vertical-window (div: ndivs window-name: win-name) {
     if {set? ndivs} else: {set ndivs 2};
     if {$ndivs < 2} then: {set ndivs 2};
@@ -257,6 +251,12 @@ Window method get-buffer-list (win-name) {
     };
     
     return $buff-list;
+};
+
+Window method next-window-name (win) {
+    n ::= $win split sep: "#" : get 1 : int : + 1;
+    if {$n > $MAX_WINDOW_DIVS} {n := 1};
+    return ["Window#" . $n];
 };
 
 Window method get-window-by-name (window-name) {
