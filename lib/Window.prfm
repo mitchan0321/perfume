@@ -705,3 +705,11 @@ Window method read-keymaps () {
 	};
     };
 };
+
+Window method suspend (*) {
+    curs-terminate;
+    call spawn $*;
+    cur ::= curs-init;
+    $MainWindow set-curs $cur;
+};
+

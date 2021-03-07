@@ -2700,12 +2700,9 @@ defcommand help {
     return ALL;
 };
 
-defcommand suspend {
+defcommand shell {
     | main window |
-    curs-terminate;
-    spawn "bash";
-    cur ::= curs-init;
-    $MainWindow set-curs $cur;
+    $main suspend $DEFAULT_SHELL;
     result ALL;
 };
 
