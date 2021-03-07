@@ -201,25 +201,6 @@ Window method create-split-cross-window (window-name: win-name) {
     $hook eval;
 };
 
-Window method get-buffer-list (win-name) {
-    buff-list := ();
-    1 each to: $MAX_WINDOW_DIVS do: {
-        w ::= get-window-by-name $win-name;
-        if $w {
-            $buff-list <<- [$w get-buffer];
-        } {
-            if {$BufferBinding set? $win-name} {
-                $buff-list <<- [$BufferBinding get $win-name];
-            } {
-                $buff-list <<- <nil>;
-            };
-        };
-        win-name ::= next-window-name $win-name;
-    };
-    
-    return $buff-list;
-};
-    
 Window method create-split-cross-window-sub (win-name) {
     buff-list ::= get-buffer-list $win-name;
     sets WindowList ();
@@ -257,6 +238,25 @@ Window method create-split-cross-window-sub (win-name) {
         $buff ?? {buff ::= $w get-buffer};
 	$MainWindow bind-buffer [$w get-window-name] $buff;
     };
+};
+
+Window method get-buffer-list (win-name) {
+    buff-list := ();
+    1 each to: $MAX_WINDOW_DIVS do: {
+        w ::= get-window-by-name $win-name;
+        if $w {
+            $buff-list <<- [$w get-buffer];
+        } {
+            if {$BufferBinding set? $win-name} {
+                $buff-list <<- [$BufferBinding get $win-name];
+            } {
+                $buff-list <<- <nil>;
+            };
+        };
+        win-name ::= next-window-name $win-name;
+    };
+    
+    return $buff-list;
 };
 
 Window method get-window-by-name (window-name) {
