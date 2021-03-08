@@ -708,8 +708,13 @@ Window method read-keymaps () {
 
 Window method suspend (*) {
     curs-terminate;
-    call spawn $*;
+    e := <nil>;
+    try {
+        call spawn $*;
+    } catch: {| e |}
+    ;
     cur ::= curs-init;
     set-curs $cur;
     resize-window;
+    if $e {show-message ["Execute error" . $e]};
 };
