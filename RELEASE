@@ -1554,6 +1554,10 @@
 
 2021/03/05
 	pmacs update:
-		Add editor command 'suspend' for run shell under pmacs sub-prosess.
+		Add editor command 'shell' for run shell under pmacs sub-prosess.
+
+2021/03/07
+	pmacs update:
+		Add editor commands are: git-pull, git-push and git-commit.
 
 #eof
