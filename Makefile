@@ -14,6 +14,7 @@ CC		= cc
 PKG_TMP		= $(HOME)/tmp
 PKG_DIR		= $(PKG_TMP)/pmacs-install
 PKG_EXTLIB_DIR	= /usr/local/lib
+STD_LIB_DIR	= /lib/x86_64-linux-gnu
 PKG_TAR_NAME	= pmacs-install.tar.gz
 ifeq ($(shell uname),Linux)
   MAKE		= make
@@ -189,6 +190,9 @@ build-pkg:
 	cp -r $(PKG_EXTLIB_DIR)/libgmp*    $(PKG_DIR)/lib
 	cp -r $(PKG_EXTLIB_DIR)/libonigmo* $(PKG_DIR)/lib
 	cp -r $(PKG_EXTLIB_DIR)/libpcl*    $(PKG_DIR)/lib
+ifeq ($(shell uname),Linux)
+	cp -r $(STD_LIB_DIR)/libncursesw*  $(PKG_DIR)/lib
+endif
 	chmod 644 $(PKG_DIR)/lib/lib*
 	mkdir -p $(PKG_DIR)/bin
 	mkdir -p $(PKG_DIR)/lib/perfume
