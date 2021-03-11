@@ -68,7 +68,39 @@ defun pmacs (trace: t) {
                     };
                 };
                 if $path {
-                    (result err) ::= $buff load-content $path;
+                    (result err) ::= $buff load-content $path :init-only;
+                    f := <nil>;
+                    try {
+                        f ::= new File init: ($path mode: i);
+                        (y x) ::= $MainWindow get-screen-size;
+                        marginx ::= $x - 80 : / 2;
+                        if {$marginx < 0} {
+                            marginxs := 0;
+                        } {
+                            marginxs ::= " " repeat $marginx;
+                        };
+                        marginy ::= $y - 22 : / 3;
+                        if {$marginy < 0} {
+                            marginy := 0;
+                        };
+                        0 each to: $marginy do: {
+                            $buff append-string "";
+                        };
+                        $f each do: {| r |
+                            $buff append-string [$marginxs . $r];
+                        };
+                        0 each to: $marginy do: {
+                            $buff append-string "";
+                        };
+                    }
+                    catch: {| e |
+                        show-message ["Can\'t read logo file, " . [$e cdr]]; ### '
+                    }
+                    fin: {
+                        $f close;
+                    }
+                    ;;
+                    
                     if $result {
                         $MainWindow bind-buffer "Window#1" $buff;
                         $MainWindow apply {render-all; refresh};

@@ -1563,5 +1563,6 @@
 2021/03/11
 	pmacs update:
 		Add editor command read-file for read file and insert into buffer.
+		Change start log centering.
 
 #eof

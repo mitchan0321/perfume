@@ -38,6 +38,10 @@ CombiWindow method init (main y x line column) {
     sets HILIGHT_REGEXP <nil>;
 };
 
+CombiWindow method get-window-size () {
+    return [curs-get-screen-size $BufferCurs];
+};
+
 CombiWindow method activate () {
     set-window-color-default $BufferCurs EDIT_BUFFER;
     set-window-color-default $StatusLineCurs ACTIVE_STATUS_LINE;
