@@ -1560,4 +1560,8 @@
 	pmacs update:
 		Add editor commands are: git-pull, git-push and git-commit.
 
+2021/03/11
+	pmacs update:
+		Add editor command read-file for read file and insert into buffer.
+
 #eof
