@@ -1,3 +1,7 @@
+###
+### All Pmacs editor command definition.
+###
+
 defcommand roll-current-window {
     | main window |
     $main roll-current-window;
@@ -476,7 +480,7 @@ defcommand backdelete-character {
 
 defcommand execute-command {
     | main window |
-    $main mini-input-start "" prompt: "Command: ";
+    $main mini-input-start "" prompt: "Perfume command: ";
     $main add-mini-input-callback $window {| main window in-key value |
         if {eq? $in-key KEY_ESC} {
 	    $main mini-input-end;
@@ -513,16 +517,16 @@ defcommand execute-editor-command {
 	    $main mini-input-end;
 	    $window apply-command $main $window "" $value; 
 	};
-	if {or {string? $in-key} {eq? $in-key CTRL_H} {eq? $in-key KEY_DC}} {
+	if {or {string? $in-key} {eq? $in-key CTRL_H} {eq? $in-key KEY_BACKSPACE} {eq? $in-key KEY_DC}} {
 	    setvar EditorCommandList [msort [$EditorCommand keys :string : filter {| i | $i =~ [$value rquote]}]];
-	    $EditorCommandList ?? {setvar EditorCommandList ()};
+	    $EditorCommandList ?? {setvar EditorCommandList ($value)};
 	};
         if {eq? $in-key CTRL_I} {
 	    i ::= $EditorCommandList find $value;
 	    if $i {$i ++} {i := 0};
 	    c ::= $EditorCommandList get $i;
 	    $c ?? {c ::= $EditorCommandList get 0};
-	    $c ?? {c := ""};
+	    $c ?? {c := $value};
 	    $main mini-input-value-override $c [$c len];
 	};
 	if {eq? $in-key CTRL_V} {
@@ -567,16 +571,16 @@ defcommand trace-editor-command {
             $f close;
             show-message ["Wrote tracefile to: " . [pwd] "/" "pmacs-command-trace.txt"];
 	};
-	if {or {string? $in-key} {eq? $in-key CTRL_H} {eq? $in-key KEY_DC}} {
+	if {or {string? $in-key} {eq? $in-key CTRL_H} {eq? $in-key KEY_BACKSPACE} {eq? $in-key KEY_DC}} {
 	    setvar EditorCommandList [msort [$EditorCommand keys :string : filter {| i | $i =~ [$value rquote]}]];
-	    $EditorCommandList ?? {setvar EditorCommandList ()};
+	    $EditorCommandList ?? {setvar EditorCommandList ($value)};
 	};
         if {eq? $in-key CTRL_I} {
 	    i ::= $EditorCommandList find $value;
 	    if $i {$i ++} {i := 0};
 	    c ::= $EditorCommandList get $i;
 	    $c ?? {c ::= $EditorCommandList get 0};
-	    $c ?? {c := ""};
+	    $c ?? {c := $value};
 	    $main mini-input-value-override $c [$c len];
 	};
 	if {eq? $in-key CTRL_V} {
