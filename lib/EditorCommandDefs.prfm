@@ -1306,8 +1306,17 @@ defcommand paste-buffer {
     result ALL;
 };
 
-defcommand search {
+defcommand search-forward {
     | main window |
+    return [search-sub $main $window <t>];
+};
+
+defcommand search-backward {
+    | main window |
+    return [search-sub $main $window <nil>];
+};
+
+defun search-sub (main window dir) {
     __buff_in_clojure__ ::= $window get-buffer;
 
     str := "";
@@ -1322,7 +1331,7 @@ defcommand search {
     };
 
     $window start-search;
-    $main mini-input-start $str prompt: "Search: ";
+    $main mini-input-start $str prompt: [$dir ??? "Search regex [forward]: " "Search regex [backward]: "];
     $window reset-search;
     $window set-search-result [$__buff_in_clojure__ search $str];
     $window stay-search;
@@ -1387,9 +1396,25 @@ defcommand search {
 	};
 	if {eq? $in-key CTRL_F} {
 	    str ::= $window get-search-string;
-	    $main mini-input-value-override $str [$str len];
-	    $window set-search-result [$__buff_in_clojure__ search $str];
-	    $window move-to-next-search;
+	    if [$value = ""] {
+                $main mini-input-value-override $str [$str len];
+                $window set-search-result [$__buff_in_clojure__ search $str];
+            } {
+                $window set-search-result [$__buff_in_clojure__ search $value];
+            };
+	    $window stay-search;
+            $main send-key-event (KEY_DOWN);
+	};
+	if {eq? $in-key CTRL_R} {
+	    str ::= $window get-search-string;
+	    if [$value = ""] {
+                $main mini-input-value-override $str [$str len];
+                $window set-search-result [$__buff_in_clojure__ search $str];
+            } {
+                $window set-search-result [$__buff_in_clojure__ search $value];
+            };
+	    $window stay-search;
+            $main send-key-event (KEY_UP);
 	};
 	if {eq? $in-key CTRL_V} {
             str ::= $window get-copy-buffer;
@@ -1409,10 +1434,14 @@ defcommand search {
 	    $window reset-search;
 	    $window set-search-result [$__buff_in_clojure__ search $value];
 	    $window stay-search;
-            $main send-key-event (KEY_DOWN);
+            if $dir {
+                $main send-key-event (KEY_DOWN);
+            } {
+                $main send-key-event (KEY_UP);
+            };
 	};
     };
-    result SELF;
+    return SELF;
 };
 
 defcommand search-next {
