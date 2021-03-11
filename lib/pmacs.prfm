@@ -89,7 +89,7 @@ defun pmacs (trace: t) {
                         $f each do: {| r |
                             $buff append-string [$marginxs . $r];
                         };
-                        0 each to: $marginy do: {
+                        0 each to: [$marginy * 2] do: {
                             $buff append-string "";
                         };
                     }
