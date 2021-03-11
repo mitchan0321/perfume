@@ -774,6 +774,81 @@ defcommand view-file {
     result SELF;
 };
 
+defcommand read-file {
+    | main window |
+    $main mini-input-start [get-current-buffer-dir $window : . "/"] prompt: "Read file: ";
+    $main add-mini-input-callback $window {| main window in-key value |
+        if {eq? $in-key KEY_ESC} {
+	    $main mini-input-end;
+	    show-message "Canceled.";
+	    BufferManager unregist-buffer "*Directory*";	
+            return SELF;
+	};
+        if {eq? $in-key CTRL_M} {
+	    $main mini-input-end;
+	    if {[$value len] = 0} {
+		show-message "No file name specified.";
+                BufferManager unregist-buffer "*Directory*";
+		return SELF;
+	    };
+            path ::= path-adjust [
+		{[$value sub 0 1] = "/"} ???
+		    $value
+		    [get-current-buffer-dir $window : . "/" $value]
+	    ];
+	    buff ::= $window get-buffer;
+            geom ::= $window get-geom;
+            $buff ?? {
+                show-message "No buffer.";
+                result SELF;
+            };
+            f := <nil>;
+            try {
+                f ::= new File init: ($path mode: i);
+                (line col) ::= $window get-source-index $buff $geom;
+                $f each do: {| r |
+                    $buff insert-string-at [$r . "\r"] $line 0;
+                    $line ++;
+                };
+                $window cursor-move-to $geom $line 0;
+            }
+            catch: {| e |
+                show-message ["File read error, " . [$e cdr]];
+                return SELF;
+            }
+            fin: {
+                if $f {$f close};
+                BufferManager unregist-buffer "*Directory*";
+            };
+	};
+	if {eq? $in-key CTRL_I} {
+            if {$value = ""} {
+                fname ::= show-files-in-window $main $window [get-current-buffer-dir $window];
+            } {
+                fname ::= show-files-in-window $main $window $value;
+            };
+	    $window apply-command $main $window "" top-of-buffer;
+	    $main mini-input-value-override $fname [$fname len];
+	    return ALL;
+	};
+	if {eq? $in-key KEY_DOWN} {
+	    $window apply-command $main $window "" move-half-up;
+	    return SELF;
+	};
+	if {eq? $in-key KEY_UP} {
+	    $window apply-command $main $window "" move-half-down;
+	    return SELF;
+	};
+	if {eq? $in-key "/"} {
+            if {[$value at -2] = "/"} {
+		$main mini-input-value-override "/" 1;
+            };
+	    return SELF;
+	};
+    };
+    result SELF;
+};
+
 defcommand save-buffer {
     | main window |
     __buff_in_clojure__ ::= $window get-buffer;
