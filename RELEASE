@@ -1565,4 +1565,10 @@
 		Add editor command read-file for read file and insert into buffer.
 		Change start log centering.
 
+2021/03/12
+	pmacs update:
+		Add mark at editor command search-next and search-previous.
+		Change search command split to search-forward and search-backward.
+		  search-previous bind to Ctrl+R.
+
 #eof

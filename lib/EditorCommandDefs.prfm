@@ -1454,6 +1454,7 @@ defcommand search-next {
         show-message "No set search string, execute 'search' command first.";
         return SELF;
     };
+    $window mark;
     (y x) ::= get-next-search $ey $ex [$str rquote] $buff;
     $window cursor-move-to $geom $y $x;
     return SELF;
@@ -1469,6 +1470,7 @@ defcommand search-previous {
         show-message "No set search string, execute 'search' command first.";
         return SELF;
     };
+    $window mark;
     (y x) ::= get-previous-search $ey $ex [$str rquote] $buff;
     $window cursor-move-to $geom $y $x;
     return SELF;
