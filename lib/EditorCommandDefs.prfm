@@ -2131,7 +2131,16 @@ defcommand grep {
                 return SELF;
             };
 
-            $main mini-input-start "grep -nHe '' *" prompt: "grep command line: " index: 11;
+            str := "";
+            buff ::= $window get-buffer;
+            geom ::= $window get-geom;
+            if [$window get-region] {
+                ### eval region
+                (sy sx) ::= $window end-region;
+                (ey ex) ::= $window get-source-index $buff $geom;
+                str ::= $window get-region-string $sy $sx $ey $ex;
+            };
+            $main mini-input-start ["grep -nHe '" . $str "' *"] prompt: "grep command line: " index: 11;
             $main add-mini-input-callback $window {| main window in-key value |
                 if {eq? $in-key KEY_ESC} {
                     $main mini-input-end;

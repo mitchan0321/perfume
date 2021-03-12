@@ -140,37 +140,43 @@ defun line-input (curs disp-line disp-col input-len cur-index cur-val key-in) {
 	if {$curs-x < $input-len} {
 	    (command start-y start-x new-y new-x) ::= $v insert-string-at $key-in 0 $cur-index;
 	};
-        result := ALL;
+        break;
     }
     {eq? $key-in KEY_RIGHT} {
 	new-x ::= $cur-index + 1;
 	if {$new-x > [$v get 0 : len]} {
 	    new-x := [$v get 0 : len];
 	};
+        break;
     }
     {eq? $key-in KEY_LEFT} {
 	new-x ::= $cur-index - 1;
 	if {$new-x < 0} {new-x := 0};
+        break;
     }
     {eq? $key-in kRIT5} {
 	new-x ::= $cur-val len;
+        break;
     }
     {eq? $key-in kLFT5} {
 	new-x := 0;
+        break;
     }
     {eq? $key-in KEY_END} {
 	new-x ::= $cur-val len;
+        break;
     }
     {eq? $key-in KEY_HOME} {
 	new-x := 0;
+        break;
     }
     {or [eq? $key-in KEY_BACKSPACE] [eq? $key-in CTRL_H]} {
 	(command char new-y new-x) ::= $v backdelete-character-at 0 $cur-index;
-        result := ALL;
+        break;
     }
     {eq? $key-in KEY_DC} {
 	(command char new-y new-x) ::= $v delete-character-at 0 $cur-index;
-        result := ALL;
+        break;
     }
     ;
 
