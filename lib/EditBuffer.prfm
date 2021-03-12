@@ -1,6 +1,7 @@
 class EditBuffer BufferBase;
 
 EditBuffer method init () {
+    base-constructor;
     init-constructor;
 };
 

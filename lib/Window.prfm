@@ -384,6 +384,7 @@ Window method bind-buffer (window-name buffer) {
     $window ?? {return};
 
     $BufferBinding set $window-name $buffer;
+    $buffer set-raise;
     
     # Save window buffer geometory
     orig-buff ::= $window get-buffer;
@@ -721,4 +722,11 @@ Window method suspend (*) {
     set-curs $cur;
     resize-window;
     if $e {show-message ["Execute error" . $e]};
+};
+
+Window method refresh-screen () {
+    curs-terminate;
+    cur ::= curs-init;
+    set-curs $cur;
+    resize-window;
 };

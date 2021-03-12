@@ -1,5 +1,9 @@
 class BufferBase;
 
+BufferBase method base-constructor () {
+    set-raise;
+};
+
 BufferBase method set-buffer-name (name) {
     sets BufferName $name;
 };
@@ -15,6 +19,18 @@ BufferBase method set-buffer-mode (mode) {
 BufferBase method get-buffer-mode () {
     if {sets? Mode} {return $Mode};
     return <nil>;
+};
+
+BufferBase method set-raise () {
+    sets LastRaiseTimestamp [time-of-day :msec];
+};
+
+BufferBase method set-raise-low () {
+    sets LastRaiseTimestamp 0;
+};
+
+BufferBase method get-raise-timestamp () {
+    return [if {true? LastRaiseTimestamp} $LastRaiseTimestamp 0];
 };
 
 BufferBase method load-content (path) {

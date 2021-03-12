@@ -641,8 +641,7 @@ defcommand send-eof {
 
 defcommand refresh-screen {
     | main window |
-    $main wipe-window;
-    $main send-key-event (KEY_RESIZE);
+    $main refresh-screen;
     result ALL;
 };
 
@@ -1075,8 +1074,8 @@ defcommand key-binding-list {
 
     $buff append-string "<<< Key bindings >>>";
     $buff append-string ["Buffer mode: " . $mode];
-    $buff append-string ["%-18v%26v %-v" fmt "Key group" "Key modifier" "Command"];
-    $buff append-string ["%-18v%26v %-v" fmt "------------" "---------------" "----------"];
+    $buff append-string ["%-15v %28v %-v" fmt  "Key group"     "Key modifier"  "Command"];
+    $buff append-string ["%-15v %28v %-v" fmt ["-" repeat 15] ["-" repeat 28] ["-" repeat 38]];
     d ::= $window get KeyBinding;
     desc ::= $window get KeyDesc;
     l := ();
@@ -1116,6 +1115,7 @@ defcommand buffer-list {
     buff ::= new EditBuffer;
     $buff load-content "buffer list" :init-only buffer-name: "*Buffer List*";
     $main bind-buffer [$window get-window-name] $buff;
+    $buff set-raise-low;
     $buff clear-all;
 
     $buff append-string "<<< Buffer list >>>";
@@ -1123,7 +1123,8 @@ defcommand buffer-list {
     $buff append-string "";
     $buff append-string ["%1v%1v%1v %-26v %6v %-6v %-v" fmt "p" "m" "n" "Buffer name" "Length" "Mode" "Content path"];
     $buff append-string ["%1v%1v%1v %-26v %6v %-6v %-v" fmt "-" "-" "-" "-----------" "------" "----" "------------"];
-    l ::= BufferManager get-buffer-list;
+    ### l ::= BufferManager get-buffer-list;
+    l ::= BufferManager get-buffer-list-order-by-newer;
     $l each do: {| buff-name |
 	display-buffer ::= BufferManager get-buffer $buff-name;
 	$buff append-string [

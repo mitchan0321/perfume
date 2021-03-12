@@ -1,7 +1,9 @@
 class ScratchBuffer EditBuffer;
 
 ScratchBuffer method init () {
+    base-constructor;
     init-constructor;
+    
     sets Src [vector (
 	"Welcome to Perfume/pmacs world !!"
 	""
@@ -21,6 +23,7 @@ ScratchBuffer method init () {
 	"    5) If you want to send eof to application or interpriter: Ctrl+G"
 	""
     )];
+    
     [self] set-content [$DEFAULT_PWIKI_DIR . "/"];
 };
 

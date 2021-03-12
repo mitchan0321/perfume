@@ -32,6 +32,14 @@ BufferManager method get-buffer-list () {
     return [buffer-order-list];
 };
 
+BufferManager method get-buffer-list-order-by-newer () {
+    l1 ::= $BufferList keys :string : map {| i |
+        result ([get-buffer $i : get-raise-timestamp] $i)
+    };
+    l2 ::= msort $l1 order: < getter: {| i | $i get 0};
+    return [$l2 map {| i | $i get 1}];
+};
+
 BufferManager method get-buffer (name) {
     buff ::= $BufferList get $name;
     $buff ?? {
