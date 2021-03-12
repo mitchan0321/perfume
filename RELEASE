@@ -1579,4 +1579,13 @@
 		Add grep command become to use region selection.
 		WUtil::line-input a few fix.
 
+2021/03/16
+	pmacs update:
+		Add new property LasiRaiseTimestamp at BufferBase for buffer list ordering.
+		Add BufferManager::get-buffer-list-order-by-newer for buffer list ordering newer.
+		Change refresh-screen editor command for re-construct scree.
+		Change key-binding-list formatting.
+		Change buffer-list list order by last raise newer.
+		Add mode Java and mode file Mode-Java.key.
+
 #eof
