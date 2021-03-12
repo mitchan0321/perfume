@@ -1572,4 +1572,11 @@
 		Change search command split to search-forward and search-backward.
 		  search-previous bind to Ctrl+R.
 
+2021/03/15
+	pmacs update:
+		Fix editor command completion bug at execute-editor-command and trace-editor-command.
+		Add mark at goto editor command.
+		Add grep command become to use region selection.
+		WUtil::line-input a few fix.
+
 #eof
