@@ -519,7 +519,7 @@ defcommand execute-editor-command {
 	};
 	if {or {string? $in-key} {eq? $in-key CTRL_H} {eq? $in-key KEY_BACKSPACE} {eq? $in-key KEY_DC}} {
 	    setvar EditorCommandList [msort [$EditorCommand keys :string : filter {| i | $i =~ [$value rquote]}]];
-	    $EditorCommandList ?? {setvar EditorCommandList ($value)};
+	    $EditorCommandList ?? {setvar EditorCommandList ()};
 	};
         if {eq? $in-key CTRL_I} {
 	    i ::= $EditorCommandList find $value;
@@ -573,7 +573,7 @@ defcommand trace-editor-command {
 	};
 	if {or {string? $in-key} {eq? $in-key CTRL_H} {eq? $in-key KEY_BACKSPACE} {eq? $in-key KEY_DC}} {
 	    setvar EditorCommandList [msort [$EditorCommand keys :string : filter {| i | $i =~ [$value rquote]}]];
-	    $EditorCommandList ?? {setvar EditorCommandList ($value)};
+	    $EditorCommandList ?? {setvar EditorCommandList ()};
 	};
         if {eq? $in-key CTRL_I} {
 	    i ::= $EditorCommandList find $value;
@@ -2516,6 +2516,7 @@ defcommand goto {
                 show-message "Enter line number.";
                 return SELF;
             };
+            $window mark;
             geom ::= $window get-geom;
             buff ::= $window get-buffer;
             line ::= $value int;
