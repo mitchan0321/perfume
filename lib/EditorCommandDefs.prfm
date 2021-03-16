@@ -1279,7 +1279,15 @@ defcommand select-region-all {
 
 defcommand select-region-paragraph {
     | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    $window mark;
     $window apply-command $main $window "" cursor-top-of-line;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    r ::= $buff get-buffer-line $ey;
+    if {or {[$r at 0] = " "} {[$r at 0] = ""} {[$r at 0] = "\t"}} {
+        $window apply-command $main $window "" move-previous-paragraph;
+    };
     if {! [$window get-region]} {
         $window apply-command $main $window "" start-region;
     };
