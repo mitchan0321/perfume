@@ -1229,7 +1229,7 @@ defcommand copy-region {
     | main window |
     buff ::= $window get-buffer;
     [$window get-region] ?? {
-	show-message "Not start region. Press CTRL-SP to start region.";
+	show-message "Not start region. Press Ctrl+[SPACE] to start region.";
 	$window end-region;
 	return SELF;
     };
@@ -1245,7 +1245,7 @@ defcommand cut-region {
     | main window |
     buff ::= $window get-buffer;
     [$window get-region] ?? {
-	show-message "Not start region. Press CTRL-SP to start region.";
+	show-message "Not start region. Press Ctrl+[SPACE] to start region.";
 	$window end-region;
 	return SELF;
     };

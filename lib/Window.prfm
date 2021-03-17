@@ -51,6 +51,10 @@ Window method get-curs-mini () {
     return $CursWinMini;
 };
 
+Window method active? (win) {
+    return [eq? [$WindowList : car] $win];
+};
+
 Window method create-minibuffer-window () {
     (y x) ::= curs-get-screen-size $RootWin;
     sets CursWinMini [curs-new-window $RootWin [$y - 1] 0 1 [$x - $ROOT_WINDOW_RIGHT_MARGIN]];
@@ -81,7 +85,6 @@ Window method create-full-window-sub (win-name) {
     win ::= new CombiWindow init: ([self] 0 0 $l $c);
     $win set-window-name $win-name;
     $WindowList <<- $win;
-    $WindowList car : activate;
 
     if [$orig-win null?] {
         buff ::= $win get-buffer;
@@ -90,6 +93,7 @@ Window method create-full-window-sub (win-name) {
         $buff ?? {buff ::= $win get-buffer};
     };
     $MainWindow bind-buffer [$win get-window-name] $buff;
+    $WindowList car : activate;
 };
 
 Window method create-split-vertical-window (div: ndivs window-name: win-name) {
@@ -130,7 +134,6 @@ Window method create-split-vertical-window-sub (ndivs win-name) {
 	w ::= $w + $c;
     };
 
-    $WindowList car : activate;
     $WindowList cdr : each do: {| i | $i diactivate};
 
     $WindowList each do: {| w |
@@ -138,6 +141,7 @@ Window method create-split-vertical-window-sub (ndivs win-name) {
         $buff ?? {buff ::= $w get-buffer};
 	$MainWindow bind-buffer [$w get-window-name] $buff;
     };
+    $WindowList car : activate;
 };
 
 Window method create-split-horizontal-window (div: ndivs window-name: win-name) {
@@ -178,7 +182,6 @@ Window method create-split-horizontal-window-sub (ndivs win-name) {
 	w ::= $w + $l;
     };
 
-    $WindowList car : activate;
     $WindowList cdr : each do: {| i | $i diactivate};
 
     $WindowList each do: {| w |
@@ -186,6 +189,7 @@ Window method create-split-horizontal-window-sub (ndivs win-name) {
         $buff ?? {buff ::= $w get-buffer};
 	$MainWindow bind-buffer [$w get-window-name] $buff;
     };
+    $WindowList car : activate;
 };
 
 Window method create-split-cross-window (window-name: win-name) {
@@ -228,7 +232,6 @@ Window method create-split-cross-window-sub (win-name) {
     $win set-window-name $win-name;
     $WindowList <<- $win;
 
-    $WindowList car : activate;
     $WindowList cdr : each do: {| i | $i diactivate};
 
     $WindowList each do: {| w |
@@ -236,6 +239,7 @@ Window method create-split-cross-window-sub (win-name) {
         $buff ?? {buff ::= $w get-buffer};
 	$MainWindow bind-buffer [$w get-window-name] $buff;
     };
+    $WindowList car : activate;
 };
 
 Window method get-buffer-list (win-name) {
@@ -329,16 +333,16 @@ Window method get-current-window () {
 Window method roll-current-window () {
     win ::= $WindowList >>;
     $WindowList <<- $win;
-    $WindowList car : activate;
     try {$WindowList cdr : each do: {| i | $i diactivate}} catch: {};
+    $WindowList car : activate;
     return [$WindowList car];
 };
 
 Window method roll-current-window-backward () {
     win ::= $WindowList ->>;
     $WindowList << $win;
-    $WindowList car : activate;
     try {$WindowList cdr : each do: {| i | $i diactivate}} catch: {};
+    $WindowList car : activate;
     return [$WindowList car];
 };
 
@@ -352,8 +356,8 @@ Window method roll-to-window (window-name) {
 	    $WindowList <<- $win;
 	};
     };
-    $WindowList car : activate;
     try {$WindowList cdr : each do: {| i | $i diactivate}} catch: {};
+    $WindowList car : activate;
     return [$WindowList car];
 };
 

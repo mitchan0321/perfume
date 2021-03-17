@@ -44,8 +44,13 @@ CombiWindow method get-window-size () {
 
 CombiWindow method activate () {
     set-window-color-default $BufferCurs EDIT_BUFFER;
-    set-window-color-default $StatusLineCurs ACTIVE_STATUS_LINE;
-    set-window-color-default $VerticalLineCurs ACTIVE_VERT_LINE;
+    if [get-buffer : protect?] {
+        set-window-color-default $StatusLineCurs ACTIVE_STATUS_LINE_PROTECT;
+        set-window-color-default $VerticalLineCurs ACTIVE_VERT_LINE_PROTECT;
+    } {
+        set-window-color-default $StatusLineCurs ACTIVE_STATUS_LINE;
+        set-window-color-default $VerticalLineCurs ACTIVE_VERT_LINE;
+    };
     sets Activate <t>;
 };
 
@@ -91,6 +96,7 @@ CombiWindow method render () {
     clear;
 
     if $Activate {geom-trimming};
+    if $Activate {activate};
 
     win ::= get-window-name;
     buff ::= get-buffer;

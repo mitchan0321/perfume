@@ -15,7 +15,9 @@ case $THEME
 LIGHT {
     $ColorDB set EDIT_BUFFER                [WUtil color-pair BLACK   WHITE   ];
     $ColorDB set ACTIVE_STATUS_LINE         [WUtil color-pair BLACK   CYAN    ];
+    $ColorDB set ACTIVE_STATUS_LINE_PROTECT [WUtil color-pair BLACK   YELLOW  ];
     $ColorDB set ACTIVE_VERT_LINE           [WUtil color-pair BLACK   CYAN    ];
+    $ColorDB set ACTIVE_VERT_LINE_PROTECT   [WUtil color-pair BLACK   YELLOW  ];
     $ColorDB set ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair WHITE   BLUE    ];
     $ColorDB set INACTIVE_EDIT_BUFFER       [WUtil color-pair BLACK   WHITE   ];
     $ColorDB set INACTIVE_STATUS_LINE       [WUtil color-pair YELLOW  BLACK   ];
@@ -38,7 +40,9 @@ LIGHT {
 DARK {
     $ColorDB set EDIT_BUFFER                [WUtil color-pair WHITE   BLACK   ];
     $ColorDB set ACTIVE_STATUS_LINE         [WUtil color-pair BLACK   WHITE   ];
+    $ColorDB set ACTIVE_STATUS_LINE_PROTECT [WUtil color-pair BLACK   YELLOW  ];
     $ColorDB set ACTIVE_VERT_LINE           [WUtil color-pair BLACK   WHITE   ];
+    $ColorDB set ACTIVE_VERT_LINE_PROTECT   [WUtil color-pair BLACK   YELLOW  ];
     $ColorDB set ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair BLACK   CYAN    ];
     $ColorDB set INACTIVE_EDIT_BUFFER       [WUtil color-pair WHITE   BLACK   ];
     $ColorDB set INACTIVE_STATUS_LINE       [WUtil color-pair CYAN    BLUE    ];
@@ -61,7 +65,9 @@ DARK {
 BLUE-BACK {
     $ColorDB set EDIT_BUFFER                [WUtil color-pair WHITE   BLUE    ];
     $ColorDB set ACTIVE_STATUS_LINE         [WUtil color-pair BLACK   WHITE   ];
+    $ColorDB set ACTIVE_STATUS_LINE_PROTECT [WUtil color-pair BLACK   YELLOW  ];
     $ColorDB set ACTIVE_VERT_LINE           [WUtil color-pair BLACK   WHITE   ];
+    $ColorDB set ACTIVE_VERT_LINE_PROTECT   [WUtil color-pair BLACK   YELLOW  ];
     $ColorDB set ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair BLACK   CYAN    ];
     $ColorDB set INACTIVE_EDIT_BUFFER       [WUtil color-pair WHITE   BLACK   ];
     $ColorDB set INACTIVE_STATUS_LINE       [WUtil color-pair CYAN    BLUE    ];
@@ -84,7 +90,9 @@ BLUE-BACK {
 RETRO {
     $ColorDB set EDIT_BUFFER                [WUtil color-pair WHITE   BLACK   ];
     $ColorDB set ACTIVE_STATUS_LINE         [WUtil color-pair BLACK   GREEN   ];
+    $ColorDB set ACTIVE_STATUS_LINE_PROTECT [WUtil color-pair BLACK   YELLOW  ];
     $ColorDB set ACTIVE_VERT_LINE           [WUtil color-pair BLACK   GREEN   ];
+    $ColorDB set ACTIVE_VERT_LINE_PROTECT   [WUtil color-pair BLACK   YELLOW  ];
     $ColorDB set ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair GREEN   BLACK   ];
     $ColorDB set INACTIVE_EDIT_BUFFER       [WUtil color-pair GREEN   BLACK   ];
     $ColorDB set INACTIVE_STATUS_LINE       [WUtil color-pair BLACK   GREEN   ];
@@ -107,7 +115,9 @@ RETRO {
 MONO {
     $ColorDB set EDIT_BUFFER                [WUtil color-pair WHITE   BLACK   ];
     $ColorDB set ACTIVE_STATUS_LINE         [WUtil color-pair BLACK   WHITE   ];
+    $ColorDB set ACTIVE_STATUS_LINE_PROTECT [WUtil color-pair BLACK   WHITE   ];
     $ColorDB set ACTIVE_VERT_LINE           [WUtil color-pair BLACK   WHITE   ];
+    $ColorDB set ACTIVE_VERT_LINE_PROTECT   [WUtil color-pair BLACK   WHITE   ];
     $ColorDB set ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair WHITE   BLACK   ];
     $ColorDB set INACTIVE_EDIT_BUFFER       [WUtil color-pair WHITE   BLACK   ];
     $ColorDB set INACTIVE_STATUS_LINE       [WUtil color-pair WHITE   BLACK   ];
@@ -130,7 +140,9 @@ MONO {
 MONO-GREEN {
     $ColorDB set EDIT_BUFFER                [WUtil color-pair GREEN   BLACK   ];
     $ColorDB set ACTIVE_STATUS_LINE         [WUtil color-pair BLACK   GREEN   ];
+    $ColorDB set ACTIVE_STATUS_LINE_PROTECT [WUtil color-pair BLACK   GREEN   ];
     $ColorDB set ACTIVE_VERT_LINE           [WUtil color-pair BLACK   GREEN   ];
+    $ColorDB set ACTIVE_VERT_LINE_PROTECT   [WUtil color-pair BLACK   GREEN   ];
     $ColorDB set ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair GREEN   BLACK   ];
     $ColorDB set INACTIVE_EDIT_BUFFER       [WUtil color-pair GREEN   BLACK   ];
     $ColorDB set INACTIVE_STATUS_LINE       [WUtil color-pair GREEN   BLACK   ];

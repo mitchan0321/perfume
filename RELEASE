@@ -1581,11 +1581,18 @@
 
 2021/03/16
 	pmacs update:
-		Add new property LasiRaiseTimestamp at BufferBase for buffer list ordering.
+		Add new property LastRaiseTimestamp at BufferBase for buffer list ordering.
 		Add BufferManager::get-buffer-list-order-by-newer for buffer list ordering newer.
-		Change refresh-screen editor command for re-construct scree.
+		Change refresh-screen editor command for re-construct screen.
 		Change key-binding-list formatting.
 		Change buffer-list list order by last raise newer.
 		Add mode Java and mode file Mode-Java.key.
+		Change select-region-paragraph become any cursor position select region.
+
+2021/03/17
+	pmacs update:
+		Add window status and vertical line color change if buffer mode is protect.
+		Change HILIGHT regex list style.
+		Add pmacs.conf description.
 
 #eof
