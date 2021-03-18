@@ -18,7 +18,7 @@ LIGHT {
     $ColorDB set ACTIVE_STATUS_LINE_PROTECT [WUtil color-pair BLACK   YELLOW  ];
     $ColorDB set ACTIVE_VERT_LINE           [WUtil color-pair BLACK   CYAN    ];
     $ColorDB set ACTIVE_VERT_LINE_PROTECT   [WUtil color-pair BLACK   YELLOW  ];
-    $ColorDB set ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair WHITE   BLUE    ];
+    $ColorDB set ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair BLUE    BLUE    ];
     $ColorDB set INACTIVE_EDIT_BUFFER       [WUtil color-pair BLACK   WHITE   ];
     $ColorDB set INACTIVE_STATUS_LINE       [WUtil color-pair YELLOW  BLACK   ];
     $ColorDB set INACTIVE_VERT_LINE         [WUtil color-pair BLUE    BLACK   ];
@@ -43,7 +43,7 @@ DARK {
     $ColorDB set ACTIVE_STATUS_LINE_PROTECT [WUtil color-pair BLACK   YELLOW  ];
     $ColorDB set ACTIVE_VERT_LINE           [WUtil color-pair BLACK   WHITE   ];
     $ColorDB set ACTIVE_VERT_LINE_PROTECT   [WUtil color-pair BLACK   YELLOW  ];
-    $ColorDB set ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair BLACK   CYAN    ];
+    $ColorDB set ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair CYAN    CYAN    ];
     $ColorDB set INACTIVE_EDIT_BUFFER       [WUtil color-pair WHITE   BLACK   ];
     $ColorDB set INACTIVE_STATUS_LINE       [WUtil color-pair CYAN    BLUE    ];
     $ColorDB set INACTIVE_VERT_LINE         [WUtil color-pair BLACK   BLUE    ];
@@ -68,7 +68,7 @@ BLUE-BACK {
     $ColorDB set ACTIVE_STATUS_LINE_PROTECT [WUtil color-pair BLACK   YELLOW  ];
     $ColorDB set ACTIVE_VERT_LINE           [WUtil color-pair BLACK   WHITE   ];
     $ColorDB set ACTIVE_VERT_LINE_PROTECT   [WUtil color-pair BLACK   YELLOW  ];
-    $ColorDB set ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair BLACK   CYAN    ];
+    $ColorDB set ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair CYAN    CYAN    ];
     $ColorDB set INACTIVE_EDIT_BUFFER       [WUtil color-pair WHITE   BLACK   ];
     $ColorDB set INACTIVE_STATUS_LINE       [WUtil color-pair CYAN    BLUE    ];
     $ColorDB set INACTIVE_VERT_LINE         [WUtil color-pair BLACK   BLUE    ];
