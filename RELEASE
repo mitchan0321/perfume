@@ -1592,7 +1592,7 @@
 2021/03/17
 	pmacs update:
 		Add window status and vertical line color change if buffer mode is protect.
-		Change HILIGHT regex list style.
+		Change HILIGHT_REGEX_DEFAULT regex list style.
 		Add pmacs.conf description.
 
 #eof
