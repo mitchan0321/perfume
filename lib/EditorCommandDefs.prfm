@@ -1750,10 +1750,24 @@ defcommand exit {
 
 defcommand smart-newline {
     | main window |
-    $window apply-command $main $window "\r" insert-character;
-    
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
+
+    REM {
+    ### current line smart indent
+    (ey ex) ::= $window get-source-index $buff $geom;
+    str-prev := "";
+    if {$ey > 0} {
+	str-prev ::= $buff get-buffer-line [$ey - 1];
+    };
+    cur-level ::= get-indent-level $str-prev;
+    next-level-count ::= get-next-indent-count-backward $str-prev;
+    };
+    
+    ### insert newline
+    $window apply-command $main $window "\r" insert-character;
+    
+    ### next line smart indent
     (ey ex) ::= $window get-source-index $buff $geom;
     str-prev := "";
     if {$ey > 0} {
@@ -1838,6 +1852,26 @@ defun get-next-indent-count (str) {
 	  "]" {$kakko-kaku --}
 	;
         if {or [$kakko-maru > 0] [$kakko-nami > 0] [$kakko-kaku > 0]} {break};
+    };
+    return [$kakko-maru + $kakko-nami : + $kakko-kaku];
+};
+
+defun get-next-indent-count-backward (str) {
+    kakko-maru := 0; ### '(' ')' balance count
+    kakko-nami := 0; ### '{' '}' balance count
+    kakko-kaku := 0; ### '[' ']' balance count
+    
+    0 each to: [$str len : - 1] do: {| i |
+	c ::= $str at $i;
+	case $c
+	  "(" {$kakko-maru ++}
+	  "{" {$kakko-nami ++}
+	  "[" {$kakko-kaku ++}
+	  ")" {$kakko-maru --}
+	  "}" {$kakko-nami --}
+	  "]" {$kakko-kaku --}
+	;
+        if {or [$kakko-maru < 0] [$kakko-nami < 0] [$kakko-kaku < 0]} {break};
     };
     return [$kakko-maru + $kakko-nami : + $kakko-kaku];
 };
