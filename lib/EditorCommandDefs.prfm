@@ -1763,7 +1763,7 @@ defcommand smart-newline {
         };
         prev-level ::= get-indent-level $str-prev;
         prev-indent ::= get-next-indent-count $str-prev;
-        cur-level ::= get-next-indent-count $str-cur;
+        cur-level ::= get-next-indent-count-backward $str-cur;
         cur-level-count ::= $cur-level + $prev-indent;
         if {$cur-level < 0} {
             if {or {$cur-level-count < 0}
@@ -1862,6 +1862,33 @@ defun get-next-indent-count (str) {
 	  "}" {$kakko-nami --}
 	  "]" {$kakko-kaku --}
 	;
+        if {or {$kakko-maru > 0} {$kakko-nami > 0} {$kakko-kaku > 0 }} {break};
+    };
+
+    i ::= $kakko-maru + $kakko-nami : + $kakko-kaku;
+    return [cond
+        {$i = 0} {break  0}
+        {$i > 0} {break  1}
+        {$i < 0} {break -1}
+    ];
+};
+
+defun get-next-indent-count-backward (str) {
+    kakko-maru := 0; ### '(' ')' balance count
+    kakko-nami := 0; ### '{' '}' balance count
+    kakko-kaku := 0; ### '[' ']' balance count
+    
+    0 each to: [$str len : - 1] do: {| i |
+	c ::= $str at $i;
+	case $c
+	  "(" {$kakko-maru ++}
+	  "{" {$kakko-nami ++}
+	  "[" {$kakko-kaku ++}
+	  ")" {$kakko-maru --}
+	  "}" {$kakko-nami --}
+	  "]" {$kakko-kaku --}
+	;
+        if {or {$kakko-maru < 0} {$kakko-nami < 0} {$kakko-kaku < 0 }} {break};
     };
 
     i ::= $kakko-maru + $kakko-nami : + $kakko-kaku;
