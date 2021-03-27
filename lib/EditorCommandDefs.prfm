@@ -1753,15 +1753,28 @@ defcommand smart-newline {
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
 
-    REM {
-    ### current line smart indent
     (ey ex) ::= $window get-source-index $buff $geom;
-    str-prev := "";
-    if {$ey > 0} {
-	str-prev ::= $buff get-buffer-line [$ey - 1];
-    };
-    cur-level ::= get-indent-level $str-prev;
-    next-level-count ::= get-next-indent-count-backward $str-prev;
+    str-cur ::= $buff get-buffer-line $ey;
+    if {and $str-cur {$ex >= [$str-cur len]}} {
+        ### current line smart indent
+        str-prev := "";
+        if {$ey > 0} {
+            str-prev ::= $buff get-buffer-line [$ey - 1];
+        };
+        prev-level ::= get-indent-level $str-prev;
+        prev-indent ::= get-next-indent-count $str-prev;
+        cur-level ::= get-next-indent-count $str-cur;
+        cur-level-count ::= $cur-level + $prev-indent;
+        if {$cur-level < 0} {
+            if {or {$cur-level-count < 0}
+                   {and {$cur-level-count = 0} {$prev-indent > 0}}} {
+                cur-indent ::= $prev-level + [$cur-level-count * $INDENT_WIDTH];
+                cur-indent ::= [$cur-indent < 0] ??? 0 $cur-indent;
+                new-str ::= [" " repeat $cur-indent] . [$str-cur clean];
+                $buff line-update $new-str $ey;
+                $geom set! IndexColumn.SAVE [$new-str len];
+            };
+        };
     };
     
     ### insert newline
@@ -1811,8 +1824,6 @@ defcommand smart-indent {
     if {$cur-pos < $next-indent} {
 	# smart indent
 	new-str ::= [" " repeat $next-indent] . [$str clean];
-##	$buff cut-region $ey 0 $ey [$str len];
-##	$buff insert-string-at $new-str $ey 0;
         $buff line-update $new-str $ey;
         $geom set! IndexColumn.SAVE $next-indent;
     } {
@@ -1851,29 +1862,14 @@ defun get-next-indent-count (str) {
 	  "}" {$kakko-nami --}
 	  "]" {$kakko-kaku --}
 	;
-        if {or [$kakko-maru > 0] [$kakko-nami > 0] [$kakko-kaku > 0]} {break};
     };
-    return [$kakko-maru + $kakko-nami : + $kakko-kaku];
-};
 
-defun get-next-indent-count-backward (str) {
-    kakko-maru := 0; ### '(' ')' balance count
-    kakko-nami := 0; ### '{' '}' balance count
-    kakko-kaku := 0; ### '[' ']' balance count
-    
-    0 each to: [$str len : - 1] do: {| i |
-	c ::= $str at $i;
-	case $c
-	  "(" {$kakko-maru ++}
-	  "{" {$kakko-nami ++}
-	  "[" {$kakko-kaku ++}
-	  ")" {$kakko-maru --}
-	  "}" {$kakko-nami --}
-	  "]" {$kakko-kaku --}
-	;
-        if {or [$kakko-maru < 0] [$kakko-nami < 0] [$kakko-kaku < 0]} {break};
-    };
-    return [$kakko-maru + $kakko-nami : + $kakko-kaku];
+    i ::= $kakko-maru + $kakko-nami : + $kakko-kaku;
+    return [cond
+        {$i = 0} {break  0}
+        {$i > 0} {break  1}
+        {$i < 0} {break -1}
+    ];
 };
 
 defcommand smart-dedent {
