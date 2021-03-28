@@ -5,25 +5,28 @@ CombiWindow method init (main y x line column) {
     
     curs ::= $main get-curs;
 
-    sets BufferCurs	  [curs-new-window
-			   $curs
-#			   $y 		 	$x
-			   $y 		 	[$x + 1]
-			   [$line - 1]  	[$column - 1]
-	];
+    sets BufferCurs [
+        curs-new-window
+        $curs
+        # $y 		 	$x
+        $y 		 	[$x + 1]
+        [$line - 1]  	[$column - 1]
+    ];
 
-    sets StatusLineCurs	  [curs-new-window
-			   $curs
-			   [$y + $line : - 1]   $x
-			   1 	     		$column
-	];
+    sets StatusLineCurs [
+        curs-new-window
+        $curs
+        [$y + $line : - 1]   $x
+        1 	     		$column
+    ];
     
-    sets VerticalLineCurs [curs-new-window
-			   $curs
-#			   $y 		 	[$x + $column : - 1]
-			   $y 		 	$x
-			   [$line - 1] 		1
-	];
+    sets VerticalLineCurs [
+        curs-new-window
+        $curs
+        # $y 		 	[$x + $column : - 1]
+        $y 		 	$x
+        [$line - 1] 		1
+    ];
 
     sets Parent $main;
     sets Activate <nil>;
@@ -978,7 +981,8 @@ CombiWindow method cursor-move-to (geom y x) {
     $geom set! CursorLine [$new-y - $geom,ViewLine];
     $geom set! CursorColumn [$new-x - $geom,ViewColumn];
     (sy sx) ::= get-screen-size;
-    fit-to-cursor $geom $sy $sx :center;
+    ### fit-to-cursor $geom $sy $sx :center;
+    fit-to-cursor $geom $sy $sx;
 };
 
 CombiWindow method cursor-fit-to-top (geom) {
