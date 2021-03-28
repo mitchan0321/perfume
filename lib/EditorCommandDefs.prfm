@@ -1761,11 +1761,12 @@ defcommand smart-newline {
         if {$ey > 0} {
             str-prev ::= $buff get-buffer-line [$ey - 1];
         };
-        prev-level ::= get-indent-level $str-prev;
-        prev-indent ::= get-next-indent-count $str-prev;
         cur-level ::= get-next-indent-count-backward $str-cur;
-        cur-level-count ::= $cur-level + $prev-indent;
         if {$cur-level < 0} {
+            prev-level ::= get-indent-level $str-prev;
+            prev-indent ::= get-next-indent-count $str-prev;
+            cur-level-count ::= $cur-level + $prev-indent;
+            if [$cur-level-count < 0] {cur-level-count := -1};
             if {or {$cur-level-count < 0}
                    {and {$cur-level-count = 0} {$prev-indent > 0}}} {
                 cur-indent ::= $prev-level + [$cur-level-count * $INDENT_WIDTH];
