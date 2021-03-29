@@ -1469,7 +1469,7 @@ defcommand search-next {
     };
     $window mark;
     (y x) ::= get-next-search $ey $ex [$str rquote] $buff;
-    $window cursor-move-to $geom $y $x;
+    $window cursor-move-to-fit-center $geom $y $x;
     return SELF;
 };
 
@@ -1485,7 +1485,7 @@ defcommand search-previous {
     };
     $window mark;
     (y x) ::= get-previous-search $ey $ex [$str rquote] $buff;
-    $window cursor-move-to $geom $y $x;
+    $window cursor-move-to-fit-center $geom $y $x;
     return SELF;
 };
 
@@ -1924,8 +1924,6 @@ defcommand smart-dedent {
     if {$next-indent < 0} {next-indent := 0};
     
     new-str ::= [" " repeat $next-indent] . [$str clean];
-##    $buff cut-region $ey 0 $ey [$str len];
-##    $buff insert-string-at $new-str $ey 0;
     $buff line-update $new-str $ey;
     $geom set! IndexColumn.SAVE [$new-str len];
     
@@ -2322,7 +2320,7 @@ defcommand grep-next {
         if {and {$f != ""} {$n != ""} {$n numeric?}} {break};
     };
     if {$ey >= [$grep-buff get-buffer-length]} {ey ::= $grep-buff get-buffer-length : - 1};
-    $window cursor-move-to $grep-geom $ey 0;
+    $window cursor-move-to-fit-center $grep-geom $ey 0;
     $window cursor-fit-to-top $grep-geom;
     $str ?? {
         show-message "Bottom of *Grep* buffer.";
@@ -2374,7 +2372,7 @@ defcommand grep-previous {
         if {and {$f != ""} {$n != ""} {$n numeric?}} {break};
     };
     if {$ey < 0} {ey := 0};
-    $window cursor-move-to $grep-geom $ey 0;
+    $window cursor-move-to-fit-center $grep-geom $ey 0;
     $window cursor-fit-to-top $grep-geom;
     $str ?? {
         show-message "Top of *Grep* buffer.";
@@ -2403,7 +2401,7 @@ defun show-file-at (window-name path line) {
     $MainWindow roll-to-window $window-name;
     win ::= $MainWindow get-current-window;
     geom ::= $win get-geom;
-    $win cursor-move-to $geom [$line - 1] 0;
+    $win cursor-move-to-fit-center $geom [$line - 1] 0;
 };
 
 defun chdir-cwd (buff) {

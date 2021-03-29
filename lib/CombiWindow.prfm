@@ -871,7 +871,7 @@ CombiWindow method move-to-next-search () {
     if $elem {
 	ey ::= $elem car;
 	ex ::= $elem cdr : car : car;
-	cursor-move-to $geom $ey $ex;
+	cursor-move-to-fit-center $geom $ey $ex;
     };
 
     ### search result hilight
@@ -963,7 +963,7 @@ CombiWindow method move-to-previous-search () {
     if $elem {
 	ey ::= $elem car;
 	ex ::= $elem cdr : car : car;
-	cursor-move-to $geom $ey $ex;
+	cursor-move-to-fit-center $geom $ey $ex;
     };
 
     ### search result hilight
@@ -983,6 +983,18 @@ CombiWindow method cursor-move-to (geom y x) {
     (sy sx) ::= get-screen-size;
     ### fit-to-cursor $geom $sy $sx :center;
     fit-to-cursor $geom $sy $sx;
+};
+
+CombiWindow method cursor-move-to-fit-center (geom y x) {
+    sets FreeCursor <nil>;
+    
+    buff ::= get-buffer;
+    (new-y new-x) ::= get-cursor-index $buff $y $x;
+    $geom set! IndexColumn.SAVE $new-x;
+    $geom set! CursorLine [$new-y - $geom,ViewLine];
+    $geom set! CursorColumn [$new-x - $geom,ViewColumn];
+    (sy sx) ::= get-screen-size;
+    fit-to-cursor $geom $sy $sx :center;
 };
 
 CombiWindow method cursor-fit-to-top (geom) {
