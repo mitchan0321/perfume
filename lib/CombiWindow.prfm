@@ -8,23 +8,23 @@ CombiWindow method init (main y x line column) {
     sets BufferCurs [
         curs-new-window
         $curs
-        # $y 		 	$x
-        $y 		 	[$x + 1]
-        [$line - 1]  	[$column - 1]
+        ### $y                      $x          ### Right side Vertical Line
+        $y 		 	[$x + 1]    ### Left side Vertical Line
+        [$line - 1]  	        [$column - 1]
     ];
 
     sets StatusLineCurs [
         curs-new-window
         $curs
-        [$y + $line : - 1]   $x
+        [$y + $line : - 1]      $x
         1 	     		$column
     ];
     
     sets VerticalLineCurs [
         curs-new-window
         $curs
-        # $y 		 	[$x + $column : - 1]
-        $y 		 	$x
+        ### $y                      [$x + $column : - 1]    ### Right side Vertical Line
+        $y 		 	$x                      ### Left side Vertical Line
         [$line - 1] 		1
     ];
 
