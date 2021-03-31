@@ -5,13 +5,32 @@ CombiWindow method init (main y x line column) {
     
     curs ::= $main get-curs;
 
-    sets BufferCurs [
-        curs-new-window
-        $curs
-        ### $y                      $x          ### Right side Vertical Line
-        $y 		 	[$x + 1]    ### Left side Vertical Line
-        [$line - 1]  	        [$column - 1]
-    ];
+    case $VERTICAL_WINDOW_SIDE
+    LEFT {
+        sets BufferCurs [
+            curs-new-window
+            $curs
+            $y 		 	[$x + 1]                ### Left side Vertical Line
+            [$line - 1]         [$column - 1]
+        ];
+    }
+    RIGHT {
+        sets BufferCurs [
+            curs-new-window
+            $curs
+            $y                  $x                      ### Right side Vertical Line
+            [$line - 1]         [$column - 1]
+        ];
+    }
+    <t> {
+        sets BufferCurs [
+            curs-new-window
+            $curs
+            $y 		 	[$x + 1]                ### Left side Vertical Line
+            [$line - 1]         [$column - 1]
+        ];
+    }
+    ;;
 
     sets StatusLineCurs [
         curs-new-window
@@ -20,13 +39,32 @@ CombiWindow method init (main y x line column) {
         1 	     		$column
     ];
     
-    sets VerticalLineCurs [
-        curs-new-window
-        $curs
-        ### $y                      [$x + $column : - 1]    ### Right side Vertical Line
-        $y 		 	$x                      ### Left side Vertical Line
-        [$line - 1] 		1
-    ];
+    case $VERTICAL_WINDOW_SIDE
+    LEFT {
+        sets VerticalLineCurs [
+            curs-new-window
+            $curs
+            $y 		 	$x                      ### Left side Vertical Line
+            [$line - 1] 	1
+        ];
+    }
+    RIGHT {
+        sets VerticalLineCurs [
+            curs-new-window
+            $curs
+            $y                  [$x + $column : - 1]    ### Right side Vertical Line
+            [$line - 1]         1
+        ];
+    }
+    <t> {
+        sets VerticalLineCurs [
+            curs-new-window
+            $curs
+            $y 		 	$x                      ### Left side Vertical Line
+            [$line - 1] 	1
+        ];
+    }
+    ;;
 
     sets Parent $main;
     sets Activate <nil>;
