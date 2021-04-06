@@ -1803,6 +1803,7 @@ defcommand smart-newline {
 
 defcommand smart-indent {
     | main window |
+
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     (ey ex) ::= $window get-source-index $buff $geom;
@@ -1816,12 +1817,12 @@ defcommand smart-indent {
     next-level-count ::= get-next-indent-count $str-prev;
     next-level-count ::= [$next-level-count > 0] ??? 1 0;
     next-indent ::= $cur-level + [$next-level-count * $INDENT_WIDTH];
-    next-level-count ::= get-next-indent-count $str;
+    next-level-count ::= get-next-indent-count-backward $str;
     if {$next-level-count < 0} {
         next-indent ::= $next-indent - $INDENT_WIDTH;
     };
-    cur-pos ::= curs-index-to-pos $str $ex $DEFAULT_TAB_WIDTH;
 
+    cur-pos ::= curs-index-to-pos $str $ex $DEFAULT_TAB_WIDTH;
     if {$cur-pos < $next-indent} {
 	# smart indent
 	new-str ::= [" " repeat $next-indent] . [$str clean];
@@ -1907,25 +1908,12 @@ defcommand smart-dedent {
     (ey ex) ::= $window get-source-index $buff $geom;
     str ::= $buff get-buffer-line $ey;
     str ::= $str ?? "";
-    str-prev := "";
-    if {$ey > 0} {
-	str-prev ::= $buff get-buffer-line [$ey - 1];
-    };
-    cur-level ::= get-indent-level $str-prev;
-    next-indent ::= $cur-level - $INDENT_WIDTH;
-    next-level-count ::= get-next-indent-count $str-prev;
-    if {$next-level-count > 0} {
-        next-indent ::= $next-indent + $INDENT_WIDTH;
-    };
-    next-level-count ::= get-next-indent-count $str;
-    if {$next-level-count < 0} {
-        next-indent ::= $next-indent - $INDENT_WIDTH;
-    };
-    if {$next-indent < 0} {next-indent := 0};
-    
+    cur-level ::= get-indent-level $str;
+    next-indent ::= [$cur-level / $INDENT_WIDTH] - 1 : * $INDENT_WIDTH;
+    if {$next-indent < 0} {return ALL};
     new-str ::= [" " repeat $next-indent] . [$str clean];
     $buff line-update $new-str $ey;
-    $geom set! IndexColumn.SAVE [$new-str len];
+    $geom set! IndexColumn.SAVE $next-indent;
     
     result ALL;
 };
