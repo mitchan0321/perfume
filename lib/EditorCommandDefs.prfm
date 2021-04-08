@@ -2238,8 +2238,11 @@ defcommand grep {
                         $main create-split-vertical-window;
                     };
                     $main bind-buffer "Window#1" $buff;
-                    window ::= $main get-current-window;
+                    ### window ::= $main get-current-window;
+                    window ::= $main get-window-by-name "Window#1";
                     geom ::= $window get-geom;
+                    $geom set! ViewLine 0;
+                    $geom set! ViewColumn 0;
                     $window cursor-move-to $geom 0 0;
                     return SELF;
                 };
