@@ -370,7 +370,7 @@ toy_parse_string(Bulk *src, wchar_t endc) {
 	    case L'n':
 		c = L'\n';
 		break;
-	    case L'\n':
+	    case L'\n': case L'\r':
 		c = 0;
 		break;
 	    }
@@ -422,7 +422,7 @@ toy_parse_rquote(Bulk *src, wchar_t endc) {
 	    case L'\'':
 		c = L'\'';
 		break;
-            case L'\n':
+            case L'\n': case L'\r':
                 c = 0;
                 break;
 	    default:
