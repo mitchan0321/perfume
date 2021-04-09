@@ -1,3 +1,4 @@
+2021/04/09	PRFM_20210409		1.5.3
 2021/03/12	PRFM_20210312		1.5.2
 2021/01/04	PRFM_20210104		1.5.1
 2020/12/23	PRFM_20201223_K32	1.5.0
@@ -570,6 +571,9 @@
 		Add array_swap.
 	doc
 		Update docment.
+	tag:
+		PRFM_20141223_K26
+		0.4.0
 
 2015/02/15:
 	util.prfm
@@ -602,6 +606,9 @@
 		Add REM command.
 	*
 		C stack overflow signal handling change.
+	tag:
+		PRFM_20150215_A26
+		0.5.0
 
 2015/07/30:
 	methods.c / commands.c / global.[ch]
@@ -625,6 +632,11 @@
 2015/08/06:
 	methods.c / global.[ch]
 		Fix String::fmt if some arguments are omitted, replace to null string ("").
+
+2015/08/09:
+	tag:
+		PRFM_20150809
+		0.6.0
 
 2015/08/12:
 	type.c
@@ -658,6 +670,9 @@
 	lib/util.prfm
 		Add String methods are +, -, *, /, %, ^, &&, ||, ^^, ~~, sin, cos, tan,
 		asin, acos, atan, sqrt, pow, exp10, exp, log10, and log.
+	tag:
+		PRFM_20150920_N27
+		0.7.0
 
 2015/9/25:
 	eval.c
@@ -666,6 +681,9 @@
 		Add File::clear for clear eof state method.
 	lib/Stream.prfm
 		New class Stream like as File object that process internal input/output.
+	tag:
+		PRFM_20150925
+		0.7.1
 
 2015/10/1:
 	commands.c / global.[ch]
@@ -679,6 +697,9 @@
 		coroutine_handl(internal) and coro_finalizer(internal).
 	methods.c
 		Add method Coro::stat.
+	tag:
+		PRFM_20151001
+		0.7.2
 
 2015/10/22:
 	Makefile
@@ -879,6 +900,9 @@
 		Fix GETMACRO's left item is SYMBOL.
 	lib/util.prfm
 		Change unknown receive parameter 'args:' to '*'.
+	tag:
+		PRFM_20151223_K27
+		0.8.0
 
 2015/12/30:
 	lib/Pipe.prfm
@@ -895,6 +919,9 @@
 		Fix initial read file name 'setup.toy' to 'setup.prfm'.
 	tests/*.res
 		Fix no output result by new perfumesh.
+	tag:
+		PRFM_20151230
+		0.8.1
 
 2015/12/31:
 	lib/pipe.prfm, Pipe.prfm
@@ -921,6 +948,9 @@
 		Add String::clean, String::upper, String::lower methods.
 	lib/http-get.prfm
 		Add utility function for simple http access.
+	tag:
+		PRFM_20160215_A27
+		0.9.0
 
 2016/03/02:
 	lib/exec.prfm
@@ -930,6 +960,9 @@
 		Change request URI string.
 	lib/lsort.prfm
 		Fix list::>> sub-effect bug.
+	tag:
+		PRFM_20160302
+		0.9.1
 
 2016/03/12:
 	commands.c
@@ -943,12 +976,18 @@
 		Fix function terminate condition.
 	lib/tarai*.prfm
 		Change if syntax, use no keyword parameter.
+	tag:
+		PRFM_20160312
+		0.9.2
 
 2017/01/12:
 	cell.c, types.c
 		Fix performance bug.
 	lib/{cat.prfm,grep.prfm,head.prfm,ncat.prfm,wc.prfm}
 		Add keyword parameter 'native-value: nv'.
+	tag:
+		PRFM_20170112
+		0.9.3
 
 2017/01/13:
 	Major change.
@@ -1001,6 +1040,9 @@
 	1.0.0 / PRFM_20170321_OMAPERO15 RELEASE.
 	lib/diff.prfm
 		Add option :heuristic and :costbase.
+	tag:
+		PRFM_20170321_OMAPERO15
+		1.0.0
 
 2017/06/14:
 	commands.c
@@ -1021,6 +1063,9 @@
 		Add String::fmt control character "%a" for real value show indicate.
 	types.c
 		Change Real value to_string format.
+	tag:
+		PRFM_20170614
+		1.0.1
 
 2018/04/19:
 	methods.c
@@ -1040,10 +1085,16 @@
 		Fix comment bug, INTEGER 64bit signed integer -> big integer.
 	tests/*
 		Fix test scripts and test result file.
+	tag:
+		PRFM_20180515
+		1.1.0
 
 2018/05/17:
 	methods.c
 		Fix Integer::sqrt, Real:sqrt, detect minus number and throw Exception.
+	tag:
+		PRFM_20180517
+		1.1.1
 
 2018/11/21:
 	lib/chat.prfm,chatd.prfm,chat-config.prfm
@@ -1084,6 +1135,9 @@
 	parser.c
 		Add new escape \<cr> that mean next line to be continued.
 		Add octal number literal. ex) 0o[0-7]+
+	tag:
+		PRFM_20181223_K30
+		1.2.0
 
 2019/01/07
 	commands.c
@@ -1109,11 +1163,19 @@
 	commands.c
 		Chage command 'file stat' use system call stat(2) to lstat(2) and use file type macro.
 
+2019/02/15
+	tag:
+		PRFM_20190215_A30
+		1.2.1
+
 2019/02/26
 	commands.c
 		Add 'symbolic-link' property to file stat result list, when 'type' property is "l".
 	lib/ll.prfm
 		Add display symbolic link object.
+	tag:
+		PRFM_20190226
+		1.2.2
 
 2019/04/01
 	methods.c, array.c
@@ -1137,6 +1199,9 @@
 		Fix a few performance.
 	tests/*
 		Fix bug and some tests added.
+	tag:
+		PRFM_20190401
+		1.2.3
 
 2019/05/27
 	lib/standard-io-command-templ.prfm
@@ -1146,6 +1211,9 @@
 		Change these commands are change to use standard-io-command-tmpl.
 	eval.c
 		Fix, if statement first item is premitive then clone it.
+	tag:
+		PRFM_20190527
+		1.2.4
 
 2019/06/17
 	lib/PipeWrapper.prfm
@@ -1163,6 +1231,9 @@
 	methods.c
 		Fix Integer::++ and Integer::-- function argument can acceptable any type
 		(auto conversion to Integer call).
+	tag:
+		PRFM_20190617
+		1.2.5
 
 2019/06/25
 	commands.c
@@ -1177,11 +1248,17 @@
 		Change case command default body specify.
 	types.c
 		Change '<NATIVE>' objects printable style.
+	tag:
+		PRFM_20190625
+		1.2.6
 
 2019/08/23
 	commands.c
 		Add new command spawn is execute unix command. Standard I/O descriptores are
 		inherit to child process.
+	tag:
+		PRFM_20190823
+		1.2.7
 
 2019/10/16
 	eval.c, parser.c
@@ -1198,6 +1275,9 @@
 		Add List::max, List::min methods.
 	lib/String.prfm
 		Add String::replace method.
+	tag:
+		PRFM_20191016
+		1.2.8
 
 2019/12/02
 	lib/interp.prfm
@@ -1232,6 +1312,9 @@
 		    Bulk::len, Bulk::capacity, Bulk::truncate, Bulk::read and Bulk::write.
 	lib/hexdump.prfm
 		Add utility hexdump.
+	tag:
+		PRFM_20200221
+		1.3.0
 
 2020/03/03
 	lib/hexdump.prfm
@@ -1264,6 +1347,9 @@
 2020/04/15
 	doc/manual.*
 		All fonts are changed to Noto-* font family.
+	tag:
+		PRFM_20200415
+		1.4.0
 
 2020/05/28
 	lib/flat.prfm
@@ -1290,6 +1376,9 @@
 		Change to display stacktrace when execute line occurds exception.
 	ncurses.c
 		Add optional feature, curses library wrapper commands.
+	tag:
+		PRFM_20200910
+		1.4.1
 
 2020/10/27
 	Makefile
@@ -1343,6 +1432,9 @@
 		Add perfumesh command option -D PREFIX for specified system top directory.
 	methods.c
 		Add commands String::alphabetic?, String::numeric? and String::alphanumeric?.
+	tag:
+		PRFM_20201209
+		1.5.0_RC_1
 
 2020/12/23
 	Makefile
@@ -1374,6 +1466,9 @@
 		Add parse argments for specified initial open files.
 	perfumesh.c
 		Fix arguments parase bug, for specified initial open files.
+	tag:
+		PRFM_20201223_K32
+		1.5.0
 
 2020/12/25
 	pmacs update:
@@ -1447,6 +1542,9 @@
 		  delete-word, delete-to-end-of-line.
 		Change grep-next and grep-previous use CWD buffer line when exists this
 		  record, open target file before change directory it.
+	tag:
+		PRFM_20210104
+		1.5.1
 
 2021/01/23
 	pmacs update:
@@ -1571,6 +1669,9 @@
 		Add mark at editor command search-next and search-previous.
 		Change search command split to search-forward and search-backward.
 		  search-previous bind to Ctrl+R.
+	tag:
+		PRFM_20210312
+		1.5.2
 
 2021/03/15
 	pmacs update:
@@ -1594,5 +1695,17 @@
 		Add window status and vertical line color change if buffer mode is protect.
 		Change HILIGHT_REGEX_DEFAULT regex list style.
 		Add pmacs.conf description.
+
+2021/04/09
+	pmacs update:
+		Add editor command cursor-{up|down|right|left}-with-region and
+		  assign to Shift+Ctrl+{up|down|right|left} key.
+		Change algorithm smart-newline, smart-indent and smart-dedent.
+		Fix grep, read-grep-file and compile set cursor point.
+	parser.c
+		Add newline character if detect '\r' at parse string and rquote.
+	tag:
+		PRFM_20210409
+		1.5.3
 
 #eof
