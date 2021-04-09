@@ -118,6 +118,62 @@ defcommand cursor-left {
     result SELF;
 };
 
+defcommand cursor-down-with-region {
+    | main window |
+
+    if {! [$window get-region]} {
+        buff ::= $window get-buffer;
+        geom ::= $window get-geom;
+        (cy cx) ::= $window get-source-index $buff $geom;
+        $window start-region $cy $cx;
+    };
+
+    $window move-down;
+    result SELF;
+};
+
+defcommand cursor-up-with-region {
+    | main window |
+
+    if {! [$window get-region]} {
+        buff ::= $window get-buffer;
+        geom ::= $window get-geom;
+        (cy cx) ::= $window get-source-index $buff $geom;
+        $window start-region $cy $cx;
+    };
+
+    $window move-up;
+    result SELF;
+};
+
+defcommand cursor-right-with-region {
+    | main window |
+
+    if {! [$window get-region]} {
+        buff ::= $window get-buffer;
+        geom ::= $window get-geom;
+        (cy cx) ::= $window get-source-index $buff $geom;
+        $window start-region $cy $cx;
+    };
+
+    $window move-right;
+    result SELF;
+};
+
+defcommand cursor-left-with-region {
+    | main window |
+
+    if {! [$window get-region]} {
+        buff ::= $window get-buffer;
+        geom ::= $window get-geom;
+        (cy cx) ::= $window get-source-index $buff $geom;
+        $window start-region $cy $cx;
+    };
+
+    $window move-left;
+    result SELF;
+};
+
 defcommand move-half-up {
     | main window |
     buff ::= $window get-buffer;
