@@ -39,8 +39,7 @@ String method log   ()  {[[self] real]   log     };
 #   Result: Replace at ${val1}, ${val2}, ... ${valN} string to val1, val2 ... valN symbols value.
 #
 String method expand () {
-
-l := ();
+    l := ();
     r ::= [self] =~ :all '\$\{[^${} ]+\}';
     if {nil? $r} then: {return [self]};
     
