@@ -1708,4 +1708,14 @@
 		PRFM_20210409
 		1.5.3
 
+2021/04/19
+	pmacs update:
+		Add set-line-limit command become accept 'auto' value that mean line folding by
+		  current screen width.
+		Fix CombiWindow::get-region if EditBuffer size truncated less than region size,
+		  region hilight fit to buffer size.
+		Add if editor command paste-region execute in region select, do paste buffer after
+		  delete region.
+		Change in pmacs.conf value INTERP_LINE_LIMIT set default to "auto". 
+
 #eof
