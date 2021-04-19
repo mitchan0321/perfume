@@ -1361,6 +1361,11 @@ defcommand paste-buffer {
 	return SELF;
     };
     geom ::= $window get-geom;
+    if [$window get-region] {
+        (sy sx) ::= $window end-region;
+        (ey ex) ::= $window get-source-index $buff $geom;
+        (line col) ::= $window delete-region $sy $sx $ey $ex;
+    };
     (sy sx) ::= $window get-source-index $buff $geom;
     (cy cx) ::= $buff insert-string-at $str $sy $sx;
     show-message "Paste.";
@@ -2672,13 +2677,21 @@ defcommand set-line-limit {
                 return SELF;
             };
             if [$value numeric?] else: {
-                show-message "Enter line length limit.";
+                if {eq? "auto" $value} {
+                    if {defvar? INTERP_LIMIT_LEN} {
+                        setvar INTERP_LIMIT_LEN $value;
+                    } {
+                        defvar INTERP_LIMIT_LEN $value;
+                    };
+                } {
+                    show-message "Enter line length limit.";
+                };
                 return SELF;
             };
             if {defvar? INTERP_LIMIT_LEN} {
                 setvar INTERP_LIMIT_LEN [$value int];
             } {
-                devvar INTERP_LIMIT_LEN [$value int];
+                defvar INTERP_LIMIT_LEN [$value int];
             };
             return SELF;
         };

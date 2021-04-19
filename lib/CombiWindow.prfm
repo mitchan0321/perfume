@@ -756,10 +756,18 @@ CombiWindow method display-evaluation () {
                 r ::= [$r sub 0 80] . " ...";
                 $buff append-string $r;
             } {
-                if {$INTERP_LIMIT_LEN > 0} {
-                    while {[$r len] > $INTERP_LIMIT_LEN} do: {
-                        $buff append-string [[$r sub 0 $INTERP_LIMIT_LEN] . " \\"];
-                        r ::= $r sub $INTERP_LIMIT_LEN;
+                if {eq? "auto" $INTERP_LIMIT_LEN} {
+                    (dummy lim) ::= get-screen-size;
+                    $lim -- 2;
+                    if {$lim < 0} {lim := 0};
+                } {
+                    lim := $INTERP_LIMIT_LEN;
+                };
+                
+                if {$lim > 0} {
+                    while {[$r len] > $lim} do: {
+                        $buff append-string [[$r sub 0 $lim] . " \\"];
+                        r ::= $r sub $lim;
                     };
                 };
                 $buff append-string $r;
@@ -794,9 +802,19 @@ CombiWindow method end-region () {
 
 CombiWindow method get-region () {
     geom ::= get-geom;
-    return $geom,Region;
-};
+    buff ::= get-buffer;
+    $geom,Region ?? {return <nil>};
+    (y x) := $geom,Region;
+    if {[$buff get-buffer-length] < $y} {y ::= $buff get-buffer-length};
+    src ::= $buff get-buffer-line $y;
+    if $src {
+	if {[$src len] < $x} {x ::= $src len};
+    } {
+        x := 0;
+    };
 
+    return ($y $x);
+};
 
 CombiWindow method copy-region (sy sx ey ex) {
     buff ::= get-buffer;
@@ -812,6 +830,16 @@ CombiWindow method cut-region (sy sx ey ex) {
     buff ::= get-buffer;
     ret ::= $buff cut-region $sy $sx $ey $ex;
     setvar CopyBuffer [$ret get 0];
+    result ::= $ret get 1;
+    if $result,0 {
+	return ($result,2 $result,3);
+    };
+    return (0 0);
+};
+
+CombiWindow method delete-region (sy sx ey ex) {
+    buff ::= get-buffer;
+    ret ::= $buff cut-region $sy $sx $ey $ex;
     result ::= $ret get 1;
     if $result,0 {
 	return ($result,2 $result,3);
