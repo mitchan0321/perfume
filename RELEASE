@@ -1718,4 +1718,13 @@
 		  delete region.
 		Change in pmacs.conf value INTERP_LINE_LIMIT set default to "auto". 
 
+2021/04/20
+	pmacs update:
+		Fix dismis the cursor flicker at move cursor continuously.
+		Fix execute-editor-command and trace-editor-command if null regex input become
+		  no make command list.
+		Add key bind to Man mode, 'j' is smooth-scroll-down and 'k' is smooth-scroll-up.
+	ncurses.c
+		Add curs-set command for cursor on/off.
+
 #eof
