@@ -1276,6 +1276,25 @@ error:
     return new_exception(TE_SYNTAX, L"Syntax error at 'curs-col', syntax: curs-col string", interp);
 }
 
+Toy_Type*
+func_curses_set(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *ival;
+    int i;
+    
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (arglen != 1) goto error;
+
+    ival = list_get_item(posargs);
+    if (GET_TAG(ival) != INTEGER) goto error;
+    i = mpz_get_si(ival->u.biginteger);
+    curs_set(i);
+    
+    return ival;
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'curs-set', syntax: curs-set 0 | 1", interp);
+}
+
 int
 toy_add_func_ncurses(Toy_Interp* interp) {
     toy_add_func(interp, L"curs-init",		func_curses_init,		NULL);
@@ -1301,6 +1320,7 @@ toy_add_func_ncurses(Toy_Interp* interp) {
     toy_add_func(interp, L"curs-index-to-pos",	func_curses_index_to_pos,	L"string,index,tab-width");
     toy_add_func(interp, L"curs-flash",		func_curses_flash,		NULL);    
     toy_add_func(interp, L"curs-col",		func_curses_col,		L"string");    
+    toy_add_func(interp, L"curs-set",		func_curses_set,		L"integer");    
     return 0;
 }
 
