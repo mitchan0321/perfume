@@ -557,7 +557,7 @@ Window method key-event-loop () {
 	    result ::= $window apply-keybind $main $window $k;
 	    cond
 	    {eq? $result ALL} {
-		$main apply {render-all; refresh};
+		$main apply {render-all; refresh-without-mini-window};
 		if $MiniInput {$MiniWindow apply {render; refresh}};
 	    }
 	    {eq? $result SELF} {

@@ -103,6 +103,7 @@ CombiWindow method diactivate () {
 };
 
 CombiWindow method refresh () {
+    curs-set 0;
     curs-refresh $StatusLineCurs;
     curs-refresh $VerticalLineCurs;	    
     curs-refresh $BufferCurs;
@@ -134,6 +135,7 @@ CombiWindow method get-curs () {
 };
 
 CombiWindow method render () {
+    ### curs-set 0;
     clear;
 
     if $Activate {geom-trimming};
