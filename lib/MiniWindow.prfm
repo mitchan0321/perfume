@@ -27,6 +27,7 @@ MiniWindow method diactivate () {
 };
 
 MiniWindow method refresh () {
+    curs-set 0;
     curs-refresh $MiniCurs;
     ### curs-move $MiniCurs 0 0;
 };
@@ -101,6 +102,7 @@ MiniWindow method mini-input-value (val index) {
 };
 
 MiniWindow method render () {
+    ### curs-set 0;
     curs-clear $MiniCurs;
     curs-render-line
 	$MiniCurs
