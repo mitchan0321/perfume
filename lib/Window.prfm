@@ -497,9 +497,9 @@ Window method key-event-loop () {
                 setvar KEY_REPEAT_ACCEL 1;
             } {
                 setvar KEY_REPEAT_ACCEL [
-                    if {$rtime > 2.0} 
-                        16
-                        [$rtime / 2.0 : * 15.0 : int : + 1]
+                    if {$rtime > $KEY_REPEAT_ACCEL_DELAY} 
+                        [$KEY_REPEAT_ACCEL_MAXLINE int]
+                        [$rtime / $KEY_REPEAT_ACCEL_DELAY : * [$KEY_REPEAT_ACCEL_MAXLINE - 1.0] : int : + 1]
                     ;;
                 ];
             };
