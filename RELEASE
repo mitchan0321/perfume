@@ -1727,4 +1727,9 @@
 	ncurses.c
 		Add curs-set command for cursor on/off.
 
+2021/04/21
+	pmacs update:
+		Change keyboard repeat accelaration value parameterized.
+		Add editor command samples guru-guru and guru-wave.
+
 #eof
