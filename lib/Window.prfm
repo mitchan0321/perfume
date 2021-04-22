@@ -518,13 +518,13 @@ Window method key-event-loop () {
 		try {
 		    result ::= exec-background;
 		    cond
-		    {eq? $result ALL} { 
-			$main apply {render-all; refresh};
-		    }
-		    {eq? $result REFRESH-ONLY} {
-			$main apply {refresh};
-		    }
-		    ;
+                        {eq? $result ALL} {
+                            $main apply {render-all; refresh};
+                        }
+                        {eq? $result REFRESH-ONLY} {
+                            $main apply {refresh};
+                        }
+		    ;;
 		} catch: {| e |
 		    show-message ["Error at background: <" . [$e car] "># " [$e cdr]];
 		};

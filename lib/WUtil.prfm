@@ -135,50 +135,50 @@ defun line-input (curs disp-line disp-col input-len cur-index cur-val key-in) {
     new-x := $cur-index;
     result := SELF;
     cond
-    {string? $key-in} {
-	curs-x ::= curs-index-to-pos $cur-val [$cur-val len] $DEFAULT_TAB_WIDTH;
-	if {$curs-x < $input-len} {
-	    (command start-y start-x new-y new-x) ::= $v insert-string-at $key-in 0 $cur-index;
-	};
-        break;
-    }
-    {eq? $key-in KEY_RIGHT} {
-	new-x ::= $cur-index + 1;
-	if {$new-x > [$v get 0 : len]} {
-	    new-x := [$v get 0 : len];
-	};
-        break;
-    }
-    {eq? $key-in KEY_LEFT} {
-	new-x ::= $cur-index - 1;
-	if {$new-x < 0} {new-x := 0};
-        break;
-    }
-    {eq? $key-in kRIT5} {
-	new-x ::= $cur-val len;
-        break;
-    }
-    {eq? $key-in kLFT5} {
-	new-x := 0;
-        break;
-    }
-    {eq? $key-in KEY_END} {
-	new-x ::= $cur-val len;
-        break;
-    }
-    {eq? $key-in KEY_HOME} {
-	new-x := 0;
-        break;
-    }
-    {or [eq? $key-in KEY_BACKSPACE] [eq? $key-in CTRL_H]} {
-	(command char new-y new-x) ::= $v backdelete-character-at 0 $cur-index;
-        break;
-    }
-    {eq? $key-in KEY_DC} {
-	(command char new-y new-x) ::= $v delete-character-at 0 $cur-index;
-        break;
-    }
-    ;
+        {string? $key-in} {
+            curs-x ::= curs-index-to-pos $cur-val [$cur-val len] $DEFAULT_TAB_WIDTH;
+            if {$curs-x < $input-len} {
+                (command start-y start-x new-y new-x) ::= $v insert-string-at $key-in 0 $cur-index;
+            };
+            break;
+        }
+        {eq? $key-in KEY_RIGHT} {
+            new-x ::= $cur-index + 1;
+            if {$new-x > [$v get 0 : len]} {
+                new-x := [$v get 0 : len];
+            };
+            break;
+        }
+        {eq? $key-in KEY_LEFT} {
+            new-x ::= $cur-index - 1;
+            if {$new-x < 0} {new-x := 0};
+            break;
+        }
+        {eq? $key-in kRIT5} {
+            new-x ::= $cur-val len;
+            break;
+        }
+        {eq? $key-in kLFT5} {
+            new-x := 0;
+            break;
+        }
+        {eq? $key-in KEY_END} {
+            new-x ::= $cur-val len;
+            break;
+        }
+        {eq? $key-in KEY_HOME} {
+            new-x := 0;
+            break;
+        }
+        {or [eq? $key-in KEY_BACKSPACE] [eq? $key-in CTRL_H]} {
+            (command char new-y new-x) ::= $v backdelete-character-at 0 $cur-index;
+            break;
+        }
+        {eq? $key-in KEY_DC} {
+            (command char new-y new-x) ::= $v delete-character-at 0 $cur-index;
+            break;
+        }
+    ;;
 
     return ($key-in $new-x [if {[$v len] = 0} "" {$v get 0}] $result);
 };

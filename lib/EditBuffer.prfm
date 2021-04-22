@@ -301,7 +301,7 @@ EditBuffer method undo () {
                 {eq? $cmd line-update} {
                     return ($o,2 0);
                 }
-            ;
+            ;;
 	};
     };
     return (<nil> <nil>);
@@ -320,27 +320,28 @@ EditBuffer method redo () {
 	    sets Modify <t>;
 
 	    cond
-	    {eq? $cmd delete-region} {
-		return ($o,1 $o,2);
-	    }
-	    {eq? $cmd insert-string-at} {
-		return ($o,2 $o,3);
-	    }
-	    {eq? $cmd insert-string-at-next} {
-	        line := $o,2;
-		col ::= $o,3 + 1;
-		if {$col > [$Src get $line : len]} {
-		    col := 0;
-		    line ::= $line + 1;
-		};
-		return ($line $col);
-	    }
-            {eq? $cmd backdelete-character-at} {
-                return ($o,1 $o,2);
-            }
-            {eq? $cmd line-update} {
-                return ($o,2 0);
-            }
+                {eq? $cmd delete-region} {
+                    return ($o,1 $o,2);
+                }
+                {eq? $cmd insert-string-at} {
+                    return ($o,2 $o,3);
+                }
+                {eq? $cmd insert-string-at-next} {
+                    line := $o,2;
+                    col ::= $o,3 + 1;
+                    if {$col > [$Src get $line : len]} {
+                        col := 0;
+                        line ::= $line + 1;
+                    };
+                    return ($line $col);
+                }
+                {eq? $cmd backdelete-character-at} {
+                    return ($o,1 $o,2);
+                }
+                {eq? $cmd line-update} {
+                    return ($o,2 0);
+                }
+            ;;
 	};
     };
     return (<nil> <nil>);
