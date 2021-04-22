@@ -73,13 +73,15 @@ defun pmacs (trace: t) {
                     try {
                         f ::= new File init: ($path mode: i);
                         (y x) ::= $MainWindow get-screen-size;
-                        marginx ::= $x - 80 : / 2;
+                        $y -- 2;
+                        $x -- 1;
+                        marginx ::= $x - 78 : / 2;
                         if {$marginx < 0} {
                             marginxs := 0;
                         } {
                             marginxs ::= " " repeat $marginx;
                         };
-                        marginy ::= $y - 22 : / 3;
+                        marginy ::= $y - 21 : / 3;
                         if {$marginy < 0} {
                             marginy := 0;
                         };
