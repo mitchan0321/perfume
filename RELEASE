@@ -1736,5 +1736,6 @@
 	pmacs update:
 		Change starting logo display position (base width/hight value change).
 		Fix mini buffer refresh when screen refreshed.
+		Change man editor command read region if selected the buffer region.
 
 #eof
