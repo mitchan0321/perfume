@@ -65,6 +65,7 @@ Window method create-minibuffer-window () {
     sets MiniWindow $win;
     $MiniWindow set-window-name "MiniBuffer";
     $MiniWindow activate;
+    $MiniWindow refresh;
 };
 
 Window method create-full-window (window-name: win-name) {
