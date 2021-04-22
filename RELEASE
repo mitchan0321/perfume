@@ -1732,4 +1732,9 @@
 		Change keyboard repeat accelaration value parameterized.
 		Add editor command samples guru-guru and guru-wave.
 
+2021/04/22
+	pmacs update:
+		Change starting logo display position (base width/hight value change).
+		Fix mini buffer refresh when screen refreshed.
+
 #eof
