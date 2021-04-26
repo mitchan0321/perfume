@@ -62,8 +62,8 @@ defun pmacs (trace: t) {
                 buff ::= new EditBuffer;
                 path := <nil>;
                 $LIB_PATH each do: {| i |
-                    if {file exists? [$i . "/pmacs.logo"]} {
-                        path ::= $i . "/pmacs.logo";
+                    if {file exists? [$i . "/" $LOGO_PATH]} {
+                        path ::= $i . "/" $LOGO_PATH;
                         break;
                     };
                 };
@@ -75,13 +75,13 @@ defun pmacs (trace: t) {
                         (y x) ::= $MainWindow get-screen-size;
                         $y -- 2;
                         $x -- 1;
-                        marginx ::= $x - 78 : / 2;
+                        marginx ::= $x - $LOGO_WIDTH : / 2;
                         if {$marginx < 0} {
                             marginxs := 0;
                         } {
                             marginxs ::= " " repeat $marginx;
                         };
-                        marginy ::= $y - 21 : / 3;
+                        marginy ::= $y - $LOGO_LINE : / 3;
                         if {$marginy < 0} {
                             marginy := 0;
                         };
