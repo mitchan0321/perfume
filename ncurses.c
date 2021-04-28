@@ -729,6 +729,34 @@ error:
 }
 
 Toy_Type*
+func_curses_get_cursor(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    WINDOW *w;
+    Toy_Type *container;
+    int y, x;
+    Toy_Type *result;
+
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (arglen != 1) goto error;
+
+    container = list_get_item(posargs);
+    if (GET_TAG(container) != CONTAINER) goto error;
+    if (wcscmp(cell_get_addr(container->u.container.desc), L"CURSES") != 0) {
+	return new_exception(TE_CURSES, L"Curses error at 'curs-move', Bad descriptor.", interp);
+    }
+    w = container->u.container.data;
+
+    getyx(w, y, x);
+    result = new_list(NULL);
+    list_append(result, new_integer_si(y));
+    list_append(result, new_integer_si(x));
+
+    return result;
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'curs-get-cursor', syntax: curs-get-cursor window", interp);
+}
+
+Toy_Type*
 func_curses_add_color(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     int pair, fg, bg;
     Toy_Type *arg;
@@ -1314,6 +1342,7 @@ toy_add_func_ncurses(Toy_Interp* interp) {
     toy_add_func(interp, L"curs-set-overlay",	func_curses_setoverlay,		L"over-window,dest-window");
     toy_add_func(interp, L"curs-destroy-window",func_curses_destroywindow,	L"window");
     toy_add_func(interp, L"curs-move",		func_curses_move,		L"window,y,x");
+    toy_add_func(interp, L"curs-get-cursor",	func_curses_get_cursor,		L"window");
     toy_add_func(interp, L"curs-add-color",	func_curses_add_color,		L"pair,fg-color,bg-color");
     toy_add_func(interp, L"curs-keyin",		func_curses_keyin,		L"window,timeout,encoding");
     toy_add_func(interp, L"curs-pos-to-index",	func_curses_pos_to_index,	L"string,pos,tab-width");
