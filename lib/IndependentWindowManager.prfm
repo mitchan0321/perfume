@@ -1,0 +1,21 @@
+class IndependentWindowManager;
+
+IndependentWindowManager method init () {
+    sets WindowList ();
+};
+
+IndependentWindowManager init;
+
+IndependentWindowManager method addWindow (w) {
+    $WindowList <<- $w;
+};
+
+IndependentWindowManager method deleteWindow (w) {
+    i ::= $WindowList find $w;
+    if $i {$WindowList delete! $i};
+    return $i;
+};
+
+IndependentWindowManager method popWindow () {
+    return [$WindowList ->>];
+};
