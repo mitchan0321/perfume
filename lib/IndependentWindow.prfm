@@ -1,9 +1,9 @@
 class IndependentWindow;
 
-$ColorDB set FLOAT_WINDOW           [WUtil color-pair GREEN BLACK];
-$ColorDB set FLOAT_WINDOW_BORDER    [WUtil color-pair BLACK GREEN];
+$ColorDB set DEFAULT_IND_WINDOW_COLOR        [WUtil color-pair GREEN BLACK];
+$ColorDB set DEFAULT_IND_WINDOW_BORDER_COLOR [WUtil color-pair BLACK GREEN];
 
-IndependentWindow method init (main y x line column border: border) {
+IndependentWindow method init (main y x line column border: border color: color bdcolor: bdcolor) {
     curs ::= $main get-curs;
     if {set? border} {
         sets BdrCurs [
@@ -27,9 +27,12 @@ IndependentWindow method init (main y x line column border: border) {
                 $line $column
         ];
     };
+    
+    if {! [set? color]}   {color   := DEFAULT_IND_WINDOW_COLOR};
+    if {! [set? bdcolor]} {bdcolor := DEFAULT_IND_WINDOW_BORDER_COLOR};
 
-    if {true? BdrCurs} {set-window-color-default $BdrCurs FLOAT_WINDOW_BORDER};
-    set-window-color-default $IndCurs FLOAT_WINDOW;
+    if {true? BdrCurs} {set-window-color-default $BdrCurs $bdcolor};
+    set-window-color-default $IndCurs $color;
 };
 
 IndependentWindow method refresh () {
