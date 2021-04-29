@@ -1738,4 +1738,12 @@
 		Fix mini buffer refresh when screen refreshed.
 		Change man editor command read region if selected the buffer region.
 
+2021/04/29
+	commands.c
+		Change atomic command becomes nested call safe.
+	ncurses.c
+		Change delete window struct memory if window destroyed.
+	pmacs update:
+		Define color pair name to ColorDB "fg-color"."bg-color" all combination.
+
 #eof
