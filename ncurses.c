@@ -684,6 +684,7 @@ func_curses_destroywindow(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs,
     posargs = list_next(posargs);
 
     delwin(w);
+    container->u.container.data = NULL;
     container->u.container.desc = new_cell(L"CURSES-deleted");
     
     return const_T;
