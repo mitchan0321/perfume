@@ -2,14 +2,79 @@
 #  The pair is in order foreground color, background color.
 #
 #  Color names are defined in curses library like following this:
-#	$ColorName set BLACK   0;
-#	$ColorName set RED     1;
-#	$ColorName set GREEN   2;
-#	$ColorName set YELLOW  3;
-#	$ColorName set BLUE    4;
-#	$ColorName set MAGENTA 5;
-#	$ColorName set CYAN    6;
-#	$ColorName set WHITE   7;
+#	WUtil::ColorName set BLACK   0;
+#	WUtil::ColorName set RED     1;
+#	WUtil::ColorName set GREEN   2;
+#	WUtil::ColorName set YELLOW  3;
+#	WUtil::ColorName set BLUE    4;
+#	WUtil::ColorName set MAGENTA 5;
+#	WUtil::ColorName set CYAN    6;
+#	WUtil::ColorName set WHITE   7;
+
+$ColorDB set BLACK.BLACK     [WUtil color-pair BLACK   BLACK   ];
+$ColorDB set BLACK.RED       [WUtil color-pair BLACK   RED     ];
+$ColorDB set BLACK.GREEN     [WUtil color-pair BLACK   GREEN   ];
+$ColorDB set BLACK.YELLOW    [WUtil color-pair BLACK   YELLOW  ];
+$ColorDB set BLACK.BLUE      [WUtil color-pair BLACK   BLUE    ];
+$ColorDB set BLACK.MAGENTA   [WUtil color-pair BLACK   MAGENTA ];
+$ColorDB set BLACK.CYAN      [WUtil color-pair BLACK   CYAN    ];
+$ColorDB set BLACK.WHITE     [WUtil color-pair BLACK   WHITE   ];
+$ColorDB set RED.BLACK       [WUtil color-pair RED     BLACK   ];
+$ColorDB set RED.RED         [WUtil color-pair RED     RED     ];
+$ColorDB set RED.GREEN       [WUtil color-pair RED     GREEN   ];
+$ColorDB set RED.YELLOW      [WUtil color-pair RED     YELLOW  ];
+$ColorDB set RED.BLUE        [WUtil color-pair RED     BLUE    ];
+$ColorDB set RED.MAGENTA     [WUtil color-pair RED     MAGENTA ];
+$ColorDB set RED.CYAN        [WUtil color-pair RED     CYAN    ];
+$ColorDB set RED.WHITE       [WUtil color-pair RED     WHITE   ];
+$ColorDB set GREEN.BLACK     [WUtil color-pair GREEN   BLACK   ];
+$ColorDB set GREEN.RED       [WUtil color-pair GREEN   RED     ];
+$ColorDB set GREEN.GREEN     [WUtil color-pair GREEN   GREEN   ];
+$ColorDB set GREEN.YELLOW    [WUtil color-pair GREEN   YELLOW  ];
+$ColorDB set GREEN.BLUE      [WUtil color-pair GREEN   BLUE    ];
+$ColorDB set GREEN.MAGENTA   [WUtil color-pair GREEN   MAGENTA ];
+$ColorDB set GREEN.CYAN      [WUtil color-pair GREEN   CYAN    ];
+$ColorDB set GREEN.WHITE     [WUtil color-pair GREEN   WHITE   ];
+$ColorDB set YELLOW.BLACK    [WUtil color-pair YELLOW  BLACK   ];
+$ColorDB set YELLOW.RED      [WUtil color-pair YELLOW  RED     ];
+$ColorDB set YELLOW.GREEN    [WUtil color-pair YELLOW  GREEN   ];
+$ColorDB set YELLOW.YELLOW   [WUtil color-pair YELLOW  YELLOW  ];
+$ColorDB set YELLOW.BLUE     [WUtil color-pair YELLOW  BLUE    ];
+$ColorDB set YELLOW.MAGENTA  [WUtil color-pair YELLOW  MAGENTA ];
+$ColorDB set YELLOW.CYAN     [WUtil color-pair YELLOW  CYAN    ];
+$ColorDB set YELLOW.WHITE    [WUtil color-pair YELLOW  WHITE   ];
+$ColorDB set BLUE.BLACK      [WUtil color-pair BLUE    BLACK   ];
+$ColorDB set BLUE.RED        [WUtil color-pair BLUE    RED     ];
+$ColorDB set BLUE.GREEN      [WUtil color-pair BLUE    GREEN   ];
+$ColorDB set BLUE.YELLOW     [WUtil color-pair BLUE    YELLOW  ];
+$ColorDB set BLUE.BLUE       [WUtil color-pair BLUE    BLUE    ];
+$ColorDB set BLUE.MAGENTA    [WUtil color-pair BLUE    MAGENTA ];
+$ColorDB set BLUE.CYAN       [WUtil color-pair BLUE    CYAN    ];
+$ColorDB set BLUE.WHITE      [WUtil color-pair BLUE    WHITE   ];
+$ColorDB set MAGENTA.BLACK   [WUtil color-pair MAGENTA BLACK   ];
+$ColorDB set MAGENTA.RED     [WUtil color-pair MAGENTA RED     ];
+$ColorDB set MAGENTA.GREEN   [WUtil color-pair MAGENTA GREEN   ];
+$ColorDB set MAGENTA.YELLOW  [WUtil color-pair MAGENTA YELLOW  ];
+$ColorDB set MAGENTA.BLUE    [WUtil color-pair MAGENTA BLUE    ];
+$ColorDB set MAGENTA.MAGENTA [WUtil color-pair MAGENTA MAGENTA ];
+$ColorDB set MAGENTA.CYAN    [WUtil color-pair MAGENTA CYAN    ];
+$ColorDB set MAGENTA.WHITE   [WUtil color-pair MAGENTA WHITE   ];
+$ColorDB set CYAN.BLACK      [WUtil color-pair CYAN    BLACK   ];
+$ColorDB set CYAN.RED        [WUtil color-pair CYAN    RED     ];
+$ColorDB set CYAN.GREEN      [WUtil color-pair CYAN    GREEN   ];
+$ColorDB set CYAN.YELLOW     [WUtil color-pair CYAN    YELLOW  ];
+$ColorDB set CYAN.BLUE       [WUtil color-pair CYAN    BLUE    ];
+$ColorDB set CYAN.MAGENTA    [WUtil color-pair CYAN    MAGENTA ];
+$ColorDB set CYAN.CYAN       [WUtil color-pair CYAN    CYAN    ];
+$ColorDB set CYAN.WHITE      [WUtil color-pair CYAN    WHITE   ];
+$ColorDB set WHITE.BLACK     [WUtil color-pair WHITE   BLACK   ];
+$ColorDB set WHITE.RED       [WUtil color-pair WHITE   RED     ];
+$ColorDB set WHITE.GREEN     [WUtil color-pair WHITE   GREEN   ];
+$ColorDB set WHITE.YELLOW    [WUtil color-pair WHITE   YELLOW  ];
+$ColorDB set WHITE.BLUE      [WUtil color-pair WHITE   BLUE    ];
+$ColorDB set WHITE.MAGENTA   [WUtil color-pair WHITE   MAGENTA ];
+$ColorDB set WHITE.CYAN      [WUtil color-pair WHITE   CYAN    ];
+$ColorDB set WHITE.WHITE     [WUtil color-pair WHITE   WHITE   ];
 
 case $THEME
 LIGHT {
