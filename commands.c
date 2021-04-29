@@ -4281,17 +4281,19 @@ error:
 Toy_Type*
 cmd_atomic(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *body, *result;
-    int atomic_save;
 
     if (arglen != 1) goto error;
     if (hash_get_length(nameargs) != 0) goto error;
     body = list_get_item(posargs);
     if (GET_TAG(body) != CLOSURE) goto error;
 
-    atomic_save = interp->signal_mask_enable;
-    interp->signal_mask_enable = 1;
-    result = eval_closure(interp, body, interp->trace_info);
-    interp->signal_mask_enable = atomic_save;
+    if (interp->signal_mask_enable) {
+        result = eval_closure(interp, body, interp->trace_info);
+    } else {
+        interp->signal_mask_enable = 1;
+        result = eval_closure(interp, body, interp->trace_info);
+        interp->signal_mask_enable = 0;
+    }
 
     return result;
 
