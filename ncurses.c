@@ -454,6 +454,7 @@ func_curses_render_line(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, i
     arg = list_get_item(posargs);
     if (GET_TAG(arg) != INTEGER) goto error;
     tab_width = mpz_get_si(arg->u.biginteger);
+    if (tab_width <= 0) tab_width = 1;
     posargs = list_next(posargs);
 
     arg = list_get_item(posargs);
@@ -1058,6 +1059,7 @@ func_curses_pos_to_index(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, 
     arg = list_get_item(posargs);
     if (GET_TAG(arg) != INTEGER) goto error;
     tab_width = mpz_get_si(arg->u.biginteger);
+    if (tab_width <= 0) tab_width = 1;
     posargs = list_next(posargs);
 
     slen = cell_get_length(disp_string->u.string);
@@ -1144,6 +1146,7 @@ func_curses_index_to_pos(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, 
     arg = list_get_item(posargs);
     if (GET_TAG(arg) != INTEGER) goto error;
     tab_width = mpz_get_si(arg->u.biginteger);
+    if (tab_width <= 0) tab_width = 1;
     posargs = list_next(posargs);
 
     slen = cell_get_length(disp_string->u.string);
@@ -1205,7 +1208,7 @@ func_curses_index_to_pos(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, 
     return new_integer_si(rendaring_data[index].display_position);
 
 error:
-    return new_exception(TE_SYNTAX, L"Syntax error at 'curs-index-to-pos', syntax: curs-index-to-pos string index", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'curs-index-to-pos', syntax: curs-index-to-pos string index tab-width", interp);
 }
 
 Toy_Type*
