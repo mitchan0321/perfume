@@ -183,6 +183,10 @@ defun line-input (curs disp-line disp-col input-len cur-index cur-val key-in) {
     return ($key-in $new-x [if {[$v len] = 0} "" {$v get 0}] $result);
 };
 
+defun string-width (str tab-width) {
+    return [curs-index-to-pos $str [$str len] $tab-width];
+};
+
 defun show-message (msg wait: msec) {
     if $MainWindow {
 	try {
