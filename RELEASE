@@ -1746,4 +1746,8 @@
 	pmacs update:
 		Define color pair name to ColorDB "fg-color"."bg-color" all combination.
 
+2021/05/10
+	pmacs update:
+		Add auto insert tabs when privious line end character is ':' at smart-newline.
+
 #eof
