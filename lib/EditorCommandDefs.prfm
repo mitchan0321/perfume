@@ -3051,10 +3051,10 @@ defcommand guru-wave {
     body := {
         set c [
             case $c
-            "-"  "/"
-            "/"  "|"
-            "|"  "\\"
-            "\\" "-"
+            "-"   "\\"
+            "\\"  "|"
+            "|"   "/"
+            "/"   "-"
             ;;
         ];
         message := "";
@@ -3062,10 +3062,50 @@ defcommand guru-wave {
         1 each to: [$x / 2] do: {
             set c1 [
                 case $c1
-                "-"  "/"
-                "/"  "|"
-                "|"  "\\"
-                "\\" "-"
+                "-"   "\\"
+                "\\"  "|"
+                "|"   "/"
+                "/"   "-"
+                ;;
+            ];
+            $message append! $c1 " ";
+        };
+        show-message $message;
+        $i ++;
+        if {$i < 100} {
+            $main add-background $body after: 100;
+        };
+        return ALL;
+    };
+    $main add-background $body after: 100;
+    result SELF;
+};
+
+defcommand guru-animal {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    c := "😺";
+    i := 0;
+    (y x) ::= $main get-screen-size;
+    body := {
+        set c [
+            case $c
+            "😺"  "🐾"
+            "🐾"  "🐼"
+            "🐼"  "🐣"
+            "🐣"  "😺"
+            ;;
+        ];
+        message := "";
+        c1 := $c;
+        1 each to: [$x / 2] do: {
+            set c1 [
+                case $c1
+                "😺"  "🐾"
+                "🐾"  "🐼"
+                "🐼"  "🐣"
+                "🐣"  "😺"
                 ;;
             ];
             $message append! $c1 " ";
