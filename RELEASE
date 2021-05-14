@@ -1750,4 +1750,9 @@
 	pmacs update:
 		Add auto insert tabs when privious line end character is ':' at smart-newline.
 
+2021/05/14
+	lib/awk.prfm
+		Fix clear $1 .. $9 variables when next line iteration and if item count less than 9,
+		  then create $(item_count+1) to $9 variables.
+
 #eof
