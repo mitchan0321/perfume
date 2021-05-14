@@ -39,8 +39,18 @@ defun awk-sub (body sep file file-name) {
 		$l each  do: {| i |
 		    set [symbol [$n string]] $i;
 		    $n ++;
-		};
+                };
+                if {$n < 9} {
+                    $n each to: 9 do: {| i |
+                        set [symbol [$i string]] "";
+                    };
+                };
 	        $body eval;
+		set n 1;
+		$l each  do: {| i |
+		    unset [symbol [$n string]];
+		    $n ++;
+                };
 	    };
 	};
     };
