@@ -40,7 +40,7 @@ defun awk-sub (body sep file file-name) {
 		    set [symbol [$n string]] $i;
 		    $n ++;
                 };
-                if {$n < 9} {
+                if {$n <= 9} {
                     $n each to: 9 do: {| i |
                         set [symbol [$i string]] "";
                     };
