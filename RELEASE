@@ -1,3 +1,4 @@
+2021/05/26	PRFM_20210526		1.5.4
 2021/04/09	PRFM_20210409		1.5.3
 2021/03/12	PRFM_20210312		1.5.2
 2021/01/04	PRFM_20210104		1.5.1
@@ -1754,5 +1755,8 @@
 	lib/awk.prfm
 		Fix clear $1 .. $9 variables when next line iteration and if item count less than 9,
 		  then create $(item_count+1) to $9 variables.
+	tag:
+		PRFM_20210526
+		1.5.4
 
 #eof
