@@ -108,8 +108,8 @@
 	add config.h file.
 
 2008/07/27:
-	object constructor implimentation. 'init' method at object creation.
-	Hash class implimentation.
+	object constructor implementation. 'init' method at object creation.
+	Hash class implementation.
 	setup.toy:
 		add apply-constructor script.
 
@@ -120,7 +120,7 @@
 		add array type.
 	methods.c:
 		add File class, Array class and modify Hash for using any type in key value.
-	get macro implimentation, for example: $object,$key meaning [$object get $key].
+	get macro implementation, for example: $object,$key meaning [$object get $key].
 
 2008/08/08:
 	commands.c:
@@ -481,7 +481,7 @@
 
 2011/08/28:
 	array.[ch]
-		change internal implimentation.
+		change internal implementation.
 		change initial size 8 to 256.
 	eval.c
 		method select bug fix.
@@ -551,7 +551,7 @@
 
 2012/07/16:
 	types.[ch], interp.c, methods.c, commands.c
-		Add bit integer implimentation.
+		Add bit integer implementation.
 
 2014/12/23:
 	A programming langage 'perfume' rename from 'toy-lang'.
@@ -647,13 +647,13 @@
 
 2015/09/12:
 	cstack.c
-		Change allocate stack implimentation.
+		Change allocate stack implementation.
 	lib/interp.prfm
 		Add message at exiting intepriter.
 	commands.c
-		File object auto GC implimentation.
+		File object auto GC implementation.
 	type.c
-		Coro object auto GC implimentation.
+		Coro object auto GC implementation.
 
 2015/9/20:
 	config.h.in
@@ -827,7 +827,7 @@
 	lib/pipe.prfm
 		Add result returned that last pipe body's last output.
 	lib/util.prfm
-		Change impliment Block::<< and Block::>> using pipe.prfm utility.
+		Change implement Block::<< and Block::>> using pipe.prfm utility.
 	methods.c
 		Fix List::item value if item is NULL.
 		Fix List::inject.
@@ -1758,5 +1758,14 @@
 	tag:
 		PRFM_20210526
 		1.5.4
+
+2021/05/27
+	pmacs update:
+		Change buffer select order after buffer killed.
+		Change set no modifiy to buffer when do undo but undo buffer is empty.
+		Change pmacs.files add to IndependentWindow.prfm and IndependentWindowManager.prfm
+		  for window style menu implementation.
+	misc/Tarai.vim
+		Add example vim-scripts tarai function.
 
 #eof
