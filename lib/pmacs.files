@@ -33,6 +33,8 @@ Mode-PWiki.key
 Mode-Man.key
 Mode-Java.key
 pinterp.prfm
+IndependentWindow.prfm
+IndependentWindowManager.prfm
 
 );
 
