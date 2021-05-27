@@ -307,6 +307,10 @@ EditBuffer method undo () {
     return (<nil> <nil>);
 };
 
+EditBuffer method undo-empty? () {
+    return [$UndoBuffer null?];
+};
+
 EditBuffer method redo () {
     if {true? Protect} {throw ErrReadOnly "Buffer is protected."};
     

@@ -1239,7 +1239,9 @@ defcommand undo-buffer {
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     (new-y new-x) ::= $buff undo;
+    ### if [$buff undo-empty?] {$buff no-modify};
     $new-y ?? {
+        $buff no-modify;
 	show-message "Undo buffer is empty.";
 	return SELF;
     };
