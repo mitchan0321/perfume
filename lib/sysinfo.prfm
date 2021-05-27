@@ -1,13 +1,17 @@
 defun sysinfo () {
-    {cat} <<< ["\
+    {cat} <<< [
+
+"\
 Version: ${VERSION}
 Library path: ${LIB_PATH}
 Arguments: ${ARGV}
 Default file encoding: ${DEFAULT_FILE_ENCODING}
 Default script encoding: ${DEFAULT_SCRIPT_ENCODING}
-Default directory script encoding: ${DEFAULT_DIRENT_ENCODING}
-Current working directory: ${CWD}"
-    expand];
+Default directory encoding: ${DEFAULT_DIRENT_ENCODING}
+Current working directory: ${CWD}
+" expand
+
+    ];
 
     return;
 };
