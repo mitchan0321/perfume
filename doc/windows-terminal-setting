@@ -1,0 +1,188 @@
+    "actions": 
+    [
+        {
+            "command": "unbound",
+            "keys": "f1"
+        },
+        {
+            "command": "unbound",
+            "keys": "f2"
+        },
+        {
+            "command": "unbound",
+            "keys": "f3"
+        },
+        {
+            "command": "unbound",
+            "keys": "f4"
+        },
+        {
+            "command": "unbound",
+            "keys": "f5"
+        },
+        {
+            "command": "unbound",
+            "keys": "f6"
+        },
+        {
+            "command": "unbound",
+            "keys": "f7"
+        },
+        {
+            "command": "unbound",
+            "keys": "f8"
+        },
+        {
+            "command": "unbound",
+            "keys": "f9"
+        },
+        {
+            "command": "unbound",
+            "keys": "f10"
+        },
+        {
+            "command": "unbound",
+            "keys": "f11"
+        },
+        {
+            "command": "unbound",
+            "keys": "f12"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+a"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+b"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+c"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+d"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+e"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+f"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+g"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+h"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+i"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+j"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+k"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+l"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+m"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+n"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+o"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+p"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+q"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+r"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+s"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+t"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+u"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+v"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+w"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+x"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+y"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+z"
+        },
+        {
+            "command": "unbound",
+            "keys": "alt+up"
+        },
+        {
+            "command": "unbound",
+            "keys": "alt+down"
+        },
+        {
+            "command": "unbound",
+            "keys": "alt+left"
+        },
+        {
+            "command": "unbound",
+            "keys": "alt+right"
+        },
+        {
+            "command": "unbound",
+            "keys": "alt+shift+up"
+        },
+        {
+            "command": "unbound",
+            "keys": "alt+shift+down"
+        },
+        {
+            "command": "unbound",
+            "keys": "alt+shift+left"
+        },
+        {
+            "command": "unbound",
+            "keys": "alt+shift+right"
+        }
+    ],
+
