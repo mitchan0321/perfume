@@ -499,6 +499,17 @@ func_curses_render_line(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, i
 	    cell_add_char(codep, p[i]);
 	    rendaring_data[i].display_char = cell_get_addr(codep);
 	    rendaring_data[i].display_width = 1;
+        }
+        else if ((p[i] >= 0x80) && (p[i] <= 0x10ff)) {
+	    /* multi display width character */
+	    codep = new_cell(NULL);
+	    cell_add_char(codep, p[i]);
+	    result = encode_unicode_to_raw(codep, iencoder, enc_error_info);
+	    if (NULL == result) {
+		return new_exception(TE_BADENCODEBYTE, enc_error_info->message, interp);
+	    }
+	    rendaring_data[i].display_char = cell_get_addr(result);
+            rendaring_data[i].display_width = 1;
 	} else {
 	    /* multi display width character */
 	    codep = new_cell(NULL);
@@ -1087,7 +1098,10 @@ func_curses_pos_to_index(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, 
 	else if (p[i] < 0x7f) {
 	    /* ASCII character encoding */
 	    rendaring_data[i].display_width = 1;
-	} else {
+        }
+        else if ((p[i] >= 0x80) && (p[i] <= 0x10ff)) {
+	    rendaring_data[i].display_width = 1;
+        } else {
 	    /* multi display width character */
 	    if ((p[i] >= 0xFF61) && (p[i] <= 0xFF9F)) {
 		/* JISX0201 (single width) */
@@ -1173,6 +1187,9 @@ func_curses_index_to_pos(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, 
 	}
 	else if (p[i] < 0x7f) {
 	    /* ASCII character encoding */
+	    rendaring_data[i].display_width = 1;
+        }
+        else if ((p[i] >= 0x80) && (p[i] <= 0x10ff)) {
 	    rendaring_data[i].display_width = 1;
 	} else {
 	    /* multi display width character */
