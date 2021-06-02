@@ -96,7 +96,7 @@ defun pmacs (trace: t) {
                         };
                     }
                     catch: {| e |
-                        show-message ["Can\'t read logo file, " . [$e cdr]]; ### '
+                        show-message :bell ["Can\'t read logo file, " . [$e cdr]]; ### '
                     }
                     fin: {
                         $f close;

@@ -466,10 +466,16 @@ defcommand input-character-code {
 	};
         if {eq? $in-key CTRL_M} {
 	    $main mini-input-end;
-	    try {i ::= ["0x" . $value] int} catch: {
-		show-message "Bad hexadecimal.";
+	    try {
+                i ::= ["0x" . $value] int;
+            } catch: {
+		show-message :bell "Bad hexadecimal.";
 		return SELF;
-	    };
+            };
+            if {or {$i < 0} {$i >= 0x200000}} {
+		show-message :bell "Bad range unicode codepoint.";
+		return SELF;
+            };
 	    $window insert-string ["" uimport! ($i)];
 	};
     };
@@ -549,7 +555,7 @@ defcommand execute-command {
 	        result ::= $value eval;
 	        show-message ["Command result: " . [$result string]];
             } catch: {| e |
-		show-message ["<" . [$e car ] "># " [$e cdr]];
+		show-message :bell ["<" . [$e car ] "># " [$e cdr]];
 	    };
 	};
     };
@@ -728,7 +734,7 @@ defcommand open-file {
         if {eq? $in-key CTRL_M} {
 	    $main mini-input-end;
 	    if {[$value len] = 0} {
-		show-message "No file name specified.";
+		show-message :bell "No file name specified.";
                 BufferManager unregist-buffer "*Directory*";
 		return SELF;
 	    };
@@ -746,7 +752,7 @@ defcommand open-file {
 	    buff ::= new EditBuffer;
 	    (result err) ::= $buff load-content $path;
 	    $MainWindow bind-buffer [$window get-window-name] $buff;
-	    $result ?? {show-message ["Open Failed, path: " . $value " ("  $err ")"]};
+	    $result ?? {show-message :bell ["Open Failed, path: " . $value " ("  $err ")"]};
 	    BufferManager unregist-buffer "*Directory*";
 	};
 	if {eq? $in-key CTRL_I} {
@@ -790,7 +796,7 @@ defcommand view-file {
         if {eq? $in-key CTRL_M} {
 	    $main mini-input-end;
 	    if {[$value len] = 0} {
-		show-message "No file name specified.";
+		show-message :bell "No file name specified.";
                 BufferManager unregist-buffer "*Directory*";
 		return SELF;
 	    };
@@ -810,7 +816,7 @@ defcommand view-file {
 	    (result err) ::= $buff load-content $path;
             $buff set-protect;
 	    $MainWindow bind-buffer [$window get-window-name] $buff;
-	    $result ?? {show-message ["Open Failed, path: " . $value " ("  $err ")"]};
+	    $result ?? {show-message :bell ["Open Failed, path: " . $value " ("  $err ")"]};
 	    BufferManager unregist-buffer "*Directory*";
 	};
 	if {eq? $in-key CTRL_I} {
@@ -854,7 +860,7 @@ defcommand read-file {
         if {eq? $in-key CTRL_M} {
 	    $main mini-input-end;
 	    if {[$value len] = 0} {
-		show-message "No file name specified.";
+		show-message :bell "No file name specified.";
                 BufferManager unregist-buffer "*Directory*";
 		return SELF;
 	    };
@@ -866,7 +872,7 @@ defcommand read-file {
 	    buff ::= $window get-buffer;
             geom ::= $window get-geom;
             $buff ?? {
-                show-message "No buffer.";
+                show-message :bell "No buffer.";
                 result SELF;
             };
             f := <nil>;
@@ -880,7 +886,7 @@ defcommand read-file {
                 $window cursor-move-to $geom $line 0;
             }
             catch: {| e |
-                show-message ["File read error, " . [$e cdr]];
+                show-message :bell ["File read error, " . [$e cdr]];
                 return SELF;
             }
             fin: {
@@ -969,7 +975,7 @@ defcommand save-buffer {
 			    if $result {
 				show-message "Save Done.";
 			    } {
-				show-message ["Save Failed, path: " . $path " (" $err ")"];
+				show-message :bell ["Save Failed, path: " . $path " (" $err ")"];
 			    };
 			    BufferManager unregist-buffer "*Directory*";
 			    $MainWindow bind-buffer [$window get-window-name] $__buff_in_clojure__;
@@ -982,7 +988,7 @@ defcommand save-buffer {
 		    if $result {
 			show-message "Save Done.";
 		    } {
-			show-message ["Save Failed, path: " . $path " (" $err ")"];
+			show-message :bell ["Save Failed, path: " . $path " (" $err ")"];
 		    };
 		    BufferManager unregist-buffer "*Directory*";
 		    $MainWindow bind-buffer [$window get-window-name] $__buff_in_clojure__;		    
@@ -1013,7 +1019,7 @@ defcommand save-buffer {
 	    if $result {
 		show-message "Save Done.";
 	    } {
-		show-message ["Save Failed, path: " . $path " (" $err ")"];
+		show-message :bell ["Save Failed, path: " . $path " (" $err ")"];
 	    };
 	    return SELF;
 	    BufferManager unregist-buffer "*Directory*";	
@@ -1074,7 +1080,7 @@ defcommand save-buffer-as {
 		       if $result {
 			   show-message "Save Done.";
 		       } {
-			   show-message ["Save Failed, path: " . $path " (" $err ")"];
+			   show-message :bell ["Save Failed, path: " . $path " (" $err ")"];
 		       };
 		       BufferManager unregist-buffer "*Directory*";
 		       $MainWindow bind-buffer [$window get-window-name] $__buff_in_clojure__;
@@ -1087,7 +1093,7 @@ defcommand save-buffer-as {
 		if $result {
 		    show-message "Save Done.";
 		    } {
-		show-message ["Save Failed, path: " . $path " (" $err ")"];
+		show-message :bell ["Save Failed, path: " . $path " (" $err ")"];
 		};
 		BufferManager unregist-buffer "*Directory*";
 		$MainWindow bind-buffer [$window get-window-name] $__buff_in_clojure__;
@@ -1214,12 +1220,12 @@ defcommand jump-to-buffer {
     (line col) ::= $window get-source-index $buff $geom;
     r ::= $buff get-buffer-line $line;
     $r ?? {
-	show-message "No buffer name specified.";
+	show-message :bell "No buffer name specified.";
 	return SELF;
     };
     l ::= $r =~ '\<[^\>]+\>';
     if {nil? $l} {
-	show-message "No buffer name specified.";
+	show-message :bell "No buffer name specified.";
 	return SELF;
     };
 
@@ -1227,7 +1233,7 @@ defcommand jump-to-buffer {
     s ::= $s sub 1 [$s len : - 1];
     target-buff ::= BufferManager find-buffer $s;
     $target-buff ?? {
-	show-message "No buffer name specified.";
+	show-message :bell "No buffer name specified.";
 	return SELF;
     };
     $main bind-buffer [$window get-window-name] $target-buff;
@@ -1242,7 +1248,7 @@ defcommand undo-buffer {
     if [$buff undo-empty?] {$buff no-modify};
     $new-y ?? {
         ###$buff no-modify;
-	show-message "Undo buffer is empty.";
+	show-message :bell "Undo buffer is empty.";
 	return SELF;
     };
     (line col) ::= $window get-cursor-index $buff $new-y $new-x;
@@ -1262,7 +1268,7 @@ defcommand redo-buffer {
     geom ::= $window get-geom;
     (new-y new-x) ::= $buff redo;
     $new-y ?? {
-	show-message "Redo buffer is empty.";
+	show-message :bell "Redo buffer is empty.";
 	return SELF;
     };
     (line col) ::= $window get-cursor-index $buff $new-y $new-x;
@@ -1295,7 +1301,7 @@ defcommand copy-region {
     | main window |
     buff ::= $window get-buffer;
     [$window get-region] ?? {
-	show-message "Not start region. Press Ctrl+[SPACE] to start region.";
+	show-message :bell "Not start region. Press Ctrl+[SPACE] to start region.";
 	$window end-region;
 	return SELF;
     };
@@ -1311,7 +1317,7 @@ defcommand cut-region {
     | main window |
     buff ::= $window get-buffer;
     [$window get-region] ?? {
-	show-message "Not start region. Press Ctrl+[SPACE] to start region.";
+	show-message :bell "Not start region. Press Ctrl+[SPACE] to start region.";
 	$window end-region;
 	return SELF;
     };
@@ -1367,7 +1373,7 @@ defcommand paste-buffer {
     buff ::= $window get-buffer;
     str ::= $window get-copy-buffer;
     if {$str = ""} {
-	show-message "Copy buffer is empty.";
+	show-message :bell "Copy buffer is empty.";
 	return SELF;
     };
     geom ::= $window get-geom;
@@ -1535,7 +1541,7 @@ defcommand search-next {
     (ey ex) ::= $window get-source-index $buff $geom;
     str ::= $window get-search-string;
     if {$str = ""} {
-        show-message "No set search string, execute 'search' command first.";
+        show-message :bell "No set search string, execute 'search' command first.";
         return SELF;
     };
     $window mark;
@@ -1551,7 +1557,7 @@ defcommand search-previous {
     (ey ex) ::= $window get-source-index $buff $geom;
     str ::= $window get-search-string;
     if {$str = ""} {
-        show-message "No set search string, execute 'search' command first.";
+        show-message :bell "No set search string, execute 'search' command first.";
         return SELF;
     };
     $window mark;
@@ -1658,19 +1664,24 @@ defcommand pwiki-click-link {
         return ALL;
     };
     path ::= $buff get-content;
-    if $path {
-        dir ::= get-dir $path;
+    if {[$link at 0] = "/"} {
+        dir := "";
     } {
-        dir := $DEFAULT_PWIKI_DIR;
+        if $path {
+            dir ::= get-dir $path;
+        } {
+            dir := $DEFAULT_PWIKI_DIR;
+        };
     };
-    new-path ::= path-adjust [$dir . "/" $link ".pwiki"];
+    
+    new-path ::= [$dir = ""] ??? [$link . ".pwiki"] [path-adjust [$dir . "/" $link ".pwiki"]];
     next-buff ::= BufferManager get-buffer-by-path $new-path;
     $next-buff ?? {
         next-buff ::= new EditBuffer;
         create-directory-if-not-exists $new-path;
         (result err) ::= $next-buff load-content $new-path;
         $result ?? {
-            show-message ["Open Failed, path: " . $path " ("  $err ")"];
+            show-message :bell ["Open Failed, path: " . $new-path " ("  $err ")"];
             return SELF;
         };
     };
@@ -1706,10 +1717,10 @@ defcommand pwiki-link-back {
         if $prev-buff {
             $main bind-buffer [$window get-window-name] $prev-buff;
         } {
-            show-message ["No found previous buffer, \'" . $prev-buff-name "\'."];
+            show-message :bell ["No found previous buffer, \'" . $prev-buff-name "\'."];
         };
     } {
-        show-message "No set previous buffer.";
+        show-message :bell "No set previous buffer.";
     };
     result ALL;
 };
@@ -1815,7 +1826,7 @@ defcommand exit {
         };
     };
     if $do_exit {exit};
-    show-message "CAUTION: Modified buffer is exists!! Try again after save the buffer or kill.";
+    show-message :bell "CAUTION: Modified buffer is exists!! Try again after save the buffer or kill.";
     result SELF;
 };
 
@@ -2047,7 +2058,7 @@ defcommand smart-move-forward {
         };
         if $fin {$window cursor-move-to $geom $last-y $last-x};
         if {or [$level-maru-kakko != 0] [$level-kaku-kakko != 0] [$level-nami-kakko != 0]} {
-            show-message ["Unbalanced brackets? " . "hint:"
+            show-message :bell ["Unbalanced brackets? " . "hint:"
                 [if [$level-maru-kakko != 0] " '(' or ')', " ""]
                 [if [$level-kaku-kakko != 0] " '[' or ']', " ""]
                 [if [$level-nami-kakko != 0] " '{' or '}', " ""]
@@ -2129,7 +2140,7 @@ defcommand smart-move-backward {
         };
         if $fin {$window cursor-move-to $geom $last-y $last-x};
         if {or [$level-maru-kakko != 0] [$level-kaku-kakko != 0] [$level-nami-kakko != 0]} {
-            show-message ["Unbalanced brackets? " . "hint:"
+            show-message :bell ["Unbalanced brackets? " . "hint:"
                 [if [$level-maru-kakko != 0] " '(' or ')', " ""]
                 [if [$level-kaku-kakko != 0] " '[' or ']', " ""]
                 [if [$level-nami-kakko != 0] " '{' or '}', " ""]
@@ -2248,12 +2259,12 @@ defcommand grep {
         if {eq? $in-key CTRL_M} {
             $main mini-input-end;
             if {[$value len] = 0} {
-                show-message "No directory specified.";
+                show-message :bell "No directory specified.";
                 return SELF;
             };
             directory := $value;
             if {file dir? $directory} else: {
-                show-message ["Not directory: " . $directory];
+                show-message :bell ["Not directory: " . $directory];
                 return SELF;
             };
 
@@ -2276,7 +2287,7 @@ defcommand grep {
                 if {eq? $in-key CTRL_M} {
                     $main mini-input-end;
                     if {[$value len] = 0} {
-                        show-message "No grep command line specified.";
+                        show-message :bell "No grep command line specified.";
                         return SELF;
                     };
                     cmd := $value;
@@ -2353,7 +2364,7 @@ defcommand grep-next {
     | main window |
     grep-buff ::= BufferManager find-buffer "*Grep*";
     $grep-buff ?? {
-        show-message "No *Grep* buffer, execute 'grep' command first.";
+        show-message :bell "No *Grep* buffer, execute 'grep' command first.";
         return ALL;
     };
     chdir-cwd $grep-buff;
@@ -2386,7 +2397,7 @@ defcommand grep-next {
     $window cursor-move-to-fit-center $grep-geom $ey 0;
     $window cursor-fit-to-top $grep-geom;
     $str ?? {
-        show-message "Bottom of *Grep* buffer.";
+        show-message :bell "Bottom of *Grep* buffer.";
         return ALL;
     };
 
@@ -2400,7 +2411,7 @@ defcommand grep-previous {
     | main window |
     grep-buff ::= BufferManager find-buffer "*Grep*";
     $grep-buff ?? {
-        show-message "No *Grep* buffer, execute 'grep' command first.";
+        show-message :bell "No *Grep* buffer, execute 'grep' command first.";
         return ALL;
     };
     chdir-cwd $grep-buff;
@@ -2438,7 +2449,7 @@ defcommand grep-previous {
     $window cursor-move-to-fit-center $grep-geom $ey 0;
     $window cursor-fit-to-top $grep-geom;
     $str ?? {
-        show-message "Top of *Grep* buffer.";
+        show-message :bell "Top of *Grep* buffer.";
         return ALL;
     };
 
@@ -2456,7 +2467,7 @@ defun show-file-at (window-name path line) {
         buff ::= new EditBuffer;
         (result err) ::= $buff load-content $path;
         $result ?? {
-            show-message ["Open Failed, path: " . $path " ("  $err ")"];
+            show-message :bell ["Open Failed, path: " . $path " ("  $err ")"];
             return;
         };
     };
@@ -2478,7 +2489,7 @@ defun chdir-cwd (buff) {
                 try {
                     cd [$cwd clean];
                 } catch: {| e |
-                    show-message ["Bad CWD line: " . $r];
+                    show-message :bell ["Bad CWD line: " . $r];
                 };
             };
         };
@@ -2497,12 +2508,12 @@ defcommand read-grep-file {
         if {eq? $in-key CTRL_M} {
             $main mini-input-end;
             if {[$value len] = 0} {
-                show-message "No grep file specified.";
+                show-message :bell "No grep file specified.";
                 return SELF;
             };
             file := $value;
             if {file read? $file} else: {
-                show-message ["Not readable file: " . $file];
+                show-message :bell ["Not readable file: " . $file];
                 return SELF;
             };
             ###
@@ -2512,7 +2523,7 @@ defcommand read-grep-file {
             buff ::= new EditBuffer;
             (result err) ::= $buff load-content $file buffer-name: "*Grep*";
             $result ?? {
-                show-message ["Open Failed, path: " . $file " ("  $err ")"];
+                show-message :bell ["Open Failed, path: " . $file " ("  $err ")"];
                 return SELF;
             };
             $main create-split-vertical-window;
@@ -2565,7 +2576,7 @@ defcommand cd {
         if {eq? $in-key CTRL_M} {
             $main mini-input-end;
             if {[$value len] = 0} {
-                show-message "No directory specified.";
+                show-message :bell "No directory specified.";
                 return SELF;
             };
             directory := $value;
@@ -2749,7 +2760,7 @@ defcommand man {
         if {eq? $in-key CTRL_M} {
             $main mini-input-end;
             if {$value = ""} {
-                show-message "Enter man topic name.";
+                show-message :bell "Enter man topic name.";
                 return ALL;
             };
             exec-man $main $window $value;
@@ -2798,7 +2809,7 @@ defcommand man-click-link {
     (ey ex) ::= $window get-source-index $buff $geom;
     str ::= cursor-on-search-regex $ey $ex $MAN_LINK $buff;
     $str ?? {
-        show-message "No man topic.";
+        show-message :bell "No man topic.";
         return ALL;
     };
 
@@ -2825,10 +2836,10 @@ defcommand man-link-back {
         if $prev-buff {
             $main bind-buffer [$window get-window-name] $prev-buff;
         } {
-            show-message ["No found previous buffer, \'" . $prev-buff-name "\'."];
+            show-message :bell ["No found previous buffer, \'" . $prev-buff-name "\'."];
         };
     } {
-        show-message "No set previous buffer.";
+        show-message :bell "No set previous buffer.";
     };
     result ALL;
 };
@@ -2865,12 +2876,12 @@ defcommand compile {
         if {eq? $in-key CTRL_M} {
             $main mini-input-end;
             if {[$value len] = 0} {
-                show-message "No directory specified.";
+                show-message :bell "No directory specified.";
                 return SELF;
             };
             directory := $value;
             if {file dir? $directory} else: {
-                show-message ["Not directory: " . $directory];
+                show-message :bell ["Not directory: " . $directory];
                 return SELF;
             };
 
@@ -2884,7 +2895,7 @@ defcommand compile {
                 if {eq? $in-key CTRL_M} {
                     $main mini-input-end;
                     if {[$value len] = 0} {
-                        show-message "No compile command specified.";
+                        show-message :bell "No compile command specified.";
                         return SELF;
                     };
                     cmd := $value;
@@ -2961,7 +2972,7 @@ defcommand help {
         create-directory-if-not-exists $help-path;
         (result err) ::= $buff load-content $help-path;
         $result ?? {
-            show-message ["Open Failed, path: " . $help-path " ("  $err ")"];
+            show-message :bell ["Open Failed, path: " . $help-path " ("  $err ")"];
             return SELF;
         };
     };

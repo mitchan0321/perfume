@@ -539,7 +539,7 @@ Window method key-event-loop () {
                         }
 		    ;;
 		} catch: {| e |
-		    show-message ["Error at background: <" . [$e car] "># " [$e cdr]];
+		    show-message :bell ["Error at background: <" . [$e car] "># " [$e cdr]];
 		};
 	    };
 	    continue;
@@ -609,7 +609,7 @@ Window method mini-input-callback (in-key value) {
 	    result ::= yield $MiniInputCallback,1 $MainWindow $MiniInputCallback,0 $in-key $value;
 	}
 	catch: {| e |
-	    show-message ["Error happend at mini window input callback, <" . [$e car] "># " [$e cdr]];
+	    show-message :bell ["Error happend at mini window input callback, <" . [$e car] "># " [$e cdr]];
 	    return <nil>;
 	};
     };
@@ -690,12 +690,12 @@ Window method exec-background () {
             result ::= yield $body [self] [get-current-window];
         }
         catch: {| e |
-            show-message ["Error happend at background: " . $command ", <" [$e car] "># " [$e cdr]];
+            show-message :bell ["Error happend at background: " . $command ", <" [$e car] "># " [$e cdr]];
 	    return <nil>;
         };
         return $result;
     };
-    show-message ["Incorrect background at: " . $command];
+    show-message :bell ["Incorrect background at: " . $command];
     return <nil>;
 };
 
@@ -739,7 +739,7 @@ Window method suspend (*) {
     cur ::= curs-init;
     set-curs $cur;
     resize-window;
-    if $e {show-message ["Execute error" . $e]};
+    if $e {show-message :bell ["Execute error" . $e]};
 };
 
 Window method refresh-screen () {
