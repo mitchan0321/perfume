@@ -1768,4 +1768,17 @@
 	misc/Tarai.vim
 		Add example vim-scripts tarai function.
 
+2021/06/02
+	pmacs update:
+		Fix curs-render-line is return exception if render line including corrupt unicode
+		  character, CombiWindow::render become catch the exception.
+		Add visible bell in show-message with :bell option, some editor commands become
+		  use this option.
+		Fix input-character-code editor command if input unicode code point greater than
+		  0x1fffff become error.
+		Fix pwiki-click-link if document link name begin '/' document content-path is
+		  same as link name.
+	ncurses.c
+		Change double width character range to greater than 0x10ff.
+
 #eof
