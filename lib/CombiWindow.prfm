@@ -179,10 +179,16 @@ CombiWindow method render () {
     i := 0;
     $buff buffer-select $geom,ViewLine [$geom,ViewLine + $y : - 1] {
 	| src |
-	curs-render-line
-	    $BufferCurs
-	    $i $geom,ViewColumn 0 $src
-	    $DEFAULT_TAB_WIDTH $DISPLAY_ENCODING;
+        try {
+            curs-render-line
+	        $BufferCurs
+                $i $geom,ViewColumn 0 $src
+                $DEFAULT_TAB_WIDTH $DISPLAY_ENCODING;
+        }
+        catch: {| e |
+            show-message :bell ["Error at curs-render-line, <" . [$e car] ">."];
+            break;
+        };
 	$i ++;
     };
 
@@ -588,7 +594,7 @@ CombiWindow method load-keybind () {
 	        load :notrace [$i . "/" $COMBIWINDOW_KEYBINDFILE]
 	    } catch: {| e |
 		### throw ErrConfiguration ["Error at key-bind file: " . $COMBIWINDOW_KEYBINDFILE ", <" [$e car] "># " [$e cdr]];
-		show-message ["Error at key-bind file: " . $COMBIWINDOW_KEYBINDFILE ", <" [$e car] "># " [$e cdr]];
+		show-message :bell ["Error at key-bind file: " . $COMBIWINDOW_KEYBINDFILE ", <" [$e car] "># " [$e cdr]];
 		return;
 	    };
 	    break;
@@ -610,7 +616,7 @@ CombiWindow method load-keybind-override (mode) {
     key-path := $MODE_FILE,$mode;
     $key-path ?? {
         $Parent add-background after: 200 {
-            show-message ["No such mode: " . $mode];
+            show-message :bell ["No such mode: " . $mode];
             result ALL;
         };
 	return <nil>;
@@ -622,7 +628,7 @@ CombiWindow method load-keybind-override (mode) {
 	        load :notrace [$i . "/" $key-path];
 	    } catch: {| e |
                 $Parent add-background after: 200 {
-                    show-message ["Error at mode file: " . $key-path ", <" [$e car] "># " [$e cdr]];
+                    show-message :bell ["Error at mode file: " . $key-path ", <" [$e car] "># " [$e cdr]];
                     result ALL;
                 };
 		return <nil>;
@@ -631,7 +637,7 @@ CombiWindow method load-keybind-override (mode) {
 	};
     };
     $Parent add-background after: 200 {
-        show-message ["No such mode file: " . $key-path];
+        show-message :bell ["No such mode file: " . $key-path];
         result ALL;
     };
     return <nil>;
@@ -660,12 +666,12 @@ CombiWindow method apply-keybind (main window key) {
 		result ::= yield $body $main $window $key;
 	    }
 	    catch: {| e |
-		show-message ["Error happend at editor command: " . $command ", <" [$e car] "># " [$e cdr]];
+		show-message :bell ["Error happend at editor command: " . $command ", <" [$e car] "># " [$e cdr]];
 		return <nil>;
 	    };
 	    return $result;
 	};
-	show-message ["Incorrect command at: " . $command];
+	show-message :bell ["Incorrect command at: " . $command];
 	return <nil>;
     };
 
@@ -676,7 +682,7 @@ CombiWindow method apply-keybind (main window key) {
     
     command ::= $KeyBinding get $key;
     if {eq? <nil> $command} {
-    show-message ["No binding key: " . $key];
+    show-message :bell ["No binding key: " . $key];
 	return <nil>;
     };
     body ::= get-command $command;
@@ -685,15 +691,15 @@ CombiWindow method apply-keybind (main window key) {
 	    result ::= yield $body $main $window;
 	}
 	catch: {| e |
-	    show-message ["Error happend at editor command: " . $command ", <" [$e car] "># " [$e cdr]];
+	    show-message :bell ["Error happend at editor command: " . $command ", <" [$e car] "># " [$e cdr]];
 	    return <nil>;
 	};
 	return $result;
     } {
-	show-message ["Editor command not defined: " . $command];
+	show-message :bell ["Editor command not defined: " . $command];
 	return <nil>;
     };
-    show-message ["Incorrect command at: " . $command];
+    show-message :bell ["Incorrect command at: " . $command];
     return <nil>;
 };
 
@@ -708,15 +714,15 @@ CombiWindow method apply-command (main window key command) {
 	    };
 	}
 	catch: {| e |
-	    show-message ["Error happend at editor command: " . $command ", <" [$e car] "># " [$e cdr]];
+	    show-message :bell ["Error happend at editor command: " . $command ", <" [$e car] "># " [$e cdr]];
 	    return <nil>;
 	};
 	return $result;
     } {
-	show-message ["Editor command not defined: " . $command];
+	show-message :bell ["Editor command not defined: " . $command];
 	return <nil>;
     };
-    show-message ["Incorrect command at: " . $command];
+    show-message :bell ["Incorrect command at: " . $command];
     return <nil>;
 };
 
@@ -1195,7 +1201,7 @@ CombiWindow method goto-mark () {
     (y x) ::= get-source-index $buff $geom;
     result ::= $buff get-mark $y $x;
     $result ?? {
-        show-message "No mark buffer.";
+        show-message :bell "No mark buffer.";
         return;
     };
     cursor-move-to-fit-center $geom [$result get 0] [$result get 1];
@@ -1207,7 +1213,7 @@ CombiWindow method unmark () {
     (y x) ::= get-source-index $buff $geom;
     result ::= $buff un-mark $y $x;
     $result ?? {
-        show-message "No unmark buffer.";
+        show-message :bell "No unmark buffer.";
         return;
     };
     cursor-move-to-fit-center $geom [$result get 0] [$result get 1];
