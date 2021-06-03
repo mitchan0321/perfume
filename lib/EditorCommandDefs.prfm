@@ -1825,8 +1825,12 @@ defcommand exit {
 	    do_exit := <nil>;
         };
     };
-    if $do_exit {exit};
-    show-message :bell "CAUTION: Modified buffer is exists!! Try again after save the buffer or kill.";
+    if $do_exit {
+        exit
+    } {
+        show-message :bell "CAUTION: Modified buffer is exists!! Try again after save the buffer or kill.";
+    };
+    
     result SELF;
 };
 
