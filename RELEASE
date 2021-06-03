@@ -1786,5 +1786,7 @@
 		Fix grep command restore the current directory after grep execute.
 		Fix grep-next and grep-previous are read CWD *Grep* buffer line
 		  if grep result path not start '/' character.
+		Change *Scratch* buffer starting message and pinterp starting message.
+		Fix to no message show at exit timming if pmacs don't have some modified buffer.
 
 #eof
