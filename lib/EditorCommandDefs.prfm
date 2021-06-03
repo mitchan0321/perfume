@@ -2295,6 +2295,7 @@ defcommand grep {
                     ###
                     ### do grep
                     ###
+                    orig-dir ::= pwd;
                     cd $directory;
                     fout ::= new Stream;
                     ferr ::= new Stream;
@@ -2327,6 +2328,7 @@ defcommand grep {
                     $geom set! ViewLine 0;
                     $geom set! ViewColumn 0;
                     $window cursor-move-to $geom 0 0;
+                    cd $orig-dir;
                     return SELF;
                 };
             };
@@ -2367,7 +2369,7 @@ defcommand grep-next {
         show-message :bell "No *Grep* buffer, execute 'grep' command first.";
         return ALL;
     };
-    chdir-cwd $grep-buff;
+    dir ::= chdir-cwd $grep-buff;
     
     w1 ::= $main get-window-by-name "Window#1";
     w2 ::= $main get-window-by-name "Window#2";
@@ -2402,7 +2404,11 @@ defcommand grep-next {
     };
 
     ### show-message ["File: " . $f ", line: " $n];
-    show-file-at "Window#2" $f $n;
+    if {[$f at 0] = "/"} {
+        show-file-at "Window#2" $f $n;
+    } {
+        show-file-at "Window#2" [$dir . $f] $n;
+    };
 
     return ALL;
 };
@@ -2414,7 +2420,7 @@ defcommand grep-previous {
         show-message :bell "No *Grep* buffer, execute 'grep' command first.";
         return ALL;
     };
-    chdir-cwd $grep-buff;
+    dir ::= chdir-cwd $grep-buff;
     
     w1 ::= $main get-window-by-name "Window#1";
     w2 ::= $main get-window-by-name "Window#2";
@@ -2454,14 +2460,16 @@ defcommand grep-previous {
     };
 
     ### show-message ["File: " . $f ", line: " $n];
-    show-file-at "Window#2" $f $n;
+    if {[$f at 0] = "/"} {
+        show-file-at "Window#2" $f $n;
+    } {
+        show-file-at "Window#2" [$dir . $f] $n;
+    };
     
     return ALL;
 };
 
 defun show-file-at (window-name path line) {
-    if {[$path at 0] != "/"} {path ::= pwd : . "/" $path};
-
     buff ::= BufferManager get-buffer-by-path $path;
     $buff ?? {
         buff ::= new EditBuffer;
@@ -2482,18 +2490,23 @@ defun chdir-cwd (buff) {
     r ::= $buff get-buffer-line 0;
     if $r {
         l ::= $r split sep: ":";
-        if {[$l len] < 2} {return};
+        if {[$l len] < 2} {return "./"};
         if {[$l get 0] = "CWD"} {
             cwd ::= $l get 1;
             if $cwd {
                 try {
-                    cd [$cwd clean];
+                    result ::= $cwd clean;
+                    if {[$result at -1] != "/"} {
+                        $result append! "/";
+                    };
+                    return $result;
                 } catch: {| e |
                     show-message :bell ["Bad CWD line: " . $r];
                 };
             };
         };
     };
+    return "./";
 };
 
 defcommand read-grep-file {
