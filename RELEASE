@@ -1788,5 +1788,6 @@
 		  if grep result path not start '/' character.
 		Change *Scratch* buffer starting message and pinterp starting message.
 		Fix to no message show at exit timming if pmacs don't have some modified buffer.
+		Add quick start document 'lib/pdoc/00quick-start.pwiki' file.
 
 #eof
