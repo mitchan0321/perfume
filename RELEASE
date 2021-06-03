@@ -1781,4 +1781,10 @@
 	ncurses.c
 		Change double width character range to greater than 0x10ff.
 
+2021/06/03
+	pmacs update:
+		Fix grep command restore the current directory after grep execute.
+		Fix grep-next and grep-previous are read CWD *Grep* buffer line
+		  if grep result path not start '/' character.
+
 #eof
