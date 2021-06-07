@@ -1114,7 +1114,7 @@ defcommand kill-buffer {
     | main window |
     buff ::= $window get-buffer;
     if [$buff modify?] {
-	$main mini-input-start "" prompt: "This buffer is modified, realy kill? [yes or ESC]: ";
+	$main mini-input-start "" prompt: "This buffer is modified, really kill? [yes or ESC]: ";
 	$main add-mini-input-callback $window {| main window in-key value |
 	    if {eq? $in-key KEY_ESC} {
 		$main mini-input-end;
