@@ -40,7 +40,7 @@ Shift+[F12] [[roll-current-window-backward]] で目的のウィンドウを選�
 
 【行の挿入】
 
-カーソル行の上の行に行を挿入する場合、Shift+INS キー [[insert-new-line]] を押します。
+カーソル行の上の行に行を挿入する場合、Ctrl+INS キー [[insert-new-line]] を押します。
 
 
 【文字の削除】
