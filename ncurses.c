@@ -884,6 +884,18 @@ func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     static unsigned long int curs_blink = 0;
     static double time_prev=0.0, time_now=0.0, time_on_repeat=0.0;
     static int no_input_count = 0;
+    int blink;
+    Toy_Type *tblink;
+
+    blink = 0;
+    tblink = hash_get_and_unset_t(nameargs, new_symbol(L"blink:"));
+    if (NULL != tblink) {
+        if (IS_NIL(tblink)) {
+            blink = 0;
+        } else {
+            blink = 1;
+        }
+    }
 
     if (hash_get_length(nameargs) > 0) goto error;
     if (arglen != 3) goto error;
@@ -916,8 +928,18 @@ func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     inlist = result = new_list(NULL);
 
     curs_blink ++;
-    // curs_set(((curs_blink >> 4) % 2) ? 0 : 1); // blink even
-    curs_set(((curs_blink >> 3) % 4) ? 1 : 0); // blink 3:1
+    switch (blink) {
+    case 0:
+        curs_set(1); // always cursor on
+        break;
+    case 1:
+        // curs_set(((curs_blink >> 4) % 2) ? 0 : 1); // blink even
+        curs_set(((curs_blink >> 3) % 4) ? 1 : 0); // blink 3:1
+        break;
+    default:
+        curs_set(1); // always cursor on
+    };
+    
     wtimeout(w, itimeout);
 
     cur_in = -1;
@@ -1041,7 +1063,7 @@ valid_return:
     return result_list;
     
 error:
-    return new_exception(TE_SYNTAX, L"Syntax error at 'curs-keyin', syntax: curs-keyin window timeout encoding", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'curs-keyin', syntax: curs-keyin window timeout encoding [:blink]", interp);
 }
 
 Toy_Type*

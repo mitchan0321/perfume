@@ -1,3 +1,4 @@
+2021/06/10	PRFM_20210610		1.5.5
 2021/05/26	PRFM_20210526		1.5.4
 2021/04/09	PRFM_20210409		1.5.3
 2021/03/12	PRFM_20210312		1.5.2
@@ -1789,5 +1790,13 @@
 		Change *Scratch* buffer starting message and pinterp starting message.
 		Fix to no message show at exit timming if pmacs don't have some modified buffer.
 		Add quick start document 'lib/pdoc/00quick-start.pwiki' file.
+
+2021/06/10
+	pmacs update:
+		Add blink: option at curs-keyin function. If blink specified <nil> system blink, 
+		  specified <t> Pmacs curs-keyin built-in blink.`
+	tag:
+		PRFM_20210610
+		1.5.5
 
 #eof

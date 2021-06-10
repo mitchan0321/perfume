@@ -20,7 +20,7 @@ ScratchBuffer method init () {
         "    Select the '*Scratch*' buffer first."
         ""
 	"    1. Execute command"
-	"       - Select line (move cursor) or region (press Ctrl+SPACE) first, if you want to execute."
+	"       - Select line (move cursor) or region (press Ctrl+SPACE) first for execute."
 	"       - Execute the selected line --> Ctrl+J"
 	"    2. Restart Perfume interpriter --> Ctrl+K"
 	"    3. Send eof to interpriter     --> Ctrl+G"

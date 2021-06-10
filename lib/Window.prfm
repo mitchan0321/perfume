@@ -506,7 +506,7 @@ Window method key-event-loop () {
 
 	window ::= $main get-current-window;
 	if {$KeyEvent null?} {
-	    (rtime i) ::= curs-keyin [$window get-curs] $INPUT_TIMEOUT $INPUT_ENCODING;
+	    (rtime i) ::= curs-keyin [$window get-curs] $INPUT_TIMEOUT $INPUT_ENCODING blink: $BLINK;
             if $KEY_REPEAT_ACCEL_OFF {
                 setvar KEY_REPEAT_ACCEL 1;
             } {
