@@ -37,7 +37,8 @@ BufferManager method get-buffer-list-order-by-newer () {
         result ([get-buffer $i : get-raise-timestamp] $i)
     };
     l2 ::= msort $l1 order: < getter: {| i | $i get 0};
-    return [$l2 map {| i | $i get 1}];
+    l3 ::= [$l2 filter {| i | [[$i get 1] at 0] != "*"}] concat [$l2 filter {| i | [[$i get 1] at 0] = "*"}];
+    return [$l3 map {| i | $i get 1}];
 };
 
 BufferManager method get-buffer (name) {

@@ -430,12 +430,7 @@ Window method unbind-buffer () {
                 if {$l null?} {
                     BufferManager get-buffer <nil>;
                 } {
-                    l ::= $l cdr;
-                    if {list? $l} {
-                        BufferManager get-buffer [$l car];
-                    } {
-                        BufferManager get-buffer <nil>;
-                    }
+                    BufferManager get-buffer [$l car];
                 };
             ];
 	};
