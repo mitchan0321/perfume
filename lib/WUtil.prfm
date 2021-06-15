@@ -267,7 +267,9 @@ defun show-files-in-window (main window dir) {
 	    $buff append-string "";
 	
 	    l ::= file list $dir : filter {| i |
-	        $i =~ ["^" . $fname ".*" : rquote];
+                ### $i =~ ["^" . $fname : rquote];
+	        ### $i =~ :text [$fname rquote];
+                [$i sub 0 [$fname len]] = $fname;
 	    };
 	    l ::= msort $l;
 	    src-list ::= $l clone;

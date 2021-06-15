@@ -1406,6 +1406,10 @@ defcommand search-backward {
     return [search-sub $main $window <nil>];
 };
 
+defun search-prompt (dir mode) {
+    $dir ??? ["Search " . $mode " [forward]: "] ["Search " . $mode " [backward]: "];
+};
+
 defun search-sub (main window dir) {
     __buff_in_clojure__ ::= $window get-buffer;
 
@@ -1421,7 +1425,7 @@ defun search-sub (main window dir) {
     };
 
     $window start-search;
-    $main mini-input-start $str prompt: [$dir ??? "Search regex [forward]: " "Search regex [backward]: "];
+    $main mini-input-start $str prompt: [search-prompt $dir $SEARCH_MODE];
     $window reset-search;
     $window set-search-result [$__buff_in_clojure__ search $str];
     $window stay-search;
@@ -1513,7 +1517,22 @@ defun search-sub (main window dir) {
                 $window set-search-result [$__buff_in_clojure__ search $str];
                 $window move-to-next-search;
             };
-	};
+        };
+        if {eq? $in-key CTRL_T} {
+            case $SEARCH_MODE
+            regex {setvar SEARCH_MODE text}
+            text  {setvar SEARCH_MODE regex}
+            ;;
+            $MainWindow set-mini-input-prompt [search-prompt $dir $SEARCH_MODE];
+      	    $window reset-search;
+	    $window set-search-result [$__buff_in_clojure__ search $value];
+	    $window stay-search;
+            if $dir {
+                $main send-key-event (KEY_DOWN);
+            } {
+                $main send-key-event (KEY_UP);
+            };
+        };
 	if {or {eq? $in-key CTRL_H} {eq? $in-key KEY_DC}
 	       {eq? $in-key KEY_BACKSPACE}} {
 	    $window reset-search;
@@ -2281,7 +2300,7 @@ defcommand grep {
                 (ey ex) ::= $window get-source-index $buff $geom;
                 str ::= $window get-region-string $sy $sx $ey $ex;
             };
-            $main mini-input-start ["grep -nHe '" . $str "' *"] prompt: "grep command line: " index: 11;
+            $main mini-input-start ["grep -rnHe '" . $str "' *"] prompt: "grep command line: " index: 12;
             $main add-mini-input-callback $window {| main window in-key value |
                 if {eq? $in-key KEY_ESC} {
                     $main mini-input-end;
@@ -2302,7 +2321,9 @@ defcommand grep {
                     orig-dir ::= pwd;
                     cd $directory;
                     fout ::= new Stream;
+                    $fout set-nolimit;
                     ferr ::= new Stream;
+                    $ferr set-nolimit;
                     sts ::= {exec "/bin/sh" "-c" $cmd} redirect-out $fout $ferr;
                     $fout close;
                     $ferr close;

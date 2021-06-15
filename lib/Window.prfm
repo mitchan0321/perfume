@@ -624,6 +624,10 @@ Window method mini-input-value-override (val index) {
     $MiniWindow mini-input-value $val $index;
 };
 
+Window method set-mini-input-prompt (prompt) {
+    $MiniWindow set-prompt $prompt;
+};
+
 Window method add-mini-input-callback (window block) {
     sets MiniInputCallback ($window $block);
 };

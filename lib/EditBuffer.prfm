@@ -402,7 +402,11 @@ EditBuffer method search (str) {
     $Src each do: {| r |
 	i ::= $i + 1;
 	try {
-	    slist ::= $r =~ $rstr :all;
+            if {eq? $SEARCH_MODE text} {
+                slist ::= $r =~ $rstr :all :text;
+            } {
+                slist ::= $r =~ $rstr :all;
+            };
 	} catch: {
 	    return ();
 	};
