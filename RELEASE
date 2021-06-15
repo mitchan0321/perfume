@@ -1799,4 +1799,16 @@
 		PRFM_20210610
 		1.5.5
 
+2021/06/14
+	pmacs update:
+		Fix buffer select order after buffer killed.
+
+2021/06/15
+	methods.c
+		Add :text option to String::=~ for search AS IS string.
+	pmacs update:
+		Add text search mode, if toggle regex/text mode do type CTRL+T in search mode.
+		Add -r flag in grep command initial prompt.
+		Fix file selector matched regex become only matchies input file name.
+
 #eof
