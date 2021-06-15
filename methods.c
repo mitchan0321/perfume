@@ -2691,10 +2691,12 @@ mth_string_match(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     Toy_Type *t_case = NULL;
     Toy_Type *t_all = NULL;
     Toy_Type *t_grep = NULL;
+    Toy_Type *t_text = NULL;
     Toy_Type *regex_hash_t;
     static Hash *regex_hash = NULL;
     Cell *key_str;
     Toy_Type *container;
+    const OnigSyntaxType *syntax;
 
     if (arglen > 1) goto error;
 
@@ -2716,6 +2718,9 @@ mth_string_match(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
 
     t_grep = hash_get_and_unset_t(nameargs, const_grep);
     if ((t_grep == NULL) || (IS_NIL(t_grep))) t_grep = NULL;
+
+    t_text = hash_get_and_unset_t(nameargs, const_text);
+    if ((t_text == NULL) || (IS_NIL(t_text))) t_text = NULL;
     
     if (hash_get_length(nameargs) > 0) goto error;
 
@@ -2729,7 +2734,7 @@ mth_string_match(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
 	regex_hash = regex_hash_t->u.dict;
     }
 
-    /* make regex key, string format is: 'regex',[case|nocase],[default|grep] */
+    /* make regex key, string format is: 'regex',[case|nocase],[default|grep|text] */
     key_str = new_cell(L"");
     cell_add_str(key_str, L"\'");
     cell_add_str(key_str, to_string(tpattern));
@@ -2741,10 +2746,14 @@ mth_string_match(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
 	cell_add_str(key_str, L"case");
     }
     cell_add_str(key_str, L",");
-    if (t_grep) {
-	cell_add_str(key_str, L"grep");
+    if (t_text) {
+        cell_add_str(key_str, L"text");
     } else {
-	cell_add_str(key_str, L"default");
+        if (t_grep) {
+            cell_add_str(key_str, L"grep");
+        } else {
+            cell_add_str(key_str, L"default");
+        }
     }
 
     /* regex cache search */
@@ -2767,6 +2776,10 @@ mth_string_match(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
 	option |= ONIG_OPTION_IGNORECASE;
     }
 
+    syntax = ONIG_SYNTAX_DEFAULT;
+    if (t_grep) syntax = ONIG_SYNTAX_GREP;
+    if (t_text) syntax = ONIG_SYNTAX_ASIS;
+
     if (NULL == reg) {
 	/* no cache then create regex object */
 	r = onig_new(&reg,
@@ -2774,7 +2787,7 @@ mth_string_match(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
 		     pattern + (cell_get_length(tpattern->u.rquote) * sizeof(wchar_t)),
 		     option,
 		     ONIG_ENCODING_UTF32_LE,
-		     (t_grep == NULL) ? ONIG_SYNTAX_DEFAULT : ONIG_SYNTAX_GREP,
+		     syntax,
 		     &einfo
 	    );
 
@@ -2847,7 +2860,7 @@ next_search:
 
 error:
     return new_exception(TE_SYNTAX,
-	 L"Syntax error at '=~', syntax: String =~ [:nocase] [:all] [:grep] 'pattern'", interp);
+	 L"Syntax error at '=~', syntax: String =~ [:nocase] [:all] [:grep] [:text] 'pattern'", interp);
 error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
 }
