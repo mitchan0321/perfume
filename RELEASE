@@ -1815,4 +1815,8 @@
 	pmacs update:
 		Change to ignore case at search command text mode.
 
+2021/06/17
+	ncurses.c
+		Change the font display width calculation to call the C library wcwidth(3).
+
 #eof
