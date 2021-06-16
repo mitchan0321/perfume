@@ -4,6 +4,8 @@
 #include <unistd.h>
 #include <ncurses.h>
 #include <locale.h>
+#define _XOPEN_SOURCE
+#include <wchar.h>
 
 #include "toy.h"
 #include "interp.h"
@@ -397,12 +399,41 @@ typedef struct _render_encode {
     int display_position;
 } Render_Encode;
 
-static wchar_t *control_character_font [33] = {
-    L"\u2400", L"\u2401", L"\u2402", L"\u2403", L"\u2404", L"\u2405", L"\u2406", L"\u2407",
-    L"\u2408", L" ",      L"\u240a", L"\u240b", L"\u240c", L"\u240d", L"\u240e", L"\u240f",
-    L"\u2410", L"\u2411", L"\u2412", L"\u2413", L"\u2414", L"\u2415", L"\u2416", L"\u2417",
-    L"\u2418", L"\u2419", L"\u241a", L"\u241b", L"\u241c", L"\u241d", L"\u241e", L"\u241f",
-    L"\u2421"
+static wchar_t *control_character_font [34] = {
+    L"\u2400",  // NUL  0x00
+    L"\u2401",  // SOH  0x01
+    L"\u2402",  // STX  0x02
+    L"\u2403",  // ETX  0x03
+    L"\u2404",  // EOT  0x04
+    L"\u2405",  // ENQ  0x05
+    L"\u2406",  // ACK  0x06
+    L"\u2407",  // BEL  0x07
+    L"\u2408",  // BS   0x08
+    L" ",       // HT   0x09
+    L"\u240a",  // LF   0x0a
+    L"\u240b",  // VT   0x0b
+    L"\u240c",  // FF   0x0c
+    L"\u240d",  // CR   0x0d
+    L"\u240e",  // SO   0x0e
+    L"\u240f",  // SI   0x0f
+    L"\u2410",  // DLE  0x10
+    L"\u2411",  // DC1  0x11
+    L"\u2412",  // DC2  0x12
+    L"\u2413",  // DC3  0x13
+    L"\u2414",  // DC4  0x14
+    L"\u2415",  // NAK  0x15
+    L"\u2416",  // SYN  0x16
+    L"\u2417",  // ETB  0x17
+    L"\u2418",  // CAN  0x18
+    L"\u2419",  // EM   0x19
+    L"\u241a",  // SUB  0x1a
+    L"\u241b",  // ESC  0x1b
+    L"\u241c",  // FS   0x1c
+    L"\u241d",  // GS   0x1d
+    L"\u241e",  // RS   0x1e
+    L"\u241f",  // US   0x1f
+    L"\u2421",  // DEL  0x7f
+    L"\u2423",  // Unknown character
 };
 
 Toy_Type*
@@ -492,41 +523,36 @@ func_curses_render_line(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, i
 		return new_exception(TE_BADENCODEBYTE, enc_error_info->message, interp);
 	    }
 	    rendaring_data[i].display_char = cell_get_addr(result);
-	}
-	else if (p[i] < 0x7f) {
+	} else if (p[i] < 0x7f) {
 	    /* ASCII character encoding */
 	    codep = new_cell(NULL);
 	    cell_add_char(codep, p[i]);
 	    rendaring_data[i].display_char = cell_get_addr(codep);
 	    rendaring_data[i].display_width = 1;
+        } else {
+            int w;
+            w = wcwidth(p[i]);
+            if (w <= 0) {
+                rendaring_data[i].display_width = 1;
+                cp = control_character_font[33];
+                codep = new_cell(NULL);
+                cell_add_char(codep, cp[0]);
+                result = encode_unicode_to_raw(codep, iencoder, enc_error_info);
+                if (NULL == result) {
+                    return new_exception(TE_BADENCODEBYTE, enc_error_info->message, interp);
+                }
+                rendaring_data[i].display_char = cell_get_addr(result);
+            } else {
+                rendaring_data[i].display_width = w;
+                codep = new_cell(NULL);
+                cell_add_char(codep, p[i]);
+                result = encode_unicode_to_raw(codep, iencoder, enc_error_info);
+                if (NULL == result) {
+                    return new_exception(TE_BADENCODEBYTE, enc_error_info->message, interp);
+                }
+                rendaring_data[i].display_char = cell_get_addr(result);
+            }
         }
-        else if ((p[i] >= 0x80) && (p[i] <= 0x10ff)) {
-	    /* multi display width character */
-	    codep = new_cell(NULL);
-	    cell_add_char(codep, p[i]);
-	    result = encode_unicode_to_raw(codep, iencoder, enc_error_info);
-	    if (NULL == result) {
-		return new_exception(TE_BADENCODEBYTE, enc_error_info->message, interp);
-	    }
-	    rendaring_data[i].display_char = cell_get_addr(result);
-            rendaring_data[i].display_width = 1;
-	} else {
-	    /* multi display width character */
-	    codep = new_cell(NULL);
-	    cell_add_char(codep, p[i]);
-	    result = encode_unicode_to_raw(codep, iencoder, enc_error_info);
-	    if (NULL == result) {
-		return new_exception(TE_BADENCODEBYTE, enc_error_info->message, interp);
-	    }
-	    rendaring_data[i].display_char = cell_get_addr(result);
-	    if ((p[i] >= 0xFF61) && (p[i] <= 0xFF9F)) {
-		/* JISX0201 (single width) */
-		rendaring_data[i].display_width = 1;
-	    } else {
-		/* otherwise (multi width) */
-		rendaring_data[i].display_width = 2;
-	    }
-	}
     }
 
     rendaring_data[0].display_position = 0;
@@ -1120,19 +1146,15 @@ func_curses_pos_to_index(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, 
 	else if (p[i] < 0x7f) {
 	    /* ASCII character encoding */
 	    rendaring_data[i].display_width = 1;
-        }
-        else if ((p[i] >= 0x80) && (p[i] <= 0x10ff)) {
-	    rendaring_data[i].display_width = 1;
         } else {
-	    /* multi display width character */
-	    if ((p[i] >= 0xFF61) && (p[i] <= 0xFF9F)) {
-		/* JISX0201 (single width) */
-		rendaring_data[i].display_width = 1;
-	    } else {
-		/* otherwise (multi width) */
-		rendaring_data[i].display_width = 2;
-	    }
-	}
+            int w;
+            w = wcwidth(p[i]);
+            if (w <= 0) {
+                rendaring_data[i].display_width = 1;
+            } else {
+                rendaring_data[i].display_width = w;
+            }
+        }
     }
 
     rendaring_data[0].display_position = 0;
@@ -1210,19 +1232,15 @@ func_curses_index_to_pos(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, 
 	else if (p[i] < 0x7f) {
 	    /* ASCII character encoding */
 	    rendaring_data[i].display_width = 1;
+        } else {
+            int w;
+            w = wcwidth(p[i]);
+            if (w <= 0) {
+                rendaring_data[i].display_width = 1;
+            } else {
+                rendaring_data[i].display_width = w;
+            }
         }
-        else if ((p[i] >= 0x80) && (p[i] <= 0x10ff)) {
-	    rendaring_data[i].display_width = 1;
-	} else {
-	    /* multi display width character */
-	    if ((p[i] >= 0xFF61) && (p[i] <= 0xFF9F)) {
-		/* JISX0201 (single width) */
-		rendaring_data[i].display_width = 1;
-	    } else {
-		/* otherwise (multi width) */
-		rendaring_data[i].display_width = 2;
-	    }
-	}
     }
 
     rendaring_data[0].display_position = 0;
