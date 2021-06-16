@@ -403,7 +403,7 @@ EditBuffer method search (str) {
 	i ::= $i + 1;
 	try {
             if {eq? $SEARCH_MODE text} {
-                slist ::= $r =~ $rstr :all :text;
+                slist ::= $r =~ $rstr :all :text :nocase;
             } {
                 slist ::= $r =~ $rstr :all;
             };
