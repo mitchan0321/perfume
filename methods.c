@@ -2860,7 +2860,7 @@ next_search:
 
 error:
     return new_exception(TE_SYNTAX,
-	 L"Syntax error at '=~', syntax: String =~ [:nocase] [:all] [:grep] [:text] 'pattern'", interp);
+	 L"Syntax error at '=~', syntax: String =~ [:nocase] [:all] [:grep | :text] 'pattern'", interp);
 error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
 }
