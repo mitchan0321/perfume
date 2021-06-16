@@ -1811,4 +1811,8 @@
 		Add -r flag in grep command initial prompt.
 		Fix file selector matched regex become only matchies input file name.
 
+2021/06/16
+	pmacs update:
+		Change to ignore case at search command text mode.
+
 #eof
