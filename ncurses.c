@@ -399,7 +399,7 @@ typedef struct _render_encode {
     int display_position;
 } Render_Encode;
 
-static wchar_t *control_character_font [34] = {
+static wchar_t *control_character_font [35] = {
     L"\u2400",  // NUL  0x00
     L"\u2401",  // SOH  0x01
     L"\u2402",  // STX  0x02
@@ -433,7 +433,8 @@ static wchar_t *control_character_font [34] = {
     L"\u241e",  // RS   0x1e
     L"\u241f",  // US   0x1f
     L"\u2421",  // DEL  0x7f
-    L"\u2423",  // Unknown character
+    L"\ufffd",  // Unknown character (width = -1)
+    L"\u2423",  // Combining character (width = 0)
 };
 
 Toy_Type*
@@ -531,10 +532,15 @@ func_curses_render_line(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, i
 	    rendaring_data[i].display_width = 1;
         } else {
             int w;
-            w = wcwidth(p[i]);
+            w = (int)wcwidth((wchar_t)p[i]);
+            // if (w < 0) {
             if (w <= 0) {
                 rendaring_data[i].display_width = 1;
-                cp = control_character_font[33];
+                if (w < 0) {
+                    cp = control_character_font[33];
+                } else {
+                    cp = control_character_font[34];
+                }
                 codep = new_cell(NULL);
                 cell_add_char(codep, cp[0]);
                 result = encode_unicode_to_raw(codep, iencoder, enc_error_info);
@@ -543,9 +549,16 @@ func_curses_render_line(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, i
                 }
                 rendaring_data[i].display_char = cell_get_addr(result);
             } else {
-                rendaring_data[i].display_width = w;
-                codep = new_cell(NULL);
-                cell_add_char(codep, p[i]);
+                if (w == 0) {
+                    rendaring_data[i].display_width = 2;
+                    codep = new_cell(NULL);
+                    cell_add_char(codep, L' ');
+                    cell_add_char(codep, p[i]);
+                } else {
+                    rendaring_data[i].display_width = w;
+                    codep = new_cell(NULL);
+                    cell_add_char(codep, p[i]);
+                }
                 result = encode_unicode_to_raw(codep, iencoder, enc_error_info);
                 if (NULL == result) {
                     return new_exception(TE_BADENCODEBYTE, enc_error_info->message, interp);
@@ -1148,11 +1161,16 @@ func_curses_pos_to_index(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, 
 	    rendaring_data[i].display_width = 1;
         } else {
             int w;
-            w = wcwidth(p[i]);
+            w = (int)wcwidth((wchar_t)p[i]);
+            // if (w < 0) {
             if (w <= 0) {
                 rendaring_data[i].display_width = 1;
             } else {
-                rendaring_data[i].display_width = w;
+                if (w == 0) {
+                    rendaring_data[i].display_width = 2;
+                } else {
+                    rendaring_data[i].display_width = w;
+                }
             }
         }
     }
@@ -1234,11 +1252,16 @@ func_curses_index_to_pos(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, 
 	    rendaring_data[i].display_width = 1;
         } else {
             int w;
-            w = wcwidth(p[i]);
+            w = (int)wcwidth((wchar_t)p[i]);
+            // if (w < 0) {
             if (w <= 0) {
                 rendaring_data[i].display_width = 1;
             } else {
-                rendaring_data[i].display_width = w;
+                if (w == 0) {
+                    rendaring_data[i].display_width = 2;
+                } else {
+                    rendaring_data[i].display_width = w;
+                }
             }
         }
     }
