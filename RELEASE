@@ -1819,4 +1819,8 @@
 	ncurses.c
 		Change the font display width calculation to call the C library wcwidth(3).
 
+2021/06/18
+	ncurses.c
+		Change font for unknown and combining character at rendering modules.
+
 #eof
