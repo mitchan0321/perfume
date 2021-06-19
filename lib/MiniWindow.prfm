@@ -9,7 +9,7 @@ MiniWindow method init (main y x line column) {
 			   $curs
 			   $y 		 	$x
 			   $line 		$column
-	];
+    ];
 
     sets Parent $main;
     sets PromptMessage "";
@@ -19,8 +19,7 @@ MiniWindow method init (main y x line column) {
 
 MiniWindow method activate () {
     set-window-color-default $MiniCurs MINI_WINDOW;
-}
-;
+};
 
 MiniWindow method diactivate () {
     set-window-color-default $MiniCurs MINI_WINDOW;

@@ -1,0 +1,13 @@
+defun show-all-character () {
+    s := "";
+    0 each to: 0xffff do: {| i |
+        if {[$i % 16] = 0} {
+            println $s;
+            s := "";
+            $s append! ["%04x " fmt $i];
+        };
+        $s append! ["[%v] " fmt ["" uimport! ($i)]];
+    };
+
+    println $s;
+};

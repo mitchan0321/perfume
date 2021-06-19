@@ -1,0 +1,9 @@
+defun prime-regex (n) {
+    1 each to: $n do: {| i |
+        m ::= "a" repeat $i;
+        if {! [$m =~ '^(?:a?|(aa+)\1+)$']} {
+            println $i;
+        };
+    };
+};
+
