@@ -3019,27 +3019,34 @@ defcommand help {
     return ALL;
 };
 
+defun get-shell () {
+    if [and [file exec? $DEFAULT_SHELL] [! [file dir? $DEFAULT_SHELL]]] {
+        return $DEFAULT_SHELL;
+    };
+    return $EMERGENCY_SHELL;
+};
+
 defcommand shell {
     | main window |
-    $main suspend $DEFAULT_SHELL;
+    $main suspend [get-shell];
     result ALL;
 };
 
 defcommand git-pull {
     | main window |
-    $main suspend $DEFAULT_SHELL "-c" "git pull; echo '--- Press enter key to continue ---'; read";
+    $main suspend [get-shell] "-c" "git pull; echo '--- Press enter key to continue ---'; read";
     result ALL;
 };
 
 defcommand git-commit {
     | main window |
-    $main suspend $DEFAULT_SHELL "-c" "git commit .; echo '--- Press enter key to continue ---'; read";
+    $main suspend [get-shell] "-c" "git commit .; echo '--- Press enter key to continue ---'; read";
     result ALL;
 };
 
 defcommand git-push {
     | main window |
-    $main suspend $DEFAULT_SHELL "-c" "git push; echo '--- Press enter key to continue ---'; read";
+    $main suspend [get-shell] "-c" "git push; echo '--- Press enter key to continue ---'; read";
     result ALL;
 };
 
