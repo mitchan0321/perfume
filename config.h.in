@@ -3,6 +3,7 @@
 
 #define VERSION			L"@VERSION@"
 #define PREFIX			L"@PREFIX@"
+#define BUILD			L"@BUILD@"
 #define SETUP_FILE		L"/lib/perfume/setup.prfm"
 #define SETUP_FILE2		L"./setup.prfm"
 

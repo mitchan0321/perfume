@@ -63,6 +63,7 @@ void def_global() {
     const_DEFAULT_ERRSTR_ENCODING = new_symbol(L"DEFAULT_ERRSTR_ENCODING");
     const_up = new_symbol(L"up:");
     const_VERSION = new_symbol(L"VERSION");
+    const_BUILD = new_symbol(L"BUILD");
     const_nocase = new_symbol(L"nocase:");
     const_grep = new_symbol(L"grep:");
     const_text = new_symbol(L"text:");

@@ -236,6 +236,9 @@ interp_setup(Toy_Interp* interp, int argc, char **argv, char **envp, char *dir) 
     /* set VERSION */
     hash_set_t(interp->globals, const_VERSION, new_string_str(VERSION));
 
+    /* set BUILD */
+    hash_set_t(interp->globals, const_BUILD, new_string_str(BUILD));
+
     /* set ARGV */
     l = argl = new_list(NULL);
     for (i=0; i<argc; i++) {
