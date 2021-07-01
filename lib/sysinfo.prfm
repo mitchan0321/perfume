@@ -3,6 +3,7 @@ defun sysinfo () {
 
 "\
 Version: ${VERSION}
+Build: ${BUILD}
 Library path: ${LIB_PATH}
 Arguments: ${ARGV}
 Default file encoding: ${DEFAULT_FILE_ENCODING}
