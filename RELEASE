@@ -1841,11 +1841,24 @@
 		Add use EMERGENCY_SHELL config parameter at 'pmacs.conf' if DEFAULT_SHELL is failed.
 
 2021/07/01
-	interp.c, global.[ch], Makefile, config.h.in.
+	Makefile, config.h.in, global.[ch], interp.c
 		Add 'BUILD' configuration parameter in config.h.in.
 	lib/sysinfo.prfm
 		Add display BUILD variable.
 	pmacs update:
 		Add display version and build at pinterp started.
+
+2021/07/02
+	pmacs update:
+		Add ALT+[alphabetic-char] combination key assign,
+		  Occures key code following this:
+			ALT+a	->	ALT_a (symbol)
+			ALT+A	->	ALT_A (symbol)
+			ALT+SHIFT+!  -> ALT_exclamation (symbol)
+		  More information see pmacs.keymap and CombiWindow.key.
+		Add editor commands are:
+		  show-keycode display input key code and key code and binding command.
+		  next-buffer-another-window switches a anothor window buffer forward.
+		  previous-buffer-another-window switches a anothor window buffer backward.
 
 #eof
