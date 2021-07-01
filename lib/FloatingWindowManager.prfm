@@ -1,0 +1,21 @@
+class FloatingWindowManager;
+
+FloatingWindowManager method init () {
+    sets WindowList ();
+};
+
+FloatingWindowManager init;
+
+FloatingWindowManager method addWindow (w) {
+    $WindowList <<- $w;
+};
+
+FloatingWindowManager method deleteWindow (w) {
+    i ::= $WindowList find $w;
+    if $i {$WindowList delete! $i};
+    return $i;
+};
+
+FloatingWindowManager method popWindow () {
+    return [$WindowList ->>];
+};

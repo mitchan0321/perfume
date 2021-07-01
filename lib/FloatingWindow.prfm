@@ -1,9 +1,9 @@
-class IndependentWindow;
+class FloatingWindow;
 
 $ColorDB set DEFAULT_IND_WINDOW_COLOR        [WUtil color-pair GREEN BLACK];
 $ColorDB set DEFAULT_IND_WINDOW_BORDER_COLOR [WUtil color-pair BLACK GREEN];
 
-IndependentWindow method init (main y x line column border: border color: color bdcolor: bdcolor) {
+FloatingWindow method init (main y x line column border: border color: color bdcolor: bdcolor) {
     curs ::= $main get-curs;
     if {set? border} {
         sets BdrCurs [
@@ -35,26 +35,26 @@ IndependentWindow method init (main y x line column border: border color: color 
     set-window-color-default $IndCurs $color;
 };
 
-IndependentWindow method refresh () {
+FloatingWindow method refresh () {
     curs-set 0;
     if {true? BdrCurs} {curs-refresh $BdrCurs};
     curs-refresh $IndCurs;
 };
 
-IndependentWindow method display (msg) {
+FloatingWindow method display (msg) {
     curs-print $IndCurs $msg $DISPLAY_ENCODING 0 0;
 };
 
-IndependentWindow method clear () {
+FloatingWindow method clear () {
     if {true? BdrCurs} {curs-clear $BdrCurs};
     curs-clear $IndCurs;
 };
 
-IndependentWindow method set-cursor (y x) {
+FloatingWindow method set-cursor (y x) {
     curs-move $IndCurs $y $x;
 };
 
-IndependentWindow method keyin (timeout: timeout) {
+FloatingWindow method keyin (timeout: timeout) {
     key := ();
     while {$key null?} do: {
         (repeat-time key) ::= curs-keyin $IndCurs $INPUT_TIMEOUT $INPUT_ENCODING;
@@ -65,7 +65,7 @@ IndependentWindow method keyin (timeout: timeout) {
     };
 };
 
-IndependentWindow method destroy () {
+FloatingWindow method destroy () {
     curs-destroy-window $IndCurs;
     if {true? BdrCurs} {curs-destroy-window $BdrCurs};
 };
