@@ -728,6 +728,10 @@ Window method read-keymaps () {
     };
 };
 
+Window method get-keymap (k) {
+    return [$KeyMaps get $k];
+};
+
 Window method suspend (*) {
     curs-terminate;
     e := <nil>;
