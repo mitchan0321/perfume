@@ -1836,4 +1836,8 @@
 		PRFM_20210619
 		1.5.6
 
+2021/06/24
+	pmacs update:
+		Add use EMERGENCY_SHELL config parameter at 'pmacs.conf' if DEFAULT_SHELL is failed.
+
 #eof
