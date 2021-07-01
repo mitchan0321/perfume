@@ -174,6 +174,7 @@ endif
 config.h:	config.h.in
 	sed 	-e s%@PREFIX@%$(PREFIX)%g \
 		-e s%@VERSION@%`head -1 RELEASE | awk '{print $$3}'`%g \
+		-e s%@BUILD@%`grep '^[0-9]' RELEASE | tail -1 | sed -e 's!/!!g'`%g \
 		< config.h.in > config.h
 
 clean:
