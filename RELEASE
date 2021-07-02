@@ -1,3 +1,4 @@
+2021/07/08	PRFM_20210708		1.5.7
 2021/06/19	PRFM_20210619		1.5.6
 2021/06/10	PRFM_20210610		1.5.5
 2021/05/26	PRFM_20210526		1.5.4
@@ -1857,12 +1858,17 @@
 			ALT+SHIFT+!  -> ALT_exclamation (symbol)
 		  More information see pmacs.keymap and CombiWindow.key.
 		Add editor commands are:
-		  show-keycode display input key code and key code and binding command.
-		  next-buffer-another-window switches a anothor window buffer forward.
-		  previous-buffer-another-window switches a anothor window buffer backward.
+		  show-keycode - display input key code, key map (if exists) and binding command.
+		  next-buffer-another-window - switches a anothor window buffer forward.
+		  previous-buffer-another-window - switches a anothor window buffer backward.
 
 2021/07/04
 	ncurses.c
-		Change unknown character font display width change 2 from 1.
+		Change unknown character font display width change 2 from 1 (selectable, see comment).
+
+2021/07/08
+	tag:
+		PRFM_20210708
+		1.5.7
 
 #eof
