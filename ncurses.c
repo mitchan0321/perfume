@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <ncurses.h>
 #include <locale.h>
-#define _XOPEN_SOURCE
+#define __USE_XOPEN
 #include <wchar.h>
 
 #include "toy.h"
@@ -535,11 +535,12 @@ func_curses_render_line(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, i
             w = (int)wcwidth((wchar_t)p[i]);
             // if (w < 0) {
             if (w <= 0) {
-                rendaring_data[i].display_width = 1;
                 if (w < 0) {
                     cp = control_character_font[33];
+                    rendaring_data[i].display_width = 2;
                 } else {
                     cp = control_character_font[34];
+                    rendaring_data[i].display_width = 1;
                 }
                 codep = new_cell(NULL);
                 cell_add_char(codep, cp[0]);
@@ -1164,7 +1165,11 @@ func_curses_pos_to_index(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, 
             w = (int)wcwidth((wchar_t)p[i]);
             // if (w < 0) {
             if (w <= 0) {
-                rendaring_data[i].display_width = 1;
+                if (w < 0) {
+                    rendaring_data[i].display_width = 2;
+                } else {
+                    rendaring_data[i].display_width = 1;
+                }
             } else {
                 if (w == 0) {
                     rendaring_data[i].display_width = 2;
@@ -1255,7 +1260,11 @@ func_curses_index_to_pos(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, 
             w = (int)wcwidth((wchar_t)p[i]);
             // if (w < 0) {
             if (w <= 0) {
-                rendaring_data[i].display_width = 1;
+                if (w < 0) {
+                    rendaring_data[i].display_width = 2;
+                } else {
+                    rendaring_data[i].display_width = 1;
+                }
             } else {
                 if (w == 0) {
                     rendaring_data[i].display_width = 2;
