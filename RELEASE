@@ -1861,4 +1861,8 @@
 		  next-buffer-another-window switches a anothor window buffer forward.
 		  previous-buffer-another-window switches a anothor window buffer backward.
 
+2021/07/04
+	ncurses.c
+		Change unknown character font display width change 2 from 1.
+
 #eof
