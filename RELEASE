@@ -1871,4 +1871,8 @@
 		PRFM_20210708
 		1.5.7
 
+2021/07/09
+	pmacs update:
+		Fix "EditorCommandDefs.prfm" some editor commands when EditBuffer::get-buffer-line returns <nil>.
+
 #eof
