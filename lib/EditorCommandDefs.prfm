@@ -695,6 +695,7 @@ defcommand eval-region {
         ### eval this line
         (ey ex) ::= $window get-source-index $buff $geom;
         str ::= $buff get-buffer-line $ey;
+        str ::= $str ?? "";
     };
 
     $window apply-command $main $window "" cursor-top-of-line;
@@ -1373,6 +1374,7 @@ defcommand select-region-paragraph {
     $window apply-command $main $window "" cursor-top-of-line;
     (ey ex) ::= $window get-source-index $buff $geom;
     r ::= $buff get-buffer-line $ey;
+    r ::= $r ?? "";
     if {or {[$r at 0] = " "} {[$r at 0] = ""} {[$r at 0] = "\t"}} {
         $window apply-command $main $window "" move-previous-paragraph;
     };
@@ -3072,6 +3074,7 @@ defcommand show-font {
     geom ::= $window get-geom;
     (ey ex) ::= $window get-source-index $buff $geom;
     str ::= $buff get-buffer-line $ey;
+    str ::= $str ?? "";
     curs-print [$main get-minibuffer-window : get-curs] $str $DISPLAY_ENCODING 0 0;
     result SELF;
 };
