@@ -1875,4 +1875,8 @@
 	pmacs update:
 		Fix "EditorCommandDefs.prfm" some editor commands when EditBuffer::get-buffer-line returns <nil>.
 
+2021/07/12
+	pmacs update:
+		Add keymap ALT+" " as ALT_space.
+
 #eof
