@@ -1582,7 +1582,11 @@ defcommand search-next {
         return SELF;
     };
     $window mark;
-    (y x) ::= get-next-search $ey $ex [$str rquote] $buff;
+    (y x) ::= case $SEARCH_MODE
+        regex    {get-next-search      $ey $ex [$str rquote] $buff;}
+        default: {get-next-search-text $ey $ex [$str rquote] $buff;}
+    ;
+
     $window cursor-move-to-fit-center $geom $y $x;
     return SELF;
 };
@@ -1598,7 +1602,11 @@ defcommand search-previous {
         return SELF;
     };
     $window mark;
-    (y x) ::= get-previous-search $ey $ex [$str rquote] $buff;
+    (y x) ::= case $SEARCH_MODE
+        regex    {get-previous-search      $ey $ex [$str rquote] $buff;}
+        default: {get-previous-search-text $ey $ex [$str rquote] $buff;}
+    ;
+
     $window cursor-move-to-fit-center $geom $y $x;
     return SELF;
 };
@@ -1630,6 +1638,33 @@ defun get-next-search (y x str buff) {
     return ($y $x);
 };
 
+defun get-next-search-text (y x str buff) {
+    r ::= $buff get-buffer-line $y;
+    $r ?? {return ($y $x)};
+
+    sl ::= $r =~ :all :text :nocase $str;
+    if $sl {
+        sl ::= $sl filter {| el | [$el get 0] > $x};
+        if {$sl null?} else: {
+            return ($y [$sl car : car]);
+        };
+    };
+    
+    result := <nil>;
+    $buff buffer-select [$y + 1] [$buff get-buffer-length] {
+        | src l |
+        sl ::= $src =~ :all :text :nocase $str;
+        if $sl {
+            result := ($l [$sl car : car]);
+        };
+        if $result {break};
+    };
+    if $result {
+        return $result;
+    };
+    return ($y $x);
+};
+
 defun get-previous-search (y x str buff) {
     if {and {$y = 0} {$x = 0}} {return ($y $x)};
         
@@ -1650,6 +1685,38 @@ defun get-previous-search (y x str buff) {
     $buff buffer-select [$y - 1] 0 {
         | src l |
         sl ::= $src =~ :all $str;
+        if $sl {
+            sl ::= $sl reverse;
+            result := ($l [$sl car : car]);
+        };
+        if $result {break};
+    };
+    if $result {
+        return $result;
+    };
+    return ($y $x);
+};
+
+defun get-previous-search-text (y x str buff) {
+    if {and {$y = 0} {$x = 0}} {return ($y $x)};
+        
+    r ::= $buff get-buffer-line $y;
+    if $r {
+        sl ::= $r =~ :all :text :nocase $str;
+        if $sl {
+            sl ::= $sl reverse;
+            sl ::= $sl filter {| el | [$el get 0] < $x};
+            if {$sl null?} else: {
+                return ($y [$sl car : car]);
+            };
+        };
+    };
+    
+    if {$y = 0} {return ($y $x)};
+    result := <nil>;
+    $buff buffer-select [$y - 1] 0 {
+        | src l |
+        sl ::= $src =~ :all :text :nocase $str;
         if $sl {
             sl ::= $sl reverse;
             result := ($l [$sl car : car]);
