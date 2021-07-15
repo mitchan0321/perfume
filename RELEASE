@@ -1879,4 +1879,10 @@
 	pmacs update:
 		Add keymap ALT+" " as ALT_space.
 
+2021/07/15
+	pmacs update:
+		Fix search-next / search-previous, use SEARCH_MODE (value: text or regex) variablle thats indicate
+		  previous searched keyword type. If keyword type is regex use get-search-{next|previous},
+		  if type is text use get-search-{next|previous}-text function.
+
 #eof
