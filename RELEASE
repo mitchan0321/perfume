@@ -1885,4 +1885,8 @@
 		  previous searched keyword type. If keyword type is regex use get-search-{next|previous},
 		  if type is text use get-search-{next|previous}-text function.
 
+2021/07/26
+	pmacs update:
+		Change config parameter BLINK in pmacs.conf default value set to <t>.
+
 #eof
