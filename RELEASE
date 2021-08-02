@@ -1889,4 +1889,14 @@
 	pmacs update:
 		Change config parameter BLINK in pmacs.conf default value set to <t>.
 
+2021/08/02
+	pmacs update:
+		Add editor commands are: window-grow-right, window-grow-left, window-grow-upper and window-grow-lower.
+		  These commands are move window split line to left/right, down/up.
+		Add key bindngs are: 
+		  ALT_h -> window-grow-right
+		  ALT_l -> window-grow-left
+		  ALT_h -> window-grow-upper
+		  ALT_k -> window-grow-lower
+
 #eof
