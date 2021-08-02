@@ -3192,6 +3192,14 @@ defcommand mini-move-message {
     result SELF;
 };
 
+defcommand window-split-ratio-reset {
+    | main window |
+    setvar VERTICAL_DIV_RATIO 1.0;
+    setvar HORIZONTAL_DIV_RATIO 1.0;
+    $main refresh-screen;
+    result ALL;
+};
+
 defcommand window-grow-right {
     | main window |
     if {$VERTICAL_DIV_RATIO >= 0.2} {
