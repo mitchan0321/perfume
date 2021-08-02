@@ -3202,8 +3202,8 @@ defcommand window-split-ratio-reset {
 
 defcommand window-grow-right {
     | main window |
-    if {$VERTICAL_DIV_RATIO >= 0.2} {
-        setvar VERTICAL_DIV_RATIO [$VERTICAL_DIV_RATIO - 0.1];
+    if {$VERTICAL_DIV_RATIO > 0.125} {
+        setvar VERTICAL_DIV_RATIO [$VERTICAL_DIV_RATIO - 0.125];
         $main refresh-screen;
     };
     result ALL;
@@ -3211,8 +3211,8 @@ defcommand window-grow-right {
 
 defcommand window-grow-left {
     | main window |
-    if {$VERTICAL_DIV_RATIO <= 1.9} {
-        setvar VERTICAL_DIV_RATIO [$VERTICAL_DIV_RATIO + 0.1];
+    if {$VERTICAL_DIV_RATIO < 1.875} {
+        setvar VERTICAL_DIV_RATIO [$VERTICAL_DIV_RATIO + 0.125];
         $main refresh-screen;
     };
     result ALL;
@@ -3220,8 +3220,8 @@ defcommand window-grow-left {
 
 defcommand window-grow-lower {
     | main window |
-    if {$HORIZONTAL_DIV_RATIO >= 0.2} {
-        setvar HORIZONTAL_DIV_RATIO [$HORIZONTAL_DIV_RATIO - 0.1];
+    if {$HORIZONTAL_DIV_RATIO > 0.125} {
+        setvar HORIZONTAL_DIV_RATIO [$HORIZONTAL_DIV_RATIO - 0.125];
         $main refresh-screen;
     };
     result ALL;
@@ -3229,8 +3229,8 @@ defcommand window-grow-lower {
 
 defcommand window-grow-upper {
     | main window |
-    if {$HORIZONTAL_DIV_RATIO <= 1.9} {
-        setvar HORIZONTAL_DIV_RATIO [$HORIZONTAL_DIV_RATIO + 0.1];
+    if {$HORIZONTAL_DIV_RATIO < 1.875} {
+        setvar HORIZONTAL_DIV_RATIO [$HORIZONTAL_DIV_RATIO + 0.125];
         $main refresh-screen;
     };
     result ALL;
