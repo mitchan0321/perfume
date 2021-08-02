@@ -118,7 +118,10 @@ Window method create-split-vertical-window-sub (ndivs win-name) {
     
     (l c) ::= curs-get-screen-size $CursWin;
     c-orig := $c;
-    c ::= [$c / $ndivs] real : * $VERTICAL_DIV_RATIO : int;
+    case $ndivs
+        2        {c ::= [$c / $ndivs] real : * $VERTICAL_DIV_RATIO : int}
+        default: {c ::= $c / $ndivs}
+    ;
     w := 0;
     1 each to: $ndivs do: {| win-ord |
 	if {$win-ord != $ndivs}
@@ -166,7 +169,10 @@ Window method create-split-horizontal-window-sub (ndivs win-name) {
     
     (l c) ::= curs-get-screen-size $CursWin;
     l-orig := $l;
-    l ::= [$l / $ndivs] real : * $HORIZONTAL_DIV_RATIO : int;
+    case $ndivs 
+        2        {l ::= [$l / $ndivs] real : * $HORIZONTAL_DIV_RATIO : int}
+        default: {l ::= $l / $ndivs}
+    ;
     w := 0;
     1 each to: $ndivs do: {| win-ord |
 	if {$win-ord != $ndivs}
