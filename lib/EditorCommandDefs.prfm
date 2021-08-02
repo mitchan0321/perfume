@@ -3196,8 +3196,8 @@ defcommand window-grow-right {
     | main window |
     if {$VERTICAL_DIV_RATIO >= 0.2} {
         setvar VERTICAL_DIV_RATIO [$VERTICAL_DIV_RATIO - 0.1];
+        $main refresh-screen;
     };
-    $main refresh-screen;
     result ALL;
 };
 
@@ -3205,8 +3205,8 @@ defcommand window-grow-left {
     | main window |
     if {$VERTICAL_DIV_RATIO <= 1.9} {
         setvar VERTICAL_DIV_RATIO [$VERTICAL_DIV_RATIO + 0.1];
+        $main refresh-screen;
     };
-    $main refresh-screen;
     result ALL;
 };
 
@@ -3214,8 +3214,8 @@ defcommand window-grow-lower {
     | main window |
     if {$HORIZONTAL_DIV_RATIO >= 0.2} {
         setvar HORIZONTAL_DIV_RATIO [$HORIZONTAL_DIV_RATIO - 0.1];
+        $main refresh-screen;
     };
-    $main refresh-screen;
     result ALL;
 };
 
@@ -3223,8 +3223,8 @@ defcommand window-grow-upper {
     | main window |
     if {$HORIZONTAL_DIV_RATIO <= 1.9} {
         setvar HORIZONTAL_DIV_RATIO [$HORIZONTAL_DIV_RATIO + 0.1];
+        $main refresh-screen;
     };
-    $main refresh-screen;
     result ALL;
 };
 
