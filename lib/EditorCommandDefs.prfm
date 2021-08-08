@@ -696,6 +696,11 @@ defcommand eval-region {
         (ey ex) ::= $window get-source-index $buff $geom;
         str ::= $buff get-buffer-line $ey;
         str ::= $str ?? "";
+ #       if {and {[$buff get-buffer-length : - 1] > $ey} {$str != ""}} {
+ #           if {[$buff get-buffer-name] = "*Scratch*"} {
+ #               $buff append-string $str;
+ #           };
+ #       };
     };
 
     $window apply-command $main $window "" cursor-top-of-line;
@@ -3202,8 +3207,8 @@ defcommand window-split-ratio-reset {
 
 defcommand window-grow-right {
     | main window |
-    if {$VERTICAL_DIV_RATIO > 0.125} {
-        setvar VERTICAL_DIV_RATIO [$VERTICAL_DIV_RATIO - 0.125];
+    if {$VERTICAL_DIV_RATIO > $DIV_RATIO_MIN} {
+        setvar VERTICAL_DIV_RATIO [$VERTICAL_DIV_RATIO - $DIV_RATIO_RES];
         $main refresh-screen;
     };
     result ALL;
@@ -3211,8 +3216,8 @@ defcommand window-grow-right {
 
 defcommand window-grow-left {
     | main window |
-    if {$VERTICAL_DIV_RATIO < 1.875} {
-        setvar VERTICAL_DIV_RATIO [$VERTICAL_DIV_RATIO + 0.125];
+    if {$VERTICAL_DIV_RATIO < $DIV_RATIO_MAX} {
+        setvar VERTICAL_DIV_RATIO [$VERTICAL_DIV_RATIO + $DIV_RATIO_RES];
         $main refresh-screen;
     };
     result ALL;
@@ -3220,8 +3225,8 @@ defcommand window-grow-left {
 
 defcommand window-grow-lower {
     | main window |
-    if {$HORIZONTAL_DIV_RATIO > 0.125} {
-        setvar HORIZONTAL_DIV_RATIO [$HORIZONTAL_DIV_RATIO - 0.125];
+    if {$HORIZONTAL_DIV_RATIO > $DIV_RATIO_MIN} {
+        setvar HORIZONTAL_DIV_RATIO [$HORIZONTAL_DIV_RATIO - $DIV_RATIO_RES];
         $main refresh-screen;
     };
     result ALL;
@@ -3229,8 +3234,8 @@ defcommand window-grow-lower {
 
 defcommand window-grow-upper {
     | main window |
-    if {$HORIZONTAL_DIV_RATIO < 1.875} {
-        setvar HORIZONTAL_DIV_RATIO [$HORIZONTAL_DIV_RATIO + 0.125];
+    if {$HORIZONTAL_DIV_RATIO < $DIV_RATIO_MAX} {
+        setvar HORIZONTAL_DIV_RATIO [$HORIZONTAL_DIV_RATIO + $DIV_RATIO_RES];
         $main refresh-screen;
     };
     result ALL;
