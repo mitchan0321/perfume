@@ -1901,4 +1901,11 @@
 		  ALT_k -> window-grow-lower
 		  ALT_o -> window-split-ratio-reset
 
+2021/08/08
+	pmacs update:
+		Change editor commands are: window-grow-* use DIV_RATIO_RES variable.
+		Change Window::*-split-*-sub are: use MIN_WINDOW_{WIDTH,HEIGHT} variable.
+		Add configure variable MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT, 
+		  DIV_RATIO_RANGE_{MIN,MAX}, DIV_RATIO_RES, DIV_RATIO_{MIN,MAX}.
+
 #eof
