@@ -118,13 +118,6 @@ Window method create-split-vertical-window-sub (ndivs win-name) {
     
     (l c) ::= curs-get-screen-size $CursWin;
     c-orig := $c;
- #   case $ndivs
- #       2        {c ::= [$c / $ndivs] real : * [$VERTICAL_DIV_RATIO / [$ndivs - 1]] : int}
- #       default: {c ::= $c / $ndivs}
- #   ;
-    # c ::= [$c / $ndivs] real : * $VERTICAL_DIV_RATIO : * [$DIV_RATIO_RANGE_MAX / $ndivs] : int;
-    # c ::= [$c / $ndivs] real : * [$VERTICAL_DIV_RATIO / [$ndivs - 1]] : int;
-    # c ::= $c / $ndivs : real : * [$VERTICAL_DIV_RATIO / [$DIV_RATIO_RANGE_MAX / 2] : * [$ndivs - 1]] : int;
     c ::= [$c / $ndivs] real : * $VERTICAL_DIV_RATIO : int;
     if {$c < $MIN_WINDOW_WIDTH} {c := $MIN_WINDOW_WIDTH};
     w := 0;
@@ -149,12 +142,12 @@ Window method create-split-vertical-window-sub (ndivs win-name) {
         win-name ::= next-window-name $win-name;
 	
 	w ::= $w + $c;
-        if {$w >= $c-orig} {break};
- #        if {[$c-orig - $w] < $MIN_WINDOW_WIDTH} {break};
-        if {[$c-orig - $w] < 2} {break};
+        if {[$c-orig - $w] < $MIN_WINDOW_WIDTH} {break};
     };
 
-    $WindowList cdr : each do: {| i | $i diactivate};
+    if {[$WindowList len] > 1} {
+        $WindowList cdr : each do: {| i | $i diactivate};
+    };
 
     $WindowList each do: {| w |
         buff ::= $buff-list >>;
@@ -185,13 +178,9 @@ Window method create-split-horizontal-window-sub (ndivs win-name) {
     
     (l c) ::= curs-get-screen-size $CursWin;
     l-orig := $l;
- #   case $ndivs 
- #       2        {l ::= [$l / $ndivs] real : * $HORIZONTAL_DIV_RATIO : int}
- #       default: {l ::= $l / $ndivs}
- #   ;
-    # l ::= [$l / $ndivs] real : * $HORIZONTAL_DIV_RATIO : * [$DIV_RATIO_RANGE_MAX / $ndivs] : int;
     l ::= [$l / $ndivs] real : * $HORIZONTAL_DIV_RATIO : int;
     if {$l < $MIN_WINDOW_HEIGHT} {l := $MIN_WINDOW_HEIGHT};
+    if {$l > $l-orig} {l := $l-orig};
     w := 0;
     1 each to: $ndivs do: {| win-ord |
 	if {$win-ord != $ndivs}
@@ -214,11 +203,12 @@ Window method create-split-horizontal-window-sub (ndivs win-name) {
         win-name ::= next-window-name $win-name;
 	
 	w ::= $w + $l;
-        if {$w >= $l-orig} {break};
-        if {[$l-orig - $w] < 2} {break};
+        if {[$l-orig - $w] < $MIN_WINDOW_HEIGHT} {break};
     };
 
-    $WindowList cdr : each do: {| i | $i diactivate};
+    if {[$WindowList len] > 1} {
+        $WindowList cdr : each do: {| i | $i diactivate};
+    };
 
     $WindowList each do: {| w |
         buff ::= $buff-list >>;
@@ -261,14 +251,14 @@ Window method create-split-cross-window-sub (win-name) {
     $WindowList <<- $win;
 
     win-name ::= next-window-name $win-name;
-    if {[$l - $y1] >= 2} {
+    if {[$l - $y1] >= $MIN_WINDOW_HEIGHT} {
         win ::= new CombiWindow init: ([self] $y1 0 [$l - $y1] $x1);
         $win set-window-name $win-name;
         $WindowList <<- $win;
     };
     
     win-name ::= next-window-name $win-name;
-    if {and {[$l - $y1] >= 2} {[$c - $x1] >= 2}} {
+    if {and {[$l - $y1] >= $MIN_WINDOW_HEIGHT} {[$c - $x1] >= $MIN_WINDOW_WIDTH}} {
         win ::= new CombiWindow init: ([self] $y1 $x1 [$l - $y1] [$c - $x1]);
         $win set-window-name $win-name;
         $WindowList <<- $win;
