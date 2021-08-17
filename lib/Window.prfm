@@ -604,6 +604,10 @@ Window method key-event-loop () {
                     window ::= $main get-current-window;
                     $window apply {render; refresh};
                 }
+                {eq? $result NARROW} {
+                    window ::= $main get-current-window;
+                    $window apply {render-line; refresh};
+                }
 	    ;;
 	    window ::= $main get-current-window;
 	    $window set-cursor;

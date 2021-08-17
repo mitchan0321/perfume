@@ -115,6 +115,10 @@ MiniWindow method render () {
 	$DISPLAY_ENCODING;
 };
 
+MiniWindow method render-line () {
+    render;
+};
+
 MiniWindow method destroy () {
     curs-destroy-window $MiniCurs;
     sets MiniCurs <nil>;

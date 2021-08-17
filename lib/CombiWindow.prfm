@@ -157,23 +157,7 @@ CombiWindow method render () {
 	(cy cx) ::= get-source-index $buff $geom;
     };
 
-    curs-print $StatusLineCurs [
-        " #%v [%v%v%v%v%v%v] (%d,%d) <%v> {%v} %v %v"
-        fmt
-            [$win split sep: "#" : get 1]
-            [[$buff protect?] ??? "%" " "]
-            [[$buff modify?] ??? "*" " "]
-            [[$buff newfile?] ??? "?" " "]
-            [[get-region] ??? "#" " "]
-            [$FreeCursor ??? "+" " "]
-            [[$Parent is-interp-busy] ??? "@" " "]
-            $cy $cx
-            $buff-name
-            $Mode
-            [[$buff get-path] ?? "*no file*"]
-            ["-" repeat $x]
-    ] $DISPLAY_ENCODING 0 0;
-    
+    render-status-line $win $buff $cy $cx $y $x $buff-name;
     render-vertical-line;
 
     i := 0;
@@ -192,6 +176,70 @@ CombiWindow method render () {
 	$i ++;
     };
 
+    set-eof-mark $geom $buff $y $x;
+
+    ###
+    ### if run word, search and region hilight at immediately, following this:
+    ###
+    set-word-hilight $buff $geom;
+    set-search-hilight $buff $geom;
+    set-region-hilight $buff $geom $y $x;
+};
+
+CombiWindow method render-line () {
+    ### if $Activate {geom-trimming};
+    ### if $Activate {activate};
+
+    win ::= get-window-name;
+    buff ::= get-buffer;
+    buff-name ::= $buff get-buffer-name;
+    geom ::= get-geom;
+    (y x) ::= curs-get-screen-size $BufferCurs;
+    (cy cx) ::= get-source-index $buff $geom;
+
+    if {$cy > [$buff get-buffer-length]} {
+	$geom set! ViewLine 0;
+	$geom set! CursorLine [$buff get-buffer-length];
+	$geom set! ViewColumn 0;
+	$geom set! CursorColumn 0;
+	$geom set! IndexColumn.SAVE 0;
+	(cy cx) ::= get-source-index $buff $geom;
+    };
+
+    render-status-line $win $buff $cy $cx $y $x $buff-name;
+    ### render-vertical-line;
+
+    i := $geom,CursorLine;
+    src ::= $buff get-buffer-line [$geom,ViewLine + $i];
+    $src ?? {src := ""};
+
+    ### erase line
+    curs-render-line
+        $BufferCurs
+        $i 0 0 [" " repeat $x]
+        $DEFAULT_TAB_WIDTH $DISPLAY_ENCODING;
+
+    try {
+        curs-render-line
+	    $BufferCurs
+            $i $geom,ViewColumn 0 $src
+            $DEFAULT_TAB_WIDTH $DISPLAY_ENCODING;
+    }
+    catch: {| e |
+        show-message :bell ["Error at curs-render-line, <" . [$e car] ">."];
+        break;
+    };
+
+    set-eof-mark $geom $buff $y $x;
+
+    ###
+    ### if run word, search and region hilight at immediately, following this:
+    ###
+    set-word-hilight-line $buff $geom $i;
+    set-region-hilight $buff $geom $y $x;
+};
+
+CombiWindow method set-eof-mark (geom buff y x) {
     if {[$geom,ViewLine + $y : - 1] >= [$buff get-buffer-length]} {
 	if {[[$buff get-buffer-length] - $geom,ViewLine] < $y} {
 	    curs-render-line
@@ -200,98 +248,6 @@ CombiWindow method render () {
 		"[eof]"
 		$DEFAULT_TAB_WIDTH $DISPLAY_ENCODING;
 	    curs-color $BufferCurs [[$buff get-buffer-length] - $geom,ViewLine] 0 5 $ColorDB,EOF_MARK 0;
-	};
-    };
-
-
-    ###
-    ### if run word and search hilight at background, following this:
-    ###
-    REM {
-    job-id ::= "ZH" . [$win split sep: "#" : get 1];
-    $Parent add-background job-id: $job-id {
-	| main window |
-	target-win ::= $main get-window-by-name $win;
-	if $target-win {
-	    $target-win set-word-hilight;
-	    $target-win set-search-hilight;
-	};
-	result REFRESH-ONLY;
-    };
-    }; ### END REM
-
-    ###
-    ### if run word and search hilight at immediately, following this:
-    ###
-    set-word-hilight;
-    set-search-hilight;
-
-    ###
-    ### region selection hilight
-    ###
-    region ::= get-region;
-    if {and $region $Activate} {
-	(sy sx) := $region;
-	(ey ex) ::= get-source-index $buff $geom;
-	if {$sy > $ey} {
-	    (sy ey sx ex) := ($ey $sy $ex $sx);
-	};
-	i := 0;
-	line := $geom,ViewLine;
-	$buff buffer-select $geom,ViewLine [$geom,ViewLine + $y : - 1] {
-	    | src |
-	    in-region := <nil>;
-	    cond
-                {and {$line = $sy} {$line = $ey}} {
-                    start-col ::= curs-index-to-pos $src $sx $DEFAULT_TAB_WIDTH;
-                    end-col ::= curs-index-to-pos $src $ex $DEFAULT_TAB_WIDTH;
-                    in-region := <t>;
-                    break;
-                }
-                {$line = $sy} {
-                    start-col ::= curs-index-to-pos $src $sx $DEFAULT_TAB_WIDTH;
-                    end-col ::= curs-index-to-pos $src [$src len] $DEFAULT_TAB_WIDTH;
-                    in-region := <t>;
-                    break;
-                }
-                {$line = $ey} {
-                    start-col ::= curs-index-to-pos $src 0 $DEFAULT_TAB_WIDTH;
-                    end-col ::= curs-index-to-pos $src $ex $DEFAULT_TAB_WIDTH;
-                    in-region := <t>;
-                    break;
-                }
-                {and {$line > $sy} {$line < $ey}} {
-                    start-col ::= curs-index-to-pos $src 0 $DEFAULT_TAB_WIDTH;
-                    end-col ::= curs-index-to-pos $src [$src len] $DEFAULT_TAB_WIDTH;
-                    in-region := <t>;
-                    break;
-                }
-            ;;
-
-	    if $in-region {
-		start-col ::= $start-col - $geom,ViewColumn;
-		end-col ::= $end-col - $geom,ViewColumn;
-		if {$start-col > $end-col} {
-		    (start-col end-col) := ($end-col $start-col);
-		};
-		if {$start-col < 0} {start-col := 0};
-		if {$start-col >= $x} {start-col := $x};
-		if {$end-col < 0} {start-col := 0};
-		if {$end-col >= $x} {end-col := $x};
-		if {[$end-col - $start-col] > 0} {
-		    curs-color $BufferCurs $i $start-col [$end-col - $start-col] $ColorDB,REGION_HILIGHT 0;
-		} {
-                    if {[$src len] = 0} {
-                        curs-color $BufferCurs $i $start-col 1 $ColorDB,REGION_HILIGHT 0;
-                    };
-                };
-                if {[$end-col - $start-col] < 0} {
-                    curs-color $BufferCurs $i $start-col 1 $ColorDB,REGION_HILIGHT 0;
-                };
-	    };
-
-	    $i ++;
-	    $line ++;
 	};
     };
 };
@@ -327,6 +283,25 @@ CombiWindow method geom-trimming () {
     };
 
     fit-to-cursor $geom $l $c;
+};
+
+CombiWindow method render-status-line (win buff cy cx y x buff-name) {
+    curs-print $StatusLineCurs [
+        " #%v [%v%v%v%v%v%v] (%d,%d) <%v> {%v} %v %v"
+        fmt
+            [$win split sep: "#" : get 1]
+            [[$buff protect?] ??? "%" " "]
+            [[$buff modify?] ??? "*" " "]
+            [[$buff newfile?] ??? "?" " "]
+            [[get-region] ??? "#" " "]
+            [$FreeCursor ??? "+" " "]
+            [[$Parent is-interp-busy] ??? "@" " "]
+            $cy $cx
+            $buff-name
+            $Mode
+            [[$buff get-path] ?? "*no file*"]
+            ["-" repeat $x]
+    ] $DISPLAY_ENCODING 0 0;
 };
 
 CombiWindow method render-vertical-line () {
@@ -1105,13 +1080,79 @@ CombiWindow method cursor-fit-to-bottom (geom) {
     $geom set! CursorLine $cursor;
 };
 
-CombiWindow method set-search-hilight () {
+CombiWindow method set-region-hilight (buff geom y x) {
+    region ::= get-region;
+    if {and $region $Activate} {
+	(sy sx) := $region;
+	(ey ex) ::= get-source-index $buff $geom;
+	if {$sy > $ey} {
+	    (sy ey sx ex) := ($ey $sy $ex $sx);
+	};
+	i := 0;
+	line := $geom,ViewLine;
+	$buff buffer-select $geom,ViewLine [$geom,ViewLine + $y : - 1] {
+	    | src |
+	    in-region := <nil>;
+	    cond
+                {and {$line = $sy} {$line = $ey}} {
+                    start-col ::= curs-index-to-pos $src $sx $DEFAULT_TAB_WIDTH;
+                    end-col ::= curs-index-to-pos $src $ex $DEFAULT_TAB_WIDTH;
+                    in-region := <t>;
+                    break;
+                }
+                {$line = $sy} {
+                    start-col ::= curs-index-to-pos $src $sx $DEFAULT_TAB_WIDTH;
+                    end-col ::= curs-index-to-pos $src [$src len] $DEFAULT_TAB_WIDTH;
+                    in-region := <t>;
+                    break;
+                }
+                {$line = $ey} {
+                    start-col ::= curs-index-to-pos $src 0 $DEFAULT_TAB_WIDTH;
+                    end-col ::= curs-index-to-pos $src $ex $DEFAULT_TAB_WIDTH;
+                    in-region := <t>;
+                    break;
+                }
+                {and {$line > $sy} {$line < $ey}} {
+                    start-col ::= curs-index-to-pos $src 0 $DEFAULT_TAB_WIDTH;
+                    end-col ::= curs-index-to-pos $src [$src len] $DEFAULT_TAB_WIDTH;
+                    in-region := <t>;
+                    break;
+                }
+            ;;
+
+	    if $in-region {
+		start-col ::= $start-col - $geom,ViewColumn;
+		end-col ::= $end-col - $geom,ViewColumn;
+		if {$start-col > $end-col} {
+		    (start-col end-col) := ($end-col $start-col);
+		};
+		if {$start-col < 0} {start-col := 0};
+		if {$start-col >= $x} {start-col := $x};
+		if {$end-col < 0} {start-col := 0};
+		if {$end-col >= $x} {end-col := $x};
+		if {[$end-col - $start-col] > 0} {
+		    curs-color $BufferCurs $i $start-col [$end-col - $start-col] $ColorDB,REGION_HILIGHT 0;
+		} {
+                    if {[$src len] = 0} {
+                        curs-color $BufferCurs $i $start-col 1 $ColorDB,REGION_HILIGHT 0;
+                    };
+                };
+                if {[$end-col - $start-col] < 0} {
+                    curs-color $BufferCurs $i $start-col 1 $ColorDB,REGION_HILIGHT 0;
+                };
+	    };
+
+	    $i ++;
+	    $line ++;
+	};
+    };
+};
+
+CombiWindow method set-search-hilight (buff geom) {
     $Activate ?? {return};
     
     list := $SearchHilight;
     $list ?? {return};
-    geom ::= get-geom;
-    buff ::= get-buffer;
 
     (scr-y scr-x) ::= get-screen-size;
     (idx-y idx-x) ::= get-source-index $buff $geom;
@@ -1139,15 +1180,40 @@ CombiWindow method set-search-hilight () {
     };
 };
 
-CombiWindow method set-word-hilight () {
+CombiWindow method set-word-hilight (buff geom) {
     if {false? HILIGHT_REGEXP} {return};
 
-    buff ::= get-buffer;
-    geom ::= get-geom;
     (y x) ::= get-source-index $buff $geom;
     (sy sx) ::= get-screen-size;
     start := $geom,ViewLine;
     end ::= $start + $sy : - 1;
+
+    $HILIGHT_REGEXP each do: {| i |
+	regex ::= $i car;
+	color ::= $i cdr : car;
+	result := ();
+	last := $result;
+	line := $start;
+	$buff buffer-select $start $end {| src |
+	    l ::= $src =~ :all $regex;
+	    if $l {
+		$l each do: {| m |
+		    $last append! ([$line + 0] $m);
+		};
+	    };
+	    $line ++;
+	};
+	set-word-hilight-color $geom $buff $result $color;
+    };
+};
+
+CombiWindow method set-word-hilight-line (buff geom pos) {
+    if {false? HILIGHT_REGEXP} {return};
+
+    (y x) ::= get-source-index $buff $geom;
+    (sy sx) ::= get-screen-size;
+    start ::= $geom,ViewLine + $pos;
+    end := $start;
 
     $HILIGHT_REGEXP each do: {| i |
 	regex ::= $i car;
