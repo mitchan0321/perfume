@@ -532,7 +532,12 @@ Window method key-event-loop () {
 
 	window ::= $main get-current-window;
 	if {$KeyEvent null?} {
-	    (rtime i) ::= curs-keyin [$window get-curs] $INPUT_TIMEOUT $INPUT_ENCODING blink: $BLINK;
+            try {
+                (rtime i) ::= curs-keyin [$window get-curs] $INPUT_TIMEOUT $INPUT_ENCODING blink: $BLINK;
+            } catch: {| e |
+                show-message :bell ["Error at curs-keyin: <" . [$e car] "># " [$e cdr]];
+                continue;
+            };
             if $KEY_REPEAT_ACCEL_OFF {
                 setvar KEY_REPEAT_ACCEL 1;
             } {
