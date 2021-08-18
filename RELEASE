@@ -1912,4 +1912,9 @@
 		PRFM_20210808
 		1.5.8
 
+2021/08/18
+	pmacs update:
+		Add Editor command result status NARROW is update self window
+		  current cursor line only at command completed.
+
 #eof
