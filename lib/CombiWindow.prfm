@@ -167,7 +167,8 @@ CombiWindow method render () {
             curs-render-line
 	        $BufferCurs
                 $i $geom,ViewColumn 0 $src
-                $DEFAULT_TAB_WIDTH $DISPLAY_ENCODING;
+                $DEFAULT_TAB_WIDTH $DISPLAY_ENCODING
+            ;
         }
         catch: {| e |
             show-message :bell ["Error at curs-render-line, <" . [$e car] ">."];
@@ -181,7 +182,7 @@ CombiWindow method render () {
     ###
     ### if run word, search and region hilight at immediately, following this:
     ###
-    set-word-hilight $buff $geom;
+    set-word-hilight $buff $geom $geom,ViewLine [$geom,ViewLine + $y : - 1];
     set-search-hilight $buff $geom;
     set-region-hilight $buff $geom $y $x;
 };
@@ -217,13 +218,15 @@ CombiWindow method render-line () {
     curs-render-line
         $BufferCurs
         $i 0 0 [" " repeat $x]
-        $DEFAULT_TAB_WIDTH $DISPLAY_ENCODING;
+        $DEFAULT_TAB_WIDTH $DISPLAY_ENCODING
+    ;
 
     try {
         curs-render-line
 	    $BufferCurs
             $i $geom,ViewColumn 0 $src
-            $DEFAULT_TAB_WIDTH $DISPLAY_ENCODING;
+            $DEFAULT_TAB_WIDTH $DISPLAY_ENCODING
+        ;
     }
     catch: {| e |
         show-message :bell ["Error at curs-render-line, <" . [$e car] ">."];
@@ -235,7 +238,7 @@ CombiWindow method render-line () {
     ###
     ### if run word, search and region hilight at immediately, following this:
     ###
-    set-word-hilight-line $buff $geom $i;
+    set-word-hilight $buff $geom $i $i;
     set-region-hilight $buff $geom $y $x;
 };
 
@@ -246,7 +249,8 @@ CombiWindow method set-eof-mark (geom buff y x) {
 		$BufferCurs
 		[[$buff get-buffer-length] - $geom,ViewLine] 0 0
 		"[eof]"
-		$DEFAULT_TAB_WIDTH $DISPLAY_ENCODING;
+		$DEFAULT_TAB_WIDTH $DISPLAY_ENCODING
+            ;
 	    curs-color $BufferCurs [[$buff get-buffer-length] - $geom,ViewLine] 0 5 $ColorDB,EOF_MARK 0;
 	};
     };
@@ -1180,40 +1184,13 @@ CombiWindow method set-search-hilight (buff geom) {
     };
 };
 
-CombiWindow method set-word-hilight (buff geom) {
+CombiWindow method set-word-hilight (buff geom start end) {
     if {false? HILIGHT_REGEXP} {return};
 
     (y x) ::= get-source-index $buff $geom;
     (sy sx) ::= get-screen-size;
-    start := $geom,ViewLine;
-    end ::= $start + $sy : - 1;
-
-    $HILIGHT_REGEXP each do: {| i |
-	regex ::= $i car;
-	color ::= $i cdr : car;
-	result := ();
-	last := $result;
-	line := $start;
-	$buff buffer-select $start $end {| src |
-	    l ::= $src =~ :all $regex;
-	    if $l {
-		$l each do: {| m |
-		    $last append! ([$line + 0] $m);
-		};
-	    };
-	    $line ++;
-	};
-	set-word-hilight-color $geom $buff $result $color;
-    };
-};
-
-CombiWindow method set-word-hilight-line (buff geom pos) {
-    if {false? HILIGHT_REGEXP} {return};
-
-    (y x) ::= get-source-index $buff $geom;
-    (sy sx) ::= get-screen-size;
-    start ::= $geom,ViewLine + $pos;
-    end := $start;
+    ### start := $geom,ViewLine;
+    ### end ::= $start + $sy : - 1;
 
     $HILIGHT_REGEXP each do: {| i |
 	regex ::= $i car;
