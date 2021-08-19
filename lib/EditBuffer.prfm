@@ -185,10 +185,10 @@ EditBuffer method get-buffer-line (line) {
     $Src ?? {return <nil>};
     if {$line < 0} {return <nil>};
     if {$line >= [$Src len]} {
-	return <nil>;
+ 	return <nil>;
     } {
-	if {[$Src len] <= 0} {return <nil>};
-	return [$Src get $line];
+ 	if {[$Src len] <= 0} {return <nil>};
+ 	return [$Src get $line];
     };
 };
 
@@ -202,7 +202,8 @@ EditBuffer method insert-string-at (input y x) {
     sets Modify <t>;
     if {true? Src} {
         if {$y >= [$Src len]} {
-            $UndoBuffer << (backdelete-character-at [$Src len : + 1] 0);
+            # $UndoBuffer << (backdelete-character-at [$Src len : + 1] 0);
+            $UndoBuffer << (backdelete-character-at [$Src len] 0);
         };
 	result ::= $Src insert-string-at $input $y $x;
 	if $result,0 {$UndoBuffer << $result; sets RedoBuffer ()};
