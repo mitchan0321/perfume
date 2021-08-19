@@ -56,6 +56,7 @@ defun pmacs (trace: t) {
 	init-color-DB;
 	$MainWindow create-minibuffer-window;
 	$MainWindow create-full-window;
+        $MainWindow set-input $stdin_orig;
         
         if {[$ARGV len] <= 3} {
             $MainWindow add-background job-id: "00-start-logo" {

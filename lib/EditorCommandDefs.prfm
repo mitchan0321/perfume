@@ -501,13 +501,13 @@ defcommand input-character-code {
 defcommand insert-character {
     | main window key |
     $window insert-string $key;
-    result NARROW;
+    result ALL;
 };
 
 defcommand insert-tab {
     | main window |
     $window insert-string "\t";
-    result NARROW;
+    result ALL;
 };
 
 defcommand insert-return {
