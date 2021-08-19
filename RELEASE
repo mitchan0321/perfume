@@ -1912,9 +1912,8 @@
 		PRFM_20210808
 		1.5.8
 
-2021/08/18
+2021/08/19
 	pmacs update:
-		Add Editor command result status NARROW is update self window
-		  current cursor line only at command completed.
+		Change if standard input channel is ready, skip display refresh.
 
 #eof
