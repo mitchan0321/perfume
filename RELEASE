@@ -1915,5 +1915,6 @@
 2021/08/19
 	pmacs update:
 		Change if standard input channel is ready, skip display refresh.
+		Fix push incorrect data to undo-list when cursor over the EOF mark.
 
 #eof
