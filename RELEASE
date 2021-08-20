@@ -1917,4 +1917,8 @@
 		Change if standard input channel is ready, skip display refresh.
 		Fix push incorrect data to undo-list when cursor over the EOF mark.
 
+2021/08/20
+	pmacs update:
+		Change terminate mini-input-mode when recieve window resize in mini-input-mode.
+
 #eof
