@@ -668,6 +668,7 @@ Window method mini-input-end () {
     if {list? $MiniInputSave} {
 	bind-buffer $MiniInputSave,0 $MiniInputSave,1;
     };
+    sets MiniInputSave <nil>;
     $MiniWindow clear;
 };
 
