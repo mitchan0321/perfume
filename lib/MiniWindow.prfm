@@ -79,6 +79,8 @@ MiniWindow method set-cursor () {
 };
 
 MiniWindow method apply-keybind (main window key) {
+    $MiniCurs ?? {return <nil>};
+    
     (y x) ::= curs-get-screen-size $MiniCurs;
     input-len ::= $x - [$PromptMessage len] : - 1;
     ### clear;

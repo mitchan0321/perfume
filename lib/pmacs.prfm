@@ -54,7 +54,7 @@ defun pmacs (trace: t) {
 	curs ::= curs-init;
 	defvar MainWindow [new Window init: ($curs)];
 	init-color-DB;
-	$MainWindow create-minibuffer-window;
+	$MainWindow create-minibuffer-window <nil>;
 	$MainWindow create-full-window;
         $MainWindow set-input $stdin_orig;
         

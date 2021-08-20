@@ -12,6 +12,7 @@ Window method init-constructor () {
     sets BufferBinding [dict];
     sets MiniInput <nil>;
     sets KeyEvent ();
+    sets MiniWindow <nil>;
 
     ## Callback for MiniWindow input method.
     ## MiniInputCallback list form is: (window closure)
@@ -55,7 +56,7 @@ Window method active? (win) {
     return [eq? [$WindowList : car] $win];
 };
 
-Window method create-minibuffer-window () {
+Window method create-minibuffer-window (orig) {
     (y x) ::= curs-get-screen-size $RootWin;
     sets CursWinMini [curs-new-window $RootWin [$y - 1] 0 1 [$x - $ROOT_WINDOW_RIGHT_MARGIN]];
 
@@ -64,6 +65,12 @@ Window method create-minibuffer-window () {
 
     sets MiniWindow $win;
     $MiniWindow set-window-name "MiniBuffer";
+    if $orig {
+        ### copy original MiniWindow properties.
+        $MiniWindow set! PromptMessage  $orig,PromptMessage;
+        $MiniWindow set! InputValue     $orig,InputValue;
+        $MiniWindow set! InputIndex     $orig,InputIndex;
+    };
     $MiniWindow activate;
     $MiniWindow refresh;
 };
@@ -494,7 +501,6 @@ Window method add-create-window-hook (hook) {
 Window method resize-window () {
     set buffer-bind [dict ()];
     $MiniWindow destroy;
-    sets MiniWindow <nil>;
     curs-destroy-window $CursWinMini;
     $WindowList each do: {| w |
         $buffer-bind set [$w get-window-name] [$w get-buffer];
@@ -506,7 +512,7 @@ Window method resize-window () {
 
     (y x) ::= curs-get-screen-size $RootWin;
     sets CursWin [curs-create-window $RootWin 0 0 [$y - 1] [$x - $ROOT_WINDOW_RIGHT_MARGIN]];
-    create-minibuffer-window;
+    create-minibuffer-window $MiniWindow;
     if {block? $CreateWindowHook} {
 	$CreateWindowHook eval;
     } {
@@ -591,6 +597,7 @@ Window method key-event-loop () {
 
 	$i each do: {| k |
 	    if {eq? $k KEY_RESIZE} {
+                $main mini-input-end;
 		$main resize-window;
 		$main apply {render-all; refresh};
 		window ::= $main get-current-window;		
