@@ -13,6 +13,7 @@ Window method init-constructor () {
     sets MiniInput <nil>;
     sets KeyEvent ();
     sets MiniWindow <nil>;
+    sets MiniInputSave <nil>;
 
     ## Callback for MiniWindow input method.
     ## MiniInputCallback list form is: (window closure)
