@@ -72,7 +72,7 @@ Window method create-minibuffer-window (orig) {
         $MiniWindow set! InputValue     $orig,InputValue;
         $MiniWindow set! InputIndex     $orig,InputIndex;
     };
-    $MiniWindow activate;
+    $MiniWindow diactivate;
     $MiniWindow refresh;
 };
 
@@ -647,6 +647,7 @@ Window method mini-input-start (init-value prompt: p index: index) {
     } {
 	$MiniWindow mini-input-start "" $init-value index: $index;
     };
+    $MiniWindow activate;
 };
 
 Window method mini-input-callback (in-key value) {
@@ -669,6 +670,7 @@ Window method mini-input-end () {
 	bind-buffer $MiniInputSave,0 $MiniInputSave,1;
     };
     sets MiniInputSave <nil>;
+    $MiniWindow diactivate;
     $MiniWindow clear;
 };
 

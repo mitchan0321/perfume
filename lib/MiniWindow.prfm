@@ -18,7 +18,7 @@ MiniWindow method init (main y x line column) {
 };
 
 MiniWindow method activate () {
-    set-window-color-default $MiniCurs MINI_WINDOW;
+    set-window-color-default $MiniCurs ACTIVE_MINI_WINDOW;
 };
 
 MiniWindow method diactivate () {
