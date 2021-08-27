@@ -50,6 +50,7 @@ toy_eval_script(Toy_Interp* interp, Toy_Type *script) {
     extern volatile int SigAlrm;
     result = const_Nil;
     volatile int baria_dist;
+    Toy_Func_Trace_Info *trace_info;
 
 #ifdef EVAL_STAT
     count_eval_script ++;
@@ -79,7 +80,9 @@ toy_eval_script(Toy_Interp* interp, Toy_Type *script) {
     }
 
     while (l) {
+        trace_info = interp->trace_info;
 	result = toy_eval(interp, list_get_item(l), &env);
+        interp->trace_info = trace_info;
 	interp->last_status = result;
 
 	if (CStack_in_baria) {
@@ -179,6 +182,7 @@ control_goto:
     trace_info->func_name = list_get_item(l);
     trace_info->object_name = const_Nil;
     trace_info->statement = statement;
+    interp->trace_info = trace_info;
 
     paramno_hint = GET_PARAMNO(statement);
 
@@ -244,8 +248,7 @@ control_goto:
 	    msg = new_cell(L"No such function, '");
 	    cell_add_str(msg, to_string(first));
 	    cell_add_str(msg, L"'.");
-
-	    ret = new_exception(TE_NOFUNC, cell_get_addr(msg), interp);
+            ret = new_exception(TE_NOFUNC, cell_get_addr(msg), interp);
 	    goto exit_eval;
 	}
 	first = tfirst;
@@ -268,8 +271,8 @@ control_goto:
 	method = list_get_item(l);
 	if (method == NULL) {
 	    msg = new_cell(L"No specified method");
-	    ret = new_exception(TE_NOMETHOD, cell_get_addr(msg), interp);
-	    goto exit_eval;
+            ret = new_exception(TE_NOMETHOD, cell_get_addr(msg), interp);
+ 	    goto exit_eval;
 	}
 	if (GET_TAG(method) != SYMBOL) {
 	    method = toy_expand(interp, method, env, trace_info);
@@ -282,7 +285,7 @@ control_goto:
 	    msg = new_cell(L"Method is not a symbol, '");
 	    cell_add_str(msg, to_string(method));
 	    cell_add_str(msg, L"'.");
-	    ret = new_exception(TE_BADMETHOD, cell_get_addr(msg), interp);
+            ret = new_exception(TE_BADMETHOD, cell_get_addr(msg), interp);
 	    goto exit_eval;
 	}
 	trace_info->func_name = method;
@@ -331,14 +334,7 @@ control_goto:
 	list_append(cmd, new_integer_si(interp->cur_func_stack));
 	list_append(cmd, interp->func_stack[interp->cur_func_stack]->trace_info->func_name);
 
-	/* for save trace_info for command functions */
-	{
-	    Toy_Func_Trace_Info *orig_trace_info;
-	    orig_trace_info = interp->trace_info;
-	    interp->trace_info = trace_info;
-	    toy_eval_script(interp, new_script(new_list(new_statement(cmd, trace_info->line))));
-	    interp->trace_info = orig_trace_info;
-	}
+        toy_eval_script(interp, new_script(new_list(new_statement(cmd, trace_info->line))));
 	
 	interp->debug_in = 0;
     }
@@ -364,7 +360,7 @@ control_goto:
 			msg = new_cell(L"No given named argument variable, name: '");
 			cell_add_str(msg, cell_get_addr(name->u.symbol.cell));
 			cell_add_str(msg, L"'.");
-			ret = new_exception(TE_NONAMEARG, cell_get_addr(msg), interp);
+                        ret = new_exception(TE_NONAMEARG, cell_get_addr(msg), interp);
 			goto exit_eval;
 		    }
 		    arg = toy_expand(interp, list_get_item(l), env, trace_info);
@@ -391,20 +387,13 @@ control_goto:
 	}
 	if (NULL != obj_env) {
 	    if (0 == toy_push_obj_env(interp, obj_env)) {
-		ret = new_exception(TE_STACKOVERFLOW, L"Object satck overflow.", interp);
+                ret = new_exception(TE_STACKOVERFLOW, L"Object satck overflow.", interp);
 		goto exit_eval;
 	    }
-	    ostack_use = 1;
+            ostack_use = 1;
 	}
 
-	/* for save trace_info for command functions */
-	{
-	    Toy_Func_Trace_Info *orig_trace_info;
-	    orig_trace_info = interp->trace_info;
-	    interp->trace_info = trace_info;
-	    ret = (first->u.native.cfunc)(interp, posargsl, namedargs, arglen);
-	    interp->trace_info = orig_trace_info;
-	}
+        ret = (first->u.native.cfunc)(interp, posargsl, namedargs, arglen);
 	goto exit_eval;
 
     case FUNC:
@@ -420,7 +409,7 @@ control_goto:
 
 	if (NULL != obj_env) {
 	    if (0 == toy_push_obj_env(interp, obj_env)) {
-		ret = new_exception(TE_STACKOVERFLOW, L"Object satck overflow.", interp);
+                ret = new_exception(TE_STACKOVERFLOW, L"Object satck overflow.", interp);
 		goto exit_eval;
 	    }
 	    ostack_use = 1;
@@ -431,32 +420,20 @@ control_goto:
 	if (0 == toy_push_func_env(interp, local_var,
 				   first->u.func.closure->u.closure.env->func_env, NULL, trace_info)) {
 
-	    ret = new_exception(TE_STACKOVERFLOW, L"Function satck overflow.", interp);
+            ret = new_exception(TE_STACKOVERFLOW, L"Function satck overflow.", interp);
 	    goto exit_eval;
 	}
 	lstack_use = 1;
 
 	interp->current_func = first;
-	/* for save trace_info for command functions */
-	{
-	    Toy_Func_Trace_Info *orig_trace_info;
-	    orig_trace_info = interp->trace_info;
-	    interp->trace_info = trace_info;
-	    ret = toy_eval_script(interp, first->u.func.closure->u.closure.block_body);
-	    interp->trace_info = orig_trace_info;
-	}
-//	if ((GET_TAG(ret) == CONTROL) && (ret->u.control.code != CTRL_GOTO)) {      //  } balanced for smart-move-*
+        ret = toy_eval_script(interp, first->u.func.closure->u.closure.block_body);
 	if ((GET_TAG(ret) == CONTROL) && (ret->u.control.code == CTRL_RETURN)) {	    
 	    ret = ret->u.control.ret_value;
 	}
 	goto exit_eval;
 
     default:
-	// msg = new_cell(L"No runnable object, '");
-	// cell_add_str(msg, to_string(first));
-	// cell_add_str(msg, L"'.");
-	// ret = new_exception(TE_NORUNNABLE, cell_get_addr(msg), interp);
-	ret = new_exception(TE_NORUNNABLE, L"No runnable object.", interp);
+        ret = new_exception(TE_NORUNNABLE, L"No runnable object.", interp);
     }
 
 exit_eval:
