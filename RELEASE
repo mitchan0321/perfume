@@ -1921,4 +1921,11 @@
 	pmacs update:
 		Change terminate mini-input-mode when recieve window resize in mini-input-mode.
 
+2021/08/27
+	eval.c
+		Fix incorrect trace information output in stack-trace.
+	pmacs update:
+		Add active mini window color name is ACTIVE_MINI_WINDOW,
+		  if start mini input mode use this.
+
 #eof
