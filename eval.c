@@ -50,7 +50,6 @@ toy_eval_script(Toy_Interp* interp, Toy_Type *script) {
     extern volatile int SigAlrm;
     result = const_Nil;
     volatile int baria_dist;
-    Toy_Func_Trace_Info *trace_info;
 
 #ifdef EVAL_STAT
     count_eval_script ++;
@@ -80,9 +79,7 @@ toy_eval_script(Toy_Interp* interp, Toy_Type *script) {
     }
 
     while (l) {
-        trace_info = interp->trace_info;
 	result = toy_eval(interp, list_get_item(l), &env);
-        interp->trace_info = trace_info;
 	interp->last_status = result;
 
 	if (CStack_in_baria) {
