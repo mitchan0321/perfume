@@ -1,0 +1,13 @@
+defun ptrace (body file: path) {
+    if [set? path] else: {path := "ptrace.out"};
+    f := `File ($path mode: o);
+    try {trace $body out: [$f fd?]} catch: {};
+    $f close;
+    
+    b ::= BufferManager get-buffer "*Scratch";
+    f := `File ($path mode: i);
+    $f each do: {| r |
+        $b append-string $r;
+    };
+    $f close;
+};
