@@ -1928,4 +1928,8 @@
 		Add active mini window color name is ACTIVE_MINI_WINDOW,
 		  if start mini input mode use this.
 
+2021/08/29
+	eval.c
+		Delete trace information copy.
+
 #eof
