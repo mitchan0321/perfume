@@ -1932,4 +1932,8 @@
 	eval.c
 		Delete trace information copy.
 
+2021/08/30
+	ptrace.prfm
+		Add trace command for running under pmacs editor.
+
 #eof
