@@ -1935,5 +1935,9 @@
 2021/08/30
 	ptrace.prfm
 		Add trace command for running under pmacs editor.
+	pmacs update:
+		Change smart-move-forward and smart-move-backward command is move cursor
+		  to word boundary but if found their character '(', '[', '{',
+		  ')', ']' and '}', stop at it.
 
 #eof
