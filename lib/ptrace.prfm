@@ -1,7 +1,12 @@
 defun ptrace (body file: path) {
+    if {defvar? PMACS} else: {
+        println "Please run under pmacs environment.";
+        return;
+    };
+
     if [set? path] else: {path := "ptrace.out"};
     f := `File ($path mode: o);
-    try {trace $body out: [$f fd?]} catch: {};
+    try {trace $body out: [$f fd?]} catch: {| e |};
     $f close;
     
     b ::= BufferManager get-buffer "*Scratch";
@@ -10,4 +15,5 @@ defun ptrace (body file: path) {
         $b append-string $r;
     };
     $f close;
+    if [set? e] {throw $e};
 };
