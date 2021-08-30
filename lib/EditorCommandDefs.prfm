@@ -2184,8 +2184,20 @@ defcommand smart-move-forward {
     ### otherwise
     ### move word forward
     $vec each-forward-char $ey [$ex + 1] {| last-y last-x c |
-        if {$c alphanumeric?} {break};
+        if {or 
+            {$c alphanumeric?}
+            {$c = "("} {$c = "["} {$c = "{"}
+            {$c = ")"} {$c = "]"} {$c = "}"}
+        } {break};
     };
+    if {or 
+        {$c = "("} {$c = "["} {$c = "{"}
+        {$c = ")"} {$c = "]"} {$c = "}"}
+    } {
+        $window cursor-move-to $geom $last-y $last-x;
+        return SELF;
+    };
+    
     $vec each-forward-char $last-y [$last-x + 1] {| last-y last-x c |
         if {! [$c alphanumeric?]} {break};
     };
@@ -2267,11 +2279,30 @@ defcommand smart-move-backward {
     ### move word backward
     (ey ex) ::= $vec get-prev-pos $ey $ex;
     $vec each-backward-char $ey $ex {| last-y last-x c |
-        if {$c alphanumeric?} {break};
+        if {or 
+            {$c alphanumeric?}
+            {$c = "("} {$c = "["} {$c = "{"}
+            {$c = ")"} {$c = "]"} {$c = "}"}
+        } {break};
     };
+    if {or 
+        {$c = "("} {$c = "["} {$c = "{"}
+        {$c = ")"} {$c = "]"} {$c = "}"}
+    } {
+        $window cursor-move-to $geom $last-y $last-x;
+        return SELF;
+    };
+    
     (ey ex) ::= $vec get-prev-pos $last-y $last-x;
     $vec each-backward-char $ey $ex {| last-y last-x c |
         if {! [$c alphanumeric?]} {break};
+    };
+    if {$last-x != 0} {
+        i := 0;
+        $vec each-forward-char $last-y $last-x {| last-y last-x c |
+            if {$i >= 1} {break};
+            $i ++;
+        };
     };
     if {$last-y < 0} {last-y := 0};
     if {$last-x < 0} {last-x := 0};
