@@ -2183,7 +2183,7 @@ defcommand smart-move-forward {
     
     ### otherwise
     ### move word forward
-    $vec each-forward-char $ey [$ex + 1] {| last-y last-x c |
+    $vec each-forward-char $ey $ex {| last-y last-x c |
         if {or 
             {$c alphanumeric?}
             {$c = "("} {$c = "["} {$c = "{"}
@@ -2297,12 +2297,8 @@ defcommand smart-move-backward {
     $vec each-backward-char $ey $ex {| last-y last-x c |
         if {! [$c alphanumeric?]} {break};
     };
-    if {$last-x != 0} {
-        i := 0;
-        $vec each-forward-char $last-y $last-x {| last-y last-x c |
-            if {$i >= 1} {break};
-            $i ++;
-        };
+    if {! [and {$last-y = 0} {$last-x = 0}]} {
+        (last-y last-x) ::= $vec get-next-pos $last-y $last-x;
     };
     if {$last-y < 0} {last-y := 0};
     if {$last-x < 0} {last-x := 0};
