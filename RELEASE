@@ -1940,4 +1940,11 @@
 		  to word boundary but if found their character '(', '[', '{',
 		  ')', ']' and '}', stop at it.
 
+2021/09/01
+	pmacs update:
+		Fix smart-move-backward command bug.
+		Change *Scratch* buffer display stdout and stderr display order,
+		  new order is stdout -> stderr.
+		Add new utility function vector::get-next-pos (x y) in WUtil.prfm file.
+
 #eof
