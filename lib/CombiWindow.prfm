@@ -735,13 +735,6 @@ CombiWindow method display-evaluation () {
 
 	update-display := <nil>;
 
-	$stderr close;
-	$stderr each do: {| r | r ::= $r string;
-	    $buff append-string ["ERR> " . $r];
-	    update-display := <t>;
-	};
-	$stderr clear;
-
 	$stdout close;
 	$stdout each do: {| r | r ::= $r string;
             if {or [$r =~ '^Result\[FUNC\]=> '] [$r =~ '^Result\[CLOSURE\]=> ']} {
@@ -767,6 +760,13 @@ CombiWindow method display-evaluation () {
 	    update-display := <t>;
 	};
 	$stdout clear;
+        
+	$stderr close;
+	$stderr each do: {| r | r ::= $r string;
+	    $buff append-string ["ERR> " . $r];
+	    update-display := <t>;
+	};
+	$stderr clear;
 
 	if $update-display {
 	    apply-command $MainWindow [self] "" bottom-of-buffer;
