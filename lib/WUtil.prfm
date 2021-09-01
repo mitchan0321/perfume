@@ -731,12 +731,31 @@ Vector method each-backward-char (sl sc body) {
     };
 };
 
+Vector method get-next-pos (y x) {
+    if {[self : len] <= 0} {return (0 0)};
+    
+    $x ++;
+    if {$y < [len]} {
+        if {$y < 0} {
+            return (0 0);
+        };
+        r ::= get $y;
+        if {$x <= [$r len]} {return ($y $x)};
+        $y ++;
+        x := 0;
+        return ($y $x);
+    };
+    
+    y ::= len;
+    return ($y 0);
+};
+
 Vector method get-prev-pos (y x) {
     $x --;
     if {$x < 0} {
         $y --;
         if {$y >= 0} {
-            x ::= self : get $y : len;
+            x ::= get $y : len;
         } {
             y := 0;
             x := 0;
