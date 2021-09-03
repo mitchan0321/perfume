@@ -1027,27 +1027,52 @@ defcommand save-buffer {
 	return SELF
     };
 
-    $main mini-input-start "" prompt: ["Save file? (" . $path ") [y/n]: "];
-    $main add-mini-input-callback $window {| main window in-key value |
-        if {or {eq? $in-key KEY_ESC} {eq? $value "n"} {eq? $value "N"}} {
-            $main mini-input-end;
-	    show-message "Canceled.";
-	    BufferManager unregist-buffer "*Directory*";	
-            return SELF;
+    if [$__buff_in_clojure__ modified-by-another-process] {
+        show-message "" :bell;
+        $main mini-input-start "" prompt: ["Maybe this file modified by anothor process. Really save file? (" . $path ") [yes or ESC]: "];
+        $main add-mini-input-callback $window {| main window in-key value |
+            if {eq? $in-key KEY_ESC} {
+                $main mini-input-end;
+                show-message "Canceled.";
+                BufferManager unregist-buffer "*Directory*";
+                return SELF;
+            };
+            if {and {eq? $in-key CTRL_M} {eq? $value "yes"}} {
+                $main mini-input-end;
+                (result err) ::= $__buff_in_clojure__ save-content;
+                if $result {
+                    show-message "Save Done.";
+                } {
+                    show-message :bell ["Save Failed, path: " . $path " (" $err ")"];
+                };
+                return SELF;
+                BufferManager unregist-buffer "*Directory*";
+            };
         };
-        if {or {$value = "y"} {$value = "Y"}} {
-	    $main mini-input-end;
-	    (result err) ::= $__buff_in_clojure__ save-content;
-	    if $result {
-		show-message "Save Done.";
-	    } {
-		show-message :bell ["Save Failed, path: " . $path " (" $err ")"];
-	    };
-	    return SELF;
-	    BufferManager unregist-buffer "*Directory*";	
-	};
+        result SELF;
+    } {
+        $main mini-input-start "" prompt: ["Save file? (" . $path ") [y/n]: "];
+        $main add-mini-input-callback $window {| main window in-key value |
+            if {or {eq? $in-key KEY_ESC} {eq? $value "n"} {eq? $value "N"}} {
+                $main mini-input-end;
+                show-message "Canceled.";
+                BufferManager unregist-buffer "*Directory*";
+                return SELF;
+            };
+            if {or {$value = "y"} {$value = "Y"}} {
+                $main mini-input-end;
+                (result err) ::= $__buff_in_clojure__ save-content;
+                if $result {
+                    show-message "Save Done.";
+                } {
+                    show-message :bell ["Save Failed, path: " . $path " (" $err ")"];
+                };
+                return SELF;
+                BufferManager unregist-buffer "*Directory*";
+            };
+        };
+        result SELF;
     };
-    result SELF;
 };
 
 defcommand save-buffer-as {

@@ -18,6 +18,7 @@ EditBuffer method init-constructor () {
     sets Protect <nil>;
     sets ContentPath <nil>;
     sets PreviousBuffer <nil>;
+    sets LastTimestamp 0;
 };
 
 EditBuffer method string () {
@@ -50,6 +51,8 @@ EditBuffer method load-content (path init-only: init-flag buffer-name: buff-name
                 if {! [file write? $path]} {
                     set-protect;
                 };
+                inode ::= dict [file stat $path];
+                sets LastTimestamp $inode,mtime;
 	        result := (<t> "");
 	    } {
 		sets NewFile <t>;
@@ -150,9 +153,37 @@ EditBuffer method save-content (path: path) {
 
     ### sets UndoBuffer ();
     ### sets RedoBuffer ();
+    try {
+        inode ::= dict [file stat $path];
+        sets LastTimestamp $inode,mtime;
+    } catch: {
+        sets LastTimestamp 0;
+    };
     sets Modify <nil>;
     sets NewFile <nil>;
     return (<t> Success);
+};
+
+EditBuffer method modified-by-another-process () {
+    if $NewFile {
+        if [file exists? $File] {
+            return <t>;
+        };
+        return <nil>;
+    };
+    
+    if [file exists? $File] else: {return <nil>};
+    
+    try {
+        inode ::= dict [file stat $File];
+    } catch: {
+        return <t>;
+    };
+    if {$LastTimestamp = $inode,mtime} {
+        return <nil>;
+    };
+    
+    return <t>;
 };
 
 EditBuffer method clear-all () {
