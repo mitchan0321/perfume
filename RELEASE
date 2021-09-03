@@ -1947,4 +1947,9 @@
 		  new order is stdout -> stderr.
 		Add new utility function vector::get-next-pos (x y) in WUtil.prfm file.
 
+2021/09/02
+	pmacs update:
+		Add detect function that another process modify same file
+		  at save-buffer editor command.
+
 #eof
