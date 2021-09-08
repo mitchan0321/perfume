@@ -13,6 +13,7 @@ EditBuffer.prfm
 EditorCommandDefs.prfm
 MiniWindow.prfm
 ScratchBuffer.prfm
+DiredBuffer.prfm
 WUtil.prfm
 Window.prfm
 WindowBase.prfm
