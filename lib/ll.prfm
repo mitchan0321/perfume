@@ -39,7 +39,7 @@ begin {
 	try {
 	    d ::= dict [file stat ["" . $f]];
 	} catch: {
-	    println "can't access \'" $f "\'.";
+	    println "can't access \'" $f "\'."; #'
 	    return;
 	};
 
