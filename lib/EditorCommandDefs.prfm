@@ -3419,7 +3419,20 @@ defcommand test {
 
 defcommand test2 {
     | main window |
-    return ALL;
+
+    f ::= fun (l) {
+        if [$l null?] else: {
+            c ::= $l >>;
+            show-message $c;
+            $main add-background {
+                $f $l;
+                result ALL;
+            } after: 500;
+        };
+
+    };
+    $f ["abcdefghijklmnopqrstuvwxyz" split sep: ""];
+    result ALL;
 };
 
 ######
