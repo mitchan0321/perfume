@@ -1,0 +1,15 @@
+class DiredBuffer EditBuffer;
+
+DiredBuffer method init () {
+    base-constructor;
+    init-constructor;
+    
+    sets SortMode   "n";    # n=name asd, N=name des,
+                            # t=time asd, T=time des,
+                            # s=size asd, S=size des
+    
+};
+
+DiredBuffer method load-content (path) {
+    
+};
