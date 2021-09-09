@@ -284,6 +284,7 @@ Window method create-split-cross-window-sub (win-name) {
 
 Window method get-buffer-list (win-name) {
     buff-list := ();
+    orig-win ::= get-window-by-name $win-name;
     1 each to: $MAX_WINDOW_DIVS do: {
         w ::= get-window-by-name $win-name;
         if $w {
@@ -292,7 +293,11 @@ Window method get-buffer-list (win-name) {
             if {$BufferBinding set? $win-name} {
                 $buff-list <<- [$BufferBinding get $win-name];
             } {
-                $buff-list <<- <nil>;
+                if $orig-win {
+                    $buff-list <<- [$orig-win get-buffer];
+                } {
+                    $buff-list <<- <nil>;
+                };
             };
         };
         win-name ::= next-window-name $win-name;
