@@ -1952,4 +1952,9 @@
 		Add detect function that another process modify same file
 		  at save-buffer editor command.
 
+2021/09/09
+	pmacs update:
+		Change bind the window #1's buffer to window #2/#3/#4, if window split
+		  first time.
+
 #eof
