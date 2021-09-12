@@ -1957,4 +1957,16 @@
 		Change bind the window #1's buffer to window #2/#3/#4, if window split
 		  first time.
 
+2021/09/12
+	pmacs update:
+		Add new feature:
+		  * New buffer 'DiredBuffer'.
+		  * New editor commands - dired, dired-open, dired-link-back, dired-cursor-up,
+		    dired-cursor-down, dired-sort-by-{name,time,size}-{ascending,descending} and
+		    dired-filter.
+		  * New mode 'Dired' and mode file 'Mode-Dired.key'.
+		  * New color defs DIRED_* in theme-color.prfm.
+		Change open-file, view-file if specified a directory at mini-input, open dired.
+		Fix WUtile::get-current-buffer-dir.
+
 #eof
