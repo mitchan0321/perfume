@@ -212,6 +212,7 @@ defun path-adjust (path) {
 	    <t>         {$r <<- $i}
 	;
     };
+    if {and {[$r len] = 1} {[$r get 0] = ""}} {return "/"};
     return [$r join sep: "/"];
 };
 
@@ -791,6 +792,7 @@ defun get-current-buffer-dir (window) {
     $buff ?? {return [pwd]};
     path ::= $buff get-path;
     $path ?? {return [pwd]};
+    if {file dir? $path} {return $path};
     dir ::= $path split sep: "/";
     $dir ->>;
     path ::= $dir join sep: "/";
