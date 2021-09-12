@@ -17,9 +17,9 @@ DiredBuffer method init () {
                             # t=time ascending, T=time descending,
                             # s=size ascending, S=size descending
 
-    ########## "f  d  perm  usr  grp  mod      sz     file"
-    sets Fmt-s "%1v%1v%-13v %-8v %-8v %-v%-10v %5v%4v %v%-2v";
-    ########## "f  d  perm  usr  grp  mod sz  file"
+    ########## "f  perm  usr  grp  mod      sz     file"
+    sets Fmt-s "%1v%-14v %-8v %-8v %-v%-10v %5v%4v %v%-2v";
+    ########## "f  perm     usr  grp  mod sz  file"
     sets Fmt   "%1v%1v%-13v %-8v %-8v %-v %9v|%v";
     
     sets Filter     '.*';
@@ -103,12 +103,12 @@ DiredBuffer method update () {
     l ::= msort $dir-list getter: $getter order: $order;
 
     append-string ["<<< " . [get-content] " >>>"];
-    append-string ["Filter: " . [$Filter literal]];
+    append-string  "  * n,N=sort by name, t,T=sort by time, s,S=sort by size, f=filter, Enter=open";
+    append-string ["[Filter: " . [$Filter literal] "], [Sort: " $SortMode "]"];
     append-string "";
     
     s ::= $Fmt-s fmt
             " "         ### edit flag
-            " "
             "Perm"
             "User"
             "Group"
@@ -120,6 +120,21 @@ DiredBuffer method update () {
             $od-n
     ;;
     append-string $s;
+
+    s ::= $Fmt-s fmt
+            " "         ### edit flag
+            "----"
+            "----"
+            "-----"
+            "------"
+            "  "
+            "  "
+            "----"
+            "----"
+            "  "
+    ;;
+    append-string $s;
+
     try {
         $l filter {| d | $d,name =~ $Filter} : each do: {| d |
             s ::= $Fmt fmt
