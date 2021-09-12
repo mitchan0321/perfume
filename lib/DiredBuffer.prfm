@@ -3,13 +3,166 @@ class DiredBuffer EditBuffer;
 DiredBuffer method init () {
     base-constructor;
     init-constructor;
+
+    sets Perms [vector("---" "--x" "-w-" "-wx" "r--" "r-x" "rw-" "rwx")];
+    sets Bits  [vector("---" "--S" "-G-" "-GS" "U--" "U-S" "UG-" "UGS")];
+
+    d ::= dict; awk sep: ":" {$d set $3 $1} "/etc/passwd";
+    sets User $d;
+
+    d ::= dict; awk sep: ":" {$d set $3 $1} "/etc/group";
+    sets Group $d;
     
-    sets SortMode   "n";    # n=name asd, N=name des,
-                            # t=time asd, T=time des,
-                            # s=size asd, S=size des
+    sets SortMode   "n";    # n=name ascending, N=name descending,
+                            # t=time ascending, T=time descending,
+                            # s=size ascending, S=size descending
+
+    ########## "f  d  perm  usr  grp  mod      sz     file"
+    sets Fmt-s "%1v%1v%-13v %-8v %-8v %-v%-10v %5v%4v %v%-2v";
+    ########## "f  d  perm  usr  grp  mod sz  file"
+    sets Fmt   "%1v%1v%-13v %-8v %-8v %-v %9v|%v";
     
+    sets Filter     '.*';
 };
 
 DiredBuffer method load-content (path) {
+    path ::= path-adjust $path;
+    sets File $path;
+    set-content $path;
+    if {$path = "/"} {
+        name := "/";
+    } {
+        name ::= $path split sep: "/" : last : car;
+    };
+    BufferManager regist-buffer [self] ["Dir=" . $name];
+
+    update;
+};
+
+DiredBuffer method update () {
+    no-protect;
+    clear-all;
     
+    dir-list := ();
+    result := $dir-list;
+    try {
+        file list [get-content] : each do: {| i |
+            try {
+                d ::= dict [file stat [$File . "/" $i]];
+                $d set name $i;
+                result ::= $result append! $d;
+            } catch: {};
+        };
+    } catch: {
+        append-string ["<<< " . [get-content] " >>>"];
+        append-string "";
+        append-string "!!! Sorry, can't get file list. !!!"; #'
+        set-protect;
+        sets Modify <nil>;
+        return;
+    };
+    
+    od-n := ""; od-t := ""; od-s := "";
+    case $SortMode
+        "n" {
+            set getter {| s | $s get name};
+            set order >;
+            od-n := "<<";
+        }
+        "N" {
+            set getter {| s | $s get name};
+            set order <;
+            od-n := ">>";
+        }
+        "t" {
+            set getter {| s | $s get mtime};
+            set order >;
+            od-t := "<<";
+        }
+        "T" {
+            set getter {| s | $s get mtime};
+            set order <;
+            od-t := ">>";
+        }
+        "s" {
+            set getter {| s | $s get size};
+            set order >;
+            od-s := "<<";
+        }
+        "S" {
+            set getter {| s | $s get size};
+            set order <;
+            od-s := ">>";
+        }
+        default: {
+            set getter {| s | $s get name};
+            set order >;
+            od-n := "<<";
+        }
+    ;;
+    l ::= msort $dir-list getter: $getter order: $order;
+
+    append-string ["<<< " . [get-content] " >>>"];
+    append-string ["Filter: " . [$Filter literal]];
+    append-string "";
+    
+    s ::= $Fmt-s fmt
+            " "         ### edit flag
+            " "
+            "Perm"
+            "User"
+            "Group"
+            "Modify"
+            $od-t
+            $od-s
+            "Size"
+            "Name"
+            $od-n
+    ;;
+    append-string $s;
+    try {
+        $l filter {| d | $d,name =~ $Filter} : each do: {| d |
+            s ::= $Fmt fmt
+                " "         ### edit flag
+                $d,type
+                [mkperm $d,perm]
+                [if [$User set? $d,uid] $User,[$d get uid] $d,uid]
+                [if [$Group set? $d,gid] $Group,[$d get gid] $d,gid]
+                [strftime "%Y/%m/%d %H:%M" $d,mtime]
+                $d,size
+                ### [if {$d,type != "l"} $d,name [$d,name . " -> " $d,symbolic-link]]
+                $d,name
+            ;;
+            append-string $s;
+        };
+    } catch: {
+        append-string "";
+        append-string "!!! Sorry, can't filter, may be bad regex. !!!"; #'
+    };
+
+    set-protect;
+    sets Modify <nil>;
+};
+
+DiredBuffer method mkperm (p) {
+    result := "";
+    f ::= "%04o" fmt $p;
+    $result append! [$Perms get [$f at 1 : int]];
+    $result append! [$Perms get [$f at 2 : int]];
+    $result append! [$Perms get [$f at 3 : int]];
+    $result append! ",";
+    $result append! [$Bits  get [$f at 0 : int]];
+    return $result;
+};
+
+DiredBuffer method set-sort-order (o) {
+    sets SortMode $o;
+};
+
+DiredBuffer method set-filter (f) {
+    sets Filter $f;
+};
+
+DiredBuffer method get-filter () {
+    return $Filter;
 };
