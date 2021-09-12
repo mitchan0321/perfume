@@ -771,6 +771,10 @@ defcommand open-file {
                 BufferManager unregist-buffer "*Directory*";
 		return SELF;
             };
+            if {file dir? $path} {
+                dired-open $main $window $path;
+                return ALL;
+            };
 	    buff ::= new EditBuffer;
 	    (result err) ::= $buff load-content $path;
 	    $MainWindow bind-buffer [$window get-window-name] $buff;
@@ -833,6 +837,10 @@ defcommand view-file {
 		$MainWindow bind-buffer [$window get-window-name] $buff;
                 BufferManager unregist-buffer "*Directory*";
 		return SELF;
+            };
+            if {file dir? $path} {
+                dired-open $main $window $path;
+                return ALL;
             };
 	    buff ::= new EditBuffer;
 	    (result err) ::= $buff load-content $path;
@@ -978,9 +986,11 @@ defcommand save-buffer {
 	    };
 	    if {eq? $in-key CTRL_M} {
 		$main mini-input-end;
-		path ::= path-adjust [{[$value sub 0 1] = "/"} ???
-		    $value
-		    [get-current-buffer-dir $window : . "/" $value]];
+		path ::= path-adjust [
+                    {[$value sub 0 1] = "/"} ???
+                        $value
+                        [get-current-buffer-dir $window : . "/" $value]
+                ];
 
 		if [file exists? $path] {
 		    $main mini-input-start "" prompt: "File already exist, overwrite? [yes or ESC]: ";
@@ -1108,9 +1118,11 @@ defcommand save-buffer-as {
 	};
 	if {eq? $in-key CTRL_M} {
 	    $main mini-input-end;
-	    path ::= path-adjust [{[$value sub 0 1] = "/"} ???
-		$value
-		[get-current-buffer-dir $window : . "/" $value]];
+	    path ::= path-adjust [
+                {[$value sub 0 1] = "/"} ???
+		    $value
+                    [get-current-buffer-dir $window : . "/" $value]
+            ];
 
 	    if [file exists? $path] {
 	       $main mini-input-start "" prompt: "File already exist, overwrite? [yes or ESC]: ";
@@ -3291,6 +3303,182 @@ defcommand window-grow-upper {
         $main refresh-screen;
     };
     result ALL;
+};
+
+defcommand dired {
+    | main window |
+    dired-open $main $window [pwd];
+    return ALL;
+};
+
+defun dired-open (main window dir) {
+    buff ::= BufferManager get-buffer-by-path $dir;
+    if $buff {
+        $main bind-buffer [$window get-window-name] $buff;
+        return $buff;
+    };
+    buff ::= new DiredBuffer;
+    $buff load-content $dir;
+    $main bind-buffer [$window get-window-name] $buff;
+    return $buff;
+};
+
+defcommand dired-open {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    r ::= $buff get-buffer-line $ey;
+    if $r {
+        l ::= $r split sep: "|";
+        if {[$l len] >= 2} {
+            pos ::= [$l get 0 : len] + 1;
+            path ::= $buff get-path;
+            if {$path = "/"} {
+                path ::= path-adjust ["/" . [$r sub $pos]];
+            } {
+                path ::= path-adjust [$path . "/" [$r sub $pos]];
+            };
+            if {file dir? $path} {
+                new-buff ::= dired-open $main $window $path;
+                $new-buff set-previous-buffer [$buff get-buffer-name];
+            } {
+                if {file read? $path} {
+                    buff ::= BufferManager get-buffer-by-path $path;
+                    if $buff {
+                        $main bind-buffer [$window get-window-name] $buff;
+                        return SELF;
+                    };
+                    buff ::= new EditBuffer;
+                    (result err) ::= $buff load-content $path;
+                    $main bind-buffer [$window get-window-name] $buff;
+                    $result ?? {show-message :bell ["Open Failed, path: " . $value " ("  $err ")"]};
+                } {
+                    show-message :bell "File not readable.";
+                };
+            };
+        };
+    };
+    return ALL;
+};
+
+defcommand dired-link-back {
+    | main window |
+    buff ::= $window get-buffer;
+    prev-buff-name ::= $buff get-previous-buffer;
+    if $prev-buff-name {
+        prev-buff ::= BufferManager find-buffer $prev-buff-name;
+        if $prev-buff {
+            $main bind-buffer [$window get-window-name] $prev-buff;
+        } {
+            show-message :bell ["No found previous buffer, \'" . $prev-buff-name "\'."];
+        };
+    } {
+        show-message :bell "No set previous buffer.";
+    };
+    result ALL;
+};
+
+defcommand dired-cursor-up {
+    | main window |
+    $window move-up;
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    r ::= $buff get-buffer-line $ey;
+    if $r {
+        l ::= $r split sep: "|";
+        if {[$l len] >= 2} {
+            $geom set! IndexColumn.SAVE [[$l get 0 : len] + 1];
+            $window set-freecursor <nil>;
+        };
+    };
+    return ALL;
+};
+
+defcommand dired-cursor-down {
+    | main window |
+    $window move-down;
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    r ::= $buff get-buffer-line $ey;
+    if $r {
+        l ::= $r split sep: "|";
+        if {[$l len] >= 2} {
+            $geom set! IndexColumn.SAVE [[$l get 0 : len] + 1];
+            $window set-freecursor <nil>;
+        };
+    };
+    return ALL;
+};
+
+defcommand dired-sort-by-name-ascending {
+    | main window |
+    buff ::= $window get-buffer;
+    $buff set-sort-order "n";
+    $buff update;
+    return ALL;
+};
+
+defcommand dired-sort-by-name-descending {
+    | main window |
+    buff ::= $window get-buffer;
+    $buff set-sort-order "N";
+    $buff update;
+    return ALL;
+};
+
+defcommand dired-sort-by-time-ascending {
+    | main window |
+    buff ::= $window get-buffer;
+    $buff set-sort-order "t";
+    $buff update;
+    return ALL;
+};
+
+defcommand dired-sort-by-time-descending {
+    | main window |
+    buff ::= $window get-buffer;
+    $buff set-sort-order "T";
+    $buff update;
+    return ALL;
+};
+
+defcommand dired-sort-by-size-ascending {
+    | main window |
+    buff ::= $window get-buffer;
+    $buff set-sort-order "s";
+    $buff update;
+    return ALL;
+};
+
+defcommand dired-sort-by-size-descending {
+    | main window |
+    buff ::= $window get-buffer;
+    $buff set-sort-order "S";
+    $buff update;
+    return ALL;
+};
+
+defcommand dired-filter {
+    | main window |
+    buff ::= $window get-buffer;
+    $main mini-input-start [$buff get-filter : string] prompt: "Filter: ";
+    $main add-mini-input-callback $window {| main window in-key value |
+        if {eq? $in-key KEY_ESC} {
+	    $main mini-input-end;
+	    show-message "Canceled.";
+            return ALL;
+        };
+        if {eq? $in-key CTRL_M} {
+            $main mini-input-end;
+            $buff set-filter [$value rquote];
+            $buff update;
+            return ALL;
+        };
+    };
+    return ALL;
 };
 
 defcommand guru-guru {
