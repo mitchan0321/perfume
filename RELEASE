@@ -1980,4 +1980,9 @@
 		Change mini-input fg/bg color.
 		Change pmacs.prfm coding style.
 
+2021/09/14
+	pmacs update:
+		Change dired sym link display format.
+		Change man buffer name '*Man xxx*' -> 'Man=xxx'.
+
 #eof
