@@ -1969,4 +1969,13 @@
 		Change open-file, view-file if specified a directory at mini-input, open dired.
 		Fix WUtile::get-current-buffer-dir.
 
+2021/09/13
+	pmacs update:
+		Add EditBuffer::get-content-dir for buffer's content path convert to
+		  content directory.
+		Add ScratchBuffer::get-content-dir for return pinterp current directory.
+		Change editor command grep, use initial grep directory get from buffer's
+		  content directory path use get-content-dir method.
+		Change file name lib/theme-color.prfm to lib/pmacs-theme.prfm.
+
 #eof
