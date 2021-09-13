@@ -2965,7 +2965,7 @@ defcommand man {
 };
 
 defun exec-man (main window value) {
-    buff-name ::= "*Man " . $value "*";
+    buff-name ::= "Man=" . $value;
     man-buff ::= BufferManager find-buffer $buff-name;
     if $man-buff else: {
         os ::= new Stream;
@@ -3334,12 +3334,12 @@ defcommand dired-open {
     if $r {
         l ::= $r split sep: "|";
         if {[$l len] >= 2} {
-            pos ::= [$l get 0 : len] + 1;
+            name ::= $l get 1;
             path ::= $buff get-path;
             if {$path = "/"} {
-                path ::= path-adjust ["/" . [$r sub $pos]];
+                path ::= path-adjust ["/" . $name];
             } {
-                path ::= path-adjust [$path . "/" [$r sub $pos]];
+                path ::= path-adjust [$path . "/" $name];
             };
             if {file dir? $path} {
                 new-buff ::= dired-open $main $window $path;
