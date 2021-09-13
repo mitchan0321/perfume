@@ -1,0 +1,257 @@
+#  Define color pair data base.
+#  The pair is in order foreground color, background color.
+#
+#  Color names are defined in curses library like following this:
+#	WUtil::ColorName set BLACK   0;
+#	WUtil::ColorName set RED     1;
+#	WUtil::ColorName set GREEN   2;
+#	WUtil::ColorName set YELLOW  3;
+#	WUtil::ColorName set BLUE    4;
+#	WUtil::ColorName set MAGENTA 5;
+#	WUtil::ColorName set CYAN    6;
+#	WUtil::ColorName set WHITE   7;
+
+$ColorDB set BLACK.BLACK     [WUtil color-pair BLACK   BLACK   ];
+$ColorDB set BLACK.RED       [WUtil color-pair BLACK   RED     ];
+$ColorDB set BLACK.GREEN     [WUtil color-pair BLACK   GREEN   ];
+$ColorDB set BLACK.YELLOW    [WUtil color-pair BLACK   YELLOW  ];
+$ColorDB set BLACK.BLUE      [WUtil color-pair BLACK   BLUE    ];
+$ColorDB set BLACK.MAGENTA   [WUtil color-pair BLACK   MAGENTA ];
+$ColorDB set BLACK.CYAN      [WUtil color-pair BLACK   CYAN    ];
+$ColorDB set BLACK.WHITE     [WUtil color-pair BLACK   WHITE   ];
+$ColorDB set RED.BLACK       [WUtil color-pair RED     BLACK   ];
+$ColorDB set RED.RED         [WUtil color-pair RED     RED     ];
+$ColorDB set RED.GREEN       [WUtil color-pair RED     GREEN   ];
+$ColorDB set RED.YELLOW      [WUtil color-pair RED     YELLOW  ];
+$ColorDB set RED.BLUE        [WUtil color-pair RED     BLUE    ];
+$ColorDB set RED.MAGENTA     [WUtil color-pair RED     MAGENTA ];
+$ColorDB set RED.CYAN        [WUtil color-pair RED     CYAN    ];
+$ColorDB set RED.WHITE       [WUtil color-pair RED     WHITE   ];
+$ColorDB set GREEN.BLACK     [WUtil color-pair GREEN   BLACK   ];
+$ColorDB set GREEN.RED       [WUtil color-pair GREEN   RED     ];
+$ColorDB set GREEN.GREEN     [WUtil color-pair GREEN   GREEN   ];
+$ColorDB set GREEN.YELLOW    [WUtil color-pair GREEN   YELLOW  ];
+$ColorDB set GREEN.BLUE      [WUtil color-pair GREEN   BLUE    ];
+$ColorDB set GREEN.MAGENTA   [WUtil color-pair GREEN   MAGENTA ];
+$ColorDB set GREEN.CYAN      [WUtil color-pair GREEN   CYAN    ];
+$ColorDB set GREEN.WHITE     [WUtil color-pair GREEN   WHITE   ];
+$ColorDB set YELLOW.BLACK    [WUtil color-pair YELLOW  BLACK   ];
+$ColorDB set YELLOW.RED      [WUtil color-pair YELLOW  RED     ];
+$ColorDB set YELLOW.GREEN    [WUtil color-pair YELLOW  GREEN   ];
+$ColorDB set YELLOW.YELLOW   [WUtil color-pair YELLOW  YELLOW  ];
+$ColorDB set YELLOW.BLUE     [WUtil color-pair YELLOW  BLUE    ];
+$ColorDB set YELLOW.MAGENTA  [WUtil color-pair YELLOW  MAGENTA ];
+$ColorDB set YELLOW.CYAN     [WUtil color-pair YELLOW  CYAN    ];
+$ColorDB set YELLOW.WHITE    [WUtil color-pair YELLOW  WHITE   ];
+$ColorDB set BLUE.BLACK      [WUtil color-pair BLUE    BLACK   ];
+$ColorDB set BLUE.RED        [WUtil color-pair BLUE    RED     ];
+$ColorDB set BLUE.GREEN      [WUtil color-pair BLUE    GREEN   ];
+$ColorDB set BLUE.YELLOW     [WUtil color-pair BLUE    YELLOW  ];
+$ColorDB set BLUE.BLUE       [WUtil color-pair BLUE    BLUE    ];
+$ColorDB set BLUE.MAGENTA    [WUtil color-pair BLUE    MAGENTA ];
+$ColorDB set BLUE.CYAN       [WUtil color-pair BLUE    CYAN    ];
+$ColorDB set BLUE.WHITE      [WUtil color-pair BLUE    WHITE   ];
+$ColorDB set MAGENTA.BLACK   [WUtil color-pair MAGENTA BLACK   ];
+$ColorDB set MAGENTA.RED     [WUtil color-pair MAGENTA RED     ];
+$ColorDB set MAGENTA.GREEN   [WUtil color-pair MAGENTA GREEN   ];
+$ColorDB set MAGENTA.YELLOW  [WUtil color-pair MAGENTA YELLOW  ];
+$ColorDB set MAGENTA.BLUE    [WUtil color-pair MAGENTA BLUE    ];
+$ColorDB set MAGENTA.MAGENTA [WUtil color-pair MAGENTA MAGENTA ];
+$ColorDB set MAGENTA.CYAN    [WUtil color-pair MAGENTA CYAN    ];
+$ColorDB set MAGENTA.WHITE   [WUtil color-pair MAGENTA WHITE   ];
+$ColorDB set CYAN.BLACK      [WUtil color-pair CYAN    BLACK   ];
+$ColorDB set CYAN.RED        [WUtil color-pair CYAN    RED     ];
+$ColorDB set CYAN.GREEN      [WUtil color-pair CYAN    GREEN   ];
+$ColorDB set CYAN.YELLOW     [WUtil color-pair CYAN    YELLOW  ];
+$ColorDB set CYAN.BLUE       [WUtil color-pair CYAN    BLUE    ];
+$ColorDB set CYAN.MAGENTA    [WUtil color-pair CYAN    MAGENTA ];
+$ColorDB set CYAN.CYAN       [WUtil color-pair CYAN    CYAN    ];
+$ColorDB set CYAN.WHITE      [WUtil color-pair CYAN    WHITE   ];
+$ColorDB set WHITE.BLACK     [WUtil color-pair WHITE   BLACK   ];
+$ColorDB set WHITE.RED       [WUtil color-pair WHITE   RED     ];
+$ColorDB set WHITE.GREEN     [WUtil color-pair WHITE   GREEN   ];
+$ColorDB set WHITE.YELLOW    [WUtil color-pair WHITE   YELLOW  ];
+$ColorDB set WHITE.BLUE      [WUtil color-pair WHITE   BLUE    ];
+$ColorDB set WHITE.MAGENTA   [WUtil color-pair WHITE   MAGENTA ];
+$ColorDB set WHITE.CYAN      [WUtil color-pair WHITE   CYAN    ];
+$ColorDB set WHITE.WHITE     [WUtil color-pair WHITE   WHITE   ];
+
+case $THEME
+LIGHT {
+    $ColorDB set EDIT_BUFFER                [WUtil color-pair BLACK   WHITE   ];
+    $ColorDB set ACTIVE_STATUS_LINE         [WUtil color-pair WHITE   BLUE    ];
+    $ColorDB set ACTIVE_STATUS_LINE_PROTECT [WUtil color-pair BLACK   GREEN   ];
+    $ColorDB set ACTIVE_VERT_LINE           [WUtil color-pair WHITE   BLUE    ];
+    $ColorDB set ACTIVE_VERT_LINE_PROTECT   [WUtil color-pair WHITE   BLUE    ];
+    $ColorDB set ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair WHITE   CYAN    ];
+    $ColorDB set INACTIVE_EDIT_BUFFER       [WUtil color-pair BLACK   WHITE   ];
+    $ColorDB set INACTIVE_STATUS_LINE       [WUtil color-pair YELLOW  BLACK   ];
+    $ColorDB set INACTIVE_VERT_LINE         [WUtil color-pair BLUE    BLACK   ];
+    $ColorDB set INACTIVE_VERT_LINE_HILIGHT [WUtil color-pair YELLOW  BLACK   ];
+    $ColorDB set MINI_WINDOW                [WUtil color-pair BLACK   WHITE   ];
+    $ColorDB set ACTIVE_MINI_WINDOW         [WUtil color-pair BLACK   YELLOW  ];
+    $ColorDB set EOF_MARK                   [WUtil color-pair WHITE   YELLOW  ];
+    $ColorDB set REGION_HILIGHT             [WUtil color-pair WHITE   MAGENTA ];
+    $ColorDB set SEARCH_CURRENT_HILIGHT     [WUtil color-pair WHITE   RED     ];
+    $ColorDB set SEARCH_HILIGHT             [WUtil color-pair BLACK   YELLOW  ];
+    $ColorDB set RESERVED_WORD_HILIGHT      [WUtil color-pair BLUE    WHITE   ];
+    $ColorDB set STRING_LITERAL_HILIGHT     [WUtil color-pair RED     WHITE   ];
+    $ColorDB set VALUE_LITERAL_HILIGHT      [WUtil color-pair MAGENTA WHITE   ];
+    $ColorDB set DATATYPE_HILIGHT           [WUtil color-pair GREEN   WHITE   ];
+    $ColorDB set COMMENT_HILIGHT            [WUtil color-pair YELLOW  WHITE   ];
+    $ColorDB set ALERT_HILIGHT              [WUtil color-pair RED     WHITE   ];
+    $ColorDB set PWIKI_LINK                 [WUtil color-pair BLUE    WHITE   ];
+    $ColorDB set DIRED_DIRECTORY            [WUtil color-pair BLUE    WHITE   ];
+    $ColorDB set DIRED_SYMLINK              [WUtil color-pair MAGENTA WHITE   ];
+    $ColorDB set DIRED_DEV                  [WUtil color-pair YELLOW  WHITE   ];
+}
+
+DARK {
+    $ColorDB set EDIT_BUFFER                [WUtil color-pair WHITE   BLACK   ];
+    $ColorDB set ACTIVE_STATUS_LINE         [WUtil color-pair BLACK   WHITE   ];
+    $ColorDB set ACTIVE_STATUS_LINE_PROTECT [WUtil color-pair BLACK   YELLOW  ];
+    $ColorDB set ACTIVE_VERT_LINE           [WUtil color-pair BLACK   WHITE   ];
+    $ColorDB set ACTIVE_VERT_LINE_PROTECT   [WUtil color-pair BLACK   WHITE   ];
+    $ColorDB set ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair WHITE   CYAN    ];
+    $ColorDB set INACTIVE_EDIT_BUFFER       [WUtil color-pair WHITE   BLACK   ];
+    $ColorDB set INACTIVE_STATUS_LINE       [WUtil color-pair CYAN    BLUE    ];
+    $ColorDB set INACTIVE_VERT_LINE         [WUtil color-pair BLACK   BLUE    ];
+    $ColorDB set INACTIVE_VERT_LINE_HILIGHT [WUtil color-pair CYAN    BLUE    ];
+    $ColorDB set MINI_WINDOW                [WUtil color-pair WHITE   BLACK   ];
+    $ColorDB set ACTIVE_MINI_WINDOW         [WUtil color-pair WHITE   BLACK   ];
+    $ColorDB set EOF_MARK                   [WUtil color-pair BLACK   GREEN   ];
+    $ColorDB set REGION_HILIGHT             [WUtil color-pair WHITE   BLUE    ];
+    $ColorDB set SEARCH_CURRENT_HILIGHT     [WUtil color-pair WHITE   RED     ];
+    $ColorDB set SEARCH_HILIGHT             [WUtil color-pair BLACK   YELLOW  ];
+    $ColorDB set RESERVED_WORD_HILIGHT      [WUtil color-pair YELLOW  BLACK   ];
+    $ColorDB set STRING_LITERAL_HILIGHT     [WUtil color-pair RED     BLACK   ];
+    $ColorDB set VALUE_LITERAL_HILIGHT      [WUtil color-pair CYAN    BLACK   ];
+    $ColorDB set DATATYPE_HILIGHT           [WUtil color-pair GREEN   BLACK   ];
+    $ColorDB set COMMENT_HILIGHT            [WUtil color-pair MAGENTA BLACK   ];
+    $ColorDB set ALERT_HILIGHT              [WUtil color-pair RED     BLACK   ];
+    $ColorDB set PWIKI_LINK                 [WUtil color-pair CYAN    BLACK   ];
+    $ColorDB set DIRED_DIRECTORY            [WUtil color-pair BLUE    BLACK   ];
+    $ColorDB set DIRED_SYMLINK              [WUtil color-pair MAGENTA BLACK   ];
+    $ColorDB set DIRED_DEV                  [WUtil color-pair YELLOW  BLACK   ];
+}
+
+BLUE-BACK {
+    $ColorDB set EDIT_BUFFER                [WUtil color-pair WHITE   BLUE    ];
+    $ColorDB set ACTIVE_STATUS_LINE         [WUtil color-pair BLACK   WHITE   ];
+    $ColorDB set ACTIVE_STATUS_LINE_PROTECT [WUtil color-pair BLACK   YELLOW  ];
+    $ColorDB set ACTIVE_VERT_LINE           [WUtil color-pair BLACK   WHITE   ];
+    $ColorDB set ACTIVE_VERT_LINE_PROTECT   [WUtil color-pair BLACK   WHITE   ];
+    $ColorDB set ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair WHITE   CYAN    ];
+    $ColorDB set INACTIVE_EDIT_BUFFER       [WUtil color-pair WHITE   BLUE    ];
+    $ColorDB set INACTIVE_STATUS_LINE       [WUtil color-pair WHITE   BLACK   ];
+    $ColorDB set INACTIVE_VERT_LINE         [WUtil color-pair BLACK   BLACK   ];
+    $ColorDB set INACTIVE_VERT_LINE_HILIGHT [WUtil color-pair BLACK   CYAN    ];
+    $ColorDB set MINI_WINDOW                [WUtil color-pair WHITE   BLACK   ];
+    $ColorDB set ACTIVE_MINI_WINDOW         [WUtil color-pair WHITE   BLACK   ];
+    $ColorDB set EOF_MARK                   [WUtil color-pair BLACK   GREEN   ];
+    $ColorDB set REGION_HILIGHT             [WUtil color-pair BLACK   CYAN    ];
+    $ColorDB set SEARCH_CURRENT_HILIGHT     [WUtil color-pair WHITE   RED     ];
+    $ColorDB set SEARCH_HILIGHT             [WUtil color-pair BLACK   YELLOW  ];
+    $ColorDB set RESERVED_WORD_HILIGHT      [WUtil color-pair YELLOW  BLUE    ];
+    $ColorDB set STRING_LITERAL_HILIGHT     [WUtil color-pair RED     BLUE    ];
+    $ColorDB set VALUE_LITERAL_HILIGHT      [WUtil color-pair CYAN    BLUE    ];
+    $ColorDB set DATATYPE_HILIGHT           [WUtil color-pair GREEN   BLUE    ];
+    $ColorDB set COMMENT_HILIGHT            [WUtil color-pair BLACK   BLUE    ];
+    $ColorDB set ALERT_HILIGHT              [WUtil color-pair RED     BLUE    ];
+    $ColorDB set PWIKI_LINK                 [WUtil color-pair BLACK   CYAN    ];
+    $ColorDB set DIRED_DIRECTORY            [WUtil color-pair YELLOW  BLUE    ];
+    $ColorDB set DIRED_SYMLINK              [WUtil color-pair MAGENTA BLUE    ];
+    $ColorDB set DIRED_DEV                  [WUtil color-pair YELLOW  BLUE    ];
+}
+
+RETRO {
+    $ColorDB set EDIT_BUFFER                [WUtil color-pair WHITE   BLACK   ];
+    $ColorDB set ACTIVE_STATUS_LINE         [WUtil color-pair BLACK   GREEN   ];
+    $ColorDB set ACTIVE_STATUS_LINE_PROTECT [WUtil color-pair BLACK   YELLOW  ];
+    $ColorDB set ACTIVE_VERT_LINE           [WUtil color-pair BLACK   GREEN   ];
+    $ColorDB set ACTIVE_VERT_LINE_PROTECT   [WUtil color-pair BLACK   GREEN   ];
+    $ColorDB set ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair GREEN   BLACK   ];
+    $ColorDB set INACTIVE_EDIT_BUFFER       [WUtil color-pair GREEN   BLACK   ];
+    $ColorDB set INACTIVE_STATUS_LINE       [WUtil color-pair WHITE   BLUE    ];
+    $ColorDB set INACTIVE_VERT_LINE         [WUtil color-pair BLACK   BLUE    ];
+    $ColorDB set INACTIVE_VERT_LINE_HILIGHT [WUtil color-pair BLUE    BLACK   ];
+    $ColorDB set MINI_WINDOW                [WUtil color-pair GREEN   BLACK   ];
+    $ColorDB set ACTIVE_MINI_WINDOW         [WUtil color-pair GREEN   BLACK   ];
+    $ColorDB set EOF_MARK                   [WUtil color-pair BLACK   YELLOW  ];
+    $ColorDB set REGION_HILIGHT             [WUtil color-pair WHITE   BLUE    ];
+    $ColorDB set SEARCH_CURRENT_HILIGHT     [WUtil color-pair WHITE   RED     ];
+    $ColorDB set SEARCH_HILIGHT             [WUtil color-pair BLACK   YELLOW  ];
+    $ColorDB set RESERVED_WORD_HILIGHT      [WUtil color-pair YELLOW  BLACK   ];
+    $ColorDB set STRING_LITERAL_HILIGHT     [WUtil color-pair RED     BLACK   ];
+    $ColorDB set VALUE_LITERAL_HILIGHT      [WUtil color-pair CYAN    BLACK   ];
+    $ColorDB set DATATYPE_HILIGHT           [WUtil color-pair GREEN   BLACK   ];
+    $ColorDB set COMMENT_HILIGHT            [WUtil color-pair MAGENTA BLACK   ];
+    $ColorDB set ALERT_HILIGHT              [WUtil color-pair RED     BLACK   ];
+    $ColorDB set PWIKI_LINK                 [WUtil color-pair BLACK   GREEN   ];
+    $ColorDB set DIRED_DIRECTORY            [WUtil color-pair BLUE    BLACK   ];
+    $ColorDB set DIRED_SYMLINK              [WUtil color-pair MAGENTA BLACK   ];
+    $ColorDB set DIRED_DEV                  [WUtil color-pair YELLOW  BLACK   ];
+}
+
+MONO {
+    $ColorDB set EDIT_BUFFER                [WUtil color-pair WHITE   BLACK   ];
+    $ColorDB set ACTIVE_STATUS_LINE         [WUtil color-pair BLACK   WHITE   ];
+    $ColorDB set ACTIVE_STATUS_LINE_PROTECT [WUtil color-pair BLACK   WHITE   ];
+    $ColorDB set ACTIVE_VERT_LINE           [WUtil color-pair BLACK   WHITE   ];
+    $ColorDB set ACTIVE_VERT_LINE_PROTECT   [WUtil color-pair BLACK   WHITE   ];
+    $ColorDB set ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair WHITE   BLACK   ];
+    $ColorDB set INACTIVE_EDIT_BUFFER       [WUtil color-pair WHITE   BLACK   ];
+    $ColorDB set INACTIVE_STATUS_LINE       [WUtil color-pair WHITE   BLACK   ];
+    $ColorDB set INACTIVE_VERT_LINE         [WUtil color-pair BLACK   WHITE   ];
+    $ColorDB set INACTIVE_VERT_LINE_HILIGHT [WUtil color-pair WHITE   BLACK   ];
+    $ColorDB set MINI_WINDOW                [WUtil color-pair WHITE   BLACK   ];
+    $ColorDB set ACTIVE_MINI_WINDOW         [WUtil color-pair WHITE   BLACK   ];
+    $ColorDB set EOF_MARK                   [WUtil color-pair BLACK   WHITE   ];
+    $ColorDB set REGION_HILIGHT             [WUtil color-pair BLACK   WHITE   ];
+    $ColorDB set SEARCH_CURRENT_HILIGHT     [WUtil color-pair BLACK   WHITE   ];
+    $ColorDB set SEARCH_HILIGHT             [WUtil color-pair WHITE   BLACK   ];
+    $ColorDB set RESERVED_WORD_HILIGHT      [WUtil color-pair WHITE   BLACK   ];
+    $ColorDB set STRING_LITERAL_HILIGHT     [WUtil color-pair WHITE   BLACK   ];
+    $ColorDB set VALUE_LITERAL_HILIGHT      [WUtil color-pair WHITE   BLACK   ];
+    $ColorDB set DATATYPE_HILIGHT           [WUtil color-pair WHITE   BLACK   ];
+    $ColorDB set COMMENT_HILIGHT            [WUtil color-pair WHITE   BLACK   ];
+    $ColorDB set ALERT_HILIGHT              [WUtil color-pair BLACK   WHITE   ];
+    $ColorDB set PWIKI_LINK                 [WUtil color-pair BLACK   WHITE   ];
+    $ColorDB set DIRED_DIRECTORY            [WUtil color-pair WHITE   BLACK   ];
+    $ColorDB set DIRED_SYMLINK              [WUtil color-pair WHITE   BLACK   ];
+    $ColorDB set DIRED_DEV                  [WUtil color-pair WHITE   BLACK   ];
+}
+
+MONO-GREEN {
+    $ColorDB set EDIT_BUFFER                [WUtil color-pair GREEN   BLACK   ];
+    $ColorDB set ACTIVE_STATUS_LINE         [WUtil color-pair BLACK   GREEN   ];
+    $ColorDB set ACTIVE_STATUS_LINE_PROTECT [WUtil color-pair BLACK   GREEN   ];
+    $ColorDB set ACTIVE_VERT_LINE           [WUtil color-pair BLACK   GREEN   ];
+    $ColorDB set ACTIVE_VERT_LINE_PROTECT   [WUtil color-pair BLACK   GREEN   ];
+    $ColorDB set ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair GREEN   BLACK   ];
+    $ColorDB set INACTIVE_EDIT_BUFFER       [WUtil color-pair GREEN   BLACK   ];
+    $ColorDB set INACTIVE_STATUS_LINE       [WUtil color-pair GREEN   BLACK   ];
+    $ColorDB set INACTIVE_VERT_LINE         [WUtil color-pair BLACK   GREEN   ];
+    $ColorDB set INACTIVE_VERT_LINE_HILIGHT [WUtil color-pair GREEN   BLACK   ];
+    $ColorDB set MINI_WINDOW                [WUtil color-pair GREEN   BLACK   ];
+    $ColorDB set ACTIVE_MINI_WINDOW         [WUtil color-pair GREEN   BLACK   ];
+    $ColorDB set EOF_MARK                   [WUtil color-pair BLACK   GREEN   ];
+    $ColorDB set REGION_HILIGHT             [WUtil color-pair BLACK   GREEN   ];
+    $ColorDB set SEARCH_CURRENT_HILIGHT     [WUtil color-pair BLACK   GREEN   ];
+    $ColorDB set SEARCH_HILIGHT             [WUtil color-pair GREEN   BLACK   ];
+    $ColorDB set RESERVED_WORD_HILIGHT      [WUtil color-pair GREEN   BLACK   ];
+    $ColorDB set STRING_LITERAL_HILIGHT     [WUtil color-pair GREEN   BLACK   ];
+    $ColorDB set VALUE_LITERAL_HILIGHT      [WUtil color-pair GREEN   BLACK   ];
+    $ColorDB set DATATYPE_HILIGHT           [WUtil color-pair GREEN   BLACK   ];
+    $ColorDB set COMMENT_HILIGHT            [WUtil color-pair GREEN   BLACK   ];
+    $ColorDB set ALERT_HILIGHT              [WUtil color-pair BLACK   GREEN   ];
+    $ColorDB set PWIKI_LINK                 [WUtil color-pair BLACK   GREEN   ];
+    $ColorDB set DIRED_DIRECTORY            [WUtil color-pair GREEN   BLACK   ];
+    $ColorDB set DIRED_SYMLINK              [WUtil color-pair GREEN   BLACK   ];
+    $ColorDB set DIRED_DEV                  [WUtil color-pair GREEN   BLACK   ];
+}
+
+default: {result <nil>}
+;;
+
+[result :last] ?? {throw ErrNoTheme "Not defined theme."};
