@@ -94,8 +94,8 @@ defun init-color-DB () {
     };
 
     $LIB_PATH each do: {| i |
-	if {file exists? [$i . "/theme-color.prfm"]} {
-	    load :notrace [$i . "/theme-color.prfm"];
+	if {file exists? [$i . "/pmacs-theme.prfm"]} {
+	    load :notrace [$i . "/pmacs-theme.prfm"];
 	    break;
 	};
     };

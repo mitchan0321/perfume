@@ -17,7 +17,7 @@ DiredBuffer.prfm
 WUtil.prfm
 Window.prfm
 WindowBase.prfm
-theme-color.prfm
+pmacs-theme.prfm
 pmacs.conf
 pmacs.prfm
 pmacs.files
