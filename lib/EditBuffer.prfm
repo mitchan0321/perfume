@@ -538,6 +538,13 @@ EditBuffer method get-content () {
     return <nil>;
 };
 
+EditBuffer method get-content-dir () {
+    dir ::= path-adjust [get-content];
+    if [file dir? $dir] {return $dir};
+    dir ::= path-adjust [$dir . "/.."];
+    return $dir;
+};
+
 EditBuffer method set-previous-buffer (buffer-name) {
     sets PreviousBuffer $buffer-name;
 };

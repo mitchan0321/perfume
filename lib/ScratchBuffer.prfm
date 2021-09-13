@@ -33,3 +33,7 @@ ScratchBuffer method init () {
 ScratchBuffer method load-content (path) {
     return (<t> "");
 };
+
+ScratchBuffer method get-content-dir () {
+    return [pwd];
+};

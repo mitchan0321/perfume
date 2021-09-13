@@ -2426,7 +2426,9 @@ defcommand goto-unmark {
 
 defcommand grep {
     | main window |
-    $main mini-input-start [pwd : . "/"] prompt: "Directory: ";
+    buff ::= $window get-buffer;
+    dir ::= $buff get-content-dir;
+    $main mini-input-start $dir prompt: "Directory: ";
     $main add-mini-input-callback $window {| main window in-key value |
         if {eq? $in-key KEY_ESC} {
             $main mini-input-end;
