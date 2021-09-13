@@ -4,6 +4,7 @@ modules := (
     BufferBase
     EditBuffer
     ScratchBuffer
+    DiredBuffer
     Window
     WindowBase
     CombiWindow
@@ -97,7 +98,7 @@ defun pmacs (trace: t) {
                         };
                     }
                     catch: {| e |
-                        show-message :bell ["Can\'t read logo file, " . [$e cdr]]; ### '
+                        show-message :bell ["Can\'t read logo file, " . [$e cdr]]; ###']
                     }
                     fin: {
                         $f close;
