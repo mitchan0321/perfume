@@ -1977,5 +1977,7 @@
 		Change editor command grep, use initial grep directory get from buffer's
 		  content directory path use get-content-dir method.
 		Change file name lib/theme-color.prfm to lib/pmacs-theme.prfm.
+		Change mini-input fg/bg color.
+		Change pmacs.prfm coding style.
 
 #eof
