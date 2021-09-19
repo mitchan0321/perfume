@@ -97,6 +97,7 @@ Stream method puts-sub (i lnewline) {
 	    if $lnewline {
 	        sets shortcut [$shortcut append! $i];
 	        $count ++;
+                sets itemcount 0;
 	    } {
 	        if {string? [$shortcut last : car]} {
 		    $shortcut last : car : append! $i;
@@ -111,6 +112,7 @@ Stream method puts-sub (i lnewline) {
 	    if $lnewline {
 	        sets shortcut [$queue append! $i];
 	        $count ++;
+                sets itemcount 0;
 	    } {
 	        sets shortcut [$queue append! ["" . $i]];
 	        $count ++;
@@ -120,6 +122,10 @@ Stream method puts-sub (i lnewline) {
     };
 
     return <t>;
+};
+
+Stream method in-pooling? () {
+    and {$itemcount > 0} {$itemcount < $itemlimit};
 };
 
 Stream method gets (nonewline: nonewline) {
