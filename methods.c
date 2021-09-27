@@ -3898,7 +3898,7 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 	    }
 	}
 	
-	if ('\n' == c) {
+	if (('\n' == c) || ('\r' == c)) {
 	    Cell *c = decode_raw_to_unicode(cbuff, f->input_encoding, enc_error_info);
 	    if (NULL == c) {
 		return new_exception(TE_BADENCODEBYTE, enc_error_info->message, interp);
