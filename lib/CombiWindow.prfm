@@ -1275,3 +1275,7 @@ CombiWindow method unmark () {
 CombiWindow method get-cursor-position () {
     curs-get-cursor [get-curs];
 };
+
+CombiWindow method set-color (line column length color-name attr) {
+    curs-color $BufferCurs $line $column $length $color-name $attr;
+};

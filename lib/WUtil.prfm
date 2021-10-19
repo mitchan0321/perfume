@@ -192,6 +192,13 @@ defun show-message (msg wait: msec bell: bell) {
 	try {
             [$MainWindow get-minibuffer-window] ?? {throw ErrNoMiniBuffer "No MiniBuffer for debugging."};
             $MainWindow display-window-message "MiniBuffer" $msg;
+            if [true? bell] {
+                $MainWindow get-minibuffer-window : 
+                    set-color
+                        0 0
+                        [$MainWindow get-screen-size : get 1]
+                        $ColorDB,MINI_CAUTION 0;
+            };
             $MainWindow get-minibuffer-window : refresh;
             if [true? bell] {
                 curs-flash;

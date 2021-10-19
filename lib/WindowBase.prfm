@@ -67,6 +67,10 @@ WindowBase method destroy (*) {
     throw ErrNoMethodImpl ["No Impliment method '" . $@name "::destroy'."];
 };
 
+WindowBase method set-color (*) {
+    throw ErrNoMethodImpl ["No Impliment method '" . $@name "::set-color'."];
+};
+
 WindowBase method string () {
     return ["<" . [get-window-name] ">"];
 };

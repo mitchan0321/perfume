@@ -125,3 +125,7 @@ MiniWindow method destroy () {
     curs-destroy-window $MiniCurs;
     sets MiniCurs <nil>;
 };
+
+MiniWindow method set-color (line column length color-name attr) {
+    curs-color $MiniCurs $line $column $length $color-name $attr;
+};

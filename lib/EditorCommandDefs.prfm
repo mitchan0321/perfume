@@ -1203,6 +1203,7 @@ defcommand key-binding-list {
 
     $buff append-string "<<< Key bindings >>>";
     $buff append-string ["Buffer mode: " . $mode];
+    $buff append-string "";
     $buff append-string ["%-15v %28v %-v" fmt  "Key group"     "Key modifier"  "Command"];
     $buff append-string ["%-15v %28v %-v" fmt ["-" repeat 15] ["-" repeat 28] ["-" repeat 38]];
     d ::= $window get KeyBinding;
