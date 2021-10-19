@@ -1994,4 +1994,10 @@
 		PRFM_20210920_N33
 		1.5.9
 
+2021/10/19
+	pmacs update:
+		Change key-binding-list format a few.
+		Add WindowBase::set-color method.
+		Change show-message if set param bell: message color use MINI_CAUTION.
+
 #eof
