@@ -1998,6 +1998,6 @@
 	pmacs update:
 		Change key-binding-list format a few.
 		Add WindowBase::set-color method.
-		Change show-message if set param bell: message color use MINI_CAUTION.
+		Change show-message messages color use MINI_CAUTION if set parameter 'bell:'.
 
 #eof
