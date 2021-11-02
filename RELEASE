@@ -2000,4 +2000,8 @@
 		Add WindowBase::set-color method.
 		Change show-message messages color use MINI_CAUTION if set parameter 'bell:'.
 
+2021/11/02
+	pmacs update:
+		Fix start logo display buf when window width less than logo width.
+
 #eof

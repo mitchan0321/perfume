@@ -79,7 +79,7 @@ defun pmacs (trace: t) {
                         $x -- 1;
                         marginx ::= $x - $LOGO_WIDTH : / 2;
                         if {$marginx < 0} {
-                            marginxs := 0;
+                            marginxs := "";
                         } {
                             marginxs ::= " " repeat $marginx;
                         };
