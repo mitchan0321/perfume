@@ -6,9 +6,9 @@ EditBuffer method init () {
 };
 
 EditBuffer method init-constructor () {
-    sets Src <nil>;
+    sets Src [vector];
     sets File <nil>;
-    sets BufferName <nil>;
+    sets BufferName "*no named*";
     sets Modify <nil>;
     sets NewFile <nil>;
     sets UndoBuffer ();
