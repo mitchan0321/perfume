@@ -2004,4 +2004,11 @@
 	pmacs update:
 		Fix start logo display buf when window width less than logo width.
 
+2021/11/11
+	pmacs update:
+		Change EditBuffer::init construct same as called init-constructor :init-only result.
+	tag: 
+		PRFM_20211111
+		1.5.10
+
 #eof
