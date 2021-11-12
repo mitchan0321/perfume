@@ -105,6 +105,7 @@ LIGHT {
     $ColorDB set DIRED_DIRECTORY            [WUtil color-pair BLUE    WHITE   ];
     $ColorDB set DIRED_SYMLINK              [WUtil color-pair MAGENTA WHITE   ];
     $ColorDB set DIRED_DEV                  [WUtil color-pair YELLOW  WHITE   ];
+    $ColorDB set INTERP_PROMPT_HILIGHT      [WUtil color-pair GREEN   WHITE   ];
 }
 
 DARK {
@@ -121,7 +122,7 @@ DARK {
     $ColorDB set MINI_WINDOW                [WUtil color-pair WHITE   BLACK   ];
     $ColorDB set ACTIVE_MINI_WINDOW         [WUtil color-pair WHITE   BLACK   ];
     $ColorDB set MINI_CAUTION               [WUtil color-pair BLACK   YELLOW  ];
-    $ColorDB set EOF_MARK                   [WUtil color-pair BLACK   GREEN   ];
+    $ColorDB set EOF_MARK                   [WUtil color-pair BLACK   YELLOW  ];
     $ColorDB set REGION_HILIGHT             [WUtil color-pair WHITE   BLUE    ];
     $ColorDB set SEARCH_CURRENT_HILIGHT     [WUtil color-pair WHITE   RED     ];
     $ColorDB set SEARCH_HILIGHT             [WUtil color-pair BLACK   YELLOW  ];
@@ -135,6 +136,7 @@ DARK {
     $ColorDB set DIRED_DIRECTORY            [WUtil color-pair BLUE    BLACK   ];
     $ColorDB set DIRED_SYMLINK              [WUtil color-pair MAGENTA BLACK   ];
     $ColorDB set DIRED_DEV                  [WUtil color-pair YELLOW  BLACK   ];
+    $ColorDB set INTERP_PROMPT_HILIGHT      [WUtil color-pair GREEN   BLACK   ];
 }
 
 BLUE-BACK {
@@ -151,7 +153,7 @@ BLUE-BACK {
     $ColorDB set MINI_WINDOW                [WUtil color-pair WHITE   BLACK   ];
     $ColorDB set ACTIVE_MINI_WINDOW         [WUtil color-pair WHITE   BLUE    ];
     $ColorDB set MINI_CAUTION               [WUtil color-pair BLACK   YELLOW  ];
-    $ColorDB set EOF_MARK                   [WUtil color-pair BLACK   GREEN   ];
+    $ColorDB set EOF_MARK                   [WUtil color-pair BLUE    YELLOW  ];
     $ColorDB set REGION_HILIGHT             [WUtil color-pair BLACK   CYAN    ];
     $ColorDB set SEARCH_CURRENT_HILIGHT     [WUtil color-pair WHITE   RED     ];
     $ColorDB set SEARCH_HILIGHT             [WUtil color-pair BLACK   YELLOW  ];
@@ -165,6 +167,7 @@ BLUE-BACK {
     $ColorDB set DIRED_DIRECTORY            [WUtil color-pair YELLOW  BLUE    ];
     $ColorDB set DIRED_SYMLINK              [WUtil color-pair MAGENTA BLUE    ];
     $ColorDB set DIRED_DEV                  [WUtil color-pair YELLOW  BLUE    ];
+    $ColorDB set INTERP_PROMPT_HILIGHT      [WUtil color-pair GREEN   BLUE    ];
 }
 
 RETRO {
@@ -195,6 +198,7 @@ RETRO {
     $ColorDB set DIRED_DIRECTORY            [WUtil color-pair BLUE    BLACK   ];
     $ColorDB set DIRED_SYMLINK              [WUtil color-pair MAGENTA BLACK   ];
     $ColorDB set DIRED_DEV                  [WUtil color-pair YELLOW  BLACK   ];
+    $ColorDB set INTERP_PROMPT_HILIGHT      [WUtil color-pair GREEN   BLACK   ];
 }
 
 MONO {
@@ -225,6 +229,7 @@ MONO {
     $ColorDB set DIRED_DIRECTORY            [WUtil color-pair WHITE   BLACK   ];
     $ColorDB set DIRED_SYMLINK              [WUtil color-pair WHITE   BLACK   ];
     $ColorDB set DIRED_DEV                  [WUtil color-pair WHITE   BLACK   ];
+    $ColorDB set INTERP_PROMPT_HILIGHT      [WUtil color-pair BLACK   WHITE   ];
 }
 
 MONO-GREEN {
@@ -255,6 +260,7 @@ MONO-GREEN {
     $ColorDB set DIRED_DIRECTORY            [WUtil color-pair GREEN   BLACK   ];
     $ColorDB set DIRED_SYMLINK              [WUtil color-pair GREEN   BLACK   ];
     $ColorDB set DIRED_DEV                  [WUtil color-pair GREEN   BLACK   ];
+    $ColorDB set INTERP_PROMPT_HILIGHT      [WUtil color-pair BLACK   GREEN   ];
 }
 
 default: {result <nil>}
