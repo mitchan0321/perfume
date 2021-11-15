@@ -2012,4 +2012,9 @@
 		PRFM_20211111
 		1.5.10
 
+2021/11/12
+	pmacs update:
+		Change window vertical bar move LEFT to RIGHT default.
+		Add color name INTERP_PROMPT_HILIGHT.
+
 #eof
