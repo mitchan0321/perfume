@@ -105,7 +105,7 @@ LIGHT {
     $ColorDB set DIRED_DIRECTORY            [WUtil color-pair BLUE    WHITE   ];
     $ColorDB set DIRED_SYMLINK              [WUtil color-pair MAGENTA WHITE   ];
     $ColorDB set DIRED_DEV                  [WUtil color-pair YELLOW  WHITE   ];
-    $ColorDB set INTERP_PROMPT_HILIGHT      [WUtil color-pair GREEN   WHITE   ];
+    $ColorDB set INTERP_PROMPT_HILIGHT      [WUtil color-pair BLACK   GREEN   ];
 }
 
 DARK {
