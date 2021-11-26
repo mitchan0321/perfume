@@ -1,0 +1,26 @@
+defun find (dir pattern do: body) {
+    if {! [file dir? $dir]}  {return <nil>};
+    if {! [file read? $dir]} {return <nil>};
+
+    if {set? body} else: {
+        body := {| file | println $file};
+    };
+    
+    file list $dir : each do: {| f |
+        if {or [$f = "."] [$f = ".."]} {continue};
+        
+        path ::= [[$dir at -1] = "/"] ???
+            {$dir . $f}
+            {$dir . "/" $f}
+        ;
+        
+        if [file dir? $path] {
+            find $path $pattern do: $body;
+        } {
+            if [$path =~ $pattern] {
+                yield $body $path;
+            };
+        };
+    };
+};
+
