@@ -23,9 +23,10 @@
 ファイルサフィックスが java		Java		Mode-Java.key
 ファイルサフィックスが pwiki		PWiki		Mode-PWiki.key
 バッファタイプが ScratchBuffer		Interp		Mode-Interp.key
+バッファタイプが DiredBuffer		Dired		Mode-Dired.key
 バッファ名が *Buffer List*		BList		Mode-BufferList.key
 バッファ名が *Grep*			Grep		Mode-Grep.key
-バッファ名が ^\*Man.*\*$ にマッチ	Man		Mode-Man.key
+バッファ名が ^Man=.* にマッチ		Man		Mode-Man.key
 上記以外				Text		Mode-Text.key
 
 バッファが生成された際に上記ルールにより、自動的にモードが設定されますが、[[set-mode]] コマンド
@@ -42,6 +43,9 @@
 * Interpモード
 　*Scratch* バッファで Perfume インタプリタを実行するためのモードです。アプリケーションの実行、
 アプリケーションへのEOFの送信や実行中アプリケーションの中断などができます。
+
+* Diredモード
+　Diredを実行するモードです。ディレクトリのブラウズや、ブラウズしているファイルのオープンができます。
 
 * PWikiモード
 　Pmacsのバッファ上でハイパーリンクを持ったテキストファイルを作成するためのモードです。
