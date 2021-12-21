@@ -260,6 +260,10 @@ cstack_release(int slot_id) {
     CStack.stack_slot[slot_id].jmp_buff_enable = 0;
     CStack.stack_slot[slot_id].memo = 0;
 
+    cstack_unprotect(slot_id);
+    cstack_clear(slot_id);
+    cstack_protect(slot_id);
+
     /* indicate garbage collection address block to BoehmGC */
     GC_remove_roots((void*)CStack.stack_slot[slot_id].safe_addr,
 		    (void*)CStack.stack_slot[slot_id].end_addr);
@@ -273,6 +277,7 @@ void cstack_release_clear(int slot_id) {
     
     cstack_release(slot_id);
     CStack.stack_slot[slot_id].state = SS_FREE;
+
     cstack_unprotect(slot_id);
     cstack_clear(slot_id);
     cstack_protect(slot_id);
