@@ -3337,6 +3337,7 @@ defcommand dired-open {
         if {[$l len] >= 2} {
             name ::= $l get 1;
             path ::= $buff get-path;
+            path ::= $path ?? [pwd];
             if {$path = "/"} {
                 path ::= path-adjust ["/" . $name];
             } {
