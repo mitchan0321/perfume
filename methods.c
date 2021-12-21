@@ -4986,7 +4986,8 @@ mth_coro_next(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 	/* fall thru */
     case CO_STS_RUN:
 	interp->co_calling = 1;
-	restore_co_id = cstack_enter(co->interp->cstack_id);
+        co->interp->co_parent = interp;
+        restore_co_id = cstack_enter(co->interp->cstack_id);
 	co_call(co->coro_id);
 	cstack_leave(restore_co_id);
 	interp->co_calling = 0;
