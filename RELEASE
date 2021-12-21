@@ -2024,5 +2024,6 @@
 2021/12/21
 	methods.c, types.c
 		Fix auto release co-routines C-stack if coro script was done.
+		Fix Coro::next re-set parent interp object into coro object by call.
 
 #eof
