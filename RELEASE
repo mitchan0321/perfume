@@ -2021,4 +2021,8 @@
 	lib/find.prfm
 		Add new find utility, like the UNIX find command.
 
+2021/12/21
+	methods.c, types.c
+		Fix auto release co-routines C-stack if coro script was done.
+
 #eof
