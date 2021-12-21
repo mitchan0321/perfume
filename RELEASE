@@ -2025,5 +2025,7 @@
 	methods.c, types.c
 		Fix auto release co-routines C-stack if coro script was done.
 		Fix Coro::next re-set parent interp object into coro object by call.
+	pmacs update:
+		Fix editor command dired-open, if get-path return <nil> use current directory path.
 
 #eof
