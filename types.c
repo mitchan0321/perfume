@@ -461,8 +461,11 @@ coroutine_handl(void *context) {
     // co->u.coroutine->interp->cstack_id = 0;
     co->u.coroutine->interp->co_parent->co_value = result;
     co->u.coroutine->state = CO_STS_DONE;
-    cstack_release(id);
- 
+    // cstack_release(id);
+    // co->u.coroutine->coro_id = 0;
+    cstack_release_clear(id);
+    co->u.coroutine->interp = NULL;
+
     co_exit();
 }
 

@@ -4972,6 +4972,9 @@ mth_coro_next(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     if (0 == co->coro_id) {
 	return new_exception(TE_COOUTOFLIFE, L"Co-routine out of life.", interp);
     }
+    if (! co->interp) {
+	return new_exception(TE_COOUTOFLIFE, L"Co-routine out of life.", interp);
+    }
     if (! cstack_isalive(co->interp->cstack_id)) {
 	return new_exception(TE_COOUTOFLIFE, L"Co-routine out of life.", interp);
     };
@@ -5024,6 +5027,7 @@ mth_coro_release(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     }
     co_delete(co->coro_id);
     co->coro_id = 0;
+    if (! co->interp) return const_Nil;
     cstack_release_clear(co->interp->cstack_id);
     co->interp->cstack_id = 0;
     co->interp->cstack = NULL;
