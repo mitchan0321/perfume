@@ -1249,16 +1249,20 @@ defcommand buffer-list {
     $buff clear-all;
 
     $buff append-string "<<< Buffer list >>>";
-    $buff append-string "  * If you want to select the buffer, move cursor to buffer line and press Enter key.";
+    $buff append-string "  * Select buffer - Move cursor to buffer line and press Enter key";
+    $buff append-string "                    or press shortcut key(0-9).";
+    $buff append-string "  * Delete buffer - Move cursor to buffer line and press \"d\" key.";
     $buff append-string "";
-    $buff append-string ["%1v%1v%1v %-26v %6v %-6v %-v" fmt "p" "m" "n" "Buffer name" "Length" "Mode" "Content path"];
-    $buff append-string ["%1v%1v%1v %-26v %6v %-6v %-v" fmt "-" "-" "-" "-----------" "------" "----" "------------"];
+    $buff append-string ["%1v %1v%1v%1v %-26v %6v %-6v %-v" fmt "#" "p" "m" "n" "Buffer name" "Length" "Mode" "Content path"];
+    $buff append-string ["%1v %1v%1v%1v %-26v %6v %-6v %-v" fmt "-" "-" "-" "-" "-----------" "------" "----" "------------"];
     ### l ::= BufferManager get-buffer-list;
     l ::= BufferManager get-buffer-list-order-by-newer;
+    shortcut-ind := 1;
     $l each do: {| buff-name |
 	display-buffer ::= BufferManager get-buffer $buff-name;
 	$buff append-string [
-	    "%1v%1v%1v %-26v %6d %-6v %-v" fmt
+	    "%1v %1v%1v%1v %-26v %6d %-6v %-v" fmt
+            [[$shortcut-ind <= 10] ??? [$shortcut-ind % 10] " "]
 	    [[$display-buffer protect?] ??? "%" " "]
 	    [[$display-buffer modify?]  ??? "*" " "]
 	    [[$display-buffer newfile?] ??? "?" " "]
@@ -1266,7 +1270,8 @@ defcommand buffer-list {
 	    [$display-buffer get-buffer-length]
             [$display-buffer get-buffer-mode]
 	    [$display-buffer get-content]
-	];
+        ];
+        $shortcut-ind ++;
     };
     $buff no-modify;
     $buff set-protect;
@@ -1298,6 +1303,139 @@ defcommand jump-to-buffer {
     };
     $main bind-buffer [$window get-window-name] $target-buff;
     result SELF;
+};
+
+defcommand buffer-list-shortcut-1 {
+    | main window |
+    jump-to-buffer-shortcut '^1 ' $main $window;
+    result SELF;
+};
+
+defcommand buffer-list-shortcut-2 {
+    | main window |
+    jump-to-buffer-shortcut '^2 ' $main $window;
+    result SELF;
+};
+
+defcommand buffer-list-shortcut-3 {
+    | main window |
+    jump-to-buffer-shortcut '^3 ' $main $window;
+    result SELF;
+};
+
+defcommand buffer-list-shortcut-4 {
+    | main window |
+    jump-to-buffer-shortcut '^4 ' $main $window;
+    result SELF;
+};
+
+defcommand buffer-list-shortcut-5 {
+    | main window |
+    jump-to-buffer-shortcut '^5 ' $main $window;
+    result SELF;
+};
+
+defcommand buffer-list-shortcut-6 {
+    | main window |
+    jump-to-buffer-shortcut '^6 ' $main $window;
+    result SELF;
+};
+
+defcommand buffer-list-shortcut-7 {
+    | main window |
+    jump-to-buffer-shortcut '^7 ' $main $window;
+    result SELF;
+};
+
+defcommand buffer-list-shortcut-8 {
+    | main window |
+    jump-to-buffer-shortcut '^8 ' $main $window;
+    result SELF;
+};
+
+defcommand buffer-list-shortcut-9 {
+    | main window |
+    jump-to-buffer-shortcut '^9 ' $main $window;
+    result SELF;
+};
+
+defcommand buffer-list-shortcut-0 {
+    | main window |
+    jump-to-buffer-shortcut '^0 ' $main $window;
+    result SELF;
+};
+
+defun jump-to-buffer-shortcut (key main window) {
+    buff ::= $window get-buffer;
+    found := <nil>;
+    $buff buffer-select 0 [$buff get-buffer-length : - 1] {| r |
+        if {$r =~ $key} {
+            found := <t>;
+            l ::= $r =~ '\<[^\>]+\>';
+            if {nil? $l} {
+                show-message :bell "No buffer name specified.";
+                return SELF;
+            };
+            s ::= $l car : get 2;
+            s ::= $s sub 1 [$s len : - 1];
+            target-buff ::= BufferManager find-buffer $s;
+            $target-buff ?? {
+                show-message :bell "No buffer name specified.";
+                return SELF;
+            };
+            $main bind-buffer [$window get-window-name] $target-buff;
+        };
+    };
+    if {! $found} {
+        show-message :bell "No shortcut line.";
+    };
+};
+
+defcommand buffer-list-delete {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (line col) ::= $window get-source-index $buff $geom;
+    r ::= $buff get-buffer-line $line;
+    $r ?? {
+	show-message :bell "No buffer name specified.";
+	return SELF;
+    };
+    l ::= $r =~ '\<[^\>]+\>';
+    if {nil? $l} {
+	show-message :bell "No buffer name specified.";
+	return SELF;
+    };
+
+    s ::= $l car : get 2;
+    s ::= $s sub 1 [$s len : - 1];
+    target-buff ::= BufferManager find-buffer $s;
+    $target-buff ?? {
+	show-message :bell "No buffer name specified.";
+	return SELF;
+    };
+
+    if [$target-buff modify?] {
+	$main mini-input-start "" prompt: "This buffer is modified, really kill? [yes or ESC]: ";
+	$main add-mini-input-callback $window {| main window in-key value |
+	    if {eq? $in-key KEY_ESC} {
+		$main mini-input-end;
+		show-message "Canceled.";
+		return ALL;
+	    };
+	    if {and {eq? $in-key CTRL_M} {eq? $value "yes"}} {
+		$main mini-input-end;
+		$main delete-buffer $target-buff;
+                $window apply-command $main $window "" buffer-list;
+		return ALL;
+	    };
+	};
+	return ALL;
+    };
+    $main delete-buffer $target-buff;
+    $window apply-command $main $window "" buffer-list;
+
+    result ALL;
 };
 
 defcommand undo-buffer {
