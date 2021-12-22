@@ -2028,4 +2028,11 @@
 	pmacs update:
 		Fix editor command dired-open, if get-path return <nil> use current directory path.
 
+2021/12/22
+	pmacs update:
+		Add buffer select using for shortcut key in buffer-list command.
+		Add buffer delete using for "d" key in buffer-list command.
+		Add key bind in BufferList mode, "0"-"9" (select buffer), "d" (buffer delete).
+
+
 #eof
