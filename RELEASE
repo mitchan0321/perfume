@@ -2040,4 +2040,14 @@
 		PRFM_20211223_K33
 		1.5.11
 
+2021/12/24
+	pmacs update:
+		Add curs-keyin's parameter blink-fact: value is cursor blink iteration fact.
+		Add global BLINK_FACT, initial value to 4.
+		Change INPUT_TIMEOUT 50 -> 20, for resolutions to less.
+		Change INTERP_ITIMER_INTERVAL 125 -> 50.
+
+	ncurses.c
+		Add new param blink-fact: in func_curses_keyin.
+
 #eof
