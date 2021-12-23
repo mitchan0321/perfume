@@ -1,3 +1,4 @@
+2021/12/23	PRFM_20211223_K33	1.5.11
 2021/11/11	PRFM_20211111		1.5.10
 2021/09/20	PRFM_20210920_N33	1.5.9
 2021/08/08	PRFM_20210808		1.5.8
@@ -2034,5 +2035,9 @@
 		Add buffer delete using for "d" key in buffer-list command.
 		Add key bind in BufferList mode, "0"-"9" (select buffer), "d" (buffer delete).
 
+2021/12/23
+	tag:
+		PRFM_20211223_K33
+		1.5.11
 
 #eof
