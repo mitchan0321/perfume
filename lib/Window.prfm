@@ -564,7 +564,9 @@ Window method key-event-loop () {
 	window ::= $main get-current-window;
 	if {$KeyEvent null?} {
             try {
-                (rtime i) ::= curs-keyin [$window get-curs] $INPUT_TIMEOUT $INPUT_ENCODING blink: $BLINK;
+                (rtime i) ::= curs-keyin [$window get-curs] $INPUT_TIMEOUT $INPUT_ENCODING
+                    blink: $BLINK blink-fact: $BLINK_FACT
+                ;;
             } catch: {| e |
                 show-message :bell ["Error at curs-keyin: <" . [$e car] "># " [$e cdr]];
                 continue;

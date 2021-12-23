@@ -924,8 +924,8 @@ func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     static unsigned long int curs_blink = 0;
     static double time_prev=0.0, time_now=0.0, time_on_repeat=0.0;
     static int no_input_count = 0;
-    int blink;
-    Toy_Type *tblink;
+    int blink, blink_fact = 3;
+    Toy_Type *tblink, *tblink_fact;
 
     blink = 0;
     tblink = hash_get_and_unset_t(nameargs, new_symbol(L"blink:"));
@@ -934,6 +934,13 @@ func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
             blink = 0;
         } else {
             blink = 1;
+        }
+    }
+
+    tblink_fact = hash_get_and_unset_t(nameargs, new_symbol(L"blink-fact:"));
+    if (NULL != tblink_fact) {
+        if (GET_TAG(tblink_fact) == INTEGER) {
+            blink_fact = mpz_get_si(tblink_fact->u.biginteger);
         }
     }
 
@@ -974,7 +981,7 @@ func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
         break;
     case 1:
         // curs_set(((curs_blink >> 4) % 2) ? 0 : 1); // blink even
-        curs_set(((curs_blink >> 3) % 4) ? 1 : 0); // blink 3:1
+        curs_set(((curs_blink >> blink_fact) % 4) ? 1 : 0); // blink 3:1
         break;
     default:
         curs_set(1); // always cursor on
@@ -1103,7 +1110,7 @@ valid_return:
     return result_list;
     
 error:
-    return new_exception(TE_SYNTAX, L"Syntax error at 'curs-keyin', syntax: curs-keyin window timeout encoding [:blink]", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'curs-keyin', syntax: curs-keyin window timeout encoding [:blink] [blink-fact: n]", interp);
 }
 
 Toy_Type*

@@ -3361,7 +3361,10 @@ defcommand show-keycode {
     show-message "Input key: ";
     i := ();
     while {$i null?} do: {
-        (rtime i) ::= curs-keyin [$window get-curs] 1000 $INPUT_ENCODING blink: $BLINK;
+        (rtime i) ::= curs-keyin [$window get-curs] 1000 $INPUT_ENCODING 
+            blink: $BLINK
+            blink-fact: $BLINK_FACT
+        ;;
     };
     m ::= "" . $i;
     k ::= $main get-keymap $i;
