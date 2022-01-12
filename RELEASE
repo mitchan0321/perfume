@@ -2050,4 +2050,12 @@
 	ncurses.c
 		Add new param blink-fact: in func_curses_keyin.
 
+2022/01/12
+	pmacs update:
+		Fix EditBuffer initial content-path value setup at constructor by current
+		  directory.
+		Add *Grep* buffer content-path value.
+		Tuning key-in timing value, INPUT_TIMEOUT, BLINK_FACTk, KEY_REPEAT_ACCEL_DELAY,
+		  KEY_REPEAT_ACCEL_MAXLINE, BLINK_FACT.
+
 #eof
