@@ -2625,6 +2625,7 @@ defcommand grep {
                     buff ::= new EditBuffer;
                     BufferManager unregist-buffer "*Grep*";
                     (result err) ::= $buff load-content  :init-only "grep buffer" buffer-name: "*Grep*";
+                    $buff set-content $directory;
                     $buff clear-all;
                     $buff append-string ["CWD:  " . $directory];
                     $buff append-string ["EXEC: " . $cmd];

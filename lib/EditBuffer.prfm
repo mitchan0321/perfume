@@ -16,7 +16,7 @@ EditBuffer method init-constructor () {
     sets MarkBuffer ();
     sets UnmarkBuffer ();
     sets Protect <nil>;
-    sets ContentPath <nil>;
+    sets ContentPath [pwd];
     sets PreviousBuffer <nil>;
     sets LastTimestamp 0;
 };
