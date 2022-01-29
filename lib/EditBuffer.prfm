@@ -16,7 +16,7 @@ EditBuffer method init-constructor () {
     sets MarkBuffer ();
     sets UnmarkBuffer ();
     sets Protect <nil>;
-    sets ContentPath [pwd];
+    sets ContentPath <nil>;
     sets PreviousBuffer <nil>;
     sets LastTimestamp 0;
 };
@@ -535,7 +535,7 @@ EditBuffer method set-content (path) {
 EditBuffer method get-content () {
     if $ContentPath {return $ContentPath};
     if $File        {return $File};
-    return <nil>;
+    return [pwd];
 };
 
 EditBuffer method get-content-dir () {
