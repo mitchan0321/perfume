@@ -750,55 +750,16 @@ error2:
     return new_exception(TE_NODELEGATE, cell_get_addr(msg), interp);
 }
 
+
+extern Toy_Type *Resolv_Object_ptr[__TYPE_LAST__];
+
 Toy_Type*
 toy_resolv_object(Toy_Interp *interp, Toy_Type *object) {
     Toy_Type *val;
     Cell *msg;
 
-    switch (GET_TAG(object)) {
-    case BOOL:
-	val = hash_get_t(interp->classes, const_Bool);
-	break;
-    case CLOSURE:
-	val = hash_get_t(interp->classes, const_Block);
-	break;
-    case LIST:
-	val = hash_get_t(interp->classes, const_List);
-	break;
-    case REAL:
-	val = hash_get_t(interp->classes, const_Real);
-	break;
-    case INTEGER:
-	val = hash_get_t(interp->classes, const_Integer);
-	break;
-    case STRING:
-	val = hash_get_t(interp->classes, const_String);
-	break;
-    case RQUOTE:
-	val = hash_get_t(interp->classes, const_RQuote);
-	break;
-    case EXCEPTION:
-	val = hash_get_t(interp->classes, const_Exception);
-	break;
-    case DICT:
-	val = hash_get_t(interp->classes, const_Dict);
-	break;
-    case VECTOR:
-	val = hash_get_t(interp->classes, const_Vector);
-	break;
-    case COROUTINE:
-	val = hash_get_t(interp->classes, const_Coro);
-	break;
-    case BULK:
-	val = hash_get_t(interp->classes, const_Bulk);
-	break;
-    case CONTAINER:
-	val = hash_get_t(interp->classes, const_Container);
-	break;
-
-    default:
-	goto error;
-    }
+    val = Resolv_Object_ptr[GET_TAG(object)];
+    if (! val) goto error;
 
     return val;
 

@@ -184,6 +184,12 @@ new_interp(wchar_t* name, int stack_size, Toy_Interp* parent,
     return interp;
 }
 
+Toy_Type *Resolv_Object_ptr[__TYPE_LAST__] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0,
+};
+
 Toy_Interp*
 interp_setup(Toy_Interp* interp, int argc, char **argv, char **envp, char *dir) {
     Toy_Type *delegate;
@@ -216,19 +222,33 @@ interp_setup(Toy_Interp* interp, int argc, char **argv, char **envp, char *dir) 
 
     toy_add_class(interp, L"Functions", interp->funcs, delegate);
     toy_add_class(interp, L"Bool", NULL, delegate);
+    Resolv_Object_ptr[BOOL] = hash_get_t(interp->classes, const_Bool);
     toy_add_class(interp, L"Integer", NULL, delegate);
+    Resolv_Object_ptr[INTEGER] = hash_get_t(interp->classes, const_Integer);
     toy_add_class(interp, L"Real", NULL, delegate);
+    Resolv_Object_ptr[REAL] = hash_get_t(interp->classes, const_Real);
     toy_add_class(interp, L"String", NULL, delegate);
+    Resolv_Object_ptr[STRING] = hash_get_t(interp->classes, const_String);
     toy_add_class(interp, L"List", NULL, delegate);
+    Resolv_Object_ptr[LIST] = hash_get_t(interp->classes, const_List);
     toy_add_class(interp, L"Block", NULL, delegate);
+    Resolv_Object_ptr[CLOSURE] = hash_get_t(interp->classes, const_Block);
     toy_add_class(interp, L"RQuote", NULL, delegate);
+    Resolv_Object_ptr[RQUOTE] = hash_get_t(interp->classes, const_RQuote);
     toy_add_class(interp, L"Object", NULL, NULL);
     toy_add_class(interp, L"File", NULL, delegate);
     toy_add_class(interp, L"Dict", NULL, delegate);
+    Resolv_Object_ptr[DICT] = hash_get_t(interp->classes, const_Dict);
     toy_add_class(interp, L"Vector", NULL, delegate);
+    Resolv_Object_ptr[VECTOR] = hash_get_t(interp->classes, const_Vector);
     toy_add_class(interp, L"Coro", NULL, delegate);
+    Resolv_Object_ptr[COROUTINE] = hash_get_t(interp->classes, const_Coro);
     toy_add_class(interp, L"Bulk", NULL, delegate);
+    Resolv_Object_ptr[BULK] = hash_get_t(interp->classes, const_Bulk);
     toy_add_class(interp, L"Container", NULL, delegate);
+    Resolv_Object_ptr[CONTAINER] = hash_get_t(interp->classes, const_Container);
+    toy_add_class(interp, L"Exception", NULL, delegate);
+    Resolv_Object_ptr[EXCEPTION] = hash_get_t(interp->classes, const_Exception);
 
     toy_add_commands(interp);
     toy_add_methods(interp);
