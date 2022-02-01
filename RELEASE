@@ -2062,4 +2062,9 @@
 		Fix content-path ileegal initial value set and change get-content-dir return 
 		  to current directory if dir is not set.
 
+2022/02/01
+	eval.c, interp.c
+		Optimizing script type ex) prim-val ops args... pattern, eval.c omitted classes
+		  dictionary access for prim-val's class resolving.
+
 #eof
