@@ -1,3 +1,4 @@
+2022/02/03	PRFM_20220203		1.5.12
 2021/12/23	PRFM_20211223_K33	1.5.11
 2021/11/11	PRFM_20211111		1.5.10
 2021/09/20	PRFM_20210920_N33	1.5.9
@@ -2066,5 +2067,10 @@
 	eval.c, interp.c
 		Optimizing script type ex) prim-val ops args... pattern, eval.c omitted classes
 		  dictionary access for prim-val's class resolving.
+
+2022/02/03
+	tag:
+		PRFM_20220203
+		1.5.12
 
 #eof
