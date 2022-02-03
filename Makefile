@@ -45,7 +45,7 @@ ifeq ($(EVAL_STAT),yes)
 endif
 
 ### for product build. (use BoehmGC)
-CFLAGS		= -Wall -O2 -c -g $(OPTIONS)
+CFLAGS		= -Wall -O3 -c -g $(OPTIONS)
 INCLUDE		= -I/usr/local/include -I.
 LIB		= -L/usr/lib -L/lib -L/usr/local/lib \
 		  -lm -lpthread -lgmp -lgc -lonigmo -lpcl $(OPTLIBS)
