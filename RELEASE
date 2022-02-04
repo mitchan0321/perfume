@@ -2047,7 +2047,6 @@
 		Add global BLINK_FACT, initial value to 4.
 		Change INPUT_TIMEOUT 50 -> 20, for resolutions to less.
 		Change INTERP_ITIMER_INTERVAL 125 -> 50.
-
 	ncurses.c
 		Add new param blink-fact: in func_curses_keyin.
 
@@ -2060,7 +2059,7 @@
 		  KEY_REPEAT_ACCEL_MAXLINE, BLINK_FACT.
 2022/01/29
 	pmacs update:
-		Fix content-path ileegal initial value set and change get-content-dir return 
+		Fix content-path illegal initial value set and change get-content-dir return 
 		  to current directory if dir is not set.
 
 2022/02/01
