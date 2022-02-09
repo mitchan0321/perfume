@@ -4,6 +4,7 @@
 Cell*raw_decoder(Cell *raw, encoder_error_info *error_info);
 Cell*raw_encoder(Cell *unicode, encoder_error_info *error_info);
 Cell*utf8_decoder(Cell *raw, encoder_error_info *error_info);
+Cell*utf8f_decoder(Cell *raw, encoder_error_info *error_info);
 Cell*utf8_encoder(Cell *unicode, encoder_error_info *error_info);
 Cell*eucjp_decoder(Cell *raw, encoder_error_info *error_info);
 Cell*eucjp_encoder(Cell *unicode, encoder_error_info *error_info);
@@ -18,6 +19,7 @@ typedef struct _encoder_methods {
 static encoder_methods Encoder_methods[] = {
     {raw_decoder, raw_encoder},		// NENCODE_RAW
     {utf8_decoder, utf8_encoder},	// NENCODE_UTF8
+    {utf8f_decoder, utf8_encoder},	// NENCODE_UTF8F
     {eucjp_decoder, eucjp_encoder},	// NENCODE_EUCJP
     {sjis_decoder, sjis_encoder},	// NENCODE_SJIS
     {0, 0}
@@ -26,8 +28,9 @@ static encoder_methods Encoder_methods[] = {
 static wchar_t *ENCODING_NAME_DEFS[] = {
     L"RAW",		// index: 0 ... RAW encoding (no encoding, byte data stream)
     L"UTF-8",		// index: 1 ... UTF-8 encoding
-    L"EUC-JP",		// index: 2 ... EUC-JP encoding
-    L"Shift-JIS",	// index: 3 ... Shift-JIS encoding
+    L"UTF-8F",		// index: 2 ... UTF-8F encoding
+    L"EUC-JP",		// index: 3 ... EUC-JP encoding
+    L"Shift-JIS",	// index: 4 ... Shift-JIS encoding
     0
 };
 
@@ -223,6 +226,128 @@ error:
     }
 	    
     return NULL;
+}
+
+#define HAS_ERROR_FAKE(c, s) 					\
+    s = 0;                                                      \
+    if (-1 == c) {						\
+        s = 1;                                                  \
+    }								\
+    if ((c & 0XC0) != 0X80) {					\
+        s = 1;                                                  \
+    }
+
+Cell*
+utf8f_decoder(Cell *raw, encoder_error_info *error_info) {
+    wchar_t *p;
+    int i, len;
+    Cell *result;
+    wchar_t c1, c2, c3, c4;
+    int errsts;
+    
+    p = cell_get_addr(raw);
+    len = cell_get_length(raw);
+    result = new_cell(L"");
+
+    for (i=0; i<len; ) {
+	if ((p[i] & 0x80) == 0) {
+	    /*
+	     * 1 byte ASCII
+	     * 0x00 - 0x7f (7 bits)
+	     */
+	    cell_add_char(result, p[i]);
+	    i++;
+	    
+	} else if ((p[i] & 0xE0) == 0xC0) {
+	    /*
+	     * 2 bytes UTF-8 sequence: 110x xxxx, 10yy yyyy
+	     * 0x80 - 0x7ff (11 bits)
+	     */
+	    c1 = (p[i] & (~0xE0));
+	    i++;
+	    
+	    c2 = RETR_CHAR(p, i, len);
+	    HAS_ERROR_FAKE(c2, errsts);
+            if (errsts == 0) {
+                c2 = c2 & (~0xC0);
+                cell_add_char(result, ((c1 << 6) | c2));
+            } else {
+                cell_add_char(result, UTF8_FAKE_CHAR);
+            }
+            i++;
+	    
+	} else if ((p[i] & 0xF0) == 0xE0) {
+	    /*
+	     * 3 bytes UTF-8 sequence: 1110 xxxx, 10yy yyyy, 10yy yyyy
+	     * 0x800 - 0xffff (16 bits)
+	     */
+	    c1 = (p[i] & (~0xF0));
+	    i++;
+
+	    c2 = RETR_CHAR(p, i , len);
+	    HAS_ERROR_FAKE(c2, errsts);
+            if (errsts == 0) {
+                c2 = c2 & (~0xC0);
+                i++;
+                
+                c3 = RETR_CHAR(p, i, len);
+                HAS_ERROR_FAKE(c3, errsts);
+                if (errsts == 0) {
+                    c3 = c3 & (~0xC0);
+                    cell_add_char(result, ((c1 << 12) | (c2 << 6) | c3));
+                } else {
+                    cell_add_char(result, UTF8_FAKE_CHAR);
+                }
+                i++;
+            } else {
+                cell_add_char(result, UTF8_FAKE_CHAR);
+                i++;
+            }
+
+	} else if ((p[i] & 0xF8) == 0xF0) {
+	    /*
+	     * 4 bytes UTF-8 sequence: 1111 0xxx, 10yy yyyy, 10yy yyyy, 10yy yyyy
+	     * 0x10000 - 0x1fffff (21 bits)
+	     */
+	    c1 = (p[i] & (~0xF8));
+	    i++;
+
+	    c2 = RETR_CHAR(p, i, len);
+	    HAS_ERROR_FAKE(c2, errsts);
+            if (errsts == 0) {
+                c2 = c2 & (~0xC0);
+                i++;
+                c3 = RETR_CHAR(p, i, len);
+                HAS_ERROR_FAKE(c3, errsts);
+                if (errsts == 0) {
+                    c3 = c3 & (~0xC0);
+                    i++;
+                    c4 = RETR_CHAR(p, i, len);
+                    HAS_ERROR_FAKE(c4, errsts);
+                    if (errsts == 0) {
+                        c4 = c4 & (~0xC0);
+                        i++;
+                        cell_add_char(result, ((c1 << 18) | (c2 << 12) | (c3 << 6) | c4));
+                    } else {
+                        cell_add_char(result, UTF8_FAKE_CHAR);
+                        i++;
+                    }
+                } else {
+                    cell_add_char(result, UTF8_FAKE_CHAR);
+                    i++;
+                }
+            } else {
+                cell_add_char(result, UTF8_FAKE_CHAR);
+                i++;
+            }
+	    
+	} else {
+            cell_add_char(result, UTF8_FAKE_CHAR);
+            i++;
+	}
+    }
+
+    return result;
 }
 
 Cell*

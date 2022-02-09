@@ -10,13 +10,14 @@
  * Indicate the maximum encoding name index; range is 0 to ENCODING_NAME_MAX.
  * Now ready encodings are RAW, UTF-8, EUC-JP and Shift-JIS.
  */
-#define ENCODING_NAME_MAX		(3)
+#define ENCODING_NAME_MAX		(4)
 
 /* encoding index */
 #define NENCODE_RAW			(0)
 #define NENCODE_UTF8			(1)
-#define NENCODE_EUCJP			(2)
-#define NENCODE_SJIS			(3)
+#define NENCODE_UTF8F			(2)
+#define NENCODE_EUCJP			(3)
+#define NENCODE_SJIS			(4)
 
 /* encoder/decoder error code */
 #define EENCODE_BADENCODING		(1)
@@ -29,6 +30,8 @@ typedef struct _encoder_error_info {
     int pos;
     wchar_t *message;
 } encoder_error_info;
+
+#define UTF8_FAKE_CHAR                  (0x2592)
 
 wchar_t* get_encoding_name(int enc_idx);
 int	 get_encoding_index(wchar_t *enc_name);
