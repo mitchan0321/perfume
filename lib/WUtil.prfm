@@ -136,7 +136,7 @@ defun line-input (curs disp-line disp-col input-len cur-index cur-val key-in) {
     result := SELF;
     cond
         {string? $key-in} {
-            curs-x ::= curs-index-to-pos $cur-val [$cur-val len] $DEFAULT_TAB_WIDTH;
+            curs-x ::= curs-index-to-pos $cur-val [$cur-val display-width] $DEFAULT_TAB_WIDTH;
             if {$curs-x < $input-len} {
                 (command start-y start-x new-y new-x) ::= $v insert-string-at $key-in 0 $cur-index;
             };
@@ -256,7 +256,7 @@ defun show-files-in-window (main window dir) {
 		# v4 ::= $l >>;
 		# if {and $v4 {file dir? [$dir . $v4]}} {$v4 append! "/"};
 		# $buff append-string ["%-20v\t%-20v\t%-20v\t%-20v" fmt [$v1 ?? ""] [$v2 ?? ""] [$v3 ?? ""] [$v4 ?? ""]];
-		$buff append-string ["%-40v%-40v" fmt [$v1 ?? ""] [$v2 ?? ""]];
+		$buff append-string ["%-40w%-40w" fmt [$v1 ?? ""] [$v2 ?? ""]];
 	    };
 	} catch: {| e |
 	    $buff append-string ["Can't read directory. <" [$e car] "># " [$e cdr]];
@@ -293,7 +293,7 @@ defun show-files-in-window (main window dir) {
 		    # v4 ::= $l >>;
 		    # if {and $v4 {file dir? [$dir . $v4]}} {$v4 append! "/"};
 		    # $buff append-string ["%-20v\t%-20v\t%-20v\t%-20v" fmt [$v1 ?? ""] [$v2 ?? ""] [$v3 ?? ""] [$v4 ?? ""]];
-		    $buff append-string ["%-40v%-40v" fmt [$v1 ?? ""] [$v2 ?? ""]];
+		    $buff append-string ["%-40w%-40w" fmt [$v1 ?? ""] [$v2 ?? ""]];
 		};
 		if {$file-count = 1} {
 		    $buff append-string "--";

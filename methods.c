@@ -9,6 +9,9 @@
 #include <sys/select.h>
 #include <onigmo.h>
 #include <math.h>
+#define __USE_XOPEN
+#include <wchar.h>
+
 #include "toy.h"
 #include "interp.h"
 #include "types.h"
@@ -3128,6 +3131,76 @@ mth_string_format_fill(wchar_t* item, int fill, int trim) {
     return cell_get_addr(result);
 }
 
+int
+display_width(wchar_t *item) {
+    wchar_t *p;
+    int len, w, cl;
+    
+    len = 0;
+    p = item;
+    while (*p) {
+        w = wcwidth((wchar_t)*p);
+        if (w <= 0) {
+            if (w < 0) {
+                cl = 1;  // if u+fffd font width is 2, set to 2
+            } else {
+                cl = 1;
+            }
+        } else {
+            if (w == 0)  {
+                cl = 2;
+            } else {
+                cl = w;
+            }
+        }
+        len += cl;
+        p++;
+    };
+    
+    return len;
+};
+
+static wchar_t*
+mth_string_format_fill_w(wchar_t* item, int fill, int trim) {
+    Cell *result;
+    int i, slen;
+
+    slen = display_width(item);
+
+    result = new_cell(L"");
+    if ((fill == 0) || (slen >= abs(fill))) {
+	cell_add_str(result, item);
+    } else if (fill < 0) {
+	/* lef align */
+	cell_add_str(result, item);
+	for (i=0 ; i<(-fill-slen) ; i++) {
+	    cell_add_char(result, L' ');
+	}
+    } else if (fill > 0) {
+	/* right align */
+	for (i=0 ; i<(fill-slen) ; i++) {
+	    cell_add_char(result, L' ');
+	}
+	cell_add_str(result, item);
+    }
+
+    if (fill && trim) {
+        wchar_t *p = cell_get_addr(result);
+	Cell *result2 = new_cell(L"");
+        while (*p) {
+            cell_add_char(result2, *p);
+            if (display_width(cell_get_addr(result2)) >= abs(fill)) {
+                break;
+            }
+            p++;
+	}
+	return cell_get_addr(result2);
+    }
+
+    /* otherwise aling only */
+    return cell_get_addr(result);
+}
+
 static wchar_t*
 mth_string_format_C(Toy_Type *item, Cell *fmt) {
     wchar_t *buff;
@@ -3215,6 +3288,17 @@ mth_string_format(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 			posargs = list_next(posargs);
 		    }
 		    cell_add_str(c, mth_string_format_fill(to_string_call(interp, item), acc * neg, trim));
+		    done = 1;
+		    break;
+
+		case L'w':
+		    item = list_get_item(posargs);
+		    if (NULL == item) {
+			item = const_nullstring;
+		    } else {
+			posargs = list_next(posargs);
+		    }
+		    cell_add_str(c, mth_string_format_fill_w(to_string_call(interp, item), acc * neg, trim));
 		    done = 1;
 		    break;
 
@@ -3591,6 +3675,34 @@ mth_string_isalnum(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int ar
 
 error:
     return new_exception(TE_SYNTAX, L"Syntax error at 'alphanumeric?', syntax: String alphanumeric?", interp);
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
+mth_string_display_width(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *self;
+    Cell *s;
+    wchar_t *p;
+    int dispw;
+
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (arglen != 0) goto error;
+    self = SELF(interp);
+    if (GET_TAG(self) != STRING) goto error2;
+
+    s = self->u.string;
+    p = cell_get_addr(s);
+
+    if (! *p) {
+        return new_integer_si(0);
+    }
+    dispw = display_width(p);
+
+    return new_integer_si(dispw);
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'display-width', syntax: String display-width", interp);
 error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
 }
@@ -5608,6 +5720,7 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, L"String", L"alphabetic?",	mth_string_isalpha,	NULL);
     toy_add_method(interp, L"String", L"numeric?",	mth_string_isnum,	NULL);
     toy_add_method(interp, L"String", L"alphanumeric?",	mth_string_isalnum,	NULL);
+    toy_add_method(interp, L"String", L"display-width",	mth_string_display_width,NULL);
 
     toy_add_method(interp, L"File", L"init", 		mth_file_init, 		L"mode:,mode,file-path");
     toy_add_method(interp, L"File", L"open", 		mth_file_open, 		L"mode:,mode,file-path");

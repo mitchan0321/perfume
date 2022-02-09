@@ -2072,4 +2072,13 @@
 		PRFM_20220203
 		1.5.12
 
+2022/02/09
+	methods.c
+		Add String::fmt "%[n]w" new indicator, compute value length as console display column width.
+		Add String::display-width for compute console display column width.
+	pmacs update:
+		Change buffer-list use new format indicator "%w" at buffer name and content-path display.
+		Change *Directory* buffer use new format indicator "%w" at file display.
+		Change mini-input compute cursor indexing use String::display-width.
+
 #eof

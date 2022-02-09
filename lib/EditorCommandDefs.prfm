@@ -1253,15 +1253,15 @@ defcommand buffer-list {
     $buff append-string "                    or press shortcut key(0-9).";
     $buff append-string "  * Delete buffer - Move cursor to buffer line and press \"d\" key.";
     $buff append-string "";
-    $buff append-string ["%1v %1v%1v%1v %-26v %6v %-6v %-v" fmt "#" "p" "m" "n" "Buffer name" "Length" "Mode" "Content path"];
-    $buff append-string ["%1v %1v%1v%1v %-26v %6v %-6v %-v" fmt "-" "-" "-" "-" "-----------" "------" "----" "------------"];
+    $buff append-string ["%1v %1v%1v%1v %-26w %6v %-6v %-w" fmt "#" "p" "m" "n" "Buffer name" "Length" "Mode" "Content path"];
+    $buff append-string ["%1v %1v%1v%1v %-26w %6v %-6v %-w" fmt "-" "-" "-" "-" "-----------" "------" "----" "------------"];
     ### l ::= BufferManager get-buffer-list;
     l ::= BufferManager get-buffer-list-order-by-newer;
     shortcut-ind := 1;
     $l each do: {| buff-name |
 	display-buffer ::= BufferManager get-buffer $buff-name;
 	$buff append-string [
-	    "%1v %1v%1v%1v %-26v %6d %-6v %-v" fmt
+	    "%1v %1v%1v%1v %-26w %6d %-6v %-w" fmt
             [[$shortcut-ind <= 10] ??? [$shortcut-ind % 10] " "]
 	    [[$display-buffer protect?] ??? "%" " "]
 	    [[$display-buffer modify?]  ??? "*" " "]
