@@ -75,7 +75,7 @@ MiniWindow method set-prompt (prompt) {
 
 MiniWindow method set-cursor () {
     curs-x ::= curs-index-to-pos $InputValue $InputIndex $DEFAULT_TAB_WIDTH;
-    curs-move $MiniCurs 0 [$PromptMessage len : + $curs-x];
+    curs-move $MiniCurs 0 [$PromptMessage display-width : + $curs-x];
 };
 
 MiniWindow method apply-keybind (main window key) {
