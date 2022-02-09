@@ -32,6 +32,7 @@ EditBuffer method get-vector () {
 EditBuffer method load-content (path init-only: init-flag buffer-name: buff-name) {
     result := (<nil> "");
     f ::= new File;
+    $f set-encoding $DEFAULT_EDIT_ENCODING;
     sets NewFile <nil>;
     sets Src [vector];
     if {[$path sub 0 1] = "/"} {path ::= path-adjust $path};
@@ -112,6 +113,7 @@ EditBuffer method save-content (path: path) {
     };
     
     f ::= new File;
+    $f set-encoding $DEFAULT_EDIT_ENCODING;
     try {
 	if $backup-path {
 	    $f open $backup-path mode: o;

@@ -1,6 +1,6 @@
 defun show-all-character () {
     s := "";
-    0 each to: 0xffff do: {| i |
+    0 each to: 0x2ffff do: {| i |
         if {[$i % 16] = 0} {
             println $s;
             s := "";
