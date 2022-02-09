@@ -2081,4 +2081,8 @@
 		Change *Directory* buffer use new format indicator "%w" at file display.
 		Change mini-input compute cursor indexing use String::display-width.
 
+2022/02/10
+	pmacs update:
+		Fix mini-input compute cursor indexing bug.
+
 #eof

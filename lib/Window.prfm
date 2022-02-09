@@ -665,7 +665,7 @@ Window method mini-input-start (init-value prompt: p index: index) {
     sets MiniInput <t>;
     sets MiniInputSave ([$WindowList,0 get-window-name] [$WindowList,0 get-buffer]);
     if {! [set? index]} {
-        index ::= $init-value display-width;
+        index ::= $init-value len;
     };
     
     if {set? p} {

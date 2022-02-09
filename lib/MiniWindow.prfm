@@ -60,7 +60,7 @@ MiniWindow method mini-input-start (prompt init-value index: index) {
     if {set? index} {
         sets InputIndex $index;
     } {
-        sets InputIndex [$init-value display-width];
+        sets InputIndex [$init-value len];
     };
 };
 
@@ -84,7 +84,9 @@ MiniWindow method apply-keybind (main window key) {
     (y x) ::= curs-get-screen-size $MiniCurs;
     input-len ::= $x - [$PromptMessage display-width] : - 1;
     ### clear;
-    (key new-index new-value result) ::= line-input $MiniCurs 0 [$PromptMessage display-width] $input-len $InputIndex $InputValue $key;
+    (key new-index new-value result) ::= line-input
+        $MiniCurs 0 [$PromptMessage display-width] $input-len $InputIndex $InputValue $key
+    ;;
     ### stub
     # (key new-index new-value result) ::= line-input $MiniCurs 0 [$PromptMessage len] $input-len $InputIndex $InputValue $key;
     # new-value := $InputValue;

@@ -136,7 +136,7 @@ defun line-input (curs disp-line disp-col input-len cur-index cur-val key-in) {
     result := SELF;
     cond
         {string? $key-in} {
-            curs-x ::= curs-index-to-pos $cur-val [$cur-val display-width] $DEFAULT_TAB_WIDTH;
+            curs-x ::= curs-index-to-pos $cur-val [$cur-val len] $DEFAULT_TAB_WIDTH;
             if {$curs-x < $input-len} {
                 (command start-y start-x new-y new-x) ::= $v insert-string-at $key-in 0 $cur-index;
             };
