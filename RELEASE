@@ -2074,7 +2074,7 @@
 
 2022/02/09
 	methods.c
-		Add String::fmt "%[n]w" new indicator, compute value length as console display column width.
+		Add String::fmt "%w" new indicator, compute value length as console display column width.
 		Add String::display-width for compute console display column width.
 	pmacs update:
 		Change buffer-list use new format indicator "%w" at buffer name and content-path display.
@@ -2084,5 +2084,14 @@
 2022/02/10
 	pmacs update:
 		Fix mini-input compute cursor indexing bug.
+
+2022/02/13
+	commands.c
+		Add set-locale command for set locale LC_ALL.
+	pmacs update:
+		Change use set-locale command at pmacs initialized.
+	tag:
+		PRFM_20220213
+		1.5.13
 
 #eof
