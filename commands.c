@@ -18,6 +18,7 @@
 #include <setjmp.h>
 #include <float.h>
 #include <time.h>
+#include <locale.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -4302,6 +4303,26 @@ error:
 			 L"Syntax error at 'atomic', syntax: atomic {body}", interp);
 }
 
+Toy_Type*
+cmd_setlocale(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *loc;
+    char *result;
+
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) != 0) goto error;
+    loc = list_get_item(posargs);
+    if (GET_TAG(loc) != STRING) goto error;
+
+    result = setlocale(LC_ALL, to_char(cell_get_addr(loc->u.string)));
+    if (NULL == result) return const_Nil;
+
+    return new_string_str(to_wchar(result));
+
+error:
+    return new_exception(TE_SYNTAX,
+			 L"Syntax error at 'set-locale', syntax: set-locale \"locale\"", interp);
+}
+
 #ifdef EVAL_STAT
 Toy_Type*
 cmd_evalstat(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
@@ -4451,6 +4472,7 @@ int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, L"set-itimer",	cmd_setitimer, 		L"msec");
     toy_add_func(interp, L"enable-itimer",cmd_enableitimer, 	NULL);
     toy_add_func(interp, L"atomic",	cmd_atomic, 		L"body");
+    toy_add_func(interp, L"set-locale",	cmd_setlocale, 		L"locale");
 
 #ifdef EVAL_STAT
     toy_add_func(interp, L"eval-stat",	cmd_evalstat, 		NULL);
