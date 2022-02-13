@@ -26,7 +26,7 @@ func_curses_init(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     if (arglen > 0) goto error;
 
     setenv("ESCDELAY", "100", 1);
-    setlocale(LC_ALL, "");
+    // setlocale(LC_ALL, "");
     wmain = initscr();
     start_color();
     raw();

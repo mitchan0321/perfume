@@ -19,6 +19,8 @@ defun pmacs (trace: t) {
     };
     defvar PMACS <t>;
     
+    set-locale "";
+    
     if {true? t} {
 	f := `File ("./trace.pmacs" mode: o);
 	trace 1 out: [$f fd?];
