@@ -909,6 +909,7 @@ defcommand read-file {
             try {
                 f ::= new File init: ($path mode: i);
                 $f set-encoding $DEFAULT_EDIT_ENCODING;
+                $f set-omit-cr $FILE_OMIT_CR;
                 (line col) ::= $window get-source-index $buff $geom;
                 $f each do: {| r |
                     $buff insert-string-at [$r . "\r"] $line 0;
