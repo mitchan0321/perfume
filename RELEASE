@@ -1,3 +1,4 @@
+2022/02/14	PRFM_20220214		1.5.14
 2022/02/13	PRFM_20220213		1.5.13
 2022/02/03	PRFM_20220203		1.5.12
 2021/12/23	PRFM_20211223_K33	1.5.11
@@ -2094,5 +2095,15 @@
 	tag:
 		PRFM_20220213
 		1.5.13
+
+2022/02/14
+	encoding.[ch]
+		Add new encoding UTF-8F, if file has bad utf-8 sequence then replace bad character to 
+		  fake character(u+2592).
+		Add File stat new item 'omit-cr', it's means if charidge return in file read line omit it.
+	pmacs update:
+		Add new config variable DEFAULT_EDIT_ENCODING = UTF-8F. If read binary file but not 
+		  occured error.
+		Add new config variable FILE_OMIT_CR.
 
 #eof
