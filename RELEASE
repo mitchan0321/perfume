@@ -2100,12 +2100,17 @@
 	encoding.[ch]
 		Add new encoding UTF-8F, if file has bad utf-8 sequence then replace bad character to 
 		  fake character(u+2592).
+	methods.c
 		Add File stat new item 'omit-cr', it's means if charidge return in file read line omit it.
+		Add File stat new item 'include-cr', if charidge return included in file indicate <t>.
 	lib/exec.prfm
 		Add set omit-cr to <t> in $IN and $ERR file stat.
 	pmacs update:
 		Add new config variable DEFAULT_EDIT_ENCODING = UTF-8F. If read binary file but not 
 		  occured error.
 		Add new config variable FILE_OMIT_CR for Windows type text reading.
+		Add indicator DOS type file at window status line.
+		Add indicator DOS type file at *Buffer List*.
+		Add EditBuffer::save-content write '\r' character if DOS type file read before.
 
 #eof
