@@ -3739,6 +3739,7 @@ typedef struct _toy_file {
     int noblock;
     int input_encoding;
     int output_encoding;
+    int omit_cr;
 } Toy_File;
 
 void
@@ -3785,6 +3786,7 @@ mth_file_init(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     f = new_file();
     f->input_encoding = NENCODE_RAW;
     f->output_encoding = NENCODE_RAW;
+    f->omit_cr = 0;
     hash_set_t(self, const_Holder, new_container(f, L"FILE"));
 
     enc = hash_get_t(interp->globals, const_DEFAULT_FILE_ENCODING);
@@ -3997,7 +3999,13 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 	if (('\n' == c) || ('\r' == c)) {
 	    if (! flag_nonewline) {
 		if (! flag_nocontrol) {
-		    cell_add_char(cbuff, c);
+                    if (f->omit_cr) {
+                        if ('\n' == c) {
+                            cell_add_char(cbuff, c);
+                        }
+                    } else {
+                        cell_add_char(cbuff, c);
+                    }
 		}
 	    }
 	} else {
@@ -4147,7 +4155,36 @@ mth_file_setnewline(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int a
     }
 	
 error:
-    return new_exception(TE_SYNTAX, L"Syntax error at 'set-newline', syntax: File set-newline [t | nil]", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'set-newline', syntax: File set-newline [<t> | <nil>]", interp);
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
+mth_file_setomitcr(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Hash *self;
+    Toy_File *f;
+    Toy_Type *container, *flag;
+
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    self = SELF_HASH(interp);
+    container = hash_get_t(self, const_Holder);
+    if (NULL == container) goto error2;
+    f = container->u.container.data;
+
+    flag = list_get_item(posargs);
+    if (IS_NIL(flag)) {
+	f->omit_cr = 0;
+	return const_Nil;
+    } else {
+	f->omit_cr = 1;
+	return const_T;
+    }
+	
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'set-omit-cr', syntax: File set-omit-cr [<t> | <nil>]", interp);
 error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
 }
@@ -4205,6 +4242,7 @@ mth_file_stat(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     list_append(l, new_cons(new_symbol(L"input-encoding"), new_symbol(enc?enc:L"(BAD ENCODING)")));
     enc = get_encoding_name(f->output_encoding);
     list_append(l, new_cons(new_symbol(L"output-encoding"), new_symbol(enc?enc:L"(BAD ENCODING)")));
+    list_append(l, new_cons(new_symbol(L"omit-cr"), f->omit_cr ? const_T : const_Nil));
 
     return l;
 
@@ -5730,6 +5768,7 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, L"File", L"flush", 		mth_file_flush, 	NULL);
     toy_add_method(interp, L"File", L"stat", 		mth_file_stat, 		NULL);
     toy_add_method(interp, L"File", L"set-newline", 	mth_file_setnewline, 	L"val");
+    toy_add_method(interp, L"File", L"set-omit-cr", 	mth_file_setomitcr, 	L"val");
     toy_add_method(interp, L"File", L"eof?", 		mth_file_iseof, 	NULL);
     toy_add_method(interp, L"File", L"fd?", 		mth_file_getfd, 	NULL);
     toy_add_method(interp, L"File", L"set!", 		mth_file_set, 		L"val");
