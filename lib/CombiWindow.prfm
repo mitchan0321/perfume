@@ -291,7 +291,7 @@ CombiWindow method geom-trimming () {
 
 CombiWindow method render-status-line (win buff cy cx y x buff-name) {
     curs-print $StatusLineCurs [
-        " #%v [%v%v%v%v%v%v] (%d,%d) <%v> {%v} %v %v"
+        " #%v [%v%v%v%v%v%v%v] (%d,%d) <%v> {%v} %v %v"
         fmt
             [$win split sep: "#" : get 1]
             [[$buff protect?] ??? "%" " "]
@@ -299,6 +299,7 @@ CombiWindow method render-status-line (win buff cy cx y x buff-name) {
             [[$buff newfile?] ??? "?" " "]
             [[get-region] ??? "#" " "]
             [$FreeCursor ??? "+" " "]
+            [[$buff includeCR?] ??? "D" " "]
             [[$Parent is-interp-busy] ??? "@" " "]
             $cy $cx
             $buff-name
