@@ -19,6 +19,7 @@ EditBuffer method init-constructor () {
     sets ContentPath <nil>;
     sets PreviousBuffer <nil>;
     sets LastTimestamp 0;
+    sets IncludeCR <nil>;
 };
 
 EditBuffer method string () {
@@ -48,7 +49,10 @@ EditBuffer method load-content (path init-only: init-flag buffer-name: buff-name
 		$f open $path mode: i;
 		$f each do: {| r |
 		    $Src append! $r;
-		};
+                };
+                if {dict [$f stat] : get include-cr} {
+                    sets IncludeCR <t>;
+                };
 		$f close;
                 if {! [file write? $path]} {
                     set-protect;
@@ -131,9 +135,15 @@ EditBuffer method save-content (path: path) {
 
     try {
 	if $Src {
-	    $Src each do: {| r |
-		$f puts $r;
-	    }
+            if $IncludeCR {
+                $Src each do: {| r |
+                    $f puts [$r . "\r"];
+                }
+            } {
+                $Src each do: {| r |
+                    $f puts $r;
+                }
+            };
 	};
 	$f close;
 	if $backup-path {
@@ -397,6 +407,10 @@ EditBuffer method no-modify () {
 
 EditBuffer method newfile? () {
     return $NewFile;
+};
+
+EditBuffer method includeCR? () {
+    return $IncludeCR;
 };
 
 EditBuffer method get-region-string (sy sx ey ex) {
