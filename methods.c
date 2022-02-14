@@ -3740,6 +3740,7 @@ typedef struct _toy_file {
     int input_encoding;
     int output_encoding;
     int omit_cr;
+    int include_cr;
 } Toy_File;
 
 void
@@ -3787,6 +3788,7 @@ mth_file_init(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     f->input_encoding = NENCODE_RAW;
     f->output_encoding = NENCODE_RAW;
     f->omit_cr = 0;
+    f->include_cr = 0;
     hash_set_t(self, const_Holder, new_container(f, L"FILE"));
 
     enc = hash_get_t(interp->globals, const_DEFAULT_FILE_ENCODING);
@@ -3978,7 +3980,10 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     while (1) {
 	c = fgetc(f->fd);
         if ('\r' == c) {
-            if (f->omit_cr) continue;
+            f->include_cr = 1;
+            if (f->omit_cr) {
+                continue;
+            }
         }
 	
         if (EOF == c) {
@@ -4241,6 +4246,7 @@ mth_file_stat(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     enc = get_encoding_name(f->output_encoding);
     list_append(l, new_cons(new_symbol(L"output-encoding"), new_symbol(enc?enc:L"(BAD ENCODING)")));
     list_append(l, new_cons(new_symbol(L"omit-cr"), f->omit_cr ? const_T : const_Nil));
+    list_append(l, new_cons(new_symbol(L"include-cr"), f->include_cr ? const_T : const_Nil));
 
     return l;
 
