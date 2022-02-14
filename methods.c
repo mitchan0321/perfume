@@ -3977,7 +3977,11 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     
     while (1) {
 	c = fgetc(f->fd);
-	if (EOF == c) {
+        if ('\r' == c) {
+            if (f->omit_cr) continue;
+        }
+	
+        if (EOF == c) {
 	    if ((errno == EAGAIN) && (! feof(f->fd))) {
 		clearerr(f->fd);
 		f->r_pending = cbuff;
@@ -3995,28 +3999,22 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 		return new_string_cell(c);
 	    }
 	}
-	
-	if (('\n' == c) || ('\r' == c)) {
-	    if (! flag_nonewline) {
-		if (! flag_nocontrol) {
-                    if (f->omit_cr) {
-                        if ('\n' == c) {
-                            cell_add_char(cbuff, c);
-                        }
-                    } else {
-                        cell_add_char(cbuff, c);
-                    }
-		}
-	    }
-	} else {
-	    if (wcisprint(c)) {
-		cell_add_char(cbuff, c);
-	    } else {
-		if (! flag_nocontrol) {
-		    cell_add_char(cbuff, c);
-		}
-	    }
-	}
+
+        if (('\n' == c) || ('\r' == c)) {
+            if (! flag_nonewline) {
+                if (! flag_nocontrol) {
+                    cell_add_char(cbuff, c);
+                }
+            }
+        } else {
+            if (wcisprint(c)) {
+                cell_add_char(cbuff, c);
+            } else {
+                if (! flag_nocontrol) {
+                    cell_add_char(cbuff, c);
+                }
+            }
+        }
 	
 	if (('\n' == c) || ('\r' == c)) {
 	    Cell *c = decode_raw_to_unicode(cbuff, f->input_encoding, enc_error_info);
