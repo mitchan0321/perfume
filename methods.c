@@ -3980,9 +3980,15 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     while (1) {
 	c = fgetc(f->fd);
         if ('\r' == c) {
-            f->include_cr = 1;
-            if (f->omit_cr) {
-                continue;
+            int nc = fgetc(f->fd);
+            if (EOF != nc) {
+                ungetc(nc, f->fd);
+            }
+            if (('\n' == nc) || (EOF == nc)) {
+                f->include_cr = 1;
+                if (f->omit_cr) {
+                    continue;
+                }
             }
         }
 	
@@ -4010,6 +4016,12 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
                 if (! flag_nocontrol) {
                     cell_add_char(cbuff, c);
                 }
+            } else {
+                if ('\r' == c) {
+                    if (! flag_nocontrol) {
+                        cell_add_char(cbuff, c);
+                    }
+                }
             }
         } else {
             if (wcisprint(c)) {
@@ -4021,7 +4033,7 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
             }
         }
 	
-	if (('\n' == c) || ('\r' == c)) {
+	if (('\n' == c) || (('\r' == c) && (f->omit_cr == 0))) {
 	    Cell *c = decode_raw_to_unicode(cbuff, f->input_encoding, enc_error_info);
 	    if (NULL == c) {
 		return new_exception(TE_BADENCODEBYTE, enc_error_info->message, interp);
