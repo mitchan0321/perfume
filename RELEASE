@@ -1,3 +1,4 @@
+2022/02/15	PRFM_20220215_A33	1.5.15
 2022/02/14	PRFM_20220214		1.5.14
 2022/02/13	PRFM_20220213		1.5.13
 2022/02/03	PRFM_20220203		1.5.12
@@ -2112,5 +2113,18 @@
 		Add indicator DOS type file at window status line.
 		Add indicator DOS type file at *Buffer List*.
 		Add EditBuffer::save-content write '\r' character if DOS type file read before.
+	tag:
+		PRFM_20220214
+		1.5.14
+
+2022/02/15
+	methods.c
+		Fix File::gets '\r' and omit-cr option is <t> and next char is not '\n', 
+		  then read and append result string '\r'.
+	pmacs update:
+		Add new key bind CTRL_G to goto command.
+	tag:
+		PRFM_20220215_A33
+		1.5.15
 
 #eof
