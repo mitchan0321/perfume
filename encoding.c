@@ -237,6 +237,11 @@ error:
         s = 1;                                                  \
     }
 
+#define HAS_ERROR_SET(e)     					\
+    e->errorno = EENCODE_BADSEQUENCE;    			\
+    e->pos = i;				        		\
+    e->message = L"Bad UTF-8 sequence";
+
 Cell*
 utf8f_decoder(Cell *raw, encoder_error_info *error_info) {
     wchar_t *p;
@@ -245,6 +250,10 @@ utf8f_decoder(Cell *raw, encoder_error_info *error_info) {
     wchar_t c1, c2, c3, c4;
     int errsts;
     
+    error_info->errorno = 0;
+    error_info->pos = 0;
+    error_info->message = L"";
+
     p = cell_get_addr(raw);
     len = cell_get_length(raw);
     result = new_cell(L"");
@@ -273,6 +282,7 @@ utf8f_decoder(Cell *raw, encoder_error_info *error_info) {
                 cell_add_char(result, ((c1 << 6) | c2));
             } else {
                 cell_add_char(result, UTF8_FAKE_CHAR);
+                HAS_ERROR_SET(error_info);
             }
             i++;
 	    
@@ -297,10 +307,12 @@ utf8f_decoder(Cell *raw, encoder_error_info *error_info) {
                     cell_add_char(result, ((c1 << 12) | (c2 << 6) | c3));
                 } else {
                     cell_add_char(result, UTF8_FAKE_CHAR);
+                    HAS_ERROR_SET(error_info);
                 }
                 i++;
             } else {
                 cell_add_char(result, UTF8_FAKE_CHAR);
+                HAS_ERROR_SET(error_info);
                 i++;
             }
 
@@ -330,19 +342,23 @@ utf8f_decoder(Cell *raw, encoder_error_info *error_info) {
                         cell_add_char(result, ((c1 << 18) | (c2 << 12) | (c3 << 6) | c4));
                     } else {
                         cell_add_char(result, UTF8_FAKE_CHAR);
+                        HAS_ERROR_SET(error_info);
                         i++;
                     }
                 } else {
                     cell_add_char(result, UTF8_FAKE_CHAR);
+                    HAS_ERROR_SET(error_info);
                     i++;
                 }
             } else {
                 cell_add_char(result, UTF8_FAKE_CHAR);
+                HAS_ERROR_SET(error_info);
                 i++;
             }
 	    
 	} else {
             cell_add_char(result, UTF8_FAKE_CHAR);
+            HAS_ERROR_SET(error_info);
             i++;
 	}
     }
