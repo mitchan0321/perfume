@@ -3741,6 +3741,7 @@ typedef struct _toy_file {
     int output_encoding;
     int omit_cr;
     int include_cr;
+    int enc_error;
 } Toy_File;
 
 void
@@ -3789,6 +3790,7 @@ mth_file_init(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     f->output_encoding = NENCODE_RAW;
     f->omit_cr = 0;
     f->include_cr = 0;
+    f->enc_error = 0;
     hash_set_t(self, const_Holder, new_container(f, L"FILE"));
 
     enc = hash_get_t(interp->globals, const_DEFAULT_FILE_ENCODING);
@@ -4035,6 +4037,9 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 	
 	if (('\n' == c) || (('\r' == c) && (f->omit_cr == 0))) {
 	    Cell *c = decode_raw_to_unicode(cbuff, f->input_encoding, enc_error_info);
+            if (enc_error_info->errorno != 0) {
+                f->enc_error = 1;
+            }
 	    if (NULL == c) {
 		return new_exception(TE_BADENCODEBYTE, enc_error_info->message, interp);
 	    }
@@ -4259,6 +4264,7 @@ mth_file_stat(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     list_append(l, new_cons(new_symbol(L"output-encoding"), new_symbol(enc?enc:L"(BAD ENCODING)")));
     list_append(l, new_cons(new_symbol(L"omit-cr"), f->omit_cr ? const_T : const_Nil));
     list_append(l, new_cons(new_symbol(L"include-cr"), f->include_cr ? const_T : const_Nil));
+    list_append(l, new_cons(new_symbol(L"encode-error"), f->enc_error ? const_T : const_Nil));
 
     return l;
 
