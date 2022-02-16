@@ -908,7 +908,6 @@ defcommand read-file {
             f := <nil>;
             try {
                 f ::= new File init: ($path mode: i);
-                $f set-encoding $DEFAULT_EDIT_ENCODING;
                 $f set-omit-cr $FILE_OMIT_CR;
                 (line col) ::= $window get-source-index $buff $geom;
                 $f each do: {| r |
@@ -1255,16 +1254,17 @@ defcommand buffer-list {
     $buff append-string "                    or press shortcut key(0-9).";
     $buff append-string "  * Delete buffer - Move cursor to buffer line and press \"d\" key.";
     $buff append-string "";
-    $buff append-string ["%1v %1v%1v%1v%1v %-32w %6v %-6v %-w" fmt "#" "p" "m" "n" "d" "Buffer name" "Length" "Mode" "Content path"];
-    $buff append-string ["%1v %1v%1v%1v%1v %-32w %6v %-6v %-w" fmt "-" "-" "-" "-" "-" "-----------" "------" "----" "------------"];
+    $buff append-string ["%1v %1v%1v%1v%1v%1v %-32w %6v %-6v %-w" fmt "#" "e" "p" "m" "n" "d" "Buffer name" "Length" "Mode" "Content path"];
+    $buff append-string ["%1v %1v%1v%1v%1v%1v %-32w %6v %-6v %-w" fmt "-" "-" "-" "-" "-" "-" "-----------" "------" "----" "------------"];
     ### l ::= BufferManager get-buffer-list;
     l ::= BufferManager get-buffer-list-order-by-newer;
     shortcut-ind := 1;
     $l each do: {| buff-name |
 	display-buffer ::= BufferManager get-buffer $buff-name;
 	$buff append-string [
-	    "%1v %1v%1v%1v%1v %-32w %6d %-6v %-w" fmt
+	    "%1v %1v%1v%1v%1v%1v %-32w %6d %-6v %-w" fmt
             [[$shortcut-ind <= 10] ??? [$shortcut-ind % 10] " "]
+            [["" . [$display-buffer get-encoding]] at 0]
 	    [[$display-buffer protect?] ??? "%" " "]
 	    [[$display-buffer modify?]  ??? "*" " "]
 	    [[$display-buffer newfile?] ??? "?" " "]
@@ -3630,6 +3630,40 @@ defcommand dired-filter {
     return ALL;
 };
 
+defcommand set-encoder {
+    | main window |
+    buff ::= $window get-buffer;
+    if {$buff modify?} {
+        show-message :bell "Buffer is modified. Try again after re-open this file.";
+        return SELF;
+    };
+    $main mini-input-start "" prompt: ["Encoding UTF-8F(u)/EUC-JP(e)/Shift-JIS(s) [current is " .
+        ["" . [$buff get-encoding]] "]: "];
+    $main add-mini-input-callback $window {| main window in-key value |
+        enc := <nil>;
+        case  $in-key
+        "u" {enc := "UTF-8F"}
+        "U" {enc := "UTF-8F"}
+        "e" {enc := "EUC-JP"}
+        "E" {enc := "EUC-JP"}
+        "s" {enc := "Shift-JIS"}
+        "S" {enc := "Shift-JIS"}
+        ;;
+        if $enc {
+            $main mini-input-end;
+            $buff set-encoding $enc;
+            $buff reload-content;
+            return ALL;
+        };
+        if {eq? $in-key KEY_ESC} {
+	    $main mini-input-end;
+	    show-message "Canceled.";
+            return ALL;
+        };
+    };
+    result ALL;
+};    
+    
 defcommand guru-guru {
     | main window |
     buff ::= $window get-buffer;
