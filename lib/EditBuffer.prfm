@@ -20,6 +20,7 @@ EditBuffer method init-constructor () {
     sets PreviousBuffer <nil>;
     sets LastTimestamp 0;
     sets IncludeCR <nil>;
+    sets Encoding $DEFAULT_EDIT_ENCODING;
 };
 
 EditBuffer method string () {
@@ -33,7 +34,7 @@ EditBuffer method get-vector () {
 EditBuffer method load-content (path init-only: init-flag buffer-name: buff-name) {
     result := (<nil> "");
     f ::= new File;
-    $f set-encoding $DEFAULT_EDIT_ENCODING;
+    $f set-encoding $Encoding;
     $f set-omit-cr $FILE_OMIT_CR;
     sets NewFile <nil>;
     sets Src [vector];
@@ -52,6 +53,11 @@ EditBuffer method load-content (path init-only: init-flag buffer-name: buff-name
                 };
                 if {dict [$f stat] : get include-cr} {
                     sets IncludeCR <t>;
+                };
+                if {dict [$f stat] : get encode-error} {
+                    set-protect;
+                } {
+                    no-protect;
                 };
 		$f close;
                 if {! [file write? $path]} {
@@ -90,6 +96,48 @@ EditBuffer method load-content (path init-only: init-flag buffer-name: buff-name
     return $result;
 };
 
+EditBuffer method set-encoding (enc) {
+    if [("EUC-JP" "Shift-JIS" "UTF-8" "UTF-8F") find $enc] else: {return <nil>};
+    sets Encoding [symbol $enc];
+};
+
+EditBuffer method get-encoding () {
+    return $Encoding;
+};
+
+EditBuffer method reload-content () {
+    f ::= new File;
+    $f set-encoding $Encoding;
+    $f set-omit-cr $FILE_OMIT_CR;
+    path := $File;
+    if $path else: {
+        throw ErrFileSpec "File not set.";
+    };
+    if {or {file dir? $path} {and {file exists? $path} {! [file read? $path]}}} {
+        throw ErrFileSpec "File is directory or unreadable.";
+    };
+    sets Src [vector];
+    $f open $path mode: i;
+    $f each do: {| r |
+        $Src append! $r;
+    };
+    if {dict [$f stat] : get include-cr} {
+        sets IncludeCR <t>;
+    };
+    if {dict [$f stat] : get encode-error} {
+        set-protect;
+    } {
+        no-protect;
+    };
+    $f close;
+    if {! [file write? $path]} {
+        set-protect;
+    };
+    inode ::= dict [file stat $path];
+    sets LastTimestamp $inode,mtime;
+    return <t>;
+};
+
 EditBuffer method save-content (path: path) {
     if {protect?} {
         return (<nil> "Buffer is protected, try after no-protect command executed.");
@@ -118,7 +166,7 @@ EditBuffer method save-content (path: path) {
     };
     
     f ::= new File;
-    $f set-encoding $DEFAULT_EDIT_ENCODING;
+    $f set-encoding $Encoding;
     $f set-omit-cr $FILE_OMIT_CR;
     try {
 	if $backup-path {
