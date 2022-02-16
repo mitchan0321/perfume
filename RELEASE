@@ -1,3 +1,4 @@
+2022/02/16	PRFM_20220216		1.5.16
 2022/02/15	PRFM_20220215_A33	1.5.15
 2022/02/14	PRFM_20220214		1.5.14
 2022/02/13	PRFM_20220213		1.5.13
@@ -2126,5 +2127,21 @@
 	tag:
 		PRFM_20220215_A33
 		1.5.15
+
+2022/02/16
+	encoding.[ch]
+		Fix encorder UTF-8F, if read bad UTF-8 sequence, return error info and read line both.
+	methods.c
+		Add error indicator to File::stat, property name is encode-error. 
+	pmacs update:
+		Add editor command set-encoding for select encoding and re-load the file.
+		Add EditBuffer::set-encoding, EditBuffer::get-encoding and EditBuffer::reload-content method.
+		Fix if encorder return UTF-8 bad sequence, set protect to buffer.
+		Add indicator current encoding at window status line.
+		Add indicator current encoding at *Buffer List*.
+		Add new key binding ALT_e to set-encoder command.
+	tag:
+		PRFM_20220216
+		1.5.16
 
 #eof
