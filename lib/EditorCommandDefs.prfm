@@ -98,6 +98,13 @@ defcommand previous-buffer-anothor-window {
     result ALL;
 };
 
+defcommand dismiss-current-window {
+    | main window |
+    $window apply-command $main [$main get-current-window] "" roll-current-window-backward;
+    $window apply-command $main [$main get-current-window] "" full-window;
+    result ALL;
+};
+
 defcommand next-page {
     | main window |
     $window page-down;
