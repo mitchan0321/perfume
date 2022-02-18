@@ -25,6 +25,8 @@
 #define EENCODE_BAD2NDBYTE		(3)
 #define EENCODE_OUTOFRANGEUNICODE	(4)
 #define EENCODE_BADSEQUENCE	        (5)
+#define EENCODE_BADSEQUENCEE	        (6)
+#define EENCODE_BADSEQUENCES	        (7)
 
 typedef struct _encoder_error_info {
     int errorno;
