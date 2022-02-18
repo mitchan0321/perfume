@@ -80,7 +80,7 @@ case $THEME
 LIGHT {
     $ColorDB set EDIT_BUFFER                [WUtil color-pair BLACK   WHITE   ];
     $ColorDB set ACTIVE_STATUS_LINE         [WUtil color-pair WHITE   BLUE    ];
-    $ColorDB set ACTIVE_STATUS_LINE_PROTECT [WUtil color-pair BLACK   GREEN   ];
+    $ColorDB set ACTIVE_STATUS_LINE_PROTECT [WUtil color-pair WHITE   GREEN   ];
     $ColorDB set ACTIVE_VERT_LINE           [WUtil color-pair WHITE   BLUE    ];
     $ColorDB set ACTIVE_VERT_LINE_PROTECT   [WUtil color-pair WHITE   BLUE    ];
     $ColorDB set ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair WHITE   CYAN    ];
