@@ -2144,4 +2144,15 @@
 		PRFM_20220216
 		1.5.16
 
+2022/02/18
+	encoding.[ch]
+		Add decorder error indicat to error_info, Shift-JIS and EUC-JP.
+	pmacs update:
+		Add new editor command dismiss-current-window.
+		Add key binding Shift+F01 to dismiss-current-window.
+		Change ACTIVE_STATUS_LINE_PROTECT LIGHT theme color.
+	tag:
+		PRFM_20220218
+		1.5.17
+
 #eof
