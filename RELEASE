@@ -1,3 +1,4 @@
+2022/02/28	PRFM_20220228		1.5.18
 2022/02/18	PRFM_20220218		1.5.17
 2022/02/16	PRFM_20220216		1.5.16
 2022/02/15	PRFM_20220215_A33	1.5.15
@@ -2164,5 +2165,9 @@
 		Change EditorCommandDefs::dired-open call DiredBuffer::update if buffer
 		  is already exists.
 		Change if file encoding error occured, show error message at some editor commands.
+		Change *Scratch* buffer initial text.
+	tag:
+		PRFM_20220228
+		1.5.18
 
 #eof
