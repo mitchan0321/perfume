@@ -2170,4 +2170,8 @@
 		PRFM_20220228
 		1.5.18
 
+2022/03/01
+	pmacs update:
+		Add editor command set-tab-width for global set TAB display width.
+
 #eof
