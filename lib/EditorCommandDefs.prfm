@@ -1261,7 +1261,7 @@ defcommand buffer-list {
     $buff append-string "                    or press shortcut key(0-9).";
     $buff append-string "  * Delete buffer - Move cursor to buffer line and press \"d\" key.";
     $buff append-string "";
-    $buff append-string ["%1v %1v%1v%1v%1v%1v %-32w %6v %-6v %-w" fmt "#" "e" "p" "m" "n" "d" "Buffer name" "Length" "Mode" "Content path"];
+    $buff append-string ["%1v %1v%1v%1v%1v%1v %-32w %6v %-6v %-w" fmt "#" "e" "d" "p" "m" "n" "Buffer name" "Length" "Mode" "Content path"];
     $buff append-string ["%1v %1v%1v%1v%1v%1v %-32w %6v %-6v %-w" fmt "-" "-" "-" "-" "-" "-" "-----------" "------" "----" "------------"];
     ### l ::= BufferManager get-buffer-list;
     l ::= BufferManager get-buffer-list-order-by-newer;
@@ -1272,10 +1272,10 @@ defcommand buffer-list {
 	    "%1v %1v%1v%1v%1v%1v %-32w %6d %-6v %-w" fmt
             [[$shortcut-ind <= 10] ??? [$shortcut-ind % 10] " "]
             [["" . [$display-buffer get-encoding]] at 0]
+	    [[$display-buffer includeCR?] ??? "D" " "]
 	    [[$display-buffer protect?] ??? "%" " "]
 	    [[$display-buffer modify?]  ??? "*" " "]
 	    [[$display-buffer newfile?] ??? "?" " "]
-	    [[$display-buffer includeCR?] ??? "D" " "]
 	    ["<" . $buff-name ">"]
 	    [$display-buffer get-buffer-length]
             [$display-buffer get-buffer-mode]

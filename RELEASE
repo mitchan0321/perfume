@@ -2156,4 +2156,9 @@
 		PRFM_20220218
 		1.5.17
 
+2022/02/28
+	pmacs update:
+		Change indicate DOS type flag position at window status line.
+		Change indicate DOS type flag position at *Buffer List*.
+
 #eof
