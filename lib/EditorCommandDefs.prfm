@@ -3696,7 +3696,7 @@ defcommand set-encoder {
 
 defcommand set-tab-width {
     | main window |
-    tab := 4;
+    tab := 8;
     if {defvar? DEFAULT_TAB_WIDTH} {
         tab := $DEFAULT_TAB_WIDTH;
     };
