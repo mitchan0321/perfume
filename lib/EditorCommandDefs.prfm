@@ -3325,7 +3325,7 @@ defcommand compile {
 
 defcommand help {
     | main window |
-    help-path ::= $DEFAULT_PWIKI_DIR . "/00start.pwiki";
+    help-path ::= $DEFAULT_PWIKI_DIR . $DEFAULT_PWIKI_HOME_FILE;
     buff ::= BufferManager get-buffer-by-path $help-path;
     $buff ?? {
         buff ::= new EditBuffer;
@@ -3692,7 +3692,48 @@ defcommand set-encoder {
         };
     };
     result ALL;
-};    
+};
+
+defcommand set-tab-width {
+    | main window |
+    tab := 4;
+    if {defvar? DEFAULT_TAB_WIDTH} {
+        tab := $DEFAULT_TAB_WIDTH;
+    };
+    $main mini-input-start "" prompt: ["Set TAB width [current is " . $tab "]: "];
+    $main add-mini-input-callback $window {| main window in-key value |
+        if {eq? $in-key KEY_ESC} {
+	    $main mini-input-end;
+	    show-message "Canceled.";
+            return ALL;
+        };
+        if {eq? $in-key CTRL_M} {
+            $main mini-input-end;
+            try {
+                if {$value = ""} {
+                    tab := $tab; # set closure value to local value.
+                } {
+                    tab ::= $value int;
+                };
+            } catch: {
+                show-message :bell "Illegal TAB number specified.";
+                return ALL;
+            };
+            if {or [$tab <= 0] [$tab >= 256]} {
+                show-message :bell "Illegal TAB number specified.";
+                return ALL;
+            };
+            if {defvar? DEFAULT_TAB_WIDTH} {
+                setvar DEFAULT_TAB_WIDTH $tab;
+            } {
+                defvar DEFAULT_TAB_WIDTH $tab;
+            };
+            show-message ["Set TAB width to " . $tab "."];
+            return ALL;
+        };
+    };
+    result ALL;
+};
     
 defcommand guru-guru {
     | main window |
