@@ -772,18 +772,21 @@ defcommand open-file {
 		    $value
 		    [get-current-buffer-dir $window : . "/" $value]
 	    ];
+            if {file dir? $path} {
+                dired-open $main $window $path;
+                return ALL;
+            };
 	    buff ::= BufferManager get-buffer-by-path $path;
             if $buff {
 		$MainWindow bind-buffer [$window get-window-name] $buff;
                 BufferManager unregist-buffer "*Directory*";
 		return SELF;
             };
-            if {file dir? $path} {
-                dired-open $main $window $path;
-                return ALL;
-            };
 	    buff ::= new EditBuffer;
 	    (result err) ::= $buff load-content $path;
+            if {$buff enc-error?} {
+                show-message :bell "File encode error occured!! Try ALT-e and specify another encoding for re-load.";
+            };
 	    $MainWindow bind-buffer [$window get-window-name] $buff;
 	    $result ?? {show-message :bell ["Open Failed, path: " . $value " ("  $err ")"]};
 	    BufferManager unregist-buffer "*Directory*";
@@ -838,6 +841,10 @@ defcommand view-file {
 		    $value
 		    [get-current-buffer-dir $window : . "/" $value]
 	    ];
+            if {file dir? $path} {
+                dired-open $main $window $path;
+                return ALL;
+            };
 	    buff ::= BufferManager get-buffer-by-path $path;
             if $buff {
                 $buff set-protect;
@@ -845,12 +852,11 @@ defcommand view-file {
                 BufferManager unregist-buffer "*Directory*";
 		return SELF;
             };
-            if {file dir? $path} {
-                dired-open $main $window $path;
-                return ALL;
-            };
 	    buff ::= new EditBuffer;
 	    (result err) ::= $buff load-content $path;
+            if {$buff enc-error?} {
+                show-message :bell "File encode error occured!! Try ALT-e and specify another encoding for re-load.";
+            };
             $buff set-protect;
 	    $MainWindow bind-buffer [$window get-window-name] $buff;
 	    $result ?? {show-message :bell ["Open Failed, path: " . $value " ("  $err ")"]};
@@ -916,6 +922,7 @@ defcommand read-file {
             try {
                 f ::= new File init: ($path mode: i);
                 $f set-omit-cr $FILE_OMIT_CR;
+                $f set-encoding [$buff get-encoding];
                 (line col) ::= $window get-source-index $buff $geom;
                 $f each do: {| r |
                     $buff insert-string-at [$r . "\r"] $line 0;
@@ -1975,9 +1982,15 @@ defcommand pwiki-click-link {
         next-buff ::= new EditBuffer;
         create-directory-if-not-exists $new-path;
         (result err) ::= $next-buff load-content $new-path;
+        if {$next-buff enc-error?} {
+            show-message :bell "File encode error occured!! Try ALT-e and specify another encoding for re-load.";
+        };
         $result ?? {
             show-message :bell ["Open Failed, path: " . $new-path " ("  $err ")"];
             return SELF;
+            if {$buff enc-error?} {
+                show-message :bell "File encode error occured!! Try ALT-e and specify another encoding for re-load.";
+            };
         };
     };
     $main bind-buffer [$window get-window-name] $next-buff;
@@ -2809,6 +2822,9 @@ defun show-file-at (window-name path line) {
             show-message :bell ["Open Failed, path: " . $path " ("  $err ")"];
             return;
         };
+        if {$buff enc-error?} {
+            show-message :bell "File encode error occured!! Try ALT-e and specify another encoding for re-load.";
+        };
     };
     $MainWindow bind-buffer $window-name $buff;
     $MainWindow roll-to-window $window-name;
@@ -3469,6 +3485,7 @@ defcommand dired {
 defun dired-open (main window dir) {
     buff ::= BufferManager get-buffer-by-path $dir;
     if $buff {
+        $buff update;
         $main bind-buffer [$window get-window-name] $buff;
         return $buff;
     };
@@ -3507,6 +3524,9 @@ defcommand dired-open {
                     };
                     buff ::= new EditBuffer;
                     (result err) ::= $buff load-content $path;
+                    if {$buff enc-error?} {
+                        show-message :bell "File encode error occured!! Try ALT-e and specify another encoding for re-load.";
+                    };
                     $main bind-buffer [$window get-window-name] $buff;
                     $result ?? {show-message :bell ["Open Failed, path: " . $value " ("  $err ")"]};
                 } {
@@ -3660,6 +3680,9 @@ defcommand set-encoder {
             $main mini-input-end;
             $buff set-encoding $enc;
             $buff reload-content;
+            if {$buff enc-error?} {
+                show-message :bell "File encode error occured!! Try ALT-e and specify another encoding for re-load.";
+            };
             return ALL;
         };
         if {eq? $in-key KEY_ESC} {
