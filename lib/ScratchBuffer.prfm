@@ -17,13 +17,12 @@ ScratchBuffer method init () {
 	"    3. Exit from Pmacs editor: Press [F11] next type \"exit\" and hit Enter key."
 	""
 	"  <<< Using for Perfume/Pmacs interpriter >>>"
-        "    Select the '*Scratch*' buffer first."
-        ""
-	"    1. Execute command"
+        "    1. Select the '*Scratch*' buffer first."
+	"    2. Execute command"
 	"       - Select line (move cursor) or region (press Ctrl+SPACE) first for execute."
 	"       - Execute the selected line --> Ctrl+J"
-	"    2. Restart Perfume interpriter --> Ctrl+K"
-	"    3. Send eof to interpriter     --> Ctrl+G"
+	"    3. Restart Perfume interpriter --> Ctrl+K"
+	"    4. Send eof to interpriter     --> Ctrl+G"
 	""
     )];
     
