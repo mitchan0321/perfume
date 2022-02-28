@@ -20,6 +20,7 @@ EditBuffer method init-constructor () {
     sets PreviousBuffer <nil>;
     sets LastTimestamp 0;
     sets IncludeCR <nil>;
+    sets EncError <nil>;
     sets Encoding $DEFAULT_EDIT_ENCODING;
 };
 
@@ -36,6 +37,8 @@ EditBuffer method load-content (path init-only: init-flag buffer-name: buff-name
     f ::= new File;
     $f set-encoding $Encoding;
     $f set-omit-cr $FILE_OMIT_CR;
+    sets EncError <nil>;
+
     sets NewFile <nil>;
     sets Src [vector];
     if {[$path sub 0 1] = "/"} {path ::= path-adjust $path};
@@ -55,6 +58,7 @@ EditBuffer method load-content (path init-only: init-flag buffer-name: buff-name
                     sets IncludeCR <t>;
                 };
                 if {dict [$f stat] : get encode-error} {
+                    sets EncError <t>;
                     set-protect;
                 } {
                     no-protect;
@@ -124,7 +128,9 @@ EditBuffer method reload-content () {
     if {dict [$f stat] : get include-cr} {
         sets IncludeCR <t>;
     };
+    sets EncError <nil>;
     if {dict [$f stat] : get encode-error} {
+        sets EncError <t>;
         set-protect;
     } {
         no-protect;
@@ -459,6 +465,10 @@ EditBuffer method newfile? () {
 
 EditBuffer method includeCR? () {
     return $IncludeCR;
+};
+
+EditBuffer method enc-error? () {
+    return $EncError;
 };
 
 EditBuffer method get-region-string (sy sx ey ex) {
