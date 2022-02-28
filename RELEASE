@@ -2160,5 +2160,9 @@
 	pmacs update:
 		Change indicate DOS type flag position at window status line.
 		Change indicate DOS type flag position at *Buffer List*.
+		Add indicate encoding error at EditBuffer method name is 'enc-error?'.
+		Change EditorCommandDefs::dired-open call DiredBuffer::update if buffer
+		  is already exists.
+		Change if file encoding error occured, show error message at some editor commands.
 
 #eof
