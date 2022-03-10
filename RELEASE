@@ -1,3 +1,4 @@
+2022/03/10	PRFM_20220310		1.5.19
 2022/02/28	PRFM_20220228		1.5.18
 2022/02/18	PRFM_20220218		1.5.17
 2022/02/16	PRFM_20220216		1.5.16
@@ -2173,5 +2174,12 @@
 2022/03/01
 	pmacs update:
 		Add editor command set-tab-width for global set TAB display width.
+
+2022/03/10
+	pmacs update:
+		Change 00quick-start.pwiki documentation a few.
+	tag:
+		PRFM_20220310
+		1.5.19
 
 #eof
