@@ -24,7 +24,7 @@ EditBuffer method init-constructor () {
     if {defvar? DEFAULT_EDIT_ENCODING} {
         sets Encoding $DEFAULT_EDIT_ENCODING;
     } {
-        sets DEFAULT_EDIT_ENCODING UTF-8F;
+        sets Encoding UTF-8F;
     };
 };
 
