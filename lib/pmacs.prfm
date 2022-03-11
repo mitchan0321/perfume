@@ -12,8 +12,6 @@ modules := (
     WUtil
 );
 
-defvar DEFAULT_EDIT_ENCODING    UTF-8F;
-
 defun pmacs (trace: t) {
     if {defvar? PMACS} {
         println "Pmacs already start.";

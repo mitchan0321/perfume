@@ -21,7 +21,11 @@ EditBuffer method init-constructor () {
     sets LastTimestamp 0;
     sets IncludeCR <nil>;
     sets EncError <nil>;
-    sets Encoding $DEFAULT_EDIT_ENCODING;
+    if {defvar? DEFAULT_EDIT_ENCODING} {
+        sets Encoding $DEFAULT_EDIT_ENCODING;
+    } {
+        sets DEFAULT_EDIT_ENCODING UTF-8F;
+    };
 };
 
 EditBuffer method string () {
