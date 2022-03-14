@@ -2185,6 +2185,7 @@
 2022/03/11
 	pmacs update:
 		Change grep command, append "/" to initial directory path tail.
-		Change globa definition DEFAULT_TAB_WIDTH.
+		Fix EditBuffer Encoding instance variable setting.
+		Change BLINK_FACT 4 -> 3.
 
 #eof
