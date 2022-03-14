@@ -1,3 +1,4 @@
+2022/03/14	PRFM_20220314		1.5.20
 2022/03/10	PRFM_20220310		1.5.19
 2022/02/28	PRFM_20220228		1.5.18
 2022/02/18	PRFM_20220218		1.5.17
@@ -2187,5 +2188,12 @@
 		Change grep command, append "/" to initial directory path tail.
 		Fix EditBuffer Encoding instance variable setting.
 		Change BLINK_FACT 4 -> 3.
+
+2022/03/14
+	doc/manual.pdf
+		Update Perfume documentation for version 1.5.19.
+	tag:
+		PRFM_20220314
+		1.5.20
 
 #eof
