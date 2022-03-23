@@ -241,7 +241,7 @@ defun show-files-in-window (main window dir) {
 
 	dir ::= path-adjust $dir;
 	if {$dir != "/"} {dir ::= $dir . "/"};
-	$buff append-string ["<< In directory: %v >>" fmt $dir];
+	$buff append-string ["<<< In directory: %v >>>" fmt $dir];
 	$buff append-string "";
 
 	try {
@@ -271,7 +271,7 @@ defun show-files-in-window (main window dir) {
 	try {
 	    dir ::= $flist join sep: "/";
 	    if {$dir != "/"} {dir ::= $dir . "/"};
-	    $buff append-string ["<< In directory matchies: %v >>" fmt $dir];
+	    $buff append-string ["<<< In directory matchies: %v >>>" fmt $dir];
 	    $buff append-string "";
 	
 	    l ::= file list $dir : filter {| i |

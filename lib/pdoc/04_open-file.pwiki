@@ -38,7 +38,7 @@ Ctrl+O を入力し、ミニウィンドウが
 されます。
 
 （ウィンドウ）
-    << In directory matchies: /FOO/perfume/ >>
+    <<< In directory matchies: /FOO/perfume/ >>>
 
     encoding-table.c                        encoding-table.o
     encoding.c                              encoding.h
@@ -55,7 +55,7 @@ Ctrl+O を入力し、ミニウィンドウが
 されます。
 
 （ウィンドウ）
-    << In directory matchies: /FOO/perfume/ >>
+    <<< In directory matchies: /FOO/perfume/ >>>
 
     eval.c                                  eval.o
     --
@@ -69,7 +69,7 @@ TABキーでの補完の結果、ファイルがひとつしか存在しない�
 ファイル名が表示されます。
 
 （ウィンドウ）
-    << In directory matchies: /FOO/perfume/ >>
+    <<< In directory matchies: /FOO/perfume/ >>>
     
     eval.c
     --
