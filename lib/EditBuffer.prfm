@@ -40,7 +40,7 @@ EditBuffer method load-content (path init-only: init-flag buffer-name: buff-name
     result := (<nil> "");
     f ::= new File;
     $f set-encoding $Encoding;
-    $f set-omit-cr $FILE_OMIT_CR;
+    $f set-ignore-cr $FILE_IGNORE_CR;
     sets EncError <nil>;
 
     sets NewFile <nil>;
@@ -116,7 +116,7 @@ EditBuffer method get-encoding () {
 EditBuffer method reload-content () {
     f ::= new File;
     $f set-encoding $Encoding;
-    $f set-omit-cr $FILE_OMIT_CR;
+    $f set-ignore-cr $FILE_IGNORE_CR;
     path := $File;
     if $path else: {
         throw ErrFileSpec "File not set.";
@@ -177,7 +177,7 @@ EditBuffer method save-content (path: path) {
     
     f ::= new File;
     $f set-encoding $Encoding;
-    $f set-omit-cr $FILE_OMIT_CR;
+    $f set-ignore-cr $FILE_IGNORE_CR;
     try {
 	if $backup-path {
 	    $f open $backup-path mode: o;

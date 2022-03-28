@@ -921,7 +921,7 @@ defcommand read-file {
             f := <nil>;
             try {
                 f ::= new File init: ($path mode: i);
-                $f set-omit-cr $FILE_OMIT_CR;
+                $f set-ignore-cr $FILE_IGNORE_CR;
                 $f set-encoding [$buff get-encoding];
                 (line col) ::= $window get-source-index $buff $geom;
                 $f each do: {| r |

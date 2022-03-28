@@ -21,7 +21,7 @@ defun exec (args: args) {
     $IN set! $in mode: i;
     $IN set-newline <nil>;
     $IN set-nobuffer;
-    $IN set-omit-cr <t>;
+    $IN set-ignore-cr <t>;
     if {true? CO-MODE} then: {$IN set-noblock <t>};
 
     err := $d,error;
@@ -29,7 +29,7 @@ defun exec (args: args) {
     $ERR set! $err mode: i;
     $ERR set-newline <nil>;
     $ERR set-nobuffer;
-    $ERR set-omit-cr <t>;
+    $ERR set-ignore-cr <t>;
     if {true? CO-MODE} then: {$ERR set-noblock <t>};
 
     if {true? PipeObject} then: {
