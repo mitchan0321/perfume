@@ -2196,4 +2196,11 @@
 		PRFM_20220314
 		1.5.20
 
+2022/03/28
+	methods.c
+		Change File property name omit_cr -> ignore_cr, change method set-omit-cr -> set-ignore-cr.
+	pmacs update:
+		Add config variable TOP_OF_STATUS_BAR for display status line at window top.
+		Add global setting variable STDIO_FILE_ENCODING for standard-io-command-templ.prfm specify file encoding.
+
 #eof
