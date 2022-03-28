@@ -5,12 +5,14 @@ CombiWindow method init (main y x line column) {
     
     curs ::= $main get-curs;
 
+    top_offset ::= $TOP_OF_STATUS_BAR ??? 1 0;
+
     case $VERTICAL_WINDOW_SIDE
     LEFT {
         sets BufferCurs [
             curs-new-window
             $curs
-            $y 		 	[$x + 1]                ### Left side Vertical Line
+            [$y + $top_offset]  [$x + 1]                ### Left side Vertical Line
             [$line - 1]         [$column - 1]
         ];
     }
@@ -18,7 +20,7 @@ CombiWindow method init (main y x line column) {
         sets BufferCurs [
             curs-new-window
             $curs
-            $y                  $x                      ### Right side Vertical Line
+            [$y + $top_offset]  $x                      ### Right side Vertical Line
             [$line - 1]         [$column - 1]
         ];
     }
@@ -26,25 +28,34 @@ CombiWindow method init (main y x line column) {
         sets BufferCurs [
             curs-new-window
             $curs
-            $y 		 	[$x + 1]                ### Left side Vertical Line
+            [$y + $top_offset]  [$x + 1]                ### Left side Vertical Line
             [$line - 1]         [$column - 1]
         ];
     }
     ;;
 
-    sets StatusLineCurs [
-        curs-new-window
-        $curs
-        [$y + $line : - 1]      $x
-        1 	     		$column
-    ];
+    if $TOP_OF_STATUS_BAR {
+        sets StatusLineCurs [
+            curs-new-window
+            $curs
+            $y                  $x
+            1 	     		$column
+        ];
+    } {
+        sets StatusLineCurs [
+            curs-new-window
+            $curs
+            [$y + $line : - 1]  $x
+            1 	     		$column
+        ];
+    };
     
     case $VERTICAL_WINDOW_SIDE
     LEFT {
         sets VerticalLineCurs [
             curs-new-window
             $curs
-            $y 		 	$x                      ### Left side Vertical Line
+            [$y + $top_offset]  $x                      ### Left side Vertical Line
             [$line - 1] 	1
         ];
     }
@@ -52,7 +63,7 @@ CombiWindow method init (main y x line column) {
         sets VerticalLineCurs [
             curs-new-window
             $curs
-            $y                  [$x + $column : - 1]    ### Right side Vertical Line
+            [$y + $top_offset]  [$x + $column : - 1]    ### Right side Vertical Line
             [$line - 1]         1
         ];
     }
@@ -60,7 +71,7 @@ CombiWindow method init (main y x line column) {
         sets VerticalLineCurs [
             curs-new-window
             $curs
-            $y 		 	$x                      ### Left side Vertical Line
+            [$y + $top_offset]  $x                      ### Left side Vertical Line
             [$line - 1] 	1
         ];
     }
