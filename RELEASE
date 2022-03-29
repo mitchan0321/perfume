@@ -2203,4 +2203,11 @@
 		Add config variable TOP_OF_STATUS_BAR for display status line at window top.
 		Add global setting variable STDIO_FILE_ENCODING for standard-io-command-templ.prfm specify file encoding.
 
+2022/03/29
+	pmacs update:
+		Add new editor command internal-stat for display system internal status
+		  at *Scratch* buffer.
+		Add key bind Ctrl+Alt+F12 to internal-ssat.
+		Change kill-interp for new create stdin/stdout/stderr object.
+
 #eof
