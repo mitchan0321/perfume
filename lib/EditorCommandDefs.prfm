@@ -724,9 +724,8 @@ defcommand kill-interp {
     if {defvar? PINTERP} {
 	try {$PINTERP release} catch: {};
     };
-    $stdin clear;
-    $stdout clear;
-    $stderr clear;
+    reset-stdio;
+    setvar PINTERP_LOCAL [dict];
     $stderr puts "Interpriter killed.";
     result ALL;
 };
@@ -3842,7 +3841,7 @@ defcommand guru-animal {
     result SELF;
 };
 
-defcommand test {
+defcommand internal-stat {
     | main window |
     w;
     println "";
