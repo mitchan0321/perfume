@@ -805,3 +805,19 @@ defun get-current-buffer-dir (window) {
     path ::= $dir join sep: "/";
     return $path;
 };
+
+defun reset-stdio () {
+    setvar stdin  [new Stream];
+    $stdin set-nolimit;
+    $stdin set-comode;
+
+    setvar stdout [new Stream];
+    $stdout set-limit 1024;
+    $stdout set-itemlimit 80;
+    $stdout set-comode;
+
+    setvar stderr [new Stream];
+    $stderr set-limit 1024;
+    $stderr set-itemlimit 80;
+    $stderr set-comode;
+};

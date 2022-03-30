@@ -36,20 +36,7 @@ defun pmacs (trace: t) {
     defvar stdin_orig  $stdin;
     defvar stdout_orig $stdout;
     defvar stderr_orig $stderr;
-
-    setvar stdin  [new Stream];
-    $stdin set-nolimit;
-    $stdin set-comode;
-
-    setvar stdout [new Stream];
-    $stdout set-limit 128;
-    $stdout set-itemlimit 80;
-    $stdout set-comode;
-
-    setvar stderr [new Stream];
-    $stderr set-limit 128;
-    $stderr set-itemlimit 80;
-    $stderr set-comode;
+    reset-stdio;
     
     try {
         WUtil init;
@@ -159,9 +146,9 @@ defun pmacs (trace: t) {
 		    };
 		};
 
-		$MainWindow add-background job-id: "50-PINTERP-WATCHDOG" $body;
-	    };
-	    yield $body $MainWindow <nil>;
+                $MainWindow add-background job-id: "50-PINTERP-WATCHDOG" $body;
+            };
+            yield $body $MainWindow <nil>;
 	};
 
         files ::= $ARGV clone;

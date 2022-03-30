@@ -1,0 +1,52 @@
+class EditStream;
+
+EditStream method init () {
+    base-constructor;
+    init-constructor;
+    sets Src [vector()];
+};
+
+EditStream method init-constructor () {
+    sets newline <nil>;
+};
+
+EditStream method eof? () {
+};
+
+EditStream method close () {
+};
+
+EditStream method clear () {
+};
+
+EditStream method ready? (timeout: timeout) {
+};
+
+EditStream method puts (nonewline: nonewline args: r) {
+};
+
+EditStream method gets (nonewline: nonewline) {
+};
+
+EditStream method flush () {
+    return <t>;
+};
+
+EditStream method stat () {
+    return (
+	    (fd . <nil>) (mode . io) (path . $name) (eof . $eof)
+	    (limit . $limit) (count . $count) (newline . $newline)
+	    (itemlimit . $itemlimit) (itemcount . $itemcount)
+	   );
+};
+
+EditStream method each (do: body) {
+};
+
+EditStream method string () {
+};
+
+EditStream method set-newline (m) {
+    sets newline $m;
+    return $m;
+};

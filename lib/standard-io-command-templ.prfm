@@ -9,11 +9,11 @@ defun standard-io-command-templ (native-value: nv
     else: {
 	$file-list each do: {| n |
 	    try {
+                f := `File($n mode: i);
                 if {defvar? STDIO_FILE_ENCODING} {
                     $f set-encoding $STDIO_FILE_ENCODING;
                 };
                 $f set-ignore-cr <t>;
-                f := `File($n mode: i);
 		$drv $f $n $nv;
 	    }
 	    catch: {| e |
