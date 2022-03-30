@@ -773,6 +773,7 @@ defcommand open-file {
 		    [get-current-buffer-dir $window : . "/" $value]
 	    ];
             if {file dir? $path} {
+                BufferManager unregist-buffer "*Directory*";
                 dired-open $main $window $path;
                 return ALL;
             };
@@ -842,6 +843,7 @@ defcommand view-file {
 		    [get-current-buffer-dir $window : . "/" $value]
 	    ];
             if {file dir? $path} {
+                BufferManager unregist-buffer "*Directory*";
                 dired-open $main $window $path;
                 return ALL;
             };
