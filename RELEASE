@@ -2210,4 +2210,8 @@
 		Add key bind Ctrl+Alt+F12 to internal-ssat.
 		Change kill-interp for new create stdin/stdout/stderr object.
 
+2022/03/30
+	pmacs update:
+		Fix *Directory* buffer leak.
+
 #eof
