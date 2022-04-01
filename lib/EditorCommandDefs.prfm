@@ -1264,20 +1264,22 @@ defcommand buffer-list {
     $buff set-raise-low;
     $buff clear-all;
 
+    l ::= BufferManager get-buffer-list-order-by-newer;
+    maxlen ::= $l map {| _i | $_i len : + 2} : max;
+    if {$maxlen < ["Buffer name" len]} {maxlen ::= "Buffer name" len};
+
     $buff append-string "<<< Buffer list >>>";
     $buff append-string "  * Select buffer - Move cursor to buffer line and press Enter key";
     $buff append-string "                    or press shortcut key(0-9).";
     $buff append-string "  * Delete buffer - Move cursor to buffer line and press \"d\" key.";
     $buff append-string "";
-    $buff append-string ["%1v %1v%1v%1v%1v%1v %-32w %6v %-6v %-w" fmt "#" "e" "d" "p" "m" "n" "Buffer name" "Length" "Mode" "Content path"];
-    $buff append-string ["%1v %1v%1v%1v%1v%1v %-32w %6v %-6v %-w" fmt "-" "-" "-" "-" "-" "-" "-----------" "------" "----" "------------"];
-    ### l ::= BufferManager get-buffer-list;
-    l ::= BufferManager get-buffer-list-order-by-newer;
+    $buff append-string ["%1v %1v%1v%1v%1v%1v %-${maxlen}w %6v %-6v %-w" expand : fmt "#" "e" "d" "p" "m" "n" "Buffer name" "Length" "Mode" "Content path"];
+    $buff append-string ["%1v %1v%1v%1v%1v%1v %-${maxlen}w %6v %-6v %-w" expand : fmt "-" "-" "-" "-" "-" "-" "-----------" "------" "----" "------------"];
     shortcut-ind := 1;
     $l each do: {| buff-name |
 	display-buffer ::= BufferManager get-buffer $buff-name;
 	$buff append-string [
-	    "%1v %1v%1v%1v%1v%1v %-32w %6d %-6v %-w" fmt
+	    "%1v %1v%1v%1v%1v%1v %-${maxlen}w %6d %-6v %-w" expand : fmt
             [[$shortcut-ind <= 10] ??? [$shortcut-ind % 10] " "]
             [["" . [$display-buffer get-encoding]] at 0]
 	    [[$display-buffer includeCR?] ??? "D" " "]
