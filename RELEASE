@@ -2207,11 +2207,12 @@
 	pmacs update:
 		Add new editor command internal-stat for display system internal status
 		  at *Scratch* buffer.
-		Add key bind Ctrl+Alt+F12 to internal-ssat.
+		Add key bind Ctrl+Alt+F12 to internal-stat.
 		Change kill-interp for new create stdin/stdout/stderr object.
 
 2022/03/30
 	pmacs update:
 		Fix *Directory* buffer leak.
+		Change buffer-list buffer name display fix length to fit to max buffer name length.
 
 #eof
