@@ -1265,7 +1265,7 @@ defcommand buffer-list {
     $buff clear-all;
 
     l ::= BufferManager get-buffer-list-order-by-newer;
-    maxlen ::= $l map {| _i | $_i len : + 2} : max;
+    maxlen ::= $l map {| _i | $_i display-width : + 2} : max;
     if {$maxlen < ["Buffer name" len]} {maxlen ::= "Buffer name" len};
 
     $buff append-string "<<< Buffer list >>>";
