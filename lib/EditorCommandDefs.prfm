@@ -3847,7 +3847,7 @@ defcommand guru-animal {
 
 defcommand internal-stat {
     | main window |
-    w;
+    w :wide;
     println "";
     stack-trace : split sep: "\n" : each do: {| i | $stdout puts $i};
     println ["interp stat: " . [$PINTERP stat]];
