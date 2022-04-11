@@ -89,8 +89,8 @@ LIGHT {
     $ColorDB set INACTIVE_VERT_LINE         [WUtil color-pair BLUE    BLACK   ];
     $ColorDB set INACTIVE_VERT_LINE_HILIGHT [WUtil color-pair YELLOW  BLACK   ];
     $ColorDB set MINI_WINDOW                [WUtil color-pair WHITE   BLACK   ];
-    $ColorDB set ACTIVE_MINI_WINDOW         [WUtil color-pair BLACK   WHITE   ];
-    $ColorDB set MINI_CAUTION               [WUtil color-pair BLACK   YELLOW  ];
+    $ColorDB set ACTIVE_MINI_WINDOW         [WUtil color-pair BLACK   YELLOW  ];
+    $ColorDB set MINI_CAUTION               [WUtil color-pair WHITE   RED     ];
     $ColorDB set EOF_MARK                   [WUtil color-pair WHITE   YELLOW  ];
     $ColorDB set REGION_HILIGHT             [WUtil color-pair WHITE   CYAN    ];
     $ColorDB set SEARCH_CURRENT_HILIGHT     [WUtil color-pair WHITE   RED     ];
