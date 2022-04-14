@@ -1270,7 +1270,7 @@ defcommand buffer-list {
 
     $buff append-string "<<< Buffer list >>>";
     $buff append-string "  * Select buffer - Move cursor to buffer line and press Enter key";
-    $buff append-string "                    or press shortcut key(0-9).";
+    $buff append-string "                    or press shortcut key(0-9) or press CTRL+B to name completion.";
     $buff append-string "  * Delete buffer - Move cursor to buffer line and press \"d\" key.";
     $buff append-string "";
     $buff append-string ["%1v %1v%1v%1v%1v%1v %-${maxlen}w %6v %-6v %-w" expand : fmt "#" "e" "d" "p" "m" "n" "Buffer name" "Length" "Mode" "Content path"];
@@ -1323,6 +1323,89 @@ defcommand jump-to-buffer {
     };
     $main bind-buffer [$window get-window-name] $target-buff;
     result SELF;
+};
+
+defcommand buffer-list-completion {
+    | main window |
+    $main mini-input-start "" prompt: "Buffer name: ";
+    set _index -1;
+    set _list [BufferManager get-buffer-list];
+
+    $main add-mini-input-callback $window {| main window in-key value |
+        if {eq? $in-key KEY_ESC} {
+            $main mini-input-end;
+            show-message "Canceled.";
+            return ALL;
+        };
+
+        if {eq? $in-key CTRL_I} {
+            if {[$_list len] = 0 } {
+                $MainWindow set-mini-input-prompt "Buffer name (no match completion): ";
+                return ALL;
+            };
+            setc _index [$_index +  1];
+            if {$_index >= [$_list len] } {
+                setc _index 0;
+            };
+            str ::= $_list get $_index;
+            $MainWindow set-mini-input-prompt ["Buffer name (" . [$_list len] " match(es) completion): "];
+            $main mini-input-value-override $str [$str len];
+            return ALL;
+        };
+
+        if {or {string? $in-key} {eq? $in-key KEY_DC} {eq? $in-key CTRL_H} {eq? $in-key KEY_BACKSPACE}} {
+            try {
+                setc _list [[BufferManager get-buffer-list] filter {| n | $n =~ :text :nocase [$value rquote]}];
+            } catch: {
+                setc _list ();
+            };
+            setc _index -1;
+            if {[$_list len] > 0} {
+                $MainWindow set-mini-input-prompt ["Buffer name (" . [$_list len] " match(es) completion): "];
+                if {[$_list len] = 1} {
+                    setc _index 0;
+                };
+            } {
+                $MainWindow set-mini-input-prompt "Buffer name (no match completion): ";
+            };
+            return ALL;
+        };
+            
+        if {eq? $in-key CTRL_M} {
+            if {or {[$_list len] = 0} {$_index < 0}} {
+                show-message :bell "No buffer name specified.";
+                return ALL;
+            };
+            $main mini-input-end;
+            s ::= $_list get $_index;
+            target-buff ::= BufferManager find-buffer $s;
+            $target-buff ?? {
+                show-message :bell "No buffer name specified.";
+                return ALL;
+            };
+            $main bind-buffer [$window get-window-name] $target-buff;
+            return ALL;
+        };
+    };
+    return ALL;
+};
+
+# closure variable test
+defcommand test2 {
+    | main window |
+    $main mini-input-start "" prompt: "test2: ";
+    set _index 0;
+    $main add-mini-input-callback $window {| main window in-key value |
+        if {eq? $in-key KEY_ESC} {
+            $main mini-input-end;
+            show-message "Canceled.";
+            return ALL;
+        };
+        $MainWindow set-mini-input-prompt ["test2: " . [info closure] ": _index=" $_index ": "];
+        setc _index [$_index + 1];
+        return ALL;
+    };
+    return ALL;
 };
 
 defcommand buffer-list-shortcut-1 {
