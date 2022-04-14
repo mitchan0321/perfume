@@ -1353,6 +1353,21 @@ defcommand buffer-list-completion {
             return ALL;
         };
 
+        if {eq? $in-key KEY_BTAB} {
+            if {[$_list len] = 0 } {
+                $MainWindow set-mini-input-prompt "Buffer name (no match completion): ";
+                return ALL;
+            };
+            setc _index [$_index -  1];
+            if {$_index < 0 } {
+                setc _index [$_list len : - 1];
+            };
+            str ::= $_list get $_index;
+            $MainWindow set-mini-input-prompt ["Buffer name (" . [$_list len] " match(es) completion): "];
+            $main mini-input-value-override $str [$str len];
+            return ALL;
+        };
+
         if {or {string? $in-key} {eq? $in-key KEY_DC} {eq? $in-key CTRL_H} {eq? $in-key KEY_BACKSPACE}} {
             try {
                 setc _list [[BufferManager get-buffer-list] filter {| n | $n =~ :text :nocase [$value rquote]}];
@@ -1391,7 +1406,7 @@ defcommand buffer-list-completion {
 };
 
 # closure variable test
-defcommand test2 {
+defcommand test-closure {
     | main window |
     $main mini-input-start "" prompt: "test2: ";
     set _index 0;
