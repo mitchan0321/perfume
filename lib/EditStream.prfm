@@ -1,13 +1,12 @@
 class EditStream;
 
 EditStream method init () {
-    base-constructor;
-    init-constructor;
-    sets Src [vector()];
+    sets Buffer <nil>;
+    sets Name <nil>;
 };
 
-EditStream method init-constructor () {
-    sets newline <nil>;
+EditStream method open (name mode: iomode) {
+    
 };
 
 EditStream method eof? () {
