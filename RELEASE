@@ -2225,4 +2225,8 @@
 		Change internal-stat show w(where command) display to wide.
 		Change mode Interp HILIGHT_REGEXP.
 
+2022/04/14
+	pmacs update:
+		Add editor command buffer-list-completion and bind to CTRL+B at BufferList mode.
+
 #eof
