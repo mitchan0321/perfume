@@ -1,3 +1,4 @@
+2022/04/15	PRFM_20220415		1.5.22
 2022/04/01	PRFM_20220401		1.5.21
 2022/03/14	PRFM_20220314		1.5.20
 2022/03/10	PRFM_20220310		1.5.19
@@ -2228,5 +2229,10 @@
 2022/04/14
 	pmacs update:
 		Add editor command buffer-list-completion and bind to CTRL+B at BufferList mode.
+
+2022/04/15
+	tag:
+		PRFM_20220415
+		1.5.22
 
 #eof
