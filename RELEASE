@@ -2243,4 +2243,13 @@
 		  and delete MODE_SELECT closure.
 		  If you want customize mode select, you can append mode select logic to $MODE_SELECT_LIST.
 
+2022/04/18
+	pmacs update:
+		Add user configuration feature.
+		  Add WUtil::read-user-conf-file is read the user configuration file.
+		  Read $HOME/.pmacs/pmacs.conf at startup if exists.
+		  Read $HOME/.pmacs/default.key at CombiWindow re-builded if exists.
+		  Read $HOME/.pmacs/Mode-[mode].key at set-mode if exists.
+		Fix WUtil::show-message if $MainWindow not exists occured error.
+
 #eof
