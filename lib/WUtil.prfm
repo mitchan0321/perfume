@@ -821,3 +821,25 @@ defun reset-stdio () {
     $stderr set-itemlimit 80;
     $stderr set-comode;
 };
+
+defun mode-select (window buffer-type buffer-name buffer-mode file-path) {
+    suffix ::= if $file-path {$file-path split sep: "." : last : car};
+
+    result := <nil>;
+    if {! [nil? $buffer-mode]} {
+        result := $buffer-mode;
+    } {
+        $MODE_SELECT_LIST each do: {| i |
+            (cond mode) := $i;
+            try {
+                if [fun (window buffer-type buffer-name buffer-mode file-path suffix) $cond :
+                         $window $buffer-type $buffer-name $buffer-mode $file-path $suffix] {
+                    result := $mode;
+                    break;
+                };
+            } catch: {};
+        };
+        $result ?? {result := $DEFAULT_MODE};
+    };
+    result $result;
+};

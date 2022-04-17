@@ -448,7 +448,8 @@ Window method bind-buffer (window-name buffer) {
     #### geom ::= BufferManager get-buffer-geom $window-name [$buffer get-buffer-name];
     BufferManager set-buffer-geom $window-name [$buffer get-buffer-name];
 
-    mode ::= yield $MODE_SELECT $window 
+    mode ::= mode-select
+        $window
         [$buffer get @name]
         [$buffer get-buffer-name]
         [$buffer get-buffer-mode]
