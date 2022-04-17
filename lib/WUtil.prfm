@@ -188,7 +188,7 @@ defun string-width (str tab-width) {
 };
 
 defun show-message (msg wait: msec bell: bell) {
-    if $MainWindow {
+    if {true? MainWindow} {
 	try {
             [$MainWindow get-minibuffer-window] ?? {throw ErrNoMiniBuffer "No MiniBuffer for debugging."};
             $MainWindow display-window-message "MiniBuffer" $msg;
@@ -205,6 +205,8 @@ defun show-message (msg wait: msec bell: bell) {
             };
             if {set? msec} {sleep $msec};
 	} catch: {};
+    } {
+        println file: $stderr $msg;
     };
 };
 
@@ -842,4 +844,16 @@ defun mode-select (window buffer-type buffer-name buffer-mode file-path) {
         $result ?? {result := $DEFAULT_MODE};
     };
     result $result;
+};
+
+defun read-user-conf-file (conf-name) {
+    path ::= $USER_CONF_DIR . "/" $conf-name;
+    if {and {file read? $path} {! [file dir? $path]}} {
+        try {
+            load :notrace $path;
+        } catch: {
+            | e |
+            show-message :bell ["User configuration file (" . $path ") has error, <" [$e car] "># " [$e cdr]];
+        };
+    };
 };

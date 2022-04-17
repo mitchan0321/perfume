@@ -624,7 +624,9 @@ CombiWindow method load-keybind-override (mode) {
                     result ALL;
                 };
 		return <nil>;
-	    };
+            };
+            ### read user config mode key file.
+            read-user-conf-file $key-path;
 	    return <t>;
 	};
     };
