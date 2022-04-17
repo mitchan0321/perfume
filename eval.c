@@ -795,11 +795,29 @@ error:
 	l = list_next(l);						\
     }
 #else
+#ifdef NO_LAZY
     #define PARAM_BIND(n) {					        \
 	val = list_get_item(l);						\
 	var = &(a->array[n]);						\
 	if (GET_TAG(val) == EVAL) {					\
-	    if (*env == NULL) {						\
+            val = toy_expand(interp, val, env, trace_info);             \
+            if (GET_TAG(val) == EXCEPTION) {return val;}                \
+	} else {							\
+	    val = toy_expand(interp, val, env, trace_info);		\
+	    if (GET_TAG(val) == EXCEPTION) {return val;}		\
+	    if (IS_LAZY(var)) {                                         \
+                SET_LAZY(val);                                          \
+            }           				                \
+	}								\
+	hash_set_t(args, var, toy_clone(val));				\
+	l = list_next(l);						\
+    }
+#else
+    #define PARAM_BIND(n) {					        \
+	val = list_get_item(l);						\
+	var = &(a->array[n]);						\
+	if (GET_TAG(val) == EVAL) {					\
+            if (*env == NULL) {						\
 		*env = new_closure_env(interp);				\
 	    }								\
 	    val = new_closure(val->u.eval_body, *env, interp->script_id);\
@@ -815,6 +833,7 @@ error:
 	hash_set_t(args, var, toy_clone(val));				\
 	l = list_next(l);						\
     }
+#endif /* NO_LAZY */
 #endif /* EVAL_STAT */
 
 static Toy_Type*

@@ -31,8 +31,14 @@ endif
 ###
 
 ### Enable curses library (for use in perfume intepriter execute curs-* commands)
+### If you specified NCURSES=yes, ncurses commands are included.
 NCURSES = yes
+
+### If you specified EVAL_STAT=yes, eval-stat command is included.
 EVAL_STAT = no
+
+### If you specified NO_LAZY_CALL=yes, the lazy call mechanism when calling a function is omitted.
+NO_LAZY_CALL = no
 
 ifeq ($(NCURSES),yes)
   OPTIONS	+= -DNCURSES
@@ -42,6 +48,10 @@ endif
 
 ifeq ($(EVAL_STAT),yes)
   OPTIONS	+= -DEVAL_STAT
+endif
+
+ifeq ($(NO_LAZY_CALL),yes)
+  OPTIONS	+= -DNO_LAZY
 endif
 
 ### for product build. (use BoehmGC)
