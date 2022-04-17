@@ -1,11 +1,11 @@
 class EditStream;
 
-EditStream method init () {
+EditStream method init (args: args) {
     sets Buffer <nil>;
     sets Name <nil>;
 };
 
-EditStream method open (name mode: iomode) {
+EditStream method open (name) {
     
 };
 
