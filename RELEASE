@@ -2235,4 +2235,12 @@
 		PRFM_20220415
 		1.5.22
 
+2022/04/16
+	Makefile, eval.c
+		If you specified NO_LAZY_CALL=yes at Makefile, the lazy call mechanism when calling a function is omitted.
+	pmacs update:
+		Add mode-select function and global variable MODE_SELECT_LIST defined at pmacs.conf
+		  and delete MODE_SELECT closure.
+		  If you want customize mode select, you can append mode select logic to $MODE_SELECT_LIST.
+
 #eof
