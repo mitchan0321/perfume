@@ -11,6 +11,9 @@ read_size(int fd, char* buff, int size) {
     int sts;
     int pos = 0;
     int remain = size;
+    
+    if (size < 0)  return -1;
+    if (size == 0) return  1;
 
     do {
 	sts = read(fd, &buff[pos], remain);
@@ -31,6 +34,9 @@ write_size(int fd, char* buff, int size) {
     int pos = 0;
     int remain = size;
 
+    if (size < 0)  return -1;
+    if (size == 0) return  1;
+    
     do {
 	sts = write(fd, &buff[pos], remain);
 	if (-1 == sts) return -1;
