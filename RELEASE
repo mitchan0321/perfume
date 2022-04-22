@@ -2260,4 +2260,8 @@
 		PRFM_20220419
 		1.5.23
 
+2022/04/23
+	pmacs update:
+		Change raise buffer order when previous buffer killed.
+
 #eof
