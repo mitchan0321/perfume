@@ -471,7 +471,8 @@ Window method unbind-buffer () {
 	if {[$i get-buffer : get-buffer-name] = $kill-buff-name} {
             ### bind-buffer [$i get-window-name] $next-buff;
 	    bind-buffer [$i get-window-name] [
-                l ::= BufferManager get-buffer-list-split-order-by-newer;
+                ### l ::= BufferManager get-buffer-list-split-order-by-newer;
+                l ::= BufferManager get-buffer-list-order-by-newer;
                 if {$l null?} {
                     BufferManager get-buffer <nil>;
                 } {
