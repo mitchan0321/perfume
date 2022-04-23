@@ -2263,5 +2263,6 @@
 2022/04/23
 	pmacs update:
 		Change raise buffer order when previous buffer killed.
+		Change DARK theme color.
 
 #eof
