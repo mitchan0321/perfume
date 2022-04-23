@@ -123,7 +123,7 @@ DARK {
     $ColorDB set ACTIVE_MINI_WINDOW         [WUtil color-pair WHITE   BLACK   ];
     $ColorDB set MINI_CAUTION               [WUtil color-pair BLACK   YELLOW  ];
     $ColorDB set EOF_MARK                   [WUtil color-pair BLACK   YELLOW  ];
-    $ColorDB set REGION_HILIGHT             [WUtil color-pair WHITE   BLUE    ];
+    $ColorDB set REGION_HILIGHT             [WUtil color-pair BLACK   CYAN    ];
     $ColorDB set SEARCH_CURRENT_HILIGHT     [WUtil color-pair WHITE   RED     ];
     $ColorDB set SEARCH_HILIGHT             [WUtil color-pair BLACK   YELLOW  ];
     $ColorDB set RESERVED_WORD_HILIGHT      [WUtil color-pair YELLOW  BLACK   ];
