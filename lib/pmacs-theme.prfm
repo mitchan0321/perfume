@@ -111,7 +111,7 @@ LIGHT {
 DARK {
     $ColorDB set EDIT_BUFFER                [WUtil color-pair WHITE   BLACK   ];
     $ColorDB set ACTIVE_STATUS_LINE         [WUtil color-pair BLACK   WHITE   ];
-    $ColorDB set ACTIVE_STATUS_LINE_PROTECT [WUtil color-pair BLACK   YELLOW  ];
+    $ColorDB set ACTIVE_STATUS_LINE_PROTECT [WUtil color-pair BLACK   GREEN   ];
     $ColorDB set ACTIVE_VERT_LINE           [WUtil color-pair BLACK   WHITE   ];
     $ColorDB set ACTIVE_VERT_LINE_PROTECT   [WUtil color-pair BLACK   WHITE   ];
     $ColorDB set ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair WHITE   CYAN    ];
