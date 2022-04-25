@@ -2265,4 +2265,8 @@
 		Change raise buffer order when previous buffer killed.
 		Change DARK theme color.
 
+2022/04/25
+	pmacs update:
+		Fix smart-move-forward cursor jump to illegal position when cursor on EOF.
+
 #eof
