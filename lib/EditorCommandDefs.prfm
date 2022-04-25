@@ -2487,6 +2487,8 @@ defcommand smart-move-forward {
     
     ### otherwise
     ### move word forward
+    last-y := $ey;
+    last-x := $ex;
     $vec each-forward-char $ey $ex {| last-y last-x c |
         if {or 
             {$c alphanumeric?}
