@@ -2428,7 +2428,7 @@ defcommand smart-move-forward {
 
     (ey ex) ::= $window get-source-index $buff $geom;
     str ::= $buff get-buffer-line $ey;
-    str ::= $str ?? "";
+    $str ?? {return ALL};
     cur-char ::= $str at $ex;
     if {or [$cur-char = ")"] [$cur-char = "]"] [$cur-char = "}"]} {
         show-message "Bracket directions are opposite.";
