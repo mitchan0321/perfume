@@ -2116,7 +2116,7 @@ defun create-directory-if-not-exists (path) {
         try {
             file mkdir $dir $DEFAULT_DIR_MODE;
         } catch: {| err |
-            throw ErrFileAccess ["Can\'t create directory \'" . $dir "\'."];
+            throw ErrFileAccess ["Can\'t create directory \'" . $dir "\'."]; #'
         };
     };
 };
@@ -4041,6 +4041,28 @@ defcommand test {
 	};
     };
     result ALL;
+};
+
+defcommand color-index {| main window |
+  (height width) ::= $window get-screen-size;
+  buff ::= $window get-buffer;
+  geom ::= $window get-geom;
+  (y x) ::= $window get-source-index $buff $geom;
+  v ::= $buff get-vector;
+  start := $geom,ViewLine;
+  end ::= $geom,ViewLine + $height : - 1;
+  $v each-backward-char $y $x { | cy cx cc |
+    if {$cy < $start} {break};
+    if {$cc = "0"} {
+      $window set-spot-color-item ["A" . $cy "." $cx] $cy $cx 1 BLACK.CYAN;
+    };
+  };
+  $v each-forward-char $y $x { | cy cx cc |
+    if {$cy > $end} {break};
+    if {$cc = "1"} {
+      $window set-spot-color-item ["A" . $cy "." $cx] $cy $cx 1 BLACK.CYAN;
+    };
+  };
 };
 
 ######
