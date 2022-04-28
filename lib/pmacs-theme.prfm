@@ -170,7 +170,7 @@ BLUE-BACK {
     $ColorDB set DIRED_SYMLINK              [WUtil color-pair MAGENTA BLUE    ];
     $ColorDB set DIRED_DEV                  [WUtil color-pair YELLOW  BLUE    ];
     $ColorDB set INTERP_PROMPT_HILIGHT      [WUtil color-pair GREEN   BLUE    ];
-    $ColorDB set BRACKETS_PAIR              [WUtil color-pair WHITE   BLUE    ];
+    $ColorDB set BRACKETS_PAIR              [WUtil color-pair WHITE   BLACK   ];
 }
 
 RETRO {
