@@ -7,6 +7,7 @@ BufferGeom method init () {
     sets CursorColumn 0;
     sets IndexColumn.SAVE 0;
     sets Region <nil>;
+    sets SpotColor [dict()];
 };
 
 BufferGeom method clone () {
@@ -17,6 +18,7 @@ BufferGeom method clone () {
     $b set! CursorColumn $CursorColumn;
     $b set! IndexColumn.SAVE $IndexColumn.SAVE;
     $b set! Region $Region;
+    $b set! SpotColor $SpotColor;
     return $b;
 };
 
@@ -28,6 +30,7 @@ BufferGeom method restore-geom (geom) {
     $b set! CursorColumn $geom,CursorColumn;
     $b set! IndexColumn.SAVE $geom,IndexColumn.SAVE;
     $b set! Region $geom,Region;
+    $b set! SpotColor $geom,SpotColor;
 };
 
 BufferGeom method string () {

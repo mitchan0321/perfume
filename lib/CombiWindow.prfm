@@ -88,7 +88,6 @@ CombiWindow method init (main y x line column) {
     load-keybind;
     sets Mode <nil>;
     sets HILIGHT_REGEXP <nil>;
-    sets SpotColor [dict()];
 };
 
 CombiWindow method get-window-size () {
@@ -606,7 +605,6 @@ CombiWindow method setkeydesc (key desc) {
 
 CombiWindow method load-keybind-override (mode) {
     sets HILIGHT_REGEXP <nil>;
-    sets SpotColor [dict()];
     load-keybind;
     key-path := $MODE_FILE,$mode;
     $key-path ?? {
@@ -1236,7 +1234,7 @@ CombiWindow method set-word-hilight (buff geom start end) {
 };
 
 CombiWindow method set-spot-color (buff geom) {
-    $SpotColor each do: {| k v | 
+    $geom,SpotColor each do: {| k v | 
         try {
             l ::= $v car : car;
             set-word-hilight-color $geom $buff ([$v car]) [$v cdr : car];
@@ -1312,10 +1310,16 @@ CombiWindow method set-color (line column length color-name attr) {
 };
 
 CombiWindow method set-spot-color-item (key y x len color) {
-    $SpotColor set $key (($y ($x [$x + $len])) $color);
+    geom ::= get-geom;
+    $geom,SpotColor set $key (($y ($x [$x + $len])) $color);
 };
 
 CombiWindow method remove-spot-color-item (key) {
-    $SpotColor unset $key;
+    geom ::= get-geom;
+    $geom,SpotColor unset $key;
 };
 
+CombiWindow method remove-spot-color-all () {
+    geom ::= get-geom;
+    $geom set! SpotColor [dict()];
+};

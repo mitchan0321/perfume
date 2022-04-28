@@ -666,7 +666,6 @@ Window method send-key-event (event-list) {
 Window method mini-input-start (init-value prompt: p index: index) {
     sets MiniInput <t>;
     sets MiniInputSave ([$WindowList,0 get-window-name] [$WindowList,0 get-buffer]);
-    sets MiniInputSpotColorSave [$WindowList,0 get SpotColor];
     if {! [set? index]} {
         index ::= $init-value len;
     };
@@ -698,7 +697,6 @@ Window method mini-input-end () {
     if {list? $MiniInputSave} {
 	bind-buffer $MiniInputSave,0 $MiniInputSave,1;
     };
-    $WindowList,0 set! SpotColor $MiniInputSpotColorSave;
     sets MiniInputSave <nil>;
     $MiniWindow diactivate;
     $MiniWindow clear;
