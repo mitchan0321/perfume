@@ -2269,4 +2269,8 @@
 	pmacs update:
 		Fix smart-move-forward cursor jump to illegal position when cursor on EOF.
 
+2022/04/28
+	pmacs update:
+		Add spot color face function.
+
 #eof
