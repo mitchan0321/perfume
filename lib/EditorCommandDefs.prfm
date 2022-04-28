@@ -3966,6 +3966,102 @@ defcommand internal-stat {
     result ALL;
 };
 
+defcommand brackets-pair {
+    | main window |
+    (height width) ::= $window get-screen-size;
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (y x) ::= $window get-source-index $buff $geom;
+    v ::= $buff get-vector;
+    start := $geom,ViewLine;
+    end ::= $geom,ViewLine + $height : - 1;
+    cur-char ::= $v at $y $x;
+    if {and {$y = 0} {$x = 0}} {
+        (py px) := (0 0);
+        prev-char := "";
+    } {
+        (py px) ::= $v get-prev-pos $y $x;
+        prev-char ::= $v at $py $px;
+    };
+    if {or {"(" = $cur-char} {")" = $cur-char} {"[" = $cur-char}
+           {"]" = $cur-char} {"{" = $cur-char} {"}" = $cur-char}}
+    else: {
+        cur-char := $prev-char;
+        (y x) := ($py $px);
+    };
+    case $cur-char
+       "(" {
+           dir := f;
+           cap-dec := ")";
+           cap-inc := "(";
+       }
+       "[" {
+           dir := f;
+           cap-dec := "]";
+           cap-inc := "[";
+       }
+       "{" {
+           dir := f;
+           cap-dec := "}";
+           cap-inc := "{";
+       }
+       ")" {
+           dir := b;
+           cap-dec := ")";
+           cap-inc := "(";
+       }
+       "]" {
+           dir := b;
+           cap-dec := "]";
+           cap-inc := "[";
+       }
+       "}" {
+           dir := b;
+           cap-dec := "}";
+           cap-inc := "{";
+       }
+       <t> {return SELF};
+    ;;
+
+    find := <nil>;
+    case $dir
+        f {
+            (start-y start-x) ::= $v get-next-pos $y $x;
+            level := 1;
+            $v each-forward-char $start-y $start-x {
+                | cy cx cc |
+                if {$cy > $end} {return SELF};
+                if {$cc = $cap-dec} {$level --};
+                if {$cc = $cap-inc} {$level ++};
+                if {$level = 0} {
+                    find := <t>;
+                    break;
+                };
+            };
+        }
+        b {
+            (start-y start-x) ::= $v get-prev-pos $y $x;
+            level := -1;
+            $v each-backward-char $start-y $start-x {
+                | cy cx cc |
+                if {$cy < $start} {return SELF};
+                if {$cc = $cap-dec} {$level --};
+                if {$cc = $cap-inc} {$level ++};
+                if {$level = 0} {
+                    find := <t>;
+                    break
+                };
+            };
+        }
+    ;;
+    if $find {
+        $window set-spot-color-item "BRACKETS-PAIR" $cy $cx 1 BRACKETS_PAIR;
+    } {
+        $window remove-spot-color-item "BRACKETS-PAIR";
+    };
+    return SELF;
+};
+
 defcommand test2 {
     | main window |
 

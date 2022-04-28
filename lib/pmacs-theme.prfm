@@ -106,6 +106,7 @@ LIGHT {
     $ColorDB set DIRED_SYMLINK              [WUtil color-pair MAGENTA WHITE   ];
     $ColorDB set DIRED_DEV                  [WUtil color-pair YELLOW  WHITE   ];
     $ColorDB set INTERP_PROMPT_HILIGHT      [WUtil color-pair BLACK   GREEN   ];
+    $ColorDB set BRACKETS_PAIR              [WUtil color-pair BLACK   CYAN    ];
 }
 
 DARK {
@@ -137,6 +138,7 @@ DARK {
     $ColorDB set DIRED_SYMLINK              [WUtil color-pair MAGENTA BLACK   ];
     $ColorDB set DIRED_DEV                  [WUtil color-pair YELLOW  BLACK   ];
     $ColorDB set INTERP_PROMPT_HILIGHT      [WUtil color-pair GREEN   BLACK   ];
+    $ColorDB set BRACKETS_PAIR              [WUtil color-pair WHITE   BLUE    ];
 }
 
 BLUE-BACK {
@@ -168,6 +170,7 @@ BLUE-BACK {
     $ColorDB set DIRED_SYMLINK              [WUtil color-pair MAGENTA BLUE    ];
     $ColorDB set DIRED_DEV                  [WUtil color-pair YELLOW  BLUE    ];
     $ColorDB set INTERP_PROMPT_HILIGHT      [WUtil color-pair GREEN   BLUE    ];
+    $ColorDB set BRACKETS_PAIR              [WUtil color-pair WHITE   BLUE    ];
 }
 
 RETRO {
@@ -199,6 +202,7 @@ RETRO {
     $ColorDB set DIRED_SYMLINK              [WUtil color-pair MAGENTA BLACK   ];
     $ColorDB set DIRED_DEV                  [WUtil color-pair YELLOW  BLACK   ];
     $ColorDB set INTERP_PROMPT_HILIGHT      [WUtil color-pair GREEN   BLACK   ];
+    $ColorDB set BRACKETS_PAIR              [WUtil color-pair WHITE   BLUE    ];
 }
 
 MONO {
@@ -230,6 +234,7 @@ MONO {
     $ColorDB set DIRED_SYMLINK              [WUtil color-pair WHITE   BLACK   ];
     $ColorDB set DIRED_DEV                  [WUtil color-pair WHITE   BLACK   ];
     $ColorDB set INTERP_PROMPT_HILIGHT      [WUtil color-pair BLACK   WHITE   ];
+    $ColorDB set BRACKETS_PAIR              [WUtil color-pair BLACK   WHITE   ];
 }
 
 MONO-GREEN {
@@ -261,6 +266,7 @@ MONO-GREEN {
     $ColorDB set DIRED_SYMLINK              [WUtil color-pair GREEN   BLACK   ];
     $ColorDB set DIRED_DEV                  [WUtil color-pair GREEN   BLACK   ];
     $ColorDB set INTERP_PROMPT_HILIGHT      [WUtil color-pair BLACK   GREEN   ];
+    $ColorDB set BRACKETS_PAIR              [WUtil color-pair BLACK   GREEN   ];
 }
 
 default: {result <nil>}

@@ -774,6 +774,11 @@ Vector method get-prev-pos (y x) {
     return ($y $x);
 };
 
+Vector method at (y x) {
+    if {or {$y < 0} {$y >= [self : len]}} {return ""};
+    return [get $y : at $x];
+};
+
 String method repeat (times) {
     result := "";
     if {$times = 0} {return $result};
