@@ -3968,6 +3968,7 @@ defcommand internal-stat {
 
 defcommand brackets-pair {
     | main window |
+    $window remove-spot-color-item "BRACKETS-PAIR";
     (height width) ::= $window get-screen-size;
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -4020,7 +4021,9 @@ defcommand brackets-pair {
            cap-dec := "}";
            cap-inc := "{";
        }
-       <t> {return SELF};
+       default: {
+           return SELF;
+       }
     ;;
 
     find := <nil>;
@@ -4030,7 +4033,9 @@ defcommand brackets-pair {
             level := 1;
             $v each-forward-char $start-y $start-x {
                 | cy cx cc |
-                if {$cy > $end} {return SELF};
+                if {$cy > $end} {
+                    return SELF;
+                };
                 if {$cc = $cap-dec} {$level --};
                 if {$cc = $cap-inc} {$level ++};
                 if {$level = 0} {
@@ -4044,7 +4049,9 @@ defcommand brackets-pair {
             level := -1;
             $v each-backward-char $start-y $start-x {
                 | cy cx cc |
-                if {$cy < $start} {return SELF};
+                if {$cy < $start} {
+                    return SELF;
+                };
                 if {$cc = $cap-dec} {$level --};
                 if {$cc = $cap-inc} {$level ++};
                 if {$level = 0} {
@@ -4056,8 +4063,6 @@ defcommand brackets-pair {
     ;;
     if $find {
         $window set-spot-color-item "BRACKETS-PAIR" $cy $cx 1 BRACKETS_PAIR;
-    } {
-        $window remove-spot-color-item "BRACKETS-PAIR";
     };
     return SELF;
 };

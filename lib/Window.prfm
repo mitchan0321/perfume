@@ -642,6 +642,13 @@ Window method key-event-loop () {
                     cursor-update := <nil>;
                     break;
                 }
+                <t> {
+                    if {! $MiniInput} {
+			if {eq? [$window get @name] CombiWindow} {
+                            $window apply-command $main $window <nil> brackets-pair;
+                        };
+                    };
+                }
                 {eq? $result ALL} {
                     $main apply {render-all; refresh};
                     if $MiniInput {$MiniWindow apply {render; refresh}};

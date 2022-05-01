@@ -18,7 +18,7 @@ BufferGeom method clone () {
     $b set! CursorColumn $CursorColumn;
     $b set! IndexColumn.SAVE $IndexColumn.SAVE;
     $b set! Region $Region;
-    $b set! SpotColor $SpotColor;
+    $b set! SpotColor [dict()]; # Do not share
     return $b;
 };
 
