@@ -24,7 +24,7 @@ CombiWindow method init (main y x line column) {
             [$line - 1]         [$column - 1]
         ];
     }
-    <t> {
+    default: {
         sets BufferCurs [
             curs-new-window
             $curs
@@ -67,7 +67,7 @@ CombiWindow method init (main y x line column) {
             [$line - 1]         1
         ];
     }
-    <t> {
+    default: {
         sets VerticalLineCurs [
             curs-new-window
             $curs
