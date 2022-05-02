@@ -1841,8 +1841,8 @@ defun search-sub (main window dir) {
         };
         if {eq? $in-key CTRL_T} {
             case $SEARCH_MODE
-            regex {setvar SEARCH_MODE text}
-            text  {setvar SEARCH_MODE regex}
+                regex {setvar SEARCH_MODE text}
+                text  {setvar SEARCH_MODE regex}
             ;;
             $MainWindow set-mini-input-prompt [search-prompt $dir $SEARCH_MODE];
       	    $window reset-search;
@@ -3776,12 +3776,12 @@ defcommand set-encoder {
     $main add-mini-input-callback $window {| main window in-key value |
         enc := <nil>;
         case  $in-key
-        "u" {enc := "UTF-8F"}
-        "U" {enc := "UTF-8F"}
-        "e" {enc := "EUC-JP"}
-        "E" {enc := "EUC-JP"}
-        "s" {enc := "Shift-JIS"}
-        "S" {enc := "Shift-JIS"}
+            "u" {enc := "UTF-8F"}
+            "U" {enc := "UTF-8F"}
+            "e" {enc := "EUC-JP"}
+            "E" {enc := "EUC-JP"}
+            "s" {enc := "Shift-JIS"}
+            "S" {enc := "Shift-JIS"}
         ;;
         if $enc {
             $main mini-input-end;
@@ -3852,10 +3852,10 @@ defcommand guru-guru {
     body := {
         set message [
             case $message
-            "-"  "/"
-            "/"  "|"
-            "|"  "\\"
-            "\\" "-"
+                "-"  "/"
+                "/"  "|"
+                "|"  "\\"
+                "\\" "-"
             ;;
         ];
         show-message [[$message . " "] repeat [$x / 2]];
@@ -3879,10 +3879,10 @@ defcommand guru-wave {
     body := {
         set c [
             case $c
-            "-"   "\\"
-            "\\"  "|"
-            "|"   "/"
-            "/"   "-"
+                "-"   "\\"
+                "\\"  "|"
+                "|"   "/"
+                "/"   "-"
             ;;
         ];
         message := "";
@@ -3890,10 +3890,10 @@ defcommand guru-wave {
         1 each to: [$x / 2] do: {
             set c1 [
                 case $c1
-                "-"   "\\"
-                "\\"  "|"
-                "|"   "/"
-                "/"   "-"
+                    "-"   "\\"
+                    "\\"  "|"
+                    "|"   "/"
+                    "/"   "-"
                 ;;
             ];
             $message append! $c1 " ";
@@ -3919,10 +3919,10 @@ defcommand guru-animal {
     body := {
         set c [
             case $c
-            "😺"  "🐾"
-            "🐾"  "🐼"
-            "🐼"  "🐣"
-            "🐣"  "😺"
+                "😺"  "🐾"
+                "🐾"  "🐼"
+                "🐼"  "🐣"
+                "🐣"  "😺"
             ;;
         ];
         message := "";
@@ -3930,10 +3930,10 @@ defcommand guru-animal {
         1 each to: [$x / 2] do: {
             set c1 [
                 case $c1
-                "😺"  "🐾"
-                "🐾"  "🐼"
-                "🐼"  "🐣"
-                "🐣"  "😺"
+                    "😺"  "🐾"
+                    "🐾"  "🐼"
+                    "🐼"  "🐣"
+                    "🐣"  "😺"
                 ;;
             ];
             $message append! $c1 " ";
@@ -3969,7 +3969,7 @@ defcommand internal-stat {
 defcommand brackets-pair {
     | main window |
     $window remove-spot-color-item "BRACKETS-PAIR";
-    (height width) ::= $window get-screen-size;
+    (height width) ::= $window get-window-size;
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     (y x) ::= $window get-source-index $buff $geom;
