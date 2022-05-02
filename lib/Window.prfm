@@ -645,7 +645,15 @@ Window method key-event-loop () {
                 <t> {
                     if {! $MiniInput} {
 			if {eq? [$window get @name] CombiWindow} {
-                            $window apply-command $main $window <nil> brackets-pair;
+                            add-background after: 0 {
+                                if {! $MiniInput} {
+                                    if {eq? [$window get @name] CombiWindow} {
+                                        $window apply-command $main $window <nil> brackets-pair;
+                                        $window apply {render; refresh};
+                                        $window set-cursor;
+                                    };
+                                };
+                            };
                         };
                     };
                 }
