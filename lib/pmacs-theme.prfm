@@ -165,12 +165,12 @@ BLUE-BACK {
     $ColorDB set DATATYPE_HILIGHT           [WUtil color-pair GREEN   BLUE    ];
     $ColorDB set COMMENT_HILIGHT            [WUtil color-pair BLACK   BLUE    ];
     $ColorDB set ALERT_HILIGHT              [WUtil color-pair RED     BLUE    ];
-    $ColorDB set PWIKI_LINK                 [WUtil color-pair BLACK   CYAN    ];
+    $ColorDB set PWIKI_LINK                 [WUtil color-pair GREEN   BLUE    ];
     $ColorDB set DIRED_DIRECTORY            [WUtil color-pair YELLOW  BLUE    ];
     $ColorDB set DIRED_SYMLINK              [WUtil color-pair MAGENTA BLUE    ];
     $ColorDB set DIRED_DEV                  [WUtil color-pair YELLOW  BLUE    ];
     $ColorDB set INTERP_PROMPT_HILIGHT      [WUtil color-pair GREEN   BLUE    ];
-    $ColorDB set BRACKETS_PAIR              [WUtil color-pair WHITE   BLACK   ];
+    $ColorDB set BRACKETS_PAIR              [WUtil color-pair WHITE   CYAN    ];
 }
 
 RETRO {
