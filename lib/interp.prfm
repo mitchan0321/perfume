@@ -66,7 +66,8 @@ defun interp-co () {
 		    println "EXCEPTION: <" [$__exp car] "># " [$__exp cdr];
 		    println $@stack-trace;
 		    unset __cont__;
-	        };
+	        }
+            ;;
         };
 
         if [set? __cont__] then: {interp-prompt prompt: "...> "} else: {interp-prompt};
