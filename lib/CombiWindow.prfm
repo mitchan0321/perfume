@@ -757,7 +757,8 @@ CombiWindow method display-evaluation () {
 	update-display := <nil>;
 
 	$stdout close;
-	$stdout each do: {| r | r ::= $r string;
+	$stdout each do: {| r |
+            r ::= $r string;
             if {or [$r =~ '^Result\[FUNC\]=> '] [$r =~ '^Result\[CLOSURE\]=> ']} {
                 r ::= [$r sub 0 80] . " ...";
                 $buff append-string $r;
