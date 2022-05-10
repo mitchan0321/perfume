@@ -17,7 +17,7 @@ EditStream method open (name) {
 EditStream method eof? () {
     $Buffer ?? {return <t>};
     
-    return [[$Buffer get-buffer-length] <= $Locate];
+    [[$Buffer get-buffer-length] <= $Locate] ??? <t> <nil>;
 };
 
 EditStream method close () {
@@ -52,6 +52,11 @@ EditStream method puts (nonewline: nonewline args: r) {
 };
 
 EditStream method gets (nonewline: nonewline) {
+    $Buffer ?? {throw FileNotOpen "EditBuffer stream not open."};
+
+    r ::= $Buffer get-buffer-line $Locate;
+    $Locate ++;
+    return $r;
 };
 
 EditStream method flush () {
@@ -65,9 +70,14 @@ EditStream method stat () {
 };
 
 EditStream method each (do: body) {
+    while {! [eof?]} do: {
+        yield $body [gets];
+    };
 };
 
 EditStream method string () {
+    $Buffer ?? {return ""};
+    return ["<" . $Name ">"];
 };
 
 EditStream method set-newline (m) {
