@@ -3,6 +3,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/select.h>
+#include <sys/time.h>
+#include <unistd.h>
 #include "util.h"
 #include "global.h"
 
@@ -193,4 +196,23 @@ decode_error(Toy_Interp *interp, char *str) {
     }
     
     return cell_get_addr(c);
+}
+
+int
+is_read_ready(int fd, int timeout_m) {
+    struct timeval timeout;
+    int maxfd;
+    fd_set read_fds;
+    int sts;
+    
+    timeout.tv_sec = timeout_m / 1000;
+    timeout.tv_usec = (timeout_m % 1000) * 1000;
+    maxfd = fd + 1;
+    FD_ZERO(&read_fds);
+    FD_SET(fd, &read_fds);
+    sts = select(maxfd, &read_fds, NULL, NULL, &timeout);
+    if (-1 == sts)                                          return IRDY_ERR;
+    if ((timeout.tv_sec <= 0) && (timeout.tv_usec <= 0))    return IRDY_TOUT;
+    if (FD_ISSET(fd, &read_fds))                            return IRDY_OK;
+    return IRDY_NO;
 }

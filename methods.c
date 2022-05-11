@@ -3980,7 +3980,13 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     }
     
     while (1) {
-	c = fgetc(f->fd);
+        c = fgetc(f->fd);
+        
+        /*
+         * 読み込んだ文字が CR であるとき、次の一文字を先読みして、
+         * それが LF であった場合、include_cr インジケータをオンにする。
+         * そして、ignore_cr が設定されている場合は、CR 文字は無視する。
+         */
         if ('\r' == c) {
             int nc = fgetc(f->fd);
             if (EOF != nc) {
@@ -3993,7 +3999,13 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
                 }
             }
         }
-	
+        
+        /*
+         * EOFの場合：
+         * ・errnoがEAGAINの場合は呼び出し元にException(TE_IOAGAIN)を返す。
+         * ・cbuff が 0 バイトの場合は <nil> (EOF) を返す。
+         * ・cbuff に文字がある場合は、デコードして返す。
+         */
         if (EOF == c) {
 	    if ((errno == EAGAIN) && (! feof(f->fd))) {
 		clearerr(f->fd);
@@ -4012,7 +4024,15 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 		return new_string_cell(c);
 	    }
 	}
-
+        
+        /*
+         * 読み込んだ文字が CR または LF の場合
+         * ・(引数)!nonewline かつ (プロパティ)!newline であれば cbuff に追加する。
+         * ・CR で (引数)nonewline であれば cbuff に追加する。
+         * 読み込んだ文字が CR でも LF でもない場合
+         * ・印字可能文字であれば cbuff に追加する。
+         * ・そうでなければ (プロパティ)!nocontrol であれば cbuff に追加する。
+         */
         if (('\n' == c) || ('\r' == c)) {
             if (! flag_nonewline) {
                 if (! flag_nocontrol) {
@@ -4035,6 +4055,10 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
             }
         }
 	
+        /*
+         * 最終的な文字返却判定を行う。
+         * 読んだ文字が LF または (プロパティ)!ignore_cr かつ CR の場合、cbuff をデコードして返す。
+         */
 	if (('\n' == c) || (('\r' == c) && (f->ignore_cr == 0))) {
 	    Cell *c = decode_raw_to_unicode(cbuff, f->input_encoding, enc_error_info);
             if (enc_error_info->errorno != 0) {
@@ -4044,7 +4068,29 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 		return new_exception(TE_BADENCODEBYTE, enc_error_info->message, interp);
 	    }
 	    return new_string_cell(c);
-	}
+        }
+        
+        int sts = is_read_ready(fileno(f->fd), 1000);
+        fprintf(stderr, "****** is_read_ready: %d\n", sts);
+        if (IRDY_OK == sts) {
+            continue;
+        }
+        if (IRDY_ERR == sts) {
+            return new_exception(TE_FILEACCESS, L"File select status can\'t get.", interp); // '
+        }
+
+        if (IRDY_TOUT == sts) {
+            if (cell_get_length(cbuff) == 0) continue;
+            
+            Cell *c = decode_raw_to_unicode(cbuff, f->input_encoding, enc_error_info);
+            if (enc_error_info->errorno != 0) {
+                f->enc_error = 1;
+            }
+            if (NULL == c) {
+                return new_exception(TE_BADENCODEBYTE, enc_error_info->message, interp);
+            }
+            return new_string_cell(c);
+        }
     }
 
 error:

@@ -10,6 +10,7 @@ modules := (
     CombiWindow
     MiniWindow
     WUtil
+    EditStream
 );
 
 defun pmacs (trace: t) {
