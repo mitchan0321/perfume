@@ -2279,4 +2279,19 @@
 		PRFM_20220505
 		1.5.24
 
+2022/05/15
+	methods.c
+		Add if data stream stoped but not line terminate when File::noblock setting,
+		  File::gets returns data early exit to caller.
+		  This case the File object property set early-exit flag to <t>.
+		Add method File::set-readbuffer-max if set this (no zero), return data to caller
+		  when if input data length greater than set-readbuffer-max value.
+		Add flag value File::early-exit, sets if File::gets input data greater than
+		  File::set-readbuffer-max or File::noblock is blocked.
+	util.[ch]
+		Add new utility function is_read_ready.
+	lib/exec.prfm
+		Change set to property methods File::set-readbuffer-max and File::set-noblock,
+		  and use condition flag File::early-exit.
+
 #eof
