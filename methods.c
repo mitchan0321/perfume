@@ -3725,10 +3725,11 @@ error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
-#define FMODE_INPUT	(1)
-#define FMODE_OUTPUT	(2)
-#define FMODE_APPEND	(3)
-#define FMODE_INOUT	(4)
+#define FMODE_INPUT	        (1)
+#define FMODE_OUTPUT	        (2)
+#define FMODE_APPEND	        (3)
+#define FMODE_INOUT	        (4)
+#define READBUFFER_MAX_DEFAULT  (0)    /* default is no-limit */
 
 typedef struct _toy_file {
     FILE *fd;
@@ -3736,6 +3737,8 @@ typedef struct _toy_file {
     int newline;
     Toy_Type *path;
     Cell *r_pending;
+    int readbuffer_max;
+    int early_exit;
     int noblock;
     int input_encoding;
     int output_encoding;
@@ -3791,6 +3794,8 @@ mth_file_init(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     f->ignore_cr = 0;
     f->include_cr = 0;
     f->enc_error = 0;
+    f->readbuffer_max = READBUFFER_MAX_DEFAULT;
+    f->early_exit = 0;
     hash_set_t(self, const_Holder, new_container(f, L"FILE"));
 
     enc = hash_get_t(interp->globals, const_DEFAULT_FILE_ENCODING);
@@ -3979,6 +3984,8 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 	cbuff = new_cell(L"");
     }
     
+    f->early_exit = 0;
+    
     while (1) {
         c = fgetc(f->fd);
         
@@ -4058,7 +4065,7 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
         /*
          * 最終的な文字返却判定を行う。
          * 読んだ文字が LF または (プロパティ)!ignore_cr かつ CR の場合、cbuff をデコードして返す。
-         */
+        */
 	if (('\n' == c) || (('\r' == c) && (f->ignore_cr == 0))) {
 	    Cell *c = decode_raw_to_unicode(cbuff, f->input_encoding, enc_error_info);
             if (enc_error_info->errorno != 0) {
@@ -4070,18 +4077,7 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 	    return new_string_cell(c);
         }
         
-        int sts = is_read_ready(fileno(f->fd), 1000);
-        fprintf(stderr, "****** is_read_ready: %d\n", sts);
-        if (IRDY_OK == sts) {
-            continue;
-        }
-        if (IRDY_ERR == sts) {
-            return new_exception(TE_FILEACCESS, L"File select status can\'t get.", interp); // '
-        }
-
-        if (IRDY_TOUT == sts) {
-            if (cell_get_length(cbuff) == 0) continue;
-            
+        if ((f->readbuffer_max != 0) && (cell_get_length(cbuff) >= f->readbuffer_max)) {
             Cell *c = decode_raw_to_unicode(cbuff, f->input_encoding, enc_error_info);
             if (enc_error_info->errorno != 0) {
                 f->enc_error = 1;
@@ -4089,7 +4085,42 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
             if (NULL == c) {
                 return new_exception(TE_BADENCODEBYTE, enc_error_info->message, interp);
             }
+            f->early_exit = 1;
             return new_string_cell(c);
+        }
+        
+        if (f->noblock == 0) continue;
+        
+        if (cell_get_length(cbuff) > 0) {
+            int nc = fgetc(f->fd);
+            if ((EOF == nc) && (errno == EAGAIN)) {
+                clearerr(f->fd);
+                int sts = is_read_ready(fileno(f->fd), 500);
+                if (IRDY_ERR == sts) {
+                    wchar_t *buff;
+                    buff = GC_MALLOC(64*sizeof(wchar_t));
+                    ALLOC_SAFE(buff);
+                    swprintf(buff, 64, L"File select timeout error(%d).", errno);
+                    return new_exception(TE_FILEACCESS, buff, interp);
+                }
+                if (IRDY_OK == sts) {
+                    continue;
+                }
+                if (IRDY_TOUT == sts) {
+                    Cell *c = decode_raw_to_unicode(cbuff, f->input_encoding, enc_error_info);
+                    if (enc_error_info->errorno != 0) {
+                        f->enc_error = 1;
+                    }
+                    if (NULL == c) {
+                        return new_exception(TE_BADENCODEBYTE, enc_error_info->message, interp);
+                    }
+                    f->early_exit = 1;
+                    return new_string_cell(c);
+                }
+            }
+            if (EOF != nc) {
+                ungetc(nc, f->fd);
+            }
         }
     }
 
@@ -4304,6 +4335,8 @@ mth_file_stat(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     }
     list_append(l, new_cons(new_symbol(L"newline"), f->newline ? const_T : const_Nil));
     list_append(l, new_cons(new_symbol(L"noblock"), f->noblock ? const_T : const_Nil));
+    list_append(l, new_cons(new_symbol(L"readbuffer-max"), new_integer_si(f->readbuffer_max)));
+    list_append(l, new_cons(new_symbol(L"early-exit"), f->early_exit ? const_T : const_Nil));
     enc = get_encoding_name(f->input_encoding);
     list_append(l, new_cons(new_symbol(L"input-encoding"), new_symbol(enc?enc:L"(BAD ENCODING)")));
     enc = get_encoding_name(f->output_encoding);
@@ -4704,6 +4737,35 @@ mth_file_setoutputencoding(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs
     
 error:
     return new_exception(TE_SYNTAX, L"Syntax error at 'set-output-encoding', syntax: File set-output-encoding encoding-name", interp);
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
+mth_file_setreadbuffer_max(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Hash *self;
+    Toy_Type *container;
+    Toy_File *f;
+    Toy_Type *tsize;
+    int bsize;
+
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    self = SELF_HASH(interp);
+    container = hash_get_t(self, const_Holder);
+    if (NULL == container) goto error2;
+    f = container->u.container.data;
+
+    tsize = list_get_item(posargs);
+    bsize = mpz_get_si(tsize->u.biginteger);
+    if (bsize < 0) goto error;
+    
+    f->readbuffer_max = bsize;
+    return tsize;
+    
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'set-readbuffer-max', syntax: File set-readbuffer-max buffer-sizse(zero is no-limited)", interp);
 error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
 }
@@ -5847,6 +5909,7 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, L"File", L"set-encoding", 	mth_file_setencoding, 	L"val");
     toy_add_method(interp, L"File", L"set-input-encoding", 	mth_file_setinputencoding,	L"val");
     toy_add_method(interp, L"File", L"set-output-encoding", 	mth_file_setoutputencoding,	L"val");
+    toy_add_method(interp, L"File", L"set-readbuffer-max", 	mth_file_setreadbuffer_max,	L"val");
 
     toy_add_method(interp, L"Block", L"eval", 		mth_block_eval, 	NULL);
 
