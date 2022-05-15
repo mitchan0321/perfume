@@ -22,7 +22,8 @@ defun exec (args: args) {
     $IN set-newline <nil>;
     $IN set-nobuffer;
     $IN set-ignore-cr <t>;
-    if {true? CO-MODE} then: {$IN set-noblock <t>};
+    $IN set-noblock <t>;
+    $IN set-readbuffer-max 256;
 
     err := $d,error;
     ERR ::= new File;
@@ -30,7 +31,8 @@ defun exec (args: args) {
     $ERR set-newline <nil>;
     $ERR set-nobuffer;
     $ERR set-ignore-cr <t>;
-    if {true? CO-MODE} then: {$ERR set-noblock <t>};
+    $ERR set-noblock <t>;
+    $ERR set-readbuffer-max 256;
 
     if {true? PipeObject} then: {
 	$PipeObject set-term-hook [fun () {$IN close; $OUT close; $ERR close}];
@@ -94,7 +96,11 @@ defun exec (args: args) {
 		    };
 		};
 		if $i {
-		    $stdout puts $i;
+                    if {dict [$IN stat] : get early-exit} {
+                        $stdout puts :nonewline $i;
+                    } {
+                        $stdout puts $i;
+                    };
 		    $stdout flush;
 		};
 	    }
@@ -118,7 +124,11 @@ defun exec (args: args) {
 		    };
 		};
 		if $i {
-		    $stderr puts $i;
+                    if {dict [$ERR stat] : get early-exit} {
+                        $stderr puts :nonewline $i;
+                    } {
+                        $stderr puts $i;
+                    };
 		    $stderr flush;
 		};
 	    }
