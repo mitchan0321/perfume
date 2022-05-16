@@ -4033,7 +4033,14 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
          */
         if (EOF == c) {
 	    if ((errno == EAGAIN) && (! feof(f->fd))) {
-                fprintf(stderr, "DEBUG: EAGAIN (1), eof=%d, c=%d\n", feof(f->fd), c);
+                // fprintf(stderr, "DEBUG: EAGAIN (1), eof=%d, c=%d\n", feof(f->fd), c);
+                int i = 0;
+                while (is_read_ready(fileno(f->fd), 100) != IRDY_OK) {
+                    i ++;
+                    if (i > 30) {
+                        return new_exception(TE_IOAGAIN, L"No data available at File::gets, canceled.", interp);
+                    }
+                }
 		clearerr(f->fd);
                 continue;
                 // f->r_pending = cbuff;
@@ -4147,7 +4154,7 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
             errno = 0;
             int nc = fgetc(f->fd);
             if ((EOF == nc) && (errno == EAGAIN)) {
-                fprintf(stderr, "DEBUG: EAGAIN (2), nc=%d\n", nc);
+                // fprintf(stderr, "DEBUG: EAGAIN (2), nc=%d\n", nc);
                 clearerr(f->fd);
                 int sts = is_read_ready(fileno(f->fd), 100);
                 if (IRDY_ERR == sts) {
