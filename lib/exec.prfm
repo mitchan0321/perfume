@@ -68,7 +68,8 @@ defun exec (args: args) {
 	
 	$poll add-event-queue (
 	    {and [$stdin ready?] [$OUT ready?]} {
-		i ::= $stdin gets;
+                i ::= $stdin gets;
+                
 		if $i {
 		    $OUT puts $i;
 		    $OUT flush;
@@ -81,20 +82,7 @@ defun exec (args: args) {
 	$poll add-event-queue (
 	    {$IN ready?} {
 		i := <nil>;
-		try {
-		    i ::= $IN gets;
-		} catch: {| e |
-		    if {eq? [$e car] ErrIOAgain} {
-			if {true? CO-MODE} {
-			    pause @WRITE;
-			    continue;
-			} {
-			    throw $e;
-			};
-		    } {
-			throw $e;
-		    };
-		};
+                i ::= $IN gets;
 		if $i {
                     if {dict [$IN stat] : get early-exit} {
                         $stdout puts :nonewline $i;
@@ -109,20 +97,7 @@ defun exec (args: args) {
 	$poll add-event-queue (
 	    {$ERR ready?} {
 		i := <nil>;
-		try {
-		    i ::= $ERR gets;
-		} catch: {| e |
-		    if {eq? [$e car] ErrIOAgain} {
-			if {true? CO-MODE} {
-			    pause @WRITE;
-			    continue;
-			} {
-			    throw $e;
-			};
-		    } {
-			throw $e;
-		    };
-		};
+                i ::= $ERR gets;
 		if $i {
                     if {dict [$ERR stat] : get early-exit} {
                         $stderr puts :nonewline $i;

@@ -4001,6 +4001,7 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
          *   ただし、tty 入力の場合、tty ドライバにより LF が入力されるまでブロックする。
          *   (注)coocked モードの場合～Perfumeでは設定方法がないため tty は常に coocked モードである。
          */
+        errno = 0;
         c = fgetc(f->fd);
         
         /*
@@ -4009,6 +4010,7 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
          * そして、ignore_cr が設定されている場合は、CR 文字は無視する。
          */
         if ('\r' == c) {
+            errno = 0;
             int nc = fgetc(f->fd);
             if (EOF != nc) {
                 ungetc(nc, f->fd);
@@ -4016,6 +4018,7 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
             if (('\n' == nc) || (EOF == nc)) {
                 f->include_cr = 1;
                 if (f->ignore_cr) {
+                    clearerr(f->fd);
                     continue;
                 }
             }
@@ -4024,15 +4027,23 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
         /*
          * EOFの場合：
          * ・errnoがEAGAINの場合は呼び出し元にException(TE_IOAGAIN)を返す。
+         *     -> 2022/05/16 Exception を返さず1文字入力に戻るよう変更、これにより ErrIOAgain を発生する箇所はなくなった。
          * ・cbuff が 0 バイトの場合は <nil> (EOF) を返す。
          * ・cbuff に文字がある場合は、デコードして返す。
          */
         if (EOF == c) {
 	    if ((errno == EAGAIN) && (! feof(f->fd))) {
+                fprintf(stderr, "DEBUG: EAGAIN (1), eof=%d, c=%d\n", feof(f->fd), c);
 		clearerr(f->fd);
-		f->r_pending = cbuff;
-		return new_exception(TE_IOAGAIN, L"No data available at File::gets, try again.", interp);
+                continue;
+                // f->r_pending = cbuff;
+                // return new_exception(TE_IOAGAIN, L"No data available at File::gets, try again.", interp);
 	    }
+            
+            if ((errno == EINTR) && (! feof(f->fd))) {
+                clearerr(f->fd);
+                continue;
+            }
 	    
 	    f->r_pending = NULL;
 	    if (cell_get_length(cbuff) == 0) {
@@ -4133,8 +4144,10 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
          * ・EOFでない場合は、データがすでに到着しているため、正規の1文字入力へ戻る(EOFを除く)。
          */
         if (cell_get_length(cbuff) > 0) {
+            errno = 0;
             int nc = fgetc(f->fd);
             if ((EOF == nc) && (errno == EAGAIN)) {
+                fprintf(stderr, "DEBUG: EAGAIN (2), nc=%d\n", nc);
                 clearerr(f->fd);
                 int sts = is_read_ready(fileno(f->fd), 100);
                 if (IRDY_ERR == sts) {
