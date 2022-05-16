@@ -3984,9 +3984,23 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 	cbuff = new_cell(L"");
     }
     
+    /*
+     * 通常 File::gets は LF が入力されるまでデータを取り込み、1行単位でアプリケーションへ返す。
+     * ただし、socket などの場合で noblock を指定した場合や、1行が readbuffer_max を超えた場合、
+     * LF を待たずにアプリケーションへ返す。その場合、LF が取り込まれていないことを示す、
+     * early-exit フラグが設定される。
+     * その early-exit フラグは gets の処理前にクリアする。
+     */
     f->early_exit = 0;
     
     while (1) {
+        /*
+         * 1文字入力を行う。
+         * ・noblock == 0 の場合、データが無ければブロックする。
+         * ・noblock == 1 の場合、データが無ければ EOF が返る。
+         *   ただし、tty 入力の場合、tty ドライバにより LF が入力されるまでブロックする。
+         *   (注)coocked モードの場合～Perfumeでは設定方法がないため tty は常に coocked モードである。
+         */
         c = fgetc(f->fd);
         
         /*
@@ -4065,7 +4079,7 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
         /*
          * 最終的な文字返却判定を行う。
          * 読んだ文字が LF または (プロパティ)!ignore_cr かつ CR の場合、cbuff をデコードして返す。
-        */
+         */
 	if (('\n' == c) || (('\r' == c) && (f->ignore_cr == 0))) {
 	    Cell *c = decode_raw_to_unicode(cbuff, f->input_encoding, enc_error_info);
             if (enc_error_info->errorno != 0) {
@@ -4076,7 +4090,14 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 	    }
 	    return new_string_cell(c);
         }
-        
+
+        /*
+         * readbuffer_max が設定されている場合(!= 0)でかつ、cbuff の入力済み文字数が既に
+         * readbuffer_max より大きいか等しい場合は、LF が無い状態でデータをデコードして返す。
+         * この場合、行が LF で満了していないため、early-exit インジケータをオンにする。
+         * early-exit インジケータがオンの場合、アプリケーション側では、この行に LF が無いものと
+         * 判断する必要がある。
+         */
         if ((f->readbuffer_max != 0) && (cell_get_length(cbuff) >= f->readbuffer_max)) {
             Cell *c = decode_raw_to_unicode(cbuff, f->input_encoding, enc_error_info);
             if (enc_error_info->errorno != 0) {
@@ -4089,13 +4110,33 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
             return new_string_cell(c);
         }
         
+        /*
+         * noblock プロパティが設定されていなければ1文字入力へ戻る。
+         */
         if (f->noblock == 0) continue;
         
+        /*
+         * 以降は noblock プロパティが設定されている場合にデータの満了を判断するブロック。
+         * ・cbuff が 0文字であれば入力へ戻る。
+         * ・現在ファイルは noblock が設定されているので、1文字読み込みを試みる。
+         *   - 通常ファイル、ソケットの場合は、データがあれば入力され、なければ EOF が返る。
+         *   - tty の場合は、LFが入力されるまで ttyドライバによりブロックされる。
+         * ・EOF でかつ errno が EAGAIN の場合はデータが届いていないことを意味するため、
+         *   さらに 0.1秒データの到着を待つ(is_read_ready)。
+         *   - is_read_ready でエラー(IRDY_ERR) の場合は Exception を返す。
+         *   - データOK(IRDY_OK) であれば、0.1秒待つ間にデータが到着したことを示すため、入力へ戻る。
+         *   - タイムアウト(IRDY_TOUT) であれば、データが0.1秒以内にデータが到着しなかったことを示す
+         *     ため、満了と判断し cbuff をデコードし返す。
+         *     この場合、行が LF で満了していないため、early-exit インジケータをオンにする。
+         *     early-exit インジケータがオンの場合、アプリケーション側では、この行に LF が無いものと
+         *     判断する必要がある。
+         * ・EOFでない場合は、データがすでに到着しているため、正規の1文字入力へ戻る(EOFを除く)。
+         */
         if (cell_get_length(cbuff) > 0) {
             int nc = fgetc(f->fd);
             if ((EOF == nc) && (errno == EAGAIN)) {
                 clearerr(f->fd);
-                int sts = is_read_ready(fileno(f->fd), 500);
+                int sts = is_read_ready(fileno(f->fd), 100);
                 if (IRDY_ERR == sts) {
                     wchar_t *buff;
                     buff = GC_MALLOC(64*sizeof(wchar_t));

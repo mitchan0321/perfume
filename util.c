@@ -209,7 +209,8 @@ is_read_ready(int fd, int timeout_m) {
     timeout.tv_sec = timeout_m / 1000;
     timeout.tv_usec = (timeout_m % 1000) * 1000;
 
-retry:    
+retry:
+    // fprintf(stderr, "DEBUG: timeout sec = %ld, usec = %ld\n", timeout.tv_sec, timeout.tv_usec);
     maxfd = fd + 1;
     FD_ZERO(&read_fds);
     FD_SET(fd, &read_fds);
