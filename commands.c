@@ -2608,6 +2608,39 @@ error:
     return new_exception(TE_SYNTAX, L"Syntax error, syntax: begin {block} [local: hash-object] [:rebase]", interp);
 }
 
+int
+setup_pty(int in[], int out[], int err[]) {
+    int master, slave;
+    char *sname;
+    
+    if (-1 == (master = posix_openpt(O_RDWR))) {
+        return -1;
+    }
+    if (-1 == grantpt(master)) {
+        return -1;
+    }
+    if (-1 == unlockpt(master)) {
+        return -1;
+    }
+    sname = ptsname(master);
+    if (NULL == sname) {
+        return -1;
+    }
+    if (-1 == (slave = open(sname, O_RDWR))) {
+        return -1;
+    }
+    
+    in[0] = slave;
+    out[1] = dup(slave);
+    err[1] = dup(slave);
+    
+    in[1] = master;
+    out[0] = dup(master);
+    err[0] = dup(master);
+    
+    return 0;
+}
+
 Toy_Type*
 cmd_forkandexec(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     wchar_t *command;
@@ -2617,7 +2650,18 @@ cmd_forkandexec(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     Toy_Type *result;
     int flag;
     encoder_error_info *error_info;
+    int ispty = 0;
+    Toy_Type *pty;
 
+    pty = hash_get_and_unset_t(nameargs, new_symbol(L"pty:"));
+    if (pty) {
+        if (GET_TAG(pty) == BOOL) {
+            if (pty->u.tbool.value == TRUE) {
+                ispty = 1;
+            }
+        }
+    }
+    
     if (hash_get_length(nameargs) > 0) goto error;
     if (arglen < 1) goto error;
 
@@ -2647,14 +2691,24 @@ cmd_forkandexec(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     }
     argv[i] = NULL;
 
-    if (-1 == pipe(left_ch)) {
-	return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
-    }
-    if (-1 == pipe(right_ch)) {
-	return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
-    }
-    if (-1 == pipe(err_ch)) {
-	return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
+    if (ispty) {
+        if (-1 == setup_pty(left_ch, right_ch, err_ch)) {
+	    return new_exception(TE_SYSCALL, L"Setup pty device failed.", interp);
+        }
+        // fprintf(stderr, "*** in[0] =%d, in[1] =%d\n", left_ch[0], left_ch[1]);
+        // fprintf(stderr, "*** out[0]=%d, out[1]=%d\n", right_ch[0], right_ch[1]);
+        // fprintf(stderr, "*** err[0]=%d, err[1]=%d\n", err_ch[0], err_ch[1]);
+
+    } else {
+        if (-1 == pipe(left_ch)) {
+            return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
+        }
+        if (-1 == pipe(right_ch)) {
+            return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
+        }
+        if (-1 == pipe(err_ch)) {
+            return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
+        }
     }
     
     pid = fork();
@@ -2665,22 +2719,27 @@ cmd_forkandexec(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
 
     if (0 == pid) {
 	/* I am a child */
-	close(left_ch[1]);
-	close(right_ch[0]);
-	close(err_ch[0]);
+        close(left_ch[1]);
+        close(right_ch[0]);
+        close(err_ch[0]);
+        
+        close(0);
+        dup(left_ch[0]);
+        close(left_ch[0]);
+        
+        close(1);
+        dup(right_ch[1]);
+        close(right_ch[1]);
+        
+        close(2);
+        dup(err_ch[1]);
+        close(err_ch[1]);
+        
+        /* new session and set process group myself */
+        setsid();
+        setpgrp();
 
-	close(0);
-	dup(left_ch[0]);
-	close(left_ch[0]);
-
-	close(1);
-	dup(right_ch[1]);
-	close(right_ch[1]);
-
-	close(2);
-	dup(err_ch[1]);
-	close(err_ch[1]);
-
+        /* execute command */
 	execvp(argv[0], argv);
 	exit(255);
     }
@@ -2717,7 +2776,7 @@ cmd_forkandexec(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     return result;
 
 error:
-    return new_exception(TE_SYNTAX, L"Syntax error, syntax: fork-exec command [arg ...] | [(arg ...)]", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error, syntax: fork-exec [ :pty ] command [arg ...] | [(arg ...)]", interp);
 }
 
 Toy_Type*

@@ -2,14 +2,20 @@
 
 load-class PollingManager;
 
-defun exec (args: args) {
+defun exec (pty: pty args: args) {
     args ::= $args map {| i | "" . $i};
     command ::= $args >>;
 
-    d ::= dict [fork-exec $command $args];
+    if {set? pty} {
+        d ::= dict [fork-exec :pty $command $args];
+    } {
+        d ::= dict [fork-exec $command $args];
+    };
 
     pid := $d,pid;
 
+    ttin := $stdin;
+    
     out := $d,left;
     OUT ::= new File;
     $OUT set! $out mode: o;
@@ -43,32 +49,31 @@ defun exec (args: args) {
 	poll ::= new PollingManager;
 
 	$poll set-exit-condition-block {
-	    result [and [$IN eof?] [$ERR eof?]];
+            try {
+                result [and [$IN eof?] [$ERR eof?]];
+            } catch: {
+                result <t>;
+            };
 	};
-
+        
 	$poll set-wait-block {
-	    if [$stdin eof?] {$OUT close};
-	    sts := <nil>;
-	    if {and [$stdin ready?] [$OUT ready?]} {
-		sts := <t>;
-	    } {
-		try {
-		    (in out exp) ::= select ([$IN fd?] [$ERR fd?]) () () 50;
-		    if {$in null?} {
-		        sts := <nil>;
-		    } {
-		        sts := <t>;
-		    };
-		} catch: {
-		    sts := <nil>;
-		};
-	    };
-	    result $sts;
-	};
+            if [$stdin eof?] {$OUT close};
+            if [$IN eof?]    {$IN close};
+            if [$ERR eof?]   {$ERR close};
+            sts := <nil>;
+            if {or {$ttin ready?} {$IN ready?} {$ERR ready?}} {
+                sts := <t>;
+            } {
+                try {
+                    (in out exp) ::= select ([$IN fd?] [$ERR fd?]) () () 50;
+                } catch: {}
+            };
+            result $sts;
+        };
 	
 	$poll add-event-queue (
-	    {and [$stdin ready?] [$OUT ready?]} {
-                i ::= $stdin gets;
+	    {and [$ttin ready?] [$OUT ready?]} {
+                i ::= $ttin gets;
                 
 		if $i {
 		    $OUT puts $i;
@@ -118,7 +123,7 @@ defun exec (args: args) {
 	try {$ERR close} catch: {};
 	status ::= wait $pid;
 	if {$status = 255} then: {
-	    throw ErrExecProgram "Can\'t execute program."
+	    throw ErrExecProgram "Can\'t execute program." #'
 	};
     };
 

@@ -4559,12 +4559,22 @@ mth_file_isready(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     
     fdesc = fileno(fd);
     if (fdesc < 0) return const_Nil;
-
+    
+    if (f->noblock) {
+        int nc = fgetc(f->fd);
+        if (EOF == nc) {
+            return const_Nil;
+        }
+        ungetc(nc, f->fd);
+        return const_T;
+    }
+    
     FD_ZERO(&fds);
     FD_SET(fdesc, &fds);
     timeout.tv_sec = itimeout / 1000;
     timeout.tv_usec = (itimeout % 1000) * 1000;
 
+retry:
     switch (f->mode) {
     case FMODE_INPUT:
     case FMODE_INOUT:	/* XXX: fix me!! */
@@ -4579,6 +4589,7 @@ mth_file_isready(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     default:
 	goto error2;
     }
+    if (errno == EINTR) goto retry;
 
     if (0 == sts) return const_Nil;
     if (FD_ISSET(fdesc, &fds)) return const_T;

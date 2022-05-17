@@ -35,7 +35,12 @@ PollingManager method event-loop () {
 PollingManager method eval-queue () {
     $EventQueue each do: {| item |
 	(cond body) := $item;
-        if {block? $cond} {cond ::= yield $cond};
-        if $cond {yield $body};
+        if {block? $cond} {
+            c ::= yield $cond;
+            while {true? c} do: {
+                yield $body;
+                c ::= yield $cond;
+            };
+        };
     };
 };
