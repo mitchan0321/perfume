@@ -4575,6 +4575,7 @@ mth_file_isready(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     timeout.tv_usec = (itimeout % 1000) * 1000;
 
 retry:
+    errno = 0;
     switch (f->mode) {
     case FMODE_INPUT:
     case FMODE_INOUT:	/* XXX: fix me!! */
@@ -4589,8 +4590,8 @@ retry:
     default:
 	goto error2;
     }
-    if (errno == EINTR) goto retry;
-
+    if ((-1 == sts) && (errno == EINTR)) goto retry;
+    
     if (0 == sts) return const_Nil;
     if (FD_ISSET(fdesc, &fds)) return const_T;
     return const_Nil;
