@@ -2736,8 +2736,13 @@ cmd_forkandexec(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
         close(err_ch[1]);
         
         /* new session and set process group myself */
+
         setsid();
+#if __FreeBSD__
+        setpgrp(0, getpid());
+#else
         setpgrp();
+#endif /* __FreeBSD__ */
 
         /* execute command */
 	execvp(argv[0], argv);
