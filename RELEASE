@@ -2294,4 +2294,17 @@
 		Change set to property methods File::set-readbuffer-max and File::set-noblock,
 		  and use condition flag File::early-exit.
 
+2022/05/17
+	commands.c
+		Add fork-exec option :pty, this option is use pty device for communication to 
+		  the child process.
+		Add fork-exec to setup process group when specify :pty option.
+	methods.c
+		Add File::noblock case to File::ready? method.
+	lib/PollingManager.prfm
+		Fix eval-queue, if data remains in event-queue, process all remain data after
+		  next event-queue process.
+	lib/exec.prfm
+		Fix, rewrite exit-condition-block, wait-bloc for data stream jammed.
+
 #eof
