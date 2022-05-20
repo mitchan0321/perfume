@@ -170,6 +170,10 @@ $KeyMaps set (KEY_ESC "[1;4D") (kLFT4);      # shift+alt+
 $KeyMaps set (KEY_ESC "[1;5D") (kLFT5);      # ctrl+
 $KeyMaps set (KEY_ESC "[1;5H") (kHOM5);      # ctrl+
 $KeyMaps set (KEY_ESC "[1;5F") (kEND5);      # ctrl+
+$KeyMaps set (KEY_ESC "[3;2~") (kDC2);       # shift+
+$KeyMaps set (KEY_ESC "[3;3~") (kDC3);       # alt+
+$KeyMaps set (KEY_ESC "[3;4~") (kDC4);       # shift+alt+
+$KeyMaps set (KEY_ESC "[3;5~") (kDC5);       # ctrl+
 $KeyMaps set (KEY_ESC "[1;2P") (KEY_F13);    # shift+
 $KeyMaps set (KEY_ESC "[1;2Q") (KEY_F14);    # shift+
 $KeyMaps set (KEY_ESC "[1;2R") (KEY_F15);    # shift+
