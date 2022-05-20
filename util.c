@@ -214,12 +214,13 @@ retry:
     maxfd = fd + 1;
     FD_ZERO(&read_fds);
     FD_SET(fd, &read_fds);
+    errno = 0;
     sts = select(maxfd, &read_fds, NULL, NULL, &timeout);
     if (-1 == sts) {
         if (errno == EINTR) goto retry;
         return IRDY_ERR;
     }
-    if ((timeout.tv_sec <= 0) && (timeout.tv_usec <= 0)) return IRDY_TOUT;
     if (FD_ISSET(fd, &read_fds))                         return IRDY_OK;
+    if ((timeout.tv_sec <= 0) && (timeout.tv_usec <= 0)) return IRDY_TOUT;
     return IRDY_NO;
 }

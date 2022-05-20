@@ -4032,14 +4032,17 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
          * ・cbuff に文字がある場合は、デコードして返す。
          */
         if (EOF == c) {
-	    if ((errno == EAGAIN) && (! feof(f->fd))) {
+            // if ((errno == EAGAIN) && (! feof(f->fd))) { //}
+            if (errno == EAGAIN) {
                 // fprintf(stderr, "DEBUG: EAGAIN (1), eof=%d, c=%d\n", feof(f->fd), c);
                 int i = 0;
+                clearerr(f->fd);
                 while (is_read_ready(fileno(f->fd), 100) != IRDY_OK) {
                     i ++;
                     if (i > 30) {
                         return new_exception(TE_IOAGAIN, L"No data available at File::gets, canceled.", interp);
                     }
+                    clearerr(f->fd);
                 }
 		clearerr(f->fd);
                 continue;
@@ -4047,7 +4050,7 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
                 // return new_exception(TE_IOAGAIN, L"No data available at File::gets, try again.", interp);
 	    }
             
-            if ((errno == EINTR) && (! feof(f->fd))) {
+            if (errno == EINTR) {
                 clearerr(f->fd);
                 continue;
             }
