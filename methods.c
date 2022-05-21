@@ -4028,6 +4028,8 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
          * EOFの場合：
          * ・errnoがEAGAINの場合は呼び出し元にException(TE_IOAGAIN)を返す。
          *     -> 2022/05/16 Exception を返さず1文字入力に戻るよう変更、これにより ErrIOAgain を発生する箇所はなくなった。
+         *     -> errnoがEAGAINの場合、再度入力可能か試みる。最大3秒待ちが発生するが、これを超えると Exception を返す。
+         * ・errnoがEINTRの場合は1文字入力に戻る。
          * ・cbuff が 0 バイトの場合は <nil> (EOF) を返す。
          * ・cbuff に文字がある場合は、デコードして返す。
          */
