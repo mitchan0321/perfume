@@ -2,7 +2,7 @@
 
 load-class PollingManager;
 
-defun exec (pty: pty args: args) {
+defun exec (proc-enc: enc pty: pty args: args) {
     args ::= $args map {| i | "" . $i};
     command ::= $args >>;
 
@@ -15,12 +15,19 @@ defun exec (pty: pty args: args) {
     pid := $d,pid;
 
     ttin := $stdin;
-    
+
+    if {set? enc} else: {
+        set enc UTF-8F;
+    };
+
     out := $d,left;
     OUT ::= new File;
     $OUT set! $out mode: o;
     $OUT set-newline <t>;
     $OUT set-nobuffer;
+    if {set? enc} {
+        $OUT set-output-encoding $enc;
+    };
 
     in := $d,right;
     IN ::= new File;
@@ -30,6 +37,9 @@ defun exec (pty: pty args: args) {
     $IN set-ignore-cr <t>;
     $IN set-noblock <t>;
     $IN set-readbuffer-max 256;
+    if {set? enc} {
+        $IN set-input-encoding $enc;
+    };
 
     err := $d,error;
     ERR ::= new File;
@@ -39,6 +49,9 @@ defun exec (pty: pty args: args) {
     $ERR set-ignore-cr <t>;
     $ERR set-noblock <t>;
     $ERR set-readbuffer-max 256;
+    if {set? enc} {
+        $ERR set-input-encoding $enc;
+    };
 
     if {true? PipeObject} then: {
 	$PipeObject set-term-hook [fun () {$IN close; $OUT close; $ERR close}];
