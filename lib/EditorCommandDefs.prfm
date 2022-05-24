@@ -3245,7 +3245,7 @@ defun exec-man (main window value) {
         $os set-nolimit;
         oe ::= new Stream;
         $oe set-nolimit;
-        sts ::= {exec "/bin/sh" "-c" [$MAN_PREFIX . $value]} redirect-out $os $oe;
+        sts ::= {exec proc-enc: $MAN_ENCODING "/bin/sh" "-c" [$MAN_PREFIX . $value]} redirect-out $os $oe;
         $os close;
         $oe close;
         
