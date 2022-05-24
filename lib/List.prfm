@@ -137,3 +137,19 @@ List method combinations-sub (n sum body) {
 
     return ([$s car]);
 };
+
+List method assoc (k) {
+    [self] each do: {| i |
+        if {list? $i} else: {continue};
+        if {eq? $k [$i car]} {return $i};
+    };
+    return <nil>;
+};
+
+List method assoc-value (k) {
+    [self] each do: {| i |
+        if {list? $i} else: {continue};
+        if {eq? $k [$i car]} {return [$i cdr]};
+    };
+    return <nil>;
+};
