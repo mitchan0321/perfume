@@ -36,7 +36,7 @@ defun exec (proc-enc: enc pty: pty args: args) {
     $IN set-nobuffer;
     $IN set-ignore-cr <t>;
     $IN set-noblock <t>;
-    $IN set-readbuffer-max 256;
+    $IN set-readbuffer-max 1024;
     if {set? enc} {
         $IN set-input-encoding $enc;
     };
@@ -48,7 +48,7 @@ defun exec (proc-enc: enc pty: pty args: args) {
     $ERR set-nobuffer;
     $ERR set-ignore-cr <t>;
     $ERR set-noblock <t>;
-    $ERR set-readbuffer-max 256;
+    $ERR set-readbuffer-max 1024;
     if {set? enc} {
         $ERR set-input-encoding $enc;
     };
