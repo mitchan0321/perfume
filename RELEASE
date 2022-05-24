@@ -2313,4 +2313,9 @@
 		PRFM_20220523
 		1.5.25
 
+2022/05/24
+	lib/List.prfm
+		Add method List::assoc and List::assoc-value, assoc like the lisp's assoc function
+		  and assoc-value is same as $foo assoc v : cdr.
+
 #eof
