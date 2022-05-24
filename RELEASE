@@ -2319,11 +2319,14 @@
 		  and assoc-value is same as $foo assoc v : cdr.
 	lib/exec.prfm
 		Add proc-enc: named parameter for specify to process character encoding.
+		Change buffer size 256 to 1024.
 	pmacs update:
 		Change man editor command can now specify the character encoding of
 		  a sub-process by the global environment MAN_ENCODOING.
 		  Default encoding is UTF-8F.
 		Add config variable MAN_ENCODING at pmacs.conf and sample for FreeBSD jman settings.
 		Add key map for FreeBSD kDN6, kDN7, kUP6, kUP7, kRIT6, kRIT7, kLFT6 and kLFT7.
+	Makefile
+		Change static link FreeBSD target.
 
 #eof
