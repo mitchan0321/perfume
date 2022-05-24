@@ -57,8 +57,12 @@ endif
 ### for product build. (use BoehmGC)
 CFLAGS		= -Wall -O3 -c -g $(OPTIONS)
 INCLUDE		= -I/usr/local/include -I.
-LIB		= -L/usr/lib -L/lib -L/usr/local/lib \
-		  -lm -lpthread -lgmp -lgc -lonigmo -lpcl $(OPTLIBS)
+
+ifeq ($(shell uname),FreeBSD)
+	LIB	= -static -L/usr/lib -L/lib -L/usr/local/lib -lm -lpthread -lgmp -lgc -lonigmo -lpcl $(OPTLIBS)
+else
+	LIB	= -L/usr/lib -L/lib -L/usr/local/lib -lm -lpthread -lgmp -lgc -lonigmo -lpcl $(OPTLIBS)
+endif
 
 ### for normaly link option (BSD and Linux)
 #		  -lm -lpthread -lgmp -lgc -lonigmo -lpcl $(OPTLIBS)
@@ -197,14 +201,14 @@ build-pkg:
 	rm -rf $(PKG_TMP)
 	mkdir -p $(PKG_DIR)
 	mkdir -p $(PKG_DIR)/lib
+ifeq ($(shell uname),Linux)
 	cp -r $(PKG_EXTLIB_DIR)/libgc*     $(PKG_DIR)/lib
 	cp -r $(PKG_EXTLIB_DIR)/libgmp*    $(PKG_DIR)/lib
 	cp -r $(PKG_EXTLIB_DIR)/libonigmo* $(PKG_DIR)/lib
 	cp -r $(PKG_EXTLIB_DIR)/libpcl*    $(PKG_DIR)/lib
-ifeq ($(shell uname),Linux)
 	cp -r $(STD_LIB_DIR)/libncursesw*  $(PKG_DIR)/lib
-endif
 	chmod 644 $(PKG_DIR)/lib/lib*
+endif
 	mkdir -p $(PKG_DIR)/bin
 	mkdir -p $(PKG_DIR)/lib/perfume
 	mkdir -p $(PKG_DIR)/lib/perfume/lib
