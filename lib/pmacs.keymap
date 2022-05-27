@@ -199,7 +199,7 @@ $KeyMaps set (KEY_ESC "[1;5Q") (KEY_F26);    # ctrl+
 $KeyMaps set (KEY_ESC "[1;5R") (KEY_F27);    # ctrl+
 $KeyMaps set (KEY_ESC "[1;5S") (KEY_F28);    # ctrl+
 $KeyMaps set (KEY_ESC "[15;5~") (KEY_F29);   # ctrl+
-$KeyMaps set (KEY_ESC "[17;5~")(KEY_F30);   # ctrl+
+$KeyMaps set (KEY_ESC "[17;5~") (KEY_F30);   # ctrl+
 $KeyMaps set (KEY_ESC "[18;5~") (KEY_F31);   # ctrl+
 $KeyMaps set (KEY_ESC "[19;5~") (KEY_F32);   # ctrl+
 $KeyMaps set (KEY_ESC "[20;5~") (KEY_F33);   # ctrl+
