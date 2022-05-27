@@ -2327,6 +2327,6 @@
 		Add config variable MAN_ENCODING at pmacs.conf and sample for FreeBSD jman settings.
 		Add key map for FreeBSD kDN6, kDN7, kUP6, kUP7, kRIT6, kRIT7, kLFT6 and kLFT7.
 	Makefile
-		Change static link FreeBSD target.
+		Change FreeBSD target perfumesh to static link .
 
 #eof
