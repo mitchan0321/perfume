@@ -360,7 +360,7 @@ CombiWindow method render-vertical-line () {
 };
 
 CombiWindow method page-down () {
-    sets FreeCursor <t>;
+    sets FreeCursor $FREECURSOR_ENABLE;
 
     buff ::= get-buffer;
     geom ::= get-geom;
@@ -373,7 +373,7 @@ CombiWindow method page-down () {
 };
 
 CombiWindow method page-up () {
-    sets FreeCursor <t>;
+    sets FreeCursor $FREECURSOR_ENABLE;
 
     geom ::= get-geom;
     (y x) ::= curs-get-screen-size $BufferCurs;
@@ -453,7 +453,8 @@ CombiWindow method free-cursor-turn-off (geom buff) {
 CombiWindow method move-right () {
     geom ::= get-geom;
     buff ::= get-buffer;
-    free-cursor-turn-off $geom $buff;    (cy cx) ::= get-source-index $buff $geom;
+    free-cursor-turn-off $geom $buff;
+    (cy cx) ::= get-source-index $buff $geom;
 
     r ::= $buff get-buffer-line $cy;
     if $r {
@@ -730,7 +731,7 @@ CombiWindow method get-screen-size () {
 };
 
 CombiWindow method set-freecursor (flag) {
-    sets FreeCursor $flag;
+    sets FreeCursor [and $flag $FREECURSOR_ENABLE];
 };
 
 CombiWindow method destroy () {
@@ -773,11 +774,16 @@ CombiWindow method display-evaluation () {
                 
                 if {$lim > 0} {
                     while {[$r len] > $lim} do: {
-                        $buff append-string [[$r sub 0 $lim] . " \\"];
+                        r2 ::= [$r sub 0 $lim] . " \\";
+                        $r2 split sep: "\n" : each do: {| r3 |
+                            $buff append-string $r3;
+                        };
                         r ::= $r sub $lim;
                     };
                 };
-                $buff append-string $r;
+                $r split sep: "\n" : each do: {| r3 |
+                    $buff append-string $r3;
+                };
             };
 	    update-display := <t>;
 	};
@@ -785,8 +791,10 @@ CombiWindow method display-evaluation () {
         
 	$stderr close;
 	$stderr each do: {| r | r ::= $r string;
-	    $buff append-string ["ERR> " . $r];
-	    update-display := <t>;
+            $r split sep: "\n" : each do: {| r3 |
+                $buff append-string ["ERR> " . $r3];
+            };
+            update-display := <t>;
 	};
 	$stderr clear;
 

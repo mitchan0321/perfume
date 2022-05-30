@@ -2329,4 +2329,11 @@
 	Makefile
 		Change FreeBSD target perfumesh to static link .
 
+2022/05/30
+	pmacs update:
+		Add global configuration variable FREECURSOR_ENABLE for FreeCursor mode feature
+		  on/off value.
+		Add if output string data including "\n" character, *Scratch* buffer is split the
+		  line and output.
+
 #eof
