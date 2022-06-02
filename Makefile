@@ -206,7 +206,6 @@ ifeq ($(shell uname),Linux)
 	cp -r $(PKG_EXTLIB_DIR)/libgmp*    $(PKG_DIR)/lib
 	cp -r $(PKG_EXTLIB_DIR)/libonigmo* $(PKG_DIR)/lib
 	cp -r $(PKG_EXTLIB_DIR)/libpcl*    $(PKG_DIR)/lib
-	cp -r $(STD_LIB_DIR)/libncursesw*  $(PKG_DIR)/lib
 	chmod 644 $(PKG_DIR)/lib/lib*
 endif
 	mkdir -p $(PKG_DIR)/bin
