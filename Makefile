@@ -11,9 +11,9 @@ OPTLIBS2 =
 ###
 PREFIX		= /usr/local
 ifeq ($(shell basename `which clang`),clang)
-	CC	= clang
+  CC		= clang
 else
-	CC	= cc
+  CC		= cc
 endif
 PKG_TMP		= $(HOME)/tmp
 PKG_DIR		= $(PKG_TMP)/pmacs-install
