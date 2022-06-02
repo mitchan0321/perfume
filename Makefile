@@ -10,7 +10,11 @@ OPTLIBS2 =
 ###   FIX ME
 ###
 PREFIX		= /usr/local
-CC		= cc
+ifeq ($(shell basename `which clang`),clang)
+	CC	= clang
+else
+	CC	= cc
+endif
 PKG_TMP		= $(HOME)/tmp
 PKG_DIR		= $(PKG_TMP)/pmacs-install
 PKG_EXTLIB_DIR	= /usr/local/lib
