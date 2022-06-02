@@ -1,3 +1,4 @@
+2022/06/02	PRFM_20220602		1.5.26
 2022/05/23	PRFM_20220523		1.5.25
 2022/05/05	PRFM_20220505		1.5.24
 2022/04/19	PRFM_20220419		1.5.23
@@ -2335,5 +2336,15 @@
 		  on/off value.
 		Add if output string data including "\n" character, *Scratch* buffer is split the
 		  line and output.
+
+2022/06/02
+	Makefile
+		If your system have the clang compiler, use it.
+		Remove libncursesw* dynamic link library file from package tar ball.
+	pmacs update:
+		Support Red Hat Linux man command, see pmacs.conf MAN_PREFIX variable.
+	tag:
+		PRFM_20220602
+		1.5.26
 
 #eof
