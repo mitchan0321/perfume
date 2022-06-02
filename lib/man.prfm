@@ -6,7 +6,8 @@ defun man (args: p) {
     };
     
     is ::= new Stream;
-    $is puts ["LANG=ja_JP.UTF-8 MANWIDTH=80 MAN_KEEP_FORMATTING=t man " . $s];
+    #$is puts ["TERM=\"\" LANG=ja_JP.UTF-8 MANWIDTH=80 MAN_KEEP_FORMATTING=t man ${s}" expand];
+    $is puts ["TERM=\"\" LANG=ja_JP.UTF-8 MANWIDTH=80 man ${s}" expand];
     $is close;
     
     pipe in: $is

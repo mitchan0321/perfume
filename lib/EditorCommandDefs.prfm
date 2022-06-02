@@ -3237,22 +3237,22 @@ defcommand man {
     return ALL;
 };
 
-defun exec-man (main window value) {
-    buff-name ::= "Man=" . $value;
+defun exec-man (main window topic) {
+    buff-name ::= "Man=" . $topic;
     man-buff ::= BufferManager find-buffer $buff-name;
     if $man-buff else: {
         os ::= new Stream;
         $os set-nolimit;
         oe ::= new Stream;
         $oe set-nolimit;
-        sts ::= {exec proc-enc: $MAN_ENCODING "/bin/sh" "-c" [$MAN_PREFIX . $value]} redirect-out $os $oe;
+        sts ::= {exec proc-enc: $MAN_ENCODING "/bin/sh" "-c" [$MAN_PREFIX expand]} redirect-out $os $oe;
         $os close;
         $oe close;
         
         man-buff ::= new EditBuffer;
         (result err) ::= $man-buff load-content
             :init-only
-            ["man " . $value]
+            ["man " . $topic]
             buffer-name: $buff-name
         ;
         $man-buff clear-all;
