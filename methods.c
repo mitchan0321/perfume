@@ -4201,7 +4201,7 @@ mth_file_puts(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     Hash *self;
     Toy_File *f;
     Toy_Type *container;
-    int c;
+    int c, i;
     int flag_nonewline = 0;
     wchar_t *p;
     Cell *unicode, *raw;
@@ -4236,13 +4236,22 @@ mth_file_puts(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     }
 
     while (posargs) {
-	unicode = new_cell(to_string_call(interp, list_get_item(posargs)));
+        if (STRING == GET_TAG(list_get_item(posargs))) {
+            unicode = list_get_item(posargs)->u.string;
+        } else {
+            unicode = new_cell(to_string_call(interp, list_get_item(posargs)));
+        }
 	raw = encode_unicode_to_raw(unicode, f->output_encoding, enc_error_info);
 	if (NULL == raw) {
 	    return new_exception(TE_BADENCODEBYTE, enc_error_info->message, interp);
 	}
-	p = cell_get_addr(raw);
-	c = fputs(to_char(p), f->fd);
+        p = cell_get_addr(raw);
+        // c = fputs(to_char(p), f->fd);
+        for (i=0; i<cell_get_length(raw); i++) {
+            unsigned char wc;
+            wc = p[i];
+            c = fwrite(&wc, 1, 1, f->fd);
+        }
 	if (flag_nonewline == 0) {
 	    c = fputs("\n", f->fd);
 	}
