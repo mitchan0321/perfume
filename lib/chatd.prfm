@@ -1,4 +1,5 @@
 defun chatd () {
+    chat-config;
 
     # create listen port
 
@@ -63,6 +64,3 @@ defun chatd () {
 	close $lfd
     };
 };
-
-chat-config;
-chatd;
