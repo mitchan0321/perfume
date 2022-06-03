@@ -2347,4 +2347,19 @@
 		PRFM_20220602
 		1.5.26
 
+2022/06/03
+	types.c
+		Change toy_clone, use cell_clone in cell.c for null data copy.
+	cell.[ch]
+		Add function cell_clone and cell_add_cell for cell copy with null data.
+	commands.c
+		Change command print/prinntln use cell_add_cell in cell.c for null data copy.
+		Fix command select and accept, if receive EINTR retry system calls.
+	methods.c
+		Change method File::puts use fwrite(C) for null data output to file.
+	lib/copy.prfm
+		Add new utility, file copy can binary file copy too.
+	lib/man.prfm
+		Fix sub-process environment variable.
+
 #eof
