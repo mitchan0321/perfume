@@ -1,0 +1,26 @@
+defun copy (from to) {
+    src := <nil>;
+    dest := <nil>;
+    try {
+        src := `File($from mode: i);
+        $src set-newline <t>;
+        $src set-readbuffer-max 4096;
+        $src set-encoding RAW;
+        
+        dest := `File($to mode: o);
+        $dest set-newline <nil>;
+        $dest set-encoding RAW;
+        
+        r ::= $src gets;
+        while {! [nil? $r]} do: {
+            $dest puts :nonewline $r;
+            r ::= $src gets;
+        };
+
+    }
+    fin: {
+        if $src  {$src  close};
+        if $dest {$dest close};
+    }
+    ;;
+};
