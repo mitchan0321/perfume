@@ -561,7 +561,8 @@ toy_clone(Toy_Type *obj) {
 	dest = GC_MALLOC(sizeof(Toy_Type));
 	ALLOC_SAFE(dest);
 	dest->tag = obj->tag;
-	dest->u.string = new_cell(cell_get_addr(obj->u.string));
+        // dest->u.string = new_cell(cell_get_addr(obj->u.string));
+        dest->u.string = cell_clone(obj->u.string);
 	break;
     default:
 	dest = obj;
