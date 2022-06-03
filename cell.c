@@ -27,6 +27,22 @@ new_cell(const wchar_t *src) {
 }
 
 Cell*
+cell_clone(Cell *p) {
+    Cell *c;
+    
+    if (NULL == p) return new_cell(L"");
+
+    c = (Cell*)GC_MALLOC(sizeof(Cell));
+    ALLOC_SAFE(c);
+    memcpy(c, p, sizeof(Cell));
+    c->data = (wchar_t*)GC_MALLOC(p->allocsize*sizeof(wchar_t));
+    ALLOC_SAFE(c->data);
+    memcpy(c->data, p->data, ((p->allocsize > p->length+1) ? p->length+1 : p->allocsize)*sizeof(wchar_t));
+    
+    return c;
+}
+
+Cell*
 cell_add_str(Cell *p, const wchar_t *src) {
     int len;
 
@@ -41,6 +57,25 @@ cell_add_str(Cell *p, const wchar_t *src) {
     wcsncpy(&p->data[p->length], src, len);
     p->length = p->length + len-1;
 
+    return p;
+}
+
+Cell*
+cell_add_cell(Cell *p, Cell *src) {
+    int len;
+    
+    if (NULL == p) return NULL;
+    if (NULL == src) return p;
+
+    len = src->length+1;
+    if ((len + p->length) > p->allocsize) {
+	if (NULL == cell_realloc(p, len + p->length))
+	    return NULL;
+    }
+    
+    memcpy(&p->data[p->length], src->data, len*sizeof(wchar_t));
+    p->length = p->length + len-1;
+    
     return p;
 }
 

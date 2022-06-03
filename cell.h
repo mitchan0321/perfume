@@ -13,7 +13,9 @@ typedef struct _cell {
 } Cell;
 
 Cell*	new_cell(const wchar_t *src);
+Cell*	cell_clone(Cell *p);
 Cell*	cell_add_str(Cell *p, const wchar_t *src);
+Cell*	cell_add_cell(Cell *p, Cell *src);
 Cell*	cell_add_char(Cell *p, const wchar_t src);
 wchar_t* cell_get_addr(Cell *p);
 int	cell_get_length(Cell *p);
