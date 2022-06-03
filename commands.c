@@ -867,7 +867,11 @@ cmd_print(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 
     s = new_cell(L"");
     while (! IS_LIST_NULL(posargs)) {
-	cell_add_str(s, to_string_call(interp, list_get_item(posargs)));
+        if (STRING == GET_TAG(list_get_item(posargs))) {
+            cell_add_cell(s, list_get_item(posargs)->u.string);
+        } else {
+            cell_add_str(s, to_string_call(interp, list_get_item(posargs)));
+        }
 	posargs = list_next(posargs);
     }
 
@@ -913,7 +917,11 @@ cmd_println(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 
     s = new_cell(L"");
     while (! IS_LIST_NULL(posargs)) {
-	cell_add_str(s, to_string_call(interp, list_get_item(posargs)));
+        if (STRING == GET_TAG(list_get_item(posargs))) {
+            cell_add_cell(s, list_get_item(posargs)->u.string);
+        } else {
+            cell_add_str(s, to_string_call(interp, list_get_item(posargs)));
+        }
 	posargs = list_next(posargs);
     }
 
@@ -3378,12 +3386,13 @@ cmd_select(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     }
 
     maxfd ++;
+    timeout_l = mpz_get_si(timeout_v->u.biginteger);
+    timeout.tv_sec = timeout_l / 1000;
+    timeout.tv_usec = (timeout_l % 1000) * 1000;
 
+retry:
+    errno = 0;
     if (GET_TAG(timeout_v) == INTEGER) {
-	timeout_l = mpz_get_si(timeout_v->u.biginteger);
-	timeout.tv_sec = timeout_l / 1000;
-	timeout.tv_usec = (timeout_l % 1000) * 1000;
-
 	result = select(maxfd, &read_fds, &write_fds, &except_fds, &timeout);
     } else {
 	result = select(maxfd, &read_fds, &write_fds, &except_fds, NULL);
@@ -3399,8 +3408,12 @@ cmd_select(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	    list_append(result_l, write_result_l);
 	    list_append(result_l, except_result_l);
 	    return result_l;
-	} else {
-	    return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
+        } else {
+            if (errno == EINTR) {
+                goto retry;
+            } else {
+                return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
+            }
 	}
     }
 
@@ -3457,9 +3470,16 @@ cmd_accept(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     fd = mpz_get_si(tfd->u.biginteger);
 
     client_addr_in_size = (socklen_t)sizeof(client_addr_in);
+
+retry:
+    errno = 0;
     sts = accept(fd, (struct sockaddr*)&client_addr_in, &client_addr_in_size);
     if (-1 == sts) {
-	return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
+        if (errno == EINTR) {
+            goto retry;
+        } else {
+            return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
+        }
     }
 
     result = new_list(NULL);
