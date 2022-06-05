@@ -2362,4 +2362,12 @@
 	lib/man.prfm
 		Fix sub-process environment variable.
 
+2022/06/05
+	cell.[ch]
+		Add function cell_cmp for cell compare with null data.
+	methods.c
+		Change String::{=,>,>=,<,<=,!=} compare logic become to use cell_cmp.
+	pmacs update:
+        	Add file decoder RAW.
+
 #eof
