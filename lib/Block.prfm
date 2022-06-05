@@ -36,4 +36,7 @@ Block method redirect-out (out err) {
         setvar stderr $_err;
     };
     return $sts;
+
+    ### sts ::= pipe out: $out [self];
+    ### return $sts;
 };

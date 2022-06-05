@@ -3252,6 +3252,8 @@ defun exec-man (main window topic) {
         $oe set-nolimit;
         $oe set-comode;
         sts ::= {exec proc-enc: $MAN_ENCODING "/bin/sh" "-c" [$MAN_PREFIX expand]} redirect-out $os $oe;
+        ### run-command ::= $MAN_PREFIX expand;
+        ### sts ::= pipe out: $os {exec proc-enc: $MAN_ENCODING "/bin/sh" "-c" $run-command};
         $os close;
         $oe close;
         
