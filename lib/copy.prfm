@@ -16,10 +16,9 @@ defun copy (from to) {
             $dest puts :nonewline $r;
             r ::= $src gets;
         };
-
     }
     fin: {
-        if $src  {$src  close};
+        if $src {$src close};
         if $dest {$dest close};
     }
     ;;
