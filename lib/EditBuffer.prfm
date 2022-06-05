@@ -105,7 +105,7 @@ EditBuffer method load-content (path init-only: init-flag buffer-name: buff-name
 };
 
 EditBuffer method set-encoding (enc) {
-    if [("EUC-JP" "Shift-JIS" "UTF-8" "UTF-8F") find $enc] else: {return <nil>};
+    if [("EUC-JP" "Shift-JIS" "UTF-8" "UTF-8F" "RAW") find $enc] else: {return <nil>};
     sets Encoding [symbol $enc];
 };
 
