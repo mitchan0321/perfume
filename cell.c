@@ -142,12 +142,11 @@ cell_sub(Cell *c, int start, int end) {
 
     if (end < 0) return d;
     if (start < 0) start = 0;
-/*    if (end == 0) end = l; */
     if (end <= start) return d;
     if (start >= l) return d;
 
-    if (end >= l) {
-	return cell_add_str(d, &p[start]);
+    if (end > l) {
+	end = l;
     }
 
     for (i=start; i<end; i++) {
@@ -155,4 +154,18 @@ cell_sub(Cell *c, int start, int end) {
     }
 
     return d;
+}
+
+int
+cell_cmp(Cell *src, Cell *dest) {
+    int l;
+    int result;
+    
+    l = (src->length > dest->length) ? dest->length : src->length; 
+    result = wmemcmp(src->data, dest->data, l);
+    if (result) return result;
+    
+    if (src->length == dest->length) return 0;
+    if (src->length > dest->length) return 1;
+    return -1;
 }

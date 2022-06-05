@@ -2462,15 +2462,18 @@ error2:
 
 Toy_Type*
 mth_string_equal(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
-    Toy_Type *self;
+    Toy_Type *self, *dest;
 
     if (hash_get_length(nameargs) > 0) goto error;
     if (arglen != 1) goto error;
     self = SELF(interp);
     if (GET_TAG(self) != STRING) goto error2;
 
-    if (wcscmp(cell_get_addr(self->u.string),
-	       to_string_call(interp, list_get_item(posargs))) == 0) {
+    dest = list_get_item(posargs);
+    if (STRING != GET_TAG(dest)) {
+        dest = new_string_str(to_string_call(interp, list_get_item(posargs)));
+    }
+    if (cell_cmp(self->u.string, dest->u.string) == 0) {
 	return const_T;
     } else {
 	return const_Nil;
@@ -2484,15 +2487,18 @@ error2:
 
 Toy_Type*
 mth_string_gt(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
-    Toy_Type *self;
+    Toy_Type *self, *dest;
 
     if (hash_get_length(nameargs) > 0) goto error;
     if (arglen != 1) goto error;
     self = SELF(interp);
     if (GET_TAG(self) != STRING) goto error2;
 
-    if (wcscmp(cell_get_addr(self->u.string),
-	       to_string_call(interp, list_get_item(posargs))) > 0) {
+    dest = list_get_item(posargs);
+    if (STRING != GET_TAG(dest)) {
+        dest = new_string_str(to_string_call(interp, list_get_item(posargs)));
+    }
+    if (cell_cmp(self->u.string, dest->u.string) > 0) {
 	return const_T;
     } else {
 	return const_Nil;
@@ -2506,15 +2512,18 @@ error2:
 
 Toy_Type*
 mth_string_lt(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
-    Toy_Type *self;
+    Toy_Type *self, *dest;
 
     if (hash_get_length(nameargs) > 0) goto error;
     if (arglen != 1) goto error;
     self = SELF(interp);
     if (GET_TAG(self) != STRING) goto error2;
 
-    if (wcscmp(cell_get_addr(self->u.string),
-	       to_string_call(interp, list_get_item(posargs))) < 0) {
+    dest = list_get_item(posargs);
+    if (STRING != GET_TAG(dest)) {
+        dest = new_string_str(to_string_call(interp, list_get_item(posargs)));
+    }
+    if (cell_cmp(self->u.string, dest->u.string) < 0) {
 	return const_T;
     } else {
 	return const_Nil;
@@ -2528,15 +2537,18 @@ error2:
 
 Toy_Type*
 mth_string_ge(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
-    Toy_Type *self;
+    Toy_Type *self, *dest;
 
     if (hash_get_length(nameargs) > 0) goto error;
     if (arglen != 1) goto error;
     self = SELF(interp);
     if (GET_TAG(self) != STRING) goto error2;
 
-    if (wcscmp(cell_get_addr(self->u.string),
-	       to_string_call(interp, list_get_item(posargs))) >= 0) {
+    dest = list_get_item(posargs);
+    if (STRING != GET_TAG(dest)) {
+        dest = new_string_str(to_string_call(interp, list_get_item(posargs)));
+    }
+    if (cell_cmp(self->u.string, dest->u.string) >= 0) {
 	return const_T;
     } else {
 	return const_Nil;
@@ -2550,15 +2562,18 @@ error2:
 
 Toy_Type*
 mth_string_le(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
-    Toy_Type *self;
+    Toy_Type *self, *dest;
 
     if (hash_get_length(nameargs) > 0) goto error;
     if (arglen != 1) goto error;
     self = SELF(interp);
     if (GET_TAG(self) != STRING) goto error2;
 
-    if (wcscmp(cell_get_addr(self->u.string),
-	       to_string_call(interp, list_get_item(posargs))) <= 0) {
+    dest = list_get_item(posargs);
+    if (STRING != GET_TAG(dest)) {
+        dest = new_string_str(to_string_call(interp, list_get_item(posargs)));
+    }
+    if (cell_cmp(self->u.string, dest->u.string) <= 0) {
 	return const_T;
     } else {
 	return const_Nil;
@@ -2572,15 +2587,18 @@ error2:
 
 Toy_Type*
 mth_string_nequal(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
-    Toy_Type *self;
+    Toy_Type *self, *dest;
 
     if (hash_get_length(nameargs) > 0) goto error;
     if (arglen != 1) goto error;
     self = SELF(interp);
     if (GET_TAG(self) != STRING) goto error2;
 
-    if (wcscmp(cell_get_addr(self->u.string),
-	       to_string_call(interp, list_get_item(posargs))) != 0) {
+    dest = list_get_item(posargs);
+    if (STRING != GET_TAG(dest)) {
+        dest = new_string_str(to_string_call(interp, list_get_item(posargs)));
+    }
+    if (cell_cmp(self->u.string, dest->u.string) != 0) {
 	return const_T;
     } else {
 	return const_Nil;
