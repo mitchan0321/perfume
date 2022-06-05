@@ -785,7 +785,7 @@ defcommand open-file {
 	    buff ::= new EditBuffer;
 	    (result err) ::= $buff load-content $path;
             if {$buff enc-error?} {
-                show-message :bell "File encode error occured!! Try ALT-e and specify another encoding for re-load.";
+                show-message :bell "File decode error occured!! Try ALT-e and specify another encoding for re-load.";
             };
 	    $MainWindow bind-buffer [$window get-window-name] $buff;
 	    $result ?? {show-message :bell ["Open Failed, path: " . $value " ("  $err ")"]};
@@ -856,7 +856,7 @@ defcommand view-file {
 	    buff ::= new EditBuffer;
 	    (result err) ::= $buff load-content $path;
             if {$buff enc-error?} {
-                show-message :bell "File encode error occured!! Try ALT-e and specify another encoding for re-load.";
+                show-message :bell "File decode error occured!! Try ALT-e and specify another encoding for re-load.";
             };
             $buff set-protect;
 	    $MainWindow bind-buffer [$window get-window-name] $buff;
@@ -2088,13 +2088,13 @@ defcommand pwiki-click-link {
         create-directory-if-not-exists $new-path;
         (result err) ::= $next-buff load-content $new-path;
         if {$next-buff enc-error?} {
-            show-message :bell "File encode error occured!! Try ALT-e and specify another encoding for re-load.";
+            show-message :bell "File decode error occured!! Try ALT-e and specify another encoding for re-load.";
         };
         $result ?? {
             show-message :bell ["Open Failed, path: " . $new-path " ("  $err ")"];
             return SELF;
             if {$buff enc-error?} {
-                show-message :bell "File encode error occured!! Try ALT-e and specify another encoding for re-load.";
+                show-message :bell "File decode error occured!! Try ALT-e and specify another encoding for re-load.";
             };
         };
     };
@@ -2747,8 +2747,10 @@ defcommand grep {
                     cd $directory;
                     fout ::= new Stream;
                     $fout set-nolimit;
+                    $fout set-comode;
                     ferr ::= new Stream;
                     $ferr set-nolimit;
+                    $ferr set-comode;
                     sts ::= {exec "/bin/sh" "-c" $cmd} redirect-out $fout $ferr;
                     $fout close;
                     $ferr close;
@@ -2766,6 +2768,8 @@ defcommand grep {
                     $ferr each do: {| r |
                         $buff append-string ["ERR> " . $r];
                     };
+                    fout := <nil>;
+                    ferr := <nil>;
                     $buff append-string "";
                     $buff append-string ["exit(" . $sts ")"];
                     
@@ -2930,7 +2934,7 @@ defun show-file-at (window-name path line) {
             return;
         };
         if {$buff enc-error?} {
-            show-message :bell "File encode error occured!! Try ALT-e and specify another encoding for re-load.";
+            show-message :bell "File decode error occured!! Try ALT-e and specify another encoding for re-load.";
         };
     };
     $MainWindow bind-buffer $window-name $buff;
@@ -3243,8 +3247,10 @@ defun exec-man (main window topic) {
     if $man-buff else: {
         os ::= new Stream;
         $os set-nolimit;
+        $os set-comode;
         oe ::= new Stream;
         $oe set-nolimit;
+        $oe set-comode;
         sts ::= {exec proc-enc: $MAN_ENCODING "/bin/sh" "-c" [$MAN_PREFIX expand]} redirect-out $os $oe;
         $os close;
         $oe close;
@@ -3261,6 +3267,8 @@ defun exec-man (main window topic) {
         $os each do: {| r |
             $man-buff append-string [curs-col $r];
         };
+        os := <nil>;
+        oe := <nil>;
         $man-buff set-protect;
         $man-buff no-modify;
     };
@@ -3372,6 +3380,7 @@ defcommand compile {
                     ###
                     cd $directory;
                     fout ::= new Stream;
+                    $fout set-comode;
                     sts ::= {exec "/bin/sh" "-c" $cmd} redirect-out $fout $fout;
                     $fout close;
                     buff ::= new EditBuffer;
@@ -3384,6 +3393,7 @@ defcommand compile {
                     $fout each do: {| r |
                         $buff append-string $r;
                     };
+                    fout := <nil>;
                     $buff append-string "";
                     $buff append-string ["exit(" . $sts ")"];
                     
@@ -3632,7 +3642,7 @@ defcommand dired-open {
                     buff ::= new EditBuffer;
                     (result err) ::= $buff load-content $path;
                     if {$buff enc-error?} {
-                        show-message :bell "File encode error occured!! Try ALT-e and specify another encoding for re-load.";
+                        show-message :bell "File decode error occured!! Try ALT-e and specify another encoding for re-load.";
                     };
                     $main bind-buffer [$window get-window-name] $buff;
                     $result ?? {show-message :bell ["Open Failed, path: " . $value " ("  $err ")"]};
@@ -3771,7 +3781,7 @@ defcommand set-encoder {
         show-message :bell "Buffer is modified. Try again after re-open this file.";
         return SELF;
     };
-    $main mini-input-start "" prompt: ["Encoding UTF-8F(u)/EUC-JP(e)/Shift-JIS(s) [current is " .
+    $main mini-input-start "" prompt: ["Encoding UTF-8(u)/EUC-JP(e)/Shift-JIS(s)/RAW(r) [current is " .
         ["" . [$buff get-encoding]] "]: "];
     $main add-mini-input-callback $window {| main window in-key value |
         enc := <nil>;
@@ -3782,13 +3792,15 @@ defcommand set-encoder {
             "E" {enc := "EUC-JP"}
             "s" {enc := "Shift-JIS"}
             "S" {enc := "Shift-JIS"}
+            "r" {enc := "RAW"}
+            "R" {enc := "RAW"}
         ;;
         if $enc {
             $main mini-input-end;
             $buff set-encoding $enc;
             $buff reload-content;
             if {$buff enc-error?} {
-                show-message :bell "File encode error occured!! Try ALT-e and specify another encoding for re-load.";
+                show-message :bell "File decode error occured!! Try ALT-e and specify another encoding for re-load.";
             };
             return ALL;
         };
