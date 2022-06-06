@@ -28,15 +28,13 @@ PipeWrapper method stat? () {
 
 PipeWrapper method run () {
     if {sets? coro} else: {
-	sets coro [coro {begin $body}];
+        sets Locals [dict [dict-closure $body : pairs]];
+        sets coro [coro {begin local: $Locals $body}];
 	$coro eval {
 	    setvar stdin $in;
 	    setvar stdout $out;
 	    setvar INFILE $infile;
 	    setvar OUTFILE $outfile;
-            dict-closure $body : pairs : each do: {| i |
-                set [$i car] [$i cdr];
-            };
 	    if {defvar? CO-MODE} else: {defvar CO-MODE <t>};
 	    enable-itimer;
 	};
