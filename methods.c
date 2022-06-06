@@ -3789,11 +3789,12 @@ new_file() {
     ALLOC_SAFE(o);
     memset(o, 0, sizeof(Toy_File));
 
-    GC_register_finalizer_ignore_self((void*)o,
-				      file_finalizer,
-				      NULL,
-				      NULL,
-				      NULL);
+    // GC_register_finalizer_ignore_self((void*)o,
+    GC_register_finalizer_no_order((void*)o,
+                                   file_finalizer,
+				   NULL,
+				   NULL,
+				   NULL);
 
     return o;
 }
