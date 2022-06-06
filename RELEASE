@@ -2370,4 +2370,13 @@
 	pmacs update:
         	Add file decoder RAW.
 
+2022/06/06
+	methods.c, types.c
+		Change GC finalizer call GC_register_finalizer_ignore_self ->
+		  GC_register_finalizer_no_order, for GC warning message 
+		  "GC Warning: Finalization cycle involving" suppress file and coro
+		  finalize.
+	lib/PipeWrapper.prfm
+		Add coro closure value inject to co-routin local stack.
+
 #eof
