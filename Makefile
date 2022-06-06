@@ -59,12 +59,14 @@ ifeq ($(NO_LAZY_CALL),yes)
 endif
 
 ### for product build. (use BoehmGC)
-CFLAGS		= -Wall -O3 -c -g $(OPTIONS)
-INCLUDE		= -I/usr/local/include -I.
 
 ifeq ($(shell uname),FreeBSD)
+	CFLAGS	= -Wall -O3 -c -g $(OPTIONS)
+	INCLUDE	= -I/usr/local/include -I.
 	LIB	= -static -L/usr/lib -L/lib -L/usr/local/lib -lm -lpthread -lgmp -lgc -lonigmo -lpcl $(OPTLIBS)
 else
+	CFLAGS	= -Wall -O3 -c -g $(OPTIONS)
+	INCLUDE	= -I/usr/local/include -I.
 	LIB	= -L/usr/lib -L/lib -L/usr/local/lib -lm -lpthread -lgmp -lgc -lonigmo -lpcl $(OPTLIBS)
 endif
 
