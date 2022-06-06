@@ -36,4 +36,10 @@ Block method redirect-out (out err) {
         setvar stderr $_err;
     };
     return $sts;
+
+REM { ### This is invalid code ....
+    sts ::= pipe out: $out [self];
+    return $sts;
+};
+
 };
