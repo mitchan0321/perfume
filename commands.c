@@ -4407,6 +4407,12 @@ error:
 			 L"Syntax error at 'set-locale', syntax: set-locale \"locale\"", interp);
 }
 
+Toy_Type*
+cmd_pid(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+
+    return new_integer_si(getpid());
+}
+
 #ifdef EVAL_STAT
 Toy_Type*
 cmd_evalstat(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
@@ -4557,6 +4563,7 @@ int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, L"enable-itimer",cmd_enableitimer, 	NULL);
     toy_add_func(interp, L"atomic",	cmd_atomic, 		L"body");
     toy_add_func(interp, L"set-locale",	cmd_setlocale, 		L"locale");
+    toy_add_func(interp, L"pid",    	cmd_pid, 		NULL);
 
 #ifdef EVAL_STAT
     toy_add_func(interp, L"eval-stat",	cmd_evalstat, 		NULL);
