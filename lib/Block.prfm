@@ -37,9 +37,8 @@ Block method redirect-out (out err) {
     };
     return $sts;
 
-REM { ### This is invalid code ....
-    sts ::= pipe out: $out [self];
-    return $sts;
-};
-
+    ### sts ::= pipe out: $out [self];
+    ### $out close;
+    ### $err close;
+    ### return $sts;
 };
