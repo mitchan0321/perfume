@@ -2376,7 +2376,19 @@
 		  GC_register_finalizer_no_order, for GC warning message 
 		  "GC Warning: Finalization cycle involving" suppress file and coro
 		  finalize.
+	commands.c
+		Add pid command for return process id myself.
 	lib/PipeWrapper.prfm
 		Add coro closure value inject to co-routin local stack.
+	lib/exec.prfm
+		Add command option :err-to-stdout for error output read from sub-process,
+		  if this option is specified read data is output to stdout.
+	lib/sysinfo.prfm
+		Add process id myself output.
+	pmacs update:
+		Fix grep-next, grep-previous file name in grep line process become to
+		  path-adjust function for normalized.
+		Chage grep, man, compile command to use pipe command for these process.
+		Add pinterp.prfm output starting message sysinfo too.
 
 #eof
