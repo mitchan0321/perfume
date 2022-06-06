@@ -2747,11 +2747,15 @@ defcommand grep {
                     cd $directory;
                     fout ::= new Stream;
                     $fout set-nolimit;
-                    $fout set-comode;
                     ferr ::= new Stream;
                     $ferr set-nolimit;
-                    $ferr set-comode;
-                    sts ::= {exec "/bin/sh" "-c" $cmd} redirect-out $fout $ferr;
+                    ### sts ::= {exec "/bin/sh" "-c" $cmd} redirect-out $fout $ferr;
+                    sts := 0;
+                    try {
+                        pipe out: $fout {exec :err-to-stdout "/bin/sh" "-c" $cmd};
+                    } catch: {| e |
+                        sts ::= "<" . [$e car] "> #" [$e cdr];
+                    };
                     $fout close;
                     $ferr close;
                     buff ::= new EditBuffer;
@@ -2859,10 +2863,12 @@ defcommand grep-next {
     };
 
     ### show-message ["File: " . $f ", line: " $n];
+    f ::= $f split : last : car;
+    f ::= $f ?? "";
     if {[$f at 0] = "/"} {
-        show-file-at "Window#2" $f $n;
+        show-file-at "Window#2" [path-adjust $f] $n;
     } {
-        show-file-at "Window#2" [$dir . $f] $n;
+        show-file-at "Window#2" [path-adjust [$dir . $f]] $n;
     };
 
     return ALL;
@@ -2915,10 +2921,12 @@ defcommand grep-previous {
     };
 
     ### show-message ["File: " . $f ", line: " $n];
+    f ::= $f split : last : car;
+    f ::= $f ?? "";
     if {[$f at 0] = "/"} {
-        show-file-at "Window#2" $f $n;
+        show-file-at "Window#2" [path-adjust $f] $n;
     } {
-        show-file-at "Window#2" [$dir . $f] $n;
+        show-file-at "Window#2" [path-adjust [$dir . $f]] $n;
     };
     
     return ALL;
@@ -3247,11 +3255,10 @@ defun exec-man (main window topic) {
     if $man-buff else: {
         os ::= new Stream;
         $os set-nolimit;
-        $os set-comode;
         oe ::= new Stream;
         $oe set-nolimit;
-        $oe set-comode;
-        sts ::= {exec proc-enc: $MAN_ENCODING "/bin/sh" "-c" [$MAN_PREFIX expand]} redirect-out $os $oe;
+        ### sts ::= {exec proc-enc: $MAN_ENCODING "/bin/sh" "-c" [$MAN_PREFIX expand]} redirect-out $os $oe;
+        sts ::= pipe out: $os {exec :err-to-stdout proc-enc: $MAN_ENCODING "/bin/sh" "-c" [$MAN_PREFIX expand]};
         $os close;
         $oe close;
         
@@ -3268,7 +3275,6 @@ defun exec-man (main window topic) {
             $man-buff append-string [curs-col $r];
         };
         os := <nil>;
-        oe := <nil>;
         $man-buff set-protect;
         $man-buff no-modify;
     };
@@ -3380,8 +3386,13 @@ defcommand compile {
                     ###
                     cd $directory;
                     fout ::= new Stream;
-                    $fout set-comode;
-                    sts ::= {exec "/bin/sh" "-c" $cmd} redirect-out $fout $fout;
+                    ### sts ::= {exec "/bin/sh" "-c" $cmd} redirect-out $fout $fout;
+                    sts := 0;
+                    try {
+                        pipe out: $fout {exec :err-to-stdout "/bin/sh" "-c" $cmd};
+                    } catch: {| e |
+                        sts ::= "<" . [$e car] "> #" [$e cdr];
+                    };
                     $fout close;
                     buff ::= new EditBuffer;
                     BufferManager unregist-buffer "*Grep*";
