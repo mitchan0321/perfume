@@ -1,4 +1,5 @@
 defun sysinfo () {
+    pid ::= pid;
     {cat} <<< ["\
 Version: ${VERSION}
 Build: ${BUILD}
@@ -8,6 +9,7 @@ Default file encoding: ${DEFAULT_FILE_ENCODING}
 Default script encoding: ${DEFAULT_SCRIPT_ENCODING}
 Default directory encoding: ${DEFAULT_DIRENT_ENCODING}
 Current working directory: ${CWD}
+Current process id: ${pid}
 " expand];
 
     return;
