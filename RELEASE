@@ -1,3 +1,4 @@
+2022/06/07	PRFM_20220607		1.5.27
 2022/06/02	PRFM_20220602		1.5.26
 2022/05/23	PRFM_20220523		1.5.25
 2022/05/05	PRFM_20220505		1.5.24
@@ -2390,5 +2391,12 @@
 		  path-adjust function for normalized.
 		Chage grep, man, compile command to use pipe command for these process.
 		Add pinterp.prfm output starting message sysinfo too.
+
+2022/06/07
+	Makefile
+		Change make build-pkg copy shared library only.
+	tag:
+		PRFM_20220607
+		1.5.27
 
 #eof
