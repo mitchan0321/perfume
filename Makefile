@@ -10,7 +10,7 @@ OPTLIBS2 =
 ###   FIX ME
 ###
 PREFIX		= /usr/local
-ifeq ($(shell basename X`which clang`),Xclang)
+ifeq ($(shell basename `which clang`X),clangX)
   CC		= clang
 else
   CC		= cc
