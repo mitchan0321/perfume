@@ -2399,4 +2399,14 @@
 		PRFM_20220607
 		1.5.27
 
+2022/06/07
+	Makefile
+		Change detect CLANG compiler writting.
+	pmacs update:
+		Change pkg/INSTALL document.
+		Change open-file, view-file, read-file, save-buffer, save-buffer-as,
+		  grep, read-grep-file, cd and compile commands are become to
+		  return the my home directory when input "~" character before "/"
+		  character.
+
 #eof
