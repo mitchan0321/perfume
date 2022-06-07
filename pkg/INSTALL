@@ -1,25 +1,53 @@
-<<< INSTALL perfume/pmacs package >>>
+*** This is a programing language Perfume and Pmacs text editor binary package ***
+
+<<< Package description >>>
+
+1. Package name: pmacs-install-YYYYMMDD-amd64-ubuntu20.tar.gz
+   This package for Linux distribution Ubuntu-20.04TLS, arch x86_64(AMD64).
+
+2. Package name: pmacs-install-YYYYMMDD-amd64-ubuntu22.tar.gz
+   This package for Linux distribution Ubuntu-22.04TLS, arch x86_64(AMD64).
+
+3. Package name: pmacs-install-YYYYMMDD-amd64-redhat8.tar.gz
+   This package for Linux distribution Red Hat Enterprise Linux 8, arch x86_64(AMD64).
+
+4. Package name: pmacs-install-YYYYMMDD-amd64-freebsd.tar.gz
+   This package for FreeBSD, arch x86_64(AMD64).
+
+
+<<< INSTALL Perfume/Pmacs package >>>
 
 1. Extract downloaded binary package in any directory you want to install.
-   (ex) If you install in your home directory.
 
-	cd $HOME
-	tar xvzf pmacs-install-yyyymmdd.tar.gz
+        (ex) If you install into your home directory.
+
+        cd $HOME
+        tar xvzf pmacs-install-YYYYMMDD-amd64-XXX.tar.gz	[ Specify package name you downloaded ]
 
 2. Enter package directory.
 
-	cd pmacs-install
+        cd pmacs-install
 
 3. Run installer.
 
-	./install.sh
+        sh ./install.sh
 
 4. Set the shell environment variable PATH.
 
-	(ex) PATH=${PATH}:${HOME}/pmacs-install/bin
+        (ex) Edit your shell profile.
 
-5. Start pmacs editor.
+        PATH=${PATH}:${HOME}/bin
 
-	pmacs
+5. Create pmacs command file under your program path.
+
+        (ex) Create program file in your $HOME/bin directory.
+
+        cd $HOME/bin
+        ln -s ../pmacs-install/bin/pmacs pmacs
+
+6. Start pmacs editor.
+
+        pmacs
+
 
 #eof
