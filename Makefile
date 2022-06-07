@@ -10,7 +10,7 @@ OPTLIBS2 =
 ###   FIX ME
 ###
 PREFIX		= /usr/local
-ifeq ($(shell basename `which clang`),clang)
+ifeq ($(shell basename X`which clang`),Xclang)
   CC		= clang
 else
   CC		= cc
@@ -208,10 +208,10 @@ build-pkg:
 	mkdir -p $(PKG_DIR)
 	mkdir -p $(PKG_DIR)/lib
 ifeq ($(shell uname),Linux)
-	cp -r $(PKG_EXTLIB_DIR)/libgc*     $(PKG_DIR)/lib
-	cp -r $(PKG_EXTLIB_DIR)/libgmp*    $(PKG_DIR)/lib
-	cp -r $(PKG_EXTLIB_DIR)/libonigmo* $(PKG_DIR)/lib
-	cp -r $(PKG_EXTLIB_DIR)/libpcl*    $(PKG_DIR)/lib
+	cp -r $(PKG_EXTLIB_DIR)/libgc*.so*     $(PKG_DIR)/lib
+	cp -r $(PKG_EXTLIB_DIR)/libgmp*.so*    $(PKG_DIR)/lib
+	cp -r $(PKG_EXTLIB_DIR)/libonigmo*.so* $(PKG_DIR)/lib
+	cp -r $(PKG_EXTLIB_DIR)/libpcl*.so*    $(PKG_DIR)/lib
 	chmod 644 $(PKG_DIR)/lib/lib*
 endif
 	mkdir -p $(PKG_DIR)/bin
