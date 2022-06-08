@@ -1,7 +1,7 @@
 defun pinterp (window) {
-    ### $stdout puts ["Start Perfume/Pmacs interpriter - version ${VERSION}, build ${BUILD}." expand];
-    $stdout puts "Start Perfume/Pmacs interpriter.";
-    $stdin puts "sysinfo";
+    $stdout puts ["Start Perfume/Pmacs interpriter - version ${VERSION}, build ${BUILD}." expand];
+    ### $stdout puts "Start Perfume/Pmacs interpriter.";
+    ### $stdin puts "sysinfo";
     $window set-interp-idle;
     loop do: {
 	$stdin each do: {| exec-command |
