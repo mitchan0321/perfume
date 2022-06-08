@@ -815,6 +815,12 @@ defcommand open-file {
             };
 	    return SELF;
 	};
+	if {eq? $in-key "~"} {
+            if {[$value at -2] = "/"} {
+                $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
+            };
+	    return SELF;
+	};
     };
     result SELF;
 };
@@ -884,6 +890,12 @@ defcommand view-file {
 	if {eq? $in-key "/"} {
             if {[$value at -2] = "/"} {
 		$main mini-input-value-override "/" 1;
+            };
+	    return SELF;
+	};
+	if {eq? $in-key "~"} {
+            if {[$value at -2] = "/"} {
+                $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
             };
 	    return SELF;
 	};
@@ -961,6 +973,12 @@ defcommand read-file {
 	if {eq? $in-key "/"} {
             if {[$value at -2] = "/"} {
 		$main mini-input-value-override "/" 1;
+            };
+	    return SELF;
+	};
+	if {eq? $in-key "~"} {
+            if {[$value at -2] = "/"} {
+                $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
             };
 	    return SELF;
 	};
@@ -1046,6 +1064,12 @@ defcommand save-buffer {
             if {eq? $in-key "/"} {
                 if {[$value at -2] = "/"} {
                     $main mini-input-value-override "/" 1;
+                };
+                return SELF;
+            };
+            if {eq? $in-key "~"} {
+                if {[$value at -2] = "/"} {
+                    $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
                 };
                 return SELF;
             };
@@ -1178,6 +1202,12 @@ defcommand save-buffer-as {
         if {eq? $in-key "/"} {
             if {[$value at -2] = "/"} {
 		$main mini-input-value-override "/" 1;
+            };
+	    return SELF;
+	};
+	if {eq? $in-key "~"} {
+            if {[$value at -2] = "/"} {
+                $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
             };
 	    return SELF;
 	};
@@ -2817,6 +2847,12 @@ defcommand grep {
             };
 	    return SELF;
 	};
+	if {eq? $in-key "~"} {
+            if {[$value at -2] = "/"} {
+                $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
+            };
+	    return SELF;
+	};
     };
     result SELF;
 };
@@ -3039,6 +3075,12 @@ defcommand read-grep-file {
             };
 	    return SELF;
 	};
+	if {eq? $in-key "~"} {
+            if {[$value at -2] = "/"} {
+                $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
+            };
+	    return SELF;
+	};
     };
     result SELF;
 };
@@ -3084,6 +3126,12 @@ defcommand cd {
 	if {eq? $in-key "/"} {
             if {[$value at -2] = "/"} {
 		$main mini-input-value-override "/" 1;
+            };
+	    return SELF;
+	};
+	if {eq? $in-key "~"} {
+            if {[$value at -2] = "/"} {
+                $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
             };
 	    return SELF;
 	};
@@ -3444,6 +3492,12 @@ defcommand compile {
 	if {eq? $in-key "/"} {
             if {[$value at -2] = "/"} {
 		$main mini-input-value-override "/" 1;
+            };
+	    return SELF;
+	};
+	if {eq? $in-key "~"} {
+            if {[$value at -2] = "/"} {
+                $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
             };
 	    return SELF;
 	};
