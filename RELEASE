@@ -2409,4 +2409,10 @@
 		  return the my home directory when input "~" character before "/"
 		  character.
 
+2022/06/10
+	methods.c
+		Change String::append! and String::. use cell_add_cell become to string concat
+		  can null data included.
+		Fix few syntax print.
+
 #eof
