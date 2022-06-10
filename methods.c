@@ -1691,7 +1691,7 @@ mth_list_append(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     return l;
 
 error:
-    return new_exception(TE_SYNTAX, L"Syntax error at 'append', syntax: List append! | + [val ...]", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'append!', syntax: List append! | + [val ...]", interp);
 error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
 }
@@ -2642,7 +2642,7 @@ error2:
 
 Toy_Type*
 mth_string_append(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
-    Toy_Type *self;
+    Toy_Type *self, *src;
     Cell *o;
 
     if (hash_get_length(nameargs) > 0) goto error;
@@ -2654,7 +2654,11 @@ mth_string_append(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 
     while (posargs) {
 	if (! IS_LIST_NULL(posargs)) {
-	    cell_add_str(o, to_string_call(interp, list_get_item(posargs)));
+            src = list_get_item(posargs);
+            if (STRING != GET_TAG(src)) {
+                src = new_string_str(to_string_call(interp, list_get_item(posargs)));
+            }
+	    cell_add_cell(o, src->u.string);
 	}
 
 	posargs = list_next(posargs);
@@ -2663,14 +2667,14 @@ mth_string_append(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     return self;
 
 error:
-    return new_exception(TE_SYNTAX, L"Syntax error at '+', syntax: String + [val ...]", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'append!', syntax: String append! [val ...]", interp);
 error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
 Toy_Type*
 mth_string_concat(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
-    Toy_Type *self;
+    Toy_Type *self, *src;
     Cell *o;
 
     if (hash_get_length(nameargs) > 0) goto error;
@@ -2678,11 +2682,15 @@ mth_string_concat(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     self = SELF(interp);
     if (GET_TAG(self) != STRING) goto error2;
 
-    o = new_cell(cell_get_addr(self->u.string));
+    o = cell_clone(self->u.string);
 
     while (posargs) {
 	if (! IS_LIST_NULL(posargs)) {
-	    cell_add_str(o, to_string_call(interp, list_get_item(posargs)));
+            src = list_get_item(posargs);
+            if (STRING != GET_TAG(src)) {
+                src = new_string_str(to_string_call(interp, list_get_item(posargs)));
+            }
+	    cell_add_cell(o, src->u.string);
 	}
 
 	posargs = list_next(posargs);
@@ -5083,7 +5091,7 @@ mth_vector_append(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     return item;
 
 error:
-    return new_exception(TE_SYNTAX, L"Syntax error at 'append', syntax: Vector append val", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'append!', syntax: Vector append! val", interp);
 
 error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
