@@ -178,6 +178,10 @@ defun line-input (curs disp-line disp-col input-len cur-index cur-val key-in) {
             (command char new-y new-x) ::= $v delete-character-at 0 $cur-index;
             break;
         }
+        {eq? $key-in kDC8} {
+            $MainWindow mini-input-end;
+            break;
+        };
     ;;
 
     return ($key-in $new-x [if {[$v len] = 0} "" {$v get 0}] $result);
