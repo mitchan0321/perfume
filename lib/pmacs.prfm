@@ -50,63 +50,61 @@ defun pmacs (trace: t) {
         $MainWindow set-input $stdin_orig;
         
         if {[$ARGV len] <= 3} {
-            $MainWindow add-background job-id: "00-start-logo" {
-                buff ::= new EditBuffer;
-                path := <nil>;
-                $LIB_PATH each do: {| i |
-                    if {file exists? [$i . "/" $LOGO_PATH]} {
-                        path ::= $i . "/" $LOGO_PATH;
-                        break;
-                    };
+            buff ::= new EditBuffer;
+            path := <nil>;
+            $LIB_PATH each do: {| i |
+                if {file exists? [$i . "/" $LOGO_PATH]} {
+                    path ::= $i . "/" $LOGO_PATH;
+                    break;
                 };
-                if $path {
-                    (result err) ::= $buff load-content $path :init-only;
-                    f := <nil>;
-                    try {
-                        f ::= new File init: ($path mode: i);
-                        (y x) ::= $MainWindow get-screen-size;
-                        $y -- 2;
-                        $x -- 1;
-                        marginx ::= $x - $LOGO_WIDTH : / 2;
-                        if {$marginx < 0} {
-                            marginxs := "";
-                        } {
-                            marginxs ::= " " repeat $marginx;
-                        };
-                        marginy ::= $y - $LOGO_LINE : / 3;
-                        if {$marginy < 0} {
-                            marginy := 0;
-                        };
-                        0 each to: $marginy do: {
-                            $buff append-string "";
-                        };
-                        $f each do: {| r |
-                            $buff append-string [$marginxs . $r];
-                        };
-                        0 each to: [$marginy * 2] do: {
-                            $buff append-string "";
-                        };
-                    }
-                    catch: {| e |
-                        show-message :bell ["Can\'t read logo file, " . [$e cdr]]; ###']
-                    }
-                    fin: {
-                        $f close;
-                    }
-                    ;;
-                    
-                    if $result {
-                        $MainWindow bind-buffer "Window#1" $buff;
-                        $MainWindow apply {render-all; refresh};
-                        key := ();
-                        timeout := 10000;
-                        while {$key null?} do: {
-                            (repeat-time key) ::= curs-keyin [$MainWindow get-current-window : get-curs] $INPUT_TIMEOUT $INPUT_ENCODING;
-                            $timeout -- $INPUT_TIMEOUT;
-                            if {$timeout < 0} {break};
-                        };
-                        $MainWindow unbind-buffer;
+            };
+            if $path {
+                (result err) ::= $buff load-content $path :init-only;
+                f := <nil>;
+                try {
+                    f ::= new File init: ($path mode: i);
+                    (y x) ::= $MainWindow get-screen-size;
+                    $y -- 2;
+                    $x -- 1;
+                    marginx ::= $x - $LOGO_WIDTH : / 2;
+                    if {$marginx < 0} {
+                        marginxs := "";
+                    } {
+                        marginxs ::= " " repeat $marginx;
                     };
+                    marginy ::= $y - $LOGO_LINE : / 3;
+                    if {$marginy < 0} {
+                        marginy := 0;
+                    };
+                    0 each to: $marginy do: {
+                        $buff append-string "";
+                    };
+                    $f each do: {| r |
+                        $buff append-string [$marginxs . $r];
+                    };
+                    0 each to: [$marginy * 2] do: {
+                        $buff append-string "";
+                    };
+                }
+                catch: {| e |
+                    show-message :bell ["Can\'t read logo file, " . [$e cdr]]; ###']
+                }
+                fin: {
+                    $f close;
+                }
+                ;;
+                
+                if $result {
+                    $MainWindow bind-buffer "Window#1" $buff;
+                    $MainWindow apply {render-all; refresh};
+                    key := ();
+                    timeout := 10000;
+                    while {$key null?} do: {
+                        (repeat-time key) ::= curs-keyin [$MainWindow get-current-window : get-curs] $INPUT_TIMEOUT $INPUT_ENCODING;
+                        $timeout -- $INPUT_TIMEOUT;
+                        if {$timeout < 0} {break};
+                    };
+                    $MainWindow unbind-buffer;
                 };
             };
         };
@@ -123,7 +121,6 @@ defun pmacs (trace: t) {
         c ::= coro {pinterp $MainWindow};
         $c eval {defvar CO-MODE <t>};
         $c eval {enable-itimer};
-        set-itimer $INTERP_ITIMER_INTERVAL;
         $PINTERP set $c;
         
         body := {| main window |
@@ -160,15 +157,16 @@ defun pmacs (trace: t) {
             open-file $f;
         };
         if $files,0 {
-            $MainWindow add-background job-id: "01-file-raise" {
+            $MainWindow add-background job-id: "01-file-raise" after: 500 {
                 target-buff ::= BufferManager get-buffer [$files,0 split sep: "/" : last : car];
                 $MainWindow bind-buffer "Window#1" $target-buff;
                 result ALL;
             };
         };
-        
 	$MainWindow render-all;
 	$MainWindow refresh;
+
+        set-itimer $INTERP_ITIMER_INTERVAL;
 	$MainWindow key-event-loop;
     }
     fin: {
