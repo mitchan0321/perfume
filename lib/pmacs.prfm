@@ -111,46 +111,45 @@ defun pmacs (trace: t) {
             };
         };
 
-        if {defvar? PINTERP_LOCAL} else: {
-	    defvar PINTERP_LOCAL [dict];
+        try {defvar PINTERP_LOCAL [dict]};
+        try {
+            defvar PINTERP [new];
+            $PINTERP method set (i) {sets Interp $i};
+            $PINTERP method eval (i) {$Interp eval $i};
+            $PINTERP method next () {$Interp next};
+            $PINTERP method release () {$Interp release};
+            $PINTERP method stat () {$Interp stat};
         };
-	$MainWindow add-background job-id: "50-PINTERP-WATCHDOG" {
-	    c ::= coro {pinterp $MainWindow};
-	    $c eval {defvar CO-MODE <t>};
-	    $c eval {enable-itimer};
-	    set-itimer $INTERP_ITIMER_INTERVAL;
-	    
-	    if {defvar? PINTERP} {
-		setvar PINTERP $c;
-	    } {
-		defvar PINTERP $c;
-	    };
-
-	    body := {| main window |
-		if {eq? [$PINTERP stat] DONE} {
-		    try {$PINTERP release} catch: {};
-		    c ::= coro {pinterp $MainWindow};
-		    $c eval {defvar CO-MODE <t>};
-		    $c eval {enable-itimer};
-		    setvar PINTERP $c;
-		};
-
-	        buff := <nil>;
-		if $window {
-		    if {eq? CombiWindow [$window get @name]} {buff ::= $window get-buffer};
-		};
-		if $buff {
-		    if {eq? ScratchBuffer [$buff get @name]} {
-			if {$window method? display-evaluation} {
-			    $window display-evaluation;
-			};
-		    };
-		};
-
-                $MainWindow add-background job-id: "50-PINTERP-WATCHDOG" $body;
+        c ::= coro {pinterp $MainWindow};
+        $c eval {defvar CO-MODE <t>};
+        $c eval {enable-itimer};
+        set-itimer $INTERP_ITIMER_INTERVAL;
+        $PINTERP set $c;
+        
+        body := {| main window |
+            if {eq? [$PINTERP stat] DONE} {
+                try {$PINTERP release} catch: {};
+                c ::= coro {pinterp $MainWindow};
+                $c eval {defvar CO-MODE <t>};
+                $c eval {enable-itimer};
+                $PINTERP set $c;
             };
-            yield $body $MainWindow <nil>;
-	};
+            
+            buff := <nil>;
+            if $window {
+                if {eq? CombiWindow [$window get @name]} {buff ::= $window get-buffer};
+            };
+            if $buff {
+                if {eq? ScratchBuffer [$buff get @name]} {
+                    if {$window method? display-evaluation} {
+                        $window display-evaluation;
+                    };
+                };
+            };
+            
+            $MainWindow add-background job-id: "50-PINTERP-WATCHDOG" $body;
+        };
+        yield $body $MainWindow <nil>;
 
         files ::= $ARGV clone;
         $files >>;
