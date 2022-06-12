@@ -2415,4 +2415,13 @@
 		  can null data included.
 		Fix few syntax print.
 
+2022/06/12
+	pmacs update:
+		Add ask interp kill.
+		Delete create stderr chanel at grep, man, compile commands.
+		Add info for info global and $PINTERP value at internal-stat.
+		Add emagency exit from mini-input, press Ctrl+Shift+Alt+DEL.
+		Change PINTERP value to object for delegation.
+		Change PINTERP start-up code.
+
 #eof
