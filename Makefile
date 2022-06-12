@@ -211,7 +211,9 @@ ifeq ($(shell uname),Linux)
 	cp -r $(PKG_EXTLIB_DIR)/libgc*.so*     $(PKG_DIR)/lib
 	cp -r $(PKG_EXTLIB_DIR)/libgmp*.so*    $(PKG_DIR)/lib
 	cp -r $(PKG_EXTLIB_DIR)/libonigmo*.so* $(PKG_DIR)/lib
+ifneq ($(shell arch),aarch64)
 	cp -r $(PKG_EXTLIB_DIR)/libpcl*.so*    $(PKG_DIR)/lib
+endif
 	chmod 644 $(PKG_DIR)/lib/lib*
 endif
 	mkdir -p $(PKG_DIR)/bin
