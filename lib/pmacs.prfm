@@ -23,8 +23,12 @@ defun pmacs (trace: t) {
     set-locale "";
     
     if {true? t} {
-	f := `File ("./trace.pmacs" mode: o);
-	trace 1 out: [$f fd?];
+        if {defvar? _TRACE_FILE} {
+            setvar _TRACE_FILE `File ("./trace.pmacs" mode: o);
+        } {
+            defvar _TRACE_FILE `File ("./trace.pmacs" mode: o);
+        };
+	trace 1 out: [$_TRACE_FILE fd?];
     };
 
     fun (modules) {
