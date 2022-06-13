@@ -181,6 +181,8 @@ begin {
 #
 # This functions are pipe utility command suite.
 #
+load-func :force pipe;
+
 defun >@ (body) {
     result := <nil>;
     $stdin each do: {| i |
