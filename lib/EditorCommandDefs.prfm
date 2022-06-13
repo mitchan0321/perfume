@@ -3307,7 +3307,7 @@ defun exec-man (main window topic) {
     if $man-buff else: {
         os ::= new Stream;
         $os set-nolimit;
-        ### sts ::= {exec proc-enc: $MAN_ENCODING "/bin/sh" "-c" [$MAN_PREFIX expand]} redirect-out $os $oe;
+        ### sts ::= {exec proc-enc: $MAN_ENCODING "/bin/sh" "-c" [$MAN_PREFIX expand]} redirect-out $os $os;
         sts ::= pipe out: $os {exec :err-to-stdout proc-enc: $MAN_ENCODING "/bin/sh" "-c" [$MAN_PREFIX expand]};
         $os close;
         
