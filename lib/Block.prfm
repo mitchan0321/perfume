@@ -23,6 +23,7 @@ Block method <<< (string) {
 };
 
 Block method redirect-out (out err) {
+    REM { ### REMARK
     sts := 0;
     try {
         set _out $stdout;
@@ -36,9 +37,8 @@ Block method redirect-out (out err) {
         setvar stderr $_err;
     };
     return $sts;
+    }; ### REMARK END
 
-    ### sts ::= pipe out: $out [self];
-    ### $out close;
-    ### $err close;
-    ### return $sts;
+    sts ::= pipe out: $out [self];
+    return $sts;
 };
