@@ -157,11 +157,9 @@ defun pmacs (trace: t) {
             open-file $f;
         };
         if $files,0 {
-            $MainWindow add-background job-id: "01-file-raise" after: 500 {
-                target-buff ::= BufferManager get-buffer [$files,0 split sep: "/" : last : car];
-                $MainWindow bind-buffer "Window#1" $target-buff;
-                result ALL;
-            };
+            target-buff ::= BufferManager get-buffer [$files,0 split sep: "/" : last : car];
+            $MainWindow bind-buffer "Window#1" $target-buff;
+            result ALL;
         };
 	$MainWindow render-all;
 	$MainWindow refresh;
