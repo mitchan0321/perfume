@@ -2424,4 +2424,11 @@
 		Change PINTERP value to object for delegation.
 		Change PINTERP start-up code.
 
+2022/06/13
+	expand-syntax.prfm
+		Add load pipe at system initialize.
+	pmacs update:
+		Change the argument files load at on the fly.
+		Change pinterp starting message.
+
 #eof
