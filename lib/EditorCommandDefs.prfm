@@ -4067,13 +4067,13 @@ defcommand file-completion {
     try {  
         list ::= file list $dir;
     } catch: {
-        show-message ["Directory not found: \"" . $dir "\"."];
+        show-message :bell ["Directory not found: \"" . $dir "\"."];
         return ALL;
     };
     
     compl ::= path-match $list $f;
     if {$compl len : = 0} {
-        show-message ["No match file: \"" . $f "\"."];
+        show-message :bell ["No match file: \"" . $f "\"."];
         return all;
     };
     if {$compl len : = 1} {
