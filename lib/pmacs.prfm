@@ -176,6 +176,15 @@ defun pmacs (trace: t) {
 	setvar stdin  $stdin_orig;
 	setvar stdout $stdout_orig;
 	setvar stderr $stderr_orig;
+        undef stdin_orig;
+        undef stdout_orig;
+        undef stderr_orig;
+        $PINTERP release;
+        undef PINTERP;
+        undef PINTERP_LOCAL;
+        undef MainWindow;
+        undef PMACS;
+        WUtil term;
     }
     catch: {| e |
 	__error_info__ ::= "ERROR: <%v># %v\n\n%v" fmt [$e car] [$e cdr] $@stack-trace;

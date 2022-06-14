@@ -20,6 +20,13 @@ WUtil method init () {
     };
 };
 
+WUtil method term () {
+    d ::= dict-func;
+    f ::= $d get _exit;
+    $d unset exit;
+    $d set exit $f;
+};
+
 WUtil method color-pair (fg bg) {
     if {sets? ColorPair} else: {
 	sets ColorPair [dict];
