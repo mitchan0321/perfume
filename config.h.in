@@ -38,6 +38,6 @@
 // #define STACK_SLOT_SIZE		(128*1024)
 
 /* for SIGSEGV signal handler */
-#define SIGASTKSZ		(16*1024)
+#define SIGASTKSZ		(64*1024)
 
 #endif /* __CONFIG_H__ */
