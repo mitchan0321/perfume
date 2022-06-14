@@ -4056,8 +4056,11 @@ defcommand file-completion {
         if {and {$l len : = 1} {$l get 0 : = ""}} {
             dir := "/";
         } {
-            dir ::= $l join sep: "/";
-            dir ::= {$dir = ""} ??? "./" [$dir . "/"];
+            if {$r at $start : = "/"} {
+                dir ::= $l join sep: "/" : . "/";
+            } {
+                dir ::= $buff get-content-dir : . "/" [$l join sep: "/"] : . "/";
+            };
         };
     };
 
