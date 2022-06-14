@@ -4050,11 +4050,15 @@ defcommand file-completion {
     l ::= $r sub $start $x : split sep: "/";
     f ::= $l ->>;
     f ::= $f ?? "";
-    if {and {$l len : = 1} {$l get 0 : = ""}} {
-        dir := "/";
+    if {$l null?} {
+        dir ::= $buff get-content-dir : . "/";
     } {
-        dir ::= $l join sep: "/";
-        dir ::= {$dir = ""} ??? "./" [$dir . "/"];
+        if {and {$l len : = 1} {$l get 0 : = ""}} {
+            dir := "/";
+        } {
+            dir ::= $l join sep: "/";
+            dir ::= {$dir = ""} ??? "./" [$dir . "/"];
+        };
     };
 
     try {  
@@ -4070,9 +4074,15 @@ defcommand file-completion {
         return all;
     };
     if {$compl len : = 1} {
-        $buff line-update [[$r sub 0 [$x - [$f len]]] . $compl,0 [$dq ??? "\" " " "] [$r sub $x]] $y;
-        dx ::= [$compl,0 len] - [$f len] : + [$dq ??? 2 1];
-        $window cursor-move-to $geom $y [$x + $dx];
+        if {file dir? [$dir . $compl,0]} {
+            $buff line-update [[$r sub 0 [$x - [$f len]]] . $compl,0 "/" [$r sub $x]] $y;
+            dx ::= [$compl,0 len] - [$f len] : + 1;
+            $window cursor-move-to $geom $y [$x + $dx];
+        } {
+            $buff line-update [[$r sub 0 [$x - [$f len]]] . $compl,0 [$dq ??? "\" " " "] [$r sub $x]] $y;
+            dx ::= [$compl,0 len] - [$f len] : + [$dq ??? 2 1];
+            $window cursor-move-to $geom $y [$x + $dx];
+        };
         return ALL;
     };
     comp ::= path-longest-match $compl $f;
