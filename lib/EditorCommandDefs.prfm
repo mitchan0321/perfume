@@ -1310,7 +1310,7 @@ defcommand buffer-list {
 
     $buff append-string "<<< Buffer list >>>";
     $buff append-string "  * Select buffer - Move cursor to buffer line and press Enter key";
-    $buff append-string "                    or press shortcut key(0-9) or press CTRL+B to name completion.";
+    $buff append-string "                    or press shortcut key(0-9). Press CTRL+B to name completion.";
     $buff append-string "  * Delete buffer - Move cursor to buffer line and press \"d\" key.";
     $buff append-string "";
     $buff append-string ["%1v %1v%1v%1v%1v%1v %-${maxlen}w %6v %-6v %-w" expand : fmt "#" "e" "d" "p" "m" "n" "Buffer name" "Length" "Mode" "Content path"];
@@ -3919,6 +3919,189 @@ defcommand set-tab-width {
     };
     result ALL;
 };
+
+defcommand brackets-pair {
+    | main window |
+    $window remove-spot-color-item "BRACKETS-PAIR";
+    (height width) ::= $window get-window-size;
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (y x) ::= $window get-source-index $buff $geom;
+    v ::= $buff get-vector;
+    start := $geom,ViewLine;
+    end ::= $geom,ViewLine + $height : - 1;
+    cur-char ::= $v at $y $x;
+    if {and {$y = 0} {$x = 0}} {
+        (py px) := (0 0);
+        prev-char := "";
+    } {
+        (py px) ::= $v get-prev-pos $y $x;
+        prev-char ::= $v at $py $px;
+    };
+    if {or {"(" = $cur-char} {")" = $cur-char} {"[" = $cur-char}
+           {"]" = $cur-char} {"{" = $cur-char} {"}" = $cur-char}}
+    else: {
+        cur-char := $prev-char;
+        (y x) := ($py $px);
+    };
+    case $cur-char
+       "(" {
+           dir := f;
+           cap-dec := ")";
+           cap-inc := "(";
+       }
+       "[" {
+           dir := f;
+           cap-dec := "]";
+           cap-inc := "[";
+       }
+       "{" {
+           dir := f;
+           cap-dec := "}";
+           cap-inc := "{";
+       }
+       ")" {
+           dir := b;
+           cap-dec := ")";
+           cap-inc := "(";
+       }
+       "]" {
+           dir := b;
+           cap-dec := "]";
+           cap-inc := "[";
+       }
+       "}" {
+           dir := b;
+           cap-dec := "}";
+           cap-inc := "{";
+       }
+       default: {
+           return SELF;
+       }
+    ;;
+
+    find := <nil>;
+    case $dir
+        f {
+            (start-y start-x) ::= $v get-next-pos $y $x;
+            level := 1;
+            $v each-forward-char $start-y $start-x {
+                | cy cx cc |
+                if {$cy > $end} {
+                    return SELF;
+                };
+                if {$cc = $cap-dec} {$level --};
+                if {$cc = $cap-inc} {$level ++};
+                if {$level = 0} {
+                    find := <t>;
+                    break;
+                };
+            };
+        }
+        b {
+            (start-y start-x) ::= $v get-prev-pos $y $x;
+            level := -1;
+            $v each-backward-char $start-y $start-x {
+                | cy cx cc |
+                if {$cy < $start} {
+                    return SELF;
+                };
+                if {$cc = $cap-dec} {$level --};
+                if {$cc = $cap-inc} {$level ++};
+                if {$level = 0} {
+                    find := <t>;
+                    break
+                };
+            };
+        }
+    ;;
+    if $find {
+        $window set-spot-color-item "BRACKETS-PAIR" $cy $cx 1 BRACKETS_PAIR;
+    };
+    return SELF;
+};
+
+defcommand file-completion {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (y x) ::= $window get-source-index $buff $geom;
+    r ::= $buff get-buffer-line $y;
+    $r ?? {
+        $window apply-command $main $window "" smart-indent;
+        return ALL;
+    };
+    if {or {$x = 0} {and {$x > 0} {$r at [$x - 1] : = " "}}} {
+        $window apply-command $main $window "" smart-indent;
+        return ALL;
+    };
+
+    dq := <nil>;    
+    start := 0;
+    [$x - 1] each to: 0 do: {| i |
+        c ::= $r at $i;
+        if {or {$c = " "} {$c = "\""}} {
+            start ::= $i + 1;
+            dq ::= [$c = "\""] ??? <t> <nil>;
+            break;
+        };
+    };
+
+    l ::= $r sub $start $x : split sep: "/";
+    f ::= $l ->>;
+    f ::= $f ?? "";
+    if {and {$l len : = 1} {$l get 0 : = ""}} {
+        dir := "/";
+    } {
+        dir ::= $l join sep: "/";
+        dir ::= {$dir = ""} ??? "./" [$dir . "/"];
+    };
+
+    try {  
+        list ::= file list $dir;
+    } catch: {
+        show-message ["Directory not found: \"" . $dir "\"."];
+        return ALL;
+    };
+    
+    compl ::= path-match $list $f;
+    if {$compl len : = 0} {
+        show-message ["No match file: \"" . $f "\"."];
+        return all;
+    };
+    if {$compl len : = 1} {
+        $buff line-update [[$r sub 0 [$x - [$f len]]] . $compl,0 [$dq ??? "\" " " "] [$r sub $x]] $y;
+        dx ::= [$compl,0 len] - [$f len] : + [$dq ??? 2 1];
+        $window cursor-move-to $geom $y [$x + $dx];
+        return ALL;
+    };
+    comp ::= path-longest-match $compl $f;
+    $buff line-update [[$r sub 0 [$x - [$f len]]] . $comp [$r sub $x]] $y;
+    dx ::= [$comp len] - [$f len];
+    $window cursor-move-to $geom $y [$x + $dx];
+    show-message [[$compl len : string] . " files matches: " [msort $compl : join sep: " "]];
+    
+    return ALL;
+};
+
+defcommand internal-stat {
+    | main window |
+    w :wide;
+    println "";
+    stack-trace : split sep: "\n" : each do: {| i | $stdout puts $i};
+    println ["interp stat: " . [$PINTERP stat]];
+    println ["interp busy: " . [$MainWindow is-interp-busy]];
+    println "";
+    println ["stdin stat:  " . [$stdin stat]];
+    println ["stdout stat: " . [$stdout stat]];
+    println ["stderr stat: " . [$stderr stat]];
+    println "";
+    println ["info global: " . [info global]];
+    println ["PINTERP value: " . $PINTERP];
+    slist;
+
+    result ALL;
+};
     
 defcommand guru-guru {
     | main window |
@@ -4027,127 +4210,7 @@ defcommand guru-animal {
     result SELF;
 };
 
-defcommand internal-stat {
-    | main window |
-    w :wide;
-    println "";
-    stack-trace : split sep: "\n" : each do: {| i | $stdout puts $i};
-    println ["interp stat: " . [$PINTERP stat]];
-    println ["interp busy: " . [$MainWindow is-interp-busy]];
-    println "";
-    println ["stdin stat:  " . [$stdin stat]];
-    println ["stdout stat: " . [$stdout stat]];
-    println ["stderr stat: " . [$stderr stat]];
-    println "";
-    println ["info global: " . [info global]];
-    println ["PINTERP value: " . $PINTERP];
-    slist;
-
-    result ALL;
-};
-
-defcommand brackets-pair {
-    | main window |
-    $window remove-spot-color-item "BRACKETS-PAIR";
-    (height width) ::= $window get-window-size;
-    buff ::= $window get-buffer;
-    geom ::= $window get-geom;
-    (y x) ::= $window get-source-index $buff $geom;
-    v ::= $buff get-vector;
-    start := $geom,ViewLine;
-    end ::= $geom,ViewLine + $height : - 1;
-    cur-char ::= $v at $y $x;
-    if {and {$y = 0} {$x = 0}} {
-        (py px) := (0 0);
-        prev-char := "";
-    } {
-        (py px) ::= $v get-prev-pos $y $x;
-        prev-char ::= $v at $py $px;
-    };
-    if {or {"(" = $cur-char} {")" = $cur-char} {"[" = $cur-char}
-           {"]" = $cur-char} {"{" = $cur-char} {"}" = $cur-char}}
-    else: {
-        cur-char := $prev-char;
-        (y x) := ($py $px);
-    };
-    case $cur-char
-       "(" {
-           dir := f;
-           cap-dec := ")";
-           cap-inc := "(";
-       }
-       "[" {
-           dir := f;
-           cap-dec := "]";
-           cap-inc := "[";
-       }
-       "{" {
-           dir := f;
-           cap-dec := "}";
-           cap-inc := "{";
-       }
-       ")" {
-           dir := b;
-           cap-dec := ")";
-           cap-inc := "(";
-       }
-       "]" {
-           dir := b;
-           cap-dec := "]";
-           cap-inc := "[";
-       }
-       "}" {
-           dir := b;
-           cap-dec := "}";
-           cap-inc := "{";
-       }
-       default: {
-           return SELF;
-       }
-    ;;
-
-    find := <nil>;
-    case $dir
-        f {
-            (start-y start-x) ::= $v get-next-pos $y $x;
-            level := 1;
-            $v each-forward-char $start-y $start-x {
-                | cy cx cc |
-                if {$cy > $end} {
-                    return SELF;
-                };
-                if {$cc = $cap-dec} {$level --};
-                if {$cc = $cap-inc} {$level ++};
-                if {$level = 0} {
-                    find := <t>;
-                    break;
-                };
-            };
-        }
-        b {
-            (start-y start-x) ::= $v get-prev-pos $y $x;
-            level := -1;
-            $v each-backward-char $start-y $start-x {
-                | cy cx cc |
-                if {$cy < $start} {
-                    return SELF;
-                };
-                if {$cc = $cap-dec} {$level --};
-                if {$cc = $cap-inc} {$level ++};
-                if {$level = 0} {
-                    find := <t>;
-                    break
-                };
-            };
-        }
-    ;;
-    if $find {
-        $window set-spot-color-item "BRACKETS-PAIR" $cy $cx 1 BRACKETS_PAIR;
-    };
-    return SELF;
-};
-
-defcommand test2 {
+defcommand para-alphabet {
     | main window |
 
     f ::= fun (l) {

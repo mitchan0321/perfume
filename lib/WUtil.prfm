@@ -360,6 +360,17 @@ defun path-longest-match (list fname) {
     return $result;
 };
 
+defun path-match (list fname) {
+    result := ();
+    l := $result;
+    $list each do: {| i |
+        if {$i =~ ["^" . $fname : rquote]} {
+            l ::= $l append! $i;
+        };
+    };
+    return $result;
+};
+
 ##
 ## define Vector method for EditBuffer operations.
 ##
