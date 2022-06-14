@@ -2431,4 +2431,10 @@
 		Change the argument files load at on the fly.
 		Change pinterp starting message.
 
+2022/06/14
+	config.h.in
+		Change signal stack size 16KB -> 64KB.
+	pmacs update:
+		Add pmacs terminate process.
+
 #eof
