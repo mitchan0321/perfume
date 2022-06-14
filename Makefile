@@ -61,11 +61,11 @@ endif
 ### for product build. (use BoehmGC)
 
 ifeq ($(shell uname),FreeBSD)
-	CFLAGS	= -Wall -O3 -c -g $(OPTIONS)
+	CFLAGS	= -Wall -O2 -c -g $(OPTIONS)
 	INCLUDE	= -I/usr/local/include -I.
 	LIB	= -static -L/usr/lib -L/lib -L/usr/local/lib -lm -lpthread -lgmp -lgc -lonigmo -lpcl $(OPTLIBS)
 else
-	CFLAGS	= -Wall -O3 -c -g $(OPTIONS)
+	CFLAGS	= -Wall -O2 -c -g $(OPTIONS)
 	INCLUDE	= -I/usr/local/include -I.
 	LIB	= -L/usr/lib -L/lib -L/usr/local/lib -lm -lpthread -lgmp -lgc -lonigmo -lpcl $(OPTLIBS)
 endif
