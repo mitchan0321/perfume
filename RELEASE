@@ -2436,5 +2436,8 @@
 		Change signal stack size 16KB -> 64KB.
 	pmacs update:
 		Add pmacs terminate process.
+		Add file-completion command is file completion command for file name completion at *Scratch* buffer.
+		Add key bind CTRL+I to file-completion at Mode-Interp.
+		Add key bind Alt+i to file-completion at default mode.
 
 #eof
