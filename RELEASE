@@ -2436,8 +2436,21 @@
 		Change signal stack size 16KB -> 64KB.
 	pmacs update:
 		Add pmacs terminate process.
-		Add file-completion command is file completion command for file name completion at *Scratch* buffer.
+		Add file-completion command is file completion command for file name completion at
+		  *Scratch* buffer.
 		Add key bind CTRL+I to file-completion at Mode-Interp.
 		Add key bind Alt+i to file-completion at default mode.
+
+2022/06/15
+	methods.c
+		Fix String::split make a null list if string is zero size, it's become to make
+		  one element zero string.
+	pmacs update:
+		Add mini-input key Ctrl+DEL is delete character at current cursor position to
+		  line end.
+		Fix *Scratch* buffer can't out zero size string.
+	tag:
+		PRFM_20220615
+		1.5.28
 
 #eof
