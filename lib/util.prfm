@@ -1,23 +1,32 @@
-#
-# load system sub functions and constants.
-#
-load [[$LIB_PATH item] . "/expand-syntax.prfm"];
-load [[$LIB_PATH item] . "/consts.prfm"];
+(
+    #
+    # load built-in classes.
+    #
+    "Object.prfm"
+    "List.prfm"
+    "String.prfm"
+    "Integer.prfm"
+    "Block.prfm"
+    "File.prfm"
+    "Dict.prfm"
+    "Vector.prfm"
+    "Bulk.prfm"
+    
+    #
+    # load system sub functions and constants.
+    #
+    "expand-syntax.prfm"
+    "consts.prfm"
 
-#
-# load built-in classes.
-#
-load [[$LIB_PATH item] . "/Object.prfm"];
-load [[$LIB_PATH item] . "/List.prfm"];
-load [[$LIB_PATH item] . "/String.prfm"];
-load [[$LIB_PATH item] . "/Integer.prfm"];
-load [[$LIB_PATH item] . "/Block.prfm"];
-load [[$LIB_PATH item] . "/File.prfm"];
-load [[$LIB_PATH item] . "/Dict.prfm"];
-load [[$LIB_PATH item] . "/Vector.prfm"];
-load [[$LIB_PATH item] . "/Bulk.prfm"];
-
-#
-# other functions.
-#
-load [[$LIB_PATH item] . "/net.prfm"];
+    #
+    # other functions.
+    #
+    "net.prfm"
+    
+) each do: {| f |
+    try {
+        load [[$LIB_PATH item] . "/" $f];
+    } catch: {| e |
+        println file: $stderr ["Setup error at " . $f ", <" [$e car] ">#" [$e cdr]];
+    };
+};
