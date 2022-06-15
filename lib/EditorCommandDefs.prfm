@@ -4073,7 +4073,7 @@ defcommand file-completion {
     
     compl ::= path-match $list $f;
     if {$compl len : = 0} {
-        show-message :bell ["No match file: \"" . $f "\"."];
+        show-message :bell ["No match file: \"" . $f "\", in directory (" $dir ")."];
         return all;
     };
     if {$compl len : = 1} {
