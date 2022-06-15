@@ -3021,6 +3021,10 @@ mth_string_split(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
 	    l = list_append(l, new_string_str(L""));
 	}
     }
+    
+    if (list_length(result) == 0) {
+        l = list_append(l, new_string_str(L""));
+    }
 
     return result;
 
