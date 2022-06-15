@@ -1895,7 +1895,7 @@ defun search-sub (main window dir) {
             };
         };
 	if {or {eq? $in-key CTRL_H} {eq? $in-key KEY_DC}
-	       {eq? $in-key KEY_BACKSPACE}} {
+	       {eq? $in-key KEY_BACKSPACE} {eq? $in-key kDC5}} {
 	    $window reset-search;
 	    $window set-search-result [$__buff_in_clojure__ search $value];
 	    $window move-to-next-search;
