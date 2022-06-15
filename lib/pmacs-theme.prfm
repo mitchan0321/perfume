@@ -106,7 +106,7 @@ LIGHT {
     $ColorDB set DIRED_SYMLINK              [WUtil color-pair MAGENTA WHITE   ];
     $ColorDB set DIRED_DEV                  [WUtil color-pair YELLOW  WHITE   ];
     $ColorDB set INTERP_PROMPT_HILIGHT      [WUtil color-pair BLACK   GREEN   ];
-    $ColorDB set BRACKETS_PAIR              [WUtil color-pair BLACK   CYAN    ];
+    $ColorDB set BRACKETS_PAIR              [WUtil color-pair BLACK   YELLOW  ];
 }
 
 DARK {
