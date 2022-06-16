@@ -307,7 +307,7 @@ CombiWindow method render-status-line (win buff cy cx y x buff-name) {
         fmt
             [$win split sep: "#" : get 1]
             [["" . [$buff get-encoding]] at 0]
-            [[$buff includeCR?] ??? "D" ""]
+            [[$buff includeCR?] ??? "d" "u"]
             [[$buff protect?] ??? "%" " "]
             [[$buff modify?] ??? "*" " "]
             [[$buff newfile?] ??? "?" " "]
