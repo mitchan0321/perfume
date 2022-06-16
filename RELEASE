@@ -2464,5 +2464,10 @@
 	pmacs update:
 		Change buffer-list display format.
 		Change CombiWindow status bar display format.
+		Add command grep-current-word for immediataly grep on cursor text,
+		  and key bind to Shift+F5.
+		Add command man-current-word for immediataly man on cursor text,
+		  and key bind to Shift+F6.
+		Change smart-move-{forward,backward} word character "-" become to including.
 
 #eof
