@@ -2889,6 +2889,7 @@ defcommand grep-current-word {
     ###
     ### do grep
     ###
+    show-message ["Doing - " . $command];
     orig-dir ::= pwd;
     cd $dir;
     
@@ -2929,6 +2930,7 @@ defcommand grep-current-word {
     $buff set-protect;
     $buff no-modify;
     cd $orig-dir;
+    show-message "Done.";
 
     return SELF;
 };
