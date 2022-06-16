@@ -2460,4 +2460,9 @@
 	pmacs update:
 		Change BRACKETS-PAIR color.
 
+2022/06/16
+	pmacs update:
+		Change buffer-list display format.
+		Change CombiWindow status bar display format.
+
 #eof
