@@ -2545,7 +2545,7 @@ defcommand smart-move-forward {
     };
     
     $vec each-forward-char $last-y [$last-x + 1] {| last-y last-x c |
-        if {! [$c alphanumeric?]} {break};
+        if {! [or {$c alphanumeric?} {$c = "-"}] } {break};
     };
     $window cursor-move-to $geom $last-y $last-x;
 
@@ -2641,7 +2641,7 @@ defcommand smart-move-backward {
     
     (ey ex) ::= $vec get-prev-pos $last-y $last-x;
     $vec each-backward-char $ey $ex {| last-y last-x c |
-        if {! [$c alphanumeric?]} {break};
+        if {! [or {$c alphanumeric?} {$c = "-"}] } {break};
     };
     if {! [and {$last-y = 0} {$last-x = 0}]} {
         (last-y last-x) ::= $vec get-next-pos $last-y $last-x;
@@ -2820,6 +2820,8 @@ defcommand grep {
                     $geom set! ViewLine 0;
                     $geom set! ViewColumn 0;
                     $window cursor-move-to $geom 0 0;
+                    $buff set-protect;
+                    $buff no-modify;
                     cd $orig-dir;
                     return SELF;
                 };
@@ -2858,6 +2860,72 @@ defcommand grep {
 	};
     };
     result SELF;
+};
+
+defcommand grep-current-word {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    dir ::= [$buff get-content-dir] . "/";
+
+    orig_geom ::= $geom clone;
+    $window apply-command $main $window "" smart-move-forward;
+    $window apply-command $main $window "" cursor-left;
+    $window apply-command $main $window "" smart-move-backward;
+    $window apply-command $main $window "" start-region;
+    $window apply-command $main $window "" smart-move-forward;
+
+    (sy sx) ::= $window end-region;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    str ::= $window get-region-string $sy $sx $ey $ex;
+    $geom restore-geom $orig_geom;
+    command ::= "grep -rnHe '" . $str "' *";
+    
+    ###
+    ### do grep
+    ###
+    orig-dir ::= pwd;
+    cd $dir;
+    
+    fout ::= new Stream;
+    $fout set-nolimit;
+    sts := 0;
+    try {
+        pipe out: $fout {exec :err-to-stdout "/bin/sh" "-c" $command};
+    } catch: {| e |
+        sts ::= "<" . [$e car] "> #" [$e cdr];
+    };
+    $fout close;
+    buff ::= new EditBuffer;
+    BufferManager unregist-buffer "*Grep*";
+    (result err) ::= $buff load-content  :init-only "grep buffer" buffer-name: "*Grep*";
+    $buff set-content $dir;
+    $buff clear-all;
+    $buff append-string ["CWD:  " . $dir];
+    $buff append-string ["EXEC: " . $command];
+    $buff append-string "";
+    $fout each do: {| r |
+        $buff append-string $r;
+    };
+    fout := <nil>;
+    $buff append-string "";
+    $buff append-string ["exit(" . $sts ")"];
+    
+    w1 ::= $main get-window-by-name "Window#1";
+    if $w1 else: {
+        $main create-split-vertical-window;
+    };
+    $main bind-buffer "Window#1" $buff;
+    window ::= $main get-window-by-name "Window#1";
+    geom ::= $window get-geom;
+    $geom set! ViewLine 0;
+    $geom set! ViewColumn 0;
+    $window cursor-move-to $geom 0 0;
+    $buff set-protect;
+    $buff no-modify;
+    cd $orig-dir;
+
+    return SELF;
 };
 
 defcommand grep-next {
@@ -3271,10 +3339,10 @@ defcommand set-noprotect {
 
 defcommand man {
     | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
     str := "";
     if [$window get-region] {
-        buff ::= $window get-buffer;
-        geom ::= $window get-geom;
         (sy sx) ::= $window end-region;
         (ey ex) ::= $window get-source-index $buff $geom;
         str ::= $window get-region-string $sy $sx $ey $ex;
@@ -3293,11 +3361,65 @@ defcommand man {
                 show-message :bell "Enter man topic name.";
                 return ALL;
             };
-            exec-man $main $window $value;
+            exec-man $main $window $buff $value;
             return ALL;
         };
     };
     return ALL;
+};
+
+defcommand man-current-word {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+
+    orig_geom ::= $geom clone;
+    $window apply-command $main $window "" smart-move-forward;
+    $window apply-command $main $window "" cursor-left;
+    $window apply-command $main $window "" smart-move-backward;
+    $window apply-command $main $window "" start-region;
+    $window apply-command $main $window "" smart-move-forward;
+
+    (sy sx) ::= $window end-region;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    str ::= $window get-region-string $sy $sx $ey $ex;
+    $geom restore-geom $orig_geom;
+    exec-man $main $window $buff $str;
+    return ALL;
+};
+
+defun exec-man (main window cur-buff topic) {
+    ltopic ::= $topic split;
+    buff-name ::= if {$ltopic len : >= 2} {"Man=" . $ltopic,1 "(" $ltopic,0 ")"} {"Man=" . $topic};
+    man-buff ::= BufferManager find-buffer $buff-name;
+    if $man-buff else: {
+        os ::= new Stream;
+        $os set-nolimit;
+        ### sts ::= {exec proc-enc: $MAN_ENCODING "/bin/sh" "-c" [$MAN_PREFIX expand]} redirect-out $os $os;
+        sts ::= pipe out: $os {exec :err-to-stdout proc-enc: $MAN_ENCODING "/bin/sh" "-c" [$MAN_PREFIX expand]};
+        $os close;
+        
+        man-buff ::= new EditBuffer;
+        (result err) ::= $man-buff load-content
+            :init-only
+            ["man " . $topic]
+            buffer-name: $buff-name
+        ;
+        $man-buff clear-all;
+        $man-buff set-content [$DEFAULT_PWIKI_DIR . "/"];
+        
+        $os each do: {| r |
+            $man-buff append-string [curs-col $r];
+        };
+        os := <nil>;
+        $man-buff set-protect;
+        $man-buff no-modify;
+    };
+    $main bind-buffer [$window get-window-name] $man-buff;
+    geom ::= $window get-geom;
+    $window cursor-move-to $geom 0 0;
+    $man-buff set-previous-buffer [$cur-buff get-buffer-name];
+
 };
 
 defun exec-man (main window topic) {
