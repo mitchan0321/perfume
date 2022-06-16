@@ -2469,5 +2469,6 @@
 		Add command man-current-word for immediataly man on cursor text,
 		  and key bind to Shift+F6.
 		Change smart-move-{forward,backward} word character "-" become to including.
+		Add mini-input support insert from paste buffer press key CTRL_V.
 
 #eof
