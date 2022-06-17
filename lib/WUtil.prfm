@@ -190,6 +190,7 @@ defun line-input (curs disp-line disp-col input-len cur-index cur-val key-in) {
             break;
         }
         {eq? $key-in CTRL_V} {
+            if {$CopyBuffer = ""} {break};
             (command start-y start-x new-y new-x) ::= $v insert-string-at $CopyBuffer 0 $cur-index;
             break;
        }
