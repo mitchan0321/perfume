@@ -117,10 +117,10 @@
 2008/07/25	TOY_20080725		0.0.1
 
 --
-2008/07/25:	
+2008/07/25	
 	initial CVS repository imported.
 
-2008/07/26:
+2008/07/26
 	eval.c:
 		rewrite toy_eval, to non recurcive function call.
 	commands.c:
@@ -131,13 +131,13 @@
 	add setup.toy script.
 	add config.h file.
 
-2008/07/27:
+2008/07/27
 	object constructor implementation. 'init' method at object creation.
 	Hash class implementation.
 	setup.toy:
 		add apply-constructor script.
 
-2008/08/05:
+2008/08/05
 	eval.c:
 		bind_args, change algorithm.
 	array.c:
@@ -146,7 +146,7 @@
 		add File class, Array class and modify Hash for using any type in key value.
 	get macro implementation, for example: $object,$key meaning [$object get $key].
 
-2008/08/08:
+2008/08/08
 	commands.c:
 		print / println change, use $@out, $stdout File object.
 	eval.c:
@@ -159,10 +159,10 @@
 	setup.toy:
 		add stdin / stdout / stderr variables setup.
 
-2008/08/13:
+2008/08/13
 	output global variable '@stack-trace' if generated exception.
 
-2008/08/16:
+2008/08/16
 	commands.c:
 		add stack-trace command.
 		add trap command for UNIX signal handling.
@@ -175,7 +175,7 @@
 		add String::+ method.
 	Closure variable is able to reference in function and method.
 
-2008/08/19:
+2008/08/19
 	commands.c:
 		add ! / and / not command.
 		add load command.
@@ -192,7 +192,7 @@
 	types.c:
 		add TAG_NAMED_MASK into SYMBOL.
 
-2008/08/22:
+2008/08/22
 	commands.c:
 		fix sid command for specified FUNC object.
 		add sdir command.
@@ -200,7 +200,7 @@
 		fix List::append degrade, return last item cons cell.
 		add Array::last method.
 
-2008/08/23:
+2008/08/23
 	Makefile:
 		add install script.
 		add config.h.in configuration.
@@ -218,7 +218,7 @@
 	type.[ch]:
 		add ALIAS type.
 
-2008/08/24:
+2008/08/24
 	Makefile:
 		add onigruma library added.
 		mearge Makefile.nogc, Makefile.prof into Makefile.
@@ -229,20 +229,20 @@
 	parser.c:
 		add RQuote parse.
 
-2008/08/30:
+2008/08/30
 	cell.c:
 		add cell_sub for sub-string return.
 	methods.c:
 		fix String::=~ and add switch 'all:' and 'case:'.
 		add String::sub command.
 
-2008/08/31:
+2008/08/31
 	methods.c, eval.c:
 		change for init method parameter useful.
 	eval.c:
 		add to_string_call for Object::string.
 
-2008/09/04:
+2008/09/04
 	eval.c:
 		add switch argument, ":XXX" meaning same as named arg "XXX: 1".
 	*:
@@ -256,32 +256,32 @@
 		add Hash::init
 		add Array::init
 
-2008/10/04:
+2008/10/04
 	methods.c:
 		when dividing by zero, ErrZeroDivide is generated.
 
-2008/11/01:
+2008/11/01
 	eval.c:
 		to signal block execute under closure environment.
 
-2008/12/07:
+2008/12/07
 	methods.c:
 		add List::eval
 	cell.c:
 		change GC_MALLOC to GC_MALLOC_ATOMIC for allocate cells data.
 
-2009/01/17:
+2009/01/17
 	commands.c
 		add sleep command.
 		fix self command.
 	setup.toy
 		add method Block::>> for command outpu redirect file method.
 
-2009/01/21:
+2009/01/21
 	commands.c
 		change defvar and add setvar.
 
-2009/01/24:
+2009/01/24
 	Makefile
 		setup.toy install directory change to /usr/local/lib/toy.
 
@@ -307,15 +307,15 @@
 		add global variable INTERACTIVE for shell mode indicator.
 		$HOME/.toyrc load if file existing.
 
-2009/02/15:
+2009/02/15
 	methods.c
 		add method List::filter, List::map
 
-2009/02/17:
+2009/02/17
 	*
 		syntax change: var: X -> in: X
 
-2009/02/19:
+2009/02/19
 	Makefile
 		install lib directory to $PREFIX/toy/lib.
 	eval.c,	setup.toy
@@ -329,7 +329,7 @@
 		sid return nil if no func match.
 		add type? command.
 
-2009/02/21:
+2009/02/21
 	commands.c
 		'if' command syntax extend, if cond-block is value then eval value.
 		add command rand.
@@ -345,11 +345,11 @@
 	toysh.c
 		print result length limit to 512 bytes.
 
-2009/02/22:
+2009/02/22
 	eval.c
 		to_string_call bug fix.
 
-2009/03/01:
+2009/03/01
 	methods.c
 		add method List::>> (shift), List::<< (unshift),
 			List::->> (pop), List::<<- (push)
@@ -357,11 +357,11 @@
 	msort.toy
 		new added sample script merge sort program.
 
-2009/03/07:
+2009/03/07
 	commands.c, eval.c
 		add trace command.
 
-2009/03/08:
+2009/03/08
 	commands.c
 		trace syntax added for body tracing.
 		add exit command.
@@ -369,7 +369,7 @@
 		add feature toy script for command interpriter.
 		for using: interp
 
-2009/03/28:
+2009/03/28
 	Makefile
 		gcc flag '-Wall' add.
 	commands.c
@@ -383,23 +383,23 @@
 	SysQueue.toy
 		add error handling.
 
-2009/03/30:
+2009/03/30
 	commands.c
 		bug fix String constructor mangled.
 	commands.c, methods.c
 		in progress add callcc.
 
-2009/05/10:
+2009/05/10
 	*
 		Any iterator syntax change.
 		    old style) List::each in: i do: {block}
 		    new style) List::each do: {| i | block}
 
-2009/05/17:
+2009/05/17
 	*
 		add lazy feature.
 
-2009/07/06:
+2009/07/06
 	commands.c
 		change case syntax.
 		       old) case var (val {body} ...)
@@ -417,7 +417,7 @@
 	lib/util.toy
 		add Hash::each method.
 
-2009/07/27:
+2009/07/27
 	*
 		add memory allocate error detect code.
 		fix interpriter stack operation bug.
@@ -426,7 +426,7 @@
 	commands.c
 		try command fix, if occurd exception in fin: block then return exception.
 
-2009/09/05:
+2009/09/05
 	hash.c, eval.c
 		add global cache feature. If this feauture turn on, specify HAS_GCACHE in Makefile.
 	commands.c
@@ -446,7 +446,7 @@
 		if parameters less than 6, optimizing parameter bind process.
 		change stack trace design and optimizing.
 
-2009/09/23:
+2009/09/23
 	commands.c
 		'new' command recognize variable $LIB_PATH, if not defined class auto loading.
 		fix print/println error message.
@@ -463,7 +463,7 @@
 	lib/util.toy
 		add Block::<< method.
 
-2009/11/01:
+2009/11/01
 	*
 		symbolized keyword parameter (e.g. then:, else:, do: ...)
 	eval.c, commands.c
@@ -476,7 +476,7 @@
 		add object Dict.
 		add method String::split.
 
-2009/11/21:
+2009/11/21
 	types.[ch]
 		add type VECTOR.
 		add type COROUTINE.
@@ -503,7 +503,7 @@
 	*
 		long long int to int64_t.
 
-2011/08/28:
+2011/08/28
 	array.[ch]
 		change internal implementation.
 		change initial size 8 to 256.
@@ -518,7 +518,7 @@
 	lib/*
 		a few changes.
 
-2011/12/09:
+2011/12/09
 	cstack.c
 		add feature C machine stack management mechanizm.
 	commands.c
@@ -535,7 +535,7 @@
 		add method List:insert!, List:: delete!, List::find,
 		List::find* and List::reverse.
 
-2012/03/01:
+2012/03/01
 	cstack.c
 		C native stack divid used mechanizm from co-routine.
 		C native stack barriered by mmap(2).
@@ -550,18 +550,18 @@
 	lib/Y.toy,fact-Ycombi.toy,feb.toy,start-interp.toy
 		add thease commands.
 
-2012/03/06:
+2012/03/06
 	eval.c, commands.c, interp.c, types.h
 		Lexical scope changed.
 	Y.toy, fact-Ycombi.toy
 	        Sample for Y-combinator.
 
-2012/06/10:
+2012/06/10
 	cstack.[ch]
 		Support 32bit/64bit environment.
 		(Use __PTRFIFF_TYPE__ macro)
 
-2012/07/05:
+2012/07/05
 	lib/util.toy
 		List::find, List::find* bug fix.
 	parser.h
@@ -569,15 +569,15 @@
 	lib/fib.toy
 		Bug fix.
 
-2012/07/10:
+2012/07/10
 	commands.c
 		Add multiple variable set feature to 'set' command.
 
-2012/07/16:
+2012/07/16
 	types.[ch], interp.c, methods.c, commands.c
 		Add bit integer implementation.
 
-2014/12/23:
+2014/12/23
 	A programming langage 'perfume' rename from 'toy-lang'.
 	eval.c
 		Delete command result variable '?'.
@@ -600,7 +600,7 @@
 		PRFM_20141223_K26
 		0.4.0
 
-2015/02/15:
+2015/02/15
 	util.prfm
 		Add global variable PI, E.
 	methods.c
@@ -635,7 +635,7 @@
 		PRFM_20150215_A26
 		0.5.0
 
-2015/07/30:
+2015/07/30
 	methods.c / commands.c / global.[ch]
 		Add option :nonewline and :nocontrol at File::gets.
 		Add option :nonewline and :nocontrol at read.
@@ -644,32 +644,32 @@
 	eval.c / commands.c
 	        Add closure variable update command 'setc' and check command 'setc?'.
 
-2015/07/31:
+2015/07/31
 	methods.c
 		Integer::+,-,*,/,%,=,!=,>,>=,<,<=
 		Real::+,-,*,/,=,!=,>,>=,<,<=
 		Calculation of numerical value between different types became possible.
 
-2015/08/03:
+2015/08/03
 	methods.c
 		Fix String::fmt that %d and %f indicate accept different type.
 
-2015/08/06:
+2015/08/06
 	methods.c / global.[ch]
 		Fix String::fmt if some arguments are omitted, replace to null string ("").
 
-2015/08/09:
+2015/08/09
 	tag:
 		PRFM_20150809
 		0.6.0
 
-2015/08/12:
+2015/08/12
 	type.c
 		Fix signed integer into big integer type bug.
 	lib/slist.prfm
 		Fix display address bug.
 
-2015/09/12:
+2015/09/12
 	cstack.c
 		Change allocate stack implementation.
 	lib/interp.prfm
@@ -679,7 +679,7 @@
 	type.c
 		Coro object auto GC implementation.
 
-2015/9/20:
+2015/9/20
 	config.h.in
 		Co-routine stack slot number change to 256.
 	lib/slist.prfm
@@ -699,7 +699,7 @@
 		PRFM_20150920_N27
 		0.7.0
 
-2015/9/25:
+2015/9/25
 	eval.c
 		Fix get macro and init macro performance bug.
         methods.c
@@ -710,7 +710,7 @@
 		PRFM_20150925
 		0.7.1
 
-2015/10/1:
+2015/10/01
 	commands.c / global.[ch]
 		Add :silent option to unset and unsets for suppress return original value.
 		Fix cstack-release command to release co-routine object.
@@ -726,7 +726,7 @@
 		PRFM_20151001
 		0.7.2
 
-2015/10/22:
+2015/10/22
 	Makefile
 		Add -lm option in $(LIB) for memory debuging.
 	commands.c
@@ -751,7 +751,7 @@
 	methods.c
 		Delete file finalizer.
 
-2015/10/23:
+2015/10/23
 	Makefile
 		Delete HAS_GCACHE flag for bug fix.
 	lib/Stream.prfm
@@ -764,7 +764,7 @@
 	setup.prfm, methods.c, commands.c
 		Change File I/O newline meaning.
 
-2015/11/15:
+2015/11/15
 	eval.c, commands.c, methods.c, interp.c, types.[ch]
 		Fix stack trace information collection.
 		Fixed functions are:
@@ -794,7 +794,7 @@
 	lib/debugger.prfm
 		Add debugger suite.
 
-2015/11/23:
+2015/11/23
 	Makefile
 		Delete HAS_GCACHE option.
 	commands.c
@@ -819,7 +819,7 @@
 	lib/pipe.prfm
 		Fix some bugs.
 
-2015/11/24:
+2015/11/24
 	commands.c
 		Set FD_CLOEXEC flag to pipe file descripter at fork-exec.
 	methods.c
@@ -828,7 +828,7 @@
 	lib/exec.prfm
 		Fix $stdin eof conditiion.
 
-2015/12/09:
+2015/12/09
 	error.h
 		Add error 'ErrIOAgain'.
 	eval.c
@@ -863,7 +863,7 @@
 	types.c
 		Fix List::string, suppress display '(null address)'.
 
-2015/12/11:
+2015/12/11
 	lib/pipe.prfm
 		Change syntax error symbol.
 	lib/w.prfm
@@ -872,7 +872,7 @@
 		Add noblock status to container member.
 		Change noblock option _IONBF --> _IOLBF, FreeBSD libraries bug?
 
-2015/12/13:
+2015/12/13
 	commands.c
 		Add :top option into where command.
 	lib/w.prfm
@@ -880,7 +880,7 @@
 	doc/manual.*
 		Version 0.8.0.
 
-2015/12/17:
+2015/12/17
 	methods.c
 		Add Coro::eval.
 	interp.c
@@ -898,7 +898,7 @@
 	lib/glob.prfm
 		Add glob.prfm like unix glob command.
 
-2015/12/18:
+2015/12/18
 	lib/glob.prfm
 		Fix some bugs.
 	lib/pipe.prfm
@@ -908,7 +908,7 @@
 	methods.c
 		Fix String:split when last character is seperater character bihavior.
 
-2015/12/21:
+2015/12/21
 	commands.c
 		Change where command returned stack clone object.
 	cstack.c
@@ -920,7 +920,7 @@
 	doc/*
 		Fix 0.8.0_RC3.
 
-2015/12/23:
+2015/12/23
 	eval.c
 		Fix GETMACRO's left item is SYMBOL.
 	lib/util.prfm
@@ -929,7 +929,7 @@
 		PRFM_20151223_K27
 		0.8.0
 
-2015/12/30:
+2015/12/30
 	lib/Pipe.prfm
 		Change variable move to global INFILE, OUTFILE and CO-MODE.
 		Fix refer uninitialized variable.
@@ -948,27 +948,27 @@
 		PRFM_20151230
 		0.8.1
 
-2015/12/31:
+2015/12/31
 	lib/pipe.prfm, Pipe.prfm
 		Fix don't terminate when last block exited.
 
-2016/01/07:
+2016/01/07
 	doc/*
 		Add perfumesh command option '-c'.
 	setup.prfm, lib/util.prfm
 		Add try when load scripts at unknown, load-func and load-class.
 
-2016/01/14:
+2016/01/14
 	lib/Pipe.prfm -> lib/PipeWrapper.prfm, lib/pipe.prfm
 		Rename class Pipe to PipeWrapper.
 
-2016/02/02:
+2016/02/02
 	perfumesh.c
 		Fix '-c' option error bug when no commands presents.
 	lib/tarai-slow.prfm
 		Change lazy parameters expand oparation.
 
-2016/02/15:
+2016/02/15
 	methods.c
 		Add String::clean, String::upper, String::lower methods.
 	lib/http-get.prfm
@@ -977,7 +977,7 @@
 		PRFM_20160215_A27
 		0.9.0
 
-2016/03/02:
+2016/03/02
 	lib/exec.prfm
 		Fix external process was not runnable condition when return 
 		exit status 255.
@@ -989,7 +989,7 @@
 		PRFM_20160302
 		0.9.1
 
-2016/03/12:
+2016/03/12
 	commands.c
 		Add count: option in time command.
 		Add if command 2nd syntax, new syntax is: if cond true-block false-block.
@@ -1005,7 +1005,7 @@
 		PRFM_20160312
 		0.9.2
 
-2017/01/12:
+2017/01/12
 	cell.c, types.c
 		Fix performance bug.
 	lib/{cat.prfm,grep.prfm,head.prfm,ncat.prfm,wc.prfm}
@@ -1014,19 +1014,19 @@
 		PRFM_20170112
 		0.9.3
 
-2017/01/13:
+2017/01/13
 	Major change.
 		Change Internal character code, char -> wchar_t.
 
-2017/01/16:
+2017/01/16
 	parse.c, bulk.c
 		Fix parser bug.
 
-2017/01/18:
+2017/01/18
 	methods.c
 		Add String::uexport and String::uimport! methods.
 
-2017/02/22:
+2017/02/22
 	add file
 		encoding.[ch]
 	methods.c
@@ -1050,18 +1050,18 @@
 	perfumesh.c
 		Add specify unicode encoding 'RAW' at script loading.
 
-2017/03/01:
+2017/03/01
 	encoding.[ch]
 		Add encodings are RAW, UTF-8, EUC-JP and Shift-JIS, support character sets are UNICODE,
 		JIS X0208 and JIS X0201.
 
-2017/03/03:
+2017/03/03
 	commands.c, methods.c
 		Fix iterator CTRL_CONTINUE bug.
 	lib/diff.prfm
 		Add utility diff tool, like UNIX diff command.
 
-2017/03/21:
+2017/03/21
 	1.0.0 / PRFM_20170321_OMAPERO15 RELEASE.
 	lib/diff.prfm
 		Add option :heuristic and :costbase.
@@ -1069,7 +1069,7 @@
 		PRFM_20170321_OMAPERO15
 		1.0.0
 
-2017/06/14:
+2017/06/14
 	commands.c
 		Fix not return control code bug fix at cond command.
 		Add ref command for refer symbol value.
@@ -1092,12 +1092,12 @@
 		PRFM_20170614
 		1.0.1
 
-2018/04/19:
+2018/04/19
 	methods.c
 		Add ":string" option in Dict::keys and Dict::pairs,
 		return some string type key items when idicated.
 
-2018/05/15:
+2018/05/15
 	commands.c
 		Fix try command, return CTRL_BREAK when occured CTRL_BREAK in body.
 		Fix try command, if occur EXCEPTION at catch body, 
@@ -1114,14 +1114,14 @@
 		PRFM_20180515
 		1.1.0
 
-2018/05/17:
+2018/05/17
 	methods.c
 		Fix Integer::sqrt, Real:sqrt, detect minus number and throw Exception.
 	tag:
 		PRFM_20180517
 		1.1.1
 
-2018/11/21:
+2018/11/21
 	lib/chat.prfm,chatd.prfm,chat-config.prfm
 		Add new apprication chat system.
 	lib/prime-fact.prfm
@@ -1129,7 +1129,7 @@
 	methods.c
 		Add method File::fd? for query file object holding descriptor number.
 
-2018/12/23:
+2018/12/23
 	error.h
 		Add new Exception, ErrInfinity and ErrNaN.
 	methods.c
