@@ -3344,6 +3344,22 @@ defcommand set-noprotect {
     result ALL;
 };
 
+defcommand set-dos {
+    | main window |
+    buff ::= $window get-buffer;
+    $buff set-includeCR <t>;
+    show-message "Set buffer type to DOS.";
+    result ALL;
+};
+
+defcommand set-nodos {
+    | main window |
+    buff ::= $window get-buffer;
+    $buff set-includeCR <nil>;
+    show-message "Set buffer type to non-DOS.";
+    result ALL;
+};
+
 defcommand man {
     | main window |
     buff ::= $window get-buffer;

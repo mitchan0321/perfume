@@ -471,6 +471,10 @@ EditBuffer method includeCR? () {
     return $IncludeCR;
 };
 
+EditBuffer method set-includeCR (dos) {
+    $dos ??? {sets IncludeCR <t>} {sets IncludeCR <nil>};
+};
+
 EditBuffer method enc-error? () {
     return $EncError;
 };
