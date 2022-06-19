@@ -1714,6 +1714,7 @@ defcommand select-region-paragraph {
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     $window mark;
+    $window end-region;
     $window apply-command $main $window "" cursor-top-of-line;
     (ey ex) ::= $window get-source-index $buff $geom;
     r ::= $buff get-buffer-line $ey;
@@ -1726,6 +1727,20 @@ defcommand select-region-paragraph {
     };
     $window apply-command $main $window "" move-next-paragraph;
     $window apply-command $main $window "" cursor-down;
+    result SELF;
+};
+
+defcommand select-region-word {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+
+    $window end-region;
+    $window apply-command $main $window "" smart-move-forward;
+    $window apply-command $main $window "" smart-move-backward;
+    $window apply-command $main $window "" start-region;
+    $window apply-command $main $window "" smart-move-forward;
+
     result SELF;
 };
 
