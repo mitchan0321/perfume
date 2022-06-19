@@ -2476,4 +2476,9 @@
 		Add command select-region-word and bind to key ALT_w.
 		Fix line-input routine when copy buffer is empty.
 
+2022/06/19
+	pmacs update:
+		Change pdoc documentation.
+		Add commands set-dos and set-nodos are set text type to DOS or UNIX.
+
 #eof
