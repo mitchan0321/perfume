@@ -2485,5 +2485,6 @@
 	pmacs update:
 		Change remake select-region-word, become to restrict select word.
 		Change delete-word, grep-current-word and man-current-word to use select-region-word.
+		Add new keybinding ALT_space -> start-region for Android terminal.
 
 #eof
