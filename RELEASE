@@ -2481,4 +2481,9 @@
 		Change pdoc documentation.
 		Add commands set-dos and set-nodos are set text type to DOS or UNIX.
 
+2022/06/20
+	pmacs update:
+		Change remake select-region-word, become to restrict select word.
+		Change delete-word, grep-current-word and man-current-word to use select-region-word.
+
 #eof
