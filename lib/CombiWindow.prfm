@@ -823,6 +823,12 @@ CombiWindow method end-region () {
     return $reg;
 };
 
+CombiWindow method in-region? () {
+    geom ::= get-geom;
+    reg := $geom,Region;
+    return $reg;
+};
+
 CombiWindow method get-region () {
     geom ::= get-geom;
     buff ::= get-buffer;
