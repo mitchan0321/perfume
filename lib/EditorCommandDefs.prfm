@@ -539,10 +539,11 @@ defcommand delete-character {
 
 defcommand delete-word {
     | main window |
-    if {! [$window get-region]} {
-        $window apply-command $main $window "" start-region;
+    $window apply-command $main $window "" select-region-word;
+    [$window in-region?] ?? {
+        show-message "Word not found.";
+        return ALL;
     };
-    $window apply-command $main $window "" smart-move-forward;
     $window apply-command $main $window "" cut-region;
     result ALL;
 };
@@ -1734,12 +1735,45 @@ defcommand select-region-word {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
+    (y x) ::= $window get-source-index $buff $geom;
+    r ::= $buff get-buffer-line $y;
 
     $window end-region;
-    $window apply-command $main $window "" smart-move-forward;
-    $window apply-command $main $window "" smart-move-backward;
+    $r ?? {return ALL};
+    
+    i := 0;
+    if {or {[$r at $x] alphanumeric?} {[$r at $x] = "-"}} {
+        found := <t>;
+        s ::= [$x = 0] ??? $x [$x - 1];
+        i := $s;
+        $s each to: 0 do: {| i |
+            if {! [or {[$r at $i] alphanumeric?} {[$r at $i] = "-"}]} {
+                i ::= $i + 1;
+                break;
+            };
+        };
+    } {
+        found := <nil>;
+        s ::= $x + 1;
+        i := $s;
+        $s each to: [$r len] do: {| i |
+            if {or {[$r at $i] alphanumeric?} {[$r at $i] = "-"}} {
+                found := <t>;
+                break;
+            };
+        };
+    };
+    $found ?? {return ALL};
+    
+    $window cursor-move-to $geom $y $i;
     $window apply-command $main $window "" start-region;
-    $window apply-command $main $window "" smart-move-forward;
+
+    $i each to: [$r len] do: {| j |
+        if {! [or {[$r at $j] alphanumeric?} {[$r at $j] = "-"}]} {
+            break;
+        };
+    };
+    $window cursor-move-to $geom $y $j;
 
     result SELF;
 };
@@ -2890,11 +2924,13 @@ defcommand grep-current-word {
     dir ::= [$buff get-content-dir] . "/";
 
     orig_geom ::= $geom clone;
-    $window apply-command $main $window "" smart-move-forward;
-    $window apply-command $main $window "" smart-move-backward;
-    $window apply-command $main $window "" start-region;
-    $window apply-command $main $window "" smart-move-forward;
+    $window apply-command $main $window "" select-region-word;
 
+    [$window in-region?] ?? {
+        show-message "Word not found.";
+        return ALL;
+    };
+    
     (sy sx) ::= $window end-region;
     (ey ex) ::= $window get-source-index $buff $geom;
     str ::= $window get-region-string $sy $sx $ey $ex;
@@ -3412,10 +3448,12 @@ defcommand man-current-word {
     geom ::= $window get-geom;
 
     orig_geom ::= $geom clone;
-    $window apply-command $main $window "" smart-move-forward;
-    $window apply-command $main $window "" smart-move-backward;
-    $window apply-command $main $window "" start-region;
-    $window apply-command $main $window "" smart-move-forward;
+    $window apply-command $main $window "" select-region-word;
+
+    [$window in-region?] ?? {
+        show-message "Word not found.";
+        return ALL;
+    };
 
     (sy sx) ::= $window end-region;
     (ey ex) ::= $window get-source-index $buff $geom;
