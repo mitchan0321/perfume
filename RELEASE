@@ -2487,4 +2487,8 @@
 		Change delete-word, grep-current-word and man-current-word to use select-region-word.
 		Add new keybinding ALT_space -> start-region for Android terminal.
 
+2022/06/22
+	pmacs update:
+		Fix paste-buffer bug when if region multi line selected.
+
 #eof
