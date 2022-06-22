@@ -1,3 +1,4 @@
+2022/06/22	PRFM_20220622		1.5.29
 2022/06/15	PRFM_20220615		1.5.28
 2022/06/07	PRFM_20220607		1.5.27
 2022/06/02	PRFM_20220602		1.5.26
@@ -2490,5 +2491,8 @@
 2022/06/22
 	pmacs update:
 		Fix paste-buffer bug when if region multi line selected.
+	tag:
+		PRFM_20220622
+		1.5.29
 
 #eof
