@@ -881,6 +881,11 @@ CombiWindow method get-copy-buffer () {
     return $CopyBuffer;
 };
 
+CombiWindow method set-copy-buffer (str) {
+    ### CAUTION: this variable CopyBuffer is global.
+    setvar CopyBuffer $str;
+};
+
 CombiWindow method get-search-string () {
     ### CAUTION: this variable SearchString is global.
     return $SearchString;

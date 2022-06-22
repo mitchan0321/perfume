@@ -1791,9 +1791,11 @@ defcommand paste-buffer {
         (sy sx) ::= $window end-region;
         (ey ex) ::= $window get-source-index $buff $geom;
         (line col) ::= $window delete-region $sy $sx $ey $ex;
+    } {
+        (sy sx) ::= $window get-source-index $buff $geom;
     };
-    (sy sx) ::= $window get-source-index $buff $geom;
     (cy cx) ::= $buff insert-string-at $str $sy $sx;
+    $window set-copy-buffer $str;
     show-message "Paste.";
     (line col) ::= $window get-cursor-index $buff $cy $cx;
     $window set-freecursor <nil>;
