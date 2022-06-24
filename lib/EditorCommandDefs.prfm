@@ -2937,7 +2937,7 @@ defcommand grep-current-word {
     (ey ex) ::= $window get-source-index $buff $geom;
     str ::= $window get-region-string $sy $sx $ey $ex;
     $geom restore-geom $orig_geom;
-    command ::= "grep -rnHe '" . $str "' *";
+    command ::= "grep -nHe '" . $str "' *";
     
     ###
     ### do grep
