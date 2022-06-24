@@ -2495,4 +2495,8 @@
 		PRFM_20220622
 		1.5.29
 
+2022/06/24
+	pmacs update:
+		Change grep-current-word grep option '-rnHe' -> '-nHe' for local directory only grep.
+
 #eof
