@@ -527,11 +527,15 @@ new_coroutine(Toy_Interp *interp, Toy_Type* script) {
     o->u.coroutine->state = CO_STS_INIT;
 
     //GC_register_finalizer_ignore_self((void*)o,
+    /***
+     *** coroutine finalizer deleted.
+     ***
     GC_register_finalizer_no_order((void*)o,
 				   coro_finalizer,
 				   (void*)interp,
 				   NULL,
 				   NULL);
+     ***/
 
     if (NULL == o->u.coroutine->coro_id) {
 	return new_exception(TE_NOSLOT, L"Can\'t create co-routine.", interp);
