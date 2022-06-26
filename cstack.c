@@ -81,6 +81,13 @@ init_cstack() {
     Current_coroutine = 0;
     CStack_in_baria = 0;
 
+    if (0 == sigsetjmp(jmp_env, 1)) {
+	cstack_set_jmpbuff(0, &jmp_env);
+    } else {
+	fprintf(stderr, "Catch SIGSEGV at main coroutine, exit.\n");
+        exit(1);
+    }
+
     /* running signal install */
     ss.ss_sp = GC_MALLOC(SIGASTKSZ);
     if (NULL == ss.ss_sp) {
@@ -178,6 +185,7 @@ sig_cstack(int flag, siginfo_t* siginfo, void* ptr) {
 static void
 sig_cstack_running_handler(int flag, siginfo_t* siginfo, void* ptr) {
     fprintf(stderr, "*** receive SIGSEGV by sig_cstack_running_handler.\n");
+    fprintf(stderr, "coroutine id: %d\n", Current_coroutine);
     fprintf(stderr, "flag: %d\n", flag);
     fprintf(stderr, "si_signo: %d\n", siginfo->si_signo);
     fprintf(stderr, "si_errno: %d\n", siginfo->si_errno);
@@ -197,8 +205,8 @@ sig_cstack_running_handler(int flag, siginfo_t* siginfo, void* ptr) {
     CStack_in_baria = 1;
     if (CStack.stack_slot[Current_coroutine].jmp_buff_enable) {
 	cstack_unprotect(Current_coroutine);
-	//sigreturn(ptr);
-	return;
+        sigreturn(ptr);
+	//return;
 #if 0
 	siglongjmp(CStack.stack_slot[Current_coroutine].jmp_buff, 1);
 #endif
