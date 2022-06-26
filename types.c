@@ -530,11 +530,11 @@ new_coroutine(Toy_Interp *interp, Toy_Type* script) {
     /***
      *** coroutine finalizer deleted.
      ***
-    GC_register_finalizer_no_order((void*)o,
-				   coro_finalizer,
-				   (void*)interp,
-				   NULL,
-				   NULL);
+     *** GC_register_finalizer_no_order((void*)o,
+     ***                           coro_finalizer,
+     ***                           (void*)interp,
+     ***                           NULL,
+     ***                           NULL);
      ***/
 
     if (NULL == o->u.coroutine->coro_id) {
