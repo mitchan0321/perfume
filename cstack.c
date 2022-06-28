@@ -277,7 +277,8 @@ cstack_release(int slot_id) {
 		    (void*)CStack.stack_slot[slot_id].end_addr);
 }
 
-void cstack_release_clear(int slot_id) {
+void
+cstack_release_clear(int slot_id) {
     if ((slot_id >= CStack.number_of_slot) ||
 	(slot_id < 1)) {
 	return;
@@ -285,14 +286,18 @@ void cstack_release_clear(int slot_id) {
     
     cstack_release(slot_id);
     CStack.stack_slot[slot_id].state = SS_FREE;
-
+    
+    /* comment out because duplicate with cstack_release.
     cstack_unprotect(slot_id);
     cstack_clear(slot_id);
     cstack_protect(slot_id);
+    */
     
     /* indicate garbage collection address block to BoehmGC */
+    /* comment out because duplicate with cstack_release.
     GC_remove_roots((void*)CStack.stack_slot[slot_id].safe_addr,
 		    (void*)CStack.stack_slot[slot_id].end_addr);
+    */
 }
 
 Toy_Type*
