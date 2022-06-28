@@ -157,8 +157,9 @@ defun pmacs (trace: t) {
         if {and {! [$files null?]} {$files,0 = "-c"}} {
             $files >>; $files >>;
         };
-        $files each do: {| f |
+        [$files reverse] each do: {| f |
             open-file $f;
+            sleep 1;
         };
         if $files,0 {
             target-buff ::= BufferManager get-buffer [$files,0 split sep: "/" : last : car];
