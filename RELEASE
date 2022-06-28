@@ -2499,4 +2499,8 @@
 	pmacs update:
 		Change grep-current-word grep option '-rnHe' -> '-nHe' for local directory only grep.
 
+2022/06/28
+	pmacs update:
+		Fix initial file order was reversed specified file list.
+
 #eof
