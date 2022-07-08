@@ -2508,4 +2508,8 @@
 	pmacs update:
 		Change mini window foreground and background color on LIGHT theme.
 
+2022/07/19
+	pmacs update:
+		Change LIGHT themes status and vertical window color.
+
 #eof
