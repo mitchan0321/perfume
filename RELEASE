@@ -2503,7 +2503,6 @@
 	pmacs update:
 		Fix initial file order was reversed specified file list.
 
-
 2022/07/05
 	pmacs update:
 		Change mini window foreground and background color on LIGHT theme.
