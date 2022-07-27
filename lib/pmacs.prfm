@@ -159,7 +159,7 @@ defun pmacs (trace: t) {
         };
         [$files reverse] each do: {| f |
             open-file $f;
-            sleep 1;
+            $MainWindow apply {render-all; refresh};
         };
         if $files,0 {
             target-buff ::= BufferManager get-buffer [$files,0 split sep: "/" : last : car];
