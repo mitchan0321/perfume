@@ -84,7 +84,7 @@ LIGHT {
     $ColorDB set ACTIVE_VERT_LINE           [WUtil color-pair WHITE   BLUE    ];
     $ColorDB set ACTIVE_VERT_LINE_PROTECT   [WUtil color-pair WHITE   BLUE    ];
     $ColorDB set ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair WHITE   CYAN    ];
-    $ColorDB set INACTIVE_EDIT_BUFFER       [WUtil color-pair BLACK   WHITE   ];
+    $ColorDB set INACTIVE_EDIT_BUFFER       [WUtil color-pair BLUE    WHITE   ];
     $ColorDB set INACTIVE_STATUS_LINE       [WUtil color-pair BLACK   CYAN    ];
     $ColorDB set INACTIVE_VERT_LINE         [WUtil color-pair BLACK   CYAN    ];
     $ColorDB set INACTIVE_VERT_LINE_HILIGHT [WUtil color-pair BLACK   CYAN    ];
