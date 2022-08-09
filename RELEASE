@@ -2517,4 +2517,10 @@
 		PRFM_20220727_PLASMA
 		1.6.0
 
+2022/08/02
+	pmacs update:
+		Change DARK theme color, inactive edit window foreground color.
+		Change LIGHT theme color, inactive foreground color.
+		Delete window number display from edit windows status line.
+
 #eof
