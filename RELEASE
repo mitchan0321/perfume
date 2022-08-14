@@ -2523,4 +2523,8 @@
 		Change LIGHT theme color, inactive foreground color.
 		Delete window number display from edit windows status line.
 
+2022/08/14
+	pmacs update:
+		Delete mode BList key bind Ctrl+B and add global key bind ALT+b command is buffer-list-completion.
+
 #eof
