@@ -321,6 +321,17 @@ CombiWindow method render-status-line (win buff cy cx y x buff-name) {
             [[$buff get-path] ?? "*no file*"]
             ["-" repeat $x]
     ] $DISPLAY_ENCODING 0 0;
+
+    (y x) ::= curs-get-screen-size $StatusLineCurs;
+    if $Activate {
+        if [get-buffer : protect?] {
+            apply-color $StatusLineCurs 0 0 $x ACTIVE_STATUS_LINE_PROTECT;
+        } {
+            apply-color $StatusLineCurs 0 0 $x ACTIVE_STATUS_LINE;
+        }
+    } {
+        apply-color $StatusLineCurs 0 0 $x INACTIVE_STATUS_LINE;
+    };
 };
 
 CombiWindow method render-vertical-line () {
