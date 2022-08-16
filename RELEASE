@@ -2538,4 +2538,9 @@
 		Change set-theme add error handling when conf file reading.
 		Change init-color-DB read user config theme file ".pmacs/theme.conf".
 
+2022/08/17
+	pmacs update:
+		Change to display message delay when user config file occured error.
+		Add color attributes apply at status line window.
+
 #eof
