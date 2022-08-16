@@ -96,6 +96,35 @@ defun init-config () {
 };
 
 defun init-color-DB () {
+    (
+        (A_ALTCHARSET   0x00400000 "代替文字セットモード")
+        (A_BLINK        0x00080000 "点滅モード")
+        (A_BOLD         0x00200000 "太字モード")
+        (A_DIM          0x00100000 "低輝度モード")
+        (A_INVIS        0x00800000 "Invisible or blank mode")
+        (A_ITALIC       0x80000000 "イタリックモード")
+        (A_NORMAL       0x00000000 "通常の属性")
+        (A_PROTECT      0x01000000 "Protected mode")
+        (A_REVERSE      0x00040000 "Reverse background and foreground colors")
+        (A_STANDOUT     0x00010000 "強調モード")
+        (A_UNDERLINE    0x00020000 "下線モード")
+        (A_HORIZONTAL   0x02000000 "Horizontal highlight")
+        (A_LEFT         0x04000000 "Left highlight")
+        (A_LOW          0x08000000 "Low highlight")
+        (A_RIGHT        0x10000000 "Right highlight")
+        (A_TOP          0x20000000 "Top highlight")
+        (A_VERTICAL     0x40000000 "Vertical highlight")
+        (A_CHARTEXT     0x000000ff "Bit-mask to extract a character")
+    ) each do: {| i |
+        (a v d) := $i;
+        if [defvar? $a] else: {
+            defvar $a $v;
+        };
+    };
+    if [defvar? AttrDB] else: {
+	defvar AttrDB [dict];
+    };
+    
     if [defvar? ColorDB] else: {
 	defvar ColorDB [dict];
     };
@@ -105,6 +134,31 @@ defun init-color-DB () {
 	    load :notrace [$i . "/pmacs-theme.prfm"];
 	    break;
 	};
+    };
+};
+
+defun set-color-name (name color-pair-no attr: attr-list) {
+    $ColorDB set $name $color-pair-no;
+
+    if [set? attr-list] {
+        attr := 0;
+        $attr-list each do: {| i |
+            attr ::= $attr || $i;
+        };
+        $AttrDB set $name $attr;
+    } {
+        $AttrDB unset $name;
+    };
+
+    true;
+};
+
+defun apply-color (curs y x len color-name) {
+    attr := $AttrDB,$color-name;
+    if $attr {
+        curs-color $curs $y $x $len $ColorDB,$color-name $attr;
+    } {
+        curs-color $curs $y $x $len $ColorDB,$color-name 0;
     };
 };
 
@@ -217,7 +271,7 @@ defun show-message (msg wait: msec bell: bell) {
                     set-color
                         0 0
                         [$MainWindow get-screen-size : get 1]
-                        $ColorDB,MINI_CAUTION 0;
+                        MINI_CAUTION 0;
             };
             $MainWindow get-minibuffer-window : refresh;
             if [true? bell] {

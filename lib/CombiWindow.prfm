@@ -263,7 +263,7 @@ CombiWindow method set-eof-mark (geom buff y x) {
 		"[eof]"
 		$DEFAULT_TAB_WIDTH $DISPLAY_ENCODING
             ;
-	    curs-color $BufferCurs [[$buff get-buffer-length] - $geom,ViewLine] 0 5 $ColorDB,EOF_MARK 0;
+	    apply-color $BufferCurs [[$buff get-buffer-length] - $geom,ViewLine] 0 5 EOF_MARK;
 	};
     };
 };
@@ -353,9 +353,9 @@ CombiWindow method render-vertical-line () {
     0 each to: $lines do: {| i |
 	curs-print $VerticalLineCurs "|" $DISPLAY_ENCODING [$i + $start] 0;
 	if $Activate {
-	    curs-color $VerticalLineCurs [$i + $start] 0 1 $ColorDB,ACTIVE_VERT_LINE_HILIGHT 0;
+	    apply-color $VerticalLineCurs [$i + $start] 0 1 ACTIVE_VERT_LINE_HILIGHT;
 	} {
-	    curs-color $VerticalLineCurs [$i + $start] 0 1 $ColorDB,INACTIVE_VERT_LINE_HILIGHT 0;
+            apply-color $VerticalLineCurs [$i + $start] 0 1 INACTIVE_VERT_LINE_HILIGHT;
 	};
     };
 };
@@ -1178,14 +1178,14 @@ CombiWindow method set-region-hilight (buff geom y x) {
 		if {$end-col < 0} {start-col := 0};
 		if {$end-col >= $x} {end-col := $x};
 		if {[$end-col - $start-col] > 0} {
-		    curs-color $BufferCurs $i $start-col [$end-col - $start-col] $ColorDB,REGION_HILIGHT 0;
+		    apply-color $BufferCurs $i $start-col [$end-col - $start-col] REGION_HILIGHT;
 		} {
                     if {[$src len] = 0} {
-                        curs-color $BufferCurs $i $start-col 1 $ColorDB,REGION_HILIGHT 0;
+                        apply-color $BufferCurs $i $start-col 1 REGION_HILIGHT;
                     };
                 };
                 if {[$end-col - $start-col] < 0} {
-                    curs-color $BufferCurs $i $start-col 1 $ColorDB,REGION_HILIGHT 0;
+                    apply-color $BufferCurs $i $start-col 1 REGION_HILIGHT;
                 };
 	    };
 
@@ -1220,9 +1220,9 @@ CombiWindow method set-search-hilight (buff geom) {
 	if {$len <= 0} {continue};
 
 	if {and {$idx-y = $py} {$idx-x = $pxs}} {
-	    curs-color $BufferCurs $y $start-x $len $ColorDB,SEARCH_CURRENT_HILIGHT 0;
+	    apply-color $BufferCurs $y $start-x $len SEARCH_CURRENT_HILIGHT;
 	} {
-	    curs-color $BufferCurs $y $start-x $len $ColorDB,SEARCH_HILIGHT 0;
+            apply-color $BufferCurs $y $start-x $len SEARCH_HILIGHT;
 	};
     };
 };
@@ -1286,7 +1286,7 @@ CombiWindow method set-word-hilight-color (geom buff list color) {
 	if {$end-x >= $scr-x} {end-x := $scr-x};
 	if {$len <= 0} {continue};
 
-	curs-color $BufferCurs $y $start-x $len $ColorDB,$color 0;
+        apply-color $BufferCurs $y $start-x $len $color;
     };
 };
 
@@ -1327,7 +1327,7 @@ CombiWindow method get-cursor-position () {
 };
 
 CombiWindow method set-color (line column length color-name attr) {
-    curs-color $BufferCurs $line $column $length $color-name $attr;
+    apply-color $BufferCurs $line $column $length $color-name;
 };
 
 CombiWindow method set-spot-color-item (key y x len color) {

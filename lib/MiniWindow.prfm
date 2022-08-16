@@ -129,5 +129,5 @@ MiniWindow method destroy () {
 };
 
 MiniWindow method set-color (line column length color-name attr) {
-    curs-color $MiniCurs $line $column $length $color-name $attr;
+    apply-color $MiniCurs $line $column $length $color-name;
 };

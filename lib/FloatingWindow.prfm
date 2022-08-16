@@ -1,7 +1,7 @@
 class FloatingWindow;
 
-$ColorDB set DEFAULT_IND_WINDOW_COLOR        [WUtil color-pair GREEN BLACK];
-$ColorDB set DEFAULT_IND_WINDOW_BORDER_COLOR [WUtil color-pair BLACK GREEN];
+set-color-name DEFAULT_IND_WINDOW_COLOR        [WUtil color-pair GREEN BLACK];
+set-clolr-name DEFAULT_IND_WINDOW_BORDER_COLOR [WUtil color-pair BLACK GREEN];
 
 FloatingWindow method init (main y x line column border: border color: color bdcolor: bdcolor) {
     curs ::= $main get-curs;
