@@ -944,7 +944,9 @@ defun read-user-conf-file (conf-name) {
             load :notrace $path;
         } catch: {
             | e |
-            show-message :bell ["User configuration file (" . $path ") has error, <" [$e car] "># " [$e cdr]];
+            $main add-background after: 100 {
+                show-message :bell ["User configuration file (" . $path ") has error, <" [$e car] "># " [$e cdr]];
+            };
         };
     };
 };
