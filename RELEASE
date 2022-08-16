@@ -2535,5 +2535,7 @@
 		Change pmacs-theme.prfm use set-color-name utility function.
 		Add AttrDB global variable.
 		Change *::set-color method interface change, color-name value change to color-name symbol.
+		Change set-theme add error handling when conf file reading.
+		Change init-color-DB read user config theme file ".pmacs/theme.conf".
 
 #eof
