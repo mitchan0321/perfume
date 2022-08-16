@@ -2527,4 +2527,13 @@
 	pmacs update:
 		Delete mode BList key bind Ctrl+B and add global key bind ALT+b command is buffer-list-completion.
 
+2022/08/16
+	pmacs update:
+		Add utility function apply-color for wrap curs-color and display attributes set to region.
+		Change curs-color calling to apply-color call overall.
+		Add utility function set-color-name for append color name to dictionary $ColorDB and append attributes.
+		Change pmacs-theme.prfm use set-color-name utility function.
+		Add AttrDB global variable.
+		Change *::set-color method interface change, color-name value change to color-name symbol.
+
 #eof
