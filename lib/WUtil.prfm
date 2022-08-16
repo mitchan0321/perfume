@@ -135,6 +135,7 @@ defun init-color-DB () {
 	    break;
 	};
     };
+    read-user-conf-file "theme.conf";
 };
 
 defun set-color-name (name color-pair-no attr: attr-list) {

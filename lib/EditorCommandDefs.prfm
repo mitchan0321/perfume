@@ -3281,9 +3281,15 @@ defcommand set-theme {
 	};
         if {eq? $in-key CTRL_M} {
             $main mini-input-end;
+            t := $THEME;
             setvar THEME $value;
-            init-color-DB;
-            $window apply-command $main $window "" refresh-screen;
+            try {
+                init-color-DB;
+                $window apply-command $main $window "" refresh-screen;
+            } catch: {| e |
+                show-message :bell [$e cdr];
+                setvar THEME $t;
+            };
             return ALL;
         };
     };
