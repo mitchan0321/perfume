@@ -100,8 +100,8 @@ set-color-name WHITE.WHITE     [WUtil color-pair WHITE   WHITE   ];
 case $THEME
 LIGHT {
     set-color-name EDIT_BUFFER                [WUtil color-pair BLACK   WHITE   ];
-    set-color-name ACTIVE_STATUS_LINE         [WUtil color-pair WHITE   BLUE    ];
-    set-color-name ACTIVE_STATUS_LINE_PROTECT [WUtil color-pair WHITE   GREEN   ];
+    set-color-name ACTIVE_STATUS_LINE         [WUtil color-pair WHITE   BLUE    ] attr: ($A_BOLD $A_ITALIC);
+    set-color-name ACTIVE_STATUS_LINE_PROTECT [WUtil color-pair WHITE   GREEN   ] attr: ($A_BOLD $A_ITALIC);
     set-color-name ACTIVE_VERT_LINE           [WUtil color-pair WHITE   BLUE    ];
     set-color-name ACTIVE_VERT_LINE_PROTECT   [WUtil color-pair WHITE   BLUE    ];
     set-color-name ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair WHITE   CYAN    ];
