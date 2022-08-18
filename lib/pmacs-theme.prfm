@@ -11,7 +11,7 @@
 #	WUtil::ColorName set CYAN    6;
 #	WUtil::ColorName set WHITE   7;
 #
-# Attributes list is:
+#  Attributes list is:
 #       A_ALTCHARSET   0x00400000 "代替文字セットモード"
 #       A_BLINK        0x00080000 "点滅モード"
 #       A_BOLD         0x00200000 "太字モード"
@@ -106,7 +106,7 @@ LIGHT {
     set-color-name ACTIVE_VERT_LINE_PROTECT   [WUtil color-pair WHITE   BLUE    ];
     set-color-name ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair WHITE   CYAN    ];
     set-color-name INACTIVE_EDIT_BUFFER       [WUtil color-pair BLUE    WHITE   ];
-    set-color-name INACTIVE_STATUS_LINE       [WUtil color-pair BLACK   CYAN    ];
+    set-color-name INACTIVE_STATUS_LINE       [WUtil color-pair WHITE   CYAN    ] attr: ($A_DIM);
     set-color-name INACTIVE_VERT_LINE         [WUtil color-pair BLACK   CYAN    ];
     set-color-name INACTIVE_VERT_LINE_HILIGHT [WUtil color-pair BLACK   CYAN    ];
     set-color-name MINI_WINDOW                [WUtil color-pair WHITE   BLACK   ];
@@ -120,14 +120,15 @@ LIGHT {
     set-color-name STRING_LITERAL_HILIGHT     [WUtil color-pair RED     WHITE   ];
     set-color-name VALUE_LITERAL_HILIGHT      [WUtil color-pair MAGENTA WHITE   ];
     set-color-name DATATYPE_HILIGHT           [WUtil color-pair GREEN   WHITE   ] attr: ($A_ITALIC);
-    set-color-name COMMENT_HILIGHT            [WUtil color-pair YELLOW  WHITE   ];
+    set-color-name COMMENT_HILIGHT            [WUtil color-pair WHITE   WHITE   ] attr: ($A_ITALIC $A_DIM);
     set-color-name ALERT_HILIGHT              [WUtil color-pair RED     WHITE   ];
     set-color-name PWIKI_LINK                 [WUtil color-pair BLUE    WHITE   ] attr: ($A_UNDERLINE);
     set-color-name DIRED_DIRECTORY            [WUtil color-pair BLUE    WHITE   ];
     set-color-name DIRED_SYMLINK              [WUtil color-pair MAGENTA WHITE   ];
     set-color-name DIRED_DEV                  [WUtil color-pair YELLOW  WHITE   ];
-    set-color-name INTERP_PROMPT_HILIGHT      [WUtil color-pair GREEN   WHITE   ] attr: ($A_ITALIC $A_UNDERLINE $A_BOLD);
+    set-color-name INTERP_PROMPT_HILIGHT      [WUtil color-pair GREEN   WHITE   ] attr: ($A_ITALIC $A_UNDERLINE $A_BOLD $A_DIM);
     set-color-name BRACKETS_PAIR              [WUtil color-pair BLACK   YELLOW  ] attr: ($A_BOLD);
+    set-color-name NORMAL_TEXT                [WUtil color-pair BLACK   WHITE   ];
     true;
 }
 
@@ -161,6 +162,7 @@ DARK {
     set-color-name DIRED_DEV                  [WUtil color-pair YELLOW  BLACK   ];
     set-color-name INTERP_PROMPT_HILIGHT      [WUtil color-pair GREEN   BLACK   ];
     set-color-name BRACKETS_PAIR              [WUtil color-pair WHITE   BLUE    ];
+    set-color-name NORMAL_TEXT                [WUtil color-pair WHITE   BLACK   ];
     true;
 }
 
@@ -194,6 +196,7 @@ BLUE-BACK {
     set-color-name DIRED_DEV                  [WUtil color-pair YELLOW  BLUE    ];
     set-color-name INTERP_PROMPT_HILIGHT      [WUtil color-pair GREEN   BLUE    ];
     set-color-name BRACKETS_PAIR              [WUtil color-pair WHITE   CYAN    ];
+    set-color-name NORMAL_TEXT                [WUtil color-pair WHITE   BLUE    ];
     true;
 }
 
@@ -227,6 +230,7 @@ RETRO {
     set-color-name DIRED_DEV                  [WUtil color-pair YELLOW  BLACK   ];
     set-color-name INTERP_PROMPT_HILIGHT      [WUtil color-pair GREEN   BLACK   ];
     set-color-name BRACKETS_PAIR              [WUtil color-pair WHITE   BLUE    ];
+    set-color-name NORMAL_TEXT                [WUtil color-pair WHITE   BLACK   ];
     true;
 }
 
@@ -260,6 +264,7 @@ MONO {
     set-color-name DIRED_DEV                  [WUtil color-pair WHITE   BLACK   ];
     set-color-name INTERP_PROMPT_HILIGHT      [WUtil color-pair BLACK   WHITE   ];
     set-color-name BRACKETS_PAIR              [WUtil color-pair BLACK   WHITE   ];
+    set-color-name NORMAL_TEXT                [WUtil color-pair WHITE   BLACK   ];
     true;
 }
 
@@ -293,6 +298,7 @@ MONO-GREEN {
     set-color-name DIRED_DEV                  [WUtil color-pair GREEN   BLACK   ];
     set-color-name INTERP_PROMPT_HILIGHT      [WUtil color-pair BLACK   GREEN   ];
     set-color-name BRACKETS_PAIR              [WUtil color-pair BLACK   GREEN   ];
+    set-color-name NORMAL_TEXT                [WUtil color-pair GREEN   BLACK   ];
     true;
 }
 
