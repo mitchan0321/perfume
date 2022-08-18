@@ -302,7 +302,7 @@ CombiWindow method geom-trimming () {
 };
 
 CombiWindow method render-status-line (win buff cy cx y x buff-name) {
-    curs-print $StatusLineCurs [
+    message ::= 
         ### " #%v %v%v[%v%v%v%v%v%v] (%d,%d) <%v> {%v} %v %v"
         " %v%v[%v%v%v%v%v%v] (%d,%d) <%v> {%v} %v %v"
         fmt
@@ -320,14 +320,16 @@ CombiWindow method render-status-line (win buff cy cx y x buff-name) {
             $Mode
             [[$buff get-path] ?? "*no file*"]
             ["-" repeat $x]
-    ] $DISPLAY_ENCODING 0 0;
+    ;;
+    curs-print $StatusLineCurs $message $DISPLAY_ENCODING 0 0;
 
     (y x) ::= curs-get-screen-size $StatusLineCurs;
     if $Activate {
+	b ::= $message split sep: ")" : get 0 : len : + 1;
         if [get-buffer : protect?] {
-            apply-color $StatusLineCurs 0 0 $x ACTIVE_STATUS_LINE_PROTECT;
+            apply-color $StatusLineCurs 0 $b $x ACTIVE_STATUS_LINE_PROTECT;
         } {
-            apply-color $StatusLineCurs 0 0 $x ACTIVE_STATUS_LINE;
+            apply-color $StatusLineCurs 0 $b $x ACTIVE_STATUS_LINE;
         }
     } {
         apply-color $StatusLineCurs 0 0 $x INACTIVE_STATUS_LINE;
