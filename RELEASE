@@ -2543,4 +2543,8 @@
 		Change to display message delay when user config file occured error.
 		Add color attributes apply at status line window.
 
+2022/08/18
+	pmacs update:
+		Add regexp pattern RESERVED_KEYWORD_HILIGHT and VALUE_LITERAL_HILIGHT, add hex number pettern, octal number pattern.
+
 #eof
