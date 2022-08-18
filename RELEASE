@@ -2546,5 +2546,6 @@
 2022/08/18
 	pmacs update:
 		Add regexp pattern RESERVED_KEYWORD_HILIGHT and VALUE_LITERAL_HILIGHT, add hex number pettern, octal number pattern.
+		Add color name NORMAL_TEXT for cancel the matched resorved word hilight color.
 
 #eof
