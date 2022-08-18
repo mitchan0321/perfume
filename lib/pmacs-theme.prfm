@@ -103,10 +103,10 @@ LIGHT {
     set-color-name ACTIVE_STATUS_LINE         [WUtil color-pair WHITE   BLUE    ] attr: ($A_STANDOUT $A_BOLD $A_ITALIC);
     set-color-name ACTIVE_STATUS_LINE_2       [WUtil color-pair WHITE   BLUE    ] attr: ($A_BOLD);
     set-color-name ACTIVE_STATUS_LINE_PROTECT [WUtil color-pair WHITE   GREEN   ] attr: ($A_STANDOUT $A_BOLD $A_ITALIC);
-    set-color-name ACTIVE_STATUS_LINE_PROTECT_2 [WUtil color-pair WHITE   GREEN ] attr: ($A_BOLD);
+    set-color-name ACTIVE_STATUS_LINE_PROTECT_2 [WUtil color-pair WHITE GREEN   ] attr: ($A_BOLD);
     set-color-name ACTIVE_VERT_LINE           [WUtil color-pair WHITE   BLUE    ];
     set-color-name ACTIVE_VERT_LINE_PROTECT   [WUtil color-pair WHITE   BLUE    ];
-    set-color-name ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair WHITE   CYAN    ];
+    set-color-name ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair WHITE   BLUE    ] attr: ($A_STANDOUT $A_BOLD);
     set-color-name INACTIVE_EDIT_BUFFER       [WUtil color-pair BLACK   WHITE   ];
     set-color-name INACTIVE_STATUS_LINE       [WUtil color-pair WHITE   CYAN    ] attr: ($A_DIM);
     set-color-name INACTIVE_VERT_LINE         [WUtil color-pair BLACK   CYAN    ];
@@ -137,7 +137,9 @@ LIGHT {
 DARK {
     set-color-name EDIT_BUFFER                [WUtil color-pair WHITE   BLACK   ];
     set-color-name ACTIVE_STATUS_LINE         [WUtil color-pair BLACK   WHITE   ];
+    set-color-name ACTIVE_STATUS_LINE_2       [WUtil color-pair BLACK   WHITE   ];
     set-color-name ACTIVE_STATUS_LINE_PROTECT [WUtil color-pair BLACK   GREEN   ];
+    set-color-name ACTIVE_STATUS_LINE_PROTECT_2 [WUtil color-pair BLACK GREEN   ];
     set-color-name ACTIVE_VERT_LINE           [WUtil color-pair BLACK   WHITE   ];
     set-color-name ACTIVE_VERT_LINE_PROTECT   [WUtil color-pair BLACK   WHITE   ];
     set-color-name ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair BLACK   CYAN    ];
@@ -171,7 +173,9 @@ DARK {
 BLUE-BACK {
     set-color-name EDIT_BUFFER                [WUtil color-pair WHITE   BLUE    ];
     set-color-name ACTIVE_STATUS_LINE         [WUtil color-pair BLACK   WHITE   ];
+    set-color-name ACTIVE_STATUS_LINE_2       [WUtil color-pair BLACK   WHITE   ];
     set-color-name ACTIVE_STATUS_LINE_PROTECT [WUtil color-pair BLACK   GREEN   ];
+    set-color-name ACTIVE_STATUS_LINE_PROTECT_2 [WUtil color-pair BLACK GREEN   ];
     set-color-name ACTIVE_VERT_LINE           [WUtil color-pair BLACK   WHITE   ];
     set-color-name ACTIVE_VERT_LINE_PROTECT   [WUtil color-pair BLACK   WHITE   ];
     set-color-name ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair WHITE   CYAN    ];
@@ -205,7 +209,9 @@ BLUE-BACK {
 RETRO {
     set-color-name EDIT_BUFFER                [WUtil color-pair WHITE   BLACK   ];
     set-color-name ACTIVE_STATUS_LINE         [WUtil color-pair BLACK   GREEN   ];
+    set-color-name ACTIVE_STATUS_LINE_2       [WUtil color-pair BLACK   GREEN   ];
     set-color-name ACTIVE_STATUS_LINE_PROTECT [WUtil color-pair BLACK   YELLOW  ];
+    set-color-name ACTIVE_STATUS_LINE_PROTECT_2 [WUtil color-pair BLACK YELLOW  ];
     set-color-name ACTIVE_VERT_LINE           [WUtil color-pair BLACK   GREEN   ];
     set-color-name ACTIVE_VERT_LINE_PROTECT   [WUtil color-pair BLACK   GREEN   ];
     set-color-name ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair GREEN   BLACK   ];
@@ -239,7 +245,9 @@ RETRO {
 MONO {
     set-color-name EDIT_BUFFER                [WUtil color-pair WHITE   BLACK   ];
     set-color-name ACTIVE_STATUS_LINE         [WUtil color-pair BLACK   WHITE   ];
+    set-color-name ACTIVE_STATUS_LINE_2       [WUtil color-pair BLACK   WHITE   ];
     set-color-name ACTIVE_STATUS_LINE_PROTECT [WUtil color-pair BLACK   WHITE   ];
+    set-color-name ACTIVE_STATUS_LINE_PROTECT_2 [WUtil color-pair BLACK WHITE   ];
     set-color-name ACTIVE_VERT_LINE           [WUtil color-pair BLACK   WHITE   ];
     set-color-name ACTIVE_VERT_LINE_PROTECT   [WUtil color-pair BLACK   WHITE   ];
     set-color-name ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair WHITE   BLACK   ];
@@ -273,7 +281,9 @@ MONO {
 MONO-GREEN {
     set-color-name EDIT_BUFFER                [WUtil color-pair GREEN   BLACK   ];
     set-color-name ACTIVE_STATUS_LINE         [WUtil color-pair BLACK   GREEN   ];
+    set-color-name ACTIVE_STATUS_LINE_2       [WUtil color-pair BLACK   GREEN   ];
     set-color-name ACTIVE_STATUS_LINE_PROTECT [WUtil color-pair BLACK   GREEN   ];
+    set-color-name ACTIVE_STATUS_LINE_PROTECT_2 [WUtil color-pair BLACK GREEN   ];
     set-color-name ACTIVE_VERT_LINE           [WUtil color-pair BLACK   GREEN   ];
     set-color-name ACTIVE_VERT_LINE_PROTECT   [WUtil color-pair BLACK   GREEN   ];
     set-color-name ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair GREEN   BLACK   ];
