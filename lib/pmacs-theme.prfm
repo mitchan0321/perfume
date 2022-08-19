@@ -106,7 +106,7 @@ MODERN {
     set-color-name ACTIVE_STATUS_LINE_PROTECT_2 [WUtil color-pair WHITE   GREEN   ] attr: ($A_BOLD);
     set-color-name ACTIVE_VERT_LINE             [WUtil color-pair WHITE   BLUE    ];
     set-color-name ACTIVE_VERT_LINE_PROTECT     [WUtil color-pair WHITE   BLUE    ] attr: ($A_BOLD);
-    set-color-name ACTIVE_VERT_LINE_HILIGHT     [WUtil color-pair WHITE   BLUE    ] attr: ($A_STANDOUT $A_BOLD);
+    set-color-name ACTIVE_VERT_LINE_HILIGHT     [WUtil color-pair BLACK   WHITE   ] attr: ($A_BOLD $A_STANDOUT);
     set-color-name INACTIVE_EDIT_BUFFER         [WUtil color-pair BLACK   WHITE   ];
     set-color-name INACTIVE_STATUS_LINE         [WUtil color-pair BLACK   WHITE   ] attr: ($A_BOLD $A_ITALIC $A_STANDOUT);
     set-color-name INACTIVE_STATUS_LINE_2       [WUtil color-pair WHITE   CYAN    ] attr: ($A_DIM);
