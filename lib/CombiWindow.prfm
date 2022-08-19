@@ -319,22 +319,33 @@ CombiWindow method render-status-line (win buff cy cx y x buff-name) {
             $buff-name
             $Mode
             [[$buff get-path] ?? "*no file*"]
-            ["-" repeat $x]
     ;;
+    b2 ::= $message display-width;
+    $message append! [" " . ["-" repeat $x]];
+
     curs-print $StatusLineCurs $message $DISPLAY_ENCODING 0 0;
 
-    (y x) ::= curs-get-screen-size $StatusLineCurs;
+    b ::= $message split sep: ")" : get 0 : display-width : + 2;
     if $Activate {
-	b ::= $message split sep: ")" : get 0 : len : + 2;
         if [get-buffer : protect?] {
             apply-color $StatusLineCurs 0 $b $x ACTIVE_STATUS_LINE_PROTECT;
             apply-color $StatusLineCurs 0 0 $b ACTIVE_STATUS_LINE_PROTECT_2;
+            if {$b2 < $x} {
+                apply-color $StatusLineCurs 0 $b2 $x ACTIVE_STATUS_LINE_PROTECT_2;
+            };
         } {
             apply-color $StatusLineCurs 0 $b $x ACTIVE_STATUS_LINE;
             apply-color $StatusLineCurs 0 0 $b ACTIVE_STATUS_LINE_2;
+            if {$b2 < $x} {
+                apply-color $StatusLineCurs 0 $b2 $x ACTIVE_STATUS_LINE_2;
+            };
         }
     } {
-        apply-color $StatusLineCurs 0 0 $x INACTIVE_STATUS_LINE;
+        apply-color $StatusLineCurs 0 $b $x INACTIVE_STATUS_LINE;
+        apply-color $StatusLineCurs 0 0 $b INACTIVE_STATUS_LINE_2;
+        if {$b2 < $x} {
+            apply-color $StatusLineCurs 0 $b2 $x INACTIVE_STATUS_LINE_2;
+        };
     };
 };
 

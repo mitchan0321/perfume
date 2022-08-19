@@ -98,7 +98,7 @@ set-color-name WHITE.CYAN      [WUtil color-pair WHITE   CYAN    ];
 set-color-name WHITE.WHITE     [WUtil color-pair WHITE   WHITE   ];
 
 case $THEME
-LIGHT {
+MODERN {
     set-color-name EDIT_BUFFER                [WUtil color-pair BLACK   WHITE   ];
     set-color-name ACTIVE_STATUS_LINE         [WUtil color-pair WHITE   BLUE    ] attr: ($A_STANDOUT $A_BOLD $A_ITALIC);
     set-color-name ACTIVE_STATUS_LINE_2       [WUtil color-pair WHITE   BLUE    ] attr: ($A_BOLD);
@@ -108,7 +108,8 @@ LIGHT {
     set-color-name ACTIVE_VERT_LINE_PROTECT   [WUtil color-pair WHITE   BLUE    ];
     set-color-name ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair WHITE   BLUE    ] attr: ($A_STANDOUT $A_BOLD);
     set-color-name INACTIVE_EDIT_BUFFER       [WUtil color-pair BLACK   WHITE   ];
-    set-color-name INACTIVE_STATUS_LINE       [WUtil color-pair WHITE   CYAN    ] attr: ($A_DIM);
+    set-color-name INACTIVE_STATUS_LINE       [WUtil color-pair CYAN    BLUE    ] attr: ($A_BOLD $A_ITALIC $A_STANDOUT);
+    set-color-name INACTIVE_STATUS_LINE_2     [WUtil color-pair WHITE   CYAN    ] attr: ($A_DIM);
     set-color-name INACTIVE_VERT_LINE         [WUtil color-pair BLACK   CYAN    ];
     set-color-name INACTIVE_VERT_LINE_HILIGHT [WUtil color-pair BLACK   CYAN    ];
     set-color-name MINI_WINDOW                [WUtil color-pair WHITE   BLACK   ];
@@ -122,7 +123,7 @@ LIGHT {
     set-color-name STRING_LITERAL_HILIGHT     [WUtil color-pair RED     WHITE   ];
     set-color-name VALUE_LITERAL_HILIGHT      [WUtil color-pair MAGENTA WHITE   ];
     set-color-name DATATYPE_HILIGHT           [WUtil color-pair GREEN   WHITE   ] attr: ($A_ITALIC);
-    set-color-name COMMENT_HILIGHT            [WUtil color-pair CYAN    WHITE   ] attr: ($A_ITALIC $A_DIM);
+    set-color-name COMMENT_HILIGHT            [WUtil color-pair WHITE   WHITE   ] attr: ($A_ITALIC $A_DIM);
     set-color-name ALERT_HILIGHT              [WUtil color-pair RED     WHITE   ];
     set-color-name PWIKI_LINK                 [WUtil color-pair BLUE    WHITE   ] attr: ($A_UNDERLINE);
     set-color-name DIRED_DIRECTORY            [WUtil color-pair BLUE    WHITE   ];
@@ -130,6 +131,43 @@ LIGHT {
     set-color-name DIRED_DEV                  [WUtil color-pair YELLOW  WHITE   ];
     set-color-name INTERP_PROMPT_HILIGHT      [WUtil color-pair GREEN   WHITE   ] attr: ($A_ITALIC $A_UNDERLINE $A_BOLD $A_DIM);
     set-color-name BRACKETS_PAIR              [WUtil color-pair BLACK   YELLOW  ] attr: ($A_BOLD);
+    set-color-name NORMAL_TEXT                [WUtil color-pair BLACK   WHITE   ];
+    true;
+}
+
+LIGHT {
+    set-color-name EDIT_BUFFER                [WUtil color-pair BLACK   WHITE   ];
+    set-color-name ACTIVE_STATUS_LINE         [WUtil color-pair WHITE   BLUE    ];
+    set-color-name ACTIVE_STATUS_LINE_2       [WUtil color-pair WHITE   BLUE    ];
+    set-color-name ACTIVE_STATUS_LINE_PROTECT [WUtil color-pair WHITE   GREEN   ];
+    set-color-name ACTIVE_STATUS_LINE_PROTECT_2 [WUtil color-pair WHITE GREEN   ];
+    set-color-name ACTIVE_VERT_LINE           [WUtil color-pair WHITE   BLUE    ];
+    set-color-name ACTIVE_VERT_LINE_PROTECT   [WUtil color-pair WHITE   BLUE    ];
+    set-color-name ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair WHITE   CYAN    ];
+    set-color-name INACTIVE_EDIT_BUFFER       [WUtil color-pair BLACK   WHITE   ];
+    set-color-name INACTIVE_STATUS_LINE       [WUtil color-pair BLACK   CYAN    ];
+    set-color-name INACTIVE_STATUS_LINE_2     [WUtil color-pair BLACK   CYAN    ];
+    set-color-name INACTIVE_VERT_LINE         [WUtil color-pair BLACK   CYAN    ];
+    set-color-name INACTIVE_VERT_LINE_HILIGHT [WUtil color-pair WHITE   CYAN    ];
+    set-color-name MINI_WINDOW                [WUtil color-pair WHITE   BLACK   ];
+    set-color-name ACTIVE_MINI_WINDOW         [WUtil color-pair BLACK   WHITE   ];
+    set-color-name MINI_CAUTION               [WUtil color-pair BLACK   YELLOW  ];
+    set-color-name EOF_MARK                   [WUtil color-pair WHITE   YELLOW  ];
+    set-color-name REGION_HILIGHT             [WUtil color-pair WHITE   CYAN    ];
+    set-color-name SEARCH_CURRENT_HILIGHT     [WUtil color-pair WHITE   RED     ];
+    set-color-name SEARCH_HILIGHT             [WUtil color-pair BLACK   YELLOW  ];
+    set-color-name RESERVED_WORD_HILIGHT      [WUtil color-pair BLUE    WHITE   ];
+    set-color-name STRING_LITERAL_HILIGHT     [WUtil color-pair RED     WHITE   ];
+    set-color-name VALUE_LITERAL_HILIGHT      [WUtil color-pair MAGENTA WHITE   ];
+    set-color-name DATATYPE_HILIGHT           [WUtil color-pair GREEN   WHITE   ];
+    set-color-name COMMENT_HILIGHT            [WUtil color-pair YELLOW  WHITE   ];
+    set-color-name ALERT_HILIGHT              [WUtil color-pair RED     WHITE   ];
+    set-color-name PWIKI_LINK                 [WUtil color-pair BLUE    WHITE   ];
+    set-color-name DIRED_DIRECTORY            [WUtil color-pair BLUE    WHITE   ];
+    set-color-name DIRED_SYMLINK              [WUtil color-pair MAGENTA WHITE   ];
+    set-color-name DIRED_DEV                  [WUtil color-pair YELLOW  WHITE   ];
+    set-color-name INTERP_PROMPT_HILIGHT      [WUtil color-pair GREEN   WHITE   ];
+    set-color-name BRACKETS_PAIR              [WUtil color-pair BLACK   YELLOW  ];
     set-color-name NORMAL_TEXT                [WUtil color-pair BLACK   WHITE   ];
     true;
 }
@@ -145,6 +183,7 @@ DARK {
     set-color-name ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair BLACK   CYAN    ];
     set-color-name INACTIVE_EDIT_BUFFER       [WUtil color-pair WHITE   BLACK   ];
     set-color-name INACTIVE_STATUS_LINE       [WUtil color-pair BLACK   BLUE    ];
+    set-color-name INACTIVE_STATUS_LINE_2     [WUtil color-pair BLACK   BLUE    ];
     set-color-name INACTIVE_VERT_LINE         [WUtil color-pair BLACK   BLUE    ];
     set-color-name INACTIVE_VERT_LINE_HILIGHT [WUtil color-pair BLACK   BLUE    ];
     set-color-name MINI_WINDOW                [WUtil color-pair WHITE   BLACK   ];
@@ -181,6 +220,7 @@ BLUE-BACK {
     set-color-name ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair WHITE   CYAN    ];
     set-color-name INACTIVE_EDIT_BUFFER       [WUtil color-pair WHITE   BLUE    ];
     set-color-name INACTIVE_STATUS_LINE       [WUtil color-pair WHITE   BLACK   ];
+    set-color-name INACTIVE_STATUS_LINE_2     [WUtil color-pair WHITE   BLACK   ];
     set-color-name INACTIVE_VERT_LINE         [WUtil color-pair BLACK   BLACK   ];
     set-color-name INACTIVE_VERT_LINE_HILIGHT [WUtil color-pair BLACK   CYAN    ];
     set-color-name MINI_WINDOW                [WUtil color-pair WHITE   BLUE    ];
@@ -217,6 +257,7 @@ RETRO {
     set-color-name ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair GREEN   BLACK   ];
     set-color-name INACTIVE_EDIT_BUFFER       [WUtil color-pair GREEN   BLACK   ];
     set-color-name INACTIVE_STATUS_LINE       [WUtil color-pair WHITE   BLUE    ];
+    set-color-name INACTIVE_STATUS_LINE_2     [WUtil color-pair WHITE   BLUE    ];
     set-color-name INACTIVE_VERT_LINE         [WUtil color-pair BLACK   BLUE    ];
     set-color-name INACTIVE_VERT_LINE_HILIGHT [WUtil color-pair BLUE    BLACK   ];
     set-color-name MINI_WINDOW                [WUtil color-pair GREEN   BLACK   ];
@@ -253,6 +294,7 @@ MONO {
     set-color-name ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair WHITE   BLACK   ];
     set-color-name INACTIVE_EDIT_BUFFER       [WUtil color-pair WHITE   BLACK   ];
     set-color-name INACTIVE_STATUS_LINE       [WUtil color-pair WHITE   BLACK   ];
+    set-color-name INACTIVE_STATUS_LINE_2     [WUtil color-pair WHITE   BLACK   ];
     set-color-name INACTIVE_VERT_LINE         [WUtil color-pair BLACK   WHITE   ];
     set-color-name INACTIVE_VERT_LINE_HILIGHT [WUtil color-pair WHITE   BLACK   ];
     set-color-name MINI_WINDOW                [WUtil color-pair WHITE   BLACK   ];
@@ -289,6 +331,7 @@ MONO-GREEN {
     set-color-name ACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair GREEN   BLACK   ];
     set-color-name INACTIVE_EDIT_BUFFER       [WUtil color-pair GREEN   BLACK   ];
     set-color-name INACTIVE_STATUS_LINE       [WUtil color-pair GREEN   BLACK   ];
+    set-color-name INACTIVE_STATUS_LINE_2     [WUtil color-pair GREEN   BLACK   ];
     set-color-name INACTIVE_VERT_LINE         [WUtil color-pair BLACK   GREEN   ];
     set-color-name INACTIVE_VERT_LINE_HILIGHT [WUtil color-pair GREEN   BLACK   ];
     set-color-name MINI_WINDOW                [WUtil color-pair GREEN   BLACK   ];
