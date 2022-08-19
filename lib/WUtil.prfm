@@ -273,6 +273,12 @@ defun show-message (msg wait: msec bell: bell) {
                         0 0
                         [$MainWindow get-screen-size : get 1]
                         MINI_CAUTION 0;
+            } {
+                $MainWindow get-minibuffer-window : 
+                    set-color
+                        0 0
+                        [$MainWindow get-screen-size : get 1]
+                        MINI_WINDOW 0;
             };
             $MainWindow get-minibuffer-window : refresh;
             if [true? bell] {
