@@ -103,7 +103,7 @@ MODERN {
     set-color-name ACTIVE_STATUS_LINE           [WUtil color-pair WHITE   BLUE    ] attr: ($A_STANDOUT $A_BOLD $A_ITALIC);
     set-color-name ACTIVE_STATUS_LINE_2         [WUtil color-pair WHITE   BLUE    ] attr: ($A_BOLD);
     set-color-name ACTIVE_STATUS_LINE_PROTECT   [WUtil color-pair WHITE   GREEN   ] attr: ($A_STANDOUT $A_BOLD $A_ITALIC);
-    set-color-name ACTIVE_STATUS_LINE_PROTECT_2 [WUtil color-pair WHITE GREEN     ] attr: ($A_BOLD);
+    set-color-name ACTIVE_STATUS_LINE_PROTECT_2 [WUtil color-pair WHITE   GREEN   ] attr: ($A_BOLD);
     set-color-name ACTIVE_VERT_LINE             [WUtil color-pair WHITE   BLUE    ];
     set-color-name ACTIVE_VERT_LINE_PROTECT     [WUtil color-pair WHITE   BLUE    ] attr: ($A_BOLD);
     set-color-name ACTIVE_VERT_LINE_HILIGHT     [WUtil color-pair WHITE   BLUE    ] attr: ($A_STANDOUT $A_BOLD);
@@ -123,7 +123,7 @@ MODERN {
     set-color-name STRING_LITERAL_HILIGHT       [WUtil color-pair RED     WHITE   ];
     set-color-name VALUE_LITERAL_HILIGHT        [WUtil color-pair MAGENTA WHITE   ];
     set-color-name DATATYPE_HILIGHT             [WUtil color-pair GREEN   WHITE   ] attr: ($A_ITALIC);
-    set-color-name COMMENT_HILIGHT              [WUtil color-pair WHITE   WHITE   ] attr: ($A_ITALIC $A_DIM);
+    set-color-name COMMENT_HILIGHT              [WUtil color-pair BLUE    WHITE   ] attr: ($A_ITALIC $A_DIM);
     set-color-name ALERT_HILIGHT                [WUtil color-pair RED     WHITE   ];
     set-color-name PWIKI_LINK                   [WUtil color-pair BLUE    WHITE   ] attr: ($A_UNDERLINE);
     set-color-name DIRED_DIRECTORY              [WUtil color-pair BLUE    WHITE   ];
