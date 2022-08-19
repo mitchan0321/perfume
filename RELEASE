@@ -2548,4 +2548,8 @@
 		Add regexp pattern RESERVED_KEYWORD_HILIGHT and VALUE_LITERAL_HILIGHT, add hex number pettern, octal number pattern.
 		Add color name NORMAL_TEXT for cancel the matched resorved word hilight color.
 
+2022/08/19
+	pmacs update:
+		Add new theme MODERN forked from LIGHT.
+
 #eof
