@@ -199,7 +199,7 @@ LIGHT {
     set-color-name DATATYPE_HILIGHT             [WUtil color-pair GREEN   WHITE   ];
     set-color-name COMMENT_HILIGHT              [WUtil color-pair YELLOW  WHITE   ];
     set-color-name ALERT_HILIGHT                [WUtil color-pair RED     WHITE   ];
-    set-color-name PWIKI_LINK                   [WUtil color-pair BLUE    WHITE   ];
+    set-color-name PWIKI_LINK                   [WUtil color-pair BLUE    WHITE   ] attr: ($A_UNDERLINE);
     set-color-name DIRED_DIRECTORY              [WUtil color-pair BLUE    WHITE   ];
     set-color-name DIRED_SYMLINK                [WUtil color-pair MAGENTA WHITE   ];
     set-color-name DIRED_DEV                    [WUtil color-pair YELLOW  WHITE   ];
@@ -236,7 +236,7 @@ DARK {
     set-color-name DATATYPE_HILIGHT             [WUtil color-pair GREEN   BLACK   ];
     set-color-name COMMENT_HILIGHT              [WUtil color-pair MAGENTA BLACK   ];
     set-color-name ALERT_HILIGHT                [WUtil color-pair RED     BLACK   ];
-    set-color-name PWIKI_LINK                   [WUtil color-pair CYAN    BLACK   ];
+    set-color-name PWIKI_LINK                   [WUtil color-pair CYAN    BLACK   ] attr: ($A_UNDERLINE);
     set-color-name DIRED_DIRECTORY              [WUtil color-pair BLUE    BLACK   ];
     set-color-name DIRED_SYMLINK                [WUtil color-pair MAGENTA BLACK   ];
     set-color-name DIRED_DEV                    [WUtil color-pair YELLOW  BLACK   ];
@@ -273,7 +273,7 @@ BLUE-BACK {
     set-color-name DATATYPE_HILIGHT             [WUtil color-pair GREEN   BLUE    ];
     set-color-name COMMENT_HILIGHT              [WUtil color-pair BLACK   BLUE    ];
     set-color-name ALERT_HILIGHT                [WUtil color-pair RED     BLUE    ];
-    set-color-name PWIKI_LINK                   [WUtil color-pair GREEN   BLUE    ];
+    set-color-name PWIKI_LINK                   [WUtil color-pair GREEN   BLUE    ] attr: ($A_UNDERLINE);
     set-color-name DIRED_DIRECTORY              [WUtil color-pair YELLOW  BLUE    ];
     set-color-name DIRED_SYMLINK                [WUtil color-pair MAGENTA BLUE    ];
     set-color-name DIRED_DEV                    [WUtil color-pair YELLOW  BLUE    ];
@@ -310,7 +310,7 @@ RETRO {
     set-color-name DATATYPE_HILIGHT             [WUtil color-pair GREEN   BLACK   ];
     set-color-name COMMENT_HILIGHT              [WUtil color-pair MAGENTA BLACK   ];
     set-color-name ALERT_HILIGHT                [WUtil color-pair RED     BLACK   ];
-    set-color-name PWIKI_LINK                   [WUtil color-pair BLACK   GREEN   ];
+    set-color-name PWIKI_LINK                   [WUtil color-pair BLACK   GREEN   ] attr: ($A_UNDERLINE);
     set-color-name DIRED_DIRECTORY              [WUtil color-pair BLUE    BLACK   ];
     set-color-name DIRED_SYMLINK                [WUtil color-pair MAGENTA BLACK   ];
     set-color-name DIRED_DEV                    [WUtil color-pair YELLOW  BLACK   ];
@@ -347,7 +347,7 @@ MONO {
     set-color-name DATATYPE_HILIGHT             [WUtil color-pair WHITE   BLACK   ];
     set-color-name COMMENT_HILIGHT              [WUtil color-pair WHITE   BLACK   ];
     set-color-name ALERT_HILIGHT                [WUtil color-pair BLACK   WHITE   ];
-    set-color-name PWIKI_LINK                   [WUtil color-pair BLACK   WHITE   ];
+    set-color-name PWIKI_LINK                   [WUtil color-pair BLACK   WHITE   ] attr: ($A_UNDERLINE);
     set-color-name DIRED_DIRECTORY              [WUtil color-pair WHITE   BLACK   ];
     set-color-name DIRED_SYMLINK                [WUtil color-pair WHITE   BLACK   ];
     set-color-name DIRED_DEV                    [WUtil color-pair WHITE   BLACK   ];
@@ -384,7 +384,7 @@ MONO-GREEN {
     set-color-name DATATYPE_HILIGHT             [WUtil color-pair GREEN   BLACK   ];
     set-color-name COMMENT_HILIGHT              [WUtil color-pair GREEN   BLACK   ];
     set-color-name ALERT_HILIGHT                [WUtil color-pair BLACK   GREEN   ];
-    set-color-name PWIKI_LINK                   [WUtil color-pair BLACK   GREEN   ];
+    set-color-name PWIKI_LINK                   [WUtil color-pair BLACK   GREEN   ] attr: ($A_UNDERLINE);
     set-color-name DIRED_DIRECTORY              [WUtil color-pair GREEN   BLACK   ];
     set-color-name DIRED_SYMLINK                [WUtil color-pair GREEN   BLACK   ];
     set-color-name DIRED_DEV                    [WUtil color-pair GREEN   BLACK   ];
