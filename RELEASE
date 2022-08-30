@@ -2552,4 +2552,8 @@
 	pmacs update:
 		Add new theme MODERN forked from LIGHT.
 
+2022/08/30
+	pmacs update:
+		Add brackets pair hilight origin near cursor bracket too.
+
 #eof
