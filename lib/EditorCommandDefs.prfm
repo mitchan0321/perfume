@@ -4095,7 +4095,8 @@ defcommand set-tab-width {
 
 defcommand brackets-pair {
     | main window |
-    $window remove-spot-color-item "BRACKETS-PAIR";
+    $window remove-spot-color-item "BRACKETS-PAIR-S";
+    $window remove-spot-color-item "BRACKETS-PAIR-D";
     (height width) ::= $window get-window-size;
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -4189,7 +4190,8 @@ defcommand brackets-pair {
         }
     ;;
     if $find {
-        $window set-spot-color-item "BRACKETS-PAIR" $cy $cx 1 BRACKETS_PAIR;
+        $window set-spot-color-item "BRACKETS-PAIR-D" $cy $cx 1 BRACKETS_PAIR;
+        $window set-spot-color-item "BRACKETS-PAIR-S" $y $x 1 BRACKETS_PAIR;
     };
     return SELF;
 };
