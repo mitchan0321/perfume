@@ -2,14 +2,14 @@
 #  The pair is in order foreground color, background color.
 #
 #  Color names are defined in curses library like following this:
-#	WUtil::ColorName set BLACK   0;
-#	WUtil::ColorName set RED     1;
-#	WUtil::ColorName set GREEN   2;
-#	WUtil::ColorName set YELLOW  3;
-#	WUtil::ColorName set BLUE    4;
-#	WUtil::ColorName set MAGENTA 5;
-#	WUtil::ColorName set CYAN    6;
-#	WUtil::ColorName set WHITE   7;
+#       WUtil::ColorName set BLACK   0;
+#       WUtil::ColorName set RED     1;
+#       WUtil::ColorName set GREEN   2;
+#       WUtil::ColorName set YELLOW  3;
+#       WUtil::ColorName set BLUE    4;
+#       WUtil::ColorName set MAGENTA 5;
+#       WUtil::ColorName set CYAN    6;
+#       WUtil::ColorName set WHITE   7;
 #
 #  Attributes list is:
 #       A_ALTCHARSET   0x00400000 "代替文字セットモード"
@@ -96,6 +96,15 @@ set-color-name WHITE.BLUE      [WUtil color-pair WHITE   BLUE    ];
 set-color-name WHITE.MAGENTA   [WUtil color-pair WHITE   MAGENTA ];
 set-color-name WHITE.CYAN      [WUtil color-pair WHITE   CYAN    ];
 set-color-name WHITE.WHITE     [WUtil color-pair WHITE   WHITE   ];
+
+###
+### define color sample names.
+###
+### 1. load "color-sample.prfm"
+### 2. run print-theme in *Scratch* buffer.
+### 3. display color defines at *Scratch* buffer.
+### 4. copy color defines from *Scratch* buffer to here.
+###
 
 case $THEME
 MODERN {
