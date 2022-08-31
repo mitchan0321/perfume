@@ -438,7 +438,7 @@ mth_integer_eq(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
 
     if (0 == (mpz_cmp(SELF(interp)->u.biginteger,
 		      arg->u.biginteger))) {
-	return SELF(interp);
+	return const_T;
     }
     return const_Nil;
     
@@ -466,7 +466,7 @@ mth_integer_neq(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
 
     if (0 != (mpz_cmp(SELF(interp)->u.biginteger,
 		      arg->u.biginteger))) {
-	return SELF(interp);
+	return const_T;
     }
     return const_Nil;
 
@@ -493,7 +493,7 @@ mth_integer_gt(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     }
 
     if (mpz_cmp(SELF(interp)->u.biginteger, arg->u.biginteger) > 0) {
-	return SELF(interp);
+	return const_T;
     }
     return const_Nil;
 	
@@ -520,7 +520,7 @@ mth_integer_lt(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     }
 
     if (mpz_cmp(SELF(interp)->u.biginteger, arg->u.biginteger) < 0) {
-	return SELF(interp);
+	return const_T;
     }
     return const_Nil;
     
@@ -547,7 +547,7 @@ mth_integer_ge(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     }
 
     if (mpz_cmp(SELF(interp)->u.biginteger, arg->u.biginteger) >= 0) {
-	return SELF(interp);
+	return const_T;
     }
     return const_Nil;
 
@@ -574,7 +574,7 @@ mth_integer_le(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     }
 
     if (mpz_cmp(SELF(interp)->u.biginteger, arg->u.biginteger) <= 0) {
-	return SELF(interp);
+	return const_T;
     }
     return const_Nil;
 
@@ -1203,7 +1203,7 @@ mth_real_eq(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     }
 
     if (SELF(interp)->u.real == arg->u.real) {
-	return SELF(interp);
+	return const_T;
     }
     return const_Nil;
 
@@ -1229,7 +1229,7 @@ mth_real_neq(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
     }
 
     if (SELF(interp)->u.real != arg->u.real) {
-	return SELF(interp);
+	return const_T;
     }
     return const_Nil;
 
@@ -1255,7 +1255,7 @@ mth_real_gt(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     }
 
     if (SELF(interp)->u.real > arg->u.real) {
-	return SELF(interp);
+	return const_T;
     }
     return const_Nil;
 
@@ -1281,7 +1281,7 @@ mth_real_lt(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     }
 
     if (SELF(interp)->u.real < arg->u.real) {
-	return SELF(interp);
+	return const_T;
     }
     return const_Nil;
 
@@ -1307,7 +1307,7 @@ mth_real_ge(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     }
 
     if (SELF(interp)->u.real >= arg->u.real) {
-	return SELF(interp);
+	return const_T;
     }
     return const_Nil;
 
@@ -1333,7 +1333,7 @@ mth_real_le(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     }
 
     if (SELF(interp)->u.real <= arg->u.real) {
-	return SELF(interp);
+	return const_T;
     }
     return const_Nil;
 
