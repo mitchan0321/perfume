@@ -97,15 +97,6 @@ set-color-name WHITE.MAGENTA   [WUtil color-pair WHITE   MAGENTA ];
 set-color-name WHITE.CYAN      [WUtil color-pair WHITE   CYAN    ];
 set-color-name WHITE.WHITE     [WUtil color-pair WHITE   WHITE   ];
 
-###
-### define color sample names.
-###
-### 1. load "color-sample.prfm"
-### 2. run print-theme in *Scratch* buffer.
-### 3. display color defines at *Scratch* buffer.
-### 4. copy color defines from *Scratch* buffer to here.
-###
-
 case $THEME
 MODERN {
     set-color-name EDIT_BUFFER                  [WUtil color-pair BLACK   WHITE   ];

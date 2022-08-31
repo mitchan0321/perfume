@@ -1,16 +1,22 @@
-color-name := ((K BLACK) (W WHITE) (R RED) (G GREEN) (B BLUE) (C CYAN) (Y YELLOW) (M MAGENTA));
+color-name := ((W WHITE) (K BLACK) (R RED) (G GREEN) (B BLUE) (C CYAN) (Y YELLOW) (M MAGENTA));
 attr-name := (
     (0 "($A_NORMAL)")
     (1 "($A_BOLD)")
     (2 "($A_ITALIC)")
     (3 "($A_UNDERLINE)")
     (4 "($A_DIM)")
-    (5 "($A_REVERSE)")
-    (6 "($A_STANDOUT)")
-    (7 "($A_DIM $A_STANDOUT)") 
-    (8 "($A_BLINK)") 
+    (5 "($A_STANDOUT)")
+    (6 "($A_DIM $A_STANDOUT)") 
 );
 
+###
+### define color sample names.
+###
+### 1. load "color-sample.prfm"
+### 2. run print-theme in *Scratch* buffer.
+### 3. display color defines at *Scratch* buffer.
+### 4. copy color defines from *Scratch* buffer to lib/pmacs-theme.prfm.
+###
 defun print-theme () {
     $color-name each do: {| i |
         (ii in) := $i;
@@ -27,6 +33,14 @@ defun print-theme () {
     };
 };
 
+###
+### define color and attrs regexs.
+###
+### 1. load "color-sample.prfm"
+### 2. run print-regex in *Scratch* buffer.
+### 3. display color and attrs regexs at *Scratch* buffer.
+### 4. copy color and attrs regexs from *Scratch* buffer to lib/Mode-Interp.key into HILIGHT_REGEX list.
+###
 defun print-regex () {
     $color-name each do: {| i |
         (ii in) := $i;
@@ -45,6 +59,9 @@ defun print-regex () {
     };
 };
 
+###
+### run print-sample in *Scratch* buffer.
+###
 defun print-sample () {
     $color-name each do: {| i |
         (ii in) := $i;
@@ -53,10 +70,9 @@ defun print-sample () {
             l := "";
             $attr-name each do: {| k |
                 (ki kn) := $k;
-                $l append! ["{%v%v%v Color Sample} " fmt $ii $ji $ki];
+                $l append! ["{%v%v%v Color Sample} " fmt $ji $ii $ki];
             };
             println $l;
         };
     };
 };
-
