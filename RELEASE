@@ -2545,7 +2545,8 @@
 
 2022/08/18
 	pmacs update:
-		Add regexp pattern RESERVED_KEYWORD_HILIGHT and VALUE_LITERAL_HILIGHT, add hex number pettern, octal number pattern.
+		Add regexp pattern RESERVED_KEYWORD_HILIGHT and VALUE_LITERAL_HILIGHT, add hex number pettern and
+		octal number pattern.
 		Add color name NORMAL_TEXT for cancel the matched resorved word hilight color.
 
 2022/08/19
@@ -2553,6 +2554,8 @@
 		Add new theme MODERN forked from LIGHT.
 
 2022/08/30
+	methods.c
+		Change Integer and Real comparater returns always return <t> if condition is true.
 	pmacs update:
 		Add brackets pair hilight origin near cursor bracket too.
 
