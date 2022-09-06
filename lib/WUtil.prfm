@@ -232,7 +232,7 @@ defun line-input (curs disp-line disp-col input-len cur-index cur-val key-in) {
             new-x := 0;
             break;
         }
-        {or [eq? $key-in KEY_BACKSPACE] [eq? $key-in CTRL_H]} {
+        {or [eq? $key-in KEY_BACKSPACE] [eq? $key-in CTRL_H] [eq? $key-in KEY_DEL]} {
             (command char new-y new-x) ::= $v backdelete-character-at 0 $cur-index;
             break;
         }
