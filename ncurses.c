@@ -894,6 +894,9 @@ key_conv(int in) {
     if ((in >= 0) && (in < 0x20)) {
 	return ctrlkey_defs[in];
     }
+    if (in == 0x7f) {
+        return new_symbol(L"KEY_DEL");
+    }
 
     c = new_cell(L"");
     cell_add_char(c, in);
@@ -1053,7 +1056,7 @@ func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 	//
 	// detect character input
 	//
-	if ((in >= 0) && (in < 0x20)) {
+	if (((in >= 0) && (in < 0x20)) || (in == 0x7f)) {
 	    // detect control caracter, return to caller soon.
 	    inlist = list_append(inlist, key_conv(in));
 	    cur_in = in;
