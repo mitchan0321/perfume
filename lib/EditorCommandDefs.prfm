@@ -1261,8 +1261,8 @@ defcommand key-binding-list {
     $buff append-string "<<< Key bindings >>>";
     $buff append-string ["Buffer mode: " . $mode];
     $buff append-string "";
-    $buff append-string ["%-15v %28v %-v" fmt  "Key group"     "Key modifier"  "Command"];
-    $buff append-string ["%-15v %28v %-v" fmt ["-" repeat 15] ["-" repeat 28] ["-" repeat 38]];
+    $buff append-string ["%-15v %21v %-14v %-v" fmt  "Key group"     "Key combinations"  "Key symbol"       "Command"];
+    $buff append-string ["%-15v %21v %-14v %-v" fmt ["-" repeat 15] ["-" repeat 21] ["-" repeat 14] ["-" repeat 38]];
     d ::= $window get KeyBinding;
     desc ::= $window get KeyDesc;
     l := ();
@@ -1273,9 +1273,9 @@ defcommand key-binding-list {
             ls ::= $s split;
             grp ::= $ls get 0;
             modify ::= $ls get 1;
-            $l << ["%-18v%26v [[%-v]]" fmt $grp $modify $v];
+            $l << ["%-18v%19v %-14v [[%-v]]" fmt $grp $modify $k $v];
         } {
-            $l << ["%-18v%26v [[%-v]]" fmt "***" $k $v];
+            $l << ["%-18v%19v %-14v [[%-v]]" fmt "--" (key input) $k $v];
         };
     };
     msort $l : each do: {| i |
