@@ -2568,4 +2568,10 @@
 		Change command key-binding-list output layout and CombiWindow.key file descriptions, 
 		  change key-group item, change key-combinations item and add key-symbol item.
 
+2022/09/08
+	pmacs update:
+		Change key bind,
+		  Ctrl+D -> delete-character,
+		  Alt+D -> key-binding-list.
+
 #eof
