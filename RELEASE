@@ -2563,5 +2563,9 @@
 	pmacs update:
 		Add return new key symbol KEY_DEL, if key in 0x7f character pressed.
 		Add delete back character, if input KEY_DEL at mini-input.
+2022/09/07
+	pmacs update:
+		Change command key-binding-list output layout and CombiWindow.key file descriptions, 
+		  change key-group item, change key-combinations item and add key-symbol item.
 
 #eof
