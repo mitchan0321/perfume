@@ -842,11 +842,12 @@ error:
 
 static Toy_Type*
 key_conv(int in) {
-    wchar_t buff[32];
-    static Toy_Type *ctrlkey_defs[32] = {NULL,NULL,};
+    wchar_t buff[33];
+    static Toy_Type *ctrlkey_defs[33] = {NULL,NULL,};
     Cell *c;
 
     if (ctrlkey_defs[0] == NULL) {
+        /* initialize at onece */
 	ctrlkey_defs[0]  = new_symbol(L"CTRL_SP");
 	ctrlkey_defs[1]  = new_symbol(L"CTRL_A");
 	ctrlkey_defs[2]  = new_symbol(L"CTRL_B");
@@ -879,6 +880,7 @@ key_conv(int in) {
 	ctrlkey_defs[29] = new_symbol(L"KEY_GS");
 	ctrlkey_defs[30] = new_symbol(L"KEY_RS");
 	ctrlkey_defs[31] = new_symbol(L"KEY_US");
+	ctrlkey_defs[32] = new_symbol(L"KEY_DEL");
     }
     
     if (in > 256) {
@@ -895,7 +897,7 @@ key_conv(int in) {
 	return ctrlkey_defs[in];
     }
     if (in == 0x7f) {
-        return new_symbol(L"KEY_DEL");
+        return ctrlkey_defs[32];
     }
 
     c = new_cell(L"");
