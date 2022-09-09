@@ -2574,4 +2574,8 @@
 		  Ctrl+D -> delete-character,
 		  Alt+D -> key-binding-list.
 
+2022/09/09
+	pmacs update:
+		Add editor command set-buffer-tab-width for set buffer's tab width localy.
+
 #eof
