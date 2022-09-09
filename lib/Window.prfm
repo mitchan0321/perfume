@@ -456,6 +456,7 @@ Window method bind-buffer (window-name buffer) {
         [$buffer get-path]
     ;;
     $window set-mode $mode;
+    $window set-buffer-tab-width;
 };
 
 Window method unbind-buffer () {

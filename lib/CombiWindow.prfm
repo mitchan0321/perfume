@@ -1370,3 +1370,12 @@ CombiWindow method remove-spot-color-all () {
     geom ::= get-geom;
     $geom set! SpotColor [dict()];
 };
+
+CombiWindow method set-buffer-tab-width () {
+    unsets DEFAULT_TAB_WIDTH;
+    buff ::= get-buffer;
+    width ::= $buff get-buffer-tab-width;
+    if $width {
+        sets DEFAULT_TAB_WIDTH $width;
+    };
+};

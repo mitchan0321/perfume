@@ -21,6 +21,7 @@ EditBuffer method init-constructor () {
     sets LastTimestamp 0;
     sets IncludeCR <nil>;
     sets EncError <nil>;
+    sets BufferTabWidth <nil>;
     if {defvar? DEFAULT_EDIT_ENCODING} {
         sets Encoding $DEFAULT_EDIT_ENCODING;
     } {
@@ -635,4 +636,13 @@ EditBuffer method set-previous-buffer (buffer-name) {
 
 EditBuffer method get-previous-buffer () {
     return $PreviousBuffer;
+};
+
+
+EditBuffer method set-buffer-tab-width (width) {
+    sets BufferTabWidth $width;
+};
+
+EditBuffer method get-buffer-tab-width () {
+    return $BufferTabWidth;
 };

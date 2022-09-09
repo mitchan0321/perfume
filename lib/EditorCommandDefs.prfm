@@ -4093,6 +4093,49 @@ defcommand set-tab-width {
     result ALL;
 };
 
+defcommand set-buffer-tab-width {
+    | main window |
+    buff ::= $window get-buffer;
+    tab ::= [$buff get-buffer-tab-width] ?? $DEFAULT_TAB_WIDTH;
+
+    $main mini-input-start "" prompt: ["Set buffer TAB width [current is " . $tab "]: "];
+    $main add-mini-input-callback $window {| main window in-key value |
+        if {eq? $in-key KEY_ESC} {
+	    $main mini-input-end;
+	    show-message "Canceled.";
+            return ALL;
+        };
+        if {eq? $in-key CTRL_M} {
+            $main mini-input-end;
+            try {
+                if {$value = ""} {
+                    tab := $tab; # set closure value to local value.
+                } {
+                    tab ::= $value int;
+                };
+            } catch: {
+                show-message :bell "Illegal TAB number specified.";
+                return ALL;
+            };
+            if {or [$tab < 0] [$tab >= 256]} {
+                show-message :bell "Illegal TAB number specified.";
+                return ALL;
+            };
+            if {$tab = 0} {
+                $buff set-buffer-tab-width <nil>;
+                $window set-buffer-tab-width;
+                show-message "Unset buffer TAB.";
+            } {
+                $buff set-buffer-tab-width $tab;
+                $window set-buffer-tab-width;
+                show-message ["Set buffer TAB width to " . $tab "."];
+            };
+            return ALL;
+        };
+    };
+    result ALL;
+};
+
 defcommand brackets-pair {
     | main window |
     $window remove-spot-color-item "BRACKETS-PAIR-S";
