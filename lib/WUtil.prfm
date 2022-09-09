@@ -936,7 +936,9 @@ defun mode-select (window buffer-type buffer-name buffer-mode file-path) {
                     result := $mode;
                     break;
                 };
-            } catch: {};
+            } catch: {
+                show-message :bell ["Error at mode selector, mode name is " . $mode "."];
+            };
         };
         $result ?? {result := $DEFAULT_MODE};
     };
