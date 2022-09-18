@@ -303,8 +303,8 @@ CombiWindow method geom-trimming () {
 
 CombiWindow method render-status-line (win buff cy cx y x buff-name) {
     message ::= 
-        ### " #%v %v%v[%v%v%v%v%v%v] (%d,%d) <%v> {%v} %v %v"
-        " %v%v[%v%v%v%v%v%v] (%d,%d)  <%v> {%v} %v %v"
+        ### " %v%v[%v%v%v%v%v%v] (%d,%d)  <%v> {%v} %v %v"
+        " %v%v[%v%v%v%v%v%v] (%d,%d)  <%v> {%v} "
         fmt
             ### [$win split sep: "#" : get 1]
             [["" . [$buff get-encoding]] at 0]
