@@ -2584,4 +2584,13 @@
 		PRFM_20220910
 		1.6.1
 
+2022/09/18
+	pmacs update:
+		Change CombiWindow.key key group description.
+		Change window status line, delete file full-path name.
+		Fix free cursor mode reset at smart-newline, smart-indent and smart-dedent.
+		Fix if previous line indent spec is null string, retry get indent spec from more
+		  previous line at smart-newline and smart-indent.
+		Change 00quick-start.pwiki document.
+
 #eof
