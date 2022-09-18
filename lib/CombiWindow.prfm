@@ -302,9 +302,21 @@ CombiWindow method geom-trimming () {
 };
 
 CombiWindow method render-status-line (win buff cy cx y x buff-name) {
-    message ::= 
+    if {[$buff get-buffer-length] <= $cy} {
+        code := "-EOF-";
+    } {
+        c ::= $buff get-vector : at $cy $cx;
+        if  {$c = ""} {
+            code := "-EOL-";
+        } {
+            code ::= "u+%04x" fmt [$c uexport : get 0];
+        };
+    };
+    
+    message ::=
         ### " %v%v[%v%v%v%v%v%v] (%d,%d)  <%v> {%v} %v %v"
-        " %v%v[%v%v%v%v%v%v] (%d,%d)  <%v> {%v} "
+        ### " %v%v[%v%v%v%v%v%v] (%d,%d)  <%v> {%v} "
+        " %v%v[%v%v%v%v%v%v] (%d,%d) %v <%v>"
         fmt
             ### [$win split sep: "#" : get 1]
             [["" . [$buff get-encoding]] at 0]
@@ -316,16 +328,17 @@ CombiWindow method render-status-line (win buff cy cx y x buff-name) {
             [$FreeCursor ??? "+" " "]
             [[$Parent is-interp-busy] ??? "@" " "]
             $cy $cx
+            $code
+            ### $Mode
             $buff-name
-            $Mode
-            [[$buff get-path] ?? "*no file*"]
+            ### [[$buff get-path] ?? "*no file*"]
     ;;
     b2 ::= $message display-width;
-    $message append! [" " . ["-" repeat $x]];
+    $message append! [" {" . $Mode "} " ["-" repeat $x]];
 
     curs-print $StatusLineCurs $message $DISPLAY_ENCODING 0 0;
 
-    b ::= $message split sep: ")" : get 0 : display-width : + 2;
+    b ::= $message split sep: "<" : get 0 : display-width : + 0;
     if $Activate {
         if [get-buffer : protect?] {
             apply-color $StatusLineCurs 0 $b $x ACTIVE_STATUS_LINE_PROTECT;
