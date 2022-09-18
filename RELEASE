@@ -2564,6 +2564,7 @@
 	pmacs update:
 		Add return new key symbol KEY_DEL, if key in 0x7f character pressed.
 		Add delete back character, if input KEY_DEL at mini-input.
+
 2022/09/07
 	pmacs update:
 		Change command key-binding-list output layout and CombiWindow.key file descriptions, 
@@ -2592,5 +2593,9 @@
 		Fix if previous line indent spec is null string, retry get indent spec from more
 		  previous line at smart-newline and smart-indent.
 		Change 00quick-start.pwiki document.
+
+2022/09/19
+	pmacs update:
+		Add cursor point character code/EOL mark/EOF mark in window status line.
 
 #eof
