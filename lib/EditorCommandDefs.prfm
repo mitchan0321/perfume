@@ -1275,7 +1275,7 @@ defcommand key-binding-list {
             modify ::= $ls get 1;
             $l << ["%-18v%19v %-14v [[%-v]]" fmt $grp $modify $k $v];
         } {
-            $l << ["%-18v%19v %-14v [[%-v]]" fmt "--" (key input) $k $v];
+            $l << ["%-18v%19v %-14v [[%-v]]" fmt "%%" (key input) $k $v];
         };
     };
     msort $l : each do: {| i |
@@ -2340,16 +2340,25 @@ defcommand exit {
 
 defcommand smart-newline {
     | main window |
+    $window set-freecursor <nil>;
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
-
     (ey ex) ::= $window get-source-index $buff $geom;
     str-cur ::= $buff get-buffer-line $ey;
     if {and $str-cur {$ex >= [$str-cur len]}} {
         ### current line smart indent
         str-prev := "";
         if {$ey > 0} {
-            str-prev ::= $buff get-buffer-line [$ey - 1];
+            idx-y := 1;
+            loop do: {
+                str-prev ::= $buff get-buffer-line [$ey - $idx-y];
+                if $str-prev else: {
+                    str-prev := "";
+                    break;
+                };
+                if {[$str-prev len] > 0} {break};
+                $idx-y ++;
+            };
         };
         cur-level ::= get-next-indent-count-backward $str-cur;
         if {$cur-level < 0} {
@@ -2375,7 +2384,16 @@ defcommand smart-newline {
     (ey ex) ::= $window get-source-index $buff $geom;
     str-prev := "";
     if {$ey > 0} {
-	str-prev ::= $buff get-buffer-line [$ey - 1];
+        idx-y := 1;
+        loop do: {
+            str-prev ::= $buff get-buffer-line [$ey - $idx-y];
+            if $str-prev else: {
+                str-prev := "";
+                break;
+            };
+            if {[$str-prev len] > 0} {break};
+            $idx-y ++;
+        };
     };
     cur-level ::= get-indent-level $str-prev;
     next-level-count ::= get-next-indent-count $str-prev;
@@ -2393,7 +2411,7 @@ defcommand smart-newline {
 
 defcommand smart-indent {
     | main window |
-
+    $window set-freecursor <nil>;
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     (ey ex) ::= $window get-source-index $buff $geom;
@@ -2401,7 +2419,16 @@ defcommand smart-indent {
     str ::= $str ?? "";
     str-prev := "";
     if {$ey > 0} {
-	str-prev ::= $buff get-buffer-line [$ey - 1];
+        idx-y := 1;
+        loop do: {
+            str-prev ::= $buff get-buffer-line [$ey - $idx-y];
+            if $str-prev else: {
+                str-prev := "";
+                break;
+            };
+            if {[$str-prev len] > 0} {break};
+            $idx-y ++;
+        };
     };
     cur-level ::= get-indent-level $str-prev;
     next-level-count ::= get-next-indent-count $str-prev;
@@ -2495,6 +2522,7 @@ defun get-next-indent-count-backward (str) {
 
 defcommand smart-dedent {
     | main window |
+    $window set-freecursor <nil>;
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     (ey ex) ::= $window get-source-index $buff $geom;
