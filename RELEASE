@@ -2598,4 +2598,8 @@
 	pmacs update:
 		Add cursor point character code/EOL mark/EOF mark in window status line.
 
+2022/09/23
+	pmacs update:
+		Fix key repeat acceleration algorithm.
+
 #eof
