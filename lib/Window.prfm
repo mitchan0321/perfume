@@ -578,12 +578,17 @@ Window method key-event-loop () {
                 setvar KEY_REPEAT_ACCEL 1;
             } {
                 setvar KEY_REPEAT_ACCEL [
-                    if {$rtime > $KEY_REPEAT_ACCEL_DELAY} 
-                        [$KEY_REPEAT_ACCEL_MAXLINE int]
-                        [$rtime / $KEY_REPEAT_ACCEL_DELAY : * [$KEY_REPEAT_ACCEL_MAXLINE - 1.0] : int : + 1]
-                    ;;
+                    if {$rtime <= $KEY_REPEAT_ACCEL_DELAY}
+                        1
+                        [
+                            if {$rtime >= [$KEY_REPEAT_ACCEL_DELAY + $KEY_REPEAT_ACCEL_DURING_TO_MAX]}
+                                [[$KEY_REPEAT_ACCEL_MAXLINE > 0.0] ??? [$KEY_REPEAT_ACCEL_MAXLINE int] 1]
+                                [[$rtime - $KEY_REPEAT_ACCEL_DELAY] / $KEY_REPEAT_ACCEL_DURING_TO_MAX :
+                                    * [$KEY_REPEAT_ACCEL_MAXLINE - 1.0] : int : + 2]
+                        ]
                 ];
             };
+            ### {println $rtime "," $i "," $KEY_REPEAT_ACCEL} >>> "rtime.log";
             
 	    if [$KeyMaps set? $i] {
 		i ::= $KeyMaps get $i;

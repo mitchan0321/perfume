@@ -929,6 +929,7 @@ func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     static unsigned long int curs_blink = 0;
     static double time_prev=0.0, time_now=0.0, time_on_repeat=0.0;
     static int no_input_count = 0;
+    static int on_repeat = 0;
     int blink, blink_fact = 3;
     Toy_Type *tblink, *tblink_fact;
 
@@ -1097,15 +1098,22 @@ valid_return:
         time_now = get_now_time();
         if ((time_now - time_prev) < 0.1) {
             time_on_repeat += (time_now - time_prev);
+            on_repeat = 1;
         } else {
             time_on_repeat = 0.0;
+            on_repeat = 0;
         }
         no_input_count = 0;
     } else {
 	no_input_count ++;
 	if (no_input_count >= 3) {
             time_on_repeat = 0.0;
-	}
+            on_repeat = 0;
+        } else if (on_repeat) {
+            time_prev = time_now;
+            time_now = get_now_time();
+            time_on_repeat += (time_now - time_prev);
+        }
     }
     
     result_list = new_list(NULL);
