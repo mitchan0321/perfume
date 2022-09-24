@@ -22,7 +22,13 @@ BufferBase method get-buffer-mode () {
 };
 
 BufferBase method set-raise () {
-    sets LastRaiseTimestamp [time-of-day :msec];
+    if {sets? LastRaiseTimestamp} {
+        if {$LastRaiseTimestamp > 0} {
+            sets LastRaiseTimestamp [time-of-day :msec];
+        };
+    } {
+        sets LastRaiseTimestamp [time-of-day :msec];
+    };
 };
 
 BufferBase method set-raise-low () {
