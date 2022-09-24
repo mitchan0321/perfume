@@ -2609,4 +2609,13 @@
 		  kND7 to kND4 -> smooth-scroll-down-anothor-window.
 		Refactaring mini window input become use to mini window input utilities.
 
+2022/09/25
+	pmacs update
+		Separate EditorCommandDefs.prfm file and rename to pmacs-command.prfm
+		  and pmacs-command-{buffer,dired,document,edit,file,misc,move,search,util,window}.prfm files.
+		Add error handling at pmacs-command.prfm file load.
+		Fix BufferBase::set-raise no set timestamp if already set 0(low) specified.
+		Change file completion buffer name *Directory* to *Completion* and set raise low.
+		Change trace editor command output file name to "pmacs-trace.txt".
+
 #eof

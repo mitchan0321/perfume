@@ -10,10 +10,10 @@ BufferManager.prfm
 CombiWindow.key
 CombiWindow.prfm
 EditBuffer.prfm
-EditorCommandDefs.prfm
 MiniWindow.prfm
 ScratchBuffer.prfm
 DiredBuffer.prfm
+EditStream.prfm
 WUtil.prfm
 MiniInputUtil.prfm
 Window.prfm
@@ -21,10 +21,20 @@ WindowBase.prfm
 pmacs-theme.prfm
 pmacs.conf
 pmacs.prfm
+pmacs-command.prfm
+pmacs-command-window.prfm
+pmacs-command-move.prfm
+pmacs-command-edit.prfm
+pmacs-command-file.prfm
+pmacs-command-buffer.prfm
+pmacs-command-search.prfm
+pmacs-command-util.prfm
+pmacs-command-dired.prfm
+pmacs-command-document.prfm
+pmacs-command-misc.prfm
 pmacs.files
 pmacs.logo
 pmacs.keymap
-pmacs.TODO
 Mode-BufferList.key
 Mode-C.key
 Mode-Interp.key
@@ -36,6 +46,7 @@ Mode-Man.key
 Mode-Dired.key
 Mode-Java.key
 pinterp.prfm
+ptrace.prfm
 FloatingWindow.prfm
 FloatingWindowManager.prfm
 
