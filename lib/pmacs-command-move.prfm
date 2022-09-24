@@ -1,0 +1,660 @@
+###
+### All Pmacs editor move command definition.
+###
+
+defcommand next-page {
+    | main window |
+    $window page-down;
+    result SELF;
+};
+
+defcommand previous-page {
+    | main window |
+    $window page-up;
+    result SELF;
+};
+
+defcommand cursor-down {
+    | main window |
+    $window move-down;
+    result SELF;
+};
+
+defcommand cursor-up {
+    | main window |
+    $window move-up;
+    result SELF;
+};
+
+defcommand cursor-right {
+    | main window |
+    $window move-right;
+    result SELF;
+};
+
+defcommand cursor-left {
+    | main window |
+    $window move-left;
+    result SELF;
+};
+
+defcommand cursor-down-with-region {
+    | main window |
+
+    if {! [$window get-region]} {
+        buff ::= $window get-buffer;
+        geom ::= $window get-geom;
+        (cy cx) ::= $window get-source-index $buff $geom;
+        $window start-region $cy $cx;
+    };
+
+    $window move-down;
+    result SELF;
+};
+
+defcommand cursor-up-with-region {
+    | main window |
+
+    if {! [$window get-region]} {
+        buff ::= $window get-buffer;
+        geom ::= $window get-geom;
+        (cy cx) ::= $window get-source-index $buff $geom;
+        $window start-region $cy $cx;
+    };
+
+    $window move-up;
+    result SELF;
+};
+
+defcommand cursor-right-with-region {
+    | main window |
+
+    if {! [$window get-region]} {
+        buff ::= $window get-buffer;
+        geom ::= $window get-geom;
+        (cy cx) ::= $window get-source-index $buff $geom;
+        $window start-region $cy $cx;
+    };
+
+    $window move-right;
+    result SELF;
+};
+
+defcommand cursor-left-with-region {
+    | main window |
+
+    if {! [$window get-region]} {
+        buff ::= $window get-buffer;
+        geom ::= $window get-geom;
+        (cy cx) ::= $window get-source-index $buff $geom;
+        $window start-region $cy $cx;
+    };
+
+    $window move-left;
+    result SELF;
+};
+
+defcommand move-half-up {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (y x) ::= $window get-screen-size;
+
+    $window set-freecursor <t>;
+    new-y ::= $geom,ViewLine + [$y / 2];
+    if {$new-y > [[$buff get-buffer-length] - $y : + 1]} {
+        new-y ::= [$buff get-buffer-length] - $y : + 1;
+    };
+    if {$new-y < 0} {
+        new-y := 0;
+    };
+    $geom set! ViewLine $new-y;
+    
+    result SELF;
+};
+
+defcommand move-half-down {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (y x) ::= $window get-screen-size;
+
+    $window set-freecursor <t>;
+    new-y ::= $geom,ViewLine - [$y / 2];
+    if {$new-y < 0} {
+        new-y := 0;
+    };
+    $geom set! ViewLine $new-y;
+    
+    result SELF;
+};
+
+defcommand move-half-right {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (y x) ::= $window get-screen-size;
+
+    $window set-freecursor <t>;
+    new-x ::= $geom,ViewColumn + [$x / 4];
+    $geom set! ViewColumn $new-x;
+
+    result SELF;
+};
+
+defcommand move-half-left {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (y x) ::= $window get-screen-size;
+
+    $window set-freecursor <t>;
+    new-x ::= $geom,ViewColumn - [$x / 4];
+    if {$new-x < 0} {
+        new-x := 0
+    };
+    $geom set! ViewColumn $new-x;
+
+    result SELF;
+};
+
+defcommand cursor-top-of-line {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+
+    $window set-freecursor <nil>;
+    $geom set! ViewColumn 0;
+    $geom set! CursorColumn 0;
+    $geom set! IndexColumn.SAVE 0;
+    (y x) ::= $window get-screen-size;
+    $window fit-to-cursor $geom $y $x;    
+
+    result SELF;
+};
+
+defcommand cursor-end-of-line {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (cy cx) ::= $window get-source-index $buff $geom;
+    r ::= $buff get-buffer-line $cy;
+    if $r {
+        cx ::= $r len;
+    } {
+        cx := 0;
+    };
+    (line col) ::= $window get-cursor-index $buff $cy $cx;
+
+    $window set-freecursor <nil>;
+    $geom set! CursorColumn [$col - $geom,ViewColumn];
+    $geom set! IndexColumn.SAVE $col;
+    (y x) ::= $window get-screen-size;
+    $window fit-to-cursor $geom $y $x;
+    
+    result SELF;
+};
+
+defcommand smooth-scroll-down {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+
+    (y x) ::= $window get-screen-size;
+    acc ::= 1 * $KEY_REPEAT_ACCEL;
+    new-y ::= $geom,ViewLine + $acc;
+    if {$new-y > [[$buff get-buffer-length] - $y : + 1]} {
+        new-y ::= [$buff get-buffer-length] - $y : + 1;
+    };
+    if {$new-y < 0} {
+        new-y := 0;
+    };
+    $geom set! ViewLine $new-y;
+
+    result SELF;
+};
+
+defcommand smooth-scroll-up {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+
+    (y x) ::= $window get-screen-size;
+    acc ::= 1 * $KEY_REPEAT_ACCEL;
+    new-y ::= $geom,ViewLine - $acc;
+    if {$new-y < 0} {
+        new-y := 0;
+    };
+    $geom set! ViewLine $new-y;
+
+    result SELF;
+};
+
+defcommand smooth-scroll-right {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (y x) ::= $window get-screen-size;
+
+    $window set-freecursor <t>;
+    new-x ::= $geom,ViewColumn + 4;
+    $geom set! ViewColumn $new-x;
+
+    result SELF;
+};
+
+defcommand smooth-scroll-left {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (y x) ::= $window get-screen-size;
+
+    $window set-freecursor <t>;
+    new-x ::= $geom,ViewColumn - 4;
+    if {$new-x < 0} {
+        new-x := 0;
+    };
+    $geom set! ViewColumn $new-x;
+
+    result SELF;
+};
+
+defcommand top-of-buffer {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (y x) ::= $window get-screen-size;
+
+    $window set-freecursor <nil>;
+    $geom set! ViewLine 0;
+    $geom set! ViewColumn 0;
+    $geom set! CursorLine 0;
+    $geom set! CursorColumn 0;
+    $geom set! IndexColumn.SAVE 0;
+
+    result SELF;
+};
+
+defcommand bottom-of-buffer {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (y x) ::= $window get-screen-size;
+    buff-len ::= $buff get-buffer-length;
+
+    $window set-freecursor <nil>;
+    $geom set! ViewLine 0;
+    $geom set! ViewColumn 0;
+    $geom set! CursorLine 0;
+    $geom set! CursorColumn 0;
+    $geom set! IndexColumn.SAVE 0;
+    if {$buff-len < $y} {
+	$geom set! CursorLine $buff-len;
+    } {
+	$geom set! ViewLine [$buff-len - $y : + 1];
+	$geom set! CursorLine [$y - 1];
+    };
+    
+    result SELF;
+};
+
+defcommand fit-to-top {
+    | main window |
+    $window cursor-fit-to-top [$window get-geom];
+    result SELF;
+};
+
+defcommand fit-to-bottom {
+    | main window |
+    $window cursor-fit-to-bottom [$window get-geom];
+    result SELF;
+};
+
+defcommand move-screen-top {
+    | main window |
+    $window move-screen-top;
+    result SELF;
+};
+
+defcommand move-screen-bottom {
+    | main window |
+    $window move-screen-bottom;
+    result SELF;
+};
+
+defcommand next-page-anothor-window {
+    | main window |
+    $main roll-current-window;
+    $main get-current-window : page-down;
+    $main roll-current-window-backward;
+    result ALL;
+};
+
+defcommand previous-page-anothor-window {
+    | main window |
+    $main roll-current-window;
+    $main get-current-window : page-up;
+    $main roll-current-window-backward;
+    result ALL;
+};
+
+defcommand smooth-scroll-up-anothor-window {
+    | main window |
+    $main roll-current-window;
+    $main get-current-window : apply-command $main [$main get-current-window] "" smooth-scroll-up;
+    $main roll-current-window-backward;
+    result ALL;
+};
+
+defcommand smooth-scroll-down-anothor-window {
+    | main window |
+    $main roll-current-window;
+    $main get-current-window : apply-command $main [$main get-current-window] "" smooth-scroll-down;
+    $main roll-current-window-backward;
+    result ALL;
+};
+
+defcommand smart-move-forward {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    vec ::= $buff get-vector;
+    $vec ?? {return SELF};
+
+    (ey ex) ::= $window get-source-index $buff $geom;
+    str ::= $buff get-buffer-line $ey;
+    $str ?? {return ALL};
+    cur-char ::= $str at $ex;
+    if {or [$cur-char = ")"] [$cur-char = "]"] [$cur-char = "}"]} {
+        show-message "Bracket directions are opposite.";
+        $window cursor-move-to $geom $ey [$ex + 1];
+        $window apply-command $main $window "" smart-move-forward;
+        return SELF;
+    };
+    if {or [$cur-char = "("] [$cur-char = "["] [$cur-char = "{"]} {
+        level-maru-kakko := 0;
+        level-kaku-kakko := 0;
+        level-nami-kakko := 0;
+        case $cur-char
+            "(" {fin-char := ")"; level-maru-kakko := 1}
+            "[" {fin-char := "]"; level-kaku-kakko := 1}
+            "{" {fin-char := "}"; level-nami-kakko := 1}
+        ;
+        fin := <nil>;
+        dquote := <nil>;
+        squote := <nil>;
+        $vec each-forward-char $ey [$ex + 1] {| last-y last-x c |
+            case $c
+                "\"" {dquote ::= $dquote ??? <nil> <t>} ### " balanced for smart-move-*
+                "\'" {squote ::= $squote ??? <nil> <t>} ### ' balanced for smart-move-*
+            ;
+            if {! [or $dquote $squote]} {
+                case $c
+                    "(" {$level-maru-kakko ++}
+                    "[" {$level-kaku-kakko ++}
+                    "{" {$level-nami-kakko ++}
+                    ")" {
+                        $level-maru-kakko --;
+                        if {and [$fin-char = $c] [$level-maru-kakko = 0]} {fin := <t>};
+                    }
+                    "]" {
+                        $level-kaku-kakko --;
+                        if {and [$fin-char = $c] [$level-kaku-kakko = 0]} {fin := <t>};
+                    }
+                    "}" {
+                        $level-nami-kakko --;
+                        if {and [$fin-char = $c] [$level-nami-kakko = 0]} {fin := <t>};
+                    }
+                ;
+            };
+            if $fin {break};
+        };
+        if $fin {$window cursor-move-to $geom $last-y $last-x};
+        if {or [$level-maru-kakko != 0] [$level-kaku-kakko != 0] [$level-nami-kakko != 0]} {
+            show-message :bell ["Unbalanced brackets? " . "hint:"
+                [if [$level-maru-kakko != 0] " '(' or ')', " ""]
+                [if [$level-kaku-kakko != 0] " '[' or ']', " ""]
+                [if [$level-nami-kakko != 0] " '{' or '}', " ""]
+                " check their.";
+            ];
+        };
+        return SELF;
+    };
+    
+    ### otherwise
+    ### move word forward
+    last-y := $ey;
+    last-x := $ex;
+    $vec each-forward-char $ey $ex {| last-y last-x c |
+        if {or 
+            {$c alphanumeric?}
+            {$c = "("} {$c = "["} {$c = "{"}
+            {$c = ")"} {$c = "]"} {$c = "}"}
+        } {break};
+    };
+    if {or 
+        {$c = "("} {$c = "["} {$c = "{"}
+        {$c = ")"} {$c = "]"} {$c = "}"}
+    } {
+        $window cursor-move-to $geom $last-y $last-x;
+        return SELF;
+    };
+    
+    $vec each-forward-char $last-y [$last-x + 1] {| last-y last-x c |
+        if {! [or {$c alphanumeric?} {$c = "-"}] } {break};
+    };
+    $window cursor-move-to $geom $last-y $last-x;
+
+    result SELF;
+};
+
+defcommand smart-move-backward {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    vec ::= $buff get-vector;
+    $vec ?? {return SELF};
+
+    (ey ex) ::= $window get-source-index $buff $geom;
+    str ::= $buff get-buffer-line $ey;
+    str ::= $str ?? "";
+    cur-char ::= $str at $ex;
+
+    if {or [$cur-char = "("] [$cur-char = "["] [$cur-char = "{"]} {
+        show-message "Bracket directions are opposite.";
+        (ey ex) ::= $vec get-prev-pos $ey $ex;
+        $window cursor-move-to $geom $ey $ex;
+        (ey ex) ::= $vec get-prev-pos $ey $ex;
+        prev-char ::= $vec at $ey $ex;
+        if {or {$prev-char alphanumeric?} {$prev-char = "-"}} {
+            $window apply-command $main $window "" smart-move-backward;
+        };
+        return SELF;
+    };
+    if {or [$cur-char = ")"] [$cur-char = "]"] [$cur-char = "}"]} {
+        level-maru-kakko := 0;
+        level-kaku-kakko := 0;
+        level-nami-kakko := 0;
+        case $cur-char
+            ")" {fin-char := "("; level-maru-kakko := 1}
+            "]" {fin-char := "["; level-kaku-kakko := 1}
+            "}" {fin-char := "{"; level-nami-kakko := 1}
+        ;
+        fin := <nil>;
+        dquote := <nil>;
+        squote := <nil>;
+        (ey ex) ::= $vec get-prev-pos $ey $ex;
+        $vec each-backward-char $ey $ex {| last-y last-x c |
+            case $c
+                "\"" {dquote ::= $dquote ??? <nil> <t>} ### " balanced for smart-move-*
+                "\'" {squote ::= $squote ??? <nil> <t>} ### ' balanced for smart-move-*
+            ;
+            if {! [or $dquote $squote]} {
+                case $c
+                    ")" {$level-maru-kakko ++}
+                    "]" {$level-kaku-kakko ++}
+                    "}" {$level-nami-kakko ++}
+                    "(" {
+                        $level-maru-kakko --;
+                        if {and [$fin-char = $c] [$level-maru-kakko = 0]} {fin := <t>};
+                    }
+                    "[" {
+                        $level-kaku-kakko --;
+                        if {and [$fin-char = $c] [$level-kaku-kakko = 0]} {fin := <t>};
+                    }
+                    "{" {
+                        $level-nami-kakko --;
+                        if {and [$fin-char = $c] [$level-nami-kakko = 0]} {fin := <t>};
+                    }
+                ;
+            };
+            if $fin {break};
+        };
+        if $fin {$window cursor-move-to $geom $last-y $last-x};
+        if {or [$level-maru-kakko != 0] [$level-kaku-kakko != 0] [$level-nami-kakko != 0]} {
+            show-message :bell ["Unbalanced brackets? " . "hint:"
+                [if [$level-maru-kakko != 0] " '(' or ')', " ""]
+                [if [$level-kaku-kakko != 0] " '[' or ']', " ""]
+                [if [$level-nami-kakko != 0] " '{' or '}', " ""]
+                " check their.";
+            ];
+        };
+        return SELF;
+    };
+    
+    ### otherwise
+    ### move word backward
+    (ey ex) ::= $vec get-prev-pos $ey $ex;
+    $vec each-backward-char $ey $ex {| last-y last-x c |
+        if {or 
+            {$c alphanumeric?}
+            {$c = "("} {$c = "["} {$c = "{"}
+            {$c = ")"} {$c = "]"} {$c = "}"}
+        } {break};
+    };
+    if {or 
+        {$c = "("} {$c = "["} {$c = "{"}
+        {$c = ")"} {$c = "]"} {$c = "}"}
+    } {
+        $window cursor-move-to $geom $last-y $last-x;
+        return SELF;
+    };
+    
+    (ey ex) ::= $vec get-prev-pos $last-y $last-x;
+    $vec each-backward-char $ey $ex {| last-y last-x c |
+        if {! [or {$c alphanumeric?} {$c = "-"}] } {break};
+    };
+    if {! [and {$last-y = 0} {$last-x = 0}]} {
+        (last-y last-x) ::= $vec get-next-pos $last-y $last-x;
+    };
+    if {$last-y < 0} {last-y := 0};
+    if {$last-x < 0} {last-x := 0};
+    $window cursor-move-to $geom $last-y $last-x;
+
+    result SELF;
+};
+
+defcommand move-next-paragraph {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    (line col) ::= $window get-cursor-index $buff $ey $ex;
+    if {[$ey + 1] >= [$buff get-buffer-length]} {return SELF};
+    find := <nil>;
+    $buff buffer-select [$ey + 1] [$buff get-buffer-length : - 1] {
+        | src l |
+        p ::= curs-pos-to-index $src $col $DEFAULT_TAB_WIDTH;
+        if {and [[$src len] > 0] [[$src at $p] != " "] [[$src at $p] != "\t"] [[$src at $p] != ""]} {
+            find := <t>;
+	    break;
+	};
+    };
+    if $find {
+        p ::= curs-pos-to-index $src $col $DEFAULT_TAB_WIDTH;
+        $window cursor-move-to $geom $l $p;
+    };
+    result SELF;
+};
+
+defcommand move-previous-paragraph {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    (line col) ::= $window get-cursor-index $buff $ey $ex;
+    if {$ey < 1} {return SELF};
+    find := <nil>;
+    $buff buffer-select [$ey - 1] 0 {
+        | src l |
+        p ::= curs-pos-to-index $src $col $DEFAULT_TAB_WIDTH;
+        if {and [[$src len] > 0] [[$src at $p] != " "] [[$src at $p] != "\t"] [[$src at $p] != ""]} {
+            find := <t>;
+	    break;
+	};
+    };
+    if $find {
+        p ::= curs-pos-to-index $src $col $DEFAULT_TAB_WIDTH;
+        $window cursor-move-to $geom $l $p;
+    };
+    result SELF;
+};
+
+defcommand move-next-paragraph-fit-to-top {
+    | main window |
+    $window apply-command $main $window "" cursor-top-of-line;
+    $window apply-command $main $window "" move-next-paragraph;
+    $window apply-command $main $window "" fit-to-top;
+    result SELF;
+};
+
+defcommand move-previous-paragraph-fit-to-top {
+    | main window |
+    $window apply-command $main $window "" cursor-top-of-line;
+    $window apply-command $main $window "" move-previous-paragraph;
+    $window apply-command $main $window "" fit-to-top;
+    result SELF;
+};
+
+defcommand mark {
+    | main window |
+    $window mark;
+    result SELF;
+};
+
+defcommand goto-mark {
+    | main window |
+    $window goto-mark;
+    result SELF;
+};
+
+defcommand goto-unmark {
+    | main window |
+    $window unmark;
+    result SELF;
+};
+
+defcommand goto {
+    | main window |
+
+    mini-input-until-enter $main $window
+        prompt: "Goto line: "
+        enter-proc: {| value |
+            if [$value numeric?] else: {
+                show-message "Enter line number.";
+                return ALL;
+            };
+            $window mark;
+            geom ::= $window get-geom;
+            buff ::= $window get-buffer;
+            line ::= $value int;
+            if {$line > [$buff get-buffer-length]} {
+                line ::= $buff get-buffer-length
+            };
+            $window cursor-move-to $geom $line 0;
+            return ALL;
+        }
+    ;;
+    
+    result ALL;
+};

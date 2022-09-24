@@ -1,0 +1,181 @@
+###
+### All Pmacs editor dired command definition.
+###
+
+defcommand dired {
+    | main window |
+    dired-open $main $window [pwd];
+    return ALL;
+};
+
+defun dired-open (main window dir) {
+    buff ::= BufferManager get-buffer-by-path $dir;
+    if $buff {
+        $buff update;
+        $main bind-buffer [$window get-window-name] $buff;
+        return $buff;
+    };
+    buff ::= new DiredBuffer;
+    $buff load-content $dir;
+    $main bind-buffer [$window get-window-name] $buff;
+    return $buff;
+};
+
+defcommand dired-open {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    r ::= $buff get-buffer-line $ey;
+    if $r {
+        l ::= $r split sep: "|";
+        if {[$l len] >= 2} {
+            name ::= $l get 1;
+            path ::= $buff get-path;
+            path ::= $path ?? [pwd];
+            if {$path = "/"} {
+                path ::= path-adjust ["/" . $name];
+            } {
+                path ::= path-adjust [$path . "/" $name];
+            };
+            if {file dir? $path} {
+                new-buff ::= dired-open $main $window $path;
+                $new-buff set-previous-buffer [$buff get-buffer-name];
+            } {
+                if {file read? $path} {
+                    buff ::= BufferManager get-buffer-by-path $path;
+                    if $buff {
+                        $main bind-buffer [$window get-window-name] $buff;
+                        return SELF;
+                    };
+                    buff ::= new EditBuffer;
+                    (result err) ::= $buff load-content $path;
+                    if {$buff enc-error?} {
+                        show-message :bell "File decode error occured!! Try ALT-e and specify another encoding for re-load.";
+                    };
+                    $main bind-buffer [$window get-window-name] $buff;
+                    $result ?? {show-message :bell ["Open Failed, path: " . $value " ("  $err ")"]};
+                } {
+                    show-message :bell "File not readable.";
+                };
+            };
+        };
+    };
+    return ALL;
+};
+
+defcommand dired-link-back {
+    | main window |
+    buff ::= $window get-buffer;
+    prev-buff-name ::= $buff get-previous-buffer;
+    if $prev-buff-name {
+        prev-buff ::= BufferManager find-buffer $prev-buff-name;
+        if $prev-buff {
+            $main bind-buffer [$window get-window-name] $prev-buff;
+        } {
+            show-message :bell ["No found previous buffer, \'" . $prev-buff-name "\'."];
+        };
+    } {
+        show-message :bell "No set previous buffer.";
+    };
+    result ALL;
+};
+
+defcommand dired-cursor-up {
+    | main window |
+    $window move-up;
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    r ::= $buff get-buffer-line $ey;
+    if $r {
+        l ::= $r split sep: "|";
+        if {[$l len] >= 2} {
+            $geom set! IndexColumn.SAVE [[$l get 0 : len] + 1];
+            $window set-freecursor <nil>;
+        };
+    };
+    return ALL;
+};
+
+defcommand dired-cursor-down {
+    | main window |
+    $window move-down;
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    r ::= $buff get-buffer-line $ey;
+    if $r {
+        l ::= $r split sep: "|";
+        if {[$l len] >= 2} {
+            $geom set! IndexColumn.SAVE [[$l get 0 : len] + 1];
+            $window set-freecursor <nil>;
+        };
+    };
+    return ALL;
+};
+
+defcommand dired-sort-by-name-ascending {
+    | main window |
+    buff ::= $window get-buffer;
+    $buff set-sort-order "n";
+    $buff update;
+    return ALL;
+};
+
+defcommand dired-sort-by-name-descending {
+    | main window |
+    buff ::= $window get-buffer;
+    $buff set-sort-order "N";
+    $buff update;
+    return ALL;
+};
+
+defcommand dired-sort-by-time-ascending {
+    | main window |
+    buff ::= $window get-buffer;
+    $buff set-sort-order "t";
+    $buff update;
+    return ALL;
+};
+
+defcommand dired-sort-by-time-descending {
+    | main window |
+    buff ::= $window get-buffer;
+    $buff set-sort-order "T";
+    $buff update;
+    return ALL;
+};
+
+defcommand dired-sort-by-size-ascending {
+    | main window |
+    buff ::= $window get-buffer;
+    $buff set-sort-order "s";
+    $buff update;
+    return ALL;
+};
+
+defcommand dired-sort-by-size-descending {
+    | main window |
+    buff ::= $window get-buffer;
+    $buff set-sort-order "S";
+    $buff update;
+    return ALL;
+};
+
+defcommand dired-filter {
+    | main window |
+    buff ::= $window get-buffer;
+    
+    mini-input-until-enter $main $window 
+        init-value: [$buff get-filter : string]
+        prompt: "Filter: "
+        enter-proc: {| value |
+            $buff set-filter [$value rquote];
+            $buff update;
+            return ALL;
+        }
+    ;;
+    
+    return ALL;
+};

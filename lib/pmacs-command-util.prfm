@@ -1,0 +1,851 @@
+###
+### All Pmacs editor utility command definition.
+###
+
+defcommand file-completion {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (y x) ::= $window get-source-index $buff $geom;
+    r ::= $buff get-buffer-line $y;
+    $r ?? {
+        $window apply-command $main $window "" smart-indent;
+        return ALL;
+    };
+    if {or {$x = 0} {and {$x > 0} {$r at [$x - 1] : = " "}}} {
+        $window apply-command $main $window "" smart-indent;
+        return ALL;
+    };
+
+    dq := <nil>;    
+    start := 0;
+    [$x - 1] each to: 0 do: {| i |
+        c ::= $r at $i;
+        if {or {$c = " "} {$c = "\""}} {
+            start ::= $i + 1;
+            dq ::= [$c = "\""] ??? <t> <nil>;
+            break;
+        };
+    };
+
+    l ::= $r sub $start $x : split sep: "/";
+    f ::= $l ->>;
+    f ::= $f ?? "";
+    if {$l null?} {
+        dir ::= $buff get-content-dir : . "/";
+    } {
+        if {and {$l len : = 1} {$l get 0 : = ""}} {
+            dir := "/";
+        } {
+            if {$r at $start : = "/"} {
+                dir ::= $l join sep: "/" : . "/";
+            } {
+                dir ::= $buff get-content-dir : . "/" [$l join sep: "/"] : . "/";
+            };
+        };
+    };
+
+    try {  
+        list ::= file list $dir;
+    } catch: {
+        show-message :bell ["Directory not found: \"" . $dir "\"."];
+        return ALL;
+    };
+    
+    compl ::= path-match $list $f;
+    if {$compl len : = 0} {
+        show-message :bell ["No match file: \"" . $f "\", in directory (" $dir ")."];
+        return all;
+    };
+    if {$compl len : = 1} {
+        if {file dir? [$dir . $compl,0]} {
+            $buff line-update [[$r sub 0 [$x - [$f len]]] . $compl,0 "/" [$r sub $x]] $y;
+            dx ::= [$compl,0 len] - [$f len] : + 1;
+            $window cursor-move-to $geom $y [$x + $dx];
+        } {
+            $buff line-update [[$r sub 0 [$x - [$f len]]] . $compl,0 [$dq ??? "\" " " "] [$r sub $x]] $y;
+            dx ::= [$compl,0 len] - [$f len] : + [$dq ??? 2 1];
+            $window cursor-move-to $geom $y [$x + $dx];
+        };
+        return ALL;
+    };
+    comp ::= path-longest-match $compl $f;
+    $buff line-update [[$r sub 0 [$x - [$f len]]] . $comp [$r sub $x]] $y;
+    dx ::= [$comp len] - [$f len];
+    $window cursor-move-to $geom $y [$x + $dx];
+    show-message [[$compl len : string] . " files matches: " [msort $compl : filter {| i | ! [$i =~ '^[.]+$']} : join sep: " "]];
+    
+    return ALL;
+};
+
+defcommand show-character-code {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (cy cx) ::= $window get-source-index $buff $geom;
+    s ::= $buff get-buffer-line $cy;
+    $s ?? {
+	show-message "No character.";
+	return SELF;
+    };
+    c ::= $s sub $cx [$cx + 1];
+    if {$c != ""} {
+	i ::= $c uexport : car;
+	show-message ["Code: %v[u+%06x]" fmt $i $i];
+    } {
+	show-message "No character."
+    };
+    
+    result SELF;
+};
+
+defcommand input-character-code {
+    | main window |
+
+    mini-input-until-enter $main $window
+        prompt: "Input character code: u+"
+        enter-proc: {| value |
+            try {
+                i ::= ["0x" . $value] int;
+            } catch: {
+                show-message :bell "Bad hexadecimal.";
+                return ALL;
+            };
+            if {or {$i < 0} {$i >= 0x200000}} {
+                show-message :bell "Bad range unicode codepoint.";
+                return ALL;
+            };
+            $window insert-string ["" uimport! ($i)];
+        }
+    ;;
+
+    result SELF;
+};
+
+defcommand execute-command {
+    | main window |
+    
+    mini-input-until-enter $main $window
+        prompt: "Perfume command: "
+        enter-proc: {| value |
+	    try {
+	        result ::= $value eval;
+	        show-message ["Command result: " . [$result string]];
+            } catch: {| e |
+		show-message :bell ["<" . [$e car ] "># " [$e cdr]];
+	    };
+	}
+    ;;
+
+    result ALL;
+};
+
+defcommand execute-editor-command {
+    | main window |
+    if {defvar? EditorCommandList} 
+    then: {setvar EditorCommandList ()}
+    else: {defvar EditorCommandList ()};
+
+    mini-input-until-enter $main $window
+        prompt: "Editor command: "
+        enter-proc: {| value |
+	    $window apply-command $main $window "" $value; 
+	}
+        edit-proc: {| value |
+            try {
+                setvar EditorCommandList [msort [$EditorCommand keys :string : filter {| i | $i =~ [$value rquote]}]];
+            } catch: {
+                setvar EditorCommandList ();
+            };
+	    $EditorCommandList ?? {setvar EditorCommandList ()};
+	}
+        completion-proc: {| value |
+	    i ::= $EditorCommandList find $value;
+	    if $i {$i ++} {i := 0};
+	    c ::= $EditorCommandList get $i;
+	    $c ?? {c ::= $EditorCommandList get 0};
+	    $c ?? {c := $value};
+	    $main mini-input-value-override $c [$c len];
+        }
+    ;;
+
+    result ALL;
+};
+
+defcommand trace-editor-command {
+    | main window |
+    if {defvar? EditorCommandList} 
+    then: {setvar EditorCommandList ()}
+    else: {defvar EditorCommandList ()};
+
+    mini-input-until-enter $main $window
+        prompt: "Trace editor command: "
+        enter-proc: {| value |
+            f := `File("pmacs-command-trace.txt" mode: a);
+            $f puts  "";
+            $f puts  "***";
+            $f puts  "***";
+            $f puts ["*** Editor command: " . $value];
+            err := <nil>;
+	    try {
+                trace {$window apply-command $main $window "" $value} out: [$f fd?];
+            } catch: {| err |};
+            if $err {
+                $f puts ["ERROR: " $err];
+            };
+            $f puts  "***";
+            $f puts  "";
+            $f close;
+            show-message ["Wrote tracefile to: " . [pwd] "/" "pmacs-command-trace.txt"];
+	}
+        edit-proc: {| value |
+            try {
+                setvar EditorCommandList [msort [$EditorCommand keys :string : filter {| i | $i =~ [$value rquote]}]];
+            } catch: {
+                setvar EditorCommandList ();
+            };
+	    $EditorCommandList ?? {setvar EditorCommandList ()};
+	}
+        completion-proc: {| value |
+	    i ::= $EditorCommandList find $value;
+	    if $i {$i ++} {i := 0};
+	    c ::= $EditorCommandList get $i;
+	    $c ?? {c ::= $EditorCommandList get 0};
+	    $c ?? {c := $value};
+	    $main mini-input-value-override $c [$c len];
+	}
+    ;;
+    
+    result ALL;
+};
+
+defcommand eval-region {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (y x) ::= $window get-source-index $buff $geom;
+    $window mark;
+
+    if [$window get-region] {
+	### eval region
+        (sy sx) ::= $window end-region;
+        (ey ex) ::= $window get-source-index $buff $geom;
+        str ::= $window get-region-string $sy $sx $ey $ex;
+    } {
+        ### eval this line
+        (ey ex) ::= $window get-source-index $buff $geom;
+        str ::= $buff get-buffer-line $ey;
+        str ::= $str ?? "";
+ #       if {and {[$buff get-buffer-length : - 1] > $ey} {$str != ""}} {
+ #           if {[$buff get-buffer-name] = "*Scratch*"} {
+ #               $buff append-string $str;
+ #           };
+ #       };
+    };
+
+    $window apply-command $main $window "" cursor-top-of-line;
+    $window apply-command $main $window "" cursor-down;
+
+    $stdin puts $str;
+    $window display-evaluation;
+    
+    result ALL;
+};
+
+defcommand kill-interp {
+    | main window |
+    
+    mini-input-y-or-n $main $window 
+        prompt: "kill interpriter OK? [y/n]: "
+        yes-proc: {
+            if {defvar? PINTERP} {
+                try {$PINTERP release} catch: {};
+            };
+            reset-stdio;
+            $stderr puts "Interpriter killed.";
+        }
+    ;;
+
+    result ALL;
+};
+
+defcommand send-eof {
+    | main window |
+    $stderr puts "Send eof.";
+    $stdin close;
+    result ALL;
+};
+
+defun chdir-cwd (buff) {
+    r ::= $buff get-buffer-line 0;
+    if $r {
+        l ::= $r split sep: ":";
+        if {[$l len] < 2} {return "./"};
+        if {[$l get 0] = "CWD"} {
+            cwd ::= $l get 1;
+            if $cwd {
+                try {
+                    result ::= $cwd clean;
+                    if {[$result at -1] != "/"} {
+                        $result append! "/";
+                    };
+                    return $result;
+                } catch: {| e |
+                    show-message :bell ["Bad CWD line: " . $r];
+                };
+            };
+        };
+    };
+    return "./";
+};
+
+defcommand cd {
+    | main window |
+    
+    mini-input-until-enter $main $window
+        init-value: [pwd : . "/"] 
+        prompt: "Directory: "
+        enter-proc: {| value |
+            if {[$value len] = 0} {
+                show-message :bell "No directory specified.";
+                return ALL;
+            };
+            directory := $value;
+            cd $directory;
+            show-message ["Current directory is: " . $directory];
+            return ALL;
+        }
+        completion-proc: {| value |
+            if {$value = ""} {
+                fname ::= show-files-in-window $main $window [get-current-buffer-dir $window];
+            } {
+                fname ::= show-files-in-window $main $window $value;
+            };
+	    $window apply-command $main $window "" top-of-buffer;
+	    $main mini-input-value-override $fname [$fname len];
+	    return ALL;
+	}
+        keyin-proc: {| value in-key |
+            if {eq? $in-key KEY_DOWN} {
+                $window apply-command $main $window "" move-half-up;
+                return ALL;
+            };
+            if {eq? $in-key KEY_UP} {
+                $window apply-command $main $window "" move-half-down;
+                return ALL;
+            };
+            if {eq? $in-key "/"} {
+                if {[$value at -2] = "/"} {
+                    $main mini-input-value-override "/" 1;
+                };
+                return ALL;
+            };
+            if {eq? $in-key "~"} {
+                if {or {[$value len] <= 1} {[$value at -2] = "/"}} {
+                    $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
+                };
+                return ALL;
+            };
+        }
+    ;;
+
+    result SELF;
+};
+
+defcommand set-theme {
+    | main window |
+    
+    mini-input-until-enter $main $window
+        prompt: "Theme: "
+        enter-proc: {| value |
+            t := $THEME;
+            setvar THEME $value;
+            try {
+                init-color-DB;
+                $window apply-command $main $window "" refresh-screen;
+            } catch: {| e |
+                show-message :bell [$e cdr];
+                setvar THEME $t;
+            };
+            return ALL;
+        }
+    ;;
+    
+    result ALL;
+};
+
+defcommand set-mode {
+    | main window |
+
+    mini-input-until-enter $main $window 
+        prompt: "Mode: "
+        enter-proc: {| value |
+            $window set-mode $value;
+            $window apply-command $main $window "" refresh-screen;
+            return ALL;
+        }
+    ;;
+
+    result ALL;
+};
+
+defcommand set-line-limit {
+    | main window |
+
+    mini-input-until-enter $main $window
+        prompt: [
+            "Line length limit (current=" .
+                [[true? INTERP_LIMIT_LEN] ??? $INTERP_LIMIT_LEN "none"] "): "
+        ]
+        enter-proc: {| value |
+            if {$value = ""} {
+                show-message "Enter line length limit.";
+                return ALL;
+            };
+            if [$value numeric?] else: {
+                if {eq? "auto" $value} {
+                    if {defvar? INTERP_LIMIT_LEN} {
+                        setvar INTERP_LIMIT_LEN $value;
+                    } {
+                        defvar INTERP_LIMIT_LEN $value;
+                    };
+                } {
+                    show-message "Enter line length limit.";
+                };
+                return ALL;
+            };
+            if {defvar? INTERP_LIMIT_LEN} {
+                setvar INTERP_LIMIT_LEN [$value int];
+            } {
+                defvar INTERP_LIMIT_LEN [$value int];
+            };
+            return ALL;
+        }
+    ;;
+    
+    result SELF;
+};
+
+defcommand set-protect {
+    | main window |
+    buff ::= $window get-buffer;
+    $buff set-protect;
+    show-message "Buffer is protected.";
+    result ALL;
+};
+
+defcommand set-noprotect {
+    | main window |
+    buff ::= $window get-buffer;
+    $buff no-protect;
+    show-message "Buffer is unprotected.";
+    result ALL;
+};
+
+defcommand set-dos {
+    | main window |
+    buff ::= $window get-buffer;
+    $buff set-includeCR <t>;
+    show-message "Set buffer type to DOS.";
+    result ALL;
+};
+
+defcommand set-nodos {
+    | main window |
+    buff ::= $window get-buffer;
+    $buff set-includeCR <nil>;
+    show-message "Set buffer type to non-DOS.";
+    result ALL;
+};
+
+defcommand compile {
+    | main window |
+    
+    mini-input-until-enter $main $window
+        init-value: [pwd : . "/"]
+        prompt: "Directory: "
+        enter-proc: {| value |
+            if {[$value len] = 0} {
+                show-message :bell "No directory specified.";
+                return ALL;
+            };
+            directory := $value;
+            if {file dir? $directory} else: {
+                show-message :bell ["Not directory: " . $directory];
+                return ALL;
+            };
+
+            mini-input-until-enter $main $window
+                init-value: "make -f Makefile "
+                prompt: "Compile: "
+                index: 17
+                enter-proc: {| value |
+                    if {[$value len] = 0} {
+                        show-message :bell "No compile command specified.";
+                        return ALL;
+                    };
+                    cmd := $value;
+                    
+                    ###
+                    ### do compile
+                    ###
+                    cd $directory;
+                    fout ::= new Stream;
+                    ### sts ::= {exec "/bin/sh" "-c" $cmd} redirect-out $fout $fout;
+                    sts := 0;
+                    try {
+                        pipe out: $fout {exec :err-to-stdout "/bin/sh" "-c" $cmd};
+                    } catch: {| e |
+                        sts ::= "<" . [$e car] "> #" [$e cdr];
+                    };
+                    $fout close;
+                    buff ::= new EditBuffer;
+                    BufferManager unregist-buffer "*Grep*";
+                    (result err) ::= $buff load-content  :init-only "grep buffer" buffer-name: "*Grep*";
+                    $buff clear-all;
+                    $buff append-string ["CWD:  " . $directory];
+                    $buff append-string ["EXEC: " . $cmd];
+                    $buff append-string "";
+                    $fout each do: {| r |
+                        $buff append-string $r;
+                    };
+                    fout := <nil>;
+                    $buff append-string "";
+                    $buff append-string ["exit(" . $sts ")"];
+                    
+                    w1 ::= $main get-window-by-name "Window#1";
+                    if $w1 else: {
+                        $main create-split-vertical-window;
+                    };
+                    $main bind-buffer "Window#1" $buff;
+                    window ::= $main get-window-by-name "Window#1";
+                    geom ::= $window get-geom;
+                    $geom set! ViewLine 0;
+                    $geom set! ViewColumn 0;
+                    $window cursor-move-to $geom 0 0;
+                    return ALL;
+                }
+            ;;
+            return ALL;
+        }
+        completion-proc: {| value |
+            if {$value = ""} {
+                fname ::= show-files-in-window $main $window [get-current-buffer-dir $window];
+            } {
+                fname ::= show-files-in-window $main $window $value;
+            };
+	    $window apply-command $main $window "" top-of-buffer;
+	    $main mini-input-value-override $fname [$fname len];
+	    return ALL;
+        }
+        keyin-proc: {| value in-key |
+            if {eq? $in-key KEY_DOWN} {
+                $window apply-command $main $window "" move-half-up;
+                return ALL;
+            };
+            if {eq? $in-key KEY_UP} {
+                $window apply-command $main $window "" move-half-down;
+                return ALL;
+            };
+            if {eq? $in-key "/"} {
+                if {[$value at -2] = "/"} {
+                    $main mini-input-value-override "/" 1;
+                };
+                return ALL;
+            };
+            if {eq? $in-key "~"} {
+                if {or {[$value len] <= 1} {[$value at -2] = "/"}} {
+                    $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
+                };
+                return ALL;
+            }
+        }
+    ;;
+    
+    result All;
+};
+
+defun get-shell () {
+    if [and [file exec? $DEFAULT_SHELL] [! [file dir? $DEFAULT_SHELL]]] {
+        return $DEFAULT_SHELL;
+    };
+    return $EMERGENCY_SHELL;
+};
+
+defcommand shell {
+    | main window |
+    $main suspend [get-shell];
+    result ALL;
+};
+
+defcommand git-pull {
+    | main window |
+    $main suspend [get-shell] "-c" "git pull; echo '--- Press enter key to continue ---'; read";
+    result ALL;
+};
+
+defcommand git-commit {
+    | main window |
+    $main suspend [get-shell] "-c" "git commit .; echo '--- Press enter key to continue ---'; read";
+    result ALL;
+};
+
+defcommand git-push {
+    | main window |
+    $main suspend [get-shell] "-c" "git push; echo '--- Press enter key to continue ---'; read";
+    result ALL;
+};
+
+defcommand show-font {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    str ::= $buff get-buffer-line $ey;
+    str ::= $str ?? "";
+    curs-print [$main get-minibuffer-window : get-curs] $str $DISPLAY_ENCODING 0 0;
+    result SELF;
+};
+
+defcommand show-keycode {
+    | main window |
+    show-message "Input key: ";
+    i := ();
+    while {$i null?} do: {
+        (rtime i) ::= curs-keyin [$window get-curs] 1000 $INPUT_ENCODING 
+            blink: $BLINK
+            blink-fact: $BLINK_FACT
+        ;;
+    };
+    m ::= "" . $i;
+    k ::= $main get-keymap $i;
+    if $k {
+        $m append! " -> ";
+        $m append! $k;
+    } {
+        k := $i;
+    };
+    $m append! " -> ";
+    $m append! [$window get-keybind [$k car]];
+    
+    show-message $m;
+    result SELF;
+};
+
+defcommand set-encoder {
+    | main window |
+    buff ::= $window get-buffer;
+    if {$buff modify?} {
+        show-message :bell "Buffer is modified. Try again after re-open this file.";
+        return SELF;
+    };
+
+    mini-input-until-enter $main $window
+        prompt: ["Encoding UTF-8(u)/EUC-JP(e)/Shift-JIS(s)/RAW(r) [current is " .
+            ["" . [$buff get-encoding]] "]: "]
+        keyin-proc: {| value in-key |
+            enc := <nil>;
+            case  $in-key
+                "u" {enc := "UTF-8F"}
+                "U" {enc := "UTF-8F"}
+                "e" {enc := "EUC-JP"}
+                "E" {enc := "EUC-JP"}
+                "s" {enc := "Shift-JIS"}
+                "S" {enc := "Shift-JIS"}
+                "r" {enc := "RAW"}
+                "R" {enc := "RAW"}
+            ;;
+            if $enc {
+                $main mini-input-end;
+                $buff set-encoding $enc;
+                $buff reload-content;
+                if {$buff enc-error?} {
+                    show-message :bell "File decode error occured!! Try ALT-e and specify another encoding for re-load.";
+                    return ALL;
+                };
+                show-message ["Set encoding to: " . $enc];
+                return ALL;
+            };
+        }
+    ;;
+    
+    result ALL;
+};
+
+defcommand set-tab-width {
+    | main window |
+    tab := 8;
+    if {defvar? DEFAULT_TAB_WIDTH} {
+        tab := $DEFAULT_TAB_WIDTH;
+    };
+    
+    mini-input-until-enter $main $window
+        prompt: ["Set TAB width [current is " . $tab "]: "]
+        enter-proc: {| value |
+            try {
+                if {$value = ""} {
+                    tab := $tab; # set closure value to local value.
+                } {
+                    tab ::= $value int;
+                };
+            } catch: {
+                show-message :bell "Illegal TAB number specified.";
+                return ALL;
+            };
+            if {or [$tab <= 0] [$tab >= 256]} {
+                show-message :bell "Illegal TAB number specified.";
+                return ALL;
+            };
+            if {defvar? DEFAULT_TAB_WIDTH} {
+                setvar DEFAULT_TAB_WIDTH $tab;
+            } {
+                defvar DEFAULT_TAB_WIDTH $tab;
+            };
+            show-message ["Set TAB width to " . $tab "."];
+            return ALL;
+        }
+    ;;
+    
+    result ALL;
+};
+
+defcommand set-buffer-tab-width {
+    | main window |
+    buff ::= $window get-buffer;
+    tab ::= [$buff get-buffer-tab-width] ?? $DEFAULT_TAB_WIDTH;
+
+    mini-input-until-enter $main $window
+        prompt: ["Set buffer TAB width [current is " . $tab "]: "]
+        enter-proc: {| value |
+            try {
+                if {$value = ""} {
+                    tab := $tab; # set closure value to local value.
+                } {
+                    tab ::= $value int;
+                };
+            } catch: {
+                show-message :bell "Illegal TAB number specified.";
+                return ALL;
+            };
+            if {or [$tab < 0] [$tab >= 256]} {
+                show-message :bell "Illegal TAB number specified.";
+                return ALL;
+            };
+            if {$tab = 0} {
+                $buff set-buffer-tab-width <nil>;
+                $window set-buffer-tab-width;
+                show-message "Unset buffer TAB.";
+            } {
+                $buff set-buffer-tab-width $tab;
+                $window set-buffer-tab-width;
+                show-message ["Set buffer TAB width to " . $tab "."];
+            };
+            return ALL;
+        }
+    ;;
+    
+    result ALL;
+};
+
+defcommand brackets-pair {
+    | main window |
+    $window remove-spot-color-item "BRACKETS-PAIR-S";
+    $window remove-spot-color-item "BRACKETS-PAIR-D";
+    (height width) ::= $window get-window-size;
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (y x) ::= $window get-source-index $buff $geom;
+    v ::= $buff get-vector;
+    start := $geom,ViewLine;
+    end ::= $geom,ViewLine + $height : - 1;
+    cur-char ::= $v at $y $x;
+    if {and {$y = 0} {$x = 0}} {
+        (py px) := (0 0);
+        prev-char := "";
+    } {
+        (py px) ::= $v get-prev-pos $y $x;
+        prev-char ::= $v at $py $px;
+    };
+    if {or {"(" = $cur-char} {")" = $cur-char} {"[" = $cur-char}
+           {"]" = $cur-char} {"{" = $cur-char} {"}" = $cur-char}}
+    else: {
+        cur-char := $prev-char;
+        (y x) := ($py $px);
+    };
+    case $cur-char
+       "(" {
+           dir := f;
+           cap-dec := ")";
+           cap-inc := "(";
+       }
+       "[" {
+           dir := f;
+           cap-dec := "]";
+           cap-inc := "[";
+       }
+       "{" {
+           dir := f;
+           cap-dec := "}";
+           cap-inc := "{";
+       }
+       ")" {
+           dir := b;
+           cap-dec := ")";
+           cap-inc := "(";
+       }
+       "]" {
+           dir := b;
+           cap-dec := "]";
+           cap-inc := "[";
+       }
+       "}" {
+           dir := b;
+           cap-dec := "}";
+           cap-inc := "{";
+       }
+       default: {
+           return SELF;
+       }
+    ;;
+
+    find := <nil>;
+    case $dir
+        f {
+            (start-y start-x) ::= $v get-next-pos $y $x;
+            level := 1;
+            $v each-forward-char $start-y $start-x {
+                | cy cx cc |
+                if {$cy > $end} {
+                    return SELF;
+                };
+                if {$cc = $cap-dec} {$level --};
+                if {$cc = $cap-inc} {$level ++};
+                if {$level = 0} {
+                    find := <t>;
+                    break;
+                };
+            };
+        }
+        b {
+            (start-y start-x) ::= $v get-prev-pos $y $x;
+            level := -1;
+            $v each-backward-char $start-y $start-x {
+                | cy cx cc |
+                if {$cy < $start} {
+                    return SELF;
+                };
+                if {$cc = $cap-dec} {$level --};
+                if {$cc = $cap-inc} {$level ++};
+                if {$level = 0} {
+                    find := <t>;
+                    break
+                };
+            };
+        }
+    ;;
+    if $find {
+        $window set-spot-color-item "BRACKETS-PAIR-D" $cy $cx 1 BRACKETS_PAIR;
+        $window set-spot-color-item "BRACKETS-PAIR-S" $y $x 1 BRACKETS_PAIR;
+    };
+    return SELF;
+};

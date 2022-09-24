@@ -1,0 +1,134 @@
+###
+### All Pmacs editor window command definition.
+###
+
+defcommand roll-current-window {
+    | main window |
+    $main roll-current-window;
+    result ALL;
+};
+
+defcommand roll-current-window-backward {
+    | main window |
+    $main roll-current-window-backward;
+    result ALL;
+};
+
+defcommand full-window {
+    | main window |
+    name ::= $window get-window-name;
+    $main create-full-window window-name: $name;
+    result ALL;
+};
+
+defcommand split-vertical-window {
+    | main window |
+    name ::= $window get-window-name;
+    $main create-split-vertical-window window-name: $name;
+    result ALL;
+};
+
+defcommand split-vertical-window-3 {
+    | main window |
+    name ::= $window get-window-name;
+    $main create-split-vertical-window window-name: $name div: 3;
+    result ALL;
+};
+
+defcommand split-vertical-window-4 {
+    | main window |
+    name ::= $window get-window-name;
+    $main create-split-vertical-window window-name: $name div: 4;
+    result ALL;
+};
+
+defcommand split-horizontal-window {
+    | main window |
+    name ::= $window get-window-name;
+    $main create-split-horizontal-window window-name: $name;
+    result ALL;
+};
+
+defcommand split-horizontal-window-3 {
+    | main window |
+    name ::= $window get-window-name;
+    $main create-split-horizontal-window window-name: $name div: 3;
+    result ALL;
+};
+
+defcommand split-horizontal-window-4 {
+    | main window |
+    name ::= $window get-window-name;
+    $main create-split-horizontal-window window-name: $name div: 4;
+    result ALL;
+};
+
+defcommand split-cross-window {
+    | main window |
+    name ::= $window get-window-name;
+    $main create-split-cross-window window-name: $name;
+    result ALL;
+};
+
+defcommand dismiss-current-window {
+    | main window |
+    $window apply-command $main [$main get-current-window] "" roll-current-window-backward;
+    $window apply-command $main [$main get-current-window] "" full-window;
+    result ALL;
+};
+
+defcommand refresh-screen {
+    | main window |
+    $main refresh-screen;
+    result ALL;
+};
+
+defcommand flash {
+    | main window |
+    curs-flash;
+    result ALL;
+};
+
+defcommand window-split-ratio-reset {
+    | main window |
+    setvar VERTICAL_DIV_RATIO 1.0;
+    setvar HORIZONTAL_DIV_RATIO 1.0;
+    $main refresh-screen;
+    result ALL;
+};
+
+defcommand window-grow-right {
+    | main window |
+    if {$VERTICAL_DIV_RATIO > $DIV_RATIO_MIN} {
+        setvar VERTICAL_DIV_RATIO [$VERTICAL_DIV_RATIO - $DIV_RATIO_RES];
+        $main refresh-screen;
+    };
+    result ALL;
+};
+
+defcommand window-grow-left {
+    | main window |
+    if {$VERTICAL_DIV_RATIO < $DIV_RATIO_MAX} {
+        setvar VERTICAL_DIV_RATIO [$VERTICAL_DIV_RATIO + $DIV_RATIO_RES];
+        $main refresh-screen;
+    };
+    result ALL;
+};
+
+defcommand window-grow-lower {
+    | main window |
+    if {$HORIZONTAL_DIV_RATIO > $DIV_RATIO_MIN} {
+        setvar HORIZONTAL_DIV_RATIO [$HORIZONTAL_DIV_RATIO - $DIV_RATIO_RES];
+        $main refresh-screen;
+    };
+    result ALL;
+};
+
+defcommand window-grow-upper {
+    | main window |
+    if {$HORIZONTAL_DIV_RATIO < $DIV_RATIO_MAX} {
+        setvar HORIZONTAL_DIV_RATIO [$HORIZONTAL_DIV_RATIO + $DIV_RATIO_RES];
+        $main refresh-screen;
+    };
+    result ALL;
+};

@@ -1,0 +1,550 @@
+###
+### All Pmacs editor edit command definition.
+###
+
+defcommand insert-character {
+    | main window key |
+    $window insert-string $key;
+    result ALL;
+};
+
+defcommand insert-tab {
+    | main window |
+    $window insert-string "\t";
+    result ALL;
+};
+
+defcommand insert-return {
+    | main window |
+    $window insert-string "\r";
+    result ALL;
+};
+
+defcommand insert-new-line {
+    | main window |
+    $window apply-command $main $window "" cursor-top-of-line;
+    $window insert-string "\r";
+    $window apply-command $main $window "" cursor-up;
+    result ALL;
+};
+
+defcommand delete-character {
+    | main window |
+    $window delete-character;
+    result ALL;
+};
+
+defcommand delete-word {
+    | main window |
+    $window apply-command $main $window "" select-region-word;
+    [$window in-region?] ?? {
+        show-message "Word not found.";
+        return ALL;
+    };
+    $window apply-command $main $window "" cut-region;
+    result ALL;
+};
+
+defcommand delete-to-end-of-line {
+    | main window |
+    if {! [$window get-region]} {
+        $window apply-command $main $window "" start-region;
+    };
+    $window apply-command $main $window "" cursor-end-of-line;
+    $window apply-command $main $window "" cut-region;
+    result ALL;
+};
+
+defcommand backdelete-character {
+    | main window |
+    $window backdelete-character;
+    result ALL;
+};
+
+defcommand undo-buffer {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (new-y new-x) ::= $buff undo;
+    if [$buff undo-empty?] {$buff no-modify};
+    $new-y ?? {
+        ###$buff no-modify;
+	show-message :bell "Undo buffer is empty.";
+	return SELF;
+    };
+    (line col) ::= $window get-cursor-index $buff $new-y $new-x;
+    $window set-freecursor <nil>;
+    $geom set! IndexColumn.SAVE $col;
+    $geom set! CursorLine [$line - $geom,ViewLine];
+    $geom set! CursorColumn [$col - $geom,ViewColumn];
+
+    (y x) ::= $window get-screen-size;
+    $window fit-to-cursor $geom $y $x;
+    result ALL;
+};
+
+defcommand redo-buffer {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (new-y new-x) ::= $buff redo;
+    $new-y ?? {
+	show-message :bell "Redo buffer is empty.";
+	return SELF;
+    };
+    (line col) ::= $window get-cursor-index $buff $new-y $new-x;
+    $window set-freecursor <nil>;
+    $geom set! IndexColumn.SAVE $col;
+    $geom set! CursorLine [$line - $geom,ViewLine];
+    $geom set! CursorColumn [$col - $geom,ViewColumn];
+
+    (y x) ::= $window get-screen-size;
+    $window fit-to-cursor $geom $y $x;
+    result ALL;
+};
+
+defcommand start-region {
+    | main window |
+    buff ::= $window get-buffer;
+    if [$window get-region] {
+	show-message "End region.";
+	$window end-region;
+	return SELF;
+    };
+    geom ::= $window get-geom;
+    (cy cx) ::= $window get-source-index $buff $geom;
+    $window start-region $cy $cx;
+    show-message "Start region.";
+    result SELF;
+};
+
+defcommand copy-region {
+    | main window |
+    buff ::= $window get-buffer;
+    [$window get-region] ?? {
+	show-message :bell "Not start region. Press Ctrl+[SPACE] to start region.";
+	$window end-region;
+	return SELF;
+    };
+    geom ::= $window get-geom;
+    (sy sx) ::= $window end-region;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    $window copy-region $sy $sx $ey $ex;
+    show-message "Copied.";
+    result SELF;
+};
+
+defcommand cut-region {
+    | main window |
+    buff ::= $window get-buffer;
+    [$window get-region] ?? {
+	show-message :bell "Not start region. Press Ctrl+[SPACE] to start region.";
+	$window end-region;
+	return SELF;
+    };
+    geom ::= $window get-geom;
+    (sy sx) ::= $window end-region;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    (line col) ::= $window cut-region $sy $sx $ey $ex;
+    (line col) ::= $window get-cursor-index $buff $line $col;
+    show-message "Cut.";
+    $window set-freecursor <nil>;
+    $geom set! IndexColumn.SAVE $col;
+    $geom set! CursorLine [$line - $geom,ViewLine];
+    $geom set! CursorColumn [$col - $geom,ViewColumn];
+
+    (y x) ::= $window get-screen-size;
+    $window fit-to-cursor $geom $y $x;
+    result ALL;
+};
+
+defcommand select-region-all {
+    | main window |
+    $window mark;
+    if {$window get-region} {
+        $window apply-command $main $window "" start-region;
+    };
+    $window apply-command $main $window "" top-of-buffer;
+    $window apply-command $main $window "" start-region;
+    $window apply-command $main $window "" bottom-of-buffer;
+    result ALL;
+};
+
+defcommand select-region-paragraph {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    $window mark;
+    $window end-region;
+    $window apply-command $main $window "" cursor-top-of-line;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    r ::= $buff get-buffer-line $ey;
+    r ::= $r ?? "";
+    if {or {[$r at 0] = " "} {[$r at 0] = ""} {[$r at 0] = "\t"}} {
+        $window apply-command $main $window "" move-previous-paragraph;
+    };
+    if {! [$window get-region]} {
+        $window apply-command $main $window "" start-region;
+    };
+    $window apply-command $main $window "" move-next-paragraph;
+    $window apply-command $main $window "" cursor-down;
+    result SELF;
+};
+
+defcommand select-region-word {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (y x) ::= $window get-source-index $buff $geom;
+    r ::= $buff get-buffer-line $y;
+
+    $window end-region;
+    $r ?? {return ALL};
+    
+    i := 0;
+    if {or {[$r at $x] alphanumeric?} {[$r at $x] = "-"}} {
+        found := <t>;
+        s ::= [$x = 0] ??? $x [$x - 1];
+        i := $s;
+        $s each to: 0 do: {| i |
+            if {! [or {[$r at $i] alphanumeric?} {[$r at $i] = "-"}]} {
+                i ::= $i + 1;
+                break;
+            };
+        };
+    } {
+        found := <nil>;
+        s ::= $x + 1;
+        i := $s;
+        $s each to: [$r len] do: {| i |
+            if {or {[$r at $i] alphanumeric?} {[$r at $i] = "-"}} {
+                found := <t>;
+                break;
+            };
+        };
+    };
+    $found ?? {return ALL};
+    
+    $window cursor-move-to $geom $y $i;
+    $window apply-command $main $window "" start-region;
+
+    $i each to: [$r len] do: {| j |
+        if {! [or {[$r at $j] alphanumeric?} {[$r at $j] = "-"}]} {
+            break;
+        };
+    };
+    $window cursor-move-to $geom $y $j;
+
+    result SELF;
+};
+
+defcommand paste-buffer {
+    | main window |
+    buff ::= $window get-buffer;
+    str ::= $window get-copy-buffer;
+    if {$str = ""} {
+	show-message :bell "Copy buffer is empty.";
+	return SELF;
+    };
+    geom ::= $window get-geom;
+    if [$window get-region] {
+        (sy sx) ::= $window end-region;
+        (ey ex) ::= $window get-source-index $buff $geom;
+        (line col) ::= $window delete-region $sy $sx $ey $ex;
+    } {
+        (sy sx) ::= $window get-source-index $buff $geom;
+    };
+    (cy cx) ::= $buff insert-string-at $str $sy $sx;
+    $window set-copy-buffer $str;
+    show-message "Paste.";
+    (line col) ::= $window get-cursor-index $buff $cy $cx;
+    $window set-freecursor <nil>;
+    $geom set! IndexColumn.SAVE $col;
+    $geom set! CursorLine [$line - $geom,ViewLine];
+    $geom set! CursorColumn [$col - $geom,ViewColumn];
+
+    (y x) ::= $window get-screen-size;
+    $window fit-to-cursor $geom $y $x;
+    result ALL;
+};
+
+defun cursor-on-search-regex (y x str buff) {
+    r ::= $buff get-buffer-line $y;
+    $r ?? {return <nil>};
+    sl ::= $r =~ :all $str;
+    $sl ?? {return <nil>};
+    $sl each do: {| el |
+        if {and {$x >= [$el get 0]} {$x < [$el get 1]}} {
+            return [$el get 2];
+        };
+    };
+    return <nil>;
+};
+defcommand smart-newline {
+    | main window |
+    $window set-freecursor <nil>;
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    str-cur ::= $buff get-buffer-line $ey;
+    if {and $str-cur {$ex >= [$str-cur len]}} {
+        ### current line smart indent
+        str-prev := "";
+        if {$ey > 0} {
+            idx-y := 1;
+            loop do: {
+                str-prev ::= $buff get-buffer-line [$ey - $idx-y];
+                if $str-prev else: {
+                    str-prev := "";
+                    break;
+                };
+                if {[$str-prev len] > 0} {break};
+                $idx-y ++;
+            };
+        };
+        cur-level ::= get-next-indent-count-backward $str-cur;
+        if {$cur-level < 0} {
+            prev-level ::= get-indent-level $str-prev;
+            prev-indent ::= get-next-indent-count $str-prev;
+            cur-level-count ::= $cur-level + $prev-indent;
+            if [$cur-level-count < 0] {cur-level-count := -1};
+            if {or {$cur-level-count < 0}
+                   {and {$cur-level-count = 0} {$prev-indent > 0}}} {
+                cur-indent ::= $prev-level + [$cur-level-count * $INDENT_WIDTH];
+                cur-indent ::= [$cur-indent < 0] ??? 0 $cur-indent;
+                new-str ::= [" " repeat $cur-indent] . [$str-cur clean];
+                $buff line-update $new-str $ey;
+                $geom set! IndexColumn.SAVE [$new-str len];
+            };
+        };
+    };
+    
+    ### insert newline
+    $window apply-command $main $window "\r" insert-character;
+    
+    ### next line smart indent
+    (ey ex) ::= $window get-source-index $buff $geom;
+    str-prev := "";
+    if {$ey > 0} {
+        idx-y := 1;
+        loop do: {
+            str-prev ::= $buff get-buffer-line [$ey - $idx-y];
+            if $str-prev else: {
+                str-prev := "";
+                break;
+            };
+            if {[$str-prev len] > 0} {break};
+            $idx-y ++;
+        };
+    };
+    cur-level ::= get-indent-level $str-prev;
+    next-level-count ::= get-next-indent-count $str-prev;
+
+    if {$cur-level > 0} {
+        $window apply-command $main $window "" smart-indent;
+    } {
+        if {$next-level-count > 0} {
+            $window apply-command $main $window "" smart-indent;
+        };
+    };
+    
+    result ALL;
+};
+
+defcommand smart-indent {
+    | main window |
+    $window set-freecursor <nil>;
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    str ::= $buff get-buffer-line $ey;
+    str ::= $str ?? "";
+    str-prev := "";
+    if {$ey > 0} {
+        idx-y := 1;
+        loop do: {
+            str-prev ::= $buff get-buffer-line [$ey - $idx-y];
+            if $str-prev else: {
+                str-prev := "";
+                break;
+            };
+            if {[$str-prev len] > 0} {break};
+            $idx-y ++;
+        };
+    };
+    cur-level ::= get-indent-level $str-prev;
+    next-level-count ::= get-next-indent-count $str-prev;
+    next-level-count ::= [$next-level-count > 0] ??? 1 0;
+    next-indent ::= $cur-level + [$next-level-count * $INDENT_WIDTH];
+    next-level-count ::= get-next-indent-count-backward $str;
+    if {$next-level-count < 0} {
+        next-indent ::= $next-indent - $INDENT_WIDTH;
+    };
+
+    cur-pos ::= curs-index-to-pos $str $ex $DEFAULT_TAB_WIDTH;
+    if {$cur-pos < $next-indent} {
+	# smart indent
+	new-str ::= [" " repeat $next-indent] . [$str clean];
+        $buff line-update $new-str $ey;
+        $geom set! IndexColumn.SAVE $next-indent;
+    } {
+	# insert indent
+	in ::= $INDENT_WIDTH - [$cur-pos % $INDENT_WIDTH];
+	$buff insert-string-at [" " repeat $in] $ey $ex;
+        $geom set! IndexColumn.SAVE [$geom get IndexColumn.SAVE : + $in];
+    };
+    
+    result ALL;
+};
+
+defun get-indent-level (str) {
+    if {$str = ""} {return 0};
+
+    str ::= $str . "x";
+    0 each to: [$str len : - 1] do: {| i |
+	c ::= $str at $i;
+	if {! [or [$c = " "] [$c = "\t"]]} {break};
+    };
+    return [curs-index-to-pos $str $i $DEFAULT_TAB_WIDTH];
+};
+
+defun get-next-indent-count (str) {
+    kakko-maru := 0; ### '(' ')' balance count
+    kakko-nami := 0; ### '{' '}' balance count
+    kakko-kaku := 0; ### '[' ']' balance count
+
+    if {[[$str clean] at -1] = ":"} {return 1};
+    
+    [$str len : - 1] each to: 0 do: {| i |
+	c ::= $str at $i;
+	case $c
+	  "(" {$kakko-maru ++}
+	  "{" {$kakko-nami ++}
+	  "[" {$kakko-kaku ++}
+	  ")" {$kakko-maru --}
+	  "}" {$kakko-nami --}
+	  "]" {$kakko-kaku --}
+	;
+        if {or {$kakko-maru > 0} {$kakko-nami > 0} {$kakko-kaku > 0 }} {break};
+    };
+
+    i ::= $kakko-maru + $kakko-nami : + $kakko-kaku;
+    return [cond
+        {$i = 0} {break  0}
+        {$i > 0} {break  1}
+        {$i < 0} {break -1}
+    ];
+};
+
+defun get-next-indent-count-backward (str) {
+    kakko-maru := 0; ### '(' ')' balance count
+    kakko-nami := 0; ### '{' '}' balance count
+    kakko-kaku := 0; ### '[' ']' balance count
+    
+    0 each to: [$str len : - 1] do: {| i |
+	c ::= $str at $i;
+	case $c
+	  "(" {$kakko-maru ++}
+	  "{" {$kakko-nami ++}
+	  "[" {$kakko-kaku ++}
+	  ")" {$kakko-maru --}
+	  "}" {$kakko-nami --}
+	  "]" {$kakko-kaku --}
+	;
+        if {or {$kakko-maru < 0} {$kakko-nami < 0} {$kakko-kaku < 0 }} {break};
+    };
+
+    i ::= $kakko-maru + $kakko-nami : + $kakko-kaku;
+    return [cond
+        {$i = 0} {break  0}
+        {$i > 0} {break  1}
+        {$i < 0} {break -1}
+    ];
+};
+
+defcommand smart-dedent {
+    | main window |
+    $window set-freecursor <nil>;
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    str ::= $buff get-buffer-line $ey;
+    str ::= $str ?? "";
+    cur-level ::= get-indent-level $str;
+    next-indent ::= [$cur-level / $INDENT_WIDTH] - 1 : * $INDENT_WIDTH;
+    if {$next-indent < 0} {return ALL};
+    new-str ::= [" " repeat $next-indent] . [$str clean];
+    $buff line-update $new-str $ey;
+    $geom set! IndexColumn.SAVE $next-indent;
+    
+    result ALL;
+};
+
+defcommand replace-buffer {
+    | main window |
+
+    mini-input-until-enter $main $window
+        prompt: "Replace string: "
+        enter-proc: {| value |
+	    froms := $value;
+            mini-input-until-enter $main $window
+                prompt: ["Replace string [" . $froms "] to: "]
+                enter-proc: {| value |
+                    count ::= [$window get-buffer] replace-buffer $froms $value;
+                    show-message ["Replace [" . $froms "] to [" $value "] " $count " times completed."];
+                    return ALL;
+	        }
+                cancel-proc: {
+                    show-message "Replace canceled.";
+                    return ALL;
+                }
+            ;;
+        }
+        cancel-proc: {
+            show-message "Replace canceled.";
+            return ALL;
+        }
+    ;;
+    
+    result SELF;
+};
+
+defcommand replace-region {
+    | main window |
+    [$window get-region] ?? {
+        show-message "Please select a region first.";
+        return SELF;
+    };
+
+    mini-input-until-enter $main $window 
+        prompt: "Region replace string: "
+        enter-proc: {| value |
+	    froms := $value;
+            mini-input-until-enter $main $window
+                prompt: ["Region replace string [" . $froms "] to: "]
+                enter-proc: {| value |
+                    if [$window get-region] {
+                        buff ::= $window get-buffer;
+                        geom ::= $window get-geom;
+                        (sy sx) ::= $window end-region;
+                        (ey ex) ::= $window get-source-index $buff $geom;
+                    };
+                    if {$sy > $ey} {(sy ey) := ($ey $sy)};
+                    count ::= [$window get-buffer] replace-region $froms $value $sy $ey;
+                    show-message ["Region replace [" . $froms "] to [" $value "] " $count " times completed in region (" $sy "," $ey ")."];
+                    return ALL;
+	        }
+                cancel-proc: {
+                    show-message "Region replace canceled.";
+                    return ALL;
+                }
+            ;;
+        }
+        cancel-proc: {
+            show-message "Region replace canceled.";
+            return ALL;
+        }
+    ;;
+
+    result ALL;
+};

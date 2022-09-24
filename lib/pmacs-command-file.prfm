@@ -1,0 +1,541 @@
+###
+### All Pmacs editor file command definition.
+###
+
+defcommand open-file {
+    | main window |
+    
+    mini-input-until-enter $main $window 
+        init-value: [get-current-buffer-dir $window : . "/"]
+        prompt: "Open file: "
+        cancel-proc: {
+	    show-message "Canceled.";
+            return ALL;
+        }
+        enter-proc: {| value |
+	    if {[$value len] = 0} {
+		show-message :bell "No file name specified.";
+		return ALL;
+	    };
+            path ::= path-adjust [
+		{[$value sub 0 1] = "/"} ???
+		    $value
+		    [get-current-buffer-dir $window : . "/" $value]
+	    ];
+            if {file dir? $path} {
+                dired-open $main $window $path;
+                return ALL;
+            };
+	    buff ::= BufferManager get-buffer-by-path $path;
+            if $buff {
+		$MainWindow bind-buffer [$window get-window-name] $buff;
+		return ALL;
+            };
+	    buff ::= new EditBuffer;
+	    (result err) ::= $buff load-content $path;
+            if {$buff enc-error?} {
+                show-message :bell "File decode error occured!! Try ALT-e and specify another encoding for re-load.";
+            };
+	    $MainWindow bind-buffer [$window get-window-name] $buff;
+	    $result ?? {show-message :bell ["Open Failed, path: " . $value " ("  $err ")"]};
+            return ALL;
+        }
+        completion-proc: {| value |
+            if {$value = ""} {
+                fname ::= show-files-in-window $main $window [get-current-buffer-dir $window];
+            } {
+                fname ::= show-files-in-window $main $window $value;
+            };
+	    $window apply-command $main $window "" top-of-buffer;
+	    $main mini-input-value-override $fname [$fname len];
+	    return ALL;
+        }
+        keyin-proc: {| value in-key |
+            if {eq? $in-key KEY_DOWN} {
+                $window apply-command $main $window "" move-half-up;
+                return ALL;
+            };
+            if {eq? $in-key KEY_UP} {
+                $window apply-command $main $window "" move-half-down;
+                return ALL;
+            };
+            if {eq? $in-key "/"} {
+                if {[$value at -2] = "/"} {
+                    $main mini-input-value-override "/" 1;
+                };
+                return ALL;
+            };
+            if {eq? $in-key "~"} {
+                if {or {[$value len] <= 1} {[$value at -2] = "/"}} {
+                    $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
+                };
+                return ALL;
+            };
+        }
+    ;;
+    
+    result ALL;
+};
+
+defcommand view-file {
+    | main window |
+
+    mini-input-until-enter $main $window 
+        init-value: [get-current-buffer-dir $window : . "/"]
+        prompt: "View file: "
+        cancel-proc: {
+            show-message "Canceled.";
+            return ALL;
+        }
+        enter-proc: {| value |
+	    if {[$value len] = 0} {
+		show-message :bell "No file name specified.";
+		return ALL;
+	    };
+            path ::= path-adjust [
+		{[$value sub 0 1] = "/"} ???
+		    $value
+		    [get-current-buffer-dir $window : . "/" $value]
+	    ];
+            if {file dir? $path} {
+                dired-open $main $window $path;
+                return ALL;
+            };
+	    buff ::= BufferManager get-buffer-by-path $path;
+            if $buff {
+                $buff set-protect;
+		$MainWindow bind-buffer [$window get-window-name] $buff;
+		return ALL;
+            };
+	    buff ::= new EditBuffer;
+	    (result err) ::= $buff load-content $path;
+            if {$buff enc-error?} {
+                show-message :bell "File decode error occured!! Try ALT-e and specify another encoding for re-load.";
+            };
+            $buff set-protect;
+	    $MainWindow bind-buffer [$window get-window-name] $buff;
+	    $result ?? {show-message :bell ["Open Failed, path: " . $value " ("  $err ")"]};
+            return ALL;
+	}
+        completion-proc: {| value |
+            if {$value = ""} {
+                fname ::= show-files-in-window $main $window [get-current-buffer-dir $window];
+            } {
+                fname ::= show-files-in-window $main $window $value;
+            };
+	    $window apply-command $main $window "" top-of-buffer;
+	    $main mini-input-value-override $fname [$fname len];
+	    return ALL;
+        }
+        keyin-proc: {| value in-key |
+            if {eq? $in-key KEY_DOWN} {
+                $window apply-command $main $window "" move-half-up;
+                return ALL;
+            };
+            if {eq? $in-key KEY_UP} {
+                $window apply-command $main $window "" move-half-down;
+                return ALL;
+            };
+            if {eq? $in-key "/"} {
+                if {[$value at -2] = "/"} {
+                    $main mini-input-value-override "/" 1;
+                };
+                return ALL;
+            };
+            if {eq? $in-key "~"} {
+                if {or {[$value len] <= 1} {[$value at -2] = "/"}} {
+                    $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
+                };
+                return ALL;
+            };
+        }
+    ;;
+    
+    result SELF;
+};
+
+defcommand read-file {
+    | main window |
+
+    mini-input-until-enter $main $window 
+        init-value: [get-current-buffer-dir $window : . "/"]
+        prompt: "Read file: "
+        cancel-proc: {
+	    show-message "Canceled.";
+            return ALL;
+        }
+        enter-proc: {| value |
+	    if {[$value len] = 0} {
+		show-message :bell "No file name specified.";
+		return ALL;
+	    };
+            path ::= path-adjust [
+		{[$value sub 0 1] = "/"} ???
+		    $value
+		    [get-current-buffer-dir $window : . "/" $value]
+	    ];
+	    buff ::= $window get-buffer;
+            geom ::= $window get-geom;
+            $buff ?? {
+                show-message :bell "No buffer.";
+                return ALL;
+            };
+            f := <nil>;
+            try {
+                f ::= new File init: ($path mode: i);
+                $f set-ignore-cr $FILE_IGNORE_CR;
+                $f set-encoding [$buff get-encoding];
+                (line col) ::= $window get-source-index $buff $geom;
+                $f each do: {| r |
+                    $buff insert-string-at [$r . "\r"] $line 0;
+                    $line ++;
+                };
+                $window cursor-move-to $geom $line 0;
+            }
+            catch: {| e |
+                show-message :bell ["File read error, " . [$e cdr]];
+                return ALL;
+            }
+            fin: {
+                if $f {$f close};
+            };
+        }
+        completion-proc: {| value |
+            if {$value = ""} {
+                fname ::= show-files-in-window $main $window [get-current-buffer-dir $window];
+            } {
+                fname ::= show-files-in-window $main $window $value;
+            };
+	    $window apply-command $main $window "" top-of-buffer;
+	    $main mini-input-value-override $fname [$fname len];
+	    return ALL;
+        }
+        keyin-proc: {| value in-key |
+            if {eq? $in-key KEY_DOWN} {
+                $window apply-command $main $window "" move-half-up;
+                return ALL;
+            };
+            if {eq? $in-key KEY_UP} {
+                $window apply-command $main $window "" move-half-down;
+                return ALL;
+            };
+            if {eq? $in-key "/"} {
+                if {[$value at -2] = "/"} {
+                    $main mini-input-value-override "/" 1;
+                };
+                return ALL;
+            };
+            if {eq? $in-key "~"} {
+                if {or {[$value len] <= 1} {[$value at -2] = "/"}} {
+                    $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
+                };
+                return ALL;
+            };
+        }
+    ;;
+
+    result SELF;
+};
+
+defcommand save-buffer {
+    | main window |
+    __buff_in_clojure__ ::= $window get-buffer;
+    path ::= $__buff_in_clojure__ get-path;
+
+    if {or {nil? $path} {$path = ""}} {
+        mini-input-until-enter $main $window
+            init-value: [get-current-buffer-dir $window : . "/"]
+            prompt: "Save file name: "
+            cancel-proc: {
+		show-message "Canceled.";
+                return ALL;
+            }
+            completion-proc: {| value |
+                if {$value = ""} {
+                    fname ::= show-files-in-window $main $window [get-current-buffer-dir $window];
+                } {
+                    fname ::= show-files-in-window $main $window $value;
+                };
+	        $window apply-command $main $window "" top-of-buffer;
+		$main mini-input-value-override $fname [$fname len];
+		return ALL;
+            }
+	    enter-proc: {| value |
+		path ::= path-adjust [
+                    {[$value sub 0 1] = "/"} ???
+                        $value
+                        [get-current-buffer-dir $window : . "/" $value]
+                ];
+
+		if [file exists? $path] {
+		    mini-input-fully-yes-or-no $main $window 
+                        prompt: "File already exist, overwrite? [yes or ESC]: "
+                        no-proc: {
+			    show-message "Canceled.";
+			    return ALL;
+                        }
+                        yes-proc: {
+			    (result err) ::= $__buff_in_clojure__ save-content path: $path;
+			    if $result {
+				show-message "Save Done.";
+			    } {
+				show-message :bell ["Save Failed, path: " . $path " (" $err ")"];
+			    };
+			    $MainWindow bind-buffer [$window get-window-name] $__buff_in_clojure__;
+			    return ALL;
+			}
+                    ;;
+		} {
+		    (result err) ::= $__buff_in_clojure__ save-content path: $path;
+		    if $result {
+			show-message "Save Done.";
+		    } {
+			show-message :bell ["Save Failed, path: " . $path " (" $err ")"];
+		    };
+		    $MainWindow bind-buffer [$window get-window-name] $__buff_in_clojure__;		    
+		    return ALL;
+		};
+            }
+            keyin-proc: {| value in-key |
+                if {eq? $in-key KEY_DOWN} {
+                    $window apply-command $main $window "" move-half-up;
+                    return ALL;
+                };
+                if {eq? $in-key KEY_UP} {
+                    $window apply-command $main $window "" move-half-down;
+                    return ALL;
+                };
+                if {eq? $in-key "/"} {
+                    if {[$value at -2] = "/"} {
+                        $main mini-input-value-override "/" 1;
+                    };
+                    return ALL;
+                };
+                if {eq? $in-key "~"} {
+                    if {or {[$value len] <= 1} {[$value at -2] = "/"}} {
+                        $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
+                    };
+                    return ALL;
+                };
+            }
+        ;;
+
+        return ALL;
+    };
+
+    if [$__buff_in_clojure__ modified-by-another-process] {
+        show-message "" :bell;
+        mini-input-fully-yes-or-no $main $window
+            prompt: ["Maybe this file modified by anothor process. Really save file? (" . $path ") [yes or ESC]: "]
+            no-proc: {
+                show-message "Canceled.";
+                return ALL;
+            }
+            yes-proc: { 
+                (result err) ::= $__buff_in_clojure__ save-content;
+                if $result {
+                    show-message "Save Done.";
+                } {
+                    show-message :bell ["Save Failed, path: " . $path " (" $err ")"];
+                };
+                return ALL;
+            }
+        ;;
+        result SELF;
+    } {
+        mini-input-y-or-n $main $window
+            prompt: ["Save file? (" . $path ") [y/n]: "]
+            no-proc: {
+                show-message "Canceled.";
+                return ALL;
+            }
+            yes-proc: {
+                (result err) ::= $__buff_in_clojure__ save-content;
+                if $result {
+                    show-message "Save Done.";
+                } {
+                    show-message :bell ["Save Failed, path: " . $path " (" $err ")"];
+                };
+                return ALL;
+            }
+        ;;
+        
+        result ALL;
+    };
+};
+
+defcommand save-buffer-as {
+    | main window |
+    __buff_in_clojure__ ::= $window get-buffer;
+    path ::= $__buff_in_clojure__ get-path;
+
+    mini-input-until-enter $main $window
+        init-value: [get-current-buffer-dir $window : . "/"]
+        prompt: "Save file name: "
+        cancel-proc: {
+	    show-message "Canceled.";
+            return ALL;
+        }
+        completion-proc: {| value |
+            if {$value = ""} {
+                fname ::= show-files-in-window $main $window [get-current-buffer-dir $window];
+            } {
+                fname ::= show-files-in-window $main $window $value;
+            };
+	    $window apply-command $main $window "" top-of-buffer;
+	    $main mini-input-value-override $fname [$fname len];
+	    return ALL;
+        }
+        enter-proc: {| value |
+	    path ::= path-adjust [
+                {[$value sub 0 1] = "/"} ???
+		    $value
+                    [get-current-buffer-dir $window : . "/" $value]
+            ];
+
+	    if [file exists? $path] {
+                mini-input-fully-yes-or-no $main $window
+                    prompt: "File already exist, overwrite? [yes or ESC]: "
+                    no-proc: {
+                        show-message "Canceled.";
+                        return ALL;
+                    }
+		    yes-proc: {
+                        (result err) ::= $__buff_in_clojure__ save-content path: $path;
+                        if $result {
+                            show-message "Save Done.";
+                        } {
+                            show-message :bell ["Save Failed, path: " . $path " (" $err ")"];
+                        };
+                        $MainWindow bind-buffer [$window get-window-name] $__buff_in_clojure__;
+                        return ALL;
+		    }
+                ;;
+	    } {
+		(result err) ::= $__buff_in_clojure__ save-content path: $path;
+		if $result {
+                    show-message "Save Done.";
+                } {
+                    show-message :bell ["Save Failed, path: " . $path " (" $err ")"];
+		};
+		$MainWindow bind-buffer [$window get-window-name] $__buff_in_clojure__;
+		return ALL;
+	    };
+        }
+        keyin-proc: {| value in-key |
+            if {eq? $in-key KEY_DOWN} {
+                $window apply-command $main $window "" move-half-up;
+                return ALL;
+            };
+            if {eq? $in-key KEY_UP} {
+                $window apply-command $main $window "" move-half-down;
+                return ALL;
+            };
+            if {eq? $in-key "/"} {
+                if {[$value at -2] = "/"} {
+                    $main mini-input-value-override "/" 1;
+                };
+                return ALL;
+            };
+            if {eq? $in-key "~"} {
+                if {or {[$value len] <= 1} {[$value at -2] = "/"}} {
+                    $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
+                };
+                return ALL;
+            };
+        }
+    ;;
+    
+    result ALL;
+};
+
+defcommand exit {
+    | main window |
+    l ::= BufferManager get-buffer-list : filter {| i | "*" != [$i at 0]};
+    do_exit := <t>;
+    $l each do: {| buff-name |
+	buffer ::= BufferManager get-buffer $buff-name;
+        if {$buffer modify?} {
+	    do_exit := <nil>;
+        };
+    };
+    if $do_exit {
+        exit
+    } {
+        show-message :bell "CAUTION: Modified buffer is exists!! Try again after save the buffer or kill.";
+    };
+    
+    result SELF;
+};
+
+defcommand read-grep-file {
+    | main window |
+    
+    mini-input-until-enter $main $window
+        init-value: [pwd : . "/"]
+        prompt: "Read grep file: "
+        enter-proc: {| value |
+            if {[$value len] = 0} {
+                show-message :bell "No grep file specified.";
+                return ALL;
+            };
+            file := $value;
+            if {file read? $file} else: {
+                show-message :bell ["Not readable file: " . $file];
+                return ALL;
+            };
+            ###
+            ### do read grep file
+            ###
+            BufferManager unregist-buffer "*Grep*";
+            buff ::= new EditBuffer;
+            (result err) ::= $buff load-content $file buffer-name: "*Grep*";
+            $result ?? {
+                show-message :bell ["Open Failed, path: " . $file " ("  $err ")"];
+                return ALL;
+            };
+            $main create-split-vertical-window;
+            $main bind-buffer "Window#1" $buff;
+            window ::= $main get-window-by-name "Window#1";
+            geom ::= $window get-geom;
+            $geom set! ViewLine 0;
+            $geom set! ViewColumn 0;
+            $window cursor-move-to $geom 0 0;
+            return ALL;
+        }
+        completion-proc: {| value |
+            if {$value = ""} {
+                fname ::= show-files-in-window $main $window [get-current-buffer-dir $window];
+            } {
+                fname ::= show-files-in-window $main $window $value;
+            };
+	    $window apply-command $main $window "" top-of-buffer;
+	    $main mini-input-value-override $fname [$fname len];
+	    return ALL;
+        }
+        keyin-proc: {| value in-key |
+            if {eq? $in-key KEY_DOWN} {
+                $window apply-command $main $window "" move-half-up;
+                return ALL;
+            };
+            if {eq? $in-key KEY_UP} {
+                $window apply-command $main $window "" move-half-down;
+                return ALL;
+            };
+            if {eq? $in-key "/"} {
+                if {[$value at -2] = "/"} {
+                    $main mini-input-value-override "/" 1;
+                };
+                return ALL;
+            };
+            if {eq? $in-key "~"} {
+                if {or {[$value len] <= 1} {[$value at -2] = "/"}} {
+                    $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
+                };
+                return ALL;
+            };
+        }
+    ;;
+    
+    result ALL;
+};

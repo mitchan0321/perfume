@@ -1,0 +1,369 @@
+###
+### All Pmacs editor buffer command definition.
+###
+
+defcommand next-buffer {
+    | main window |
+    $main next-buffer;
+    result ALL;
+};
+
+defcommand previous-buffer {
+    | main window |
+    $main previous-buffer;
+    result ALL;
+};
+
+defcommand next-buffer-anothor-window {
+    | main window |
+    $main roll-current-window;
+    $main next-buffer;
+    $main roll-current-window-backward;
+    result ALL;
+};
+
+defcommand previous-buffer-anothor-window {
+    | main window |
+    $main roll-current-window;
+    $main previous-buffer;
+    $main roll-current-window-backward;
+    result ALL;
+};
+
+defcommand kill-buffer {
+    | main window |
+    buff ::= $window get-buffer;
+    if [$buff modify?] {
+        mini-input-fully-yes-or-no $main $window
+            prompt: "This buffer is modified, really kill? [yes or ESC]: "
+            yes-proc: {
+		$main unbind-buffer;
+		return ALL;
+	    }
+        ;;
+        return ALL;
+    };
+    
+    $main unbind-buffer;
+    result ALL;
+};
+
+defcommand key-binding-list {
+    | main window |
+    mode ::= $window get-mode;
+    BufferManager unregist-buffer "*Key Binding*";
+    buff ::= new EditBuffer;
+    $buff load-content "key binding" :init-only buffer-name: "*Key Binding*";
+    $buff set-content [$DEFAULT_PWIKI_DIR . "/"];
+    $buff clear-all;
+
+    $buff append-string "<<< Key bindings >>>";
+    $buff append-string ["Buffer mode: " . $mode];
+    $buff append-string "";
+    $buff append-string ["%-15v %21v %-14v %-v" fmt  "Key group"     "Key combinations"  "Key symbol"       "Command"];
+    $buff append-string ["%-15v %21v %-14v %-v" fmt ["-" repeat 15] ["-" repeat 21] ["-" repeat 14] ["-" repeat 38]];
+    d ::= $window get KeyBinding;
+    desc ::= $window get KeyDesc;
+    l := ();
+    $d each do: {| k v |
+	if {nil? $v} {continue};
+        if [$desc set? $k] {
+            s ::= $desc get $k;
+            ls ::= $s split;
+            grp ::= $ls get 0;
+            modify ::= $ls get 1;
+            $l << ["%-18v%19v %-14v [[%-v]]" fmt $grp $modify $k $v];
+        } {
+            $l << ["%-18v%19v %-14v [[%-v]]" fmt "" (key input) $k $v];
+        };
+    };
+    msort $l : each do: {| i |
+	$buff append-string $i;
+    };
+    
+    $buff append-string "";
+    $buff append-string "<<< All editor commands >>>";
+    msort [$EditorCommand keys :string] : each do: {| i |
+        $buff append-string ["[[" . $i "]]"];
+    };
+    $buff no-modify;
+    $buff set-protect;
+    
+    $main bind-buffer [$window get-window-name] $buff;
+    $window set-mode "PWiki";
+
+    result SELF;
+};
+
+defcommand buffer-list {
+    | main window |
+    BufferManager unregist-buffer "*Buffer List*";
+    buff ::= new EditBuffer;
+    $buff load-content "buffer list" :init-only buffer-name: "*Buffer List*";
+    $main bind-buffer [$window get-window-name] $buff;
+    $buff set-raise-low;
+    $buff clear-all;
+
+    l ::= BufferManager get-buffer-list-order-by-newer;
+    maxlen ::= $l map {| _i | $_i display-width : + 2} : max;
+    if {$maxlen < ["Buffer name" display-width]} {maxlen ::= "Buffer name" display-width};
+
+    $buff append-string "<<< Buffer list >>>";
+    $buff append-string "  * Select buffer - Move cursor to buffer line and press Enter key";
+    $buff append-string "                    or press shortcut key(0-9). Press CTRL+B to name completion.";
+    $buff append-string "  * Delete buffer - Move cursor to buffer line and press \"d\" key.";
+    $buff append-string "";
+    $buff append-string ["%1v %1v%1v %1v%1v%1v %-${maxlen}w %6v %-6v %-w" expand : fmt "#" "e" "t" "p" "m" "n" "Buffer name" "Length" "Mode" "Content path"];
+    $buff append-string ["%1v %1v%1v %1v%1v%1v %-${maxlen}w %6v %-6v %-w" expand : fmt "-" "-" "-" "-" "-" "-" "-----------" "------" "----" "------------"];
+    shortcut-ind := 1;
+    $l each do: {| buff-name |
+	display-buffer ::= BufferManager get-buffer $buff-name;
+	$buff append-string [
+	    "%1v %1v%1v %1v%1v%1v %-${maxlen}w %6d %-6v %-w" expand : fmt
+            [[$shortcut-ind <= 10] ??? [$shortcut-ind % 10] " "]
+            [["" . [$display-buffer get-encoding]] at 0]
+	    [[$display-buffer includeCR?] ??? "d" "u"]
+	    [[$display-buffer protect?] ??? "%" " "]
+	    [[$display-buffer modify?]  ??? "*" " "]
+	    [[$display-buffer newfile?] ??? "?" " "]
+	    ["<" . $buff-name ">"]
+	    [$display-buffer get-buffer-length]
+            [$display-buffer get-buffer-mode]
+	    [$display-buffer get-content]
+        ];
+        $shortcut-ind ++;
+    };
+    $buff no-modify;
+    $buff set-protect;
+    result SELF;
+};
+
+defcommand jump-to-buffer {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (line col) ::= $window get-source-index $buff $geom;
+    r ::= $buff get-buffer-line $line;
+    $r ?? {
+	show-message :bell "No buffer name specified.";
+	return SELF;
+    };
+    l ::= $r =~ '\<[^\>]+\>';
+    if {nil? $l} {
+	show-message :bell "No buffer name specified.";
+	return SELF;
+    };
+
+    s ::= $l car : get 2;
+    s ::= $s sub 1 [$s len : - 1];
+    target-buff ::= BufferManager find-buffer $s;
+    $target-buff ?? {
+	show-message :bell "No buffer name specified.";
+	return SELF;
+    };
+    $main bind-buffer [$window get-window-name] $target-buff;
+    result SELF;
+};
+
+defcommand buffer-list-completion {
+    | main window |
+
+    set _index -1;
+    set _list [BufferManager get-buffer-list];
+
+    mini-input-until-enter $main $window
+        prompt: "Buffer name: "
+        completion-proc: {| value |
+            if {[$_list len] = 0 } {
+                $MainWindow set-mini-input-prompt "Buffer name (no match completion): ";
+                return ALL;
+            };
+            setc _index [$_index +  1];
+            if {$_index >= [$_list len] } {
+                setc _index 0;
+            };
+            str ::= $_list get $_index;
+            $MainWindow set-mini-input-prompt ["Buffer name (" . [$_list len] " match(es) completion): "];
+            $main mini-input-value-override $str [$str len];
+            return ALL;
+        }
+        completion-back-proc: {| value |
+            if {[$_list len] = 0 } {
+                $MainWindow set-mini-input-prompt "Buffer name (no match completion): ";
+                return ALL;
+            };
+            setc _index [$_index -  1];
+            if {$_index < 0 } {
+                setc _index [$_list len : - 1];
+            };
+            str ::= $_list get $_index;
+            $MainWindow set-mini-input-prompt ["Buffer name (" . [$_list len] " match(es) completion): "];
+            $main mini-input-value-override $str [$str len];
+            return ALL;
+        }
+        edit-proc: {| value |
+            try {
+                if {$value = ""} {
+                    setc _list [BufferManager get-buffer-list];
+                } {
+                    setc _list [[BufferManager get-buffer-list] filter {| n | $n =~ :text :nocase [$value rquote]}];
+                };
+            } catch: {
+                setc _list ();
+            };
+            setc _index -1;
+            if {[$_list len] > 0} {
+                $MainWindow set-mini-input-prompt ["Buffer name (" . [$_list len] " match(es) completion): "];
+                if {[$_list len] = 1} {
+                    setc _index 0;
+                };
+            } {
+                $MainWindow set-mini-input-prompt "Buffer name (no match completion): ";
+            };
+            return ALL;
+        }
+        enter-proc: {| value |
+            if {or {[$_list len] = 0} {$_index < 0}} {
+                show-message :bell "No buffer name specified.";
+                return ALL;
+            };
+            s ::= $_list get $_index;
+            target-buff ::= BufferManager find-buffer $s;
+            $target-buff ?? {
+                show-message :bell "No buffer name specified.";
+                return ALL;
+            };
+            $main bind-buffer [$window get-window-name] $target-buff;
+            return ALL;
+        }
+    ;;
+    
+    return ALL;
+};
+
+defcommand buffer-list-shortcut-1 {
+    | main window |
+    jump-to-buffer-shortcut '^1 ' $main $window;
+    result SELF;
+};
+
+defcommand buffer-list-shortcut-2 {
+    | main window |
+    jump-to-buffer-shortcut '^2 ' $main $window;
+    result SELF;
+};
+
+defcommand buffer-list-shortcut-3 {
+    | main window |
+    jump-to-buffer-shortcut '^3 ' $main $window;
+    result SELF;
+};
+
+defcommand buffer-list-shortcut-4 {
+    | main window |
+    jump-to-buffer-shortcut '^4 ' $main $window;
+    result SELF;
+};
+
+defcommand buffer-list-shortcut-5 {
+    | main window |
+    jump-to-buffer-shortcut '^5 ' $main $window;
+    result SELF;
+};
+
+defcommand buffer-list-shortcut-6 {
+    | main window |
+    jump-to-buffer-shortcut '^6 ' $main $window;
+    result SELF;
+};
+
+defcommand buffer-list-shortcut-7 {
+    | main window |
+    jump-to-buffer-shortcut '^7 ' $main $window;
+    result SELF;
+};
+
+defcommand buffer-list-shortcut-8 {
+    | main window |
+    jump-to-buffer-shortcut '^8 ' $main $window;
+    result SELF;
+};
+
+defcommand buffer-list-shortcut-9 {
+    | main window |
+    jump-to-buffer-shortcut '^9 ' $main $window;
+    result SELF;
+};
+
+defcommand buffer-list-shortcut-0 {
+    | main window |
+    jump-to-buffer-shortcut '^0 ' $main $window;
+    result SELF;
+};
+
+defun jump-to-buffer-shortcut (key main window) {
+    buff ::= $window get-buffer;
+    found := <nil>;
+    $buff buffer-select 0 [$buff get-buffer-length : - 1] {| r |
+        if {$r =~ $key} {
+            found := <t>;
+            l ::= $r =~ '\<[^\>]+\>';
+            if {nil? $l} {
+                show-message :bell "No buffer name specified.";
+                return SELF;
+            };
+            s ::= $l car : get 2;
+            s ::= $s sub 1 [$s len : - 1];
+            target-buff ::= BufferManager find-buffer $s;
+            $target-buff ?? {
+                show-message :bell "No buffer name specified.";
+                return SELF;
+            };
+            $main bind-buffer [$window get-window-name] $target-buff;
+        };
+    };
+    if {! $found} {
+        show-message :bell "No shortcut line.";
+    };
+};
+
+defcommand buffer-list-delete {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (line col) ::= $window get-source-index $buff $geom;
+    r ::= $buff get-buffer-line $line;
+    $r ?? {
+	show-message :bell "No buffer name specified.";
+	return SELF;
+    };
+    l ::= $r =~ '\<[^\>]+\>';
+    if {nil? $l} {
+	show-message :bell "No buffer name specified.";
+	return SELF;
+    };
+
+    s ::= $l car : get 2;
+    s ::= $s sub 1 [$s len : - 1];
+    target-buff ::= BufferManager find-buffer $s;
+    $target-buff ?? {
+	show-message :bell "No buffer name specified.";
+	return SELF;
+    };
+
+    if [$target-buff modify?] {
+        mini-input-fully-yes-or-no $main $window
+            prompt: "This buffer is modified, really kill? [yes or ESC]: "
+            yes-proc: {
+		$main delete-buffer $target-buff;
+                $window apply-command $main $window "" buffer-list;
+		return ALL;
+            }
+        ;;
+	return ALL;
+    };
+    $main delete-buffer $target-buff;
+    $window apply-command $main $window "" buffer-list;
+
+    result ALL;
+};

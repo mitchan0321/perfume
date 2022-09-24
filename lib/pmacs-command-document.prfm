@@ -1,0 +1,284 @@
+###
+### All Pmacs editor document command definition.
+###
+
+defcommand pwiki-next-link {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    (y x) ::= get-next-search $ey $ex $PWIKI_LINK $buff;
+    $window cursor-move-to $geom $y $x;
+    return SELF;
+};
+
+defcommand pwiki-previous-link {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    (y x) ::= get-previous-search $ey $ex $PWIKI_LINK $buff;
+    $window cursor-move-to $geom $y $x;
+    return SELF;
+};
+
+defcommand pwiki-click-link {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    str ::= cursor-on-search-regex $ey $ex $PWIKI_LINK $buff;
+    $str ?? {
+        $window apply-command $main $window "\r" insert-character;
+        return ALL;
+    };
+
+    link ::= $str sub 2 [$str len : - 2];
+    if {[$link at 0] = "&"} {
+        ### if pwiki link form is [[&command]], execute command.
+        command ::= $link sub 1;
+        $window apply-command $main $window "" $command;
+        return ALL;
+    };
+    path ::= $buff get-content;
+    if {[$link at 0] = "/"} {
+        dir := "";
+    } {
+        if $path {
+            dir ::= get-dir $path;
+        } {
+            dir := $DEFAULT_PWIKI_DIR;
+        };
+    };
+    
+    new-path ::= [$dir = ""] ??? [$link . ".pwiki"] [path-adjust [$dir . "/" $link ".pwiki"]];
+    next-buff ::= BufferManager get-buffer-by-path $new-path;
+    $next-buff ?? {
+        next-buff ::= new EditBuffer;
+        create-directory-if-not-exists $new-path;
+        (result err) ::= $next-buff load-content $new-path;
+        if {$next-buff enc-error?} {
+            show-message :bell "File decode error occured!! Try ALT-e and specify another encoding for re-load.";
+        };
+        $result ?? {
+            show-message :bell ["Open Failed, path: " . $new-path " ("  $err ")"];
+            return SELF;
+            if {$buff enc-error?} {
+                show-message :bell "File decode error occured!! Try ALT-e and specify another encoding for re-load.";
+            };
+        };
+    };
+    $main bind-buffer [$window get-window-name] $next-buff;
+    $next-buff set-previous-buffer [$buff get-buffer-name];
+    
+    return ALL;
+};
+
+defun create-directory-if-not-exists (path) {
+    l ::= $path split sep: "/";
+    $l ->>;
+    if {[$path at 0] = "/"} {$l >>};
+    dir := "";
+    $l each do: {| e |
+        $dir append! "/";
+        $dir append! $e;
+        if {file dir? $dir} {continue};
+        try {
+            file mkdir $dir $DEFAULT_DIR_MODE;
+        } catch: {| err |
+            throw ErrFileAccess ["Can\'t create directory \'" . $dir "\'."]; #'
+        };
+    };
+};
+
+defcommand pwiki-link-back {
+    | main window |
+    buff ::= $window get-buffer;
+    prev-buff-name ::= $buff get-previous-buffer;
+    if $prev-buff-name {
+        prev-buff ::= BufferManager find-buffer $prev-buff-name;
+        if $prev-buff {
+            $main bind-buffer [$window get-window-name] $prev-buff;
+        } {
+            show-message :bell ["No found previous buffer, \'" . $prev-buff-name "\'."];
+        };
+    } {
+        show-message :bell "No set previous buffer.";
+    };
+    result ALL;
+};
+
+defun cursor-on-search-regex (y x str buff) {
+    r ::= $buff get-buffer-line $y;
+    $r ?? {return <nil>};
+    sl ::= $r =~ :all $str;
+    $sl ?? {return <nil>};
+    $sl each do: {| el |
+        if {and {$x >= [$el get 0]} {$x < [$el get 1]}} {
+            return [$el get 2];
+        };
+    };
+    return <nil>;
+};
+
+defcommand man {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    str := "";
+    if [$window get-region] {
+        (sy sx) ::= $window end-region;
+        (ey ex) ::= $window get-source-index $buff $geom;
+        str ::= $window get-region-string $sy $sx $ey $ex;
+    };
+
+    mini-input-until-enter $main $window
+        init-value: $str
+        prompt: "Man topic: "
+        enter-proc: {| value |
+            if {$value = ""} {
+                show-message :bell "Enter man topic name.";
+                return ALL;
+            };
+            exec-man $main $window $buff $value;
+            return ALL;
+        }
+    ;;
+    
+    return ALL;
+};
+
+defcommand man-current-word {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+
+    orig_geom ::= $geom clone;
+    $window apply-command $main $window "" select-region-word;
+
+    [$window in-region?] ?? {
+        show-message "Word not found.";
+        return ALL;
+    };
+
+    (sy sx) ::= $window end-region;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    str ::= $window get-region-string $sy $sx $ey $ex;
+    $geom restore-geom $orig_geom;
+    exec-man $main $window $buff $str;
+    return ALL;
+};
+
+defun exec-man (main window cur-buff topic) {
+    ltopic ::= $topic split;
+    buff-name ::= if {$ltopic len : >= 2} {"Man=" . $ltopic,1 "(" $ltopic,0 ")"} {"Man=" . $topic};
+    man-buff ::= BufferManager find-buffer $buff-name;
+    if $man-buff else: {
+        os ::= new Stream;
+        $os set-nolimit;
+        ### sts ::= {exec proc-enc: $MAN_ENCODING "/bin/sh" "-c" [$MAN_PREFIX expand]} redirect-out $os $os;
+        sts ::= pipe out: $os {exec :err-to-stdout proc-enc: $MAN_ENCODING "/bin/sh" "-c" [$MAN_PREFIX expand]};
+        $os close;
+        
+        man-buff ::= new EditBuffer;
+        (result err) ::= $man-buff load-content
+            :init-only
+            ["man " . $topic]
+            buffer-name: $buff-name
+        ;
+        $man-buff clear-all;
+        $man-buff set-content [$DEFAULT_PWIKI_DIR . "/"];
+        
+        $os each do: {| r |
+            $man-buff append-string [curs-col $r];
+        };
+        os := <nil>;
+        $man-buff set-protect;
+        $man-buff no-modify;
+    };
+    $main bind-buffer [$window get-window-name] $man-buff;
+    geom ::= $window get-geom;
+    $window cursor-move-to $geom 0 0;
+    $man-buff set-previous-buffer [$cur-buff get-buffer-name];
+
+};
+
+defcommand man-click-link {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    str ::= cursor-on-search-regex $ey $ex $MAN_LINK $buff;
+    $str ?? {
+        show-message :bell "No man topic.";
+        return ALL;
+    };
+
+    buff ::= $window get-buffer;
+    buff-name ::= $buff get-buffer-name;
+    
+    topic ::= $str split sep: "(" : get 0 : lower;
+    section ::= $str split sep: "(" : get 1 : at 0;
+    show-message ["Man topic: " . $section " " $topic];
+    exec-man $main $window $buff [$section . " " $topic];
+
+    next-buff ::= $window get-buffer;
+    $next-buff set-previous-buffer $buff-name;
+
+    return ALL;
+};
+
+defcommand man-link-back {
+    | main window |
+    buff ::= $window get-buffer;
+    prev-buff-name ::= $buff get-previous-buffer;
+    if $prev-buff-name {
+        prev-buff ::= BufferManager find-buffer $prev-buff-name;
+        if $prev-buff {
+            $main bind-buffer [$window get-window-name] $prev-buff;
+        } {
+            show-message :bell ["No found previous buffer, \'" . $prev-buff-name "\'."];
+        };
+    } {
+        show-message :bell "No set previous buffer.";
+    };
+    result ALL;
+};
+
+defcommand man-next-link {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    (y x) ::= get-next-search $ey $ex $MAN_LINK $buff;
+    $window cursor-move-to $geom $y $x;
+    return SELF;
+};
+
+defcommand man-previous-link {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    (y x) ::= get-previous-search $ey $ex $MAN_LINK $buff;
+    $window cursor-move-to $geom $y $x;
+    return SELF;
+};
+
+defcommand help {
+    | main window |
+    help-path ::= $DEFAULT_PWIKI_DIR . $DEFAULT_PWIKI_HOME_FILE;
+    buff ::= BufferManager get-buffer-by-path $help-path;
+    $buff ?? {
+        buff ::= new EditBuffer;
+        create-directory-if-not-exists $help-path;
+        (result err) ::= $buff load-content $help-path;
+        $result ?? {
+            show-message :bell ["Open Failed, path: " . $help-path " ("  $err ")"];
+            return SELF;
+        };
+    };
+    $main bind-buffer [$window get-window-name] $buff;
+    
+    return ALL;
+};
