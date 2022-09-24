@@ -1,5 +1,5 @@
 ###
-### All Pmacs editor move command definition.
+### Pmacs editor move command definition.
 ###
 
 defcommand next-page {

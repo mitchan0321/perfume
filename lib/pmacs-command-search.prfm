@@ -1,5 +1,5 @@
 ###
-### All Pmacs editor search command definition.
+### Pmacs editor search command definition.
 ###
 
 defcommand search-forward {
@@ -630,6 +630,29 @@ defcommand grep-previous {
     };
     
     return ALL;
+};
+
+defun chdir-cwd (buff) {
+    r ::= $buff get-buffer-line 0;
+    if $r {
+        l ::= $r split sep: ":";
+        if {[$l len] < 2} {return "./"};
+        if {[$l get 0] = "CWD"} {
+            cwd ::= $l get 1;
+            if $cwd {
+                try {
+                    result ::= $cwd clean;
+                    if {[$result at -1] != "/"} {
+                        $result append! "/";
+                    };
+                    return $result;
+                } catch: {| e |
+                    show-message :bell ["Bad CWD line: " . $r];
+                };
+            };
+        };
+    };
+    return "./";
 };
 
 defun show-file-at (window-name path line) {

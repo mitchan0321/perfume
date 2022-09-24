@@ -1,5 +1,5 @@
 ###
-### All Pmacs editor dired command definition.
+### Pmacs editor dired command definition.
 ###
 
 defcommand dired {

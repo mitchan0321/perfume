@@ -1,6 +1,53 @@
 ###
-### All Pmacs editor utility command definition.
+### Pmacs editor utility command definition.
 ###
+
+defcommand key-binding-list {
+    | main window |
+    mode ::= $window get-mode;
+    BufferManager unregist-buffer "*Key Binding*";
+    buff ::= new EditBuffer;
+    $buff load-content "key binding" :init-only buffer-name: "*Key Binding*";
+    $buff set-content [$DEFAULT_PWIKI_DIR . "/"];
+    $buff clear-all;
+
+    $buff append-string "<<< Key bindings >>>";
+    $buff append-string ["Buffer mode: " . $mode];
+    $buff append-string "";
+    $buff append-string ["%-15v %21v %-14v %-v" fmt  "Key group"     "Key combinations"  "Key symbol"       "Command"];
+    $buff append-string ["%-15v %21v %-14v %-v" fmt ["-" repeat 15] ["-" repeat 21] ["-" repeat 14] ["-" repeat 38]];
+    d ::= $window get KeyBinding;
+    desc ::= $window get KeyDesc;
+    l := ();
+    $d each do: {| k v |
+	if {nil? $v} {continue};
+        if [$desc set? $k] {
+            s ::= $desc get $k;
+            ls ::= $s split;
+            grp ::= $ls get 0;
+            modify ::= $ls get 1;
+            $l << ["%-18v%19v %-14v [[%-v]]" fmt $grp $modify $k $v];
+        } {
+            $l << ["%-18v%19v %-14v [[%-v]]" fmt "" (key input) $k $v];
+        };
+    };
+    msort $l : each do: {| i |
+	$buff append-string $i;
+    };
+    
+    $buff append-string "";
+    $buff append-string "<<< All editor commands >>>";
+    msort [$EditorCommand keys :string] : each do: {| i |
+        $buff append-string ["[[" . $i "]]"];
+    };
+    $buff no-modify;
+    $buff set-protect;
+    
+    $main bind-buffer [$window get-window-name] $buff;
+    $window set-mode "PWiki";
+
+    result SELF;
+};
 
 defcommand file-completion {
     | main window |
@@ -78,50 +125,6 @@ defcommand file-completion {
     return ALL;
 };
 
-defcommand show-character-code {
-    | main window |
-    buff ::= $window get-buffer;
-    geom ::= $window get-geom;
-    (cy cx) ::= $window get-source-index $buff $geom;
-    s ::= $buff get-buffer-line $cy;
-    $s ?? {
-	show-message "No character.";
-	return SELF;
-    };
-    c ::= $s sub $cx [$cx + 1];
-    if {$c != ""} {
-	i ::= $c uexport : car;
-	show-message ["Code: %v[u+%06x]" fmt $i $i];
-    } {
-	show-message "No character."
-    };
-    
-    result SELF;
-};
-
-defcommand input-character-code {
-    | main window |
-
-    mini-input-until-enter $main $window
-        prompt: "Input character code: u+"
-        enter-proc: {| value |
-            try {
-                i ::= ["0x" . $value] int;
-            } catch: {
-                show-message :bell "Bad hexadecimal.";
-                return ALL;
-            };
-            if {or {$i < 0} {$i >= 0x200000}} {
-                show-message :bell "Bad range unicode codepoint.";
-                return ALL;
-            };
-            $window insert-string ["" uimport! ($i)];
-        }
-    ;;
-
-    result SELF;
-};
-
 defcommand execute-command {
     | main window |
     
@@ -181,7 +184,7 @@ defcommand trace-editor-command {
     mini-input-until-enter $main $window
         prompt: "Trace editor command: "
         enter-proc: {| value |
-            f := `File("pmacs-command-trace.txt" mode: a);
+            f := `File("pmacs-trace.txt" mode: a);
             $f puts  "";
             $f puts  "***";
             $f puts  "***";
@@ -196,7 +199,7 @@ defcommand trace-editor-command {
             $f puts  "***";
             $f puts  "";
             $f close;
-            show-message ["Wrote tracefile to: " . [pwd] "/" "pmacs-command-trace.txt"];
+            show-message ["Wrote tracefile to: " . [pwd] "/" "pmacs-trace.txt"];
 	}
         edit-proc: {| value |
             try {
@@ -274,29 +277,6 @@ defcommand send-eof {
     $stderr puts "Send eof.";
     $stdin close;
     result ALL;
-};
-
-defun chdir-cwd (buff) {
-    r ::= $buff get-buffer-line 0;
-    if $r {
-        l ::= $r split sep: ":";
-        if {[$l len] < 2} {return "./"};
-        if {[$l get 0] = "CWD"} {
-            cwd ::= $l get 1;
-            if $cwd {
-                try {
-                    result ::= $cwd clean;
-                    if {[$result at -1] != "/"} {
-                        $result append! "/";
-                    };
-                    return $result;
-                } catch: {| e |
-                    show-message :bell ["Bad CWD line: " . $r];
-                };
-            };
-        };
-    };
-    return "./";
 };
 
 defcommand cd {

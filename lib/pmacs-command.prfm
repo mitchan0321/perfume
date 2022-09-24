@@ -1,0 +1,30 @@
+###
+### All Pmacs editor command definition.
+###
+command-files :=  (
+    "pmacs-command-window.prfm"
+    "pmacs-command-move.prfm"
+    "pmacs-command-edit.prfm"
+    "pmacs-command-file.prfm"
+    "pmacs-command-buffer.prfm"
+    "pmacs-command-search.prfm"
+    "pmacs-command-util.prfm"
+    "pmacs-command-dired.prfm"
+    "pmacs-command-document.prfm"
+    "pmacs-command-misc.prfm"
+);
+
+fun (l) {
+    $l each do: {| i |
+        $LIB_PATH each do: {| f |
+            if {file exists? [$f . "/" $i]} {
+                try {
+                    load [$f . "/" $i];
+                    break;
+                } catch: {| e |
+                    show-message ["command file load error at " . [$f . "/" $i] ", " $e];
+                };
+            };
+        };
+    };
+} : $command-files;

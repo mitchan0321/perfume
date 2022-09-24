@@ -1,5 +1,5 @@
 ###
-### All Pmacs editor document command definition.
+### Pmacs editor document command definition.
 ###
 
 defcommand pwiki-next-link {

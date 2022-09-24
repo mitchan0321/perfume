@@ -1,5 +1,5 @@
 ###
-### All Pmacs editor misc command definition.
+### Pmacs editor misc command definition.
 ###
 
 defcommand internal-stat {

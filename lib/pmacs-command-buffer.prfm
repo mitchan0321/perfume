@@ -1,5 +1,5 @@
 ###
-### All Pmacs editor buffer command definition.
+### Pmacs editor buffer command definition.
 ###
 
 defcommand next-buffer {
@@ -46,53 +46,6 @@ defcommand kill-buffer {
     
     $main unbind-buffer;
     result ALL;
-};
-
-defcommand key-binding-list {
-    | main window |
-    mode ::= $window get-mode;
-    BufferManager unregist-buffer "*Key Binding*";
-    buff ::= new EditBuffer;
-    $buff load-content "key binding" :init-only buffer-name: "*Key Binding*";
-    $buff set-content [$DEFAULT_PWIKI_DIR . "/"];
-    $buff clear-all;
-
-    $buff append-string "<<< Key bindings >>>";
-    $buff append-string ["Buffer mode: " . $mode];
-    $buff append-string "";
-    $buff append-string ["%-15v %21v %-14v %-v" fmt  "Key group"     "Key combinations"  "Key symbol"       "Command"];
-    $buff append-string ["%-15v %21v %-14v %-v" fmt ["-" repeat 15] ["-" repeat 21] ["-" repeat 14] ["-" repeat 38]];
-    d ::= $window get KeyBinding;
-    desc ::= $window get KeyDesc;
-    l := ();
-    $d each do: {| k v |
-	if {nil? $v} {continue};
-        if [$desc set? $k] {
-            s ::= $desc get $k;
-            ls ::= $s split;
-            grp ::= $ls get 0;
-            modify ::= $ls get 1;
-            $l << ["%-18v%19v %-14v [[%-v]]" fmt $grp $modify $k $v];
-        } {
-            $l << ["%-18v%19v %-14v [[%-v]]" fmt "" (key input) $k $v];
-        };
-    };
-    msort $l : each do: {| i |
-	$buff append-string $i;
-    };
-    
-    $buff append-string "";
-    $buff append-string "<<< All editor commands >>>";
-    msort [$EditorCommand keys :string] : each do: {| i |
-        $buff append-string ["[[" . $i "]]"];
-    };
-    $buff no-modify;
-    $buff set-protect;
-    
-    $main bind-buffer [$window get-window-name] $buff;
-    $window set-mode "PWiki";
-
-    result SELF;
 };
 
 defcommand buffer-list {

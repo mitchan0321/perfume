@@ -1,5 +1,5 @@
 ###
-### All Pmacs editor file command definition.
+### Pmacs editor file command definition.
 ###
 
 defcommand open-file {

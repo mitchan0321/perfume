@@ -1,5 +1,5 @@
 ###
-### All Pmacs editor window command definition.
+### Pmacs editor window command definition.
 ###
 
 defcommand roll-current-window {

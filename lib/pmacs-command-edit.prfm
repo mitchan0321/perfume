@@ -1,5 +1,5 @@
 ###
-### All Pmacs editor edit command definition.
+### Pmacs editor edit command definition.
 ###
 
 defcommand insert-character {
@@ -268,18 +268,6 @@ defcommand paste-buffer {
     result ALL;
 };
 
-defun cursor-on-search-regex (y x str buff) {
-    r ::= $buff get-buffer-line $y;
-    $r ?? {return <nil>};
-    sl ::= $r =~ :all $str;
-    $sl ?? {return <nil>};
-    $sl each do: {| el |
-        if {and {$x >= [$el get 0]} {$x < [$el get 1]}} {
-            return [$el get 2];
-        };
-    };
-    return <nil>;
-};
 defcommand smart-newline {
     | main window |
     $window set-freecursor <nil>;
@@ -547,4 +535,48 @@ defcommand replace-region {
     ;;
 
     result ALL;
+};
+
+defcommand show-character-code {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (cy cx) ::= $window get-source-index $buff $geom;
+    s ::= $buff get-buffer-line $cy;
+    $s ?? {
+	show-message "No character.";
+	return SELF;
+    };
+    c ::= $s sub $cx [$cx + 1];
+    if {$c != ""} {
+	i ::= $c uexport : car;
+	show-message ["Code: %v[u+%06x]" fmt $i $i];
+    } {
+	show-message "No character."
+    };
+    
+    result SELF;
+};
+
+defcommand input-character-code {
+    | main window |
+
+    mini-input-until-enter $main $window
+        prompt: "Input character code: u+"
+        enter-proc: {| value |
+            try {
+                i ::= ["0x" . $value] int;
+            } catch: {
+                show-message :bell "Bad hexadecimal.";
+                return ALL;
+            };
+            if {or {$i < 0} {$i >= 0x200000}} {
+                show-message :bell "Bad range unicode codepoint.";
+                return ALL;
+            };
+            $window insert-string ["" uimport! ($i)];
+        }
+    ;;
+
+    result SELF;
 };
