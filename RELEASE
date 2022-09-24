@@ -2602,4 +2602,11 @@
 	pmacs update:
 		Fix key repeat acceleration algorithm.
 
+2022/09/24
+	pmacs update
+		Change keybindngs.
+		  kND7 to kND4 -> smooth-scroll-up-anothor-window.
+		  kND7 to kND4 -> smooth-scroll-down-anothor-window.
+		Refactaring mini window input become use to mini window input utilities.
+
 #eof
