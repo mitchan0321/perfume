@@ -9,6 +9,7 @@ modules := (
     WindowBase
     CombiWindow
     MiniWindow
+    MiniInputUtil
     WUtil
     EditStream
 );

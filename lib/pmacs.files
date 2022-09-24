@@ -15,6 +15,7 @@ MiniWindow.prfm
 ScratchBuffer.prfm
 DiredBuffer.prfm
 WUtil.prfm
+MiniInputUtil.prfm
 Window.prfm
 WindowBase.prfm
 pmacs-theme.prfm
