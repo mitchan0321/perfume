@@ -248,7 +248,7 @@ defun line-input (curs disp-line disp-col input-len cur-index cur-val key-in) {
             if {$CopyBuffer = ""} {break};
             (command start-y start-x new-y new-x) ::= $v insert-string-at $CopyBuffer 0 $cur-index;
             break;
-       }
+        }
         {eq? $key-in kDC8} {
             $MainWindow mini-input-end;
             break;
