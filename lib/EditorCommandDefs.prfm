@@ -480,28 +480,24 @@ defcommand show-character-code {
 
 defcommand input-character-code {
     | main window |
-    $main mini-input-start "" prompt: "Input character code: u+";
-    $main add-mini-input-callback $window {| main window in-key value |
-        if {eq? $in-key KEY_ESC} {
-	    $main mini-input-end;
-	    show-message "Canceled.";
-            return SELF;
-	};
-        if {eq? $in-key CTRL_M} {
-	    $main mini-input-end;
-	    try {
+
+    mini-input-until-enter $main $window
+        prompt: "Input character code: u+"
+        enter-proc: {| value |
+            try {
                 i ::= ["0x" . $value] int;
             } catch: {
-		show-message :bell "Bad hexadecimal.";
-		return SELF;
+                show-message :bell "Bad hexadecimal.";
+                return ALL;
             };
             if {or {$i < 0} {$i >= 0x200000}} {
-		show-message :bell "Bad range unicode codepoint.";
-		return SELF;
+                show-message :bell "Bad range unicode codepoint.";
+                return ALL;
             };
-	    $window insert-string ["" uimport! ($i)];
-	};
-    };
+            $window insert-string ["" uimport! ($i)];
+        }
+    ;;
+
     result SELF;
 };
 
@@ -566,23 +562,19 @@ defcommand backdelete-character {
 
 defcommand execute-command {
     | main window |
-    $main mini-input-start "" prompt: "Perfume command: ";
-    $main add-mini-input-callback $window {| main window in-key value |
-        if {eq? $in-key KEY_ESC} {
-	    $main mini-input-end;
-	    show-message "Canceled.";
-            return SELF;
-	};
-        if {eq? $in-key CTRL_M} {
-	    $main mini-input-end;
+    
+    mini-input-until-enter $main $window
+        prompt: "Perfume command: "
+        enter-proc: {| value |
 	    try {
 	        result ::= $value eval;
 	        show-message ["Command result: " . [$result string]];
             } catch: {| e |
 		show-message :bell ["<" . [$e car ] "># " [$e cdr]];
 	    };
-	};
-    };
+	}
+    ;;
+
     result ALL;
 };
 
@@ -592,40 +584,29 @@ defcommand execute-editor-command {
     then: {setvar EditorCommandList ()}
     else: {defvar EditorCommandList ()};
 
-    $main mini-input-start "" prompt: "Editor command: ";
-    $main add-mini-input-callback $window {| main window in-key value |
-        if {eq? $in-key KEY_ESC} {
-	    $main mini-input-end;
-	    show-message "Canceled.";
-            return SELF;
-	};
-        if {eq? $in-key CTRL_M} {
-	    $main mini-input-end;
+    mini-input-until-enter $main $window
+        prompt: "Editor command: "
+        enter-proc: {| value |
 	    $window apply-command $main $window "" $value; 
-	};
-	if {or {string? $in-key} {eq? $in-key CTRL_H} {eq? $in-key KEY_BACKSPACE} {eq? $in-key KEY_DC}} {
+	}
+        edit-proc: {| value |
             try {
                 setvar EditorCommandList [msort [$EditorCommand keys :string : filter {| i | $i =~ [$value rquote]}]];
             } catch: {
                 setvar EditorCommandList ();
             };
 	    $EditorCommandList ?? {setvar EditorCommandList ()};
-	};
-        if {eq? $in-key CTRL_I} {
+	}
+        completion-proc: {| value |
 	    i ::= $EditorCommandList find $value;
 	    if $i {$i ++} {i := 0};
 	    c ::= $EditorCommandList get $i;
 	    $c ?? {c ::= $EditorCommandList get 0};
 	    $c ?? {c := $value};
 	    $main mini-input-value-override $c [$c len];
-	};
-	if {eq? $in-key CTRL_V} {
-            str ::= $window get-copy-buffer;
-            if {$str != ""} {
-                $main mini-input-value-override $str [$str len];
-            };
-	};
-    };
+        }
+    ;;
+
     result ALL;
 };
 
@@ -635,15 +616,9 @@ defcommand trace-editor-command {
     then: {setvar EditorCommandList ()}
     else: {defvar EditorCommandList ()};
 
-    $main mini-input-start "" prompt: "Trace editor command: ";
-    $main add-mini-input-callback $window {| main window in-key value |
-        if {eq? $in-key KEY_ESC} {
-	    $main mini-input-end;
-	    show-message "Canceled.";
-            return SELF;
-	};
-        if {eq? $in-key CTRL_M} {
-	    $main mini-input-end;
+    mini-input-until-enter $main $window
+        prompt: "Trace editor command: "
+        enter-proc: {| value |
             f := `File("pmacs-command-trace.txt" mode: a);
             $f puts  "";
             $f puts  "***";
@@ -660,30 +635,25 @@ defcommand trace-editor-command {
             $f puts  "";
             $f close;
             show-message ["Wrote tracefile to: " . [pwd] "/" "pmacs-command-trace.txt"];
-	};
-	if {or {string? $in-key} {eq? $in-key CTRL_H} {eq? $in-key KEY_BACKSPACE} {eq? $in-key KEY_DC}} {
+	}
+        edit-proc: {| value |
             try {
                 setvar EditorCommandList [msort [$EditorCommand keys :string : filter {| i | $i =~ [$value rquote]}]];
             } catch: {
                 setvar EditorCommandList ();
             };
 	    $EditorCommandList ?? {setvar EditorCommandList ()};
-	};
-        if {eq? $in-key CTRL_I} {
+	}
+        completion-proc: {| value |
 	    i ::= $EditorCommandList find $value;
 	    if $i {$i ++} {i := 0};
 	    c ::= $EditorCommandList get $i;
 	    $c ?? {c ::= $EditorCommandList get 0};
 	    $c ?? {c := $value};
 	    $main mini-input-value-override $c [$c len];
-	};
-	if {eq? $in-key CTRL_V} {
-            str ::= $window get-copy-buffer;
-            if {$str != ""} {
-                $main mini-input-value-override $str [$str len];
-            };
-	};
-    };
+	}
+    ;;
+    
     result ALL;
 };
 
@@ -722,22 +692,18 @@ defcommand eval-region {
 
 defcommand kill-interp {
     | main window |
-    $main mini-input-start "kill interpriter OK? [y/n]: ";
-    $main add-mini-input-callback $window {| main window in-key value |
-        if {or {eq? $in-key "y"} {eq? $in-key "Y"}} {
-	    $main mini-input-end;
+    
+    mini-input-y-or-n $main $window 
+        prompt: "kill interpriter OK? [y/n]: "
+        yes-proc: {
             if {defvar? PINTERP} {
                 try {$PINTERP release} catch: {};
             };
             reset-stdio;
             $stderr puts "Interpriter killed.";
-        };
-        if {or {eq? $in-key "n"} {eq? $in-key "N"} {eq? $in-key KEY_ESC}} {
-	    $main mini-input-end;
-            show-message "Canceled.";
-            return ALL;
-        };
-    };
+        }
+    ;;
+
     result ALL;
 };
 
@@ -762,20 +728,18 @@ defcommand flash {
 
 defcommand open-file {
     | main window |
-    $main mini-input-start [get-current-buffer-dir $window : . "/"] prompt: "Open file: ";
-    $main add-mini-input-callback $window {| main window in-key value |
-        if {eq? $in-key KEY_ESC} {
-	    $main mini-input-end;
+    
+    mini-input-until-enter $main $window 
+        init-value: [get-current-buffer-dir $window : . "/"]
+        prompt: "Open file: "
+        cancel-proc: {
 	    show-message "Canceled.";
-	    BufferManager unregist-buffer "*Directory*";	
-            return SELF;
-	};
-        if {eq? $in-key CTRL_M} {
-	    $main mini-input-end;
+            return ALL;
+        }
+        enter-proc: {| value |
 	    if {[$value len] = 0} {
 		show-message :bell "No file name specified.";
-                BufferManager unregist-buffer "*Directory*";
-		return SELF;
+		return ALL;
 	    };
             path ::= path-adjust [
 		{[$value sub 0 1] = "/"} ???
@@ -783,15 +747,13 @@ defcommand open-file {
 		    [get-current-buffer-dir $window : . "/" $value]
 	    ];
             if {file dir? $path} {
-                BufferManager unregist-buffer "*Directory*";
                 dired-open $main $window $path;
                 return ALL;
             };
 	    buff ::= BufferManager get-buffer-by-path $path;
             if $buff {
 		$MainWindow bind-buffer [$window get-window-name] $buff;
-                BufferManager unregist-buffer "*Directory*";
-		return SELF;
+		return ALL;
             };
 	    buff ::= new EditBuffer;
 	    (result err) ::= $buff load-content $path;
@@ -800,9 +762,9 @@ defcommand open-file {
             };
 	    $MainWindow bind-buffer [$window get-window-name] $buff;
 	    $result ?? {show-message :bell ["Open Failed, path: " . $value " ("  $err ")"]};
-	    BufferManager unregist-buffer "*Directory*";
-	};
-	if {eq? $in-key CTRL_I} {
+            return ALL;
+        }
+        completion-proc: {| value |
             if {$value = ""} {
                 fname ::= show-files-in-window $main $window [get-current-buffer-dir $window];
             } {
@@ -811,47 +773,48 @@ defcommand open-file {
 	    $window apply-command $main $window "" top-of-buffer;
 	    $main mini-input-value-override $fname [$fname len];
 	    return ALL;
-	};
-	if {eq? $in-key KEY_DOWN} {
-	    $window apply-command $main $window "" move-half-up;
-	    return SELF;
-	};
-	if {eq? $in-key KEY_UP} {
-	    $window apply-command $main $window "" move-half-down;
-	    return SELF;
-	};
-	if {eq? $in-key "/"} {
-            if {[$value at -2] = "/"} {
-		$main mini-input-value-override "/" 1;
+        }
+        keyin-proc: {| value in-key |
+            if {eq? $in-key KEY_DOWN} {
+                $window apply-command $main $window "" move-half-up;
+                return ALL;
             };
-	    return SELF;
-	};
-	if {eq? $in-key "~"} {
-            if {[$value at -2] = "/"} {
-                $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
+            if {eq? $in-key KEY_UP} {
+                $window apply-command $main $window "" move-half-down;
+                return ALL;
             };
-	    return SELF;
-	};
-    };
-    result SELF;
+            if {eq? $in-key "/"} {
+                if {[$value at -2] = "/"} {
+                    $main mini-input-value-override "/" 1;
+                };
+                return ALL;
+            };
+            if {eq? $in-key "~"} {
+                if {or {[$value len] <= 1} {[$value at -2] = "/"}} {
+                    $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
+                };
+                return ALL;
+            };
+        }
+    ;;
+    
+    result ALL;
 };
 
 defcommand view-file {
     | main window |
-    $main mini-input-start [get-current-buffer-dir $window : . "/"] prompt: "View file: ";
-    $main add-mini-input-callback $window {| main window in-key value |
-        if {eq? $in-key KEY_ESC} {
-	    $main mini-input-end;
-	    show-message "Canceled.";
-	    BufferManager unregist-buffer "*Directory*";	
-            return SELF;
-	};
-        if {eq? $in-key CTRL_M} {
-	    $main mini-input-end;
+
+    mini-input-until-enter $main $window 
+        init-value: [get-current-buffer-dir $window : . "/"]
+        prompt: "View file: "
+        cancel-proc: {
+            show-message "Canceled.";
+            return ALL;
+        }
+        enter-proc: {| value |
 	    if {[$value len] = 0} {
 		show-message :bell "No file name specified.";
-                BufferManager unregist-buffer "*Directory*";
-		return SELF;
+		return ALL;
 	    };
             path ::= path-adjust [
 		{[$value sub 0 1] = "/"} ???
@@ -859,7 +822,6 @@ defcommand view-file {
 		    [get-current-buffer-dir $window : . "/" $value]
 	    ];
             if {file dir? $path} {
-                BufferManager unregist-buffer "*Directory*";
                 dired-open $main $window $path;
                 return ALL;
             };
@@ -867,8 +829,7 @@ defcommand view-file {
             if $buff {
                 $buff set-protect;
 		$MainWindow bind-buffer [$window get-window-name] $buff;
-                BufferManager unregist-buffer "*Directory*";
-		return SELF;
+		return ALL;
             };
 	    buff ::= new EditBuffer;
 	    (result err) ::= $buff load-content $path;
@@ -878,9 +839,9 @@ defcommand view-file {
             $buff set-protect;
 	    $MainWindow bind-buffer [$window get-window-name] $buff;
 	    $result ?? {show-message :bell ["Open Failed, path: " . $value " ("  $err ")"]};
-	    BufferManager unregist-buffer "*Directory*";
-	};
-	if {eq? $in-key CTRL_I} {
+            return ALL;
+	}
+        completion-proc: {| value |
             if {$value = ""} {
                 fname ::= show-files-in-window $main $window [get-current-buffer-dir $window];
             } {
@@ -889,47 +850,48 @@ defcommand view-file {
 	    $window apply-command $main $window "" top-of-buffer;
 	    $main mini-input-value-override $fname [$fname len];
 	    return ALL;
-	};
-	if {eq? $in-key KEY_DOWN} {
-	    $window apply-command $main $window "" move-half-up;
-	    return SELF;
-	};
-	if {eq? $in-key KEY_UP} {
-	    $window apply-command $main $window "" move-half-down;
-	    return SELF;
-	};
-	if {eq? $in-key "/"} {
-            if {[$value at -2] = "/"} {
-		$main mini-input-value-override "/" 1;
+        }
+        keyin-proc: {| value in-key |
+            if {eq? $in-key KEY_DOWN} {
+                $window apply-command $main $window "" move-half-up;
+                return ALL;
             };
-	    return SELF;
-	};
-	if {eq? $in-key "~"} {
-            if {[$value at -2] = "/"} {
-                $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
+            if {eq? $in-key KEY_UP} {
+                $window apply-command $main $window "" move-half-down;
+                return ALL;
             };
-	    return SELF;
-	};
-    };
+            if {eq? $in-key "/"} {
+                if {[$value at -2] = "/"} {
+                    $main mini-input-value-override "/" 1;
+                };
+                return ALL;
+            };
+            if {eq? $in-key "~"} {
+                if {or {[$value len] <= 1} {[$value at -2] = "/"}} {
+                    $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
+                };
+                return ALL;
+            };
+        }
+    ;;
+    
     result SELF;
 };
 
 defcommand read-file {
     | main window |
-    $main mini-input-start [get-current-buffer-dir $window : . "/"] prompt: "Read file: ";
-    $main add-mini-input-callback $window {| main window in-key value |
-        if {eq? $in-key KEY_ESC} {
-	    $main mini-input-end;
+
+    mini-input-until-enter $main $window 
+        init-value: [get-current-buffer-dir $window : . "/"]
+        prompt: "Read file: "
+        cancel-proc: {
 	    show-message "Canceled.";
-	    BufferManager unregist-buffer "*Directory*";	
-            return SELF;
-	};
-        if {eq? $in-key CTRL_M} {
-	    $main mini-input-end;
+            return ALL;
+        }
+        enter-proc: {| value |
 	    if {[$value len] = 0} {
 		show-message :bell "No file name specified.";
-                BufferManager unregist-buffer "*Directory*";
-		return SELF;
+		return ALL;
 	    };
             path ::= path-adjust [
 		{[$value sub 0 1] = "/"} ???
@@ -940,7 +902,7 @@ defcommand read-file {
             geom ::= $window get-geom;
             $buff ?? {
                 show-message :bell "No buffer.";
-                result SELF;
+                return ALL;
             };
             f := <nil>;
             try {
@@ -956,14 +918,13 @@ defcommand read-file {
             }
             catch: {| e |
                 show-message :bell ["File read error, " . [$e cdr]];
-                return SELF;
+                return ALL;
             }
             fin: {
                 if $f {$f close};
-                BufferManager unregist-buffer "*Directory*";
             };
-	};
-	if {eq? $in-key CTRL_I} {
+        }
+        completion-proc: {| value |
             if {$value = ""} {
                 fname ::= show-files-in-window $main $window [get-current-buffer-dir $window];
             } {
@@ -972,28 +933,31 @@ defcommand read-file {
 	    $window apply-command $main $window "" top-of-buffer;
 	    $main mini-input-value-override $fname [$fname len];
 	    return ALL;
-	};
-	if {eq? $in-key KEY_DOWN} {
-	    $window apply-command $main $window "" move-half-up;
-	    return SELF;
-	};
-	if {eq? $in-key KEY_UP} {
-	    $window apply-command $main $window "" move-half-down;
-	    return SELF;
-	};
-	if {eq? $in-key "/"} {
-            if {[$value at -2] = "/"} {
-		$main mini-input-value-override "/" 1;
+        }
+        keyin-proc: {| value in-key |
+            if {eq? $in-key KEY_DOWN} {
+                $window apply-command $main $window "" move-half-up;
+                return ALL;
             };
-	    return SELF;
-	};
-	if {eq? $in-key "~"} {
-            if {[$value at -2] = "/"} {
-                $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
+            if {eq? $in-key KEY_UP} {
+                $window apply-command $main $window "" move-half-down;
+                return ALL;
             };
-	    return SELF;
-	};
-    };
+            if {eq? $in-key "/"} {
+                if {[$value at -2] = "/"} {
+                    $main mini-input-value-override "/" 1;
+                };
+                return ALL;
+            };
+            if {eq? $in-key "~"} {
+                if {or {[$value len] <= 1} {[$value at -2] = "/"}} {
+                    $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
+                };
+                return ALL;
+            };
+        }
+    ;;
+
     result SELF;
 };
 
@@ -1003,15 +967,14 @@ defcommand save-buffer {
     path ::= $__buff_in_clojure__ get-path;
 
     if {or {nil? $path} {$path = ""}} {
-	$main mini-input-start [get-current-buffer-dir $window : . "/"] prompt: "Save file name: ";
-	$main add-mini-input-callback $window {| main window in-key value |
-	    if {eq? $in-key KEY_ESC} {
-		$main mini-input-end;
+        mini-input-until-enter $main $window
+            init-value: [get-current-buffer-dir $window : . "/"]
+            prompt: "Save file name: "
+            cancel-proc: {
 		show-message "Canceled.";
-		BufferManager unregist-buffer "*Directory*";	
-                return SELF;
-	    };
-	    if {eq? $in-key CTRL_I} {
+                return ALL;
+            }
+            completion-proc: {| value |
                 if {$value = ""} {
                     fname ::= show-files-in-window $main $window [get-current-buffer-dir $window];
                 } {
@@ -1020,17 +983,8 @@ defcommand save-buffer {
 	        $window apply-command $main $window "" top-of-buffer;
 		$main mini-input-value-override $fname [$fname len];
 		return ALL;
-	    };
-	    if {eq? $in-key KEY_DOWN} {
-		$window apply-command $main $window "" move-half-up;
-		return SELF;
-	    };
-	    if {eq? $in-key KEY_UP} {
-		$window apply-command $main $window "" move-half-down;
-		return SELF;
-	    };
-	    if {eq? $in-key CTRL_M} {
-		$main mini-input-end;
+            }
+	    enter-proc: {| value |
 		path ::= path-adjust [
                     {[$value sub 0 1] = "/"} ???
                         $value
@@ -1038,101 +992,99 @@ defcommand save-buffer {
                 ];
 
 		if [file exists? $path] {
-		    $main mini-input-start "" prompt: "File already exist, overwrite? [yes or ESC]: ";
-		    $main add-mini-input-callback $window {| main window in-key value |
-			if {eq? $in-key KEY_ESC} {
-			    $main mini-input-end;
+		    mini-input-fully-yes-or-no $main $window 
+                        prompt: "File already exist, overwrite? [yes or ESC]: "
+                        no-proc: {
 			    show-message "Canceled.";
-			    BufferManager unregist-buffer "*Directory*";
-			    return SELF;
-			};
-			if {and {eq? $in-key CTRL_M} {eq? $value "yes"}} {
-			    $main mini-input-end;
+			    return ALL;
+                        }
+                        yes-proc: {
 			    (result err) ::= $__buff_in_clojure__ save-content path: $path;
 			    if $result {
 				show-message "Save Done.";
 			    } {
 				show-message :bell ["Save Failed, path: " . $path " (" $err ")"];
 			    };
-			    BufferManager unregist-buffer "*Directory*";
 			    $MainWindow bind-buffer [$window get-window-name] $__buff_in_clojure__;
-			    return SELF;
-			};
-		    };
+			    return ALL;
+			}
+                    ;;
 		} {
-		    $main mini-input-end;
 		    (result err) ::= $__buff_in_clojure__ save-content path: $path;
 		    if $result {
 			show-message "Save Done.";
 		    } {
 			show-message :bell ["Save Failed, path: " . $path " (" $err ")"];
 		    };
-		    BufferManager unregist-buffer "*Directory*";
 		    $MainWindow bind-buffer [$window get-window-name] $__buff_in_clojure__;		    
-		    return SELF;
+		    return ALL;
 		};
-	    };
-            if {eq? $in-key "/"} {
-                if {[$value at -2] = "/"} {
-                    $main mini-input-value-override "/" 1;
+            }
+            keyin-proc: {| value in-key |
+                if {eq? $in-key KEY_DOWN} {
+                    $window apply-command $main $window "" move-half-up;
+                    return ALL;
                 };
-                return SELF;
-            };
-            if {eq? $in-key "~"} {
-                if {[$value at -2] = "/"} {
-                    $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
+                if {eq? $in-key KEY_UP} {
+                    $window apply-command $main $window "" move-half-down;
+                    return ALL;
                 };
-                return SELF;
-            };
-	};
-	return SELF
+                if {eq? $in-key "/"} {
+                    if {[$value at -2] = "/"} {
+                        $main mini-input-value-override "/" 1;
+                    };
+                    return ALL;
+                };
+                if {eq? $in-key "~"} {
+                    if {or {[$value len] <= 1} {[$value at -2] = "/"}} {
+                        $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
+                    };
+                    return ALL;
+                };
+            }
+        ;;
+
+        return ALL;
     };
 
     if [$__buff_in_clojure__ modified-by-another-process] {
         show-message "" :bell;
-        $main mini-input-start "" prompt: ["Maybe this file modified by anothor process. Really save file? (" . $path ") [yes or ESC]: "];
-        $main add-mini-input-callback $window {| main window in-key value |
-            if {eq? $in-key KEY_ESC} {
-                $main mini-input-end;
+        mini-input-fully-yes-or-no $main $window
+            prompt: ["Maybe this file modified by anothor process. Really save file? (" . $path ") [yes or ESC]: "]
+            no-proc: {
                 show-message "Canceled.";
-                BufferManager unregist-buffer "*Directory*";
-                return SELF;
-            };
-            if {and {eq? $in-key CTRL_M} {eq? $value "yes"}} {
-                $main mini-input-end;
+                return ALL;
+            }
+            yes-proc: { 
                 (result err) ::= $__buff_in_clojure__ save-content;
                 if $result {
                     show-message "Save Done.";
                 } {
                     show-message :bell ["Save Failed, path: " . $path " (" $err ")"];
                 };
-                return SELF;
-                BufferManager unregist-buffer "*Directory*";
-            };
-        };
+                return ALL;
+            }
+        ;;
         result SELF;
     } {
-        $main mini-input-start "" prompt: ["Save file? (" . $path ") [y/n]: "];
-        $main add-mini-input-callback $window {| main window in-key value |
-            if {or {eq? $in-key KEY_ESC} {eq? $value "n"} {eq? $value "N"}} {
-                $main mini-input-end;
+        mini-input-y-or-n $main $window
+            prompt: ["Save file? (" . $path ") [y/n]: "]
+            no-proc: {
                 show-message "Canceled.";
-                BufferManager unregist-buffer "*Directory*";
-                return SELF;
-            };
-            if {or {$value = "y"} {$value = "Y"}} {
-                $main mini-input-end;
+                return ALL;
+            }
+            yes-proc: {
                 (result err) ::= $__buff_in_clojure__ save-content;
                 if $result {
                     show-message "Save Done.";
                 } {
                     show-message :bell ["Save Failed, path: " . $path " (" $err ")"];
                 };
-                return SELF;
-                BufferManager unregist-buffer "*Directory*";
-            };
-        };
-        result SELF;
+                return ALL;
+            }
+        ;;
+        
+        result ALL;
     };
 };
 
@@ -1141,15 +1093,14 @@ defcommand save-buffer-as {
     __buff_in_clojure__ ::= $window get-buffer;
     path ::= $__buff_in_clojure__ get-path;
 
-    $main mini-input-start [get-current-buffer-dir $window : . "/"] prompt: "Save file name: ";
-    $main add-mini-input-callback $window {| main window in-key value |
-	if {eq? $in-key KEY_ESC} {
-	    $main mini-input-end;
+    mini-input-until-enter $main $window
+        init-value: [get-current-buffer-dir $window : . "/"]
+        prompt: "Save file name: "
+        cancel-proc: {
 	    show-message "Canceled.";
-	    BufferManager unregist-buffer "*Directory*";	
-            return SELF;
-	};
-	if {eq? $in-key CTRL_I} {
+            return ALL;
+        }
+        completion-proc: {| value |
             if {$value = ""} {
                 fname ::= show-files-in-window $main $window [get-current-buffer-dir $window];
             } {
@@ -1158,17 +1109,8 @@ defcommand save-buffer-as {
 	    $window apply-command $main $window "" top-of-buffer;
 	    $main mini-input-value-override $fname [$fname len];
 	    return ALL;
-	};
-	if {eq? $in-key KEY_DOWN} {
-	    $window apply-command $main $window "" move-half-up;
-	    return SELF;
-	};
-	if {eq? $in-key KEY_UP} {
-	    $window apply-command $main $window "" move-half-down;
-	    return SELF;
-	};
-	if {eq? $in-key CTRL_M} {
-	    $main mini-input-end;
+        }
+        enter-proc: {| value |
 	    path ::= path-adjust [
                 {[$value sub 0 1] = "/"} ???
 		    $value
@@ -1176,75 +1118,75 @@ defcommand save-buffer-as {
             ];
 
 	    if [file exists? $path] {
-	       $main mini-input-start "" prompt: "File already exist, overwrite? [yes or ESC]: ";
-	       $main add-mini-input-callback $window {| main window in-key value |
-		   if {eq? $in-key KEY_ESC} {
-		       $main mini-input-end;
-		       show-message "Canceled.";
-		       BufferManager unregist-buffer "*Directory*";
-		       return SELF;
-		   };
-		   if {and {eq? $in-key CTRL_M} {eq? $value "yes"}} {
-		       $main mini-input-end;
-		       (result err) ::= $__buff_in_clojure__ save-content path: $path;
-		       if $result {
-			   show-message "Save Done.";
-		       } {
-			   show-message :bell ["Save Failed, path: " . $path " (" $err ")"];
-		       };
-		       BufferManager unregist-buffer "*Directory*";
-		       $MainWindow bind-buffer [$window get-window-name] $__buff_in_clojure__;
-		       return SELF;
-		   };
-	       };
+                mini-input-fully-yes-or-no $main $window
+                    prompt: "File already exist, overwrite? [yes or ESC]: "
+                    no-proc: {
+                        show-message "Canceled.";
+                        return ALL;
+                    }
+		    yes-proc: {
+                        (result err) ::= $__buff_in_clojure__ save-content path: $path;
+                        if $result {
+                            show-message "Save Done.";
+                        } {
+                            show-message :bell ["Save Failed, path: " . $path " (" $err ")"];
+                        };
+                        $MainWindow bind-buffer [$window get-window-name] $__buff_in_clojure__;
+                        return ALL;
+		    }
+                ;;
 	    } {
-		$main mini-input-end;
 		(result err) ::= $__buff_in_clojure__ save-content path: $path;
 		if $result {
-		    show-message "Save Done.";
-		    } {
-		show-message :bell ["Save Failed, path: " . $path " (" $err ")"];
+                    show-message "Save Done.";
+                } {
+                    show-message :bell ["Save Failed, path: " . $path " (" $err ")"];
 		};
-		BufferManager unregist-buffer "*Directory*";
 		$MainWindow bind-buffer [$window get-window-name] $__buff_in_clojure__;
-		return SELF;
+		return ALL;
 	    };
-	};
-        if {eq? $in-key "/"} {
-            if {[$value at -2] = "/"} {
-		$main mini-input-value-override "/" 1;
+        }
+        keyin-proc: {| value in-key |
+            if {eq? $in-key KEY_DOWN} {
+                $window apply-command $main $window "" move-half-up;
+                return ALL;
             };
-	    return SELF;
-	};
-	if {eq? $in-key "~"} {
-            if {[$value at -2] = "/"} {
-                $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
+            if {eq? $in-key KEY_UP} {
+                $window apply-command $main $window "" move-half-down;
+                return ALL;
             };
-	    return SELF;
-	};
-    };
-    result SELF;
+            if {eq? $in-key "/"} {
+                if {[$value at -2] = "/"} {
+                    $main mini-input-value-override "/" 1;
+                };
+                return ALL;
+            };
+            if {eq? $in-key "~"} {
+                if {or {[$value len] <= 1} {[$value at -2] = "/"}} {
+                    $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
+                };
+                return ALL;
+            };
+        }
+    ;;
+    
+    result ALL;
 };
 
 defcommand kill-buffer {
     | main window |
     buff ::= $window get-buffer;
     if [$buff modify?] {
-	$main mini-input-start "" prompt: "This buffer is modified, really kill? [yes or ESC]: ";
-	$main add-mini-input-callback $window {| main window in-key value |
-	    if {eq? $in-key KEY_ESC} {
-		$main mini-input-end;
-		show-message "Canceled.";
-		return ALL;
-	    };
-	    if {and {eq? $in-key CTRL_M} {eq? $value "yes"}} {
-		$main mini-input-end;
+        mini-input-fully-yes-or-no $main $window
+            prompt: "This buffer is modified, really kill? [yes or ESC]: "
+            yes-proc: {
 		$main unbind-buffer;
 		return ALL;
-	    };
-	};
-	return ALL;
+	    }
+        ;;
+        return ALL;
     };
+    
     $main unbind-buffer;
     result ALL;
 };
@@ -1275,7 +1217,7 @@ defcommand key-binding-list {
             modify ::= $ls get 1;
             $l << ["%-18v%19v %-14v [[%-v]]" fmt $grp $modify $k $v];
         } {
-            $l << ["%-18v%19v %-14v [[%-v]]" fmt "%%" (key input) $k $v];
+            $l << ["%-18v%19v %-14v [[%-v]]" fmt "" (key input) $k $v];
         };
     };
     msort $l : each do: {| i |
@@ -1368,18 +1310,13 @@ defcommand jump-to-buffer {
 
 defcommand buffer-list-completion {
     | main window |
-    $main mini-input-start "" prompt: "Buffer name: ";
+
     set _index -1;
     set _list [BufferManager get-buffer-list];
 
-    $main add-mini-input-callback $window {| main window in-key value |
-        if {eq? $in-key KEY_ESC} {
-            $main mini-input-end;
-            show-message "Canceled.";
-            return ALL;
-        };
-
-        if {eq? $in-key CTRL_I} {
+    mini-input-until-enter $main $window
+        prompt: "Buffer name: "
+        completion-proc: {| value |
             if {[$_list len] = 0 } {
                 $MainWindow set-mini-input-prompt "Buffer name (no match completion): ";
                 return ALL;
@@ -1392,9 +1329,8 @@ defcommand buffer-list-completion {
             $MainWindow set-mini-input-prompt ["Buffer name (" . [$_list len] " match(es) completion): "];
             $main mini-input-value-override $str [$str len];
             return ALL;
-        };
-
-        if {eq? $in-key KEY_BTAB} {
+        }
+        completion-back-proc: {| value |
             if {[$_list len] = 0 } {
                 $MainWindow set-mini-input-prompt "Buffer name (no match completion): ";
                 return ALL;
@@ -1407,9 +1343,8 @@ defcommand buffer-list-completion {
             $MainWindow set-mini-input-prompt ["Buffer name (" . [$_list len] " match(es) completion): "];
             $main mini-input-value-override $str [$str len];
             return ALL;
-        };
-
-        if {or {string? $in-key} {eq? $in-key KEY_DC} {eq? $in-key CTRL_H} {eq? $in-key KEY_BACKSPACE}} {
+        }
+        edit-proc: {| value |
             try {
                 if {$value = ""} {
                     setc _list [BufferManager get-buffer-list];
@@ -1429,14 +1364,12 @@ defcommand buffer-list-completion {
                 $MainWindow set-mini-input-prompt "Buffer name (no match completion): ";
             };
             return ALL;
-        };
-            
-        if {eq? $in-key CTRL_M} {
+        }
+        enter-proc: {| value |
             if {or {[$_list len] = 0} {$_index < 0}} {
                 show-message :bell "No buffer name specified.";
                 return ALL;
             };
-            $main mini-input-end;
             s ::= $_list get $_index;
             target-buff ::= BufferManager find-buffer $s;
             $target-buff ?? {
@@ -1445,26 +1378,9 @@ defcommand buffer-list-completion {
             };
             $main bind-buffer [$window get-window-name] $target-buff;
             return ALL;
-        };
-    };
-    return ALL;
-};
-
-# closure variable test
-defcommand test-closure {
-    | main window |
-    $main mini-input-start "" prompt: "test2: ";
-    set _index 0;
-    $main add-mini-input-callback $window {| main window in-key value |
-        if {eq? $in-key KEY_ESC} {
-            $main mini-input-end;
-            show-message "Canceled.";
-            return ALL;
-        };
-        $MainWindow set-mini-input-prompt ["test2: " . [info closure] ": _index=" $_index ": "];
-        setc _index [$_index + 1];
-        return ALL;
-    };
+        }
+    ;;
+    
     return ALL;
 };
 
@@ -1579,20 +1495,14 @@ defcommand buffer-list-delete {
     };
 
     if [$target-buff modify?] {
-	$main mini-input-start "" prompt: "This buffer is modified, really kill? [yes or ESC]: ";
-	$main add-mini-input-callback $window {| main window in-key value |
-	    if {eq? $in-key KEY_ESC} {
-		$main mini-input-end;
-		show-message "Canceled.";
-		return ALL;
-	    };
-	    if {and {eq? $in-key CTRL_M} {eq? $value "yes"}} {
-		$main mini-input-end;
+        mini-input-fully-yes-or-no $main $window
+            prompt: "This buffer is modified, really kill? [yes or ESC]: "
+            yes-proc: {
 		$main delete-buffer $target-buff;
                 $window apply-command $main $window "" buffer-list;
 		return ALL;
-	    };
-	};
+            }
+        ;;
 	return ALL;
     };
     $main delete-buffer $target-buff;
@@ -1837,7 +1747,6 @@ defun search-sub (main window dir) {
     };
 
     $window start-search;
-    $main mini-input-start $str prompt: [search-prompt $dir $SEARCH_MODE];
     $window reset-search;
     $window set-search-result [$__buff_in_clojure__ search $str];
     $window stay-search;
@@ -1845,123 +1754,134 @@ defun search-sub (main window dir) {
         $main send-key-event (KEY_UP);
     };
 
-    $main add-mini-input-callback $window {| main window in-key value |
-        if {eq? $in-key KEY_ESC} {
-	    $main mini-input-end;
+    mini-input-until-enter $main $window 
+        init-value: $str
+        prompt: [search-prompt $dir $SEARCH_MODE]
+        cancel-proc: {
 	    $window cancel-search $value;
 	    show-message "Search canceled.";
-	    return SELF;
-	};
-        if {eq? $in-key CTRL_M} {
-	    $main mini-input-end;
+	    return ALL;
+        }
+        enter-proc: {| value |
 	    $window end-search $value;
 	    show-message "Search complite.";
-	    return SELF;	    
-	};
-	if {eq? $in-key KEY_DOWN} {
-	    $window move-to-next-search;
-	};
-	if {eq? $in-key KEY_UP} {
-	    $window move-to-previous-search;
-	};
-	if {eq? $in-key KEY_SF} {
-	    buff ::= $window get-buffer;
-	    geom ::= $window get-geom;
-	    (sy sx) ::= $window get-source-index $buff $geom;
-	    $window apply-command $main $window "" smooth-scroll-down;
-	    (ey ex) ::= $window get-source-index $buff $geom;
-	    $geom set! CursorLine [$geom,CursorLine - [$ey - $sy]];
-	    $window stay-search;
-	};
-	if {eq? $in-key KEY_SR} {
-	    buff ::= $window get-buffer;
-	    geom ::= $window get-geom;
-	    (sy sx) ::= $window get-source-index $buff $geom;
-	    $window apply-command $main $window "" smooth-scroll-up;
-	    (ey ex) ::= $window get-source-index $buff $geom;
-	    $geom set! CursorLine [$geom,CursorLine - [$ey - $sy]];
-	    $window stay-search;
-	};
-	if {eq? $in-key KEY_SRIGHT} {
-	    buff ::= $window get-buffer;
-	    geom ::= $window get-geom;
-	    (sy sx) ::= $window get-source-index $buff $geom;
-	    $window apply-command $main $window "" smooth-scroll-right;
-	    (ey ex) ::= $window get-source-index $buff $geom;
-	    $geom set! CursorColumn [$geom,CursorColumn - [$ex - $sx]];
-	    $window stay-search;
-	};
-	if {eq? $in-key KEY_SLEFT} {
-	    buff ::= $window get-buffer;
-	    geom ::= $window get-geom;
-	    (sy sx) ::= $window get-source-index $buff $geom;
-	    $window apply-command $main $window "" smooth-scroll-left;
-	    (ey ex) ::= $window get-source-index $buff $geom;
-	    $geom set! CursorColumn [$geom,CursorColumn - [$ex - $sx]];
-	    $window stay-search;
-	};
-	if {eq? $in-key CTRL_F} {
-	    str ::= $window get-search-string;
-	    if [$value = ""] {
-                $main mini-input-value-override $str [$str len];
-                $window set-search-result [$__buff_in_clojure__ search $str];
-            } {
-                $window set-search-result [$__buff_in_clojure__ search $value];
-            };
-	    $window stay-search;
-            $main send-key-event (KEY_DOWN);
-	};
-	if {eq? $in-key CTRL_R} {
-	    str ::= $window get-search-string;
-	    if [$value = ""] {
-                $main mini-input-value-override $str [$str len];
-                $window set-search-result [$__buff_in_clojure__ search $str];
-            } {
-                $window set-search-result [$__buff_in_clojure__ search $value];
-            };
-	    $window stay-search;
-            $main send-key-event (KEY_UP);
-	};
-	if {eq? $in-key CTRL_V} {
-            str ::= $window get-copy-buffer;
-            if {$str != ""} {
-                $main mini-input-value-override $str [$str len];
-                $window set-search-result [$__buff_in_clojure__ search $str];
+            return ALL;
+        }
+        keyin-proc: {| value in-key |
+            if {eq? $in-key KEY_DOWN} {
                 $window move-to-next-search;
+                return ALL;
             };
-        };
-        if {eq? $in-key CTRL_T} {
-            case $SEARCH_MODE
-                regex {setvar SEARCH_MODE text}
-                text  {setvar SEARCH_MODE regex}
-            ;;
-            $MainWindow set-mini-input-prompt [search-prompt $dir $SEARCH_MODE];
-      	    $window reset-search;
-	    $window set-search-result [$__buff_in_clojure__ search $value];
-	    $window stay-search;
-            if $dir {
+            if {eq? $in-key KEY_UP} {
+                $window move-to-previous-search;
+                return ALL;
+            };
+            if {eq? $in-key KEY_SF} {
+                buff ::= $window get-buffer;
+                geom ::= $window get-geom;
+                (sy sx) ::= $window get-source-index $buff $geom;
+                $window apply-command $main $window "" smooth-scroll-down;
+                (ey ex) ::= $window get-source-index $buff $geom;
+                $geom set! CursorLine [$geom,CursorLine - [$ey - $sy]];
+                $window stay-search;
+                return ALL;
+            };
+            if {eq? $in-key KEY_SR} {
+                buff ::= $window get-buffer;
+                geom ::= $window get-geom;
+                (sy sx) ::= $window get-source-index $buff $geom;
+                $window apply-command $main $window "" smooth-scroll-up;
+                (ey ex) ::= $window get-source-index $buff $geom;
+                $geom set! CursorLine [$geom,CursorLine - [$ey - $sy]];
+                $window stay-search;
+                return ALL;
+            };
+            if {eq? $in-key KEY_SRIGHT} {
+                buff ::= $window get-buffer;
+                geom ::= $window get-geom;
+                (sy sx) ::= $window get-source-index $buff $geom;
+                $window apply-command $main $window "" smooth-scroll-right;
+                (ey ex) ::= $window get-source-index $buff $geom;
+                $geom set! CursorColumn [$geom,CursorColumn - [$ex - $sx]];
+                $window stay-search;
+                return ALL;
+            };
+            if {eq? $in-key KEY_SLEFT} {
+                buff ::= $window get-buffer;
+                geom ::= $window get-geom;
+                (sy sx) ::= $window get-source-index $buff $geom;
+                $window apply-command $main $window "" smooth-scroll-left;
+                (ey ex) ::= $window get-source-index $buff $geom;
+                $geom set! CursorColumn [$geom,CursorColumn - [$ex - $sx]];
+                $window stay-search;
+                return ALL;
+            };
+            if {eq? $in-key CTRL_F} {
+                str ::= $window get-search-string;
+                if [$value = ""] {
+                    $main mini-input-value-override $str [$str len];
+                    $window set-search-result [$__buff_in_clojure__ search $str];
+                } {
+                    $window set-search-result [$__buff_in_clojure__ search $value];
+                };
+                $window stay-search;
                 $main send-key-event (KEY_DOWN);
-            } {
-                $main send-key-event (KEY_UP);
+                return ALL;
             };
-        };
-	if {or {eq? $in-key CTRL_H} {eq? $in-key KEY_DC}
-	       {eq? $in-key KEY_BACKSPACE} {eq? $in-key kDC5}} {
-	    $window reset-search;
-	    $window set-search-result [$__buff_in_clojure__ search $value];
-	    $window move-to-next-search;
-	};
-	if {string? $in-key} {
-	    $window reset-search;
-	    $window set-search-result [$__buff_in_clojure__ search $value];
-	    $window stay-search;
-            if $dir {
-                $main send-key-event (KEY_DOWN);
-            } {
+            if {eq? $in-key CTRL_R} {
+                str ::= $window get-search-string;
+                if [$value = ""] {
+                    $main mini-input-value-override $str [$str len];
+                    $window set-search-result [$__buff_in_clojure__ search $str];
+                } {
+                    $window set-search-result [$__buff_in_clojure__ search $value];
+                };
+                $window stay-search;
                 $main send-key-event (KEY_UP);
+                return ALL;
             };
-	};
-    };
+            if {eq? $in-key CTRL_V} {
+                $window set-search-result [$__buff_in_clojure__ search $value];
+                $window move-to-next-search;
+                return ALL;
+            };
+            if {eq? $in-key CTRL_T} {
+                case $SEARCH_MODE
+                    regex {setvar SEARCH_MODE text}
+                    text  {setvar SEARCH_MODE regex}
+                ;;
+                $MainWindow set-mini-input-prompt [search-prompt $dir $SEARCH_MODE];
+                $window reset-search;
+                $window set-search-result [$__buff_in_clojure__ search $value];
+                $window stay-search;
+                if $dir {
+                    $main send-key-event (KEY_DOWN);
+                } {
+                    $main send-key-event (KEY_UP);
+                };
+                return ALL;
+            };
+            if {or {eq? $in-key CTRL_H} {eq? $in-key KEY_DC}
+	           {eq? $in-key KEY_BACKSPACE} {eq? $in-key kDC5}} {
+                $window reset-search;
+                $window set-search-result [$__buff_in_clojure__ search $value];
+                $window move-to-next-search;
+                return ALL;
+            };
+            if {string? $in-key} {
+                $window reset-search;
+                $window set-search-result [$__buff_in_clojure__ search $value];
+                $window stay-search;
+                if $dir {
+                    $main send-key-event (KEY_DOWN);
+                } {
+                    $main send-key-event (KEY_UP);
+                };
+                return ALL;
+            };
+        }
+    ;;
+
     return SELF;
 };
 
@@ -2244,34 +2164,30 @@ defun cursor-on-search-regex (y x str buff) {
 
 defcommand replace-buffer {
     | main window |
-    $main mini-input-start "" prompt: "Replace string: ";
-    $main add-mini-input-callback $window {
-        | main window in-key value |
-        if {eq? $in-key CTRL_M} {
-	    $main mini-input-end;
+
+    mini-input-until-enter $main $window
+        prompt: "Replace string: "
+        enter-proc: {| value |
 	    froms := $value;
-	    $main mini-input-start "" prompt: ["Replace string [" . $froms "] to: "];
-	    $main add-mini-input-callback $window {
-                | main window in-key value |
-		if {eq? $in-key CTRL_M} {
-		    $main mini-input-end;
+            mini-input-until-enter $main $window
+                prompt: ["Replace string [" . $froms "] to: "]
+                enter-proc: {| value |
                     count ::= [$window get-buffer] replace-buffer $froms $value;
                     show-message ["Replace [" . $froms "] to [" $value "] " $count " times completed."];
                     return ALL;
-	        };
-                if {eq? $in-key KEY_ESC} {
-                    $main mini-input-end;
+	        }
+                cancel-proc: {
                     show-message "Replace canceled.";
-                    return SELF;
-                };
-            };
-        };
-        if {eq? $in-key KEY_ESC} {
-	    $main mini-input-end;
+                    return ALL;
+                }
+            ;;
+        }
+        cancel-proc: {
             show-message "Replace canceled.";
-            return SELF;
-        };
-    };
+            return ALL;
+        }
+    ;;
+    
     result SELF;
 };
 
@@ -2281,17 +2197,14 @@ defcommand replace-region {
         show-message "Please select a region first.";
         return SELF;
     };
-    $main mini-input-start "" prompt: "Region replace string: ";
-    $main add-mini-input-callback $window {
-        | main window in-key value |
-        if {eq? $in-key CTRL_M} {
-	    $main mini-input-end;
+
+    mini-input-until-enter $main $window 
+        prompt: "Region replace string: "
+        enter-proc: {| value |
 	    froms := $value;
-	    $main mini-input-start "" prompt: ["Region replace string [" . $froms "] to: "];
-	    $main add-mini-input-callback $window {
-                | main window in-key value |
-		if {eq? $in-key CTRL_M} {
-		    $main mini-input-end;
+            mini-input-until-enter $main $window
+                prompt: ["Region replace string [" . $froms "] to: "]
+                enter-proc: {| value |
                     if [$window get-region] {
                         buff ::= $window get-buffer;
                         geom ::= $window get-geom;
@@ -2302,21 +2215,20 @@ defcommand replace-region {
                     count ::= [$window get-buffer] replace-region $froms $value $sy $ey;
                     show-message ["Region replace [" . $froms "] to [" $value "] " $count " times completed in region (" $sy "," $ey ")."];
                     return ALL;
-	        };
-                if {eq? $in-key KEY_ESC} {
-                    $main mini-input-end;
+	        }
+                cancel-proc: {
                     show-message "Region replace canceled.";
-                    return SELF;
-                };
-            };
-        };
-        if {eq? $in-key KEY_ESC} {
-	    $main mini-input-end;
+                    return ALL;
+                }
+            ;;
+        }
+        cancel-proc: {
             show-message "Region replace canceled.";
-            return SELF;
-        };
-    };
-    result SELF;
+            return ALL;
+        }
+    ;;
+
+    result ALL;
 };
 
 defcommand exit {
@@ -2822,23 +2734,19 @@ defcommand grep {
     | main window |
     buff ::= $window get-buffer;
     dir ::= [$buff get-content-dir] . "/";
-    $main mini-input-start $dir prompt: "Directory: ";
-    $main add-mini-input-callback $window {| main window in-key value |
-        if {eq? $in-key KEY_ESC} {
-            $main mini-input-end;
-            show-message "Canceled.";
-            return SELF;
-        };
-        if {eq? $in-key CTRL_M} {
-            $main mini-input-end;
+
+    mini-input-until-enter $main $window 
+        init-value: $dir
+        prompt: "Directory: "
+        enter-proc: {| value |
             if {[$value len] = 0} {
                 show-message :bell "No directory specified.";
-                return SELF;
+                return ALL;
             };
             directory := $value;
             if {file dir? $directory} else: {
                 show-message :bell ["Not directory: " . $directory];
-                return SELF;
+                return ALL;
             };
 
             str := "";
@@ -2850,18 +2758,15 @@ defcommand grep {
                 (ey ex) ::= $window get-source-index $buff $geom;
                 str ::= $window get-region-string $sy $sx $ey $ex;
             };
-            $main mini-input-start ["grep -rnHe '" . $str "' *"] prompt: "grep command line: " index: 12;
-            $main add-mini-input-callback $window {| main window in-key value |
-                if {eq? $in-key KEY_ESC} {
-                    $main mini-input-end;
-                    show-message "Canceled.";
-                    return SELF;
-                };
-                if {eq? $in-key CTRL_M} {
-                    $main mini-input-end;
+            
+            mini-input-until-enter $main $window
+                init-value: ["grep -rnHe '" . $str "' *"]
+                prompt: "grep command line: "
+                index: 12
+                enter-proc: {| value |
                     if {[$value len] = 0} {
                         show-message :bell "No grep command line specified.";
-                        return SELF;
+                        return ALL;
                     };
                     cmd := $value;
                     
@@ -2908,12 +2813,12 @@ defcommand grep {
                     $buff set-protect;
                     $buff no-modify;
                     cd $orig-dir;
-                    return SELF;
-                };
-            };
-            return SELF;
-        };
-	if {eq? $in-key CTRL_I} {
+                    return ALL;
+                }
+            ;;
+            return ALL;
+        }
+        completion-proc: {| value |
             if {$value = ""} {
                 fname ::= show-files-in-window $main $window [get-current-buffer-dir $window];
             } {
@@ -2922,29 +2827,32 @@ defcommand grep {
 	    $window apply-command $main $window "" top-of-buffer;
 	    $main mini-input-value-override $fname [$fname len];
 	    return ALL;
-	};
-	if {eq? $in-key KEY_DOWN} {
-	    $window apply-command $main $window "" move-half-up;
-	    return SELF;
-	};
-	if {eq? $in-key KEY_UP} {
-	    $window apply-command $main $window "" move-half-down;
-	    return SELF;
-	};
-	if {eq? $in-key "/"} {
-            if {[$value at -2] = "/"} {
-		$main mini-input-value-override "/" 1;
+        }
+        keyin-proc: {| value in-key |
+            if {eq? $in-key KEY_DOWN} {
+                $window apply-command $main $window "" move-half-up;
+                return ALL;
             };
-	    return SELF;
-	};
-	if {eq? $in-key "~"} {
-            if {[$value at -2] = "/"} {
-                $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
+            if {eq? $in-key KEY_UP} {
+                $window apply-command $main $window "" move-half-down;
+                return ALL;
             };
-	    return SELF;
-	};
-    };
-    result SELF;
+            if {eq? $in-key "/"} {
+                if {[$value at -2] = "/"} {
+                    $main mini-input-value-override "/" 1;
+                };
+                return ALL;
+            };
+            if {eq? $in-key "~"} {
+                if {or {[$value len] <= 1} {[$value at -2] = "/"}} {
+                    $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
+                };
+                return ALL;
+            };
+        }
+    ;;
+    
+    result ALL;
 };
 
 defcommand grep-current-word {
@@ -3172,23 +3080,19 @@ defun chdir-cwd (buff) {
 
 defcommand read-grep-file {
     | main window |
-    $main mini-input-start [pwd : . "/"] prompt: "Read grep file: ";
-    $main add-mini-input-callback $window {| main window in-key value |
-        if {eq? $in-key KEY_ESC} {
-            $main mini-input-end;
-            show-message "Canceled.";
-            return SELF;
-        };
-        if {eq? $in-key CTRL_M} {
-            $main mini-input-end;
+    
+    mini-input-until-enter $main $window
+        init-value: [pwd : . "/"]
+        prompt: "Read grep file: "
+        enter-proc: {| value |
             if {[$value len] = 0} {
                 show-message :bell "No grep file specified.";
-                return SELF;
+                return ALL;
             };
             file := $value;
             if {file read? $file} else: {
                 show-message :bell ["Not readable file: " . $file];
-                return SELF;
+                return ALL;
             };
             ###
             ### do read grep file
@@ -3198,7 +3102,7 @@ defcommand read-grep-file {
             (result err) ::= $buff load-content $file buffer-name: "*Grep*";
             $result ?? {
                 show-message :bell ["Open Failed, path: " . $file " ("  $err ")"];
-                return SELF;
+                return ALL;
             };
             $main create-split-vertical-window;
             $main bind-buffer "Window#1" $buff;
@@ -3207,10 +3111,9 @@ defcommand read-grep-file {
             $geom set! ViewLine 0;
             $geom set! ViewColumn 0;
             $window cursor-move-to $geom 0 0;
-            return SELF;
-        };
-
-	if {eq? $in-key CTRL_I} {
+            return ALL;
+        }
+        completion-proc: {| value |
             if {$value = ""} {
                 fname ::= show-files-in-window $main $window [get-current-buffer-dir $window];
             } {
@@ -3219,52 +3122,51 @@ defcommand read-grep-file {
 	    $window apply-command $main $window "" top-of-buffer;
 	    $main mini-input-value-override $fname [$fname len];
 	    return ALL;
-	};
-	if {eq? $in-key KEY_DOWN} {
-	    $window apply-command $main $window "" move-half-up;
-	    return SELF;
-	};
-	if {eq? $in-key KEY_UP} {
-	    $window apply-command $main $window "" move-half-down;
-	    return SELF;
-	};
-	if {eq? $in-key "/"} {
-            if {[$value at -2] = "/"} {
-		$main mini-input-value-override "/" 1;
+        }
+        keyin-proc: {| value in-key |
+            if {eq? $in-key KEY_DOWN} {
+                $window apply-command $main $window "" move-half-up;
+                return ALL;
             };
-	    return SELF;
-	};
-	if {eq? $in-key "~"} {
-            if {[$value at -2] = "/"} {
-                $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
+            if {eq? $in-key KEY_UP} {
+                $window apply-command $main $window "" move-half-down;
+                return ALL;
             };
-	    return SELF;
-	};
-    };
-    result SELF;
+            if {eq? $in-key "/"} {
+                if {[$value at -2] = "/"} {
+                    $main mini-input-value-override "/" 1;
+                };
+                return ALL;
+            };
+            if {eq? $in-key "~"} {
+                if {or {[$value len] <= 1} {[$value at -2] = "/"}} {
+                    $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
+                };
+                return ALL;
+            };
+        }
+    ;;
+    
+    result ALL;
 };
 
 defcommand cd {
     | main window |
-    $main mini-input-start [pwd : . "/"] prompt: "Directory: ";
-    $main add-mini-input-callback $window {| main window in-key value |
-        if {eq? $in-key KEY_ESC} {
-            $main mini-input-end;
-            show-message "Canceled.";
-            return SELF;
-        };
-        if {eq? $in-key CTRL_M} {
-            $main mini-input-end;
+    
+    mini-input-until-enter $main $window
+        init-value: [pwd : . "/"] 
+        prompt: "Directory: "
+        enter-proc: {| value |
             if {[$value len] = 0} {
                 show-message :bell "No directory specified.";
-                return SELF;
+                return ALL;
             };
             directory := $value;
             cd $directory;
             show-message ["Current directory is: " . $directory];
-            return SELF;
-        };
-	if {eq? $in-key CTRL_I} {
+            return ALL;
+        }
+        completion-proc: {| value |
             if {$value = ""} {
                 fname ::= show-files-in-window $main $window [get-current-buffer-dir $window];
             } {
@@ -3273,42 +3175,40 @@ defcommand cd {
 	    $window apply-command $main $window "" top-of-buffer;
 	    $main mini-input-value-override $fname [$fname len];
 	    return ALL;
-	};
-	if {eq? $in-key KEY_DOWN} {
-	    $window apply-command $main $window "" move-half-up;
-	    return SELF;
-	};
-	if {eq? $in-key KEY_UP} {
-	    $window apply-command $main $window "" move-half-down;
-	    return SELF;
-	};
-	if {eq? $in-key "/"} {
-            if {[$value at -2] = "/"} {
-		$main mini-input-value-override "/" 1;
+	}
+        keyin-proc: {| value in-key |
+            if {eq? $in-key KEY_DOWN} {
+                $window apply-command $main $window "" move-half-up;
+                return ALL;
             };
-	    return SELF;
-	};
-	if {eq? $in-key "~"} {
-            if {[$value at -2] = "/"} {
-                $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
+            if {eq? $in-key KEY_UP} {
+                $window apply-command $main $window "" move-half-down;
+                return ALL;
             };
-	    return SELF;
-	};
-    };
+            if {eq? $in-key "/"} {
+                if {[$value at -2] = "/"} {
+                    $main mini-input-value-override "/" 1;
+                };
+                return ALL;
+            };
+            if {eq? $in-key "~"} {
+                if {or {[$value len] <= 1} {[$value at -2] = "/"}} {
+                    $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
+                };
+                return ALL;
+            };
+        }
+    ;;
+
     result SELF;
 };
 
 defcommand set-theme {
     | main window |
-    $main mini-input-start "" prompt: "Theme: ";
-    $main add-mini-input-callback $window {| main window in-key value |
-        if {eq? $in-key KEY_ESC} {
-	    $main mini-input-end;
-	    show-message "Canceled.";
-            return SELF;
-	};
-        if {eq? $in-key CTRL_M} {
-            $main mini-input-end;
+    
+    mini-input-until-enter $main $window
+        prompt: "Theme: "
+        enter-proc: {| value |
             t := $THEME;
             setvar THEME $value;
             try {
@@ -3319,44 +3219,36 @@ defcommand set-theme {
                 setvar THEME $t;
             };
             return ALL;
-        };
-    };
+        }
+    ;;
+    
     result ALL;
 };
 
 defcommand set-mode {
     | main window |
-    $main mini-input-start "" prompt: "Mode: ";
-    $main add-mini-input-callback $window {| main window in-key value |
-        if {eq? $in-key KEY_ESC} {
-	    $main mini-input-end;
-	    show-message "Canceled.";
-            return SELF;
-	};
-        if {eq? $in-key CTRL_M} {
-            $main mini-input-end;
+
+    mini-input-until-enter $main $window 
+        prompt: "Mode: "
+        enter-proc: {| value |
             $window set-mode $value;
             $window apply-command $main $window "" refresh-screen;
             return ALL;
-        };
-    };
+        }
+    ;;
+
     result ALL;
 };
 
 defcommand goto {
     | main window |
-    $main mini-input-start "" prompt: "Goto line: ";
-    $main add-mini-input-callback $window {| main window in-key value |
-        if {eq? $in-key KEY_ESC} {
-	    $main mini-input-end;
-	    show-message "Canceled.";
-            return SELF;
-	};
-        if {eq? $in-key CTRL_M} {
-            $main mini-input-end;
+
+    mini-input-until-enter $main $window
+        prompt: "Goto line: "
+        enter-proc: {| value |
             if [$value numeric?] else: {
                 show-message "Enter line number.";
-                return SELF;
+                return ALL;
             };
             $window mark;
             geom ::= $window get-geom;
@@ -3367,29 +3259,24 @@ defcommand goto {
             };
             $window cursor-move-to $geom $line 0;
             return ALL;
-        };
-        return SELF;
-    };
-    result SELF;
+        }
+    ;;
+    
+    result ALL;
 };
 
 defcommand set-line-limit {
     | main window |
-    $main mini-input-start "" prompt: [
-        "Line length limit (current=" .
-            [[true? INTERP_LIMIT_LEN] ??? $INTERP_LIMIT_LEN "none"] "): "
-    ];
-    $main add-mini-input-callback $window {| main window in-key value |
-        if {eq? $in-key KEY_ESC} {
-	    $main mini-input-end;
-	    show-message "Canceled.";
-            return SELF;
-	};
-        if {eq? $in-key CTRL_M} {
-            $main mini-input-end;
+
+    mini-input-until-enter $main $window
+        prompt: [
+            "Line length limit (current=" .
+                [[true? INTERP_LIMIT_LEN] ??? $INTERP_LIMIT_LEN "none"] "): "
+        ]
+        enter-proc: {| value |
             if {$value = ""} {
                 show-message "Enter line length limit.";
-                return SELF;
+                return ALL;
             };
             if [$value numeric?] else: {
                 if {eq? "auto" $value} {
@@ -3401,17 +3288,17 @@ defcommand set-line-limit {
                 } {
                     show-message "Enter line length limit.";
                 };
-                return SELF;
+                return ALL;
             };
             if {defvar? INTERP_LIMIT_LEN} {
                 setvar INTERP_LIMIT_LEN [$value int];
             } {
                 defvar INTERP_LIMIT_LEN [$value int];
             };
-            return SELF;
-        };
-        return SELF;
-    };
+            return ALL;
+        }
+    ;;
+    
     result SELF;
 };
 
@@ -3457,24 +3344,20 @@ defcommand man {
         (ey ex) ::= $window get-source-index $buff $geom;
         str ::= $window get-region-string $sy $sx $ey $ex;
     };
-    
-    $main mini-input-start $str prompt: "Man topic: ";
-    $main add-mini-input-callback $window {| main window in-key value |
-        if {eq? $in-key KEY_ESC} {
-	    $main mini-input-end;
-	    show-message "Canceled.";
-            return SELF;
-	};
-        if {eq? $in-key CTRL_M} {
-            $main mini-input-end;
+
+    mini-input-until-enter $main $window
+        init-value: $str
+        prompt: "Man topic: "
+        enter-proc: {| value |
             if {$value = ""} {
                 show-message :bell "Enter man topic name.";
                 return ALL;
             };
             exec-man $main $window $buff $value;
             return ALL;
-        };
-    };
+        }
+    ;;
+    
     return ALL;
 };
 
@@ -3597,37 +3480,29 @@ defcommand man-previous-link {
 
 defcommand compile {
     | main window |
-    $main mini-input-start [pwd : . "/"] prompt: "Directory: ";
-    $main add-mini-input-callback $window {| main window in-key value |
-        if {eq? $in-key KEY_ESC} {
-            $main mini-input-end;
-            show-message "Canceled.";
-            return SELF;
-        };
-        if {eq? $in-key CTRL_M} {
-            $main mini-input-end;
+    
+    mini-input-until-enter $main $window
+        init-value: [pwd : . "/"]
+        prompt: "Directory: "
+        enter-proc: {| value |
             if {[$value len] = 0} {
                 show-message :bell "No directory specified.";
-                return SELF;
+                return ALL;
             };
             directory := $value;
             if {file dir? $directory} else: {
                 show-message :bell ["Not directory: " . $directory];
-                return SELF;
+                return ALL;
             };
 
-            $main mini-input-start "make -f Makefile " prompt: "Compile: " index: 17;
-            $main add-mini-input-callback $window {| main window in-key value |
-                if {eq? $in-key KEY_ESC} {
-                    $main mini-input-end;
-                    show-message "Canceled.";
-                    return SELF;
-                };
-                if {eq? $in-key CTRL_M} {
-                    $main mini-input-end;
+            mini-input-until-enter $main $window
+                init-value: "make -f Makefile "
+                prompt: "Compile: "
+                index: 17
+                enter-proc: {| value |
                     if {[$value len] = 0} {
                         show-message :bell "No compile command specified.";
-                        return SELF;
+                        return ALL;
                     };
                     cmd := $value;
                     
@@ -3668,12 +3543,12 @@ defcommand compile {
                     $geom set! ViewLine 0;
                     $geom set! ViewColumn 0;
                     $window cursor-move-to $geom 0 0;
-                    return SELF;
-                };
-            };
-            return SELF;
-        };
-	if {eq? $in-key CTRL_I} {
+                    return ALL;
+                }
+            ;;
+            return ALL;
+        }
+        completion-proc: {| value |
             if {$value = ""} {
                 fname ::= show-files-in-window $main $window [get-current-buffer-dir $window];
             } {
@@ -3682,29 +3557,32 @@ defcommand compile {
 	    $window apply-command $main $window "" top-of-buffer;
 	    $main mini-input-value-override $fname [$fname len];
 	    return ALL;
-	};
-	if {eq? $in-key KEY_DOWN} {
-	    $window apply-command $main $window "" move-half-up;
-	    return SELF;
-	};
-	if {eq? $in-key KEY_UP} {
-	    $window apply-command $main $window "" move-half-down;
-	    return SELF;
-	};
-	if {eq? $in-key "/"} {
-            if {[$value at -2] = "/"} {
-		$main mini-input-value-override "/" 1;
+        }
+        keyin-proc: {| value in-key |
+            if {eq? $in-key KEY_DOWN} {
+                $window apply-command $main $window "" move-half-up;
+                return ALL;
             };
-	    return SELF;
-	};
-	if {eq? $in-key "~"} {
-            if {[$value at -2] = "/"} {
-                $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
+            if {eq? $in-key KEY_UP} {
+                $window apply-command $main $window "" move-half-down;
+                return ALL;
             };
-	    return SELF;
-	};
-    };
-    result SELF;
+            if {eq? $in-key "/"} {
+                if {[$value at -2] = "/"} {
+                    $main mini-input-value-override "/" 1;
+                };
+                return ALL;
+            };
+            if {eq? $in-key "~"} {
+                if {or {[$value len] <= 1} {[$value at -2] = "/"}} {
+                    $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
+                };
+                return ALL;
+            }
+        }
+    ;;
+    
+    result All;
 };
 
 defcommand help {
@@ -4024,20 +3902,17 @@ defcommand dired-sort-by-size-descending {
 defcommand dired-filter {
     | main window |
     buff ::= $window get-buffer;
-    $main mini-input-start [$buff get-filter : string] prompt: "Filter: ";
-    $main add-mini-input-callback $window {| main window in-key value |
-        if {eq? $in-key KEY_ESC} {
-	    $main mini-input-end;
-	    show-message "Canceled.";
-            return ALL;
-        };
-        if {eq? $in-key CTRL_M} {
-            $main mini-input-end;
+    
+    mini-input-until-enter $main $window 
+        init-value: [$buff get-filter : string]
+        prompt: "Filter: "
+        enter-proc: {| value |
             $buff set-filter [$value rquote];
             $buff update;
             return ALL;
-        };
-    };
+        }
+    ;;
+    
     return ALL;
 };
 
@@ -4048,35 +3923,36 @@ defcommand set-encoder {
         show-message :bell "Buffer is modified. Try again after re-open this file.";
         return SELF;
     };
-    $main mini-input-start "" prompt: ["Encoding UTF-8(u)/EUC-JP(e)/Shift-JIS(s)/RAW(r) [current is " .
-        ["" . [$buff get-encoding]] "]: "];
-    $main add-mini-input-callback $window {| main window in-key value |
-        enc := <nil>;
-        case  $in-key
-            "u" {enc := "UTF-8F"}
-            "U" {enc := "UTF-8F"}
-            "e" {enc := "EUC-JP"}
-            "E" {enc := "EUC-JP"}
-            "s" {enc := "Shift-JIS"}
-            "S" {enc := "Shift-JIS"}
-            "r" {enc := "RAW"}
-            "R" {enc := "RAW"}
-        ;;
-        if $enc {
-            $main mini-input-end;
-            $buff set-encoding $enc;
-            $buff reload-content;
-            if {$buff enc-error?} {
-                show-message :bell "File decode error occured!! Try ALT-e and specify another encoding for re-load.";
+
+    mini-input-until-enter $main $window
+        prompt: ["Encoding UTF-8(u)/EUC-JP(e)/Shift-JIS(s)/RAW(r) [current is " .
+            ["" . [$buff get-encoding]] "]: "]
+        keyin-proc: {| value in-key |
+            enc := <nil>;
+            case  $in-key
+                "u" {enc := "UTF-8F"}
+                "U" {enc := "UTF-8F"}
+                "e" {enc := "EUC-JP"}
+                "E" {enc := "EUC-JP"}
+                "s" {enc := "Shift-JIS"}
+                "S" {enc := "Shift-JIS"}
+                "r" {enc := "RAW"}
+                "R" {enc := "RAW"}
+            ;;
+            if $enc {
+                $main mini-input-end;
+                $buff set-encoding $enc;
+                $buff reload-content;
+                if {$buff enc-error?} {
+                    show-message :bell "File decode error occured!! Try ALT-e and specify another encoding for re-load.";
+                    return ALL;
+                };
+                show-message ["Set encoding to: " . $enc];
+                return ALL;
             };
-            return ALL;
-        };
-        if {eq? $in-key KEY_ESC} {
-	    $main mini-input-end;
-	    show-message "Canceled.";
-            return ALL;
-        };
-    };
+        }
+    ;;
+    
     result ALL;
 };
 
@@ -4086,15 +3962,10 @@ defcommand set-tab-width {
     if {defvar? DEFAULT_TAB_WIDTH} {
         tab := $DEFAULT_TAB_WIDTH;
     };
-    $main mini-input-start "" prompt: ["Set TAB width [current is " . $tab "]: "];
-    $main add-mini-input-callback $window {| main window in-key value |
-        if {eq? $in-key KEY_ESC} {
-	    $main mini-input-end;
-	    show-message "Canceled.";
-            return ALL;
-        };
-        if {eq? $in-key CTRL_M} {
-            $main mini-input-end;
+    
+    mini-input-until-enter $main $window
+        prompt: ["Set TAB width [current is " . $tab "]: "]
+        enter-proc: {| value |
             try {
                 if {$value = ""} {
                     tab := $tab; # set closure value to local value.
@@ -4116,8 +3987,9 @@ defcommand set-tab-width {
             };
             show-message ["Set TAB width to " . $tab "."];
             return ALL;
-        };
-    };
+        }
+    ;;
+    
     result ALL;
 };
 
@@ -4126,15 +3998,9 @@ defcommand set-buffer-tab-width {
     buff ::= $window get-buffer;
     tab ::= [$buff get-buffer-tab-width] ?? $DEFAULT_TAB_WIDTH;
 
-    $main mini-input-start "" prompt: ["Set buffer TAB width [current is " . $tab "]: "];
-    $main add-mini-input-callback $window {| main window in-key value |
-        if {eq? $in-key KEY_ESC} {
-	    $main mini-input-end;
-	    show-message "Canceled.";
-            return ALL;
-        };
-        if {eq? $in-key CTRL_M} {
-            $main mini-input-end;
+    mini-input-until-enter $main $window
+        prompt: ["Set buffer TAB width [current is " . $tab "]: "]
+        enter-proc: {| value |
             try {
                 if {$value = ""} {
                     tab := $tab; # set closure value to local value.
@@ -4159,8 +4025,9 @@ defcommand set-buffer-tab-width {
                 show-message ["Set buffer TAB width to " . $tab "."];
             };
             return ALL;
-        };
-    };
+        }
+    ;;
+    
     result ALL;
 };
 
@@ -4494,78 +4361,6 @@ REM {
 
 defcommand {
     | main window |
-};
-
-defcommand miniwindow-input-sample {
-    | main window |
-    $main mini-input-start "" prompt: "test prompt: ";
-    $main add-mini-input-callback $window {| main window in-key value |
-        if {eq? $in-key KEY_ESC} {
-	    $main mini-input-end;
-	    debug-message ["input data: " . $value];
-	};
-    };
-    result ALL;
-};
-
-##
-## Nested callback sample.
-## $value was save to path variable in 1st callback, because $value is override by 2nd callback.
-##
-defcommand nest-test {
-    | main window |
-    $main mini-input-start "" prompt: "test [y(es)/n(o)]";
-    $main add-mini-input-callback $window {| main window in-key value |
-	if {eq? $in-key "y"} {
-	    $main mini-input-end;
-	    path := $value;
-	    $main mini-input-start "" prompt: "test 2 [o(k)/n(g)]";
-	    $main add-mini-input-callback $window {| main window in-key value |
-		if {eq? $in-key "o"} {
-		    $main mini-input-end;
-		    debug-message ["path value is: " . $path ", value is: " $value];
-		};
-	    };
-	};
-    };
-};
-
-defcommand test {
-    | main window |
-    # debug-message ["info local: " . [info local]] wait: 3000;
-    $main mini-input-start "" prompt: "test prompt: ";
-    $main add-mini-input-callback $window {| main window in-key value |
-        if {eq? $in-key KEY_ESC} {
-	    $main mini-input-end;
-	    debug-message ["closure: " . [info closure]];
-	};
-        if {eq? $in-key CTRL_I} {
-	    fname ::= show-files-in-window $main $window $value;
-	};
-    };
-    result ALL;
-};
-
-defcommand color-index {| main window |
-  (height width) ::= $window get-screen-size;
-  buff ::= $window get-buffer;
-  geom ::= $window get-geom;
-  (y x) ::= $window get-source-index $buff $geom;
-  v ::= $buff get-vector;
-  start := $geom,ViewLine;
-  end ::= $geom,ViewLine + $height : - 1;
-  $v each-backward-char $y $x { | cy cx cc |
-    if {$cy < $start} {break};
-    if {$cc = "0"} {
-      $window set-spot-color-item ["A" . $cy "." $cx] $cy $cx 1 BLACK.CYAN;
-    };
-  };
-  $v each-forward-char $y $x { | cy cx cc |
-    if {$cy > $end} {break};
-    if {$cc = "1"} {
-      $window set-spot-color-item ["A" . $cy "." $cx] $cy $cx 1 BLACK.CYAN;
-    };
-  };
 };
 
 ######
