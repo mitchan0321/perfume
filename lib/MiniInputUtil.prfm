@@ -1,0 +1,132 @@
+class MiniInputUtil;
+
+defun mini-input-until-enter 
+    (
+        main
+        window
+        prompt: prompt
+        init-value: val
+        enter-proc: enter-proc
+        cancel-proc: cancel-proc
+        edit-proc: edit-proc
+        keyin-proc: keyin-proc
+        completion-proc: completion-proc
+        completion-back-proc: completion-back-proc
+        index: index
+        return-status: status
+    ) {
+
+    if {set? prompt}          else: {prompt := "mini-input prompt: "};
+    if {set? val}             else: {val := ""};
+    if {set? enter-proc}      else: {enter-proc := {| value | show-message ["Enter: " . $value]}};
+    if {set? cancel-proc}     else: {cancel-proc := {show-message "Canceled."}};
+    if {set? edit-proc}       else: {edit-proc := {| value |}};
+    if {set? keyin-proc}      else: {
+        ### keyin-proc: {| value in-key | ...};
+        ### default is non-set value and exclusive with edit-proc
+    };
+    if {set? completion-proc} else: {completion-proc := {| value |}};
+    if {set? completion-back-proc} else: {completion-back-proc := {| value |}};
+    if {set? index}           else: {index ::= $val len};
+    if {set? return-status}   else: {status := ALL};
+    
+    $main mini-input-start $val prompt: $prompt index: $index;
+    $main add-mini-input-callback $window {| main window in-key value |
+        if {eq? $in-key KEY_ESC} {
+            $main mini-input-end;
+            yield $cancel-proc;
+            return $status;
+        };
+        if {eq? $in-key CTRL_M} {
+            $main mini-input-end;
+            yield $enter-proc $value;
+            return $status;
+        };
+        if {eq? $in-key CTRL_I} {
+            yield $completion-proc $value;
+            return $status;
+        };
+        if {eq? $in-key KEY_BTAB} {
+            yield $completion-back-proc $value;
+            return $status;
+        };
+        if {set? keyin-proc} {
+            if {! [nil? $in-key]} {
+                yield $keyin-proc $value $in-key;
+                return $status;
+            };
+        } {
+            if {or {string? $in-key}
+                   {eq? $in-key CTRL_H} {eq? $in-key KEY_BACKSPACE}
+                   {eq? $in-key KEY_DC} {eq? $in-key KEY_DEL} {eq? $in-key CTRL_V}} {
+                yield $edit-proc $value $in-key;
+                return $status;
+            };
+        };
+    };
+};
+
+defun mini-input-y-or-n
+    (
+        main
+        window
+        prompt: prompt
+        yes-proc: yes-proc
+        no-proc: no-proc
+        return-status: status
+    ) {
+
+    if {set? prompt}          else: {prompt := "mini-input prompt: "};
+    if {set? yes-proc}        else: {yes-proc := {| value | show-message "Enter: Yes!"}};
+    if {set? no-proc}         else: {no-proc := {show-message "Canceled."}};
+    if {set? return-status}   else: {status := ALL};
+    
+    $main mini-input-start "" prompt: $prompt;
+    $main add-mini-input-callback $window {| main window in-key value |
+        if {or {eq? $in-key KEY_ESC} {eq? [$value at 0] "n"} {eq? [$value at 0] "N"}} {
+            $main mini-input-end;
+            yield $no-proc;
+            return $status;
+        };
+        if  {or {eq? [$value at 0] "y"} {eq? [$value at 0] "Y"}} {
+            $main mini-input-end;
+            yield $yes-proc;
+            return $status;
+        };
+    };
+};
+
+defun mini-input-fully-yes-or-no
+    (
+        main
+        window
+        prompt: prompt
+        yes-proc: yes-proc
+        no-proc: no-proc
+        return-status: status
+    ) {
+
+    if {set? prompt}          else: {prompt := "mini-input prompt: "};
+    if {set? yes-proc}        else: {yes-proc := {| value | show-message "Enter: Yes!"}};
+    if {set? no-proc}         else: {no-proc := {show-message "Canceled."}};
+    if {set? return-status}   else: {status := ALL};
+    
+    $main mini-input-start "" prompt: $prompt;
+    $main add-mini-input-callback $window {| main window in-key value |
+        if {eq? $in-key KEY_ESC} {
+            $main mini-input-end;
+            yield $no-proc;
+            return $status;
+        };
+        if {and {eq? $in-key CTRL_M} {eq? [$value lower] "no"}} {
+            $main mini-input-end;
+            yield $no-proc;
+            return $status;
+        };
+        if {and {eq? $in-key CTRL_M} {eq? [$value lower] "yes"}} {
+            $main mini-input-end;
+            yield $yes-proc;
+            return $status;
+        };
+    };
+};
