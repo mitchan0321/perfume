@@ -170,8 +170,8 @@ defun init-command-DB () {
     };
 
     $LIB_PATH each do: {| i |
-	if {file exists? [$i . "/EditorCommandDefs.prfm"]} {
-	    load [$i . "/EditorCommandDefs.prfm"];
+	if {file exists? [$i . "/pmacs-command.prfm"]} {
+	    load [$i . "/pmacs-command.prfm"];
 	    break;
 	};
     };
@@ -313,9 +313,10 @@ defun get-dir (path) {
 };
 
 defun show-files-in-window (main window dir) {
-    BufferManager unregist-buffer "*Directory*";
+    BufferManager unregist-buffer "*Completion*";
     buff ::= new EditBuffer;
-    $buff load-content [$dir . "/"] :init-only buffer-name: "*Directory*";
+    $buff load-content [$dir . "/"] :init-only buffer-name: "*Completion*";
+    $buff set-raise-low;
     $buff clear-all;
 
     if {file dir? $dir} {
