@@ -1,7 +1,7 @@
 ###
 ### All Pmacs editor command definition.
 ###
-command-files :=  (
+command-files := (
     "pmacs-command-window.prfm"
     "pmacs-command-move.prfm"
     "pmacs-command-edit.prfm"
