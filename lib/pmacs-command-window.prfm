@@ -2,94 +2,94 @@
 ### Pmacs editor window command definition.
 ###
 
-defcommand roll-current-window {
+defcommand roll-current-window desc: "Change current active window forward." {
     | main window |
     $main roll-current-window;
     result ALL;
 };
 
-defcommand roll-current-window-backward {
+defcommand roll-current-window-backward desc: "Change current active window backward." {
     | main window |
     $main roll-current-window-backward;
     result ALL;
 };
 
-defcommand full-window {
+defcommand full-window desc: "Unsplit some windows and fully expanded current window to terminal size." {
     | main window |
     name ::= $window get-window-name;
     $main create-full-window window-name: $name;
     result ALL;
 };
 
-defcommand split-vertical-window {
+defcommand split-vertical-window desc: "Split window two divisions vertical." {
     | main window |
     name ::= $window get-window-name;
     $main create-split-vertical-window window-name: $name;
     result ALL;
 };
 
-defcommand split-vertical-window-3 {
+defcommand split-vertical-window-3 desc: "Split window three divisions vertical." {
     | main window |
     name ::= $window get-window-name;
     $main create-split-vertical-window window-name: $name div: 3;
     result ALL;
 };
 
-defcommand split-vertical-window-4 {
+defcommand split-vertical-window-4 desc: "Split window four divisions vertical." {
     | main window |
     name ::= $window get-window-name;
     $main create-split-vertical-window window-name: $name div: 4;
     result ALL;
 };
 
-defcommand split-horizontal-window {
+defcommand split-horizontal-window desc: "Split window two divisions horizontal." {
     | main window |
     name ::= $window get-window-name;
     $main create-split-horizontal-window window-name: $name;
     result ALL;
 };
 
-defcommand split-horizontal-window-3 {
+defcommand split-horizontal-window-3 desc: "Split window three divisions horizontal." {
     | main window |
     name ::= $window get-window-name;
     $main create-split-horizontal-window window-name: $name div: 3;
     result ALL;
 };
 
-defcommand split-horizontal-window-4 {
+defcommand split-horizontal-window-4 desc: "Split window four divisions horizontal." {
     | main window |
     name ::= $window get-window-name;
     $main create-split-horizontal-window window-name: $name div: 4;
     result ALL;
 };
 
-defcommand split-cross-window {
+defcommand split-cross-window desc: "Split window four divisions cross." {
     | main window |
     name ::= $window get-window-name;
     $main create-split-cross-window window-name: $name;
     result ALL;
 };
 
-defcommand dismiss-current-window {
+defcommand dismiss-current-window desc: "Dismiss the current window and expand another window full screen." {
     | main window |
     $window apply-command $main [$main get-current-window] "" roll-current-window-backward;
     $window apply-command $main [$main get-current-window] "" full-window;
     result ALL;
 };
 
-defcommand refresh-screen {
+defcommand refresh-screen desc: "Refresh and redraw screen all." {
     | main window |
     $main refresh-screen;
     result ALL;
 };
 
-defcommand flash {
+defcommand flash desc: "Flash screen and beep occurs." {
     | main window |
     curs-flash;
     result ALL;
 };
 
-defcommand window-split-ratio-reset {
+defcommand window-split-ratio-reset desc: "Reset the window divisions ratio." {
     | main window |
     setvar VERTICAL_DIV_RATIO 1.0;
     setvar HORIZONTAL_DIV_RATIO 1.0;
@@ -97,7 +97,7 @@ defcommand window-split-ratio-reset {
     result ALL;
 };
 
-defcommand window-grow-right {
+defcommand window-grow-right desc: "Grow right side window." {
     | main window |
     if {$VERTICAL_DIV_RATIO > $DIV_RATIO_MIN} {
         setvar VERTICAL_DIV_RATIO [$VERTICAL_DIV_RATIO - $DIV_RATIO_RES];
@@ -106,7 +106,7 @@ defcommand window-grow-right {
     result ALL;
 };
 
-defcommand window-grow-left {
+defcommand window-grow-left desc: "Grow left side window." {
     | main window |
     if {$VERTICAL_DIV_RATIO < $DIV_RATIO_MAX} {
         setvar VERTICAL_DIV_RATIO [$VERTICAL_DIV_RATIO + $DIV_RATIO_RES];
@@ -115,7 +115,7 @@ defcommand window-grow-left {
     result ALL;
 };
 
-defcommand window-grow-lower {
+defcommand window-grow-lower desc: "Grow lower side window." {
     | main window |
     if {$HORIZONTAL_DIV_RATIO > $DIV_RATIO_MIN} {
         setvar HORIZONTAL_DIV_RATIO [$HORIZONTAL_DIV_RATIO - $DIV_RATIO_RES];
@@ -124,7 +124,7 @@ defcommand window-grow-lower {
     result ALL;
 };
 
-defcommand window-grow-upper {
+defcommand window-grow-upper desc: "Grow upper side window." {
     | main window |
     if {$HORIZONTAL_DIV_RATIO < $DIV_RATIO_MAX} {
         setvar HORIZONTAL_DIV_RATIO [$HORIZONTAL_DIV_RATIO + $DIV_RATIO_RES];

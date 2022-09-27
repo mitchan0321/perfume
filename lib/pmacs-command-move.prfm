@@ -2,43 +2,43 @@
 ### Pmacs editor move command definition.
 ###
 
-defcommand next-page {
+defcommand next-page desc: "Page up current window." {
     | main window |
     $window page-down;
     result SELF;
 };
 
-defcommand previous-page {
+defcommand previous-page desc: "Page down current window." {
     | main window |
     $window page-up;
     result SELF;
 };
 
-defcommand cursor-down {
+defcommand cursor-down desc: "Move cursor to down current windodw."{
     | main window |
     $window move-down;
     result SELF;
 };
 
-defcommand cursor-up {
+defcommand cursor-up desc: "Move cursor to up current window." {
     | main window |
     $window move-up;
     result SELF;
 };
 
-defcommand cursor-right {
+defcommand cursor-right desc: "Move cursor to right current window." {
     | main window |
     $window move-right;
     result SELF;
 };
 
-defcommand cursor-left {
+defcommand cursor-left desc: "Move cursor to left current window." {
     | main window |
     $window move-left;
     result SELF;
 };
 
-defcommand cursor-down-with-region {
+defcommand cursor-down-with-region desc: "Start select region and move cursor to down. Stay region select when already region selected." {
     | main window |
 
     if {! [$window get-region]} {
@@ -52,7 +52,7 @@ defcommand cursor-down-with-region {
     result SELF;
 };
 
-defcommand cursor-up-with-region {
+defcommand cursor-up-with-region desc: "Start select region and move cursor to up. Stay region select when already region selected." {
     | main window |
 
     if {! [$window get-region]} {
@@ -66,7 +66,7 @@ defcommand cursor-up-with-region {
     result SELF;
 };
 
-defcommand cursor-right-with-region {
+defcommand cursor-right-with-region desc: "Start select region and move cursor to right. Stay region select when already region selected." {
     | main window |
 
     if {! [$window get-region]} {
@@ -80,7 +80,7 @@ defcommand cursor-right-with-region {
     result SELF;
 };
 
-defcommand cursor-left-with-region {
+defcommand cursor-left-with-region desc: "Start select region and move cursor to left. Stay region select when already region selected."  {
     | main window |
 
     if {! [$window get-region]} {
@@ -94,7 +94,7 @@ defcommand cursor-left-with-region {
     result SELF;
 };
 
-defcommand move-half-up {
+defcommand move-half-up desc: "Page half up current window." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -113,7 +113,7 @@ defcommand move-half-up {
     result SELF;
 };
 
-defcommand move-half-down {
+defcommand move-half-down desc: "Page half down current window." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -129,7 +129,7 @@ defcommand move-half-down {
     result SELF;
 };
 
-defcommand move-half-right {
+defcommand move-half-right desc: "Page half right current window." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -142,7 +142,7 @@ defcommand move-half-right {
     result SELF;
 };
 
-defcommand move-half-left {
+defcommand move-half-left desc: "Page half left current window." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -158,7 +158,7 @@ defcommand move-half-left {
     result SELF;
 };
 
-defcommand cursor-top-of-line {
+defcommand cursor-top-of-line desc: "Move cursor to top of line." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -173,7 +173,7 @@ defcommand cursor-top-of-line {
     result SELF;
 };
 
-defcommand cursor-end-of-line {
+defcommand cursor-end-of-line desc: "Move cursor to end of line." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -195,7 +195,7 @@ defcommand cursor-end-of-line {
     result SELF;
 };
 
-defcommand smooth-scroll-down {
+defcommand smooth-scroll-down desc: "Move page to down smoothly." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -214,7 +214,7 @@ defcommand smooth-scroll-down {
     result SELF;
 };
 
-defcommand smooth-scroll-up {
+defcommand smooth-scroll-up desc: "Move page to up smoothly." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -230,7 +230,7 @@ defcommand smooth-scroll-up {
     result SELF;
 };
 
-defcommand smooth-scroll-right {
+defcommand smooth-scroll-right desc: "Move page to right smoothly." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -243,7 +243,7 @@ defcommand smooth-scroll-right {
     result SELF;
 };
 
-defcommand smooth-scroll-left {
+defcommand smooth-scroll-left desc: "Move page to left smoothly." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -259,7 +259,7 @@ defcommand smooth-scroll-left {
     result SELF;
 };
 
-defcommand top-of-buffer {
+defcommand top-of-buffer desc: "Move cursor to top of buffer." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -275,7 +275,7 @@ defcommand top-of-buffer {
     result SELF;
 };
 
-defcommand bottom-of-buffer {
+defcommand bottom-of-buffer desc: "Move cursor to bottom of buffer." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -298,31 +298,31 @@ defcommand bottom-of-buffer {
     result SELF;
 };
 
-defcommand fit-to-top {
+defcommand fit-to-top desc: "Move current cursor position fit to window top edge and scroll up." {
     | main window |
     $window cursor-fit-to-top [$window get-geom];
     result SELF;
 };
 
-defcommand fit-to-bottom {
+defcommand fit-to-bottom desc: "Move current cursor position fit to window bottom edge and scroll down." {
     | main window |
     $window cursor-fit-to-bottom [$window get-geom];
     result SELF;
 };
 
-defcommand move-screen-top {
+defcommand move-screen-top desc: "Move cursor point to window top." {
     | main window |
     $window move-screen-top;
     result SELF;
 };
 
-defcommand move-screen-bottom {
+defcommand move-screen-bottom desc: "Move cursor point to window bottom." {
     | main window |
     $window move-screen-bottom;
     result SELF;
 };
 
-defcommand next-page-anothor-window {
+defcommand next-page-another-window desc: "Page up another window." {
     | main window |
     $main roll-current-window;
     $main get-current-window : page-down;
@@ -330,7 +330,7 @@ defcommand next-page-anothor-window {
     result ALL;
 };
 
-defcommand previous-page-anothor-window {
+defcommand previous-page-another-window desc: "Page down another window." {
     | main window |
     $main roll-current-window;
     $main get-current-window : page-up;
@@ -338,7 +338,7 @@ defcommand previous-page-anothor-window {
     result ALL;
 };
 
-defcommand smooth-scroll-up-anothor-window {
+defcommand smooth-scroll-up-another-window desc: "Move page to up smoothly another window." {
     | main window |
     $main roll-current-window;
     $main get-current-window : apply-command $main [$main get-current-window] "" smooth-scroll-up;
@@ -346,7 +346,7 @@ defcommand smooth-scroll-up-anothor-window {
     result ALL;
 };
 
-defcommand smooth-scroll-down-anothor-window {
+defcommand smooth-scroll-down-another-window desc: "Move page to down smoothly another window." {
     | main window |
     $main roll-current-window;
     $main get-current-window : apply-command $main [$main get-current-window] "" smooth-scroll-down;
@@ -354,7 +354,7 @@ defcommand smooth-scroll-down-anothor-window {
     result ALL;
 };
 
-defcommand smart-move-forward {
+defcommand smart-move-forward desc: "Move cursor to next word boundary or move to pair parentheses/bracket/braces" {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -448,7 +448,7 @@ defcommand smart-move-forward {
     result SELF;
 };
 
-defcommand smart-move-backward {
+defcommand smart-move-backward desc: "Move cursor to previous word boundary or move to pair parentheses/bracket/braces" {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -554,7 +554,7 @@ defcommand smart-move-backward {
     result SELF;
 };
 
-defcommand move-next-paragraph {
+defcommand move-next-paragraph desc: "Move cursor to next paragraph." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -577,7 +577,7 @@ defcommand move-next-paragraph {
     result SELF;
 };
 
-defcommand move-previous-paragraph {
+defcommand move-previous-paragraph desc: "Move cursor to previous paragraph." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -600,7 +600,7 @@ defcommand move-previous-paragraph {
     result SELF;
 };
 
-defcommand move-next-paragraph-fit-to-top {
+defcommand move-next-paragraph-fit-to-top desc: "Move cursor to next paragraph and fit to window top edge." {
     | main window |
     $window apply-command $main $window "" cursor-top-of-line;
     $window apply-command $main $window "" move-next-paragraph;
@@ -608,7 +608,7 @@ defcommand move-next-paragraph-fit-to-top {
     result SELF;
 };
 
-defcommand move-previous-paragraph-fit-to-top {
+defcommand move-previous-paragraph-fit-to-top desc: "Move cursor to previous paragraph and fit to window top edge." {
     | main window |
     $window apply-command $main $window "" cursor-top-of-line;
     $window apply-command $main $window "" move-previous-paragraph;
@@ -616,25 +616,25 @@ defcommand move-previous-paragraph-fit-to-top {
     result SELF;
 };
 
-defcommand mark {
+defcommand mark desc: "Push current cursor point into mark buffer." {
     | main window |
     $window mark;
     result SELF;
 };
 
-defcommand goto-mark {
+defcommand goto-mark desc: "Pop mark buffer and jump to previous mark, and current cursor point push to un-mark buffer." {
     | main window |
     $window goto-mark;
     result SELF;
 };
 
-defcommand goto-unmark {
+defcommand goto-unmark desc: "Pop un-mark buffer and jump to previous un-mark, and current cursor point push to mark buffer." {
     | main window |
     $window unmark;
     result SELF;
 };
 
-defcommand goto {
+defcommand goto desc: "Jump to specified line in buffer." {
     | main window |
 
     mini-input-until-enter $main $window

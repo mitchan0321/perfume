@@ -2,7 +2,7 @@
 ### Pmacs editor utility command definition.
 ###
 
-defcommand key-binding-list {
+defcommand key-binding-list desc: "Display key binding list and all editor commands." {
     | main window |
     mode ::= $window get-mode;
     BufferManager unregist-buffer "*Key Binding*";
@@ -11,11 +11,12 @@ defcommand key-binding-list {
     $buff set-content [$DEFAULT_PWIKI_DIR . "/"];
     $buff clear-all;
 
-    $buff append-string "<<< Key bindings >>>";
-    $buff append-string ["Buffer mode: " . $mode];
-    $buff append-string "";
-    $buff append-string ["%-15v %21v %-14v %-v" fmt  "Key group"     "Key combinations"  "Key symbol"       "Command"];
-    $buff append-string ["%-15v %21v %-14v %-v" fmt ["-" repeat 15] ["-" repeat 21] ["-" repeat 14] ["-" repeat 38]];
+    $buff append-string ["<<< Key bindings >>>  {Buffer mode: %v}" fmt $mode];
+    ### $buff append-string "";
+    ### $buff append-string ["%-15v %21v %-14v %-v" fmt  "Key group"     "Key combinations"  "Key symbol"       "Command"];
+    ### $buff append-string ["%-15v %21v %-14v %-v" fmt ["-" repeat 15] ["-" repeat 21] ["-" repeat 14] ["-" repeat 38]];
+    $buff append-string ["%21v %-38v %-v" fmt "Key combination" "Command" "Description"];
+    $buff append-string ["%21v %-38v %-v" fmt ["-" repeat 21]   ["-" repeat 38] ["-" repeat 11]];
     d ::= $window get KeyBinding;
     desc ::= $window get KeyDesc;
     l := ();
@@ -26,19 +27,21 @@ defcommand key-binding-list {
             ls ::= $s split;
             grp ::= $ls get 0;
             modify ::= $ls get 1;
-            $l << ["%-18v%19v %-14v [[%-v]]" fmt $grp $modify $k $v];
+            $l << ["%-18v%19v %-14v %-38v %-v" fmt $grp $modify $k ["[[" . $v "]]"] [get-command-desc $v]];
         } {
-            $l << ["%-18v%19v %-14v [[%-v]]" fmt "" (key input) $k $v];
+            $l << ["%-18v%19v %-14v %-38v %-v" fmt "" (key input) $k ["[[" . $v "]]"] [get-command-desc $v]];
         };
     };
     msort $l : each do: {| i |
-	$buff append-string $i;
+	$buff append-string ["" . [$i sub 16 38] [$i sub 53]];
     };
     
     $buff append-string "";
     $buff append-string "<<< All editor commands >>>";
+    $buff append-string ["%-38v %-v" fmt "Command" "Description"];
+    $buff append-string ["%-38v %-v" fmt ["-" repeat 38] ["-" repeat 11]];
     msort [$EditorCommand keys :string] : each do: {| i |
-        $buff append-string ["[[" . $i "]]"];
+        $buff append-string ["%-38v %-v" fmt ["[[" . $i "]]"] [get-command-desc $i]];
     };
     $buff no-modify;
     $buff set-protect;
@@ -49,7 +52,7 @@ defcommand key-binding-list {
     result SELF;
 };
 
-defcommand file-completion {
+defcommand file-completion desc: "File completion and insert file name to current buffer at cursor position." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -125,7 +128,7 @@ defcommand file-completion {
     return ALL;
 };
 
-defcommand execute-command {
+defcommand execute-command desc: "Execute Perfume language command next display command result at mini-window." {
     | main window |
     
     mini-input-until-enter $main $window
@@ -143,7 +146,7 @@ defcommand execute-command {
     result ALL;
 };
 
-defcommand execute-editor-command {
+defcommand execute-editor-command desc: "Execute editor command." {
     | main window |
     if {defvar? EditorCommandList} 
     then: {setvar EditorCommandList ()}
@@ -175,7 +178,7 @@ defcommand execute-editor-command {
     result ALL;
 };
 
-defcommand trace-editor-command {
+defcommand trace-editor-command desc: "Trace editor command and output trace result file \"pmacs-trace.txt\" at current directory." {
     | main window |
     if {defvar? EditorCommandList} 
     then: {setvar EditorCommandList ()}
@@ -222,7 +225,7 @@ defcommand trace-editor-command {
     result ALL;
 };
 
-defcommand eval-region {
+defcommand eval-region desc: "Eval selected region and output result to *Scratch* buffer." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -255,7 +258,7 @@ defcommand eval-region {
     result ALL;
 };
 
-defcommand kill-interp {
+defcommand kill-interp desc: "Kill current running process and perfume interpriter under *Scratch* buffer." {
     | main window |
     
     mini-input-y-or-n $main $window 
@@ -272,14 +275,14 @@ defcommand kill-interp {
     result ALL;
 };
 
-defcommand send-eof {
+defcommand send-eof desc: "Send EOF to current running process or perfume interpriter under *Scratch* buffer." {
     | main window |
     $stderr puts "Send eof.";
     $stdin close;
     result ALL;
 };
 
-defcommand cd {
+defcommand cd desc: "Change current directory at pmacs globally." {
     | main window |
     
     mini-input-until-enter $main $window
@@ -332,7 +335,7 @@ defcommand cd {
     result SELF;
 };
 
-defcommand set-theme {
+defcommand set-theme desc: "Set theme you specified." {
     | main window |
     
     mini-input-until-enter $main $window
@@ -354,7 +357,7 @@ defcommand set-theme {
     result ALL;
 };
 
-defcommand set-mode {
+defcommand set-mode desc: "Set current buffer mode you specified." {
     | main window |
 
     mini-input-until-enter $main $window 
@@ -369,7 +372,7 @@ defcommand set-mode {
     result ALL;
 };
 
-defcommand set-line-limit {
+defcommand set-line-limit desc: "Set *Scratch* buffer window max line length. if you specified \"auto\", fit to current window width." {
     | main window |
 
     mini-input-until-enter $main $window
@@ -406,7 +409,7 @@ defcommand set-line-limit {
     result SELF;
 };
 
-defcommand set-protect {
+defcommand set-protect desc: "Set protect mode to current buffer." {
     | main window |
     buff ::= $window get-buffer;
     $buff set-protect;
@@ -414,7 +417,7 @@ defcommand set-protect {
     result ALL;
 };
 
-defcommand set-noprotect {
+defcommand set-noprotect desc: "Unset protect mode to current buffer." {
     | main window |
     buff ::= $window get-buffer;
     $buff no-protect;
@@ -422,7 +425,7 @@ defcommand set-noprotect {
     result ALL;
 };
 
-defcommand set-dos {
+defcommand set-dos desc: "Set DOS line mode to current buffer." {
     | main window |
     buff ::= $window get-buffer;
     $buff set-includeCR <t>;
@@ -430,7 +433,7 @@ defcommand set-dos {
     result ALL;
 };
 
-defcommand set-nodos {
+defcommand set-nodos desc: "Unset DOS line mode (aka set UNIX line mode) to current buffer." {
     | main window |
     buff ::= $window get-buffer;
     $buff set-includeCR <nil>;
@@ -438,7 +441,7 @@ defcommand set-nodos {
     result ALL;
 };
 
-defcommand compile {
+defcommand compile desc: "Run compile command and output result to *Grep* buffer." {
     | main window |
     
     mini-input-until-enter $main $window
@@ -552,7 +555,7 @@ defun get-shell () {
     return $EMERGENCY_SHELL;
 };
 
-defcommand shell {
+defcommand shell desc: "Suspend pmacs and run shell under pmacs process." {
     | main window |
     $main suspend [get-shell];
     result ALL;
@@ -576,7 +579,7 @@ defcommand git-push {
     result ALL;
 };
 
-defcommand show-font {
+defcommand show-font desc: "Display current cursor buffer line direct to mini-windodw." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -587,7 +590,7 @@ defcommand show-font {
     result SELF;
 };
 
-defcommand show-keycode {
+defcommand show-keycode desc: "Display input keys key code, key sequence and binding editor command." {
     | main window |
     show-message "Input key: ";
     i := ();
@@ -612,7 +615,7 @@ defcommand show-keycode {
     result SELF;
 };
 
-defcommand set-encoder {
+defcommand set-encoder desc: "Set file encoding to current buffer. You can specified UTF-8, EUC-JP, Shift-JIS and RAW encoding. This command need the buffer is protected." {
     | main window |
     buff ::= $window get-buffer;
     if {$buff modify?} {
@@ -652,7 +655,7 @@ defcommand set-encoder {
     result ALL;
 };
 
-defcommand set-tab-width {
+defcommand set-tab-width desc: "Set TAB width globally. Default is 8." {
     | main window |
     tab := 8;
     if {defvar? DEFAULT_TAB_WIDTH} {
@@ -689,7 +692,7 @@ defcommand set-tab-width {
     result ALL;
 };
 
-defcommand set-buffer-tab-width {
+defcommand set-buffer-tab-width desc: "Set TAB width to current buffer locally. If you specified 0, set global TAB width to current buffer." {
     | main window |
     buff ::= $window get-buffer;
     tab ::= [$buff get-buffer-tab-width] ?? $DEFAULT_TAB_WIDTH;
@@ -727,7 +730,7 @@ defcommand set-buffer-tab-width {
     result ALL;
 };
 
-defcommand brackets-pair {
+defcommand brackets-pair desc: "Highlight pair character if current cursor on parentheses, bracket  or braces." {
     | main window |
     $window remove-spot-color-item "BRACKETS-PAIR-S";
     $window remove-spot-color-item "BRACKETS-PAIR-D";

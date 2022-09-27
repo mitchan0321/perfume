@@ -168,6 +168,10 @@ defun init-command-DB () {
     else: {
 	defvar EditorCommand [dict];
     };
+    if {defvar? EditorCommandDesc}
+    else: {
+	defvar EditorCommandDesc [dict];
+    };
 
     $LIB_PATH each do: {| i |
 	if {file exists? [$i . "/pmacs-command.prfm"]} {
@@ -177,12 +181,17 @@ defun init-command-DB () {
     };
 };
 
-defun defcommand (name block) {
+defun defcommand (name block desc: desc) {
     $EditorCommand set $name $block;
+    $EditorCommandDesc set $name [[set? desc] ??? {result $desc} ""];
 };
 
 defun get-command (name) {
     $EditorCommand get $name;
+};
+
+defun get-command-desc (name) {
+    $EditorCommandDesc get $name;
 };
 
 defun set-window-color-default (curs name) {

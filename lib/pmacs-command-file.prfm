@@ -2,7 +2,7 @@
 ### Pmacs editor file command definition.
 ###
 
-defcommand open-file {
+defcommand open-file desc: "Open specified file. If occured file decode error, set protect mode to the buffer." {
     | main window |
     
     mini-input-until-enter $main $window 
@@ -77,7 +77,7 @@ defcommand open-file {
     result ALL;
 };
 
-defcommand view-file {
+defcommand view-file desc: "Open specified file by protect mode." {
     | main window |
 
     mini-input-until-enter $main $window 
@@ -154,7 +154,7 @@ defcommand view-file {
     result SELF;
 };
 
-defcommand read-file {
+defcommand read-file desc: "Open specified file and insert file data to current buffer at cursor position previous line." {
     | main window |
 
     mini-input-until-enter $main $window 
@@ -237,7 +237,7 @@ defcommand read-file {
     result SELF;
 };
 
-defcommand save-buffer {
+defcommand save-buffer desc: "Save current buffer to origin file." {
     | main window |
     __buff_in_clojure__ ::= $window get-buffer;
     path ::= $__buff_in_clojure__ get-path;
@@ -326,7 +326,7 @@ defcommand save-buffer {
     if [$__buff_in_clojure__ modified-by-another-process] {
         show-message "" :bell;
         mini-input-fully-yes-or-no $main $window
-            prompt: ["Maybe this file modified by anothor process. Really save file? (" . $path ") [yes or ESC]: "]
+            prompt: ["Maybe this file modified by another process. Really save file? (" . $path ") [yes or ESC]: "]
             no-proc: {
                 show-message "Canceled.";
                 return ALL;
@@ -364,7 +364,7 @@ defcommand save-buffer {
     };
 };
 
-defcommand save-buffer-as {
+defcommand save-buffer-as desc: "Save current buffer to specified file." {
     | main window |
     __buff_in_clojure__ ::= $window get-buffer;
     path ::= $__buff_in_clojure__ get-path;
@@ -449,7 +449,7 @@ defcommand save-buffer-as {
     result ALL;
 };
 
-defcommand exit {
+defcommand exit desc: "Exit pmacs editor. If you have an unsaved buffer, pmacs was show message and don't exit." {
     | main window |
     l ::= BufferManager get-buffer-list : filter {| i | "*" != [$i at 0]};
     do_exit := <t>;
@@ -468,7 +468,7 @@ defcommand exit {
     result SELF;
 };
 
-defcommand read-grep-file {
+defcommand read-grep-file desc: "Read specified file and new create the *Grep* buffer." {
     | main window |
     
     mini-input-until-enter $main $window

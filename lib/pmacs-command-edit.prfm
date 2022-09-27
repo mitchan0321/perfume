@@ -2,25 +2,25 @@
 ### Pmacs editor edit command definition.
 ###
 
-defcommand insert-character {
+defcommand insert-character desc: "Insert pressed character into current buffer at cursor point." {
     | main window key |
     $window insert-string $key;
     result ALL;
 };
 
-defcommand insert-tab {
+defcommand insert-tab desc: "Insert TAB character into current buffer at cursor point." {
     | main window |
     $window insert-string "\t";
     result ALL;
 };
 
-defcommand insert-return {
+defcommand insert-return desc: "Insert carriage return into current buffer at cursor point." {
     | main window |
     $window insert-string "\r";
     result ALL;
 };
 
-defcommand insert-new-line {
+defcommand insert-new-line desc: "Insert new line into current buffer over line at cursor point." {
     | main window |
     $window apply-command $main $window "" cursor-top-of-line;
     $window insert-string "\r";
@@ -28,13 +28,13 @@ defcommand insert-new-line {
     result ALL;
 };
 
-defcommand delete-character {
+defcommand delete-character desc: "Delete character from current buffer at cursor point." {
     | main window |
     $window delete-character;
     result ALL;
 };
 
-defcommand delete-word {
+defcommand delete-word desc: "Delete word from current buffer at cursor point." {
     | main window |
     $window apply-command $main $window "" select-region-word;
     [$window in-region?] ?? {
@@ -45,7 +45,7 @@ defcommand delete-word {
     result ALL;
 };
 
-defcommand delete-to-end-of-line {
+defcommand delete-to-end-of-line desc: "Delete character from current buffer cursor point to end of line." {
     | main window |
     if {! [$window get-region]} {
         $window apply-command $main $window "" start-region;
@@ -55,13 +55,13 @@ defcommand delete-to-end-of-line {
     result ALL;
 };
 
-defcommand backdelete-character {
+defcommand backdelete-character desc: "Delete character from current buffer before cursor point." {
     | main window |
     $window backdelete-character;
     result ALL;
 };
 
-defcommand undo-buffer {
+defcommand undo-buffer desc: "Undo buffer." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -83,7 +83,7 @@ defcommand undo-buffer {
     result ALL;
 };
 
-defcommand redo-buffer {
+defcommand redo-buffer desc: "Redo buffer." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -103,7 +103,7 @@ defcommand redo-buffer {
     result ALL;
 };
 
-defcommand start-region {
+defcommand start-region desc: "Start region select at cursor point." {
     | main window |
     buff ::= $window get-buffer;
     if [$window get-region] {
@@ -118,7 +118,7 @@ defcommand start-region {
     result SELF;
 };
 
-defcommand copy-region {
+defcommand copy-region desc: "Copy selected region characters to copy buffer." {
     | main window |
     buff ::= $window get-buffer;
     [$window get-region] ?? {
@@ -134,7 +134,7 @@ defcommand copy-region {
     result SELF;
 };
 
-defcommand cut-region {
+defcommand cut-region desc: "Delete selected region characters from current buffer." {
     | main window |
     buff ::= $window get-buffer;
     [$window get-region] ?? {
@@ -158,7 +158,7 @@ defcommand cut-region {
     result ALL;
 };
 
-defcommand select-region-all {
+defcommand select-region-all desc: "Select region at current buffers all character." {
     | main window |
     $window mark;
     if {$window get-region} {
@@ -170,7 +170,7 @@ defcommand select-region-all {
     result ALL;
 };
 
-defcommand select-region-paragraph {
+defcommand select-region-paragraph desc: "Select region in current buffer at paragraph near cursor point." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -191,7 +191,7 @@ defcommand select-region-paragraph {
     result SELF;
 };
 
-defcommand select-region-word {
+defcommand select-region-word desc: "Select region in current buffer at word near cursor point." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -238,7 +238,7 @@ defcommand select-region-word {
     result SELF;
 };
 
-defcommand paste-buffer {
+defcommand paste-buffer desc: "Paste characters from copy buffer into current buffer at cursor point."{
     | main window |
     buff ::= $window get-buffer;
     str ::= $window get-copy-buffer;
@@ -268,7 +268,7 @@ defcommand paste-buffer {
     result ALL;
 };
 
-defcommand smart-newline {
+defcommand smart-newline desc: "Formed indent at current cursor point, insert carriage return and insert indent at new line." {
     | main window |
     $window set-freecursor <nil>;
     buff ::= $window get-buffer;
@@ -339,7 +339,7 @@ defcommand smart-newline {
     result ALL;
 };
 
-defcommand smart-indent {
+defcommand smart-indent desc: "Formed indent at line or insert more indent." {
     | main window |
     $window set-freecursor <nil>;
     buff ::= $window get-buffer;
@@ -450,7 +450,7 @@ defun get-next-indent-count-backward (str) {
     ];
 };
 
-defcommand smart-dedent {
+defcommand smart-dedent desc: "De-indent at current line." {
     | main window |
     $window set-freecursor <nil>;
     buff ::= $window get-buffer;
@@ -468,7 +468,7 @@ defcommand smart-dedent {
     result ALL;
 };
 
-defcommand replace-buffer {
+defcommand replace-buffer desc: "Replace regex string to specified string at current buffer overall." {
     | main window |
 
     mini-input-until-enter $main $window
@@ -497,7 +497,7 @@ defcommand replace-buffer {
     result SELF;
 };
 
-defcommand replace-region {
+defcommand replace-region desc: "Replace regex string to specified string at current buffers selected region."  {
     | main window |
     [$window get-region] ?? {
         show-message "Please select a region first.";
@@ -537,7 +537,7 @@ defcommand replace-region {
     result ALL;
 };
 
-defcommand show-character-code {
+defcommand show-character-code desc: "Display cursors point character code at mini-window." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -558,7 +558,7 @@ defcommand show-character-code {
     result SELF;
 };
 
-defcommand input-character-code {
+defcommand input-character-code desc: "Insert specified unicode code point character into current buffer ato cursor point." {
     | main window |
 
     mini-input-until-enter $main $window

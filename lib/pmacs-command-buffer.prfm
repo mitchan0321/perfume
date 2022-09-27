@@ -2,19 +2,19 @@
 ### Pmacs editor buffer command definition.
 ###
 
-defcommand next-buffer {
+defcommand next-buffer desc: "Switch a buffer in the current window to next buffer. Buffer selection rule is buffer name sort by ascending." {
     | main window |
     $main next-buffer;
     result ALL;
 };
 
-defcommand previous-buffer {
+defcommand previous-buffer desc: "Switch a buffer in the current window to previous buffer. Buffer selection rule is buffer name sort by ascending." {
     | main window |
     $main previous-buffer;
     result ALL;
 };
 
-defcommand next-buffer-anothor-window {
+defcommand next-buffer-another-window desc: "Switch a buffer in the next another window to next buffer." {
     | main window |
     $main roll-current-window;
     $main next-buffer;
@@ -22,7 +22,7 @@ defcommand next-buffer-anothor-window {
     result ALL;
 };
 
-defcommand previous-buffer-anothor-window {
+defcommand previous-buffer-another-window desc: "Switch a buffer in the next another window to previous buffer." {
     | main window |
     $main roll-current-window;
     $main previous-buffer;
@@ -30,7 +30,7 @@ defcommand previous-buffer-anothor-window {
     result ALL;
 };
 
-defcommand kill-buffer {
+defcommand kill-buffer desc: "Kill the current buffer. If the buffer is modified, require acknowledge." {
     | main window |
     buff ::= $window get-buffer;
     if [$buff modify?] {
@@ -48,7 +48,7 @@ defcommand kill-buffer {
     result ALL;
 };
 
-defcommand buffer-list {
+defcommand buffer-list desc: "Display all buffers list." {
     | main window |
     BufferManager unregist-buffer "*Buffer List*";
     buff ::= new EditBuffer;
@@ -91,7 +91,7 @@ defcommand buffer-list {
     result SELF;
 };
 
-defcommand jump-to-buffer {
+defcommand jump-to-buffer desc: "Switch to specified the buffer in buffer list." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -118,7 +118,7 @@ defcommand jump-to-buffer {
     result SELF;
 };
 
-defcommand buffer-list-completion {
+defcommand buffer-list-completion desc: "Completion buffer by name and switch to the buffer. Specified by keyboard interactive in mini-window." {
     | main window |
 
     set _index -1;
@@ -194,61 +194,61 @@ defcommand buffer-list-completion {
     return ALL;
 };
 
-defcommand buffer-list-shortcut-1 {
+defcommand buffer-list-shortcut-1 desc: "Select buffer by shortcut key \"1\"." {
     | main window |
     jump-to-buffer-shortcut '^1 ' $main $window;
     result SELF;
 };
 
-defcommand buffer-list-shortcut-2 {
+defcommand buffer-list-shortcut-2 desc: "Select buffer by shortcut key \"2\"." {
     | main window |
     jump-to-buffer-shortcut '^2 ' $main $window;
     result SELF;
 };
 
-defcommand buffer-list-shortcut-3 {
+defcommand buffer-list-shortcut-3 desc: "Select buffer by shortcut key \"3\"." {
     | main window |
     jump-to-buffer-shortcut '^3 ' $main $window;
     result SELF;
 };
 
-defcommand buffer-list-shortcut-4 {
+defcommand buffer-list-shortcut-4 desc: "Select buffer by shortcut key \"4\"." {
     | main window |
     jump-to-buffer-shortcut '^4 ' $main $window;
     result SELF;
 };
 
-defcommand buffer-list-shortcut-5 {
+defcommand buffer-list-shortcut-5 desc: "Select buffer by shortcut key \"5\"." {
     | main window |
     jump-to-buffer-shortcut '^5 ' $main $window;
     result SELF;
 };
 
-defcommand buffer-list-shortcut-6 {
+defcommand buffer-list-shortcut-6 desc: "Select buffer by shortcut key \"6\"." {
     | main window |
     jump-to-buffer-shortcut '^6 ' $main $window;
     result SELF;
 };
 
-defcommand buffer-list-shortcut-7 {
+defcommand buffer-list-shortcut-7 desc: "Select buffer by shortcut key \"7\"." {
     | main window |
     jump-to-buffer-shortcut '^7 ' $main $window;
     result SELF;
 };
 
-defcommand buffer-list-shortcut-8 {
+defcommand buffer-list-shortcut-8 desc: "Select buffer by shortcut key \"8\"." {
     | main window |
     jump-to-buffer-shortcut '^8 ' $main $window;
     result SELF;
 };
 
-defcommand buffer-list-shortcut-9 {
+defcommand buffer-list-shortcut-9 desc: "Select buffer by shortcut key \"9\"." {
     | main window |
     jump-to-buffer-shortcut '^9 ' $main $window;
     result SELF;
 };
 
-defcommand buffer-list-shortcut-0 {
+defcommand buffer-list-shortcut-0 desc: "Select buffer by shortcut key \"0\"." {
     | main window |
     jump-to-buffer-shortcut '^0 ' $main $window;
     result SELF;
@@ -280,7 +280,7 @@ defun jump-to-buffer-shortcut (key main window) {
     };
 };
 
-defcommand buffer-list-delete {
+defcommand buffer-list-delete desc: "Delete the selected buffer in buffer list." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;

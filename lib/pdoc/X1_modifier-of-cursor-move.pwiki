@@ -13,27 +13,27 @@ X1. 複数のキーの組み合わせによるカーソル移動
 【Textモード, Cモード, Prfmモード, Grepモード, BListモード】
 キー  単独                   Shift                   Ctrl                   Alt                                    Ctrl+Alt
 ----  ----                   -----                   ----                   ---                                    --------
-↑     [[cursor-up]]          [[smooth-scroll-up]]    [[previous-page]]      [[move-previous-paragraph]]            [[smooth-scroll-up-anothor-window]]
-↓     [[cursor-down]]        [[smooth-scroll-down]]  [[next-page]]          [[move-next-paragraph]]                [[smooth-scroll-down-anothor-window]]
+↑     [[cursor-up]]          [[smooth-scroll-up]]    [[previous-page]]      [[move-previous-paragraph]]            [[smooth-scroll-up-another-window]]
+↓     [[cursor-down]]        [[smooth-scroll-down]]  [[next-page]]          [[move-next-paragraph]]                [[smooth-scroll-down-another-window]]
 ←     [[cursor-left]]        [[smooth-scroll-left]]  [[cursor-top-of-line]] [[smart-move-backward]]                ---
 →     [[cursor-right]]       [[smooth-scroll-right]] [[cursor-end-of-line]] [[smart-move-forward]]                 ---
 HOME  [[cursor-top-of-line]] [[move-screen-top]]     [[top-of-buffer]]      ---                                    ---
 END   [[cursor-end-of-line]] [[move-screen-bottom]]  [[bottom-of-buffer]]   ---                                    ---
-PgUp  [[previous-page]]      [[fit-to-bottom]]       ---                    [[move-previous-paragraph-fit-to-top]] [[previous-page-anothor-window]]
-PgDn  [[next-page]]          [[fit-to-top]]          ---                    [[move-next-paragraph-fit-to-top]]     [[next-page-anothor-window]]
+PgUp  [[previous-page]]      [[fit-to-bottom]]       ---                    [[move-previous-paragraph-fit-to-top]] [[previous-page-another-window]]
+PgDn  [[next-page]]          [[fit-to-top]]          ---                    [[move-next-paragraph-fit-to-top]]     [[next-page-another-window]]
 
 
 【Interpモード】
 キー  単独                   Shift                   Ctrl                   Alt                                    Ctrl+Alt
 ----  ----                   -----                   ----                   ---                                    --------
-↑     [[cursor-up]]          [[smooth-scroll-up]]    [[previous-page]]      [[move-previous-paragraph]]            [[smooth-scroll-up-anothor-window]]
-↓     [[cursor-down]]        [[smooth-scroll-down]]  [[next-page]]          [[move-next-paragraph]]                [[smooth-scroll-down-anothor-window]]
+↑     [[cursor-up]]          [[smooth-scroll-up]]    [[previous-page]]      [[move-previous-paragraph]]            [[smooth-scroll-up-another-window]]
+↓     [[cursor-down]]        [[smooth-scroll-down]]  [[next-page]]          [[move-next-paragraph]]                [[smooth-scroll-down-another-window]]
 ←     [[cursor-left]]       *[[pwiki-previous-link]] [[cursor-top-of-line]] [[smart-move-backward]]                ---
 →     [[cursor-right]]      *[[pwiki-next-link]]     [[cursor-end-of-line]] [[smart-move-forward]]                 ---
 HOME  [[cursor-top-of-line]] [[move-screen-top]]     [[top-of-buffer]]      ---                                    ---
 END   [[cursor-end-of-line]] [[move-screen-bottom]]  [[bottom-of-buffer]]   ---                                    ---
-PgUp  [[previous-page]]      [[fit-to-bottom]]       ---                    [[move-previous-paragraph-fit-to-top]] [[previous-page-anothor-window]]
-PgDn  [[next-page]]          [[fit-to-top]]          ---                    [[move-next-paragraph-fit-to-top]]     [[next-page-anothor-window]]
+PgUp  [[previous-page]]      [[fit-to-bottom]]       ---                    [[move-previous-paragraph-fit-to-top]] [[previous-page-another-window]]
+PgDn  [[next-page]]          [[fit-to-top]]          ---                    [[move-next-paragraph-fit-to-top]]     [[next-page-another-window]]
 
 (*印はデフォルトのTextモードから変更がある部分)
 
@@ -41,14 +41,14 @@ PgDn  [[next-page]]          [[fit-to-top]]          ---                    [[mo
 【PWikiモード】
 キー  単独                   Shift                   Ctrl                   Alt                                    Ctrl+Alt
 ----  ----                   -----                   ----                   ---                                    --------
-↑     [[cursor-up]]          [[smooth-scroll-up]]    [[previous-page]]      [[move-previous-paragraph]]            [[smooth-scroll-up-anothor-window]]
-↓     [[cursor-down]]        [[smooth-scroll-down]]  [[next-page]]          [[move-next-paragraph]]                [[smooth-scroll-down-anothor-window]]
+↑     [[cursor-up]]          [[smooth-scroll-up]]    [[previous-page]]      [[move-previous-paragraph]]            [[smooth-scroll-up-another-window]]
+↓     [[cursor-down]]        [[smooth-scroll-down]]  [[next-page]]          [[move-next-paragraph]]                [[smooth-scroll-down-another-window]]
 ←     [[cursor-left]]       *[[pwiki-previous-link]] [[cursor-top-of-line]] [[smart-move-backward]]                ---
 →     [[cursor-right]]      *[[pwiki-next-link]]     [[cursor-end-of-line]] [[smart-move-forward]]                 ---
 HOME  [[cursor-top-of-line]] [[move-screen-top]]     [[top-of-buffer]]      ---                                    ---
 END   [[cursor-end-of-line]] [[move-screen-bottom]]  [[bottom-of-buffer]]   ---                                    ---
-PgUp  [[previous-page]]      [[fit-to-bottom]]       ---                    [[move-previous-paragraph-fit-to-top]] [[previous-page-anothor-window]]
-PgDn  [[next-page]]          [[fit-to-top]]          ---                    [[move-next-paragraph-fit-to-top]]     [[next-page-anothor-window]]
+PgUp  [[previous-page]]      [[fit-to-bottom]]       ---                    [[move-previous-paragraph-fit-to-top]] [[previous-page-another-window]]
+PgDn  [[next-page]]          [[fit-to-top]]          ---                    [[move-next-paragraph-fit-to-top]]     [[next-page-another-window]]
 (以下はバッファにプロテクト[[set-protect]]が設定されている場合に有効となります)
 "b"   [[previous-page]]
 " "   [[next-page]]
@@ -59,14 +59,14 @@ PgDn  [[next-page]]          [[fit-to-top]]          ---                    [[mo
 【Manモード】
 キー  単独                   Shift                   Ctrl                   Alt                                    Ctrl+Alt
 ----  ----                   -----                   ----                   ---                                    --------
-↑     [[cursor-up]]          [[smooth-scroll-up]]    [[previous-page]]      [[move-previous-paragraph]]            [[smooth-scroll-up-anothor-window]]
-↓     [[cursor-down]]        [[smooth-scroll-down]]  [[next-page]]          [[move-next-paragraph]]                [[smooth-scroll-down-anothor-window]]
+↑     [[cursor-up]]          [[smooth-scroll-up]]    [[previous-page]]      [[move-previous-paragraph]]            [[smooth-scroll-up-another-window]]
+↓     [[cursor-down]]        [[smooth-scroll-down]]  [[next-page]]          [[move-next-paragraph]]                [[smooth-scroll-down-another-window]]
 ←     [[cursor-left]]       *[[man-previous-link]]   [[cursor-top-of-line]] [[smart-move-backward]]                ---
 →     [[cursor-right]]      *[[man-next-link]]       [[cursor-end-of-line]] [[smart-move-forward]]                 ---
 HOME  [[cursor-top-of-line]] [[move-screen-top]]     [[top-of-buffer]]      ---                                    ---
 END   [[cursor-end-of-line]] [[move-screen-bottom]]  [[bottom-of-buffer]]   ---                                    ---
-PgUp  [[previous-page]]      [[fit-to-bottom]]       ---                    [[move-previous-paragraph-fit-to-top]] [[previous-page-anothor-window]]
-PgDn  [[next-page]]          [[fit-to-top]]          ---                    [[move-next-paragraph-fit-to-top]]     [[next-page-anothor-window]]
+PgUp  [[previous-page]]      [[fit-to-bottom]]       ---                    [[move-previous-paragraph-fit-to-top]] [[previous-page-another-window]]
+PgDn  [[next-page]]          [[fit-to-top]]          ---                    [[move-next-paragraph-fit-to-top]]     [[next-page-another-window]]
 (以下はバッファにプロテクト[[set-protect]]が設定されている場合に有効となります)
 "b"   [[previous-page]]
 " "   [[next-page]]
