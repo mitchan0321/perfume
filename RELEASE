@@ -2618,4 +2618,9 @@
 		Change file completion buffer name *Directory* to *Completion* and set raise low.
 		Change trace editor command output file name to "pmacs-trace.txt".
 
+2022/09/30
+	pmacs update
+		Add editor command descriptions.
+		Add key-binding-list display format and display editor command description.
+
 #eof
