@@ -2,7 +2,7 @@
 ### Pmacs editor misc command definition.
 ###
 
-defcommand internal-stat {
+defcommand internal-stat desc: "Display interpriter internal status." {
     | main window |
     w :wide;
     println "";
@@ -21,7 +21,7 @@ defcommand internal-stat {
     result ALL;
 };
     
-defcommand mini-move-message {
+defcommand mini-move-message desc: "Demo background." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -45,7 +45,7 @@ defcommand mini-move-message {
     result SELF;
 };
 
-defcommand guru-guru {
+defcommand guru-guru desc: "Demo background." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -72,7 +72,7 @@ defcommand guru-guru {
     result SELF;
 };
 
-defcommand guru-wave {
+defcommand guru-wave desc: "Demo background." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -112,7 +112,7 @@ defcommand guru-wave {
     result SELF;
 };
 
-defcommand guru-animal {
+defcommand guru-animal desc: "Demo background." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -152,7 +152,7 @@ defcommand guru-animal {
     result SELF;
 };
 
-defcommand para-alphabet {
+defcommand para-alphabet desc: "Demo background." {
     | main window |
 
     f ::= fun (l) {

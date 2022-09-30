@@ -2,7 +2,7 @@
 ### Pmacs editor dired command definition.
 ###
 
-defcommand dired {
+defcommand dired desc: "Open dired buffer." {
     | main window |
     dired-open $main $window [pwd];
     return ALL;
@@ -21,7 +21,7 @@ defun dired-open (main window dir) {
     return $buff;
 };
 
-defcommand dired-open {
+defcommand dired-open desc: "Open file or directory at cursor point file on dired buffer." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -64,7 +64,7 @@ defcommand dired-open {
     return ALL;
 };
 
-defcommand dired-link-back {
+defcommand dired-link-back desc: "Back to previous dired buffer." {
     | main window |
     buff ::= $window get-buffer;
     prev-buff-name ::= $buff get-previous-buffer;
@@ -81,7 +81,7 @@ defcommand dired-link-back {
     result ALL;
 };
 
-defcommand dired-cursor-up {
+defcommand dired-cursor-up desc: "Move cursor up on dired buffer." {
     | main window |
     $window move-up;
     buff ::= $window get-buffer;
@@ -98,7 +98,7 @@ defcommand dired-cursor-up {
     return ALL;
 };
 
-defcommand dired-cursor-down {
+defcommand dired-cursor-down desc: "Move cursor down on dired buffer." {
     | main window |
     $window move-down;
     buff ::= $window get-buffer;
@@ -115,7 +115,7 @@ defcommand dired-cursor-down {
     return ALL;
 };
 
-defcommand dired-sort-by-name-ascending {
+defcommand dired-sort-by-name-ascending desc: "Sort by file name ascending on dired buffer." {
     | main window |
     buff ::= $window get-buffer;
     $buff set-sort-order "n";
@@ -123,7 +123,7 @@ defcommand dired-sort-by-name-ascending {
     return ALL;
 };
 
-defcommand dired-sort-by-name-descending {
+defcommand dired-sort-by-name-descending desc: "Sort by file name descending on dired buffer." {
     | main window |
     buff ::= $window get-buffer;
     $buff set-sort-order "N";
@@ -131,7 +131,7 @@ defcommand dired-sort-by-name-descending {
     return ALL;
 };
 
-defcommand dired-sort-by-time-ascending {
+defcommand dired-sort-by-time-ascending desc: "Sort by file timestamp ascending on dired buffer." {
     | main window |
     buff ::= $window get-buffer;
     $buff set-sort-order "t";
@@ -139,7 +139,7 @@ defcommand dired-sort-by-time-ascending {
     return ALL;
 };
 
-defcommand dired-sort-by-time-descending {
+defcommand dired-sort-by-time-descending desc: "Sort by file timestamp descending on dired buffer." {
     | main window |
     buff ::= $window get-buffer;
     $buff set-sort-order "T";
@@ -147,7 +147,7 @@ defcommand dired-sort-by-time-descending {
     return ALL;
 };
 
-defcommand dired-sort-by-size-ascending {
+defcommand dired-sort-by-size-ascending desc: "Sort by file size ascending on dired buffer." {
     | main window |
     buff ::= $window get-buffer;
     $buff set-sort-order "s";
@@ -155,7 +155,7 @@ defcommand dired-sort-by-size-ascending {
     return ALL;
 };
 
-defcommand dired-sort-by-size-descending {
+defcommand dired-sort-by-size-descending desc: "Sort by file size descending on dired buffer." {
     | main window |
     buff ::= $window get-buffer;
     $buff set-sort-order "S";
@@ -163,7 +163,7 @@ defcommand dired-sort-by-size-descending {
     return ALL;
 };
 
-defcommand dired-filter {
+defcommand dired-filter desc: "Set dired file name filter." {
     | main window |
     buff ::= $window get-buffer;
     

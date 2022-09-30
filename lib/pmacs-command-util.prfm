@@ -561,19 +561,19 @@ defcommand shell desc: "Suspend pmacs and run shell under pmacs process." {
     result ALL;
 };
 
-defcommand git-pull {
+defcommand git-pull desc: "Git pull (test)." {
     | main window |
     $main suspend [get-shell] "-c" "git pull; echo '--- Press enter key to continue ---'; read";
     result ALL;
 };
 
-defcommand git-commit {
+defcommand git-commit desc: "Git commit (test)." {
     | main window |
     $main suspend [get-shell] "-c" "git commit .; echo '--- Press enter key to continue ---'; read";
     result ALL;
 };
 
-defcommand git-push {
+defcommand git-push desc: "Git push (test)." {
     | main window |
     $main suspend [get-shell] "-c" "git push; echo '--- Press enter key to continue ---'; read";
     result ALL;

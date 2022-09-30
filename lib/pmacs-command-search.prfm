@@ -2,12 +2,12 @@
 ### Pmacs editor search command definition.
 ###
 
-defcommand search-forward {
+defcommand search-forward desc: "Start search text/regex forward." {
     | main window |
     return [search-sub $main $window <t>];
 };
 
-defcommand search-backward {
+defcommand search-backward desc: "Start search text/regex backward." {
     | main window |
     return [search-sub $main $window <nil>];
 };
@@ -169,7 +169,7 @@ defun search-sub (main window dir) {
     return SELF;
 };
 
-defcommand search-next {
+defcommand search-next desc: "Search forward for previous text/regex." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -189,7 +189,7 @@ defcommand search-next {
     return SELF;
 };
 
-defcommand search-previous {
+defcommand search-previous desc: "Search backward for previous text/regex." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -327,7 +327,7 @@ defun get-previous-search-text (y x str buff) {
     return ($y $x);
 };
 
-defcommand grep {
+defcommand grep desc: "Run grep on the entered text." {
     | main window |
     buff ::= $window get-buffer;
     dir ::= [$buff get-content-dir] . "/";
@@ -452,7 +452,7 @@ defcommand grep {
     result ALL;
 };
 
-defcommand grep-current-word {
+defcommand grep-current-word desc: "Run grep on the near cursor point word." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -521,7 +521,7 @@ defcommand grep-current-word {
     return SELF;
 };
 
-defcommand grep-next {
+defcommand grep-next desc: "Jump next *Grep* buffer line." {
     | main window |
     grep-buff ::= BufferManager find-buffer "*Grep*";
     $grep-buff ?? {
@@ -574,7 +574,7 @@ defcommand grep-next {
     return ALL;
 };
 
-defcommand grep-previous {
+defcommand grep-previous desc: "Jump previous *Grep* buffer line." {
     | main window |
     grep-buff ::= BufferManager find-buffer "*Grep*";
     $grep-buff ?? {

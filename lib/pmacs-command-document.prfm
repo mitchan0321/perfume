@@ -2,7 +2,7 @@
 ### Pmacs editor document command definition.
 ###
 
-defcommand pwiki-next-link {
+defcommand pwiki-next-link desc: "Jump to next PWiki anchor link." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -12,7 +12,7 @@ defcommand pwiki-next-link {
     return SELF;
 };
 
-defcommand pwiki-previous-link {
+defcommand pwiki-previous-link desc: "Jump to previous PWiki anchor link." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -22,7 +22,7 @@ defcommand pwiki-previous-link {
     return SELF;
 };
 
-defcommand pwiki-click-link {
+defcommand pwiki-click-link desc: "Open PWiki document." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -91,7 +91,7 @@ defun create-directory-if-not-exists (path) {
     };
 };
 
-defcommand pwiki-link-back {
+defcommand pwiki-link-back desc: "Back to previous PWiki document." {
     | main window |
     buff ::= $window get-buffer;
     prev-buff-name ::= $buff get-previous-buffer;
@@ -121,7 +121,7 @@ defun cursor-on-search-regex (y x str buff) {
     return <nil>;
 };
 
-defcommand man {
+defcommand man desc: "Open man document on the entered text." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -148,7 +148,7 @@ defcommand man {
     return ALL;
 };
 
-defcommand man-current-word {
+defcommand man-current-word desc: "Open man document on near cursor point word." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -203,7 +203,7 @@ defun exec-man (main window cur-buff topic) {
 
 };
 
-defcommand man-click-link {
+defcommand man-click-link desc: "Open man document." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -228,7 +228,7 @@ defcommand man-click-link {
     return ALL;
 };
 
-defcommand man-link-back {
+defcommand man-link-back desc: "Back to previous man document." {
     | main window |
     buff ::= $window get-buffer;
     prev-buff-name ::= $buff get-previous-buffer;
@@ -245,7 +245,7 @@ defcommand man-link-back {
     result ALL;
 };
 
-defcommand man-next-link {
+defcommand man-next-link desc: "Jump to next man link." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -255,7 +255,7 @@ defcommand man-next-link {
     return SELF;
 };
 
-defcommand man-previous-link {
+defcommand man-previous-link desc: "Jump to previous man link." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -265,7 +265,7 @@ defcommand man-previous-link {
     return SELF;
 };
 
-defcommand help {
+defcommand help desc: "Open pmacs manual." {
     | main window |
     help-path ::= $DEFAULT_PWIKI_DIR . $DEFAULT_PWIKI_HOME_FILE;
     buff ::= BufferManager get-buffer-by-path $help-path;
