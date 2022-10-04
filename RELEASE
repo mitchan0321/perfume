@@ -2626,11 +2626,14 @@
 		Add key-binding-list display format and display editor command description.
 
 2022/10/04
+	auto-encoding.prfm
+		Add new utility function for auto detect file encoding.
 	pmacs update:
 		Add new utility MiniInputUtil::mini-input-file-chooser is file selecter for
 		  editor command.
 		Change to use mini-input-file-chooser these commands:
 		  open-file, view-file, read-file, save-buffer, save-buffer-as,
 		  read-grep-file, grep, cd and compile.
+		Add file encoding auto detect by new utility auto-encoding.
 
 #eof
