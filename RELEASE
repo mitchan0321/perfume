@@ -2636,5 +2636,6 @@
 		  read-grep-file, grep, cd and compile.
 		Add file encoding auto detect by new utility auto-encoding.
 		Add editor command set-buffer-encoding for specify encoding buffer internal.
+		Add guard, if file is not regular when file read.
 
 #eof
