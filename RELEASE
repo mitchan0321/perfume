@@ -2635,5 +2635,6 @@
 		  open-file, view-file, read-file, save-buffer, save-buffer-as,
 		  read-grep-file, grep, cd and compile.
 		Add file encoding auto detect by new utility auto-encoding.
+		Add editor command set-buffer-encoding for specify encoding buffer internal.
 
 #eof
