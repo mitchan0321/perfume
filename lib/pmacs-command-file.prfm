@@ -5,13 +5,9 @@
 defcommand open-file desc: "Open specified file. If occured file decode error, set protect mode to the buffer." {
     | main window |
     
-    mini-input-until-enter $main $window 
+    mini-input-file-chooser $main $window 
         init-value: [get-current-buffer-dir $window : . "/"]
         prompt: "Open file: "
-        cancel-proc: {
-	    show-message "Canceled.";
-            return ALL;
-        }
         enter-proc: {| value |
 	    if {[$value len] = 0} {
 		show-message :bell "No file name specified.";
@@ -40,38 +36,6 @@ defcommand open-file desc: "Open specified file. If occured file decode error, s
 	    $result ?? {show-message :bell ["Open Failed, path: " . $value " ("  $err ")"]};
             return ALL;
         }
-        completion-proc: {| value |
-            if {$value = ""} {
-                fname ::= show-files-in-window $main $window [get-current-buffer-dir $window];
-            } {
-                fname ::= show-files-in-window $main $window $value;
-            };
-	    $window apply-command $main $window "" top-of-buffer;
-	    $main mini-input-value-override $fname [$fname len];
-	    return ALL;
-        }
-        keyin-proc: {| value in-key |
-            if {eq? $in-key KEY_DOWN} {
-                $window apply-command $main $window "" move-half-up;
-                return ALL;
-            };
-            if {eq? $in-key KEY_UP} {
-                $window apply-command $main $window "" move-half-down;
-                return ALL;
-            };
-            if {eq? $in-key "/"} {
-                if {[$value at -2] = "/"} {
-                    $main mini-input-value-override "/" 1;
-                };
-                return ALL;
-            };
-            if {eq? $in-key "~"} {
-                if {or {[$value len] <= 1} {[$value at -2] = "/"}} {
-                    $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
-                };
-                return ALL;
-            };
-        }
     ;;
     
     result ALL;
@@ -80,13 +44,9 @@ defcommand open-file desc: "Open specified file. If occured file decode error, s
 defcommand view-file desc: "Open specified file by protect mode." {
     | main window |
 
-    mini-input-until-enter $main $window 
+    mini-input-file-chooser $main $window 
         init-value: [get-current-buffer-dir $window : . "/"]
         prompt: "View file: "
-        cancel-proc: {
-            show-message "Canceled.";
-            return ALL;
-        }
         enter-proc: {| value |
 	    if {[$value len] = 0} {
 		show-message :bell "No file name specified.";
@@ -117,38 +77,6 @@ defcommand view-file desc: "Open specified file by protect mode." {
 	    $result ?? {show-message :bell ["Open Failed, path: " . $value " ("  $err ")"]};
             return ALL;
 	}
-        completion-proc: {| value |
-            if {$value = ""} {
-                fname ::= show-files-in-window $main $window [get-current-buffer-dir $window];
-            } {
-                fname ::= show-files-in-window $main $window $value;
-            };
-	    $window apply-command $main $window "" top-of-buffer;
-	    $main mini-input-value-override $fname [$fname len];
-	    return ALL;
-        }
-        keyin-proc: {| value in-key |
-            if {eq? $in-key KEY_DOWN} {
-                $window apply-command $main $window "" move-half-up;
-                return ALL;
-            };
-            if {eq? $in-key KEY_UP} {
-                $window apply-command $main $window "" move-half-down;
-                return ALL;
-            };
-            if {eq? $in-key "/"} {
-                if {[$value at -2] = "/"} {
-                    $main mini-input-value-override "/" 1;
-                };
-                return ALL;
-            };
-            if {eq? $in-key "~"} {
-                if {or {[$value len] <= 1} {[$value at -2] = "/"}} {
-                    $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
-                };
-                return ALL;
-            };
-        }
     ;;
     
     result SELF;
@@ -157,13 +85,9 @@ defcommand view-file desc: "Open specified file by protect mode." {
 defcommand read-file desc: "Open specified file and insert file data to current buffer at cursor position previous line." {
     | main window |
 
-    mini-input-until-enter $main $window 
+    mini-input-file-chooser $main $window 
         init-value: [get-current-buffer-dir $window : . "/"]
         prompt: "Read file: "
-        cancel-proc: {
-	    show-message "Canceled.";
-            return ALL;
-        }
         enter-proc: {| value |
 	    if {[$value len] = 0} {
 		show-message :bell "No file name specified.";
@@ -200,38 +124,6 @@ defcommand read-file desc: "Open specified file and insert file data to current 
                 if $f {$f close};
             };
         }
-        completion-proc: {| value |
-            if {$value = ""} {
-                fname ::= show-files-in-window $main $window [get-current-buffer-dir $window];
-            } {
-                fname ::= show-files-in-window $main $window $value;
-            };
-	    $window apply-command $main $window "" top-of-buffer;
-	    $main mini-input-value-override $fname [$fname len];
-	    return ALL;
-        }
-        keyin-proc: {| value in-key |
-            if {eq? $in-key KEY_DOWN} {
-                $window apply-command $main $window "" move-half-up;
-                return ALL;
-            };
-            if {eq? $in-key KEY_UP} {
-                $window apply-command $main $window "" move-half-down;
-                return ALL;
-            };
-            if {eq? $in-key "/"} {
-                if {[$value at -2] = "/"} {
-                    $main mini-input-value-override "/" 1;
-                };
-                return ALL;
-            };
-            if {eq? $in-key "~"} {
-                if {or {[$value len] <= 1} {[$value at -2] = "/"}} {
-                    $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
-                };
-                return ALL;
-            };
-        }
     ;;
 
     result SELF;
@@ -243,23 +135,9 @@ defcommand save-buffer desc: "Save current buffer to origin file." {
     path ::= $__buff_in_clojure__ get-path;
 
     if {or {nil? $path} {$path = ""}} {
-        mini-input-until-enter $main $window
+        mini-input-file-chooser $main $window
             init-value: [get-current-buffer-dir $window : . "/"]
             prompt: "Save file name: "
-            cancel-proc: {
-		show-message "Canceled.";
-                return ALL;
-            }
-            completion-proc: {| value |
-                if {$value = ""} {
-                    fname ::= show-files-in-window $main $window [get-current-buffer-dir $window];
-                } {
-                    fname ::= show-files-in-window $main $window $value;
-                };
-	        $window apply-command $main $window "" top-of-buffer;
-		$main mini-input-value-override $fname [$fname len];
-		return ALL;
-            }
 	    enter-proc: {| value |
 		path ::= path-adjust [
                     {[$value sub 0 1] = "/"} ???
@@ -292,31 +170,9 @@ defcommand save-buffer desc: "Save current buffer to origin file." {
 		    } {
 			show-message :bell ["Save Failed, path: " . $path " (" $err ")"];
 		    };
-		    $MainWindow bind-buffer [$window get-window-name] $__buff_in_clojure__;		    
+                    $MainWindow bind-buffer [$window get-window-name] $__buff_in_clojure__;
 		    return ALL;
 		};
-            }
-            keyin-proc: {| value in-key |
-                if {eq? $in-key KEY_DOWN} {
-                    $window apply-command $main $window "" move-half-up;
-                    return ALL;
-                };
-                if {eq? $in-key KEY_UP} {
-                    $window apply-command $main $window "" move-half-down;
-                    return ALL;
-                };
-                if {eq? $in-key "/"} {
-                    if {[$value at -2] = "/"} {
-                        $main mini-input-value-override "/" 1;
-                    };
-                    return ALL;
-                };
-                if {eq? $in-key "~"} {
-                    if {or {[$value len] <= 1} {[$value at -2] = "/"}} {
-                        $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
-                    };
-                    return ALL;
-                };
             }
         ;;
 
@@ -369,23 +225,9 @@ defcommand save-buffer-as desc: "Save current buffer to specified file." {
     __buff_in_clojure__ ::= $window get-buffer;
     path ::= $__buff_in_clojure__ get-path;
 
-    mini-input-until-enter $main $window
+    mini-input-file-chooser $main $window
         init-value: [get-current-buffer-dir $window : . "/"]
         prompt: "Save file name: "
-        cancel-proc: {
-	    show-message "Canceled.";
-            return ALL;
-        }
-        completion-proc: {| value |
-            if {$value = ""} {
-                fname ::= show-files-in-window $main $window [get-current-buffer-dir $window];
-            } {
-                fname ::= show-files-in-window $main $window $value;
-            };
-	    $window apply-command $main $window "" top-of-buffer;
-	    $main mini-input-value-override $fname [$fname len];
-	    return ALL;
-        }
         enter-proc: {| value |
 	    path ::= path-adjust [
                 {[$value sub 0 1] = "/"} ???
@@ -422,28 +264,6 @@ defcommand save-buffer-as desc: "Save current buffer to specified file." {
 		return ALL;
 	    };
         }
-        keyin-proc: {| value in-key |
-            if {eq? $in-key KEY_DOWN} {
-                $window apply-command $main $window "" move-half-up;
-                return ALL;
-            };
-            if {eq? $in-key KEY_UP} {
-                $window apply-command $main $window "" move-half-down;
-                return ALL;
-            };
-            if {eq? $in-key "/"} {
-                if {[$value at -2] = "/"} {
-                    $main mini-input-value-override "/" 1;
-                };
-                return ALL;
-            };
-            if {eq? $in-key "~"} {
-                if {or {[$value len] <= 1} {[$value at -2] = "/"}} {
-                    $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
-                };
-                return ALL;
-            };
-        }
     ;;
     
     result ALL;
@@ -471,7 +291,7 @@ defcommand exit desc: "Exit pmacs editor. If you have an unsaved buffer, pmacs w
 defcommand read-grep-file desc: "Read specified file and new create the *Grep* buffer." {
     | main window |
     
-    mini-input-until-enter $main $window
+    mini-input-file-chooser $main $window
         init-value: [pwd : . "/"]
         prompt: "Read grep file: "
         enter-proc: {| value |
@@ -502,38 +322,6 @@ defcommand read-grep-file desc: "Read specified file and new create the *Grep* b
             $geom set! ViewColumn 0;
             $window cursor-move-to $geom 0 0;
             return ALL;
-        }
-        completion-proc: {| value |
-            if {$value = ""} {
-                fname ::= show-files-in-window $main $window [get-current-buffer-dir $window];
-            } {
-                fname ::= show-files-in-window $main $window $value;
-            };
-	    $window apply-command $main $window "" top-of-buffer;
-	    $main mini-input-value-override $fname [$fname len];
-	    return ALL;
-        }
-        keyin-proc: {| value in-key |
-            if {eq? $in-key KEY_DOWN} {
-                $window apply-command $main $window "" move-half-up;
-                return ALL;
-            };
-            if {eq? $in-key KEY_UP} {
-                $window apply-command $main $window "" move-half-down;
-                return ALL;
-            };
-            if {eq? $in-key "/"} {
-                if {[$value at -2] = "/"} {
-                    $main mini-input-value-override "/" 1;
-                };
-                return ALL;
-            };
-            if {eq? $in-key "~"} {
-                if {or {[$value len] <= 1} {[$value at -2] = "/"}} {
-                    $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
-                };
-                return ALL;
-            };
         }
     ;;
     

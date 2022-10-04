@@ -28,7 +28,7 @@ defun mini-input-until-enter
     if {set? completion-proc} else: {completion-proc := {| value |}};
     if {set? completion-back-proc} else: {completion-back-proc := {| value |}};
     if {set? index}           else: {index ::= $val len};
-    if {set? return-status}   else: {status := ALL};
+    if {set? status}          else: {status := ALL};
     
     $main mini-input-start $val prompt: $prompt index: $index;
     $main add-mini-input-callback $window {| main window in-key value |
@@ -79,7 +79,7 @@ defun mini-input-y-or-n
     if {set? prompt}          else: {prompt := "mini-input prompt: "};
     if {set? yes-proc}        else: {yes-proc := {| value | show-message "Enter: Yes!"}};
     if {set? no-proc}         else: {no-proc := {show-message "Canceled."}};
-    if {set? return-status}   else: {status := ALL};
+    if {set? status}          else: {status := ALL};
     
     $main mini-input-start "" prompt: $prompt;
     $main add-mini-input-callback $window {| main window in-key value |
@@ -109,7 +109,7 @@ defun mini-input-fully-yes-or-no
     if {set? prompt}          else: {prompt := "mini-input prompt: "};
     if {set? yes-proc}        else: {yes-proc := {| value | show-message "Enter: Yes!"}};
     if {set? no-proc}         else: {no-proc := {show-message "Canceled."}};
-    if {set? return-status}   else: {status := ALL};
+    if {set? status}          else: {status := ALL};
     
     $main mini-input-start "" prompt: $prompt;
     $main add-mini-input-callback $window {| main window in-key value |
@@ -127,6 +127,70 @@ defun mini-input-fully-yes-or-no
             $main mini-input-end;
             yield $yes-proc;
             return $status;
+        };
+    };
+};
+
+defun mini-input-file-chooser
+    (
+        main
+        window
+        prompt: prompt
+        init-value: val
+        enter-proc: enter-proc
+        cancel-proc: cancel-proc
+        index: index
+        return-status: status
+    ) {
+
+    if {set? prompt}          else: {prompt := "mini-input prompt: "};
+    if {set? val}             else: {val := ""};
+    if {set? enter-proc}      else: {enter-proc := {| value | show-message ["Enter: " . $value]}};
+    if {set? cancel-proc}     else: {cancel-proc := {show-message "Canceled."}};
+    if {set? index}           else: {index ::= $val len};
+    if {set? status}          else: {status := ALL};
+    
+    $main mini-input-start $val prompt: $prompt index: $index;
+    $main add-mini-input-callback $window {| main window in-key value |
+        if {eq? $in-key KEY_ESC} {
+            $main mini-input-end;
+            yield $cancel-proc;
+            return $status;
+        };
+        if {eq? $in-key CTRL_M} {
+            $main mini-input-end;
+            yield $enter-proc $value;
+            return $status;
+        };
+        if {eq? $in-key CTRL_I} {
+            if {$value = ""} {
+                fname ::= show-files-in-window $main $window [get-current-buffer-dir $window];
+            } {
+                fname ::= show-files-in-window $main $window $value;
+            };
+	    $window apply-command $main $window "" top-of-buffer;
+	    $main mini-input-value-override $fname [$fname len];
+            return $status;
+        };
+        if {eq? $in-key KEY_DOWN} {
+            $window apply-command $main $window "" move-half-up;
+            return ALL;
+        };
+        if {eq? $in-key KEY_UP} {
+            $window apply-command $main $window "" move-half-down;
+            return ALL;
+        };
+        if {eq? $in-key "/"} {
+            if {[$value at -2] = "/"} {
+                $main mini-input-value-override "/" 1;
+            };
+            return ALL;
+        };
+        if {eq? $in-key "~"} {
+            if {or {[$value len] <= 1} {[$value at -2] = "/"}} {
+                $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
+            };
+            return ALL;
         };
     };
 };

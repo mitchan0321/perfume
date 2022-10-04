@@ -285,7 +285,7 @@ defcommand send-eof desc: "Send EOF to current running process or perfume interp
 defcommand cd desc: "Change current directory at pmacs globally." {
     | main window |
     
-    mini-input-until-enter $main $window
+    mini-input-file-chooser $main $window
         init-value: [pwd : . "/"] 
         prompt: "Directory: "
         enter-proc: {| value |
@@ -297,38 +297,6 @@ defcommand cd desc: "Change current directory at pmacs globally." {
             cd $directory;
             show-message ["Current directory is: " . $directory];
             return ALL;
-        }
-        completion-proc: {| value |
-            if {$value = ""} {
-                fname ::= show-files-in-window $main $window [get-current-buffer-dir $window];
-            } {
-                fname ::= show-files-in-window $main $window $value;
-            };
-	    $window apply-command $main $window "" top-of-buffer;
-	    $main mini-input-value-override $fname [$fname len];
-	    return ALL;
-	}
-        keyin-proc: {| value in-key |
-            if {eq? $in-key KEY_DOWN} {
-                $window apply-command $main $window "" move-half-up;
-                return ALL;
-            };
-            if {eq? $in-key KEY_UP} {
-                $window apply-command $main $window "" move-half-down;
-                return ALL;
-            };
-            if {eq? $in-key "/"} {
-                if {[$value at -2] = "/"} {
-                    $main mini-input-value-override "/" 1;
-                };
-                return ALL;
-            };
-            if {eq? $in-key "~"} {
-                if {or {[$value len] <= 1} {[$value at -2] = "/"}} {
-                    $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
-                };
-                return ALL;
-            };
         }
     ;;
 
@@ -444,7 +412,7 @@ defcommand set-nodos desc: "Unset DOS line mode (aka set UNIX line mode) to curr
 defcommand compile desc: "Run compile command and output result to *Grep* buffer." {
     | main window |
     
-    mini-input-until-enter $main $window
+    mini-input-file-chooser $main $window
         init-value: [pwd : . "/"]
         prompt: "Directory: "
         enter-proc: {| value |
@@ -510,38 +478,6 @@ defcommand compile desc: "Run compile command and output result to *Grep* buffer
                 }
             ;;
             return ALL;
-        }
-        completion-proc: {| value |
-            if {$value = ""} {
-                fname ::= show-files-in-window $main $window [get-current-buffer-dir $window];
-            } {
-                fname ::= show-files-in-window $main $window $value;
-            };
-	    $window apply-command $main $window "" top-of-buffer;
-	    $main mini-input-value-override $fname [$fname len];
-	    return ALL;
-        }
-        keyin-proc: {| value in-key |
-            if {eq? $in-key KEY_DOWN} {
-                $window apply-command $main $window "" move-half-up;
-                return ALL;
-            };
-            if {eq? $in-key KEY_UP} {
-                $window apply-command $main $window "" move-half-down;
-                return ALL;
-            };
-            if {eq? $in-key "/"} {
-                if {[$value at -2] = "/"} {
-                    $main mini-input-value-override "/" 1;
-                };
-                return ALL;
-            };
-            if {eq? $in-key "~"} {
-                if {or {[$value len] <= 1} {[$value at -2] = "/"}} {
-                    $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
-                };
-                return ALL;
-            }
         }
     ;;
     

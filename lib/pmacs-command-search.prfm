@@ -332,7 +332,7 @@ defcommand grep desc: "Run grep on the entered text." {
     buff ::= $window get-buffer;
     dir ::= [$buff get-content-dir] . "/";
 
-    mini-input-until-enter $main $window 
+    mini-input-file-chooser $main $window 
         init-value: $dir
         prompt: "Directory: "
         enter-proc: {| value |
@@ -414,38 +414,6 @@ defcommand grep desc: "Run grep on the entered text." {
                 }
             ;;
             return ALL;
-        }
-        completion-proc: {| value |
-            if {$value = ""} {
-                fname ::= show-files-in-window $main $window [get-current-buffer-dir $window];
-            } {
-                fname ::= show-files-in-window $main $window $value;
-            };
-	    $window apply-command $main $window "" top-of-buffer;
-	    $main mini-input-value-override $fname [$fname len];
-	    return ALL;
-        }
-        keyin-proc: {| value in-key |
-            if {eq? $in-key KEY_DOWN} {
-                $window apply-command $main $window "" move-half-up;
-                return ALL;
-            };
-            if {eq? $in-key KEY_UP} {
-                $window apply-command $main $window "" move-half-down;
-                return ALL;
-            };
-            if {eq? $in-key "/"} {
-                if {[$value at -2] = "/"} {
-                    $main mini-input-value-override "/" 1;
-                };
-                return ALL;
-            };
-            if {eq? $in-key "~"} {
-                if {or {[$value len] <= 1} {[$value at -2] = "/"}} {
-                    $main mini-input-value-override [$ENV,HOME . "/"] [[$ENV,HOME . "/"] len];
-                };
-                return ALL;
-            };
         }
     ;;
     
