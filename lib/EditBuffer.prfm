@@ -55,7 +55,11 @@ EditBuffer method load-content (path init-only: init-flag buffer-name: buff-name
 		throw ErrFileSpec "File is directory or unreadable.";
 	    };
 	    if {file read? $path} {
+                enc ::= auto-encoding $path;
+		if [nil? $enc] {enc := RAW};
 		$f open $path mode: i;
+                $f set-encoding $enc;
+                sets Encoding $enc;
 		$f each do: {| r |
 		    $Src append! $r;
                 };
