@@ -1,0 +1,23 @@
+defun auto-encoding (file) {
+    enc := (UTF-8F EUC-JP Shift-JIS);
+    limit := 30;
+    if [file dir?  $file] then: {return <nil>};
+    if [file read? $file] else: {return <nil>};
+    $enc each do: {| i |
+        f := <nil>;
+        try {
+            f := `File ($file mode: i);
+            $f set-encoding $i;
+            cnt := 0;
+            $f each do: {
+                $cnt ++;
+                if {$cnt > $limit} {break};
+            };
+            [$f stat : assoc-value encode-error] ?? {return $i};
+            $f close;
+        } fin: {
+            if $f {$f close};
+        };
+    };
+    return RAW;
+};
