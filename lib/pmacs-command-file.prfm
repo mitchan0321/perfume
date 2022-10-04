@@ -111,7 +111,10 @@ defcommand read-file desc: "Open specified file and insert file data to current 
                 };
                 f ::= new File init: ($path mode: i);
                 $f set-ignore-cr $FILE_IGNORE_CR;
-                $f set-encoding [$buff get-encoding];
+                ### $f set-encoding [$buff get-encoding];
+                enc ::= auto-encoding $path;
+                if [nil? $enc] {enc := RAW};
+                $f set-encoding $enc;
                 (line col) ::= $window get-source-index $buff $geom;
                 $f each do: {| r |
                     $buff insert-string-at [$r . "\r"] $line 0;
