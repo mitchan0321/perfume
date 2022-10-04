@@ -551,7 +551,7 @@ defcommand show-keycode desc: "Display input keys key code, key sequence and bin
     result SELF;
 };
 
-defcommand set-encoder desc: "Set file encoding to current buffer. You can specified UTF-8, EUC-JP, Shift-JIS and RAW encoding. This command need the buffer is protected." {
+defcommand set-encoder desc: "Set encoding to current buffer next reload file. You can specified UTF-8, EUC-JP, Shift-JIS and RAW encoding. This command need the buffer is protected." {
     | main window |
     buff ::= $window get-buffer;
     if {$buff modify?} {
@@ -582,6 +582,37 @@ defcommand set-encoder desc: "Set file encoding to current buffer. You can speci
                     show-message :bell "File decode error occured!! Try ALT-e and specify another encoding for re-load.";
                     return ALL;
                 };
+                show-message ["Set encoding to: " . $enc];
+                return ALL;
+            };
+        }
+    ;;
+    
+    result ALL;
+};
+
+defcommand set-buffer-encoder desc: "Set buffer encoding to current buffer." {
+    | main window |
+    buff ::= $window get-buffer;
+
+    mini-input-until-enter $main $window
+        prompt: ["Encoding UTF-8(u)/EUC-JP(e)/Shift-JIS(s)/RAW(r) [current is " .
+            ["" . [$buff get-encoding]] "]: "]
+        keyin-proc: {| value in-key |
+            enc := <nil>;
+            case  $in-key
+                "u" {enc := "UTF-8F"}
+                "U" {enc := "UTF-8F"}
+                "e" {enc := "EUC-JP"}
+                "E" {enc := "EUC-JP"}
+                "s" {enc := "Shift-JIS"}
+                "S" {enc := "Shift-JIS"}
+                "r" {enc := "RAW"}
+                "R" {enc := "RAW"}
+            ;;
+            if $enc {
+                $main mini-input-end;
+                $buff set-encoding $enc;
                 show-message ["Set encoding to: " . $enc];
                 return ALL;
             };
