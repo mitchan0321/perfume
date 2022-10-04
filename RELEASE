@@ -2603,14 +2603,16 @@
 		Fix key repeat acceleration algorithm.
 
 2022/09/24
-	pmacs update
+	pmacs update:
 		Change keybindngs.
 		  kND7 to kND4 -> smooth-scroll-up-anothor-window.
 		  kND7 to kND4 -> smooth-scroll-down-anothor-window.
-		Refactaring mini window input become use to mini window input utilities.
+		Refactaring mini window input become use to mini window input utilities,
+		  new file 'MiniInputUtil.prfm' these functions are including:
+		    mini-input-until-enter, mini-input-y-or-n and mini-input-yes-or-no.
 
 2022/09/25
-	pmacs update
+	pmacs update:
 		Separate EditorCommandDefs.prfm file and rename to pmacs-command.prfm
 		  and pmacs-command-{buffer,dired,document,edit,file,misc,move,search,util,window}.prfm files.
 		Add error handling at pmacs-command.prfm file load.
@@ -2619,8 +2621,16 @@
 		Change trace editor command output file name to "pmacs-trace.txt".
 
 2022/09/30
-	pmacs update
+	pmacs update:
 		Add editor command descriptions.
 		Add key-binding-list display format and display editor command description.
+
+2022/10/04
+	pmacs update:
+		Add new utility MiniInputUtil::mini-input-file-chooser is file selecter for
+		  editor command.
+		Change to use mini-input-file-chooser these commands:
+		  open-file, view-file, read-file, save-buffer, save-buffer-as,
+		  read-grep-file, grep, cd and compile.
 
 #eof
