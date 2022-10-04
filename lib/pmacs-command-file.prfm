@@ -106,6 +106,9 @@ defcommand read-file desc: "Open specified file and insert file data to current 
             };
             f := <nil>;
             try {
+                if [file stat $path : assoc-value type : != "-"] {
+                    throw ErrFileSpec "Not regular file.";
+                };
                 f ::= new File init: ($path mode: i);
                 $f set-ignore-cr $FILE_IGNORE_CR;
                 $f set-encoding [$buff get-encoding];

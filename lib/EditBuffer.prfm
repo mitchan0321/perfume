@@ -53,7 +53,10 @@ EditBuffer method load-content (path init-only: init-flag buffer-name: buff-name
 	try {
 	    if {or {file dir? $path} {and {file exists? $path} {! [file read? $path]}}} {
 		throw ErrFileSpec "File is directory or unreadable.";
-	    };
+            };
+            if [file stat $path : assoc-value type : != "-"] {
+                throw ErrFileSpec "Not regular file.";
+            };
 	    if {file read? $path} {
                 enc ::= auto-encoding $path;
 		if [nil? $enc] {enc := RAW};
@@ -128,6 +131,9 @@ EditBuffer method reload-content () {
     };
     if {or {file dir? $path} {and {file exists? $path} {! [file read? $path]}}} {
         throw ErrFileSpec "File is directory or unreadable.";
+    };
+    if [file stat $path : assoc-value type : != "-"] {
+        throw ErrFileSpec "Not regular file.";
     };
     sets Src [vector];
     $f open $path mode: i;
