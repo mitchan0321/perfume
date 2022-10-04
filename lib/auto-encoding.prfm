@@ -14,7 +14,6 @@ defun auto-encoding (file) {
                 if {$cnt > $limit} {break};
             };
             [$f stat : assoc-value encode-error] ?? {return $i};
-            $f close;
         } fin: {
             if $f {$f close};
         };
