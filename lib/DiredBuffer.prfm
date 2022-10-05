@@ -37,6 +37,7 @@ DiredBuffer method load-content (path) {
     BufferManager regist-buffer [self] ["Dir=" . $name];
 
     update;
+    return (<t> "");
 };
 
 DiredBuffer method update () {

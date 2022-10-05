@@ -54,7 +54,7 @@ defcommand dired-open desc: "Open file or directory at cursor point file on dire
                         show-message :bell "File decode error occured!! Try ALT-e and specify another encoding for re-load.";
                     };
                     $main bind-buffer [$window get-window-name] $buff;
-                    $result ?? {show-message :bell ["Open Failed, path: " . $value " ("  $err ")"]};
+                    $result ?? {show-message :bell ["Open Failed, path: " . $path " ("  $err ")"]};
                 } {
                     show-message :bell "File not readable.";
                 };

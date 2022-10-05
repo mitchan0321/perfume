@@ -156,7 +156,7 @@ EditBuffer method reload-content () {
     };
     inode ::= dict [file stat $path];
     sets LastTimestamp $inode,mtime;
-    return <t>;
+    return (<t> "");
 };
 
 EditBuffer method save-content (path: path) {
