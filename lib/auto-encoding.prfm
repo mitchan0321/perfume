@@ -8,6 +8,7 @@ defun auto-encoding (file) {
         try {
             f := `File ($file mode: i);
             $f set-encoding $i;
+            $f set-readbuffer-max 4096;
             cnt := 0;
             $f each do: {
                 $cnt ++;

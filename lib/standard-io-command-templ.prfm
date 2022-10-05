@@ -13,6 +13,7 @@ defun standard-io-command-templ (native-value: nv
                 if {defvar? STDIO_FILE_ENCODING} {
                     $f set-encoding $STDIO_FILE_ENCODING;
                 };
+                $f set-readbuffer-max 4096;
                 $f set-ignore-cr <t>;
 		$drv $f $n $nv;
 	    }
