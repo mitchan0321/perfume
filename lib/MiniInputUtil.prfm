@@ -153,14 +153,22 @@ defun mini-input-file-chooser
     $main mini-input-start $val prompt: $prompt index: $index;
     $main add-mini-input-callback $window {| main window in-key value |
         if {eq? $in-key KEY_ESC} {
-            $main mini-input-end;
-            yield $cancel-proc;
-            return $status;
+            try {
+                $main mini-input-end;
+                yield $cancel-proc;
+                return $status;
+            } fin: {
+                BufferManager unregist-buffer "*Completion*";
+            };
         };
         if {eq? $in-key CTRL_M} {
-            $main mini-input-end;
-            yield $enter-proc $value;
-            return $status;
+            try {
+                $main mini-input-end;
+                yield $enter-proc $value;
+                return $status;
+            } fin: {
+                BufferManager unregist-buffer "*Completion*";
+            };
         };
         if {eq? $in-key CTRL_I} {
             if {$value = ""} {
