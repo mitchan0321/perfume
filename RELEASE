@@ -2650,5 +2650,6 @@
 2022/10/09
 	pmacs update:
 		Fix file stat error if file not exists when open-file and read-file command.
+		Add *Completion* buffer cleaner at mini-input-file-chooser.
 
 #eof
