@@ -482,15 +482,7 @@ defcommand replace-buffer desc: "Replace regex string to specified string at cur
                     show-message ["Replace [" . $froms "] to [" $value "] " $count " times completed."];
                     return ALL;
 	        }
-                cancel-proc: {
-                    show-message "Replace canceled.";
-                    return ALL;
-                }
             ;;
-        }
-        cancel-proc: {
-            show-message "Replace canceled.";
-            return ALL;
         }
     ;;
     
@@ -522,15 +514,7 @@ defcommand replace-region desc: "Replace regex string to specified string at cur
                     show-message ["Region replace [" . $froms "] to [" $value "] " $count " times completed in region (" $sy "," $ey ")."];
                     return ALL;
 	        }
-                cancel-proc: {
-                    show-message "Region replace canceled.";
-                    return ALL;
-                }
             ;;
-        }
-        cancel-proc: {
-            show-message "Region replace canceled.";
-            return ALL;
         }
     ;;
 

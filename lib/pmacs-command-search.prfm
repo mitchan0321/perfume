@@ -43,7 +43,7 @@ defun search-sub (main window dir) {
         prompt: [search-prompt $dir $SEARCH_MODE]
         cancel-proc: {
 	    $window cancel-search $value;
-	    show-message "Search canceled.";
+	    show-message "Canceled.";
 	    return ALL;
         }
         enter-proc: {| value |
