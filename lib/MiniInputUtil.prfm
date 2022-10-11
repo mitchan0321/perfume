@@ -59,7 +59,7 @@ defun mini-input-until-enter
             if {or {string? $in-key}
                    {eq? $in-key CTRL_H} {eq? $in-key KEY_BACKSPACE}
                    {eq? $in-key KEY_DC} {eq? $in-key KEY_DEL} {eq? $in-key CTRL_V}} {
-                yield $edit-proc $value $in-key;
+                yield $edit-proc $value;
                 return $status;
             };
         };
