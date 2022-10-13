@@ -179,3 +179,62 @@ defcommand dired-filter desc: "Set dired file name filter." {
     
     return ALL;
 };
+
+defcommand dired-rename-file desc: "Rename file on dired buffer." {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    r ::= $buff get-buffer-line $ey;
+    if $r {
+        l ::= $r split sep: "|";
+        if {[$l len] >= 2} {
+            name ::= $l get 1;
+            path ::= $buff get-path;
+            path ::= $path ?? [pwd];
+            if {$path = "/"} {
+                path ::= path-adjust ["/" . $name];
+            } {
+                path ::= path-adjust [$path . "/" $name];
+            };
+            mini-input-until-enter $main $window
+                init-value: $path
+                prompt: "Rename to: "
+                enter-proc: {| value |
+                    file rename $path $value;
+                    $buff update;
+                }
+            ;;
+        };
+    };
+    return ALL;
+};
+
+defcommand dired-delete-file desc: "Delete file on dired buffer." {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    r ::= $buff get-buffer-line $ey;
+    if $r {
+        l ::= $r split sep: "|";
+        if {[$l len] >= 2} {
+            name ::= $l get 1;
+            path ::= $buff get-path;
+            path ::= $path ?? [pwd];
+            if {$path = "/"} {
+                path ::= path-adjust ["/" . $name];
+            } {
+                path ::= path-adjust [$path . "/" $name];
+            };
+            mini-input-fully-yes-or-no $main $window
+                prompt: ["Realy delete file? (" . [$path split sep: "/" : last : get 0] ") [yes or ESC]: "]
+                yes-proc: {| value |
+                    file rm $path;
+                    $buff update;
+                }
+            ;;
+        };
+    };
+    return ALL;
+};
