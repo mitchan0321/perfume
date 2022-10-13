@@ -2652,4 +2652,16 @@
 		Fix file stat error if file not exists when open-file and read-file command.
 		Add *Completion* buffer cleaner at mini-input-file-chooser.
 
+2022/10/13
+	lib/mkdir.prfm,rmdir.prfm
+		Add file operation utilitys:
+		  mkdir.prfm is create specified the directory recursively.
+		  rmdir.prfm is remove specified the directory recursively.
+	pmacs update:
+		Add dired-rename-file and dired-delete-file command.
+		Add key bind on Dired-mode:
+		  "D" -> dired-delete-file
+		  "R" -> dired-rename-file
+		Change Dired header format.
+
 #eof
