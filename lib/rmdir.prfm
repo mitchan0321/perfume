@@ -1,0 +1,14 @@
+defun rmdir (p) {
+    p ::= "" . $p;
+    if {file dir? $p} {
+        l ::= file list $p : filter {| i | {or {$i = "."} {$i = ".."}} ??? <nil> $i};
+        $l each do: {| f |
+            if {file dir? [$p . "/" $f]} {
+                rmdir [$p . "/" $f];
+            } {
+                file rm [$p . "/" $f];
+            };
+        };
+        file rmdir $p;
+    };
+};

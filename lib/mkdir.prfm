@@ -1,0 +1,11 @@
+defun mkdir (p) {
+    l ::= "" . $p : split sep: "/";
+    dir := "";
+    while {$l len : > 0} do: {
+        $dir append! [$l >>];
+        if {file exists? $dir} else: {
+            file mkdir $dir 0o755;
+        };
+        $dir append! "/";
+    };
+};
