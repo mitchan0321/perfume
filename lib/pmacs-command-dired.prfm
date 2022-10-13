@@ -201,8 +201,18 @@ defcommand dired-rename-file desc: "Rename file on dired buffer." {
                 init-value: $path
                 prompt: "Rename to: "
                 enter-proc: {| value |
-                    file rename $path $value;
-                    $buff update;
+                    if [file exists? $value] {
+                        mini-input-fully-yes-or-no $main $window
+                            prompt: ["Target file (" . $value ") is exists. Really move? [yes or ESC]: "]
+                            yes-proc: {
+                                file rename $path $value;
+                                $buff update;
+                            }
+                        ;;
+                    } {
+                        file rename $path $value;
+                        $buff update;
+                    };
                 }
             ;;
         };
@@ -228,7 +238,7 @@ defcommand dired-delete-file desc: "Delete file on dired buffer." {
                 path ::= path-adjust [$path . "/" $name];
             };
             mini-input-fully-yes-or-no $main $window
-                prompt: ["Realy delete file? (" . [$path split sep: "/" : last : get 0] ") [yes or ESC]: "]
+                prompt: ["Really delete file? (" . [$path split sep: "/" : last : get 0] ") [yes or ESC]: "]
                 yes-proc: {| value |
                     file rm $path;
                     $buff update;
@@ -236,5 +246,65 @@ defcommand dired-delete-file desc: "Delete file on dired buffer." {
             ;;
         };
     };
+    return ALL;
+};
+
+defcommand dired-mark-file desc: "Mark specified file on dired buffer." {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    r ::= $buff get-buffer-line $ey;
+    if $r {
+        l ::= $r split sep: "|";
+        if {[$l len] >= 2} {
+            name ::= $l get 1;
+            $buff toggle-mark $name;
+            $buff update;
+        };
+    };
+    return ALL;
+};
+
+defcommand dired-delete-marked-files desc: "Delete marked files on dired buffer." {
+    | main window |
+    buff ::= $window get-buffer;
+    files ::= $buff get-marked-files : filter {| i | [or {$i = "."} {$i = ".."}] ??? <nil> $i};
+    if [$files null?] {
+        show-message "No marked files.";
+        return ALL;
+    };
+    dir ::= $buff get-path;
+    $dir ?? {
+        show-message "No set content path at Dired buffer.";
+        return ALL;
+    };
+    
+    mini-input-fully-yes-or-no $main $window
+        prompt: ["Really delete marked " . [$files len] " files? [yes or ESC]: "]
+        yes-proc: {| value |
+            cant-del := "";
+            $files each do: {| i |
+                try {
+                    file rm [$dir . "/" $i];
+                } catch: {
+                    $cant-del append! $i " ";
+                };
+            };
+            $buff clear-mark;
+            $buff update;
+            if {$cant-del != ""} {
+                show-message :bell ["Can't delete files: " . $cant-del];
+            };
+        }
+    ;;
+        
+    return ALL;
+};
+
+defcommand dired-update-window desc: "Update dired window." {
+    | main window |
+    buff ::= $window get-buffer;
+    $buff update;
     return ALL;
 };
