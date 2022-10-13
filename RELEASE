@@ -2659,9 +2659,15 @@
 		  rmdir.prfm is remove specified the directory recursively.
 	pmacs update:
 		Add dired-rename-file and dired-delete-file command.
-		Add key bind on Dired-mode:
-		  "D" -> dired-delete-file
-		  "R" -> dired-rename-file
+		Add dired-mark-file, dired-delete-marked-files and dired-update-window command.
+		Add file mark API in DiredBuffer and identify the marked file in window.
+		Add/Delete key bind on Dired-mode:
+		  "d" -> dired-delete-file
+		  "r" -> dired-rename-file
+		  " " -> dired-mark-file (delete next-page and previous-page bindings)
+		  "X" -> dired-delete-marked-files
+		  "u" -> dired-update-window
 		Change Dired header format.
+		Add color DB name DIRED_MARKED.
 
 #eof
