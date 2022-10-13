@@ -23,6 +23,8 @@ DiredBuffer method init () {
     sets Fmt   "%1v%1v%-13v %-8v %-8v %-v %9v|%v";
     
     sets Filter     '.*';
+    
+    sets Mark       [dict ()];
 };
 
 DiredBuffer method load-content (path) {
@@ -104,11 +106,12 @@ DiredBuffer method update () {
     l ::= msort $dir-list getter: $getter order: $order;
 
     append-string ["<<< " . [get-content] " >>>  {Filter: " $Filter ", Sort: " $SortMode "}"];
-    append-string "  Help: ENTER open, N|n[ame]|T|t[ime]|S|s[ize] sort, [f]ilter, D[elete], R[ename]";
+    append-string "  Help: [ENTER] open, [N|n]ame [T|t]ime [S|s]ize sort, [f]ilter, [d]elete, [r]ename";
+    append-string "        [SPACE] mark, e[X]ecute delete marked, [u]pdate";
     append-string "";
     
     s ::= $Fmt-s fmt
-            " "         ### edit flag
+            "  "         ### edit flag
             "Perm"
             "User"
             "Group"
@@ -122,7 +125,7 @@ DiredBuffer method update () {
     append-string $s;
 
     s ::= $Fmt-s fmt
-            " "         ### edit flag
+            "  "         ### edit flag
             "----"
             "----"
             "-----"
@@ -138,7 +141,7 @@ DiredBuffer method update () {
     try {
         $l filter {| d | $d,name =~ $Filter} : each do: {| d |
             s ::= $Fmt fmt
-                " "         ### edit flag
+                [[mark? $d,name] ??? "X " "  "]
                 $d,type
                 [mkperm $d,perm]
                 [if [$User set? $d,uid] $User,[$d get uid] $d,uid]
@@ -180,4 +183,26 @@ DiredBuffer method set-filter (f) {
 
 DiredBuffer method get-filter () {
     return $Filter;
+};
+
+DiredBuffer method toggle-mark (file) {
+    if {$Mark set? $file} {
+        $Mark unset $file;
+        return <nil>;
+    } {
+        $Mark set $file $file;
+        return <t>;
+    };
+};
+
+DiredBuffer method mark? (file) {
+    return [$Mark set? $file];
+};
+
+DiredBuffer method get-marked-files () {
+    return [$Mark keys :string];
+};
+
+DiredBuffer method clear-mark () {
+    sets Mark [dict ()];
 };
