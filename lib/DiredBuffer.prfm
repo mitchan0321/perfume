@@ -103,9 +103,8 @@ DiredBuffer method update () {
     ;;
     l ::= msort $dir-list getter: $getter order: $order;
 
-    append-string ["<<< " . [get-content] " >>>"];
-    append-string ["  Filter: " . $Filter ", Sort: " $SortMode];
-    append-string  "  Help: n,N=name sort, t,T=time sort, s,S=size sort, f=filter, Enter=open";
+    append-string ["<<< " . [get-content] " >>>  {Filter: " $Filter ", Sort: " $SortMode "}"];
+    append-string "  Help: ENTER open, N|n[ame]|T|t[ime]|S|s[ize] sort, [f]ilter, D[elete], R[ename]";
     append-string "";
     
     s ::= $Fmt-s fmt
