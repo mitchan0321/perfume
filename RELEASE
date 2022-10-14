@@ -2674,5 +2674,10 @@
 	pmacs update:
 		Add dired clear mark if dired-rname-file or dired-delete-file executed.
 		Add dired "." and ".." files are not to mark file.
+		Change dired item and header format.
+		Add mini-input-fully-yes-or-no keyin-proc.
+		Add dired-clear-all-marks command.
+		Add dired-delete-marked-files can use up-allow and down-allow for view marked files.
+		Fix file-completion if before file name character is '\t' can't completion.
 
 #eof
