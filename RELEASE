@@ -2679,5 +2679,6 @@
 		Add dired-clear-all-marks command.
 		Add dired-delete-marked-files can use up-allow and down-allow for view marked files.
 		Fix file-completion if before file name character is '\t' can't completion.
+		Fix if file is symbolic link then travarse link.
 
 #eof
