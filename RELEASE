@@ -2670,4 +2670,9 @@
 		Change Dired header format.
 		Add color DB name DIRED_MARKED.
 
+2022/10/14
+	pmacs update:
+		Add dired clear mark if dired-rname-file or dired-delete-file executed.
+		Add dired "." and ".." files are not to mark file.
+
 #eof
