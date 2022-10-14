@@ -241,7 +241,7 @@ defcommand dired-delete-file desc: "Delete file on dired buffer." {
             };
             mini-input-fully-yes-or-no $main $window
                 prompt: ["Really delete file? (" . [$path split sep: "/" : last : get 0] ") [yes or ESC]: "]
-                yes-proc: {| value |
+                yes-proc: {
                     $buff clear-mark $name;
                     file rm $path;
                     $buff update;
@@ -285,7 +285,7 @@ defcommand dired-delete-marked-files desc: "Delete marked files on dired buffer.
     
     mini-input-fully-yes-or-no $main $window
         prompt: ["Really delete marked " . [$files len] " files? [yes or ESC]: "]
-        yes-proc: {| value |
+        yes-proc: {
             cant-del := "";
             $files each do: {| i |
                 try {
@@ -300,6 +300,16 @@ defcommand dired-delete-marked-files desc: "Delete marked files on dired buffer.
                 show-message :bell ["Can't delete files: " . $cant-del];
             };
         }
+        keyin-proc: {| value in-key |
+            if {eq? $in-key KEY_DOWN} {
+                $window apply-command $main $window "" move-half-up;
+                return ALL;
+            };
+            if {eq? $in-key KEY_UP} {
+                $window apply-command $main $window "" move-half-down;
+                return ALL;
+            };
+        }
     ;;
         
     return ALL;
@@ -308,6 +318,14 @@ defcommand dired-delete-marked-files desc: "Delete marked files on dired buffer.
 defcommand dired-update-window desc: "Update dired window." {
     | main window |
     buff ::= $window get-buffer;
+    $buff update;
+    return ALL;
+};
+
+defcommand dired-clear-all-marks desc: "Clear dired all marks." {
+    | main window |
+    buff ::= $window get-buffer;
+    $buff clear-mark-all;
     $buff update;
     return ALL;
 };
