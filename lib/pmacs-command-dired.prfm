@@ -205,11 +205,13 @@ defcommand dired-rename-file desc: "Rename file on dired buffer." {
                         mini-input-fully-yes-or-no $main $window
                             prompt: ["Target file (" . $value ") is exists. Really move? [yes or ESC]: "]
                             yes-proc: {
+                                $buff clear-mark $name;
                                 file rename $path $value;
                                 $buff update;
                             }
                         ;;
                     } {
+                        $buff clear-mark $name;
                         file rename $path $value;
                         $buff update;
                     };
@@ -240,6 +242,7 @@ defcommand dired-delete-file desc: "Delete file on dired buffer." {
             mini-input-fully-yes-or-no $main $window
                 prompt: ["Really delete file? (" . [$path split sep: "/" : last : get 0] ") [yes or ESC]: "]
                 yes-proc: {| value |
+                    $buff clear-mark $name;
                     file rm $path;
                     $buff update;
                 }
@@ -291,7 +294,7 @@ defcommand dired-delete-marked-files desc: "Delete marked files on dired buffer.
                     $cant-del append! $i " ";
                 };
             };
-            $buff clear-mark;
+            $buff clear-mark-all;
             $buff update;
             if {$cant-del != ""} {
                 show-message :bell ["Can't delete files: " . $cant-del];
