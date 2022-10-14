@@ -106,7 +106,7 @@ defcommand read-file desc: "Open specified file and insert file data to current 
             };
             f := <nil>;
             try {
-                if {and {file exists? $path} {file stat $path : assoc-value type : != "-"}} {
+                if {and {file exists? $path} {! [regular-file? $path]}} {
                     throw ErrFileSpec "Not regular file.";
                 };
                 f ::= new File init: ($path mode: i);

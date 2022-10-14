@@ -54,7 +54,7 @@ EditBuffer method load-content (path init-only: init-flag buffer-name: buff-name
 	    if {or {file dir? $path} {and {file exists? $path} {! [file read? $path]}}} {
 		throw ErrFileSpec "File is directory or unreadable.";
             };
-            if {and {file exists? $path} {file stat $path : assoc-value type : != "-"}} {
+            if {and {file exists? $path} {! [regular-file? $path]}} {
                 throw ErrFileSpec "Not regular file.";
             };
 	    if {file read? $path} {
@@ -132,7 +132,7 @@ EditBuffer method reload-content () {
     if {or {file dir? $path} {and {file exists? $path} {! [file read? $path]}}} {
         throw ErrFileSpec "File is directory or unreadable.";
     };
-    if {and {file exists? $path} {file stat $path : assoc-value type : != "-"}} {
+    if {and {file exists? $path} {! [regular-file? $path]}} {
         throw ErrFileSpec "Not regular file.";
     };
     sets Src [vector];

@@ -970,3 +970,31 @@ defun read-user-conf-file (conf-name) {
         };
     };
 };
+
+defun regular-file? (path count: count) {
+    [set? count] ?? {count := 0};
+    $count ++;
+    if {$count > 7} {return <nil>};
+    try {
+        if {file stat $path : assoc-value type : = "-"} {return <t>};
+        if {file stat $path : assoc-value type : = "l"} {
+            next ::= file stat $path : assoc-value symbolic-link;
+            if {$next at 0 : = "/"} {
+                return [regular-file? count: $count $next];
+            } {
+                return [regular-file? count: $count [make-base $path : . "/" $next]];
+            };
+        };
+    } catch: {
+        return <nil>;
+    };
+    return <nil>;
+};
+
+defun make-base (path) {
+    l ::= $path split sep: "/";
+    $l ->>;
+    result ::= $l join sep: "/";
+    if {$result = ""} {result := "."};
+    return $result;
+};
