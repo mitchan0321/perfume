@@ -106,8 +106,8 @@ DiredBuffer method update () {
     l ::= msort $dir-list getter: $getter order: $order;
 
     append-string ["<<< " . [get-content] " >>>  {Filter: " $Filter ", Sort: " $SortMode "}"];
-    append-string "  Help: [ENTER] open, [N|n]ame [T|t]ime [S|s]ize sort, [f]ilter, [d]elete, [r]ename";
-    append-string "        [SPACE] mark, e[X]ecute delete marked, [u]pdate";
+    append-string "  Help: [ENTER] open, [N|n]ame [T|t]ime [S|s]ize sort, [f]ilter, [d]elete, [r]ename, [u]pdate";
+    append-string "        [SPACE] mark, e[X]ecute delete marked";
     append-string "";
     
     s ::= $Fmt-s fmt
@@ -186,11 +186,16 @@ DiredBuffer method get-filter () {
 };
 
 DiredBuffer method toggle-mark (file) {
+    if {or {$file = "."} {$file = ".."}} {
+        $Mark unset $file;
+        return;
+    };
+    
     if {$Mark set? $file} {
         $Mark unset $file;
         return <nil>;
     } {
-        $Mark set $file $file;
+        $Mark set $file <t>;
         return <t>;
     };
 };
@@ -203,6 +208,10 @@ DiredBuffer method get-marked-files () {
     return [$Mark keys :string];
 };
 
-DiredBuffer method clear-mark () {
+DiredBuffer method clear-mark-all () {
     sets Mark [dict ()];
+};
+
+DiredBuffer method clear-mark (file) {
+    $Mark unset $file;
 };
