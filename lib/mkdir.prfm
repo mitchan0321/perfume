@@ -1,6 +1,6 @@
 defun mkdir (p) {
     l ::= "" . $p : split sep: "/";
-    dir := "";
+    dir ::= ["" . $p : at 0 : = "/"] ??? "/" "";
     while {$l len : > 0} do: {
         $dir append! [$l >>];
         if {file exists? $dir} else: {
