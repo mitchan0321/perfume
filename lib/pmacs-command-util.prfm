@@ -62,7 +62,7 @@ defcommand file-completion desc: "File completion and insert file name to curren
         $window apply-command $main $window "" smart-indent;
         return ALL;
     };
-    if {or {$x = 0} {and {$x > 0} {$r at [$x - 1] : = " "}}} {
+    if {or {$x = 0} {and {$x > 0} {$r at [$x - 1] : = " "} {$r at [$x - 1] : = "\t"}}} {
         $window apply-command $main $window "" smart-indent;
         return ALL;
     };
@@ -71,7 +71,7 @@ defcommand file-completion desc: "File completion and insert file name to curren
     start := 0;
     [$x - 1] each to: 0 do: {| i |
         c ::= $r at $i;
-        if {or {$c = " "} {$c = "\""}} {
+        if {or {$c = " "} {$c = "\t"} {$c = "\""}} {
             start ::= $i + 1;
             dq ::= [$c = "\""] ??? <t> <nil>;
             break;
