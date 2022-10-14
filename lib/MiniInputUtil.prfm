@@ -103,6 +103,7 @@ defun mini-input-fully-yes-or-no
         prompt: prompt
         yes-proc: yes-proc
         no-proc: no-proc
+        keyin-proc: keyin-proc
         return-status: status
     ) {
 
@@ -110,6 +111,7 @@ defun mini-input-fully-yes-or-no
     if {set? yes-proc}        else: {yes-proc := {| value | show-message "Enter: Yes!"}};
     if {set? no-proc}         else: {no-proc := {show-message "Canceled."}};
     if {set? status}          else: {status := ALL};
+    if {set? keyin-proc}      else: {keyin-proc := {| value in-key |}};
     
     $main mini-input-start "" prompt: $prompt;
     $main add-mini-input-callback $window {| main window in-key value |
@@ -127,6 +129,12 @@ defun mini-input-fully-yes-or-no
             $main mini-input-end;
             yield $yes-proc;
             return $status;
+        };
+        if {set? keyin-proc} {
+            if {! [nil? $in-key]} {
+                yield $keyin-proc $value $in-key;
+                return $status;
+            }
         };
     };
 };
