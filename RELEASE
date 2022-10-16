@@ -2681,4 +2681,9 @@
 		Fix file-completion if before file name character is '\t' can't completion.
 		Fix if file is symbolic link then travarse link.
 
+2022/10/16
+	pmacs update:
+		Change DiredBuffer::get-marked-files becomes return sorted list.
+		Change dired-delete-marked-files failed delete files becomes to display separate comma.
+
 #eof
