@@ -205,7 +205,7 @@ DiredBuffer method mark? (file) {
 };
 
 DiredBuffer method get-marked-files () {
-    return [$Mark keys :string];
+    return [msort [$Mark keys :string]];
 };
 
 DiredBuffer method clear-mark-all () {
