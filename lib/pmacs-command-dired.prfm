@@ -291,7 +291,10 @@ defcommand dired-delete-marked-files desc: "Delete marked files on dired buffer.
                 try {
                     file rm [$dir . "/" $i];
                 } catch: {
-                    $cant-del append! $i " ";
+                    if {$cant-del != ""} {
+                        $cant-del append! ", ";
+                    };
+                    $cant-del append! $i;
                 };
             };
             $buff clear-mark-all;
@@ -302,11 +305,11 @@ defcommand dired-delete-marked-files desc: "Delete marked files on dired buffer.
         }
         keyin-proc: {| value in-key |
             if {eq? $in-key KEY_DOWN} {
-                $window apply-command $main $window "" move-half-up;
+                $window apply-command $main $window "" cursor-down;
                 return ALL;
             };
             if {eq? $in-key KEY_UP} {
-                $window apply-command $main $window "" move-half-down;
+                $window apply-command $main $window "" cursor-up;
                 return ALL;
             };
         }
