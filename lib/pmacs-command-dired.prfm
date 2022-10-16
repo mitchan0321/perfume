@@ -305,11 +305,11 @@ defcommand dired-delete-marked-files desc: "Delete marked files on dired buffer.
         }
         keyin-proc: {| value in-key |
             if {eq? $in-key KEY_DOWN} {
-                $window apply-command $main $window "" cursor-down;
+                $window apply-command $main $window "" smooth-scroll-down;
                 return ALL;
             };
             if {eq? $in-key KEY_UP} {
-                $window apply-command $main $window "" cursor-up;
+                $window apply-command $main $window "" smooth-scroll-up;
                 return ALL;
             };
         }
