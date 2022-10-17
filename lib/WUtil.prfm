@@ -974,7 +974,9 @@ defun read-user-conf-file (conf-name) {
 defun regular-file? (path count: count) {
     [set? count] ?? {count := 0};
     $count ++;
-    if {$count > 7} {return <nil>};
+    if {$count > 20} {
+        throw ErrLinkLoop "Too many symbolic link.";
+    };
     try {
         if {file stat $path : assoc-value type : = "-"} {return <t>};
         if {file stat $path : assoc-value type : = "l"} {
@@ -985,8 +987,21 @@ defun regular-file? (path count: count) {
                 return [regular-file? count: $count [make-base $path : . "/" $next]];
             };
         };
-    } catch: {
-        return <nil>;
+    };
+    return <nil>;
+};
+
+defun get-real-path (path) {
+    try {
+        if {file stat $path : assoc-value type : != "l"} {return $path};
+        if {file stat $path : assoc-value type : = "l"} {
+            next ::= file stat $path : assoc-value symbolic-link;
+            if {$next at 0 : = "/"} {
+                return [path-adjust [get-real-path $next]];
+            } {
+                return [path-adjust [get-real-path [make-base $path : . "/" $next]]];
+            };
+        };
     };
     return <nil>;
 };
