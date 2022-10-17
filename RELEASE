@@ -2693,5 +2693,7 @@
 		  KEY_DOWN -> smooth-scroll-down
 		  kDN5, KEY_NPAGE -> move-half-up
 		  kUP5, KEY_PPAGE -> move-half-down
+		Fix EditBuffer::load-content use file path becams to real file path for travarse sym-link.
+		Add get-real-path utility to WUtil for travarse sym-link.
 
 #eof
