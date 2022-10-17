@@ -2686,4 +2686,12 @@
 		Change DiredBuffer::get-marked-files becomes return sorted list.
 		Change dired-delete-marked-files failed delete files becomes to display separate comma.
 
+2022/10/17
+	pmacs update:
+		Change mini-input-file-chooser and dired-delete-marked-files key bind:
+		  KEY_UP -> smooth-scroll-up
+		  KEY_DOWN -> smooth-scroll-down
+		  kDN5, KEY_NPAGE -> move-half-up
+		  kUP5, KEY_PPAGE -> move-half-down
+
 #eof
