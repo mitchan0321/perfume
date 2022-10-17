@@ -308,8 +308,16 @@ defcommand dired-delete-marked-files desc: "Delete marked files on dired buffer.
                 $window apply-command $main $window "" smooth-scroll-down;
                 return ALL;
             };
+            if {or {eq? $in-key kDN5} {eq? $in-key KEY_NPAGE}} {
+                $window apply-command $main $window "" move-half-up;
+                return ALL;
+            };
             if {eq? $in-key KEY_UP} {
                 $window apply-command $main $window "" smooth-scroll-up;
+                return ALL;
+            };
+            if {or {eq? $in-key kUP5} {eq? $in-key KEY_PPAGE}} {
+                $window apply-command $main $window "" move-half-down;
                 return ALL;
             };
         }
