@@ -992,14 +992,27 @@ defun regular-file? (path count: count) {
 };
 
 defun get-real-path (path) {
+    result ::= get-real-path-sub $path count: 0;
+    if {$path at 0 : != "/"} {
+        result ::= path-adjust [[pwd] . "/./" $result];
+    };
+    return $result;
+};
+
+defun get-real-path-sub (path count: count) {
+    [set? count] ?? {count := 0};
+    $count ++;
+    if {$count > 20} {
+        throw ErrLinkLoop "Too many symbolic link.";
+    };
     try {
         if {file stat $path : assoc-value type : != "l"} {return $path};
         if {file stat $path : assoc-value type : = "l"} {
             next ::= file stat $path : assoc-value symbolic-link;
             if {$next at 0 : = "/"} {
-                return [path-adjust [get-real-path $next]];
+                return [get-real-path-sub $next count: $count];
             } {
-                return [path-adjust [get-real-path [make-base $path : . "/" $next]]];
+                return [get-real-path-sub [make-base $path : . "/" $next] count: $count];
             };
         };
     };
@@ -1010,6 +1023,10 @@ defun make-base (path) {
     l ::= $path split sep: "/";
     $l ->>;
     result ::= $l join sep: "/";
-    if {$result = ""} {result := "."};
+    if {$result = ""} {
+        if {$path at 0 : != "/"} {
+            result := "."
+        };
+    };
     return $result;
 };

@@ -47,6 +47,9 @@ EditBuffer method load-content (path init-only: init-flag buffer-name: buff-name
     sets NewFile <nil>;
     sets Src [vector];
     if {[$path sub 0 1] = "/"} {path ::= path-adjust $path};
+    if {and {! [set? buff-name]} {$path len : > 0}} {
+        buff-name ::= $path split sep: "/" : last : car;
+    };
 
     if {! [set? init-flag]} {
 	try {
@@ -57,11 +60,11 @@ EditBuffer method load-content (path init-only: init-flag buffer-name: buff-name
                 throw ErrFileSpec "Not regular file.";
             };
             if {file exists? $path} {
-                path ::= get-real-path $path;
+                path ::= path-adjust [get-real-path $path];
             };
             sets File $path;
-            
-	    if {file read? $path} {
+
+            if {file read? $path} {
                 enc ::= auto-encoding $path;
 		if [nil? $enc] {enc := RAW};
 		$f open $path mode: i;

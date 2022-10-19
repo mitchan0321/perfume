@@ -43,6 +43,7 @@ defcommand dired-open desc: "Open file or directory at cursor point file on dire
                 $new-buff set-previous-buffer [$buff get-buffer-name];
             } {
                 if {file read? $path} {
+                    path ::= get-real-path $path;
                     buff ::= BufferManager get-buffer-by-path $path;
                     if $buff {
                         $main bind-buffer [$window get-window-name] $buff;

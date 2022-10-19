@@ -22,6 +22,7 @@ defcommand open-file desc: "Open specified file. If occured file decode error, s
                 dired-open $main $window $path;
                 return ALL;
             };
+            path ::= get-real-path $path;
 	    buff ::= BufferManager get-buffer-by-path $path;
             if $buff {
 		$MainWindow bind-buffer [$window get-window-name] $buff;
@@ -61,6 +62,7 @@ defcommand view-file desc: "Open specified file by protect mode." {
                 dired-open $main $window $path;
                 return ALL;
             };
+            path ::= get-real-path $path;
 	    buff ::= BufferManager get-buffer-by-path $path;
             if $buff {
                 $buff set-protect;
