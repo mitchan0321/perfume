@@ -2696,4 +2696,8 @@
 		Fix EditBuffer::load-content use file path becams to real file path for travarse sym-link.
 		Add get-real-path utility to WUtil for travarse sym-link.
 
+2022/10/19
+	pmacs update:
+		Fix some sym-link file open.
+
 #eof
