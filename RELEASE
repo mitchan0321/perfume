@@ -2700,4 +2700,10 @@
 	pmacs update:
 		Fix some sym-link file open.
 
+2022/10/20
+	pmacs update
+		Add dired-open-other-window editor command.
+		Add binding: "o" -> dired-open-other-window on Dired mode.
+		Add Window::get-window-list, Window::get-window-list-without-current.
+
 #eof
