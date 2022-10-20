@@ -699,6 +699,15 @@ Window method mini-input-start (init-value prompt: p index: index) {
     $MiniWindow activate;
 };
 
+Window method get-window-list () {
+    return $WindowList;
+};
+
+Window method get-window-list-without-current () {
+    c ::= get-current-window;
+    return [$WindowList filter {| i | ! [eq? $i $c]}];
+};
+    
 Window method mini-input-callback (in-key value) {
     if {! [$MiniInputCallback null?]} {
 	try {
@@ -864,3 +873,5 @@ Window method input-ready? () {
     if [$InputFd ready?] {return <t>};
     return <nil>;
 };
+
+
