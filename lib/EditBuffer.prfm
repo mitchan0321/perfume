@@ -50,6 +50,9 @@ EditBuffer method load-content (path init-only: init-flag buffer-name: buff-name
     if {and {! [set? buff-name]} {$path len : > 0}} {
         buff-name ::= $path split sep: "/" : last : car;
     };
+    if {or {! [set? buff-name]} {! $buff-name} {$buff-name = ""}} {
+	buff-name := "*no named*";
+    };
 
     if {! [set? init-flag]} {
 	try {
@@ -107,10 +110,6 @@ EditBuffer method load-content (path init-only: init-flag buffer-name: buff-name
     };
 
     if {$path = ""} {sets File "EDITOR_SAVE.pmacs"};
-    if {! [set? buff-name]} {
-	buff-name ::= $path split sep: "/" : last : car;
-	$buff-name ?? {buff-name := "*no named*"};
-    };
     BufferManager regist-buffer [self] $buff-name;
 
     sets UndoBuffer ();
