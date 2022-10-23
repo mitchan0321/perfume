@@ -2706,4 +2706,11 @@
 		Add binding: "o" -> dired-open-other-window on Dired mode.
 		Add Window::get-window-list, Window::get-window-list-without-current.
 
+2022/10/23
+	commands.c
+		Add file command option 'rstat' for file status return real node information.
+	pmacs update:
+		Change key repeat parameter.
+		Change EditBuffer::load-content buffer naming.
+
 #eof
