@@ -1875,6 +1875,7 @@ cmd_file(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	println(interp, L"  exec? \"file\"         If \"file\" is excecutable then return <t>.");
 	println(interp, L"  list \"directory\"     Return \"directory\" entry list.");
 	println(interp, L"  stat \"file\"          Return \"file\" status.");
+	println(interp, L"  rstat \"file\"         Return \"file\" real status.");
 	println(interp, L"  rm \"file\"            rm \"file\".");
 	println(interp, L"  rmdir \"dir\"          rmdir \"dir\".");
 	println(interp, L"  rename \"from\" \"dest\" rename file \"from\" to \"dest\".");
@@ -2049,7 +2050,7 @@ cmd_file(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	closedir(dir);
 	return dirl;
 
-    } else if (wcscmp(commands, L"stat") == 0) {
+    } else if ((wcscmp(commands, L"stat") == 0) || (wcscmp(commands, L"rstat") == 0)) {
 	Toy_Type *fname;
 	char *fnames;
 	int sts;
@@ -2057,6 +2058,11 @@ cmd_file(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	Toy_Type *result, *l;
 	wchar_t *t;
 	encoder_error_info *error_info;
+        int cmd_sw = 0;
+        
+        if (wcscmp(commands, L"rstat") == 0) {
+            cmd_sw = 1;
+        }
 
 	if (arglen != 2) goto error_stat;
 	posargs = list_next(posargs);
@@ -2069,7 +2075,11 @@ cmd_file(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	    return new_exception(TE_BADENCODER, error_info->message, interp);
 	}
 
-	sts = lstat(fnames, &fstat);
+        if (cmd_sw == 1) {
+            sts = stat(fnames, &fstat);
+        } else {
+            sts = lstat(fnames, &fstat);
+        }
 	if (-1 == sts) {
 	    return new_exception(TE_FILEACCESS, L"file stat can\'t get.", interp); // '
 	}
@@ -2126,31 +2136,33 @@ cmd_file(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 	l = list_append(l, new_cons(new_symbol(L"perm"),
 				    new_integer_si(fstat.st_mode & 07777)));
 
-	/* if symbolic link, read link and encode */
-	if (S_ISLNK(fstat.st_mode)) {
-	    char *buff;
-	    int sts;
-	    
-	    buff = GC_MALLOC(MAXPATHLEN);
-	    ALLOC_SAFE(buff);
-	    sts = readlink(fnames, buff, MAXPATHLEN);
-	    if (-1 == sts) {
-		l = list_append(l, new_cons(new_symbol(L"symbolic-link"),
-					    const_Nil));
-	    } else {
-		encoder_error_info *error_info;
-		Cell *cfnames;
-		cfnames = decode_dirent(interp, buff, &error_info);
-		if (0 == cfnames) {
-		    l = list_append(l, new_cons(new_symbol(L"symbolic-link"),
-						const_Nil));
-		} else {
-		    l = list_append(l, new_cons(new_symbol(L"symbolic-link"),
-						new_string_cell(cfnames)));
-		}
-	    }
-	}
-					       
+        if (cmd_sw == 0) {
+            /* if symbolic link, read link and encode */
+            if (S_ISLNK(fstat.st_mode)) {
+                char *buff;
+                int sts;
+                
+                buff = GC_MALLOC(MAXPATHLEN);
+                ALLOC_SAFE(buff);
+                sts = readlink(fnames, buff, MAXPATHLEN);
+                if (-1 == sts) {
+                    l = list_append(l, new_cons(new_symbol(L"symbolic-link"),
+                                    const_Nil));
+                } else {
+                    encoder_error_info *error_info;
+                    Cell *cfnames;
+                    cfnames = decode_dirent(interp, buff, &error_info);
+                    if (0 == cfnames) {
+                        l = list_append(l, new_cons(new_symbol(L"symbolic-link"),
+			                const_Nil));
+                    } else {
+                        l = list_append(l, new_cons(new_symbol(L"symbolic-link"),
+                                        new_string_cell(cfnames)));
+                    }
+                }
+            }
+        }
+        
 	return result;
 
     } else if (wcscmp(commands, L"rm") == 0) {
