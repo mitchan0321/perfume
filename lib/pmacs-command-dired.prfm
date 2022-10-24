@@ -95,15 +95,7 @@ defcommand dired-open-other-window desc: "Open file or directory at cursor point
             (stat path message) ::= get-path-condition $path;
             case $stat
                 DIRECTORY {
-                    cwin ::= $main get-current-window;
-                    if {$main get-window-list : len : <= 1} {
-                        $main create-split-vertical-window window-name: [$cwin get-window-name];
-                    };
-                    owin ::= $main get-window-list-without-current : car;
-                    new-buff ::= dired-open $main $owin $path;
-                    $new-buff set-previous-buffer [$buff get-buffer-name];
-                    $main roll-current-window;
-                    return ALL;
+                    ### fall throw
                 }
                 REGULAR  {
                     ### fall throw
@@ -116,8 +108,22 @@ defcommand dired-open-other-window desc: "Open file or directory at cursor point
                     return ALL;
                 }
             ;;
-            
+
             cwin ::= $main get-current-window;
+            if {$main get-window-list : len : <= 1} {
+                $main create-split-vertical-window window-name: [$cwin get-window-name];
+            };
+            owin ::= $main get-window-list-without-current : car;
+            
+            case $stat
+                DIRECTORY {
+                    new-buff ::= dired-open $main $owin $path;
+                    $new-buff set-previous-buffer [$buff get-buffer-name];
+                    $main roll-current-window;
+                    return ALL;
+                }
+            ;;
+
             if {$main get-window-list : len : <= 1} {
                 $main create-split-vertical-window window-name: [$cwin get-window-name];
             };
