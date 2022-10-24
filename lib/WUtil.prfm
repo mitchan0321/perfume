@@ -1015,6 +1015,12 @@ defun get-real-path-sub (path count: count) {
                 return [get-real-path-sub [make-base $path : . "/" $next] count: $count];
             };
         };
+    } catch: {| e |
+        case [$e car]
+        ErrFileAccess {
+            return $path;
+        };
+        throw $e;
     };
     return <nil>;
 };
@@ -1029,4 +1035,62 @@ defun make-base (path) {
         };
     };
     return $result;
+};
+
+defun get-path-condition (path) {
+    ### returns: (stat original-path message)
+    ### stat: REGULAR ..... Regular file
+    ###       DIRECTORY ... Directory
+    ###       NOEXISTS .... File not exists
+    ###       NOPERM ...... File not permitted
+    ###       SPACIAL ..... Special file
+    ###       LOOP ........ Too many depth symbolic link
+
+    [$path at 0 : = "/"] ?? {path ::= [pwd] . "/" $path};
+    path ::= path-adjust $path;
+    try {
+        cur-type ::= file stat $path : assoc-value type;
+    } catch: {
+        base ::= make-base $path;
+        if {file write? $base} {
+            return (NOEXISTS $path [$path . " is not exists."]);
+        } {
+            return (NOPERM $base [$base . " directory is not permitted."]);
+        };
+    };
+    if {eq? $cur-type "l"} {
+        try {
+            path ::= get-real-path $path;
+            cur-type ::= file stat $path : assoc-value type;
+        } catch: {| e |
+            case [$e car]
+                ErrFileAccess {
+                    return (NOEXISTS $path [$path . " is not exists."]);
+                }
+                ErrLinkLoop {return (LOOP $path [$path . " symbolic link is too many depth."])}
+            ;;
+        };
+    };
+
+    case $cur-type
+        "-" {
+            if [file read? $path] {
+                return (REGULAR $path [$path . " is regular file."]);
+            } {
+                return (NOPERM $path [$path . " is not permitted."]);
+            };
+        }
+        "d" {
+            if [file read? $path] {
+                return (DIRECTORY $path [$path . " is directory."]);
+            } {
+                return (NOPERM $path [$path . " is not permitted."]);
+            };
+        }
+        "b" {return (SPECIAL $path [$path . " is special file (block device)."])}
+        "c" {return (SPECIAL $path [$path . " is special file (character device)."])}
+        "p" {return (SPECIAL $path [$path . " is special file (pipe)."])}
+        "s" {return (SPECIAL $path [$path . " is special file (socket)."])}
+        default: {return (SPECIAL $path [$path . " is unknown type file."])}
+    ;;
 };
