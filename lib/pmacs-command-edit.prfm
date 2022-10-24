@@ -286,7 +286,7 @@ defcommand smart-newline desc: "Formed indent at current cursor point, insert ca
                     str-prev := "";
                     break;
                 };
-                if {[$str-prev len] > 0} {break};
+                if {! [$str-prev =~ '^[ \t]*$']} {break};
                 $idx-y ++;
             };
         };
@@ -321,7 +321,7 @@ defcommand smart-newline desc: "Formed indent at current cursor point, insert ca
                 str-prev := "";
                 break;
             };
-            if {[$str-prev len] > 0} {break};
+            if {! [$str-prev =~ '^[ \t]*$']} {break};
             $idx-y ++;
         };
     };
@@ -356,7 +356,7 @@ defcommand smart-indent desc: "Formed indent at line or insert more indent." {
                 str-prev := "";
                 break;
             };
-            if {[$str-prev len] > 0} {break};
+            if {! [$str-prev =~ '^[ \t]*$']} {break};
             $idx-y ++;
         };
     };
