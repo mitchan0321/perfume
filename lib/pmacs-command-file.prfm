@@ -18,16 +18,25 @@ defcommand open-file desc: "Open specified file. If occured file decode error, s
 		    $value
 		    [get-current-buffer-dir $window : . "/" $value]
 	    ];
-            if {file dir? $path} {
-                dired-open $main $window $path;
-                return ALL;
-            };
-            try {
-                path ::= get-real-path $path;
-            } catch: {
-                ### $path is new file, do nothing.
-            };
-	    buff ::= BufferManager get-buffer-by-path $path;
+            (stat path message) ::= get-path-condition $path;
+            case $stat
+                DIRECTORY {
+                    dired-open $main $window $path;
+                    return ALL;
+                }
+                REGULAR  {
+                    ### fall throw
+                }
+                NOEXISTS {
+                    ### fall throw
+                }
+                default: {
+                    show-message :bell ["File not open: " . $message];
+                    return ALL;
+                }
+            ;;
+            
+            buff ::= BufferManager get-buffer-by-path $path;
             if $buff {
 		$MainWindow bind-buffer [$window get-window-name] $buff;
 		return ALL;
@@ -62,16 +71,20 @@ defcommand view-file desc: "Open specified file by protect mode." {
 		    $value
 		    [get-current-buffer-dir $window : . "/" $value]
 	    ];
-            if {file dir? $path} {
-                dired-open $main $window $path;
-                return ALL;
-            };
-            try {
-                path ::= get-real-path $path;
-            } catch: {
-                show-message :bell ["File not found, path: '" . $path "'."];
-                return ALL;
-            };
+            (stat path message) ::= get-path-condition $path;
+            case $stat
+                DIRECTORY {
+                    dired-open $main $window $path;
+                    return ALL;
+                }
+                REGULAR  {
+                    ### fall throw
+                }
+                default: {
+                    show-message :bell ["File not open: " . $message];
+                    return ALL;
+                }
+            ;;
 	    buff ::= BufferManager get-buffer-by-path $path;
             if $buff {
                 $buff set-protect;
@@ -117,9 +130,16 @@ defcommand read-file desc: "Open specified file and insert file data to current 
             };
             f := <nil>;
             try {
-                if {and {file exists? $path} {! [regular-file? $path]}} {
-                    throw ErrFileSpec "Not regular file.";
-                };
+                (stat path message) ::= get-path-condition $path;
+                case $stat
+                    REGULAR  {
+                        ### fall throw
+                    }
+                    default: {
+                        show-message :bell ["File not open: " . $message];
+                        return ALL;
+                    }
+                ;;
                 f ::= new File init: ($path mode: i);
                 $f set-ignore-cr $FILE_IGNORE_CR;
                 ### $f set-encoding [$buff get-encoding];

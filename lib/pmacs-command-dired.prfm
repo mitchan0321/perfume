@@ -38,33 +38,37 @@ defcommand dired-open desc: "Open file or directory at cursor point file on dire
             } {
                 path ::= path-adjust [$path . "/" $name];
             };
-            if {file dir? $path} {
-                new-buff ::= dired-open $main $window $path;
-                $new-buff set-previous-buffer [$buff get-buffer-name];
-            } {
-                new-file := <nil>;
-                try {
-                    path ::= get-real-path $path;
-                } catch: {
-                    new-file := <t>;
-                };
-                if {or {file read? $path} $new-file} {
-                    buff ::= BufferManager get-buffer-by-path $path;
-                    if $buff {
-                        $main bind-buffer [$window get-window-name] $buff;
-                        return SELF;
-                    };
-                    buff ::= new EditBuffer;
-                    (result err) ::= $buff load-content $path;
-                    if {$buff enc-error?} {
-                        show-message :bell "File decode error occured!! Try ALT-e and specify another encoding for re-load.";
-                    };
-                    $main bind-buffer [$window get-window-name] $buff;
-                    $result ?? {show-message :bell ["Open Failed, path: " . $path " ("  $err ")"]};
-                } {
-                    show-message :bell "File not readable.";
-                };
+            (stat path message) ::= get-path-condition $path;
+            case $stat
+                DIRECTORY {
+                    new-buff ::= dired-open $main $window $path;
+                    $new-buff set-previous-buffer [$buff get-buffer-name];
+                    return ALL;
+                }
+                REGULAR  {
+                    ### fall throw
+                }
+                NOEXISTS {
+                    ### fall throw
+                }
+                default: {
+                    show-message :bell ["File not open: " . $message];
+                    return ALL;
+                }
+            ;;
+
+            buff ::= BufferManager get-buffer-by-path $path;
+            if $buff {
+                $main bind-buffer [$window get-window-name] $buff;
+                return SELF;
             };
+            buff ::= new EditBuffer;
+            (result err) ::= $buff load-content $path;
+            if {$buff enc-error?} {
+                show-message :bell "File decode error occured!! Try ALT-e and specify another encoding for re-load.";
+            };
+            $main bind-buffer [$window get-window-name] $buff;
+            $result ?? {show-message :bell ["Open Failed, path: " . $path " ("  $err ")"]};
         };
     };
     return ALL;
@@ -87,46 +91,55 @@ defcommand dired-open-other-window desc: "Open file or directory at cursor point
             } {
                 path ::= path-adjust [$path . "/" $name];
             };
+
+            (stat path message) ::= get-path-condition $path;
+            case $stat
+                DIRECTORY {
+                    cwin ::= $main get-current-window;
+                    if {$main get-window-list : len : <= 1} {
+                        $main create-split-vertical-window window-name: [$cwin get-window-name];
+                    };
+                    owin ::= $main get-window-list-without-current : car;
+                    new-buff ::= dired-open $main $owin $path;
+                    $new-buff set-previous-buffer [$buff get-buffer-name];
+                    $main roll-current-window;
+                    return ALL;
+                }
+                REGULAR  {
+                    ### fall throw
+                }
+                NOEXISTS {
+                    ### fall throw
+                }
+                default: {
+                    show-message :bell ["File not open: " . $message];
+                    return ALL;
+                }
+            ;;
+            
             cwin ::= $main get-current-window;
             if {$main get-window-list : len : <= 1} {
                 $main create-split-vertical-window window-name: [$cwin get-window-name];
             };
             owin ::= $main get-window-list-without-current : car;
-            
-            if {file dir? $path} {
-                new-buff ::= dired-open $main $owin $path;
-                $new-buff set-previous-buffer [$buff get-buffer-name];
+
+            buff ::= BufferManager get-buffer-by-path $path;
+            if $buff {
+                $main bind-buffer [$owin get-window-name] $buff;
                 $main roll-current-window;
-            } {
-                new-file := <nil>;
-                try {
-                    path ::= get-real-path $path;
-                } catch: {
-                    new-file := <t>;
-                };
-                if {or {file read? $path} $new-file} {
-                    buff ::= BufferManager get-buffer-by-path $path;
-                    if $buff {
-                        $main bind-buffer [$owin get-window-name] $buff;
-                        $main roll-current-window;
-                        return SELF;
-                    };
-                    buff ::= new EditBuffer;
-                    (result err) ::= $buff load-content $path;
-                    if {$buff enc-error?} {
-                        show-message :bell "File decode error occured!! Try ALT-e and specify another encoding for re-load.";
-                    };
-                    $main bind-buffer [$owin get-window-name] $buff;
-                    $result ?? {
-                        show-message :bell ["Open Failed, path: " . $path " ("  $err ")"];
-                        return ALL;
-                    };
-                    $main roll-current-window;
-                } {
-                    show-message :bell "File not readable.";
-                    return ALL;
-                };
+                return SELF;
             };
+            buff ::= new EditBuffer;
+            (result err) ::= $buff load-content $path;
+            if {$buff enc-error?} {
+                show-message :bell "File decode error occured!! Try ALT-e and specify another encoding for re-load.";
+            };
+            $main bind-buffer [$owin get-window-name] $buff;
+            $result ?? {
+                show-message :bell ["Open Failed, path: " . $path " ("  $err ")"];
+                return ALL;
+            };
+            $main roll-current-window;
         };
     };
     return ALL;
@@ -406,5 +419,93 @@ defcommand dired-clear-all-marks desc: "Clear dired all marks." {
     buff ::= $window get-buffer;
     $buff clear-mark-all;
     $buff update;
+    return ALL;
+};
+
+defcommand dired-change-mode desc: "Change mode file on dired buffer." {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    r ::= $buff get-buffer-line $ey;
+    if $r {
+        l ::= $r split sep: "|";
+        if {[$l len] >= 2} {
+            name ::= $l get 1;
+            path ::= $buff get-path;
+            path ::= $path ?? [pwd];
+            if {$path = "/"} {
+                path ::= path-adjust ["/" . $name];
+            } {
+                path ::= path-adjust [$path . "/" $name];
+            };
+            mode ::= [file rstat $path : assoc-value mode] && 0o7777;
+            mini-input-until-enter $main $window
+                prompt: ["Change file mode \"" . [$path split sep: "/" : last : get 0] "\" (Octal): "]
+                init-value: ["%04o" fmt $mode]
+                enter-proc: {| value |
+                    try {
+                        file chmod $path ["0o" .  $value : int];
+                    } catch: {
+                        show-message :bell "Bad mode specified.";
+                    };
+                    $buff update;
+                }
+            ;;
+        };
+    };
+    return ALL;
+};
+
+defcommand dired-delete-dir desc: "Delete directory on dired buffer." {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    r ::= $buff get-buffer-line $ey;
+    if $r {
+        l ::= $r split sep: "|";
+        if {[$l len] >= 2} {
+            name ::= $l get 1;
+            path ::= $buff get-path;
+            path ::= $path ?? [pwd];
+            if {$path = "/"} {
+                path ::= path-adjust ["/" . $name];
+            } {
+                path ::= path-adjust [$path . "/" $name];
+            };
+            mini-input-fully-yes-or-no $main $window
+                prompt: ["Really delete file? (" . [$path split sep: "/" : last : get 0] ") [yes or ESC]: "]
+                yes-proc: {
+                    file rmdir $path;
+                    $buff update;
+                }
+            ;;
+        };
+    };
+    return ALL;
+};
+
+defcommand dired-make-dir desc: "Make directory on dired buffer." {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    r ::= $buff get-buffer-line $ey;
+    if $r {
+        l ::= $r split sep: "|";
+        if {[$l len] >= 2} {
+            name ::= $l get 1;
+            path ::= $buff get-path;
+            path ::= $path ?? [pwd];
+            mini-input-until-enter $main $window
+                prompt: "New directory name: "
+                enter-proc: {| value |
+                    file mkdir [$path . "/" $value] $DEFAULT_DIR_MODE;
+                    $buff update;
+                }
+            ;;
+        };
+    };
     return ALL;
 };
