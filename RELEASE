@@ -2713,4 +2713,18 @@
 		Change key repeat parameter.
 		Change EditBuffer::load-content buffer naming.
 
+2022/10/24
+	pmacs update:
+		Add editor commands are dired-change-mode, dired-delete-dir and dired-make-dir.
+		Add key bindings:
+		  'm' on dired mode -> dired-change-mode
+		  'D' on dired mode -> dired-delete-dir
+		  'M' on dired mode -> dired-make-dir
+		Change status line format, dismis '(', ')' and column number to left.
+		Add new utility function get-path-condition is return path condition, real-path and message,
+		  that judge follow symbolic link and file type by specified path.
+		Change dired-open, dired-open-other-window, open-file, view-file and read-file use to
+		  get-path-condition.
+		Fix smart-newline and smart-indent if previous line has white space, do more previous line detect.  
+
 #eof
