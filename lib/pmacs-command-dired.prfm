@@ -124,11 +124,6 @@ defcommand dired-open-other-window desc: "Open file or directory at cursor point
                 }
             ;;
 
-            if {$main get-window-list : len : <= 1} {
-                $main create-split-vertical-window window-name: [$cwin get-window-name];
-            };
-            owin ::= $main get-window-list-without-current : car;
-
             buff ::= BufferManager get-buffer-by-path $path;
             if $buff {
                 $main bind-buffer [$owin get-window-name] $buff;
