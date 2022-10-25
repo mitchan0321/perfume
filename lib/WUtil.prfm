@@ -994,7 +994,12 @@ defun regular-file? (path count: count) {
 defun get-real-path (path) {
     result ::= get-real-path-sub $path count: 0;
     if {$path at 0 : != "/"} {
-        result ::= path-adjust [[pwd] . "/./" $result];
+        pwd ::= pwd;
+        if {$pwd = "/"} {
+            result ::= path-adjust [$pwd . $result];
+        } {
+            result ::= path-adjust [$pwd . "/" $result];
+        };
     };
     return $result;
 };
@@ -1046,8 +1051,17 @@ defun get-path-condition (path) {
     ###       SPACIAL ..... Special file
     ###       LOOP ........ Too many depth symbolic link
 
-    [$path at 0 : = "/"] ?? {path ::= [pwd] . "/" $path};
-    path ::= path-adjust $path;
+    try {
+        path ::= get-real-path $path;
+    } catch: {| e |
+        case [$e car]
+        ErrFileAccess {
+            return (NOEXISTS $path [$path . " is not exists."]);
+        }
+        ErrLinkLoop {return (LOOP $path [$path . " symbolic link is too many depth."])}
+        ;;
+    };
+        
     try {
         cur-type ::= file stat $path : assoc-value type;
     } catch: {
@@ -1056,19 +1070,6 @@ defun get-path-condition (path) {
             return (NOEXISTS $path [$path . " is not exists."]);
         } {
             return (NOPERM $base [$base . " directory is not permitted."]);
-        };
-    };
-    if {eq? $cur-type "l"} {
-        try {
-            path ::= get-real-path $path;
-            cur-type ::= file stat $path : assoc-value type;
-        } catch: {| e |
-            case [$e car]
-                ErrFileAccess {
-                    return (NOEXISTS $path [$path . " is not exists."]);
-                }
-                ErrLinkLoop {return (LOOP $path [$path . " symbolic link is too many depth."])}
-            ;;
         };
     };
 
