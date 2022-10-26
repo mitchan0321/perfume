@@ -1,3 +1,4 @@
+2022/10/25	PRFM_20221025		1.6.3
 2022/10/06	PRFM_20221006		1.6.2
 2022/09/10	PRFM_20220910		1.6.1
 2022/07/27	PRFM_20220727_PLASMA	1.6.0
@@ -2731,5 +2732,8 @@
 	pmacs update:
 		Fix dired-delete-dir prompt spell miss.
 		Add macOS support from https://github.com/shugo.
+	tag:
+		PRFM_20221025
+		1.6.3
 
 #eof
