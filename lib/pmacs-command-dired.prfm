@@ -476,7 +476,7 @@ defcommand dired-delete-dir desc: "Delete directory on dired buffer." {
                 path ::= path-adjust [$path . "/" $name];
             };
             mini-input-fully-yes-or-no $main $window
-                prompt: ["Really delete file? (" . [$path split sep: "/" : last : get 0] ") [yes or ESC]: "]
+                prompt: ["Really delete directory? (" . [$path split sep: "/" : last : get 0] ") [yes or ESC]: "]
                 yes-proc: {
                     file rmdir $path;
                     $buff update;
