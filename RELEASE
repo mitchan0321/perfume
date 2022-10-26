@@ -2727,4 +2727,9 @@
 		  get-path-condition.
 		Fix smart-newline and smart-indent if previous line has white space, do more previous line detect.  
 
+2022/10/25
+	pmacs update:
+		Fix dired-delete-dir prompt spell miss.
+		Add macOS support from https://github.com/shugo.
+
 #eof
