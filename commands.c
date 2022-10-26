@@ -6,6 +6,10 @@
 #	define _DEFAULT_SOURCE
 #endif /* __FreeBSD__ */
 
+#ifdef __APPLE__
+# define _DARWIN_C_SOURCE    /* define major/minor on macOS */
+#endif
+
 #include <stdio.h>
 #include <wchar.h>
 #include <stdlib.h>
@@ -2107,12 +2111,21 @@ cmd_file(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 				    new_integer_si(fstat.st_blksize)));
 	l = list_append(l, new_cons(new_symbol(L"blocks"), 
 				    new_integer_si(fstat.st_blocks)));
+#ifdef __APPLE__
+	l = list_append(l, new_cons(new_symbol(L"atime"), 
+				    new_integer_ullsi(fstat.st_atime)));
+	l = list_append(l, new_cons(new_symbol(L"mtime"), 
+				    new_integer_ullsi(fstat.st_mtime)));
+	l = list_append(l, new_cons(new_symbol(L"ctime"), 
+				    new_integer_ullsi(fstat.st_ctime)));
+#else
 	l = list_append(l, new_cons(new_symbol(L"atime"), 
 				    new_integer_ullsi(fstat.st_atim.tv_sec)));
 	l = list_append(l, new_cons(new_symbol(L"mtime"), 
 				    new_integer_ullsi(fstat.st_mtim.tv_sec)));
 	l = list_append(l, new_cons(new_symbol(L"ctime"), 
 				    new_integer_ullsi(fstat.st_ctim.tv_sec)));
+#endif
 
 	if (S_ISSOCK(fstat.st_mode)) {
 	    t = L"s";

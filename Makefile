@@ -46,8 +46,13 @@ NO_LAZY_CALL = no
 
 ifeq ($(NCURSES),yes)
   OPTIONS	+= -DNCURSES
-  OPTLIBS	+= -lncursesw
-  OPTLIBS2	+= -lncursesw
+  ifeq ($(shell uname),Darwin)
+    OPTLIBS	+= -lncurses
+    OPTLIBS2	+= -lncurses
+  else
+    OPTLIBS	+= -lncursesw
+    OPTLIBS2	+= -lncursesw
+  endif
 endif
 
 ifeq ($(EVAL_STAT),yes)
