@@ -219,6 +219,9 @@ config.h:	config.h.in
 clean:
 	rm -f *.o perfumesh *~ lib/*~ tests/*~ *core* *.gmon config.h tests/setup.prfm a.out tests/test
 	rm -f encoding-set-utoj.h encoding-set-jtou.h
+ifeq ($(CORU_USE),yes)
+	(cd extlib/coru; $(MAKE) clean)
+endif
 
 build-pkg:
 	$(MAKE) clean
