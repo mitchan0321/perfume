@@ -139,7 +139,7 @@ install:
 
 perfumesh:	$(OBJS) perfumesh.o
 ifeq ($(CORU_USE),yes)
-	(cd extlib/coru; make)
+	(cd extlib/coru; $(MAKE))
 endif
 	$(CC) $(OBJS) perfumesh.o $(LIB) -o perfumesh
 
