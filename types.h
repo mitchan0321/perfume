@@ -6,7 +6,11 @@
 #include <wchar.h>
 #include <setjmp.h>
 #include <sys/types.h>
-#include <pcl.h>
+#ifdef CORU_USE
+#   include <coru.h>
+#else
+#   include <pcl.h>
+#endif /* CORU_USE */
 #include <gmp.h>
 #include "cell.h"
 #include "hash.h"
@@ -165,7 +169,11 @@ typedef struct _toy_interp {
     int cstack_id;
     void *cstack;
     int cstack_size;
+#ifdef CORU_USE
+    coru_t *coroid;
+#else
     coroutine_t coroid;
+#endif /* CORU_USE */
     struct _toy_interp *co_parent;
     struct _toy_type *co_value;
     int co_calling;
@@ -191,7 +199,11 @@ typedef struct _toy_coroutine {
     Toy_Interp *interp;
     struct _toy_type *script;
     int state;
+#ifdef CORU_USE
+    coru_t *coro_id;
+#else
     coroutine_t coro_id;
+#endif /* CORU_USE */
 } Toy_Coroutine;
 
 /*

@@ -2736,4 +2736,8 @@
 		PRFM_20221025
 		1.6.3
 
+2022/10/27
+	*
+		Add support another co-routine library 'coru'. If use to coru, try define "CORU_USE = yes" in Makefile.
+
 #eof

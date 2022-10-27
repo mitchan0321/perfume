@@ -3621,7 +3621,11 @@ cmd_pause(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     parent = interp->co_parent;
     parent->co_value = toy_clone(val);
 
+#ifdef CORU_USE
+    coru_yield();
+#else
     co_resume();
+#endif /* CORU_USE */
 
     return interp->last_status;
 
@@ -3924,7 +3928,11 @@ cmd_cstack_release(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int ar
 
     slot = mpz_get_si(t->u.biginteger);
     if (NULL != cstack_get_start_addr(slot)) {
+#ifdef CORU_USE
+        /* XXX */
+#else
 	co_delete((coroutine_t)cstack_get_start_addr(slot));
+#endif /* CORU_USE */
     }
     cstack_release_clear(slot);
     return const_Nil;

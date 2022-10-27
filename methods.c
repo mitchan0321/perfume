@@ -5386,7 +5386,11 @@ mth_coro_next(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 	interp->co_calling = 1;
         co->interp->co_parent = interp;
         restore_co_id = cstack_enter(co->interp->cstack_id);
-	co_call(co->coro_id);
+#ifdef CORU_USE
+        coru_resume(co->coro_id);
+#else
+        co_call(co->coro_id);
+#endif /* CORU_USE */
 	cstack_leave(restore_co_id);
 	interp->co_calling = 0;
 	break;
@@ -5424,8 +5428,13 @@ mth_coro_release(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     if (0 == co->coro_id) {
 	return new_exception(TE_COOUTOFLIFE, L"Co-routine is already done.", interp);
     }
+#ifdef CORU_USE
+    coru_destroy(co->coro_id);
+    co->coro_id = 0;
+#else
     co_delete(co->coro_id);
     co->coro_id = 0;
+#endif /* CORU_USE */
     if (! co->interp) return const_Nil;
     cstack_release_clear(co->interp->cstack_id);
     co->interp->cstack_id = 0;

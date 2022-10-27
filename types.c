@@ -466,7 +466,9 @@ coroutine_handl(void *context) {
     cstack_release_clear(id);
     co->u.coroutine->interp = NULL;
 
+#ifndef CORU_USE
     co_exit();
+#endif /* CORU_USE */
 }
 
 void
@@ -478,8 +480,13 @@ coro_finalizer(void *obj, void *client_data) {
     if (NULL == o->u.coroutine) return;
 
     if (0 != o->u.coroutine->coro_id) {
-	co_delete(o->u.coroutine->coro_id);
+#ifdef CORU_USE
+        coru_destroy(o->u.coroutine->coro_id);
 	o->u.coroutine->coro_id = 0;
+#else
+        co_delete(o->u.coroutine->coro_id);
+	o->u.coroutine->coro_id = 0;
+#endif /* CORU_USE */
     }
     if (NULL != o->u.coroutine->interp) {
 	cstack_release_clear(o->u.coroutine->interp->cstack_id);
@@ -519,10 +526,20 @@ new_coroutine(Toy_Interp *interp, Toy_Type* script) {
     o->u.coroutine->interp->cstack = cstack_get_start_addr(cstack_id);
     o->u.coroutine->interp->cstack_size = cstack_get_size(cstack_id);
     o->u.coroutine->interp->co_parent = interp;
+#ifdef CORU_USE
+    o->u.coroutine->coro_id = GC_malloc(sizeof(coru_t));
+    ALLOC_SAFE(o->u.coroutine->coro_id);
+    coru_create(o->u.coroutine->coro_id,
+                coroutine_handl,
+                (void*)o,
+                (size_t)(o->u.coroutine->interp->cstack_size),
+                (void*)(o->u.coroutine->interp->cstack));
+#else
     o->u.coroutine->coro_id = co_create(coroutine_handl,
 					(void*)o,
 					o->u.coroutine->interp->cstack,
-					o->u.coroutine->interp->cstack_size);
+                                        o->u.coroutine->interp->cstack_size);
+#endif /* CORU_USE */
     o->u.coroutine->interp->coroid = o->u.coroutine->coro_id;
     o->u.coroutine->state = CO_STS_INIT;
 

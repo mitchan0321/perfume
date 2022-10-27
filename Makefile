@@ -18,7 +18,6 @@ endif
 PKG_TMP		= $(HOME)/tmp
 PKG_DIR		= $(PKG_TMP)/pmacs-install
 PKG_EXTLIB_DIR	= /usr/local/lib
-STD_LIB_DIR	= /lib/x86_64-linux-gnu
 PKG_TAR_NAME	= pmacs-install.tar.gz
 ifeq ($(shell uname),Linux)
   MAKE		= make
@@ -44,6 +43,9 @@ EVAL_STAT = no
 ### If you specified NO_LAZY_CALL=yes, the lazy call mechanism when calling a function is omitted.
 NO_LAZY_CALL = no
 
+### If you use to co-routine library 'coru' set yes, if use 'pcl' set otherwise.
+CORU_USE = yes
+
 ifeq ($(NCURSES),yes)
   OPTIONS	+= -DNCURSES
   ifeq ($(shell uname),Darwin)
@@ -63,34 +65,43 @@ ifeq ($(NO_LAZY_CALL),yes)
   OPTIONS	+= -DNO_LAZY
 endif
 
+ifeq ($(CORU_USE),yes)
+  OPTIONS	+= -DCORU_USE
+  OPTLIBS       += extlib/coru/coru.a
+  OPTLIBS2      += ,extlib/coru/coru.a
+else
+  OPTLIBS       += -lpcl
+  OPTLIBS2      += ,-lpcl
+endif
+
 ### for product build. (use BoehmGC)
 
 ifeq ($(shell uname),FreeBSD)
 	CFLAGS	= -Wall -O2 -c -g $(OPTIONS)
-	INCLUDE	= -I/usr/local/include -I.
-	LIB	= -static -L/usr/lib -L/lib -L/usr/local/lib -lm -lpthread -lgmp -lgc -lonigmo -lpcl $(OPTLIBS)
+	INCLUDE	= -I/usr/local/include -I. -I./extlib/coru
+	LIB	= -static -L/usr/lib -L/lib -L/usr/local/lib -lm -lpthread -lgmp -lgc -lonigmo $(OPTLIBS)
 else
 	CFLAGS	= -Wall -O2 -c -g $(OPTIONS)
-	INCLUDE	= -I/usr/local/include -I.
-	LIB	= -L/usr/lib -L/lib -L/usr/local/lib -lm -lpthread -lgmp -lgc -lonigmo -lpcl $(OPTLIBS)
+	INCLUDE	= -I/usr/local/include -I. -I./extlib/coru
+	LIB	= -L/usr/lib -L/lib -L/usr/local/lib -lm -lpthread -lgmp -lgc -lonigmo $(OPTLIBS)
 endif
 
 ### for normaly link option (BSD and Linux)
-#		  -lm -lpthread -lgmp -lgc -lonigmo -lpcl $(OPTLIBS)
+#		  -lm -lpthread -lgmp -lgc -lonigmo $(OPTLIBS)
 ### for Linux static link options
-#		  -static-libgcc -Wl,-Bdynamic,-lc,-ldl,-lm,-lpthread,-lgc,-Bstatic,-lgmp,-lonigmo,-lpcl,$(OPTLIBS2)
+#		  -static-libgcc -Wl,-Bdynamic,-lc,-ldl,-lm,-lpthread,-lgc,-Bstatic,-lgmp,-lonigmo,$(OPTLIBS2)
 ### for BSD static link options
-#		  -static -lm -lpthread -lgmp -lgc -lonigmo -lpcl $(OPTLIBS)
+#		  -static -lm -lpthread -lgmp -lgc -lonigmo $(OPTLIBS)
 
 ### for memory debuging build.
 #CFLAGS		= -Wall -c -g -DPROF $(OPTIONS)
-#INCLUDE		= -I/usr/local/include -I.
-#LIB		= -L/usr/local/lib -lm -lonigmo -lpcl -lgmp $(OPTLIBS)
+#INCLUDE		= -I/usr/local/include -I. -I./extlib/coru
+#LIB		= -L/usr/local/lib -lm -lonigmo -lgmp $(OPTLIBS)
 
 ### for profiling build.
 #CFLAGS		= -Wall -c -g -pg -DPROF $(OPTIONS)
-#INCLUDE		= -I/usr/local/include -I.
-#LIB		= -pg -L/usr/local/lib -lonigmo -lpcl -lgmp $(OPTLIBS)
+#INCLUDE		= -I/usr/local/include -I. -I./extlib/coru
+#LIB		= -pg -L/usr/local/lib -lonigmo -lgmp $(OPTLIBS)
 
 ###
 ###   DONE
@@ -127,6 +138,9 @@ install:
 	install -m 444 lib/pdoc/* $(PREFIX)/lib/perfume/lib/pdoc
 
 perfumesh:	$(OBJS) perfumesh.o
+ifeq ($(CORU_USE),yes)
+	(cd extlib/coru; make)
+endif
 	$(CC) $(OBJS) perfumesh.o $(LIB) -o perfumesh
 
 perfumesh.o:	$(SRCS) $(HDRS) perfumesh.c

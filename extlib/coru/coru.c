@@ -52,7 +52,7 @@ int coru_create_inplace(coru_t *coru,
 }
 
 void coru_destroy(coru_t *coru) {
-    coru_free(coru->allocated);
+    // coru_free(coru->allocated);
 }
 
 int coru_resume(coru_t *coru) {
