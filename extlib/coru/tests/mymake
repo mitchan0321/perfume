@@ -1,0 +1,6 @@
+mytest: mytest.c
+	cc -I.. -o mytest mytest.c ../coru.a
+
+clean:
+	rm -f mytest
+
