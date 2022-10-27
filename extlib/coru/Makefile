@@ -14,7 +14,7 @@ ASM := $(SRC:.c=.s)
 
 TEST := $(patsubst tests/%.sh,%,$(wildcard tests/test_*))
 
-SHELL = /bin/bash -o pipefail
+SHELL = /bin/sh
 
 ifdef DEBUG
 override CFLAGS += -O0 -g3
