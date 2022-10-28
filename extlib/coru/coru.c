@@ -19,6 +19,7 @@ static coru_t *coru_active = NULL;
 int coru_create(coru_t *coru, void (*cb)(void*), void *data, size_t size, void* staddr) {
     void *buffer;
     
+    coru->need_free = 0;
     if (staddr != NULL) {
         buffer = staddr;
     } else {
@@ -26,6 +27,7 @@ int coru_create(coru_t *coru, void (*cb)(void*), void *data, size_t size, void* 
         if (!buffer) {
             return CORU_ERR_NOMEM;
         }
+        coru->need_free = 1;
     }
 
     int err = coru_create_inplace(coru, cb, data, buffer, size);
@@ -52,7 +54,7 @@ int coru_create_inplace(coru_t *coru,
 }
 
 void coru_destroy(coru_t *coru) {
-    // coru_free(coru->allocated);
+    if (coru->need_free) coru_free(coru->allocated);
 }
 
 int coru_resume(coru_t *coru) {

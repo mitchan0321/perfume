@@ -66,6 +66,15 @@ __asm__ (
 
 // Here we need a prologue to get data to the callback when
 // we startup a coroutine.
+#ifdef __APPLE__
+void coru_plat_prologue(void);
+__asm__ (
+    ".globl _coru_plat_prologue \n"
+    "_coru_plat_prologue: \n"
+    "\t mov %r13, %rdi \n"  // tail call cb(data)
+    "\t jmp *%r12 \n"
+);
+#else
 void coru_plat_prologue(void);
 __asm__ (
     ".globl coru_plat_prologue \n"
@@ -73,6 +82,7 @@ __asm__ (
     "\t mov %r13, %rdi \n"  // tail call cb(data)
     "\t jmp *%r12 \n"
 );
+#endif
 
 // Setup stack
 int coru_plat_init(void **psp, uintptr_t **pcanary,
@@ -99,6 +109,28 @@ int coru_plat_init(void **psp, uintptr_t **pcanary,
 }
 
 // Swap stacks
+#ifdef __APPLE__
+uintptr_t coru_plat_yield(void **sp, uintptr_t arg);
+__asm__ (
+    ".globl _coru_plat_yield \n"
+    "_coru_plat_yield: \n"
+    "\t push %r15 \n"           // push callee saved registers
+    "\t push %r14 \n"
+    "\t push %r13 \n"
+    "\t push %r12 \n"
+    "\t push %rbp \n"
+    "\t push %rbx \n"
+    "\t xchg %rsp, (%rdi) \n"   // swap stack
+    "\t pop %rbx \n"            // pop callee saved registers
+    "\t pop %rbp \n"
+    "\t pop %r12 \n"
+    "\t pop %r13 \n"
+    "\t pop %r14 \n"
+    "\t pop %r15 \n"
+    "\t mov %rsi, %rax \n"      // return arg
+    "\t ret \n"
+);
+#else
 uintptr_t coru_plat_yield(void **sp, uintptr_t arg);
 __asm__ (
     ".globl coru_plat_yield \n"
@@ -119,6 +151,7 @@ __asm__ (
     "\t mov %rsi, %rax \n"      // return arg
     "\t ret \n"
 );
+#endif
 
 // ARM thumb mode
 #elif defined(__thumb__)
