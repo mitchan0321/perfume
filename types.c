@@ -535,10 +535,11 @@ new_coroutine(Toy_Interp *interp, Toy_Type* script) {
                 (size_t)(o->u.coroutine->interp->cstack_size),
                 (void*)(o->u.coroutine->interp->cstack));
 #else
-    o->u.coroutine->coro_id = co_create(coroutine_handl,
-					(void*)o,
-					o->u.coroutine->interp->cstack,
-                                        o->u.coroutine->interp->cstack_size);
+    o->u.coroutine->coro_id =
+        co_create(coroutine_handl,
+                  (void*)o,
+                  o->u.coroutine->interp->cstack,
+                  o->u.coroutine->interp->cstack_size);
 #endif /* CORU_USE */
     o->u.coroutine->interp->coroid = o->u.coroutine->coro_id;
     o->u.coroutine->state = CO_STS_INIT;
