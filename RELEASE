@@ -2739,5 +2739,13 @@
 2022/10/27
 	*
 		Add support another co-routine library 'coru'. If use to coru, try define "CORU_USE = yes" in Makefile.
+		  --> See: https://github.com/geky/coru
+
+2022/10/28
+	extlib/coru
+		Add co-routine stack free flat in coru struct.
+		Add __APPLE__ compile switch in coru_platform.c.
+	types.c
+		Change coding style.
 
 #eof
