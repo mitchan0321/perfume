@@ -2748,4 +2748,8 @@
 	types.c
 		Change coding style.
 
+2022/11/02
+	pmacs update:
+		Add parameterized vertical bar separate character config, config name is VERT_BAR_CHAR default "|".
+
 #eof
