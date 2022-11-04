@@ -5,6 +5,15 @@ OPTIONS =
 OPTLIBS =
 OPTLIBS2 =
 
+HDRS		= bulk.h binbulk.h cell.h array.h error.h hash.h interp.h parser.h \
+		  toy.h types.h config.h global.h cstack.h util.h encoding.h
+SRCS		= bulk.c binbulk.c cell.c array.c hash.c list.c parser.c types.c \
+		  eval.c interp.c commands.c methods.c global.c cstack.c util.c \
+		  encoding.c encoding-table.c
+OBJS		= bulk.o binbulk.o cell.o array.o hash.o list.o parser.o types.o \
+		  eval.o interp.o commands.o methods.o global.o cstack.o util.o \
+		  encoding.o encoding-table.o
+
 ############################################################################
 ###
 ###   FIX ME
@@ -48,6 +57,8 @@ CORU_USE = yes
 
 ifeq ($(NCURSES),yes)
   OPTIONS	+= -DNCURSES
+  SRCS		+= ncurses.c
+  OBJS		+= ncurses.o
   ifeq ($(shell uname),Darwin)
     OPTLIBS	+= -lncurses
     OPTLIBS2	+= -lncurses
@@ -107,20 +118,6 @@ endif
 ###   DONE
 ###
 ############################################################################
-
-HDRS		= bulk.h binbulk.h cell.h array.h error.h hash.h interp.h parser.h \
-		  toy.h types.h config.h global.h cstack.h util.h encoding.h
-SRCS		= bulk.c binbulk.c cell.c array.c hash.c list.c parser.c types.c \
-		  eval.c interp.c commands.c methods.c global.c cstack.c util.c \
-		  encoding.c encoding-table.c
-OBJS		= bulk.o binbulk.o cell.o array.o hash.o list.o parser.o types.o \
-		  eval.o interp.o commands.o methods.o global.o cstack.o util.o \
-		  encoding.o encoding-table.o
-
-ifeq ($(NCURSES),yes)
-  SRCS		+= ncurses.c
-  OBJS		+= ncurses.o
-endif
 
 all:		perfumesh
 
