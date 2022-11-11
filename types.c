@@ -524,7 +524,7 @@ new_coroutine(Toy_Interp *interp, Toy_Type* script) {
 
     o->u.coroutine->interp->cstack_id = cstack_id;
     o->u.coroutine->interp->cstack = cstack_get_start_addr(cstack_id);
-    o->u.coroutine->interp->cstack_size = cstack_get_size(cstack_id);
+    o->u.coroutine->interp->cstack_size = cstack_get_slot_size(cstack_id);
     o->u.coroutine->interp->co_parent = interp;
 #ifdef CORU_USE
     o->u.coroutine->coro_id = GC_malloc(sizeof(coru_t));
