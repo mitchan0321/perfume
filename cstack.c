@@ -120,6 +120,11 @@ static int
 alloc_slot(int slot) {
     __PTRDIFF_TYPE__ stack_frame[STACK_SLOT_SIZE];
 
+#ifdef __arm64__
+#define ARM64_ALIGN (16)
+    unsigned int mod_align;
+#endif /* __arm64__ */
+
     if (0 == sigsetjmp(jmp_env, 1)) {
         memset((void*)stack_frame, 0, STACK_SLOT_SIZE * sizeof(__PTRDIFF_TYPE__));
         /* memset((void*)stack_frame, 0, MP_PAGESIZE); */
@@ -132,9 +137,25 @@ alloc_slot(int slot) {
     }
 
     CStack.stack_slot[slot].state = SS_FREE;
+
+#ifdef __arm64__
+    mod_align = ((long long int)stack_frame) % ARM64_ALIGN;
+    CStack.stack_slot[slot].start_addr = 
+        (__PTRDIFF_TYPE__*)((unsigned long long int)stack_frame + (ARM64_ALIGN - mod_align));
+#else
     CStack.stack_slot[slot].start_addr = (__PTRDIFF_TYPE__*)stack_frame;
+#endif /* __arm64__ */
+
+#ifdef __arm64__
     CStack.stack_slot[slot].end_addr = (__PTRDIFF_TYPE__*)
 	((void*)stack_frame + (STACK_SLOT_SIZE * sizeof(__PTRDIFF_TYPE__)));
+    mod_align = ((long long int)CStack.stack_slot[slot].end_addr) % ARM64_ALIGN;
+    CStack.stack_slot[slot].end_addr = 
+        (__PTRDIFF_TYPE__*)((unsigned long long int)CStack.stack_slot[slot].end_addr - mod_align);
+#else
+    CStack.stack_slot[slot].end_addr = (__PTRDIFF_TYPE__*)
+	((void*)stack_frame + (STACK_SLOT_SIZE * sizeof(__PTRDIFF_TYPE__)));
+#endif /* __arm64__ */
 
     /* set memory protect barrier */
     if ((__PTRDIFF_TYPE__)(((void*)stack_frame + MP_SPARE)) & MP_ALIGN) {
@@ -336,6 +357,10 @@ cstack_list() {
 				       (__PTRDIFF_TYPE__)
 				       CStack.stack_slot[i].jmp_buff_enable));
 	    list_append(elist, new_string_str(L""));
+	    list_append(elist,
+			new_integer_si((__PTRDIFF_TYPE__)
+				       (__PTRDIFF_TYPE__)
+				       cstack_get_slot_size(i)));
 
 	    break;
 
@@ -363,6 +388,10 @@ cstack_list() {
 				       (__PTRDIFF_TYPE__)
 				       CStack.stack_slot[i].jmp_buff_enable));
 	    list_append(elist, new_string_str(CStack.stack_slot[i].memo));
+	    list_append(elist,
+			new_integer_si((__PTRDIFF_TYPE__)
+				       (__PTRDIFF_TYPE__)
+				       cstack_get_slot_size(i)));
 
 	    break;
 
@@ -390,6 +419,10 @@ cstack_list() {
 				       (__PTRDIFF_TYPE__)
 				       CStack.stack_slot[i].jmp_buff_enable));
 	    list_append(elist, new_string_str(CStack.stack_slot[i].memo));
+	    list_append(elist,
+			new_integer_si((__PTRDIFF_TYPE__)
+				       (__PTRDIFF_TYPE__)
+				       cstack_get_slot_size(i)));
 
 	    break;
 	}
@@ -425,6 +458,12 @@ cstack_get_end_addr(int slot_id) {
 int
 cstack_get_size() {
     return CStack.slot_size;
+}
+
+int
+cstack_get_slot_size(int slot_id) {
+    return (unsigned long long int)CStack.stack_slot[slot_id].end_addr 
+        - (unsigned long long int)CStack.stack_slot[slot_id].start_addr ;
 }
 
 int

@@ -14,6 +14,7 @@ Toy_Type* cstack_list();
 void* cstack_get_start_addr(int);
 void* cstack_get_end_addr(int);
 int  cstack_get_size();
+int  cstack_get_slot_size(int);
 int  cstack_get_coroid();
 void cstack_set_jmpbuff(int slot, sigjmp_buf *buff);
 int  cstack_enter(int new_slot);
