@@ -121,8 +121,8 @@ alloc_slot(int slot) {
     __PTRDIFF_TYPE__ stack_frame[STACK_SLOT_SIZE];
 
 #ifdef __arm64__
-#define ARM64_ALIGN (16)
-    unsigned int mod_align;
+#define ARM64_ALIGN (16)    /* arm64 stack pointer alignment */
+    unsigned int mod_align; /* mod of alignment */
 #endif /* __arm64__ */
 
     if (0 == sigsetjmp(jmp_env, 1)) {
