@@ -563,6 +563,17 @@ new_coroutine(Toy_Interp *interp, Toy_Type* script) {
 }
 
 Toy_Type*
+new_intr(int nintr) {
+    Toy_Type *o;
+
+    o = GC_MALLOC(sizeof(Toy_Type));
+    ALLOC_SAFE(o);
+    o->tag = INTR;
+    o->u.nintr = nintr;
+    return o;
+}
+
+Toy_Type*
 toy_clone(Toy_Type *obj) {
     Toy_Type *dest;
 
@@ -621,6 +632,7 @@ static wchar_t *toy_type_char[] = {
     L"VECTOR",
     L"COROUTINE",
     L"BULK",
+    L"INTR",
 };
 
 wchar_t*
@@ -944,7 +956,7 @@ to_string(Toy_Type *obj) {
 	l = obj->u.bind_var;
 	c = new_cell(L"| ");
 	while (! IS_LIST_NULL(l)) {
-//***	    if (list_get_item(l) == NIL) break;
+            //*** if (list_get_item(l) == NIL) break;
 	    cell_add_str(c, to_print(list_get_item(l)));
 	    if (list_length(l) > 1) cell_add_char(c, L' ');
 	    l = list_next(l);
@@ -964,6 +976,20 @@ to_string(Toy_Type *obj) {
 
     case BULK:
 	return L"<BULK>";
+
+    case INTR:
+    {
+	wchar_t *buff;
+	Cell *c;
+
+        buff = GC_MALLOC(32*sizeof(wchar_t));
+	ALLOC_SAFE(buff);
+
+	c = new_cell(L"<INTERRUPT># ");
+        swprintf(buff, 32, L"%d", obj->u.nintr);
+        cell_add_str(c, buff);
+        return cell_get_addr(c);
+    }
 
     default:
 	return L"(unknown)";
@@ -1197,7 +1223,7 @@ to_print(Toy_Type *obj) {
 	c = new_cell(L"(");
 	l = obj->u.func.argspec->list;
 	while (! IS_LIST_NULL(l)) {
-//***	    if (list_get_item(l) == NIL) break;
+            //*** if (list_get_item(l) == NIL) break;
 	    cell_add_str(c, to_print(list_get_item(l)));
 	    if (list_length(l) > 1) cell_add_char(c, L' ');
 	    l = list_next(l);
@@ -1334,6 +1360,20 @@ to_print(Toy_Type *obj) {
 
     case BULK:
 	return L"<BULK>";
+
+    case INTR:
+    {
+	wchar_t *buff;
+	Cell *c;
+
+        buff = GC_MALLOC(32*sizeof(wchar_t));
+	ALLOC_SAFE(buff);
+
+	c = new_cell(L"<INTERRUPT># ");
+        swprintf(buff, 32, L"%d", obj->u.nintr);
+        cell_add_str(c, buff);
+        return cell_get_addr(c);
+    }
 
     default:
 	return L"(unknown)";

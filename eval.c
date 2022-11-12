@@ -93,6 +93,7 @@ toy_eval_script(Toy_Interp* interp, Toy_Type *script) {
 	    if ((interp->coroid != 0) && cstack_isalive(interp->cstack_id)) {
 		if (interp->co_parent) {
 		    if (interp->co_parent->co_calling) {
+                        interp->co_parent->co_value = new_intr(INTR_ITIMER);
 #ifdef CORU_USE
                         coru_yield();
 #else

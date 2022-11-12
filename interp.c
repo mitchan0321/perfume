@@ -245,6 +245,8 @@ interp_setup(Toy_Interp* interp, int argc, char **argv, char **envp, char *dir) 
     Resolv_Object_ptr[COROUTINE] = hash_get_t(interp->classes, const_Coro);
     toy_add_class(interp, L"Bulk", NULL, delegate);
     Resolv_Object_ptr[BULK] = hash_get_t(interp->classes, const_Bulk);
+    toy_add_class(interp, L"Intr", NULL, delegate);
+    Resolv_Object_ptr[INTR] = hash_get_t(interp->classes, const_Intr);
     toy_add_class(interp, L"Container", NULL, delegate);
     Resolv_Object_ptr[CONTAINER] = hash_get_t(interp->classes, const_Container);
     toy_add_class(interp, L"Exception", NULL, delegate);

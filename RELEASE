@@ -2752,4 +2752,10 @@
 	pmacs update:
 		Add parameterized vertical bar separate character config, config name is VERT_BAR_CHAR default "|".
 
+2022/11/12
+	*
+		Add new data type INTR is interrupt occurred meening.
+	extlib/coru
+		Add aarch64 platform.
+
 #eof

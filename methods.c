@@ -5884,6 +5884,19 @@ error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
+Toy_Type*
+mth_intr_get(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *self;
+
+    self = SELF(interp);
+    if (GET_TAG(self) != INTR) goto error2;
+
+    return new_integer_si(self->u.nintr);
+    
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
 int
 toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, L"Object", L"hash", 		mth_object_hash,	NULL);
@@ -6078,6 +6091,8 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, L"Bulk", L"base64decode",	mth_bulk_base64decode,	L"body");
 
     toy_add_method(interp, L"Container", L"desc",	mth_container_desc,	NULL);
+
+    toy_add_method(interp, L"Intr", L"get",     	mth_intr_get,   	NULL);
 
     return 0;
 }

@@ -46,13 +46,16 @@
 #define	   VECTOR		24	/* vector (as primitive array) */
 #define	   COROUTINE		25	/* coroutine */
 #define	   BULK			26	/* bulk data store */
-#define    __TYPE_LAST__	27
+#define	   INTR			27	/* interrupt occurred */
+#define    __TYPE_LAST__	28
 
 #define	   FALSE                0	/* BOOL value, FALSE */
 #define	   TRUE                 1	/* BOOL value, TRUE */
 
-#define S_NIL	L"<nil>"
-#define S_T	L"<t>"
+#define    S_NIL        	L"<nil>"
+#define    S_T          	L"<t>"
+
+#define    INTR_ITIMER          0       /* itimer interrupt */
 
 #define TAG_MASK		(0x000000ff)
 #define GET_TAG(p)		((p==NULL) ? -1 : (TAG_MASK & (p->tag)))
@@ -362,6 +365,9 @@ typedef struct _toy_type {
 	/* BULK */
 	struct _binbulk *bulk;
 
+        /* INTERUPT */
+        int nintr;
+        
     } u;
 } Toy_Type;
 
@@ -413,6 +419,7 @@ Toy_Type*	new_dict(struct _hash *dict);
 Toy_Type*	new_vector(struct _array *vector);
 Toy_Type*	new_binbulk_t(struct _binbulk *bulk);
 Toy_Type*	new_coroutine(Toy_Interp*, Toy_Type*);
+Toy_Type*       new_intr(int nintr);
 
 Toy_Type*	toy_clone(Toy_Type *obj);
 wchar_t*	toy_get_type_str(Toy_Type *obj);
