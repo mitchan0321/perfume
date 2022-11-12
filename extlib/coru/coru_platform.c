@@ -241,18 +241,18 @@ int coru_plat_init(void **psp, uintptr_t **pcanary,
     uint64_t *sp = (uint64_t*)((char*)buffer + size);
 
     // setup stack
-    sp[-20] = 0;                            // r18
-    sp[-19] = 0;                            // r19
-    sp[-18] = 0;                            // r20
-    sp[-17] = 0;                            // r21
-    sp[-16] = 0;                            // r22
-    sp[-15] = 0;                            // r23
-    sp[-14] = 0;                            // r24
-    sp[-13] = 0;                            // r25
-    sp[-12] = 0;                            // r26
-    sp[-11] = 0;                            // r27
-    sp[-10] = 0;                            // r28
-    sp[-9] = 0;                             // r29
+    sp[-20] = 0;                            // x18
+    sp[-19] = 0;                            // x19
+    sp[-18] = 0;                            // x20
+    sp[-17] = 0;                            // x21
+    sp[-16] = 0;                            // x22
+    sp[-15] = 0;                            // x23
+    sp[-14] = 0;                            // x24
+    sp[-13] = 0;                            // x25
+    sp[-12] = 0;                            // x26
+    sp[-11] = 0;                            // x27
+    sp[-10] = 0;                            // x28
+    sp[-9] = 0;                             // x29
     sp[-8] = 0;                             // x1
     sp[-7] = 0;                             // x2
     sp[-6] = 0;                             // x3
@@ -273,11 +273,11 @@ uintptr_t coru_plat_yield(void **sp, uintptr_t arg);
 __asm__ (
     ".global coru_plat_yield \n"
     "coru_plat_yield: \n"
-    "\t stp x7, lr, [sp, #-16]! \n"     // push callee saved registers
+    "\t stp x7, lr, [sp, #-16]! \n"     // push callee saved registers, lr and x7-x1
     "\t stp x5, x6, [sp, #-16]! \n"
     "\t stp x3, x4, [sp, #-16]! \n"
     "\t stp x1, x2, [sp, #-16]! \n"
-    "\t stp x28, x29, [sp, #-16]! \n"   // save x29-x21
+    "\t stp x28, x29, [sp, #-16]! \n"   // save x29-x18
     "\t stp x26, x27, [sp, #-16]! \n"
     "\t stp x24, x25, [sp, #-16]! \n"
     "\t stp x22, x23, [sp, #-16]! \n"
