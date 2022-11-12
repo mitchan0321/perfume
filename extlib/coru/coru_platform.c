@@ -288,16 +288,16 @@ __asm__ (
     "\t str x2, [x0] \n"
     "\t mov sp, x3 \n"
     "\t mov x0, x1 \n"                  // return arg
-    "\t ldp x18, x19 [sp], #16 \n"      // pop callee saved registers and return
-    "\t ldp x20, x21 [sp], #16 \n"
-    "\t ldp x22, x23 [sp], #16 \n"
-    "\t ldp x24, x25 [sp], #16 \n"
-    "\t ldp x26, x27 [sp], #16 \n"
-    "\t ldp x28, x29 [sp], #16 \n"
-    "\t ldp x1 x2, [sp], #16 \n"
-    "\t ldp x3 x4, [sp], #16 \n"
-    "\t ldp x5 x6, [sp], #16 \n"
-    "\t ldp x7 lr, [sp], #16 \n"
+    "\t ldp x18, x19, [sp], #16 \n"     // pop callee saved registers and return
+    "\t ldp x20, x21, [sp], #16 \n"
+    "\t ldp x22, x23, [sp], #16 \n"
+    "\t ldp x24, x25, [sp], #16 \n"
+    "\t ldp x26, x27, [sp], #16 \n"
+    "\t ldp x28, x29, [sp], #16 \n"
+    "\t ldp x1, x2, [sp], #16 \n"
+    "\t ldp x3, x4, [sp], #16 \n"
+    "\t ldp x5, x6, [sp], #16 \n"
+    "\t ldp x7, lr, [sp], #16 \n"
     "\t ret \n"                         // return to callee
 );
 
