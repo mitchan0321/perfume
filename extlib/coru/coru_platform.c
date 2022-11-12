@@ -68,10 +68,11 @@ __asm__ (
 // we startup a coroutine.
 void coru_plat_prologue(void);
 __asm__ (
-    ".globl _coru_plat_prologue \n"
 #ifdef __APPLE__
+    ".globl _coru_plat_prologue \n"
     "_coru_plat_prologue: \n"
 #else
+    ".globl coru_plat_prologue \n"
     "coru_plat_prologue: \n"
 #endif
     "\t mov %r13, %rdi \n"  // tail call cb(data)
@@ -105,10 +106,11 @@ int coru_plat_init(void **psp, uintptr_t **pcanary,
 // Swap stacks
 uintptr_t coru_plat_yield(void **sp, uintptr_t arg);
 __asm__ (
-    ".globl _coru_plat_yield \n"
 #ifdef __APPLE__
+    ".globl _coru_plat_yield \n"
     "_coru_plat_yield: \n"
 #else
+    ".globl coru_plat_yield \n"
     "coru_plat_yield: \n"
 #endif
     "\t push %r15 \n"           // push callee saved registers
@@ -200,10 +202,11 @@ __asm__ (
 // into the appropriate registers.
 void coru_plat_prologue(void);
 __asm__ (
-    ".global coru_plat_prologue \n"
 #ifdef __APPLE__
+    ".global _coru_plat_prologue \n"
     "_coru_plat_prologue: \n"
 #else
+    ".global coru_plat_prologue \n"
     "coru_plat_prologue: \n"
 #endif
     "\t mov lr, x6 \n"      // setup lr to ret to coru_halt()
@@ -250,10 +253,11 @@ int coru_plat_init(void **psp, uintptr_t **pcanary,
 // Swap stacks
 uintptr_t coru_plat_yield(void **sp, uintptr_t arg);
 __asm__ (
-    ".global coru_plat_yield \n"
 #ifdef __APPLE__
+    ".global _coru_plat_yield \n"
     "_coru_plat_yield: \n"
 #else
+    ".global coru_plat_yield \n"
     "coru_plat_yield: \n"
 #endif
     "\t stp x7, lr, [sp, #-16]! \n"     // push callee saved registers, lr and x7-x1
