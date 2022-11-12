@@ -120,10 +120,10 @@ static int
 alloc_slot(int slot) {
     __PTRDIFF_TYPE__ stack_frame[STACK_SLOT_SIZE];
 
-#ifdef __arm64__
+#ifdef __aarch64__
 #define ARM64_ALIGN (16)    /* arm64 stack pointer alignment */
     unsigned int mod_align; /* mod of alignment */
-#endif /* __arm64__ */
+#endif /* __aarch64__ */
 
     if (0 == sigsetjmp(jmp_env, 1)) {
         memset((void*)stack_frame, 0, STACK_SLOT_SIZE * sizeof(__PTRDIFF_TYPE__));
@@ -138,15 +138,15 @@ alloc_slot(int slot) {
 
     CStack.stack_slot[slot].state = SS_FREE;
 
-#ifdef __arm64__
+#ifdef __aarch64__
     mod_align = ((long long int)stack_frame) % ARM64_ALIGN;
     CStack.stack_slot[slot].start_addr = 
         (__PTRDIFF_TYPE__*)((unsigned long long int)stack_frame + (ARM64_ALIGN - mod_align));
 #else
     CStack.stack_slot[slot].start_addr = (__PTRDIFF_TYPE__*)stack_frame;
-#endif /* __arm64__ */
+#endif /* __aarch64__ */
 
-#ifdef __arm64__
+#ifdef __aarch64__
     CStack.stack_slot[slot].end_addr = (__PTRDIFF_TYPE__*)
 	((void*)stack_frame + (STACK_SLOT_SIZE * sizeof(__PTRDIFF_TYPE__)));
     mod_align = ((long long int)CStack.stack_slot[slot].end_addr) % ARM64_ALIGN;
@@ -155,7 +155,7 @@ alloc_slot(int slot) {
 #else
     CStack.stack_slot[slot].end_addr = (__PTRDIFF_TYPE__*)
 	((void*)stack_frame + (STACK_SLOT_SIZE * sizeof(__PTRDIFF_TYPE__)));
-#endif /* __arm64__ */
+#endif /* __aarch64__ */
 
     /* set memory protect barrier */
     if ((__PTRDIFF_TYPE__)(((void*)stack_frame + MP_SPARE)) & MP_ALIGN) {
