@@ -2740,6 +2740,8 @@
 	*
 		Add support another co-routine library 'coru'. If use to coru, try define "CORU_USE = yes" in Makefile.
 		  --> See: https://github.com/geky/coru
+	commands.c
+		Add support __APPLE__ for file stat|rstat command.
 
 2022/10/28
 	extlib/coru
@@ -2755,6 +2757,15 @@
 2022/11/12
 	*
 		Add new data type INTR is interrupt occurred meening.
+	commands.c
+		Add intr? command for condition judge INTR data type when interrupt occured.
+	cstack.c
+		Add aarch64 support, aarch64 need C stack alignment 16 bytes.
+		Add cstac_get_slot_size for return stack size per slot.
+	eval.c
+		Add return INTR data type when occured itimer interval interruput occured.
+	lib/slist.prfm
+		Add display item Avail is available stack memory size.
 	extlib/coru
 		Add aarch64 platform.
 
