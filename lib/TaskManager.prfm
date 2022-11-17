@@ -1,0 +1,43 @@
+class TaskManager;
+
+TaskManager method init () {
+    if {sets? TaskList} {
+        $TaskList each do: {| i |
+            $i release;
+        };
+    };
+    sets TaskList ();
+    sets LastTimeOfDay 0;
+};
+
+TaskManager method add (task name) {
+    if {$task instance? Task} else: {
+        throw ErrBadType "Not a Task object.";
+    };
+    if {$TaskList find $task} {
+        throw ErrDuplicateTask "Already registed task.";
+    };
+    n := 1;
+    sname := $name;
+    tlist ::= $TaskList map {| i | $i get-name};
+    while {$tlist find $sname} do: {
+        n ::= $n + 1;
+        sname ::= $name . ":" $n;
+    };
+    $TaskList <<- $task;
+    $task set-name $sname;
+    return $sname;
+};
+
+TaskManager method get (name) {
+    $TaskList each do: {| i |
+        if {[$i get-name] = $name} {
+            return $i;
+        };
+    };
+    return <nil>;
+};
+
+TaskManager method get-task-list () {
+    $TaskList map {| i | $i get-name};
+};

@@ -1,0 +1,67 @@
+class Task;
+
+Task method init () {
+    sets Name "";
+    sets Coro <nil>;
+    sets Last 0;
+    sets Sleep 0;
+    sets Elapsed 0;
+    sets State I;
+    sets ExitStatus 0;
+};
+
+Task method set-name (name) {
+    sets Name $name;
+};
+
+Task method get-name () {
+    return $Name;
+};
+
+Task method proc (name body args: arg) {
+    TaskManager add [self] $name;
+    sets Coro [coro $body];
+};
+
+Task method release () {
+    if $Coro {$Coro release};
+};
+
+Task method time-elapsed (msec) {
+    $Sleep -- $msec;
+};
+
+Task method run () {
+    sets State R;
+    b :: = time-of-day :msec;
+    sts ::= $Coro next;
+    $Elapsed ++ [[time-of-day :msec] - $b];
+
+    if {intr? $sts} {
+        sets State A;
+        return;
+    };
+    if {eq? [$Coro stat] DONE} {
+        sets State E;
+        return;
+    };
+
+    if {list? $sts} {
+        case [$sts car]
+        PAUSE {
+            sets State P;
+            sets Sleep [$sts get 1];
+        }
+        EXIT {
+            sets State E;
+            sets ExitStatus [$sts get 1];
+        }
+        default {
+            State A;
+        }
+        ;;
+        return;
+    };
+    
+    sets State A;
+};
