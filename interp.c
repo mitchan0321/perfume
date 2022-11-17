@@ -187,7 +187,7 @@ new_interp(wchar_t* name, int stack_size, Toy_Interp* parent,
 Toy_Type *Resolv_Object_ptr[__TYPE_LAST__] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
 };
 
 Toy_Interp*
