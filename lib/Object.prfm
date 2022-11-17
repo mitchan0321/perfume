@@ -43,3 +43,20 @@ Bool method ??? (a b) {
 	return $b;
     };
 };
+
+Object method instance? (class) {
+    if {object? [self]} else: {return <nil>};
+    l ::= __class_tree__ [self] ();
+    if {$l find $class} {return <t>};
+    return <nil>;
+};
+
+defun __class_tree__ (o result) {
+    l ::= $o delegate?;
+    if {$l null?} {return $result};
+    $l each do: {| i |
+        $result << $i;
+        __class_tree__ $i $result;
+    };
+    return $result;
+};
