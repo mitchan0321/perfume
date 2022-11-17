@@ -2745,7 +2745,7 @@
 
 2022/10/28
 	extlib/coru
-		Add co-routine stack free flat in coru struct.
+		Add co-routine stack free flag in coru struct.
 		Add __APPLE__ compile switch in coru_platform.c.
 	types.c
 		Change coding style.
@@ -2763,10 +2763,16 @@
 		Add aarch64 support, aarch64 need C stack alignment 16 bytes.
 		Add cstac_get_slot_size for return stack size per slot.
 	eval.c
-		Add return INTR data type when occured itimer interval interruput occured.
+		Add return INTR data type when occured itimer interval interruput.
 	lib/slist.prfm
 		Add display item Avail is available stack memory size.
 	extlib/coru
 		Add aarch64 platform.
+
+2022/11/17
+	lib/Object.prfm
+		Add Object::instance? class-name method for judge myself object inherit specified class-name.
+	pmacs update:
+		Change dired file order split directory and other type.
 
 #eof
