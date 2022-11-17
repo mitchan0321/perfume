@@ -47,13 +47,19 @@ DiredBuffer method update () {
     clear-all;
     
     dir-list := ();
+    dir-listd := ();
     result := $dir-list;
+    resultd := $dir-listd;
     try {
         file list [get-content] : each do: {| i |
             try {
                 d ::= dict [file stat [$File . "/" $i]];
                 $d set name $i;
-                result ::= $result append! $d;
+                if [$d,type = "d"] {
+                    resultd ::= $resultd append! $d;
+                } {
+                    result ::= $result append! $d;
+                };
             } catch: {};
         };
     } catch: {
@@ -103,8 +109,10 @@ DiredBuffer method update () {
             od-n := "<<";
         }
     ;;
-    l ::= msort $dir-list getter: $getter order: $order;
-
+    l ::= [msort $dir-listd getter: $getter order: $order]
+           concat
+          [msort $dir-list getter: $getter order: $order];
+    
     append-string ["<<< " . [get-content] " >>>  {Filter: " $Filter ", Sort: " $SortMode "}"];
     append-string "  Help: [ENTER] open, [Nn]ame [Tt]ime [Ss]ize sort, [f]ilter, [d]elete, [r]ename, [u]pdate";
     append-string "        open [o]ther window, change [m]ode, [D]elete dir, [M]ake dir";
