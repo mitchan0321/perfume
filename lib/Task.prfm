@@ -6,8 +6,17 @@ Task method init () {
     sets Last 0;
     sets Sleep 0;
     sets Elapsed 0;
-    sets State I;
     sets ExitStatus 0;
+
+    #
+    # Task status:
+    #   I ... Initial
+    #   A ... Active
+    #   R ... Running
+    #   S ... Sleep
+    #   X ... eXit
+    #   W ... Wait
+    sets State I;
 };
 
 Task method set-name (name) {
@@ -21,6 +30,7 @@ Task method get-name () {
 Task method proc (name body args: arg) {
     TaskManager add [self] $name;
     sets Coro [coro $body];
+    sets State A;
 };
 
 Task method release () {
@@ -42,18 +52,18 @@ Task method run () {
         return;
     };
     if {eq? [$Coro stat] DONE} {
-        sets State E;
+        sets State X;
         return;
     };
 
     if {list? $sts} {
         case [$sts car]
         PAUSE {
-            sets State P;
+            sets State S;
             sets Sleep [$sts get 1];
         }
         EXIT {
-            sets State E;
+            sets State X;
             sets ExitStatus [$sts get 1];
         }
         default {
@@ -61,7 +71,16 @@ Task method run () {
         }
         ;;
         return;
+    } {
+        case $sts
+        @READ {
+            sets State W;
+        }
+        @WRITE {
+            sets State W;
+        }
+        default: {
+            sets State A;
+        }
     };
-    
-    sets State A;
 };
