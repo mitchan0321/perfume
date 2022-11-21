@@ -12,6 +12,9 @@ modules := (
     MiniInputUtil
     WUtil
     EditStream
+    TaskManager
+    Task
+    SysCall
 );
 
 defun pmacs (trace: t) {
@@ -47,6 +50,7 @@ defun pmacs (trace: t) {
     try {
         WUtil init;
 	BufferManager init;
+	TaskManager init;
 	curs ::= curs-init;
 	defvar MainWindow [new Window init: ($curs)];
 	init-color-DB;

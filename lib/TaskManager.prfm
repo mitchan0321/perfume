@@ -66,5 +66,9 @@ TaskManager method dispatch () {
             };
         };
     };
-    if $min-task {$min-task run};   # dispatch to min task
+    if $min-task {
+        $min-task run;     # dispatch to min task
+        return <t>;
+    };
+    return <nil>;
 };

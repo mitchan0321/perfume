@@ -613,7 +613,10 @@ Window method key-event-loop () {
 		} catch: {| e |
 		    show-message :bell ["Error at background: <" . [$e car] "># " [$e cdr]];
 		};
-	    };
+            };
+            if {TaskManager dispatch} {
+                $main apply {render-all; refresh};
+            };
 	    continue;
 	};
         
