@@ -1,0 +1,16 @@
+class SysCall;
+
+SysCall method sleep (msec) {
+    __checkEnv;
+    pause (SLEEP $msec);
+};
+
+SysCall method exit (status) {
+    __checkEnv;
+    pause (EXIT $status);
+};
+
+SysCall method __checkEnv () {
+    if {! [defvar? SELF]}         {throw ErrNotTask "Not a Task Environment."};
+    if {! [$SELF instance? Task]} {throw ErrNotTask "Not a Task Environment."};
+};

@@ -28,9 +28,27 @@ Task method get-name () {
 };
 
 Task method proc (name body args: arg) {
-    TaskManager add [self] $name;
     sets Coro [coro $body];
+    $Coro eval {
+        defvar ARGS $arg;
+        defvar SELF [self];
+        enable-itimer;
+    };
+    TaskManager add [self] $name;
     sets State A;
+};
+
+Task method set-stdio (in out err) {
+    $Coro ?? {return};
+
+    sets __in $in;
+    sets __out $out;
+    sets __err $err;
+    $Coro eval {
+        setvar stdin $__in;
+        setvar stdout $__out;
+        setvar stderr $__err;
+    };
 };
 
 Task method release () {
@@ -43,22 +61,31 @@ Task method time-elapsed (msec) {
 
 Task method run () {
     sets State R;
-    b :: = time-of-day :msec;
-    sts ::= $Coro next;
+    b ::= time-of-day :msec;
+    try {unset e} catch: {};
+    try {sts ::= $Coro next} catch: {| e |};
     $Elapsed ++ [[time-of-day :msec] - $b];
 
+    if {set? e} {
+        sets State X;
+        sets ExitStatus (ERROR $e);
+        release;
+        return;
+    };
     if {intr? $sts} {
         sets State A;
         return;
     };
     if {eq? [$Coro stat] DONE} {
         sets State X;
+        sets ExitStatus 0;
+        release;
         return;
     };
 
     if {list? $sts} {
         case [$sts car]
-        PAUSE {
+        SLEEP {
             sets State S;
             sets Sleep [$sts get 1];
         }
@@ -83,4 +110,8 @@ Task method run () {
             sets State A;
         }
     };
+};
+
+Task method tickable? () {
+    if {or {eq? $State A} {eq? $State S}} <t> <nil>;
 };

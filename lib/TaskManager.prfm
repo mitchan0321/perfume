@@ -3,11 +3,14 @@ class TaskManager;
 TaskManager method init () {
     if {sets? TaskList} {
         $TaskList each do: {| i |
-            $i release;
+            try {$i release} catch: {};
         };
     };
     sets TaskList ();
-    sets LastTimeOfDay 0;
+    sets LastDispatch [time-of-day];
+    
+    sets Task_stdout [new EditStream];
+    $Task_stdout open "*Console*";
 };
 
 TaskManager method add (task name) {
@@ -15,7 +18,7 @@ TaskManager method add (task name) {
         throw ErrBadType "Not a Task object.";
     };
     if {$TaskList find $task} {
-        throw ErrDuplicateTask "Already registed task.";
+        throw ErrDuplicateTask "Already registerd task.";
     };
     n := 1;
     sname := $name;
@@ -26,6 +29,8 @@ TaskManager method add (task name) {
     };
     $TaskList <<- $task;
     $task set-name $sname;
+    in ::= new Stream;
+    $task set-stdio $in $Task_stdout $Task_stdout;
     return $sname;
 };
 
@@ -40,4 +45,26 @@ TaskManager method get (name) {
 
 TaskManager method get-task-list () {
     $TaskList map {| i | $i get-name};
+};
+
+TaskManager method dispatch () {
+    now ::= time-of-day :msec;
+    tick ::= $now - $LastDispatch;
+    sets LastDispatch $now;
+    
+    min-wait := 0;
+    min-task := <nil>;
+    $TaskList each do: {| t |
+        if {$t tickable?} {
+            wait ::= $t time-elapsed $tick;
+            
+            if {$wait < 0} {
+                if {$wait < $min-wait} {
+                    min-wait := $wait;
+                    min-task := $t;     # run task candidate
+                };
+            };
+        };
+    };
+    if $min-task {$min-task run};   # dispatch to min task
 };
