@@ -71,7 +71,7 @@ Task method run () {
     if {eq? $State Z} {
 	# Zap from other process.
         sets State X;
-	sets ExitStatus (ZAP);
+	sets ExitStatus (ZAP 0);
         release;
 	return;
     };
@@ -96,7 +96,7 @@ Task method run () {
     };
     if {eq? [$Coro stat] DONE} {
         sets State X;
-        sets ExitStatus 0;
+        sets ExitStatus (NORMAL 0);
         release;
         return;
     };
@@ -109,7 +109,7 @@ Task method run () {
         }
         EXIT {
             sets State X;
-            sets ExitStatus [$sts get 1];
+            sets ExitStatus (NORMAL [$sts get 1]);
         }
         default {
             State A;
