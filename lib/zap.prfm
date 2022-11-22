@@ -1,0 +1,9 @@
+defun zap (name) {
+    t ::= TaskManager get-task $name;
+    if $t {
+        $t set-zap
+    } {
+        throw ErrNoSuchTask "No such task.";
+    };
+};
+

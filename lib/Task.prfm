@@ -5,7 +5,9 @@ Task method init () {
     sets Coro <nil>;
     sets Last 0;
     sets Sleep 0;
+    sets Since 0;
     sets Elapsed 0;
+    sets Tick 0;
     sets ExitStatus 0;
 
     #
@@ -14,6 +16,7 @@ Task method init () {
     #   A ... Active
     #   R ... Running
     #   S ... Sleep
+    #   Z ... zap
     #   X ... eXit
     #   W ... Wait
     sets State I;
@@ -28,6 +31,9 @@ Task method get-name () {
 };
 
 Task method proc (name body args: arg) {
+    if $Coro {
+        throw ErrCreated "Already created task.";
+    };
     sets Coro [coro $body];
     $Coro eval {
         defvar ARGS $arg;
@@ -36,18 +42,20 @@ Task method proc (name body args: arg) {
     };
     TaskManager add [self] $name;
     sets State A;
+    sets Since [time-of-day :msec];
+    return $Name;
 };
 
 Task method set-stdio (in out err) {
     $Coro ?? {return};
 
-    sets __in $in;
-    sets __out $out;
-    sets __err $err;
+    sets __stdin $in;
+    sets __stdout $out;
+    sets __stderr $err;
     $Coro eval {
-        setvar stdin $__in;
-        setvar stdout $__out;
-        setvar stderr $__err;
+        setvar stdin $__stdin;
+        setvar stdout $__stdout;
+        setvar stderr $__stderr;
     };
 };
 
@@ -60,12 +68,22 @@ Task method time-elapsed (msec) {
 };
 
 Task method run () {
+    if {eq? $State Z} {
+	# Zap from other process.
+        sets State X;
+	sets ExitStatus (ZAP);
+        release;
+	return;
+    };
     sets State R;
     b ::= time-of-day :msec;
     try {unset e} catch: {};
     try {sts ::= $Coro next} catch: {| e |};
-    $Elapsed ++ [[time-of-day :msec] - $b];
-
+    sets Last [time-of-day :msec];
+    $Elapsed ++ [$Last - $b];
+    $Tick ++;
+    sets Sleep 0;
+    
     if {set? e} {
         sets State X;
         sets ExitStatus (ERROR $e);
@@ -113,5 +131,42 @@ Task method run () {
 };
 
 Task method tickable? () {
-    if {or {eq? $State A} {eq? $State S}} <t> <nil>;
+    if {or {eq? $State A} {eq? $State S} {eq? $State Z}} <t> <nil>;
 };
+
+Task method exit? () {
+    if {eq? $State X} <t> <nil>;
+};
+
+Task method get-name () {
+    return $Name
+};
+
+Task method get-state () {
+    return $State;
+};
+
+Task method get-exit-status () {
+    return $ExitStatus;
+};
+
+Task method get-sleep () {
+    return $Sleep;
+};
+
+Task method get-total () {
+    return $Elapsed;
+};
+
+Task method get-elapsed () {
+    return [time-of-day :msec : - $Since];
+};
+
+Task method get-tick () {
+    return $Tick;
+};
+
+Task method set-zap () {
+    sets State Z;
+};
+
