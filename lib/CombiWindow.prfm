@@ -113,6 +113,10 @@ CombiWindow method diactivate () {
     sets Activate <nil>;
 };
 
+CombiWindow method active? () {
+    return $Activate;
+};
+
 CombiWindow method refresh () {
     curs-set 0;
     curs-refresh $StatusLineCurs;
