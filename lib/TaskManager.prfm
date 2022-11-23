@@ -11,6 +11,8 @@ TaskManager method init () {
     
     sets Task_stdout [new EditStream];
     $Task_stdout open "*Console*";
+    
+    sets SysReq [new Stream];
 };
 
 TaskManager method add (task name) {
@@ -68,7 +70,7 @@ TaskManager method dispatch () {
         if {$t tickable?} {
             wait ::= $t time-elapsed $tick;
             
-            if {$wait < 0} {
+            if {$wait <= 0} {
                 if {$wait < $min-wait} {
                     min-wait := $wait;
                     min-task := $t;     # run task candidate
@@ -76,16 +78,49 @@ TaskManager method dispatch () {
             };
         };
     };
+    result := <nil>;
+    $SysReq clear;
+    $SysReq clear-queue;
     if $min-task {
         $min-task run;     # dispatch to min task
         if {$min-task exit?} {
-            $Task_stdout puts ["Task [" . [$min-task get-name] "] end, status= " [$min-task get-exit-status] "."];
+            $Task_stdout puts ["Task [" . [$min-task get-name] "] end, status= " [$min-task get-exit-status]];
             idx ::= $TaskList find $min-task;
             if {$idx >= 0} {
                 $TaskList delete! $idx
             };
         };
-        return <t>;
+        result := <t>;
+        $SysReq close;
+        apply-syscalls;
     };
-    return <nil>;
+    
+    return $result;
 };
+
+TaskManager method enqueue (msg) {
+    $SysReq puts $msg;
+};
+
+TaskManager method apply-syscalls () {
+    while {! [$SysReq eof?]} do: {
+        r ::= $SysReq gets;
+        if {list? $r} {
+            case [$r car] 
+            APPLY_EDITOR {
+                $r,1 eval;
+            }
+            default: {
+                $Task_stdout puts ["Bad SysReq: " . $r];
+            }
+        } {
+            $Task_stdout puts ["Bad SysReq: " . $r];
+        };
+    };
+};
+
+TaskManager method panic (msg) {
+    $Task_stdout puts "";
+    $Task_stdout puts $msg;
+};
+
