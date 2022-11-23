@@ -55,6 +55,10 @@ Stream method clear () {
     sets eof <nil>;
 };
 
+Stream method clear-queue () {
+    sets queue ();
+};
+
 Stream method ready? (timeout: timeout) {
     if [$queue null?] then: {
         if {and $co [set? timeout]} {
