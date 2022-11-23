@@ -1,0 +1,12 @@
+new Task : proc console-adjuster {
+    loop do: {
+        SysCall apply-editor {
+            $MainWindow get-window-list-without-current : each do: {| w |
+                if [$w get-buffer : get-buffer-name : = "*Console*"] {
+                    $w apply-command $MainWindow $w "" bottom-of-buffer;
+                };
+            };
+        };
+        SysCall sleep 500;
+    };
+};
