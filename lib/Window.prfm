@@ -614,9 +614,15 @@ Window method key-event-loop () {
 		    show-message :bell ["Error at background: <" . [$e car] "># " [$e cdr]];
 		};
             };
-            if {TaskManager dispatch} {
-                $main apply {render-all; refresh};
-            };
+            try {
+                if {TaskManager dispatch} {
+                    $main apply {render-all; refresh};
+                };
+            }
+            catch: {| e |
+                TaskManager panic ["Error at TaskManager::dispatch: " . $e];
+                show-message :bell "Error at TaskManager::dispatch, see *Console* buffer.";
+            };        
 	    continue;
 	};
         
