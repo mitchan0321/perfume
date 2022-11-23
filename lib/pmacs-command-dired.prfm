@@ -491,22 +491,13 @@ defcommand dired-make-dir desc: "Make directory on dired buffer." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
-    (ey ex) ::= $window get-source-index $buff $geom;
-    r ::= $buff get-buffer-line $ey;
-    if $r {
-        l ::= $r split sep: "|";
-        if {[$l len] >= 2} {
-            name ::= $l get 1;
-            path ::= $buff get-path;
-            path ::= $path ?? [pwd];
-            mini-input-until-enter $main $window
-                prompt: "New directory name: "
-                enter-proc: {| value |
-                    file mkdir [$path . "/" $value] $DEFAULT_DIR_MODE;
-                    $buff update;
-                }
-            ;;
-        };
+    path ::= $buff get-path;
+    path ::= $path ?? [pwd];
+    mini-input-until-enter $main $window
+    prompt: "New directory name: "
+    enter-proc: {| value |
+        file mkdir [$path . "/" $value] $DEFAULT_DIR_MODE;
+        $buff update;
     };
     return ALL;
 };
