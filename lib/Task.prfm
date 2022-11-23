@@ -64,7 +64,7 @@ Task method release () {
 };
 
 Task method time-elapsed (msec) {
-    $Sleep -- $msec;
+    return [$Sleep -- $msec];
 };
 
 Task method run () {
@@ -168,5 +168,6 @@ Task method get-tick () {
 
 Task method set-zap () {
     sets State Z;
+    sets Sleep 0;
 };
 
