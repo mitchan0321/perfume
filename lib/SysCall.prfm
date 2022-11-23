@@ -10,6 +10,11 @@ SysCall method exit (status) {
     pause (EXIT $status);
 };
 
+SysCall method apply-editor (body) {
+    __checkEnv;
+    TaskManager enqueue (APPLY_EDITOR $body);
+};
+
 SysCall method __checkEnv () {
     if {! [defvar? SELF]}         {throw ErrNotTask "Not a Task Environment."};
     if {! [$SELF instance? Task]} {throw ErrNotTask "Not a Task Environment."};
