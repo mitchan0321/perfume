@@ -51,7 +51,10 @@ defun load-tasklet (s) {
 	try {unset p; alias up: 1 __fname__ p};
 	set p [$f . "/" $s ".prfm"];
 	uplevel {
-            try {load :notrace $__fname__}
+            try {
+                load :notrace $__fname__;
+                return <t>;
+            }
             catch: {| __error__ |
                 if {eq? [$__error__ car] ErrFileNotOpen} {continue};
                 throw $__error__;
@@ -59,6 +62,7 @@ defun load-tasklet (s) {
             unset __fname__
         };
     };
+    return <nil>;
 };
 
 #
