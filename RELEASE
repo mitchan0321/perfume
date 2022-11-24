@@ -2775,4 +2775,17 @@
 	pmacs update:
 		Change dired file order split directory and other type.
 
+2022/11/24
+	lib/Stream.prfm
+		Add Stream::clear-queue for clear queue data.
+		Add Stream::ready-write? for write access ready?
+		Add Stream::gets-nowait for return queue data as soon.
+	lib/expand-syntax.prfm
+		Add load-tasklet command.
+		Fix load-class, load-func command.
+	pmacs update:
+		Add SysCall gets, puts.
+		Add Task::set-sleep.
+		Add TaskManager::force-wait-task for waiting task migrate to sleep state check.
+
 #eof

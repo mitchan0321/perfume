@@ -15,6 +15,22 @@ SysCall method apply-editor (body) {
     TaskManager enqueue (APPLY_EDITOR $body);
 };
 
+SysCall method gets (f) {
+    __checkEnv;
+    TaskManager add-wait-hook [$SELF get-name] ($SELF $f {$f ready?});
+    r ::= $f gets;
+    TaskManager delete-wait-hook [$SELF get-name];
+    return $r;
+};
+
+SysCall method puts (f r) {
+    __checkEnv;
+    TaskManager add-wait-hook [$SELF get-name] ($SELF $f {$f ready-write?});
+    sts ::= $f puts $r;
+    TaskManager delete-wait-hook [$SELF get-name];
+    return $sts;
+};
+
 SysCall method __checkEnv () {
     if {! [defvar? SELF]}         {throw ErrNotTask "Not a Task Environment."};
     if {! [$SELF instance? Task]} {throw ErrNotTask "Not a Task Environment."};

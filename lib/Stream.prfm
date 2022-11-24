@@ -57,6 +57,9 @@ Stream method clear () {
 
 Stream method clear-queue () {
     sets queue ();
+    sets count 0;
+    sets itemcount 0;
+    try {unsets shortcut};
 };
 
 Stream method ready? (timeout: timeout) {
@@ -75,6 +78,13 @@ Stream method ready? (timeout: timeout) {
     else: {
         return <t>;
     };
+};
+
+Stream method ready-write? () {
+    if {and {$itemcount < $itemlimit} {$count < $limit}} {
+        return <t>;
+    };
+    return <nil>;
 };
 
 Stream method puts (nonewline: nonewline args: r) {
@@ -144,10 +154,27 @@ Stream method gets (nonewline: nonewline) {
 	if [eof?] then: {return <nil>};
     };
     
-    $count --;
-    itemcount := 0;
-    if {$count = 0} then: {unsets shortcut};
-    $queue >>;
+    atomic {
+        $count --;
+        itemcount := 0;
+        if {$count = 0} then: {unsets shortcut};
+        $queue >>;
+    };
+};
+
+Stream method gets-nowait () {
+    if [eof?] then: {return <nil>};
+    
+    if {$queue null?} {
+        return <nil>;
+    };
+    
+    atomic {
+        $count --;
+        itemcount := 0;
+        if {$count = 0} then: {unsets shortcut};
+        $queue >>;
+    };
 };
 
 Stream method flush () {

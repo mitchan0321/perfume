@@ -13,6 +13,7 @@ TaskManager method init () {
     $Task_stdout open "*Console*";
     
     sets SysReq [new Stream];
+    sets WaitHook [dict ()];
 };
 
 TaskManager method add (task name) {
@@ -84,6 +85,7 @@ TaskManager method dispatch () {
     if $min-task {
         $min-task run;     # dispatch to min task
         if {$min-task exit?} {
+            $Task_stdout puts "";
             $Task_stdout puts ["Task [" . [$min-task get-name] "] end, status= " [$min-task get-exit-status]];
             idx ::= $TaskList find $min-task;
             if {$idx >= 0} {
@@ -93,6 +95,12 @@ TaskManager method dispatch () {
         result := <t>;
         $SysReq close;
         apply-syscalls;
+    };
+    
+    try {
+        force-wait-task;
+    } catch: {| e |
+        $Task_stdout puts ["Error at force-wait-task: " . $e];
     };
     
     return $result;
@@ -111,14 +119,36 @@ TaskManager method apply-syscalls () {
                 $r,1 eval;
             }
             default: {
-                $Task_stdout puts ["Bad SysReq: " . $r];
+                $Task_stdout puts ["Bad SysReq(APPLY_EDITOR): " . $r];
             }
         } {
-            $Task_stdout puts ["Bad SysReq: " . $r];
+            $Task_stdout puts ["Bad SysReq(UNKNOWN): " . $r];
         };
     };
 };
 
+TaskManager method force-wait-task () {
+    $WaitHook keys : each do: {| name |
+        try {
+            (task file checker-block) ::= $WaitHook get $name;
+            if {yield $checker-block} {
+                $task set-sleep;
+            };
+        }
+        catch: {| e |
+            $Task_stdout puts ["Bad SysReq(GETS/PUTS): " . $e ", " $name];
+        };
+    };
+};
+
+TaskManager method add-wait-hook (task-name wait-object) {
+    $WaitHook set $task-name $wait-object;
+};
+
+TaskManager method delete-wait-hook (task-name) {
+    $WaitHook unset $task-name;
+};
+    
 TaskManager method panic (msg) {
     $Task_stdout puts "";
     $Task_stdout puts $msg;

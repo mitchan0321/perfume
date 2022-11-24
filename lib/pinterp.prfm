@@ -19,6 +19,7 @@ defun pinterp (window) {
 		} local: $PINTERP_LOCAL :rebase;
 	    } catch: {| e |
 		result ::= "EXCEPTION: <" . [$e car] "># " [$e cdr];
+                ### println file: $stderr $@stack-trace;
 	    } fin: {
                 $window set-interp-idle;
 	    };

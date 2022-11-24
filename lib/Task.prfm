@@ -127,6 +127,7 @@ Task method run () {
         default: {
             sets State A;
         }
+        ;;
     };
 };
 
@@ -168,6 +169,11 @@ Task method get-tick () {
 
 Task method set-zap () {
     sets State Z;
+    sets Sleep 0;
+};
+
+Task method set-sleep () {
+    sets State S;
     sets Sleep 0;
 };
 
