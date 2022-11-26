@@ -2788,4 +2788,21 @@
 		Add Task::set-sleep.
 		Add TaskManager::force-wait-task for waiting task migrate to sleep state check.
 
+2022/11/27
+	Makefile
+		Add install lib/Tasklet/*.
+	lib/Stream.prfm
+		Fix Stream::clear for set eof indicator.
+		Add Stream::clear-queue for clear queue.
+		Fix Stream::ready? for return condition queue pooling only.
+		Fix Stream::puts,gets race condition code.
+		Add Stream::gets-nowait if no data return <nil> as soon.
+		Add Stream::stat comode property.
+	pmacs update
+		Add column length limit to EditStream, set property method is set-columnlimit.
+		Add EditStream::puts core logic to atomic.
+		Add P(Pause) state to Task. And control meshods are Task::set-pause / set-resume,
+		  control commands are suspend.prfm / resume.prfm.
+		Change ts output format.
+
 #eof
