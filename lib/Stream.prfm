@@ -50,11 +50,7 @@ Stream method close () {
 };
 
 Stream method clear () {
-    atomic {
-        sets count 0;
-        sets itemcount 0;
-        sets eof <nil>;
-    };
+    sets eof <nil>;
 };
 
 Stream method clear-queue () {
@@ -68,19 +64,9 @@ Stream method clear-queue () {
 
 Stream method ready? (timeout: timeout) {
     if [$queue null?] {
-        if {and $co [set? timeout]} {
-            pause @READ;
-            if [$queue null?] {
-                return <nil>;
-            } {
-                return <t>;
-            };
-        } {
-            return <nil>;
-        };
-    } {
-        return <t>;
+        return <nil>;
     };
+    return <t>;
 };
 
 Stream method ready-write? () {
@@ -93,12 +79,16 @@ Stream method ready-write? () {
 Stream method puts (nonewline: nonewline args: r) {
     lnewline := <t>;
     if {set? nonewline} {lnewline := <nil>};
-    if {[$r len] = 0} then: {throw ErrSyntax "Syntax error at 'puts', syntax: Stream puts [:nonewline] val ..."};
+    if {[$r len] = 0} {
+        throw ErrSyntax "Syntax error at 'puts', syntax: Stream puts [:nonewline] val ...";
+    };
     $r each do: {| i | puts-sub $i $lnewline};
 };
 
 Stream method puts-sub (i lnewline) {
-    if [eof?] then: {throw ErrFileAccess "Stream is closed."};
+    if [eof?] {
+        throw ErrFileAccess "Stream is closed.";
+    };
 
     while {or {$itemcount >= $itemlimit} {$count >= $limit}} do: {
 	if $co then: {
@@ -120,9 +110,9 @@ Stream method puts-sub (i lnewline) {
 		    $shortcut last : car : append! $i;
 		    $itemcount ++;
 	        } {
-		    sets shortcut [$shortcut append! ["" . $i]];
-		    $count ++;
-		    $itemcount ++;
+                    sets shortcut [$queue append! ["" . $i]];
+                    $count ++;
+                    sets itemcount 0;
 	        };
 	    };
         } {
@@ -133,7 +123,7 @@ Stream method puts-sub (i lnewline) {
 	    } {
 	        sets shortcut [$queue append! ["" . $i]];
 	        $count ++;
-	        $itemcount ++;
+                sets itemcount 0;
 	    };
         };
     };
@@ -161,12 +151,13 @@ Stream method gets (nonewline: nonewline) {
     atomic {
         $count --;
         itemcount := 0;
-        if {$count = 0} {
+        if {$count <= 0} {
             unsets shortcut;
-            r ::= $queue >>;
+            r ::= $queue car;
             sets queue ();
         } {
-            r ::= $queue >>;
+            r ::= $queue car;
+            sets queue [$queue cdr];
         };
     };
     return $r;
@@ -179,12 +170,20 @@ Stream method gets-nowait () {
         return <nil>;
     };
     
+    r := <nil>;
     atomic {
         $count --;
         itemcount := 0;
-        if {$count = 0} then: {unsets shortcut};
-        $queue >>;
+        if {$count <= 0} {
+            unsets shortcut;
+            r ::= $queue car;
+            sets queue ();
+        } {
+            r ::= $queue car;
+            sets queue [$queue cdr];
+        };
     };
+    return $r;
 };
 
 Stream method flush () {
@@ -196,6 +195,7 @@ Stream method stat () {
 	    (fd . <nil>) (mode . io) (path . $name) (eof . $eof)
 	    (limit . $limit) (count . $count) (newline . $newline)
 	    (itemlimit . $itemlimit) (itemcount . $itemcount)
+            (comode . $co)
 	   );
 };
 
@@ -216,7 +216,7 @@ Stream method set-limit (l) {
 };
 
 Stream method set-nolimit () {
-    sets limit [2 ^ 32 : - 1];
+    sets limit [2 ^ 64 : - 1];
 };
 
 Stream method set-itemlimit (l) {
