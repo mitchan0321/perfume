@@ -131,6 +131,9 @@ TaskManager method force-wait-task () {
     $WaitHook keys : each do: {| name |
         try {
             (task file checker-block) ::= $WaitHook get $name;
+            if {! [eq? [$task get-state] W]} {
+                continue;
+            };
             if {yield $checker-block} {
                 $task set-sleep;
             };

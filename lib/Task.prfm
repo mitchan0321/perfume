@@ -16,6 +16,7 @@ Task method init () {
     #   A ... Active
     #   R ... Running
     #   S ... Sleep
+    #   P ... Pause
     #   Z ... zap
     #   X ... eXit
     #   W ... Wait
@@ -68,6 +69,9 @@ Task method time-elapsed (msec) {
 };
 
 Task method run () {
+    if {eq? $State P} {
+        return;
+    };
     if {eq? $State Z} {
 	# Zap from other process.
         sets State X;
@@ -78,7 +82,10 @@ Task method run () {
     sets State R;
     b ::= time-of-day :msec;
     try {unset e} catch: {};
+
+    ### Call task one tick
     try {sts ::= $Coro next} catch: {| e |};
+    
     sets Last [time-of-day :msec];
     $Elapsed ++ [$Last - $b];
     $Tick ++;
@@ -177,3 +184,10 @@ Task method set-sleep () {
     sets Sleep 0;
 };
 
+Task method set-pause () {
+    sets State P;
+};
+
+Task method set-resume () {
+    sets State S;
+};
