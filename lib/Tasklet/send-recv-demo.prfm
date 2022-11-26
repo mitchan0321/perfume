@@ -1,0 +1,24 @@
+s ::= new Stream;
+$s set-comode;
+
+new Task : proc test-recv {
+    (s) := $ARGS;
+    loop {
+        r ::= SysCall gets $s;
+        if {$r % 1000 : = 0} {
+            println "Recv: " $r;
+        };
+    };
+} $s;
+
+new Task : proc test-send {
+    (s) := $ARGS;
+    i := 0;
+    loop {
+        SysCall puts $s $i;
+        if {$i % 1000 : = 0} {
+            println "Send: " $i;
+        };
+        $i ++;
+    };
+} $s;
