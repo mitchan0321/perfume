@@ -1,0 +1,9 @@
+defun suspend (name) {
+    t ::= TaskManager get-task $name;
+    if $t {
+        $t set-pause;
+    } {
+        throw ErrNoSuchTask "No such task.";
+    };
+};
+

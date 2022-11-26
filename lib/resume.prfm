@@ -1,0 +1,9 @@
+defun resume (name) {
+    t ::= TaskManager get-task $name;
+    if $t {
+        $t set-resume;
+    } {
+        throw ErrNoSuchTask "No such task.";
+    };
+};
+
