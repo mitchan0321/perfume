@@ -1,6 +1,6 @@
 defun ts () {
-    fmt   := "%1v %7.1f %7.1f %7.1f %6d %v";
-    fmt-h := "%1v %7v %7v %7v %6v %v";
+    fmt   := "%1v %8.1f %8.1f %8.1f %8d %v";
+    fmt-h := "%1v %8v %8v %8v %8v %v";
     println [$fmt-h fmt "f" "sleep" "total" "elapsed" "tick" "name"];
     i := 0;
     TaskManager get-task-list : each do: {| t |
