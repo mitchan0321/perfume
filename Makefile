@@ -125,6 +125,7 @@ install:
 	if [ ! -d $(PREFIX)/lib/perfume ]; then mkdir $(PREFIX)/lib/perfume; fi
 	if [ ! -d $(PREFIX)/lib/perfume/lib ]; then mkdir $(PREFIX)/lib/perfume/lib; fi
 	if [ ! -d $(PREFIX)/lib/perfume/lib/pdoc ]; then mkdir $(PREFIX)/lib/perfume/lib/pdoc; fi
+	if [ ! -d $(PREFIX)/lib/perfume/lib/Tasklet ]; then mkdir $(PREFIX)/lib/perfume/lib/Tasklet; fi
 	install -m 755 perfumesh $(PREFIX)/bin
 	install -m 644 setup.prfm $(PREFIX)/lib/perfume
 	install -m 644 lib/*.prfm $(PREFIX)/lib/perfume/lib
@@ -133,6 +134,7 @@ install:
 	install -m 644 lib/*.logo $(PREFIX)/lib/perfume/lib
 	install -m 644 lib/*.keymap $(PREFIX)/lib/perfume/lib
 	install -m 444 lib/pdoc/* $(PREFIX)/lib/perfume/lib/pdoc
+	install -m 444 lib/Tasklet/* $(PREFIX)/lib/perfume/lib/Tasklet
 
 perfumesh:	$(OBJS) perfumesh.o
 ifeq ($(CORU_USE),yes)
@@ -241,6 +243,7 @@ endif
 	mkdir -p $(PKG_DIR)/lib/perfume
 	mkdir -p $(PKG_DIR)/lib/perfume/lib
 	mkdir -p $(PKG_DIR)/lib/perfume/lib/pdoc
+	mkdir -p $(PKG_DIR)/lib/perfume/lib/Tasklet
 	install -m 755 perfumesh  $(PKG_DIR)/bin
 	install -m 644 setup.prfm $(PKG_DIR)/lib/perfume
 	install -m 644 lib/*.prfm $(PKG_DIR)/lib/perfume/lib
@@ -249,6 +252,7 @@ endif
 	install -m 644 lib/*.logo $(PKG_DIR)/lib/perfume/lib
 	install -m 644 lib/*.keymap $(PKG_DIR)/lib/perfume/lib
 	install -m 444 lib/pdoc/* $(PKG_DIR)/lib/perfume/lib/pdoc
+	install -m 444 lib/Tasklet/* $(PKG_DIR)/lib/perfume/lib/Tasklet
 	install -m 755 pkg/install.sh $(PKG_DIR)
 	install -m 644 pkg/INSTALL    $(PKG_DIR)
 	install -m 644 pkg/pmacs.in   $(PKG_DIR)/bin
