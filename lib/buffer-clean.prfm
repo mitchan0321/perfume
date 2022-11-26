@@ -1,0 +1,12 @@
+defun buffer-clean (name) {
+    b ::= BufferManager get-buffer $name;
+    $b ?? {
+        throw ErrNoSuchBuffer ["No such buffer '" . $name "'."];
+    };
+    if {[$b get-buffer-name] != $name} {
+        throw ErrNoSuchBuffer ["No such buffer '" . $name "'."];
+    };
+    $b set! UndoBuffer ();
+    $b set! RedoBuffer ();
+};
+
