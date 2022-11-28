@@ -12,7 +12,14 @@ SysCall method exit (status) {
 
 SysCall method apply-editor (body) {
     __checkEnv;
-    TaskManager enqueue (APPLY_EDITOR $body);
+    TaskManager enqueue (APPLY_EDITOR $body $SELF);
+    pause (SLEEP 0);
+};
+
+SysCall method new-task (name body) {
+    __checkEnv;
+    TaskManager enqueue (NEW_TASK $name $body $SELF);
+    pause (SLEEP 0);
 };
 
 SysCall method gets (f) {

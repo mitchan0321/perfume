@@ -94,7 +94,12 @@ TaskManager method dispatch () {
         };
         result := <t>;
         $SysReq close;
-        apply-syscalls;
+        try {
+            apply-syscalls;
+        } catch: {| e |
+            $Task_stdout puts "";
+            $Task_stdout puts ["Error at apply-syscalls: " . $e];
+        };
     };
     
     try {
@@ -113,16 +118,20 @@ TaskManager method enqueue (msg) {
 TaskManager method apply-syscalls () {
     while {! [$SysReq eof?]} do: {
         r ::= $SysReq gets;
-        if {list? $r} {
-            case [$r car] 
-            APPLY_EDITOR {
-                $r,1 eval;
-            }
-            default: {
-                $Task_stdout puts ["Bad SysReq(APPLY_EDITOR): " . $r];
-            }
-        } {
-            $Task_stdout puts ["Bad SysReq(UNKNOWN): " . $r];
+        case $r,0
+        APPLY_EDITOR {
+            (syscall body task) := $r;
+            $task add-stat (RESULT [$body eval]);
+        }
+        NEW_TASK {
+            (syscall name body task) := $r;
+            t ::= new Task;
+            $t proc $name $body;
+            $task add-stat (TASK $t);
+        }
+        default: {
+            $Task_stdout puts ["Bad SysReq(UNKNOWN): " . $fun ", " $body];
+            $task add-stat (ERROR ["Bad SysReq(UNKNOWN): " . $fun ", " $body]);
         };
     };
 };

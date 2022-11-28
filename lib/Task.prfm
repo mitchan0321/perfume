@@ -21,6 +21,8 @@ Task method init () {
     #   X ... eXit
     #   W ... Wait
     sets State I;
+    
+    sets SysReqStat ();
 };
 
 Task method set-name (name) {
@@ -191,3 +193,16 @@ Task method set-pause () {
 Task method set-resume () {
     sets State S;
 };
+
+Task method clear-syscall () {
+    sets SysReqStat ();
+};
+
+Task method add-stat (s) {
+    $SysReqStat append! $s;
+};
+
+Task method get-stat () {
+    return $SysReqStat;
+};
+
