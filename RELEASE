@@ -2805,4 +2805,9 @@
 		  control commands are suspend.prfm / resume.prfm.
 		Change ts output format.
 
+2022/11/28
+	pmacs update
+		Add returnable system-call result at Task.prfm/SysCall.prfm/TaskManager.prfm.
+		Add new system-call new-task.
+
 #eof
