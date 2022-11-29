@@ -2810,4 +2810,9 @@
 		Add returnable system-call result at Task.prfm/SysCall.prfm/TaskManager.prfm.
 		Add new system-call new-task.
 
+2022/11/29
+	pmacs update
+		Add new-task syscall can specify argument to sub task.
+		Add system call wait for wait child task exit.
+
 #eof
