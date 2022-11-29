@@ -16,9 +16,9 @@ SysCall method apply-editor (body) {
     pause (SLEEP 0);
 };
 
-SysCall method new-task (name body) {
+SysCall method new-task (name body args) {
     __checkEnv;
-    TaskManager enqueue (NEW_TASK $name $body $SELF);
+    TaskManager enqueue (NEW_TASK $name $body $args $SELF);
     pause (SLEEP 0);
 };
 

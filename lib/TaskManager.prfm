@@ -124,9 +124,9 @@ TaskManager method apply-syscalls () {
             $task add-stat (RESULT [$body eval]);
         }
         NEW_TASK {
-            (syscall name body task) := $r;
+            (syscall name body args task) := $r;
             t ::= new Task;
-            $t proc $name $body;
+            call $t [(proc $name $body) concat $args];
             $task add-stat (TASK $t);
         }
         default: {
