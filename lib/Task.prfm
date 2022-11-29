@@ -23,6 +23,15 @@ Task method init () {
     sets State I;
     
     sets SysReqStat ();
+    
+    sets Parent <nil>;
+    
+    sets ChildList ();
+    sets ChildStatus ();
+};
+
+Task method string () {
+    "<Task> name=" . $Name ", state=" $State ", parent=" [$Parent ??? [$Parent get-name] <nil>];
 };
 
 Task method set-name (name) {
@@ -120,6 +129,9 @@ Task method run () {
             sets State X;
             sets ExitStatus (NORMAL [$sts get 1]);
         }
+        WAIT {
+            sets State W;
+        }
         default {
             State A;
         }
@@ -198,7 +210,7 @@ Task method clear-syscall () {
     sets SysReqStat ();
 };
 
-Task method add-stat (s) {
+Task method add-request-stat (s) {
     $SysReqStat append! $s;
 };
 
@@ -206,3 +218,106 @@ Task method get-stat () {
     return $SysReqStat;
 };
 
+Task method set-parent (parent-task) {
+    sets Parent $parent-task;
+};
+
+Task method get-parent () {
+     return $Parent;
+};
+
+Task method add-child (child) {
+    $ChildList append! $child;
+};
+
+Task method get-child-list () {
+    return $ChildList;
+};
+
+Task method get-child (task) {
+    i ::= $ChildList find $task;
+    if $i {return $ChildList,$i};
+    return <nil>;
+};
+
+Task method remove-child (task) {
+    i ::= $ChildList find $task;
+    $ChildList delete! $i;
+};
+
+Task method add-child-exit-status (child-status) {
+    $ChildStatus append! $child-status;
+};
+
+Task method child-avail? (child) {
+    i ::= $ChildList find $child;
+    if $i {return <t>};
+    return <nil>;
+};
+
+Task method child-exited? (child) {
+    n := 0;
+    $ChildStatus each do: {| i |
+        if {eq? $i,0 $child} {
+            return <t>;
+        };
+        $n ++;
+    };
+    return <nil>;
+};
+
+#
+# call by Task inside service functions.
+#
+Task method get-result () {
+    return [__get-sys-call-stat RESULT];
+};
+
+Task method get-task () {
+    return [__get-sys-call-stat TASK];
+};
+
+Task method get-error () {
+    return [__get-sys-call-stat ERROR];
+};
+
+Task method __get-sys-call-stat (cause) {
+    atomic {
+        n := 0;
+        p := <nil>;
+        result := <nil>;
+        $SysReqStat each do: {| i |
+            if {eq? $i,0 $cause} {
+                p := $i;
+                break;
+            };
+            $n ++;
+        };
+        if $p {
+            $SysReqStat delete! $n;
+            result := $p,1;
+        };
+    };
+    
+    return $result;
+};
+
+Task method get-child-exit-status (task) {
+    atomic {
+        n := 0;
+        p := <nil>;
+        result := <nil>;
+        $ChildStatus each do: {| i |
+            if {eq? $i,0 $task} {
+                p := $i;
+                break;
+            };
+            $n ++;
+        };
+        if $p {
+            $ChildStatus delete! $n;
+            result := $p,1;
+        };
+    };
+    return $result;
+};

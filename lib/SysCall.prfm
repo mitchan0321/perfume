@@ -22,6 +22,21 @@ SysCall method new-task (name body args) {
     pause (SLEEP 0);
 };
 
+SysCall method wait (child) {
+    __checkEnv;
+    if {$SELF child-avail? $child} {
+        set __self__ $SELF;
+        TaskManager add-wait-hook [$SELF get-name] ($SELF $child {$__self__ child-exited? $child});
+        pause (WAIT 0);
+        TaskManager delete-wait-hook [$SELF get-name];
+        return [$SELF get-child-exit-status $child];
+    };
+    if {$SELF child-exited? $child} {
+        return [$SELF get-child-exit-status $child];
+    };
+    return <nil>;
+};
+
 SysCall method gets (f) {
     __checkEnv;
     TaskManager add-wait-hook [$SELF get-name] ($SELF $f {$f ready?});

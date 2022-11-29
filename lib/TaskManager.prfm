@@ -65,7 +65,10 @@ TaskManager method dispatch () {
     tick ::= $now - $LastDispatch;
     sets LastDispatch $now;
     
-    min-wait := 0;
+    #
+    # search most min sleep time task (all list element linear scan)
+    #
+    min-wait := 1;
     min-task := <nil>;
     $TaskList each do: {| t |
         if {$t tickable?} {
@@ -79,23 +82,48 @@ TaskManager method dispatch () {
             };
         };
     };
+    
+    #
+    # run most min sleep task
+    # if task was executed, then return <t>
+    #
     result := <nil>;
     $SysReq clear;
     $SysReq clear-queue;
     if $min-task {
-        $min-task run;     # dispatch to min task
+
+        ### dispatch to min task
+        $min-task run;
+
         if {$min-task exit?} {
+            #
+            # proces terminate
+            #
             $Task_stdout puts "";
             $Task_stdout puts ["Task [" . [$min-task get-name] "] end, status= " [$min-task get-exit-status]];
+
+            ### remove from task list TaskManager instance.
             idx ::= $TaskList find $min-task;
             if {$idx >= 0} {
                 $TaskList delete! $idx
+            };
+            
+            ### remove wait hook.
+            delete-wait-hook [$min-task get-name];
+            
+            ### remove parents child list and add to parents child status.
+            p ::= $min-task get-parent;
+            if $p {
+                $p remove-child $min-task;
+                $p add-child-exit-status ($min-task [$min-task get-exit-status]);
             };
         };
         result := <t>;
         $SysReq close;
         try {
+            ### apply request system call from tasn at this tick.
             apply-syscalls;
+
         } catch: {| e |
             $Task_stdout puts "";
             $Task_stdout puts ["Error at apply-syscalls: " . $e];
@@ -103,7 +131,9 @@ TaskManager method dispatch () {
     };
     
     try {
+        ### check and force to activate waiting task.
         force-wait-task;
+
     } catch: {| e |
         $Task_stdout puts ["Error at force-wait-task: " . $e];
     };
@@ -121,17 +151,19 @@ TaskManager method apply-syscalls () {
         case $r,0
         APPLY_EDITOR {
             (syscall body task) := $r;
-            $task add-stat (RESULT [$body eval]);
+            $task add-request-stat (RESULT [$body eval]);
         }
         NEW_TASK {
             (syscall name body args task) := $r;
             t ::= new Task;
+            $t set-parent $task;
+            $task add-child $t;
+            $task add-request-stat (TASK $t);
             call $t [(proc $name $body) concat $args];
-            $task add-stat (TASK $t);
         }
         default: {
             $Task_stdout puts ["Bad SysReq(UNKNOWN): " . $fun ", " $body];
-            $task add-stat (ERROR ["Bad SysReq(UNKNOWN): " . $fun ", " $body]);
+            $task add-request-stat (ERROR ["Bad SysReq(UNKNOWN): " . $fun ", " $body]);
         };
     };
 };
@@ -139,11 +171,12 @@ TaskManager method apply-syscalls () {
 TaskManager method force-wait-task () {
     $WaitHook keys : each do: {| name |
         try {
-            (task file checker-block) ::= $WaitHook get $name;
+            (task target checker-block) ::= $WaitHook get $name;
             if {! [eq? [$task get-state] W]} {
                 continue;
             };
             if {yield $checker-block} {
+                ### task state W -> S
                 $task set-sleep;
             };
         }
@@ -160,7 +193,7 @@ TaskManager method add-wait-hook (task-name wait-object) {
 TaskManager method delete-wait-hook (task-name) {
     $WaitHook unset $task-name;
 };
-    
+
 TaskManager method panic (msg) {
     $Task_stdout puts "";
     $Task_stdout puts $msg;
