@@ -1,0 +1,23 @@
+new Task : proc move-message {
+    message ::= SysCall apply-editor {
+        buff ::= $window get-buffer;
+        geom ::= $window get-geom;
+        (ey ex) ::= $window get-source-index $buff $geom;
+        str ::= $buff get-buffer-line $ey;
+        result $str;
+    };
+    (sy sx) ::= SysCall apply-editor {
+        $MainWindow get-screen-size;
+    };
+    message ::= [" " repeat $x] . $message;
+    while {$message len : > 0} do: {
+        SysCall apply-editor {
+            show-message $message;
+        };
+        SysCall sleep 100;
+        message ::= $message sub 1;
+    };
+    SysCall apply-editor {
+        show-message "Done.";
+    };
+};
