@@ -12,7 +12,7 @@ new Task : proc move-message {
     (sy sx) ::= SysCall apply-editor {
         $MainWindow get-screen-size;
     };
-    message ::= [" " repeat $x] . $message;
+    message ::= [" " repeat $sx] . $message;
     while {$message len : > 0} do: {
         SysCall apply-editor {
             show-message $message;
