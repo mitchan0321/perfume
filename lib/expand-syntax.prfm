@@ -11,7 +11,7 @@ defun load-func (s force: force) {
 	try {unset p; alias up: 1 __fname__ p};
 	set p [$f . "/" $s ".prfm"];
 	uplevel {
-            try {load $__fname__} 
+            try {begin :rebase local: [dict-local] {load $__fname__}}
             catch: {| __error__ |
                 if {eq? [$__error__ car] ErrFileNotOpen} {continue};
                 throw $__error__
@@ -34,7 +34,7 @@ defun load-class (s force: force) {
 	try {unset p; alias up: 1 __fname__ p};
 	set p [$f . "/" $s ".prfm"];
 	uplevel {
-            try {load $__fname__}
+            try {begin :rebase local: [dict-local] {load $__fname__}}
             catch: {| __error__ |
                 if {eq? [$__error__ car] ErrFileNotOpen} {continue};
                 throw $__error__
@@ -52,7 +52,7 @@ defun load-tasklet (s) {
 	set p [$f . "/" $s ".prfm"];
 	uplevel {
             try {
-                load :notrace $__fname__;
+                begin :rebase local: [dict-local] {load :notrace $__fname__};
                 return <t>;
             }
             catch: {| __error__ |
