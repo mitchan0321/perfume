@@ -162,9 +162,8 @@ defcommand para-alphabet desc: "Demo background." {
             $main add-background {
                 $f $l;
                 result ALL;
-            } after: 500;
+            } after: 100;
         };
-
     };
     $f ["abcdefghijklmnopqrstuvwxyz" split sep: ""];
     result ALL;
