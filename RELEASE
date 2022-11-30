@@ -2798,7 +2798,7 @@
 		Fix Stream::puts,gets race condition code.
 		Add Stream::gets-nowait if no data return <nil> as soon.
 		Add Stream::stat comode property.
-	pmacs update
+	pmacs update:
 		Add column length limit to EditStream, set property method is set-columnlimit.
 		Add EditStream::puts core logic to atomic.
 		Add P(Pause) state to Task. And control meshods are Task::set-pause / set-resume,
@@ -2806,13 +2806,21 @@
 		Change ts output format.
 
 2022/11/28
-	pmacs update
+	pmacs update:
 		Add returnable system-call result at Task.prfm/SysCall.prfm/TaskManager.prfm.
 		Add new system-call new-task.
 
 2022/11/29
-	pmacs update
+	pmacs update:
 		Add new-task syscall can specify argument to sub task.
 		Add system call wait for wait child task exit.
+
+2022/11/30
+	pmacs update:
+		Add SysCall return value at sleep, apply-editor, new-task, wait.
+		Add sysCall throw errors at apply-editor, new-task, task script need catch
+		  exception if use these system calls.
+		Update pmacs.conf INTERP_ITIMER_INTERVAL 20 -> 10.
+		Update pmacs.conf BLINK_FACT 4 -> 5.
 
 #eof
