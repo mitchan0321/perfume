@@ -18,6 +18,9 @@ WUtil.prfm
 MiniInputUtil.prfm
 Window.prfm
 WindowBase.prfm
+TaskManager.prfm
+Task.prfm
+SysCall.prfm
 pmacs-theme.prfm
 pmacs.conf
 pmacs.prfm
@@ -47,6 +50,10 @@ Mode-Dired.key
 Mode-Java.key
 pinterp.prfm
 ptrace.prfm
+ts.prfm
+zap.prfm
+resume.prfm
+suspend.prfm
 FloatingWindow.prfm
 FloatingWindowManager.prfm
 
