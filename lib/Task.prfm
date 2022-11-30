@@ -270,10 +270,16 @@ Task method child-exited? (child) {
 # call by Task inside service functions.
 #
 Task method get-result () {
+    if {e ::= get-error} {
+        throw $e;
+    };
     return [__get-sys-call-stat RESULT];
 };
 
 Task method get-task () {
+    if {e ::= get-error} {
+        throw $e;
+    };
     return [__get-sys-call-stat TASK];
 };
 

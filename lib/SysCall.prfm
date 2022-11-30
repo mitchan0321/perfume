@@ -3,23 +3,28 @@ class SysCall;
 SysCall method sleep (msec) {
     __checkEnv;
     pause (SLEEP $msec);
+    return <nil>;
 };
 
 SysCall method exit (status) {
     __checkEnv;
     pause (EXIT $status);
+    ### never reach
+    return <nil>;
 };
 
 SysCall method apply-editor (body) {
     __checkEnv;
     TaskManager enqueue (APPLY_EDITOR $body $SELF);
     pause (SLEEP 0);
+    return [$SELF get-result];
 };
 
 SysCall method new-task (name body args) {
     __checkEnv;
     TaskManager enqueue (NEW_TASK $name $body $args $SELF);
     pause (SLEEP 0);
+    return [$SELF get-task];
 };
 
 SysCall method wait (child) {

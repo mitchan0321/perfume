@@ -104,7 +104,7 @@ TaskManager method dispatch () {
 
             ### remove from task list TaskManager instance.
             idx ::= $TaskList find $min-task;
-            if {$idx >= 0} {
+            if $idx {
                 $TaskList delete! $idx
             };
             
@@ -151,15 +151,23 @@ TaskManager method apply-syscalls () {
         case $r,0
         APPLY_EDITOR {
             (syscall body task) := $r;
-            $task add-request-stat (RESULT [$body eval]);
+            try {
+                $task add-request-stat (RESULT [$body eval]);
+            } catch: {| e |
+                $task add-request-stat (ERROR $e);
+            };
         }
         NEW_TASK {
             (syscall name body args task) := $r;
-            t ::= new Task;
-            $t set-parent $task;
-            $task add-child $t;
-            $task add-request-stat (TASK $t);
-            call $t [(proc $name $body) concat $args];
+            try {
+                t ::= new Task;
+                $t set-parent $task;
+                $task add-child $t;
+                $task add-request-stat (TASK $t);
+                call $t [(proc $name $body) concat $args];
+            } catch: {| e |
+                $task add-request-stat (ERROR $e);
+            };
         }
         default: {
             $Task_stdout puts ["Bad SysReq(UNKNOWN): " . $fun ", " $body];
@@ -181,7 +189,8 @@ TaskManager method force-wait-task () {
             };
         }
         catch: {| e |
-            $Task_stdout puts ["Bad SysReq(GETS/PUTS): " . $e ", " $name];
+            delete-wait-hook $name;
+            $Task_stdout puts ["Bad SysReq at wait: " . $e ", " $name];
         };
     };
 };
