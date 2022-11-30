@@ -152,7 +152,9 @@ TaskManager method apply-syscalls () {
         APPLY_EDITOR {
             (syscall body task) := $r;
             try {
-                $task add-request-stat (RESULT [$body eval]);
+                $task add-request-stat (RESULT [
+                    begin {$body eval};
+                ]);
             } catch: {| e |
                 $task add-request-stat (ERROR $e);
             };
