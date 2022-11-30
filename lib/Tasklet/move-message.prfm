@@ -1,4 +1,7 @@
 new Task : proc move-message {
+    window ::= SysCall apply-editor {
+        $MainWindow get-current-window;
+    };
     message ::= SysCall apply-editor {
         buff ::= $window get-buffer;
         geom ::= $window get-geom;
