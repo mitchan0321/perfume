@@ -14,11 +14,13 @@ new Task : proc move-message {
     };
     message ::= [" " repeat $sx] . $message;
     while {$message len : > 0} do: {
-        SysCall apply-editor {
-            show-message $message;
+        if {! [$MainWindow mini-input?]} {
+            SysCall apply-editor {
+                show-message $message;
+            };
+            message ::= $message sub 1;
         };
         SysCall sleep 100;
-        message ::= $message sub 1;
     };
     SysCall apply-editor {
         show-message "Done.";
