@@ -168,3 +168,8 @@ defcommand para-alphabet desc: "Demo background." {
     $f ["abcdefghijklmnopqrstuvwxyz" split sep: ""];
     result ALL;
 };
+
+defcommand test desc: "Test command." {
+    show-message ["Local: " . [info local] ", Closure: " [info closure]];
+};
+

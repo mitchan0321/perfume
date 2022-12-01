@@ -19,7 +19,9 @@ fun (l) {
         $LIB_PATH each do: {| f |
             if {file exists? [$f . "/" $i]} {
                 try {
-                    begin :rebase local: [dict-local] {load [$f . "/" $i]};
+                    begin :rebase local: [dict ((__load_command_file__ . [$f . "/" $i]))] {
+                        load $__load_command_file__;
+                    };
                     break;
                 } catch: {| e |
                     show-message ["command file load error at " . [$f . "/" $i] ", " $e];

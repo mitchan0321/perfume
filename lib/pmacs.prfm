@@ -37,8 +37,11 @@ defun pmacs (trace: t) {
 
     fun (modules) {
 	$modules each do: {| m |
-	    try    {load-class :force $m}
-	    catch: {| e | println ["Module load error at '" . $m "', error=" $e]};
+	    try  {
+                begin :rebase local: [dict ((__module_file__ . $m))] {
+                    load-class :force $__module_file__;
+                }
+            } catch: {| e | println ["Module load error at '" . $m "', error=" $e]};
 	};
     } : $modules;
 
