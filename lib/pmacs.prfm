@@ -49,7 +49,7 @@ defun pmacs (trace: t) {
     defvar stdout_orig $stdout;
     defvar stderr_orig $stderr;
     reset-stdio;
-    
+
     try {
         WUtil init;
 	BufferManager init;
@@ -176,6 +176,17 @@ defun pmacs (trace: t) {
         };
 	$MainWindow render-all;
 	$MainWindow refresh;
+
+        try {
+            f := $STARTUP_FILE;
+            if {and {file exists? $f} {! [file dir? $f]} {file read? $f}} {
+                begin :rebase local: [dict ((__user_conf__ . $f))] {
+                    load $__user_conf__;
+                };
+            };
+        } catch: {| e |
+            println ["User configuration file load error at '" . $f "', error=" $e];
+        };
 
         set-itimer $INTERP_ITIMER_INTERVAL;
 	$MainWindow key-event-loop;
