@@ -2823,4 +2823,8 @@
 		Update pmacs.conf INTERP_ITIMER_INTERVAL 20 -> 10.
 		Update pmacs.conf BLINK_FACT 4 -> 5.
 
+2022/12/01
+	pmacs update:
+		Add user startup script file load.
+
 #eof
