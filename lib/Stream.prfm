@@ -50,7 +50,13 @@ Stream method close () {
 };
 
 Stream method clear () {
-    sets eof <nil>;
+    atomic {
+        sets queue ();
+        sets count 0;
+        sets itemcount 0;
+        try {unsets shortcut};
+        sets eof <nil>;
+    };
 };
 
 Stream method clear-queue () {
@@ -209,6 +215,10 @@ Stream method each (do: body) {
 
 Stream method set-comode () {
     sets co <t>;
+};
+
+Stream method set-nocomode () {
+    sets co <nil>;
 };
 
 Stream method set-limit (l) {
