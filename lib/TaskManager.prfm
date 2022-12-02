@@ -89,7 +89,6 @@ TaskManager method dispatch () {
     #
     result := <nil>;
     $SysReq clear;
-    $SysReq clear-queue;
     if $min-task {
 
         ### dispatch to min task
