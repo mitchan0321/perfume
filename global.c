@@ -58,6 +58,7 @@ void def_global() {
     const_ENV = new_symbol(L"ENV");
     const_ARGV = new_symbol(L"ARGV");
     const_LIB_PATH = new_symbol(L"LIB_PATH");
+    const_BASE_PATH = new_symbol(L"BASE_PATH");
     const_DEFAULT_FILE_ENCODING = new_symbol(L"DEFAULT_FILE_ENCODING");
     const_DEFAULT_SCRIPT_ENCODING = new_symbol(L"DEFAULT_SCRIPT_ENCODING");
     const_DEFAULT_DIRENT_ENCODING = new_symbol(L"DEFAULT_DIRENT_ENCODING");

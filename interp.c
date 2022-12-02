@@ -277,8 +277,10 @@ interp_setup(Toy_Interp* interp, int argc, char **argv, char **envp, char *dir) 
         swprintf(p, plen, L"%ls%ls", wdir, LIB_PATH);
         p[plen-1] = 0;
         hash_set_t(gdict, const_LIB_PATH, new_list(new_string_str(p)));
+        hash_set_t(gdict, const_BASE_PATH, new_string_str(p));
     } else {
         hash_set_t(gdict, const_LIB_PATH, new_list(new_string_str(PREFIX LIB_PATH)));
+        hash_set_t(gdict, const_BASE_PATH, new_string_str(PREFIX LIB_PATH));
     }
     hash_set_t(gdict, const_DEFAULT_FILE_ENCODING, new_symbol(DEFAULT_FILE_ENCODING));
     hash_set_t(gdict, const_DEFAULT_SCRIPT_ENCODING, new_symbol(DEFAULT_SCRIPT_ENCODING));
