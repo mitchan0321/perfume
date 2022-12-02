@@ -792,13 +792,13 @@ CombiWindow method display-evaluation () {
     buff ::= get-buffer;
 
     if {eq? ScratchBuffer [$buff get @name]} {
-        try {$PINTERP next} catch: {};
+        sts := <nil>;
+        try {sts ::= $PINTERP next} catch: {};
         timeout ::= time-of-day :msec;
         while {$stdout in-pooling?} do: {
             if {[[time-of-day :msec] - $timeout] > 1000} {break};
-            try {$PINTERP next} catch: {};
+            try {sts ::= $PINTERP next} catch: {};
         };
-
 	update-display := <nil>;
 
 	$stdout close;
