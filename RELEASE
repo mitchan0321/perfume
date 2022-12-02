@@ -2827,4 +2827,14 @@
 	pmacs update:
 		Add user startup script file load.
 
+2022/12/03
+	global.[ch], interp.c
+		Add new global variable BASE_PATH for indicate the pmacs interpriter install base directory.
+	lib/Stream.prfm
+		Fix Stream::clear for re-initialize queue count, queue element and eof mark.
+		Add Stream::nocomode to unset co-mode flag.
+	pmacs update:
+		Fix TaskManager delete $SysReq clear-queue call, aggregate to $SysReq clear by Stream.prfm fix.
+		Change initialize DEFAULT_PWIKI_PATH from $BASE_LIB variable.
+
 #eof
