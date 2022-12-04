@@ -46,16 +46,21 @@ Task method proc (name body args: arg) {
     if $Coro {
         throw ErrCreated "Already created task.";
     };
-    sets Coro [coro $body];
-    $Coro eval {
-        defvar ARGS $arg;
-        defvar SELF [self];
-        enable-itimer;
+    try {
+        sets Coro [coro $body];
+        $Coro eval {
+            defvar ARGS $arg;
+            defvar SELF [self];
+            enable-itimer;
+        };
+        TaskManager add [self] $name;
+        sets State A;
+        sets Since [time-of-day :msec];
+        return $Name;
+    } catch: {| e |
+        if $Coro {$Coro release};
+        throw $e;
     };
-    TaskManager add [self] $name;
-    sets State A;
-    sets Since [time-of-day :msec];
-    return $Name;
 };
 
 Task method set-stdio (in out err) {
