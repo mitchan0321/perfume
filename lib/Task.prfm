@@ -58,7 +58,7 @@ Task method proc (name body args: arg) {
         sets Since [time-of-day :msec];
         return $Name;
     } catch: {| e |
-        if $Coro {$Coro release};
+        release;
         throw $e;
     };
 };
@@ -195,6 +195,11 @@ Task method get-tick () {
 
 Task method set-zap () {
     sets State Z;
+    sets Sleep 0;
+};
+
+Task method set-exit () {
+    sets State X;
     sets Sleep 0;
 };
 

@@ -168,6 +168,8 @@ TaskManager method apply-syscalls () {
                 call $t [(proc $name $body) concat $args];
             } catch: {| e |
                 $task add-request-stat (ERROR $e);
+                $task release;
+                $task set-exit;
             };
         }
         default: {
