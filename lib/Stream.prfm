@@ -59,15 +59,6 @@ Stream method clear () {
     };
 };
 
-Stream method clear-queue () {
-    atomic {
-        sets queue ();
-        sets count 0;
-        sets itemcount 0;
-        try {unsets shortcut};
-    };
-};
-
 Stream method ready? (timeout: timeout) {
     if [$queue null?] {
         return <nil>;
