@@ -18,9 +18,13 @@ new Task : proc move-message {
             SysCall apply-editor {
                 show-message $message;
             };
-            message ::= $message sub 1;
+            if {$message at 0 : display-width : = 2} {
+                message ::= " " . [$message sub 1];
+            } {
+                message ::= $message sub 1;
+            };
         };
-        SysCall sleep 100;
+        SysCall sleep 50;
     };
     SysCall apply-editor {
         show-message "Done.";
