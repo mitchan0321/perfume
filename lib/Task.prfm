@@ -133,6 +133,7 @@ Task method run () {
         EXIT {
             sets State X;
             sets ExitStatus (NORMAL [$sts get 1]);
+            release;
         }
         WAIT {
             sets State W;
