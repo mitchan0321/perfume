@@ -639,36 +639,27 @@ Window method key-event-loop () {
 	### $MainWindow get-minibuffer-window : refresh;
         #######
 
+        cursor-update := <t>;
 	$i each do: {| k |
 	    if {eq? $k KEY_RESIZE} {
                 $main mini-input-end;
 		$main resize-window;
 		$main apply {render-all; refresh};
 		window ::= $main get-current-window;		
-		$window set-cursor;
 		continue;
 	    };
 		
 	    window ::= $main get-current-window;
 	    result ::= $window apply-keybind $main $window $k;
-            cursor-update := <t>;
-    	    cond
+
+            cond
                 {input-ready?} {
                     cursor-update := <nil>;
-                    break;
                 }
                 <t> {
                     if {! $MiniInput} {
-			if {eq? [$window get @name] CombiWindow} {
-                            add-background after: 0 {
-                                if {! $MiniInput} {
-                                    if {eq? [$window get @name] CombiWindow} {
-                                        $window apply-command $main $window <nil> brackets-pair;
-                                        $window set-cursor;
-                                        return ALL;
-                                    };
-                                };
-                            };
+                        if {eq? [$window get @name] CombiWindow} {
+                            $window apply-command $main $window <nil> brackets-pair;
                         };
                     };
                 }
@@ -680,12 +671,13 @@ Window method key-event-loop () {
                     window ::= $main get-current-window;
                     $window apply {render; refresh};
                 }
-	    ;;
-            if $cursor-update {
-                window ::= $main get-current-window;
-                $window set-cursor;
-            };
-	};
+            ;;
+        };
+
+        if $cursor-update {
+            window ::= $main get-current-window;
+            $window set-cursor;
+        };
     };
 };
 
@@ -886,5 +878,3 @@ Window method input-ready? () {
     if [$InputFd ready?] {return <t>};
     return <nil>;
 };
-
-
