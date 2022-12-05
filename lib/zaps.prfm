@@ -1,0 +1,9 @@
+defun zaps (name) {
+    tlist ::= TaskManager get-task-list;
+    $tlist each do: {| t |
+        if {$t get-name : =~ [["" . $name] rquote]} {
+            zap [$t get-name];
+        };
+    };
+};
+
