@@ -2832,9 +2832,17 @@
 		Add new global variable BASE_PATH for indicate the pmacs interpriter install base directory.
 	lib/Stream.prfm
 		Fix Stream::clear for re-initialize queue count, queue element and eof mark.
-		Add Stream::nocomode to unset co-mode flag.
+		Add Stream::set-nocomode to unset co-mode flag.
 	pmacs update:
 		Fix TaskManager delete $SysReq clear-queue call, aggregate to $SysReq clear by Stream.prfm fix.
 		Change initialize DEFAULT_PWIKI_PATH from $BASE_LIB variable.
+
+2022/12/05
+	lib/Stream.prfm
+		Delete method Stream::clear-queue, to use Stream::clear.
+	pmacs update:
+		Change Tasklet/move-message, if left char width greater equal 2 then delete it and add " ".
+		Fix Window:: key-event-loop refactaring and brackets-pair occurd some events supress.
+		Change pmacs.conf INTERP_ITIMER_INTERVAL, Linux -> 10, FreeBSD -> 50.
 
 #eof
