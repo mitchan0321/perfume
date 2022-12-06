@@ -42,6 +42,21 @@ SysCall method wait (child) {
     return <nil>;
 };
 
+SysCall method wait-any () {
+    __checkEnv;
+    if {$SELF child-exited-any?} {
+        return [$SELF get-child-exit-status-any];
+    };
+    if {$SELF child-avail-any?} {
+        set __self__ $SELF;
+        TaskManager add-wait-hook [$SELF get-name] ($SELF $SELF {$__self__ child-exited-any?});
+        pause (WAIT 0);
+        TaskManager delete-wait-hook [$SELF get-name];
+        return [$SELF get-child-exit-status-any];
+    };
+    return <nil>;
+};
+
 SysCall method gets (f) {
     __checkEnv;
     TaskManager add-wait-hook [$SELF get-name] ($SELF $f {$f ready?});

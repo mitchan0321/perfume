@@ -91,8 +91,14 @@ TaskManager method dispatch () {
     $SysReq clear;
     if $min-task {
 
+        ### save non task env's current working directory
+        cwd ::= pwd;
+        
         ### dispatch to min task
         $min-task run;
+        
+        ### restore non task env's current working directory
+        cd $cwd;
 
         if {$min-task exit?} {
             #

@@ -28,6 +28,8 @@ Task method init () {
     
     sets ChildList ();
     sets ChildStatus ();
+    
+    sets CWD [pwd];
 };
 
 Task method string () {
@@ -97,10 +99,24 @@ Task method run () {
     };
     sets State R;
     b ::= time-of-day :msec;
+
+    ### unset error indicate variable e
     try {unset e} catch: {};
 
     ### Call task one tick
-    try {sts ::= $Coro next} catch: {| e |};
+    try {
+        ### restore task current working directory
+        cd $CWD;
+        
+        ### dispatch!!!
+        sts ::= $Coro next
+
+    } catch: {| e |
+        ### set error indicate variable e
+    } fin: {
+        ### save task current working directory
+        sets CWD [pwd];
+    };
     
     sets Last [time-of-day :msec];
     $Elapsed ++ [$Last - $b];
@@ -266,6 +282,14 @@ Task method child-avail? (child) {
     return <nil>;
 };
 
+Task method child-avail-any? () {
+    if {$ChildList null?}
+    {
+        return <nil>
+    };
+    return <t>;
+};
+
 Task method child-exited? (child) {
     n := 0;
     $ChildStatus each do: {| i |
@@ -277,6 +301,12 @@ Task method child-exited? (child) {
     return <nil>;
 };
 
+Task method child-exited-any? () {
+    if {$ChildStatus null?} {
+        return <nil>
+    };
+    return <t>;
+};
 #
 # call by Task inside service functions.
 #
@@ -335,6 +365,13 @@ Task method get-child-exit-status (task) {
             $ChildStatus delete! $n;
             result := $p,1;
         };
+    };
+    return $result;
+};
+
+Task method get-child-exit-status-any () {
+    atomic {
+        result ::= $ChildStatus >>;
     };
     return $result;
 };
