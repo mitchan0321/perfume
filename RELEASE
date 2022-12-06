@@ -2845,4 +2845,10 @@
 		Fix Window:: key-event-loop refactaring and brackets-pair occurd some events supress.
 		Change pmacs.conf INTERP_ITIMER_INTERVAL, Linux -> 10, FreeBSD -> 50.
 
+2022/12/06
+	pmacs update:
+		Add SysCall wait-any for wait any child tasks. If waitable tasks are all done
+		  return <nil>.
+		Add task and non task environment current working directory save/restore.
+
 #eof
