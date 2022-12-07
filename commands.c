@@ -4416,6 +4416,20 @@ error:
 }
 
 Toy_Type*
+cmd_disableitimer(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    if (arglen != 0) goto error;
+    if (hash_get_length(nameargs) != 0) goto error;
+
+    interp->itimer_enable = 0;
+
+    return const_T;
+
+error:
+    return new_exception(TE_SYNTAX,
+			 L"Syntax error at 'disable-itimer', syntax: disable-itimer msec", interp);
+}
+
+Toy_Type*
 cmd_atomic(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *body, *result;
 
@@ -4613,7 +4627,8 @@ int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, L"bulk", 	cmd_newbulk, 		L"val-list");
     toy_add_func(interp, L"self-func", 	cmd_selffunc, 		NULL);
     toy_add_func(interp, L"set-itimer",	cmd_setitimer, 		L"msec");
-    toy_add_func(interp, L"enable-itimer",cmd_enableitimer, 	NULL);
+    toy_add_func(interp, L"enable-itimer", cmd_enableitimer, 	NULL);
+    toy_add_func(interp, L"disable-itimer",cmd_disableitimer, 	NULL);
     toy_add_func(interp, L"atomic",	cmd_atomic, 		L"body");
     toy_add_func(interp, L"set-locale",	cmd_setlocale, 		L"locale");
     toy_add_func(interp, L"pid",    	cmd_pid, 		NULL);
