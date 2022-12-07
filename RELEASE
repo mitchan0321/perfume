@@ -2851,4 +2851,10 @@
 		  return <nil>.
 		Add task and non task environment current working directory save/restore.
 
+2022/12/07
+	commands.c
+		Add disable-itimer command for disable interval timer signal no sencitive.
+	pmacs update:
+		Change PipeWrapper.prfm for co-routine set property to disable-itimer.
+
 #eof
