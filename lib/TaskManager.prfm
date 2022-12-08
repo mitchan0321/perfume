@@ -212,6 +212,13 @@ TaskManager method delete-wait-hook (task-name) {
     $WaitHook unset $task-name;
 };
 
+TaskManager method tell-wait-hook (task-name) {
+    [o ::= $WaitHook get $task-name] ?? {return ""};
+    if {$o,1 instance? Task} {return [$o,1 get-name]};
+    if {$o,1 instance? Stream} {return "IO"};
+    return "???";
+};
+
 TaskManager method panic (msg) {
     $Task_stdout puts "";
     $Task_stdout puts $msg;
