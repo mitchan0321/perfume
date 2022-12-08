@@ -2842,20 +2842,19 @@
 		Delete method Stream::clear-queue, to use Stream::clear.
 	pmacs update:
 		Change Tasklet/move-message, if left char width greater equal 2 then delete it and add " ".
-		Fix Window:: key-event-loop refactaring and brackets-pair occurd some events supress.
+		Fix Window::key-event-loop refactaring and brackets-pair occurd some events supress.
 		Change pmacs.conf INTERP_ITIMER_INTERVAL, Linux -> 10, FreeBSD -> 50.
 
 2022/12/06
 	pmacs update:
-		Add SysCall wait-any for wait any child tasks. If waitable tasks are all done
-		  return <nil>.
+		Add SysCall wait-any for wait any child tasks. If waitable tasks are all done return <nil>.
 		Add task and non task environment current working directory save/restore.
 
 2022/12/07
 	commands.c
 		Add disable-itimer command for disable interval timer signal no sencitive.
 	pmacs update:
-		Change PipeWrapper.prfm for co-routine set property to disable-itimer.
+		Change PipeWrapper.prfm for co-routine set property to enable-itimer.
 
 2022/12/08
 	lib/pipe.prfm, PipeWrapper.prfm
