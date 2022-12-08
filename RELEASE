@@ -2857,4 +2857,11 @@
 	pmacs update:
 		Change PipeWrapper.prfm for co-routine set property to disable-itimer.
 
+2022/12/08
+	lib/pipe.prfm, PipeWrapper.prfm
+		Fix if input and output channel jammbed in pipe command, 
+		  do change pause -> pause (SLEEP 0).
+	pmacs update:
+		Add "who" column to ts.prfm command, It's display tasks waiting target.
+
 #eof
