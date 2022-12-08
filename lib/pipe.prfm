@@ -170,12 +170,15 @@ defun pipe-dispatch (blist) {
 	    $b run;
 	
 	    s ::= $b stat?;
-	    if {and [or [eq? $s @READ] [eq? $s @WRITE]] [true? CO-MODE]} then: {pause @WRITE};
+	    if {and [or [eq? $s @READ] [eq? $s @WRITE]] [true? CO-MODE]} then: {
+                pause (SLEEP 0);
+            };
 	    if {eq? $s @READ} then: {
-		if {true? CO-MODE}
-		  {pause}
-		  {retry}
-		;
+		if {true? CO-MODE} {
+                    pause (SLEEP 0);
+                } {
+                    retry;
+                };
 	    };
         };
     };

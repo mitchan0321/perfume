@@ -33,10 +33,11 @@ PipeWrapper method run () {
 	$coro eval {
 	    setvar stdin $in;
 	    setvar stdout $out;
+	    setvar stderr $out;
 	    setvar INFILE $infile;
 	    setvar OUTFILE $outfile;
 	    if {defvar? CO-MODE} else: {defvar CO-MODE <t>};
-	    disable-itimer;
+	    enable-itimer;
 	};
     };
 
