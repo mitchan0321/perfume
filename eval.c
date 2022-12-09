@@ -62,7 +62,9 @@ toy_eval_script(Toy_Interp* interp, Toy_Type *script) {
     SIG_ACTION();
 
     l = script->u.statement_list;
-    if (IS_LIST_NULL(l)) return result;
+    if (IS_LIST_NULL(l)) {
+        l = new_list(new_statement(new_list(new_symbol(L"false")), interp->trace_info->line));
+    }
 
     script_id = interp->script_id;
     if (GET_SCRIPT_ID(script) > 0) {
