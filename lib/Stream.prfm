@@ -99,15 +99,15 @@ Stream method puts-sub (i lnewline) {
     atomic {
         if {sets? shortcut} {
 	    if $lnewline {
-	        sets shortcut [$shortcut append! $i];
-	        $count ++;
+                sets shortcut [$shortcut append! $i];
+                $count ++;
                 sets itemcount 0;
 	    } {
 	        if {string? [$shortcut last : car]} {
 		    $shortcut last : car : append! $i;
 		    $itemcount ++;
 	        } {
-                    sets shortcut [$queue append! ["" . $i]];
+                    sets shortcut [$shortcut append! ["" . $i]];
                     $count ++;
                     sets itemcount 0;
 	        };
@@ -120,7 +120,7 @@ Stream method puts-sub (i lnewline) {
 	    } {
 	        sets shortcut [$queue append! ["" . $i]];
 	        $count ++;
-                sets itemcount 0;
+                sets itemcount 1;
 	    };
         };
     };
