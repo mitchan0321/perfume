@@ -2863,4 +2863,13 @@
 	pmacs update:
 		Add "who" column to ts.prfm command, It's display tasks waiting target.
 
+2022/12/09
+	eval.c
+		Change if eval body is null statement (e.g. {}) execute "false;" statement.
+	lib/Stream.prfm
+		Fix Stream::puts if has shortcut var then use it, if no has shortcut
+		  and has :nonewline option set itemcount initial '1'.
+	pmacs update:
+		Change CombiWindow::display-evaluation call co-routine interpriter execute atomicaly.
+
 #eof
