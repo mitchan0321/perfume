@@ -109,7 +109,7 @@ Stream method puts-sub (i lnewline) {
 	        } {
                     sets shortcut [$shortcut append! ["" . $i]];
                     $count ++;
-                    sets itemcount 0;
+                    sets itemcount 1;
 	        };
 	    };
         } {
