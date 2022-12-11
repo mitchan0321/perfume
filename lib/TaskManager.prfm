@@ -34,6 +34,7 @@ TaskManager method add (task name) {
     $TaskList <<- $task;
     $task set-name $sname;
     in ::= new Stream;
+    $in set-comode;
     $task set-stdio $in $Task_stdout $Task_stdout;
     return $sname;
 };
@@ -215,7 +216,7 @@ TaskManager method delete-wait-hook (task-name) {
 TaskManager method tell-wait-hook (task-name) {
     [o ::= $WaitHook get $task-name] ?? {return ""};
     if {$o,1 instance? Task} {return [$o,1 get-name]};
-    if {$o,1 instance? Stream} {return "IO"};
+    if {string? $o,1} {return $o,1};
     return "???";
 };
 
