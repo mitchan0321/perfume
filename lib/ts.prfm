@@ -1,19 +1,25 @@
 defun ts () {
     wlen := 1;
+    plen := 1;
     TaskManager get-task-list : each do: {| t |
         l ::= "" . [TaskManager tell-wait-hook [$t get-name]] : len;
         if {$l > $wlen} {wlen := $l};
+
+        p ::= $t get-parent;
+        plentmp ::= $p ??? {$p get-name : len} 0;
+        if {$plentmp > $plen} {plen := $plentmp};
     };
 
-    fmt   ::= "%1v %-${wlen}v %6.1f %8.1f %10.1f %10d %v" expand;
-    fmt-h ::= "%1v %-${wlen}v %6v %8v %10v %10v %v" expand;
-    println [$fmt-h fmt "f" "w" "sleep" "total" "elapsed" "tick" "name"];
+    fmt   ::= "%1v %-${wlen}v %-${plen}v %6.1f %8.1f %10.1f %10d %v" expand;
+    fmt-h ::= "%1v %-${wlen}v %-${plen}v %6v %8v %10v %10v %v" expand;
+    println [$fmt-h fmt "f" "w" "p" "sleep" "total" "elapsed" "tick" "name"];
     i := 0;
 
     TaskManager get-task-list : each do: {| t |
         println [$fmt fmt 
                  [$t get-state]
                  [TaskManager tell-wait-hook [$t get-name]]
+                 [[$t get-parent] ??? [$t get-parent : get-name] ""]
                  [$t get-sleep : real : / 1000.0]
                  [$t get-total : real : / 1000.0]
                  [$t get-elapsed : real : / 1000.0]
