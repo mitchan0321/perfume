@@ -1,0 +1,9 @@
+new Task : proc test {
+    t1 ::= SysCall new-task test1 {SysCall exit "test1"} ();
+    t2 ::= SysCall new-task test2 {SysCall sleep 5000; SysCall exit "test2"} ();
+    SysCall sleep 3000;
+    r ::= SysCall wait $t1;
+    println "Parent test1 status: " $r;
+    r ::= SysCall wait $t2;
+    println "Parent test2 status: " $r;
+};
