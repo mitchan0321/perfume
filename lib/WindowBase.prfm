@@ -71,6 +71,10 @@ WindowBase method set-color (*) {
     throw ErrNoMethodImpl ["No Impliment method '" . $@name "::set-color'."];
 };
 
+WindowBase method get-window-size (*) {
+    throw ErrNoMethodImpl ["No Impliment method '" . $@name "::get-window-size'."];
+};
+
 WindowBase method string () {
     return ["<" . [get-window-name] ">"];
 };
