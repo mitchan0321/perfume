@@ -2872,4 +2872,11 @@
 	pmacs update:
 		Change CombiWindow::display-evaluation call co-routine interpriter execute atomicaly.
 
+2022/12/12
+	pmacs update:
+		Change branckets-pair call to background from Window.
+		Add dummy method WindowBase::get-window-size.
+		Change buffer-list mode column size.
+		Add mode 'Console' it's buffer name is '*Console*'.
+
 #eof
