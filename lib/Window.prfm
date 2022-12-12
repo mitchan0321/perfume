@@ -657,9 +657,11 @@ Window method key-event-loop () {
                     cursor-update := <nil>;
                 }
                 <t> {
-                    if {! $MiniInput} {
-                        if {eq? [$window get @name] CombiWindow} {
-                            $window apply-command $main $window <nil> brackets-pair;
+                    $main add-background job-id: "00-BRACKETS" after: 0 {
+                        if {! [$main mini-input?]} {
+                            if {eq? [$window get @name] CombiWindow} {
+                                $window apply-command $main $window <nil> brackets-pair;
+                            };
                         };
                     };
                 }
