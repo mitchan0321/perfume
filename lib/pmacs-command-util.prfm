@@ -788,7 +788,7 @@ defcommand brackets-pair desc: "Highlight pair character if current cursor on pa
                 if {$cc = $cap-inc} {$level ++};
                 if {$level = 0} {
                     find := <t>;
-                    break
+                    break;
                 };
             };
         }
