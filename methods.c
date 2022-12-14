@@ -3775,6 +3775,7 @@ typedef struct _toy_file {
     int ignore_cr;
     int include_cr;
     int enc_error;
+    Toy_Type *tag;
 } Toy_File;
 
 void
@@ -4450,6 +4451,7 @@ mth_file_stat(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     list_append(l, new_cons(new_symbol(L"ignore-cr"), f->ignore_cr ? const_T : const_Nil));
     list_append(l, new_cons(new_symbol(L"include-cr"), f->include_cr ? const_T : const_Nil));
     list_append(l, new_cons(new_symbol(L"encode-error"), f->enc_error ? const_T : const_Nil));
+    list_append(l, new_cons(new_symbol(L"tag"), f->tag ? f->tag : const_Nil));
 
     return l;
 
@@ -4884,6 +4886,55 @@ mth_file_setreadbuffer_max(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs
     
 error:
     return new_exception(TE_SYNTAX, L"Syntax error at 'set-readbuffer-max', syntax: File set-readbuffer-max buffer-sizse(zero is no-limited)", interp);
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
+mth_file_settag(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Hash *self;
+    Toy_Type *container;
+    Toy_File *f;
+    Toy_Type *tag;
+
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    self = SELF_HASH(interp);
+    container = hash_get_t(self, const_Holder);
+    if (NULL == container) goto error2;
+    f = container->u.container.data;
+
+    tag = list_get_item(posargs);
+    f->tag = tag;
+    return tag;
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'set-tag', syntax: File set-tag tag", interp);
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
+mth_file_gettag(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Hash *self;
+    Toy_Type *container;
+    Toy_File *f;
+    Toy_Type *tag;
+
+    if (arglen != 0) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    self = SELF_HASH(interp);
+    container = hash_get_t(self, const_Holder);
+    if (NULL == container) goto error2;
+    f = container->u.container.data;
+
+    tag = f->tag ? f->tag : const_Nil;
+    return tag;
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'get-tag', syntax: File get-tag", interp);
 error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
 }
@@ -6050,6 +6101,8 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, L"File", L"set-input-encoding", 	mth_file_setinputencoding,	L"val");
     toy_add_method(interp, L"File", L"set-output-encoding", 	mth_file_setoutputencoding,	L"val");
     toy_add_method(interp, L"File", L"set-readbuffer-max", 	mth_file_setreadbuffer_max,	L"val");
+    toy_add_method(interp, L"File", L"set-tag", 	mth_file_settag,	L"val");
+    toy_add_method(interp, L"File", L"get-tag", 	mth_file_gettag,	NULL);
 
     toy_add_method(interp, L"Block", L"eval", 		mth_block_eval, 	NULL);
 
