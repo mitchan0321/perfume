@@ -38,6 +38,7 @@ Stream method init (args: a) {
     sets newline <nil>;
     sets itemlimit 512;
     sets itemcount 0;
+    sets tag <nil>;
 };
 
 Stream method eof? () {
@@ -192,7 +193,7 @@ Stream method stat () {
 	    (fd . <nil>) (mode . io) (path . $name) (eof . $eof)
 	    (limit . $limit) (count . $count) (newline . $newline)
 	    (itemlimit . $itemlimit) (itemcount . $itemcount)
-            (comode . $co)
+            (comode . $co) (tag . $tag)
 	   );
 };
 
@@ -235,4 +236,12 @@ Stream method string () {
 Stream method set-newline (m) {
     sets newline $m;
     return $m;
+};
+
+Stream method set-tag (t) {
+    sets tag $t;
+};
+
+Stream method get-tag () {
+    return $tag;
 };
