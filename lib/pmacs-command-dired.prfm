@@ -501,3 +501,27 @@ defcommand dired-make-dir desc: "Make directory on dired buffer." {
     };
     return ALL;
 };
+
+defcommand dired-copy-link desc: "Copy file path to copy buffer." {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    r ::= $buff get-buffer-line $ey;
+    if $r {
+        l ::= $r split sep: "|";
+        if {[$l len] >= 2} {
+            name ::= $l get 1;
+            path ::= $buff get-path;
+            path ::= $path ?? [pwd];
+            if {$path = "/"} {
+                path ::= path-adjust ["/" . $name];
+            } {
+                path ::= path-adjust [$path . "/" $name];
+            };
+            $window set-copy-buffer ["\"" . $path "\""];
+            show-message "Copied.";
+        };
+    };
+    return ALL;
+};
