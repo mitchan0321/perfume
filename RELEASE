@@ -2885,4 +2885,8 @@
 	lib/Stream.prfm
 		Add Stream::set-tag and Stream::get-tag for object identify from application.
 
+2022/12/15
+	pmacs update:
+		Add dired-copy-link command and bind to 'p' key in dired mode.
+
 #eof
