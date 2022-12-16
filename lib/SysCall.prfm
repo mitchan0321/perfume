@@ -59,10 +59,20 @@ SysCall method wait-any () {
 
 SysCall method gets (f) {
     __checkEnv;
-    TaskManager add-wait-hook [$SELF get-name] ($SELF "Q>" {$f ready?});
-    r ::= $f gets;
-    TaskManager delete-wait-hook [$SELF get-name];
-    return $r;
+    case [$f get-tag]
+    STDIN {
+        TaskManager add-wait-hook [$SELF get-name] ($SELF "C>" {TaskManager stdin-ready?});
+        r ::= $f gets;
+        TaskManager delete-wait-hook [$SELF get-name];
+        return $r;
+    }
+    default: {
+        TaskManager add-wait-hook [$SELF get-name] ($SELF "Q>" {$f ready?});
+        r ::= $f gets;
+        TaskManager delete-wait-hook [$SELF get-name];
+        return $r;
+    }
+    ;;
 };
 
 SysCall method puts (f r) {
