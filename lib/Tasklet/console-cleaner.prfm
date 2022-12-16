@@ -1,7 +1,11 @@
 new Task : proc console-cleaner {
     loop do: {
         SysCall sleep 10000;
-        buffer-clean "*Console*";
+        try {
+            buffer-clean "*Console*";
+        } catch: {
+            BufferManager regist-buffer [TaskManager var? Task_stdout : var? Buffer] "*Console*";
+        };
     };
 };
 
