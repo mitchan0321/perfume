@@ -11,9 +11,13 @@ TaskManager method init () {
     
     sets Task_stdout [new EditStream];
     $Task_stdout open "*Console*";
-    
+
+    sets Task_stdin [new Stream];
+    $Task_stdin set-nolimit;
+
     sets SysReq [new Stream];
     sets WaitHook [dict ()];
+    
 };
 
 TaskManager method add (task name) {
@@ -35,6 +39,7 @@ TaskManager method add (task name) {
     $task set-name $sname;
     in ::= new Stream;
     $in set-comode;
+    $in set-tag STDIN;
     $task set-stdio $in $Task_stdout $Task_stdout;
     return $sname;
 };
@@ -90,13 +95,16 @@ TaskManager method dispatch () {
     #
     result := <nil>;
     $SysReq clear;
+
     if $min-task {
 
         ### save non task env's current working directory
         cwd ::= pwd;
         
         ### dispatch to min task
+        $Task_stdin close;
         $min-task run;
+        $Task_stdin clear-eof;
         
         ### restore non task env's current working directory
         cd $cwd;
@@ -196,6 +204,11 @@ TaskManager method force-wait-task () {
             if {yield $checker-block} {
                 ### task state W -> S
                 $task set-sleep;
+                if {$target = "C>"} {
+                    ### delivery common standard in to task standard in.
+                    r ::= $Task_stdin gets;
+                    $task delivery-stdin $r;
+                };
             };
         }
         catch: {| e |
@@ -220,8 +233,19 @@ TaskManager method tell-wait-hook (task-name) {
     return "???";
 };
 
+TaskManager method send-to-task (msg) {
+    $Task_stdin puts $msg;
+};
+
+TaskManager method recv-from-stdin () {
+    return [$Task_stdin gets];
+};
+
+TaskManager method stdin-ready? () {
+    return [$Task_stdin ready?];
+};
+
 TaskManager method panic (msg) {
     $Task_stdout puts "";
     $Task_stdout puts $msg;
 };
-
