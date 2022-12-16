@@ -47,7 +47,12 @@ Stream method eof? () {
 };
 
 Stream method close () {
+    sets itemcount 0;
     sets eof <t>;
+};
+
+Stream method clear-eof () {
+    sets eof <nil>;
 };
 
 Stream method clear () {
