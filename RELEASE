@@ -2889,4 +2889,14 @@
 	pmacs update:
 		Add dired-copy-link command and bind to 'p' key in dired mode.
 
+2022/12/16
+	lib/Stream.prfm
+		Add Stream::clear-eof only eof flag to clear.
+		Fix Stream::close to itemcount reset.
+	pmacs update:
+		Add SysCall::gets if file has tag name STDIN hook for wait std-input.
+		Add Task::delivery-stdin for input stream delivery to task's stdin.
+		Add TaskManager::force-wait-task delivery stdin data to task if task is wait from stdin data.
+		Add TaskManager::send-to-task, recv-from-stdin, stdin-ready? for delivery stdin data.
+
 #eof
