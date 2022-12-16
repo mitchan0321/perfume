@@ -78,6 +78,10 @@ Task method set-stdio (in out err) {
     };
 };
 
+Task method delivery-stdin (r) {
+    $__stdin puts $r;
+};
+
 Task method release () {
     if $Coro {$Coro release};
 };
