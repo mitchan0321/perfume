@@ -17,7 +17,6 @@ TaskManager method init () {
 
     sets SysReq [new Stream];
     sets WaitHook [dict ()];
-    
 };
 
 TaskManager method add (task name) {
