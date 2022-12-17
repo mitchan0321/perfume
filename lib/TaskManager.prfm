@@ -13,7 +13,7 @@ TaskManager method init () {
     $Task_stdout open "*Console*";
 
     sets Task_stdin [new Stream];
-    $Task_stdin set-nolimit;
+    $Task_stdin set-limit 1024;
 
     sets SysReq [new Stream];
     sets WaitHook [dict ()];
@@ -204,11 +204,6 @@ TaskManager method force-wait-task () {
             if {yield $checker-block} {
                 ### task state W -> S
                 $task set-sleep;
-                if {$target = "C>"} {
-                    ### delivery common standard in to task standard in.
-                    r ::= $Task_stdin gets;
-                    $task delivery-stdin $r;
-                };
             };
         }
         catch: {| e |
