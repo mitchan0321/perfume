@@ -61,7 +61,17 @@ SysCall method gets (f) {
     __checkEnv;
     case [$f get-tag]
     STDIN {
-        TaskManager add-wait-hook [$SELF get-name] ($SELF "C>" {TaskManager stdin-ready?});
+        set __self__ $SELF;
+        TaskManager add-wait-hook [$SELF get-name] ($SELF "C>" {
+            if {TaskManager stdin-ready?} {
+                ### delivery common standard in to task standard in.
+                r ::= TaskManager recv-from-stdin;
+                $__self__ delivery-stdin $r;
+                result <t>;
+            } {
+                result <nil>;
+            };
+        });
         r ::= $f gets;
         TaskManager delete-wait-hook [$SELF get-name];
         return $r;
