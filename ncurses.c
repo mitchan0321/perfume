@@ -1096,7 +1096,7 @@ valid_return:
     if (cur_in != -1) {
         time_prev = time_now;
         time_now = get_now_time();
-        if ((time_now - time_prev) < 0.1) {
+        if ((time_now - time_prev) < 0.2) {
             time_on_repeat += (time_now - time_prev);
             on_repeat = 1;
         } else {
