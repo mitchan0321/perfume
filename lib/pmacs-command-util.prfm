@@ -310,13 +310,13 @@ defcommand set-theme desc: "Set theme you specified." {
         prompt: "Theme: "
         enter-proc: {| value |
             t := $THEME;
-            setvar THEME $value;
+            setconf THEME [symbol $value];
             try {
                 init-color-DB;
                 $window apply-command $main $window "" refresh-screen;
             } catch: {| e |
                 show-message :bell [$e cdr];
-                setvar THEME $t;
+                setconf THEME $t;
             };
             return ALL;
         }
@@ -355,21 +355,15 @@ defcommand set-line-limit desc: "Set *Scratch* buffer window max line length. if
             };
             if [$value numeric?] else: {
                 if {eq? "auto" $value} {
-                    if {defvar? INTERP_LIMIT_LEN} {
-                        setvar INTERP_LIMIT_LEN $value;
-                    } {
-                        defvar INTERP_LIMIT_LEN $value;
-                    };
+                    unsetconf INTERP_LIMIT_LEN;
+                    setconf INTERP_LIMIT_LEN $value;
                 } {
                     show-message "Enter line length limit.";
                 };
                 return ALL;
             };
-            if {defvar? INTERP_LIMIT_LEN} {
-                setvar INTERP_LIMIT_LEN [$value int];
-            } {
-                defvar INTERP_LIMIT_LEN [$value int];
-            };
+            unsetconf INTERP_LIMIT_LEN;
+            setconf INTERP_LIMIT_LEN [$value int];
             return ALL;
         }
     ;;
@@ -646,11 +640,7 @@ defcommand set-tab-width desc: "Set TAB width globally. Default is 8." {
                 show-message :bell "Illegal TAB number specified.";
                 return ALL;
             };
-            if {defvar? DEFAULT_TAB_WIDTH} {
-                setvar DEFAULT_TAB_WIDTH $tab;
-            } {
-                defvar DEFAULT_TAB_WIDTH $tab;
-            };
+            setconf DEFAULT_TAB_WIDTH $tab;
             show-message ["Set TAB width to " . $tab "."];
             return ALL;
         }
@@ -799,3 +789,136 @@ defcommand brackets-pair desc: "Highlight pair character if current cursor on pa
     };
     return SELF;
 };
+
+defcommand list-config desc: "Display configuration list." {
+    | main window |
+    BufferManager unregist-buffer "*Config List*";
+    buff ::= new EditBuffer;
+    $buff load-content "config list" :init-only buffer-name: "*Config List*";
+    $buff set-content [$DEFAULT_PWIKI_DIR . "/"];
+    $buff clear-all;
+
+    kmax ::= $CONFIG keys :string : map {| i | $i len} : max;
+    
+    $buff append-string "<<< Configuration list >>>";
+    $buff append-string [["%-${kmax}v %-16v %-2v %-7v %-v" expand] fmt "Key" "Value" "RO" "Type" "Description"];
+    $buff append-string [["%-${kmax}v %-16v %-2v %-7v %-v" expand] fmt ["-" repeat $kmax] ["-" repeat 16] ["-" repeat 2] ["-" repeat 7] ["-" repeat 11]];
+
+    msort [$CONFIG keys :string] : each do: {| i |
+        $buff append-string [["%-${kmax}v %!-16v %-2v %-7v %-v" expand] fmt
+            $i
+            $CONFIG,$i
+            [$CONFIG_RO,$i ??? "RO" ""]
+            $CONFIG_TYPE,$i
+            [$CONFIG_DESC,$i ?? ""]
+        ]
+        ;;
+    };
+    $buff no-modify;
+    $buff set-protect;
+    $main bind-buffer [$window get-window-name] $buff;
+    
+    result SELF;
+};
+
+defcommand set-config desc: "Set configuration value." {
+    | main window |
+
+    set _index -1;
+    set _list [msort [$CONFIG keys :string]];
+
+    mini-input-until-enter $main $window
+        prompt: "Config name: "
+        completion-proc: {| value |
+            if {[$_list len] = 0} {
+                $MainWindow set-mini-input-prompt "Config name (no match completion): ";
+                return ALL;
+            };
+            setc _index [$_index +  1];
+            if {$_index >= [$_list len] } {
+                setc _index 0;
+            };
+            str ::= $_list get $_index;
+            $MainWindow set-mini-input-prompt ["Config name (" . [$_list len] " match(es) completion): "];
+            $main mini-input-value-override $str [$str len];
+            return ALL;
+        }
+        completion-back-proc: {| value |
+            if {[$_list len] = 0} {
+                $MainWindow set-mini-input-prompt "Config name (no match completion): ";
+                return ALL;
+            };
+            setc _index [$_index -  1];
+            if {$_index < 0} {
+                setc _index [$_list len : - 1];
+            };
+            str ::= $_list get $_index;
+            $MainWindow set-mini-input-prompt ["Config name (" . [$_list len] " match(es) completion): "];
+            $main mini-input-value-override $str [$str len];
+            return ALL;
+        }
+        edit-proc: {| value |
+            try {
+                if {$value = ""} {
+                    setc _list [msort [$CONFIG keys :string]];
+                } {
+                    setc _list [msort [$CONFIG keys :string] : filter {| n | $n =~ :text :nocase [$value rquote]}];
+                };
+            } catch: {
+                setc _list ();
+            };
+            setc _index -1;
+            if {[$_list len] > 0} {
+                $MainWindow set-mini-input-prompt ["Config name (" . [$_list len] " match(es) completion): "];
+                if {[$_list len] = 1} {
+                    setc _index 0;
+                };
+            } {
+                $MainWindow set-mini-input-prompt "Config name (no match completion): ";
+            };
+            return ALL;
+        }
+        enter-proc: {| value |
+            if {or {[$_list len] = 0} {$_index < 0}} {
+                show-message :bell "No config name specified.";
+                return ALL;
+            };
+            conf-name ::= $_list get $_index;
+            mini-input-until-enter $main $window
+                prompt: ["Config name [" . $conf-name "] value: "]
+                init-value: ["" . $CONFIG,$conf-name]
+                index: [["" . $CONFIG,$conf-name] len]
+                enter-proc: {| value |
+                    if {eq? SYMBOL $CONFIG_TYPE,$conf-name} {
+                        result ::= symbol $value;
+                    } {
+                        case $CONFIG_TYPE,$conf-name
+                            INTEGER {t := int}
+                            REAL    {t := real}
+                            BOOL    {t := bool}
+                            STRING  {t := string}
+                            RQUOTE  {t := rquote}
+                            LIST    {t := list}
+                            DICT    {t := dict}
+                            VECTOR  {t := vector}
+                            default: {t := string}
+                        ;;
+                        result ::= $value $t;
+                    };
+                    try {
+                        setconf [symbol $conf-name] $result;
+                    } catch: {| e |
+                        show-message :bell ["Error at setconf, <" . $e,0 "># " $e,1];
+                        return ALL;
+                    };
+                    show-message ["Set config " . $conf-name " to " $result];
+                    return ALL;
+                }
+            ;;
+            return ALL;
+        }
+    ;;
+    
+    return ALL;
+};
+

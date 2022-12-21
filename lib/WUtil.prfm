@@ -1,6 +1,16 @@
 class WUtil;
 
 WUtil method init () {
+    # init config DB
+    undef CONFIG;
+    undef CONFIG_DESC;
+    undef CONFIG_TYPE;
+    undef CONFIG_RO;
+    defvar CONFIG [dict];
+    defvar CONFIG_DESC [dict];
+    defvar CONFIG_TYPE [dict];
+    defvar CONFIG_RO [dict];
+    
     init-config;
     init-command-DB;
 
@@ -963,9 +973,13 @@ defun read-user-conf-file (conf-name) {
         } catch: {
             | e |
             message ::= "User configuration file (" . $path ") has error, <" [$e car] "># " [$e cdr];
-            $MainWindow add-background after: 100 {
-                show-message :bell $message;
-                result ALL;
+            try {
+                $MainWindow add-background after: 100 {
+                    show-message :bell $message;
+                    result ALL;
+                };
+            } catch: {
+                throw $e;
             };
         };
     };
@@ -1094,4 +1108,40 @@ defun get-path-condition (path) {
         "s" {return (SPECIAL $path [$path . " is special file (socket)."])}
         default: {return (SPECIAL $path [$path . " is unknown type file."])}
     ;;
+};
+
+defun setconf (key value ro: read-only desc: description) {
+    if {$CONFIG_RO get $key} {
+        throw ErrConfig ["Configuration key '" . $key "' is read only."];
+    };
+
+    t ::= $CONFIG_TYPE get $key;
+    if $t {
+        if {! [eq? [type? $value] $t]} {
+            throw ErrConfig ["Configuration key '" . $key "' type mismatch."];
+        };
+    } {
+        $CONFIG_TYPE set $key [type? $value];
+    };
+    
+    if {true? description} {
+        $CONFIG_DESC set $key $description;
+    };
+    $CONFIG set $key $value;
+    undef $key;
+    defvar $key $value;
+
+    if {true? read-only} {
+        $CONFIG_RO set $key <t>;
+        return [$CONFIG get $key];
+    };
+    
+    return $value;
+};
+
+defun unsetconf (key) {
+    $CONFIG unset $key;
+    $CONFIG_RO unset $key;
+    $CONFIG_TYPE unset $key;
+    $CONFIG_DESC unset $key;
 };

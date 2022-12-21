@@ -91,8 +91,8 @@ defcommand flash desc: "Flash screen and beep occurs." {
 
 defcommand window-split-ratio-reset desc: "Reset the window divisions ratio." {
     | main window |
-    setvar VERTICAL_DIV_RATIO 1.0;
-    setvar HORIZONTAL_DIV_RATIO 1.0;
+    setconf VERTICAL_DIV_RATIO 1.0;
+    setconf HORIZONTAL_DIV_RATIO 1.0;
     $main refresh-screen;
     result ALL;
 };
@@ -100,7 +100,7 @@ defcommand window-split-ratio-reset desc: "Reset the window divisions ratio." {
 defcommand window-grow-right desc: "Grow right side window." {
     | main window |
     if {$VERTICAL_DIV_RATIO > $DIV_RATIO_MIN} {
-        setvar VERTICAL_DIV_RATIO [$VERTICAL_DIV_RATIO - $DIV_RATIO_RES];
+        setconf VERTICAL_DIV_RATIO [$VERTICAL_DIV_RATIO - $DIV_RATIO_RES];
         $main refresh-screen;
     };
     result ALL;
@@ -109,7 +109,7 @@ defcommand window-grow-right desc: "Grow right side window." {
 defcommand window-grow-left desc: "Grow left side window." {
     | main window |
     if {$VERTICAL_DIV_RATIO < $DIV_RATIO_MAX} {
-        setvar VERTICAL_DIV_RATIO [$VERTICAL_DIV_RATIO + $DIV_RATIO_RES];
+        setconf VERTICAL_DIV_RATIO [$VERTICAL_DIV_RATIO + $DIV_RATIO_RES];
         $main refresh-screen;
     };
     result ALL;
@@ -118,7 +118,7 @@ defcommand window-grow-left desc: "Grow left side window." {
 defcommand window-grow-lower desc: "Grow lower side window." {
     | main window |
     if {$HORIZONTAL_DIV_RATIO > $DIV_RATIO_MIN} {
-        setvar HORIZONTAL_DIV_RATIO [$HORIZONTAL_DIV_RATIO - $DIV_RATIO_RES];
+        setconf HORIZONTAL_DIV_RATIO [$HORIZONTAL_DIV_RATIO - $DIV_RATIO_RES];
         $main refresh-screen;
     };
     result ALL;
@@ -127,7 +127,7 @@ defcommand window-grow-lower desc: "Grow lower side window." {
 defcommand window-grow-upper desc: "Grow upper side window." {
     | main window |
     if {$HORIZONTAL_DIV_RATIO < $DIV_RATIO_MAX} {
-        setvar HORIZONTAL_DIV_RATIO [$HORIZONTAL_DIV_RATIO + $DIV_RATIO_RES];
+        setconf HORIZONTAL_DIV_RATIO [$HORIZONTAL_DIV_RATIO + $DIV_RATIO_RES];
         $main refresh-screen;
     };
     result ALL;

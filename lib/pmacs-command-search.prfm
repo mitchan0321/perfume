@@ -131,8 +131,8 @@ defun search-sub (main window dir) {
             };
             if {eq? $in-key CTRL_T} {
                 case $SEARCH_MODE
-                    regex {setvar SEARCH_MODE text}
-                    text  {setvar SEARCH_MODE regex}
+                    regex {setconf SEARCH_MODE text}
+                    text  {setconf SEARCH_MODE regex}
                 ;;
                 $MainWindow set-mini-input-prompt [search-prompt $dir $SEARCH_MODE];
                 $window reset-search;
