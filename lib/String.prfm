@@ -31,7 +31,10 @@ String method exp10 ()  {[[self] real]   exp10   };
 String method exp   ()  {[[self] real]   exp     };
 String method log10 ()  {[[self] real]   log10   };
 String method log   ()  {[[self] real]   log     };
-
+String method bool  ()  {if {[self] = "<nil>"} <nil> <t>};
+String method list  ()  {"result " . [self] : eval};
+String method dict  ()  {"result " . [self] : eval};
+String method vector()  {"result " . [self] : eval};
 #
 # String::expand
 #   Expand and replace value into string.
