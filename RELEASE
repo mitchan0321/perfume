@@ -2899,4 +2899,17 @@
 		Add TaskManager::force-wait-task delivery stdin data to task if task is wait from stdin data.
 		Add TaskManager::send-to-task, recv-from-stdin, stdin-ready? for delivery stdin data.
 
+2022/12/21
+	lib/String.prfm
+		Add method bool, list, dict and vector for string constracted data structure convert
+		  to native data.
+	pmacs update:
+		Add pmacs config database management.
+		  WUtil.prfm: add setconf and unsetconf function for config database operation.
+		  pmacs-command-util.prfm: add editor command list-config and set-config.
+		    list-config is show all configuration settings.
+		    set-config is change the configuration setting.
+		  pmacs.conf: use setconf utility and discard use defvar command.
+		Add error handle in pmacs.conf when read the user config pmacs.conf.
+
 #eof
