@@ -1,3 +1,4 @@
+2022/12/23	PRFM_20221223_K34	1.7.0
 2022/10/25	PRFM_20221025		1.6.3
 2022/10/06	PRFM_20221006		1.6.2
 2022/09/10	PRFM_20220910		1.6.1
@@ -2911,5 +2912,10 @@
 		    set-config is change the configuration setting.
 		  pmacs.conf: use setconf utility and discard use defvar command.
 		Add error handle in pmacs.conf when read the user config pmacs.conf.
+
+2022/12/23
+	tag:
+		PRFM_20221223_K34
+		1.7.0
 
 #eof
