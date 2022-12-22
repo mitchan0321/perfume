@@ -807,7 +807,7 @@ defcommand list-config desc: "Display configuration list." {
     msort [$CONFIG keys :string] : each do: {| i |
         $buff append-string [["%-${kmax}v %!-16v %-2v %-7v %-v" expand] fmt
             $i
-            $CONFIG,$i
+            [setvar [symbol $i]]
             [$CONFIG_RO,$i ??? "RO" ""]
             $CONFIG_TYPE,$i
             [$CONFIG_DESC,$i ?? ""]
@@ -886,8 +886,8 @@ defcommand set-config desc: "Set configuration value." {
             conf-name ::= $_list get $_index;
             mini-input-until-enter $main $window
                 prompt: ["Config name [" . $conf-name "] value: "]
-                init-value: ["" . $CONFIG,$conf-name]
-                index: [["" . $CONFIG,$conf-name] len]
+                init-value: ["" . [setvar [symbol $conf-name]]]
+                index: [["" . [setvar [symbol $conf-name]]] len]
                 enter-proc: {| value |
                     if {eq? SYMBOL $CONFIG_TYPE,$conf-name} {
                         result ::= symbol $value;
