@@ -5,7 +5,7 @@ Task method init () {
     sets Coro <nil>;
     sets Last 0;
     sets Sleep 0;
-    sets Since 0;
+    sets Since [time-of-day :msec];
     sets Elapsed 0;
     sets Tick 0;
     sets ExitStatus 0;
@@ -30,6 +30,12 @@ Task method init () {
     sets ChildStatus ();
     
     sets CWD [pwd];
+    
+    sets __stdin <nil>;
+    sets __stdout <nil>;
+    sets __stderr <nil>;
+    
+    sets TerminateProc <nil>;
 };
 
 Task method string () {
@@ -60,7 +66,7 @@ Task method proc (name body args: arg) {
         sets Since [time-of-day :msec];
         return $Name;
     } catch: {| e |
-        release;
+        terminate;
         throw $e;
     };
 };
@@ -68,9 +74,9 @@ Task method proc (name body args: arg) {
 Task method set-stdio (in out err) {
     $Coro ?? {return};
 
-    sets __stdin $in;
-    sets __stdout $out;
-    sets __stderr $err;
+    if $in  {sets __stdin $in};
+    if $out {sets __stdout $out};
+    if $err {sets __stderr $err};
     $Coro eval {
         setvar stdin $__stdin;
         setvar stdout $__stdout;
@@ -78,12 +84,24 @@ Task method set-stdio (in out err) {
     };
 };
 
-Task method delivery-stdin (r) {
-    $__stdin puts $r;
+Task method get-stdio () {
+    return ($__stdin $__stdout $__stderr);
 };
 
-Task method release () {
-    if $Coro {$Coro release};
+Task method set-stdin (in) {
+    sets __stdin $in;
+};
+
+Task method set-stdout (out) {
+    sets __stdout $out;
+};
+
+Task method set-stderr (err) {
+    sets __stderr $err;
+};
+
+Task method delivery-stdin (r) {
+    $__stdin puts $r;
 };
 
 Task method time-elapsed (msec) {
@@ -98,7 +116,7 @@ Task method run () {
 	# Zap from other process.
         sets State X;
 	sets ExitStatus (ZAP 0);
-        release;
+        terminate;
 	return;
     };
     sets State R;
@@ -130,7 +148,7 @@ Task method run () {
     if {set? e} {
         sets State X;
         sets ExitStatus (ERROR $e);
-        release;
+        terminate;
         return;
     };
     if {intr? $sts} {
@@ -140,7 +158,7 @@ Task method run () {
     if {eq? [$Coro stat] DONE} {
         sets State X;
         sets ExitStatus (NORMAL 0);
-        release;
+        terminate;
         return;
     };
 
@@ -153,7 +171,7 @@ Task method run () {
         EXIT {
             sets State X;
             sets ExitStatus (NORMAL [$sts get 1]);
-            release;
+            terminate;
         }
         WAIT {
             sets State W;
@@ -378,4 +396,18 @@ Task method get-child-exit-status-any () {
         result ::= $ChildStatus >>;
     };
     return $result;
+};
+
+Task method set-terminate-proc (proc) {
+    sets TerminateProc $proc;
+};
+
+Task method terminate () {
+    try {
+        if $Coro {$Coro release};
+    } catch: {};
+
+    if $TerminateProc {
+        SysCall apply-editor $TerminateProc;
+    };
 };
