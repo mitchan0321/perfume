@@ -15,6 +15,10 @@ EditStream method open (name) {
     return $Buffer;
 };
 
+EditStream method get-buffer () {
+    return $Buffer;
+};
+
 EditStream method eof? () {
     $Buffer ?? {return <t>};
     
