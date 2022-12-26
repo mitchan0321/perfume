@@ -2918,4 +2918,14 @@
 		PRFM_20221223_K34
 		1.7.0
 
+2022/12/26
+	pmacs update:
+		Add EditStream::get-buffer method.
+		Add Task Since instance set initialize now time.
+		Change Task::release to Task::terminate and exec terminate proc in terminate method.
+		Add Task::{set-stdin,set-stdout,set-stdrrr} for Task driver utility API.
+		Add Task::set-terminate-proc for Task driver utility API.
+		Change Task::set-stdio if set to <nil> in in, out, error parameter, do not set instance variable.
+		Change editor command grep implimentation use Task system.
+
 #eof
