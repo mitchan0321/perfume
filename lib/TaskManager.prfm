@@ -39,7 +39,12 @@ TaskManager method add (task name) {
     in ::= new Stream;
     $in set-comode;
     $in set-tag STDIN;
-    $task set-stdio $in $Task_stdout $Task_stdout;
+    (__in __out __err) ::= $task get-stdio;
+    call $task (set-stdio 
+                [$__in ??? <nil> $in] 
+                [$__out ??? <nil> $Task_stdout] 
+                [$__err ??? <nil> $Task_stdout]
+    );
     return $sname;
 };
 
@@ -161,6 +166,7 @@ TaskManager method enqueue (msg) {
 TaskManager method apply-syscalls () {
     while {! [$SysReq eof?]} do: {
         r ::= $SysReq gets;
+        ### $Task_stdout puts "*** " $r;
         case $r,0
         APPLY_EDITOR {
             (syscall body task) := $r;
@@ -182,7 +188,7 @@ TaskManager method apply-syscalls () {
                 call $t [(proc $name $body) concat $args];
             } catch: {| e |
                 $task add-request-stat (ERROR $e);
-                $task release;
+                $task terminate;
                 $task set-exit;
             };
         }
