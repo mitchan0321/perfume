@@ -618,11 +618,10 @@ Window method key-event-loop () {
                 if {TaskManager dispatch} {
                     $main apply {render-all; refresh};
                 };
-            }
-            catch: {| e |
+            } catch: {| e |
                 TaskManager panic ["Error at TaskManager::dispatch: " . $e];
                 show-message :bell "Error at TaskManager::dispatch, see *Console* buffer.";
-            };        
+            };
 	    continue;
 	};
         
