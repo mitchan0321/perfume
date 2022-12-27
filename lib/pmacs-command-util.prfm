@@ -406,8 +406,15 @@ defcommand set-nodos desc: "Unset DOS line mode (aka set UNIX line mode) to curr
 defcommand compile desc: "Run compile command and output result to *Grep* buffer." {
     | main window |
     
+    if {defvar? COMPILE_COMMAND_DIR} {
+        dir := $COMPILE_COMMAND_DIR;
+    } {
+        dir := [pwd : . "/"];
+        defvar COMPILE_COMMAND_DIR $dir;
+    };
+
     mini-input-file-chooser $main $window
-        init-value: [pwd : . "/"]
+        init-value: $dir
         prompt: "Directory: "
         enter-proc: {| value |
             if {[$value len] = 0} {
@@ -415,59 +422,30 @@ defcommand compile desc: "Run compile command and output result to *Grep* buffer
                 return ALL;
             };
             directory := $value;
+            setvar COMPILE_COMMAND_DIR $directory;
             if {file dir? $directory} else: {
                 show-message :bell ["Not directory: " . $directory];
                 return ALL;
             };
 
+            if {defvar? COMPILE_COMMAND} {
+                command := $COMPILE_COMMAND;
+            } {
+                command := "make -j -f Makefile ";
+                defvar COMPILE_COMMAND $command;
+            };
             mini-input-until-enter $main $window
-                init-value: "make -f Makefile "
+                init-value: $command
+                index: [$command len]
                 prompt: "Compile: "
-                index: 17
                 enter-proc: {| value |
                     if {[$value len] = 0} {
                         show-message :bell "No compile command specified.";
                         return ALL;
                     };
-                    cmd := $value;
+                    setvar COMPILE_COMMAND $value;
                     
-                    ###
-                    ### do compile
-                    ###
-                    cd $directory;
-                    fout ::= new Stream;
-                    ### sts ::= {exec "/bin/sh" "-c" $cmd} redirect-out $fout $fout;
-                    sts := 0;
-                    try {
-                        pipe out: $fout {exec :err-to-stdout "/bin/sh" "-c" $cmd};
-                    } catch: {| e |
-                        sts ::= "<" . [$e car] "> #" [$e cdr];
-                    };
-                    $fout close;
-                    buff ::= new EditBuffer;
-                    BufferManager unregist-buffer "*Grep*";
-                    (result err) ::= $buff load-content  :init-only "grep buffer" buffer-name: "*Grep*";
-                    $buff clear-all;
-                    $buff append-string ["CWD:  " . $directory];
-                    $buff append-string ["EXEC: " . $cmd];
-                    $buff append-string "";
-                    $fout each do: {| r |
-                        $buff append-string $r;
-                    };
-                    fout := <nil>;
-                    $buff append-string "";
-                    $buff append-string ["exit(" . $sts ")"];
-                    
-                    w1 ::= $main get-window-by-name "Window#1";
-                    if $w1 else: {
-                        $main create-split-vertical-window;
-                    };
-                    $main bind-buffer "Window#1" $buff;
-                    window ::= $main get-window-by-name "Window#1";
-                    geom ::= $window get-geom;
-                    $geom set! ViewLine 0;
-                    $geom set! ViewColumn 0;
-                    $window cursor-move-to $geom 0 0;
+                    do-command-async $window "*Grep*" $directory $value;
                     return ALL;
                 }
             ;;
@@ -476,6 +454,47 @@ defcommand compile desc: "Run compile command and output result to *Grep* buffer
     ;;
     
     result All;
+};
+
+defun do-command-async (window buff-name directory command) {
+    BufferManager unregist-buffer $buff-name;
+    grep-buff ::= new EditStream;
+    $grep-buff open $buff-name;
+    $grep-buff get-buffer : set-content $directory;
+    $grep-buff puts ["CWD:  " . $directory];
+    $grep-buff puts ["EXEC: " . $command];
+    $grep-buff puts "";
+    $main bind-buffer "Window#1" [$grep-buff get-buffer];
+    w1 ::= $main get-window-by-name "Window#1";
+    if $w1 else: {
+        $main create-split-vertical-window;
+    };
+    window ::= $main get-window-by-name "Window#1";
+    
+    task ::= new Task;
+    $task set-stdout $grep-buff;
+    $task set-stderr $grep-buff;
+    
+    ###
+    ### do command
+    ###
+    $task proc compile {
+        (window buff cmd directory) := $ARGS;
+        cd $directory;
+        sts ::= exec sh -c $cmd;
+        println "";
+        println "exit(" $sts ")";
+        
+        geom ::= $window get-geom;
+        $geom set! ViewLine 0;
+        $geom set! ViewColumn 0;
+        $window cursor-move-to $geom 0 0;
+        $buff set-protect;
+        $buff no-modify;
+        
+    } $window [$grep-buff get-buffer] $command $directory;
+
+    return;
 };
 
 defun get-shell () {

@@ -365,40 +365,8 @@ defcommand grep desc: "Run grep on the entered text." {
                         show-message :bell "No grep command line specified.";
                         return ALL;
                     };
-                    BufferManager unregist-buffer "*Grep*";
-                    grep-buff ::= new EditStream;
-                    $grep-buff open "*Grep*";
-                    $grep-buff get-buffer : set-content $dir;
-                    $grep-buff puts ["CWD:  " . $directory];
-                    $grep-buff puts ["EXEC: " . $value];
-                    $grep-buff puts "";
-                    $main bind-buffer "Window#1" [$grep-buff get-buffer];
-                    w1 ::= $main get-window-by-name "Window#1";
-                    if $w1 else: {
-                        $main create-split-vertical-window;
-                    };
-                    window ::= $main get-window-by-name "Window#1";
 
-                    task ::= new Task;
-                    $task set-stdout $grep-buff;
-                    $task set-terminate-proc {
-                        geom ::= $window get-geom;
-                        $geom set! ViewLine 0;
-                        $geom set! ViewColumn 0;
-                        $window cursor-move-to $geom 0 0;
-                        buff ::= $grep-buff get-buffer;
-                        $buff set-protect;
-                        $buff no-modify;
-                    };
-                    ###
-                    ### do grep
-                    ###
-                    $task proc grep {
-                        (cmd directory) := $ARGS;
-                        cd $directory;
-                        exec sh -c $cmd;
-                    } $value $directory;
-
+                    do-command-async $window "*Grep*" $directory $value;
                     return ALL;
                 }
             ;;
@@ -428,54 +396,9 @@ defcommand grep-current-word desc: "Run grep on the near cursor point word." {
     str ::= $window get-region-string $sy $sx $ey $ex;
     $geom restore-geom $orig_geom;
     command ::= "grep -nHe '" . $str "' *";
-    
-    ###
-    ### do grep
-    ###
-    show-message ["Doing - " . $command];
-    orig-dir ::= pwd;
-    cd $dir;
-    
-    fout ::= new Stream;
-    $fout set-nolimit;
-    sts := 0;
-    try {
-        pipe out: $fout {exec :err-to-stdout "/bin/sh" "-c" $command};
-    } catch: {| e |
-        sts ::= "<" . [$e car] "> #" [$e cdr];
-    };
-    $fout close;
-    buff ::= new EditBuffer;
-    BufferManager unregist-buffer "*Grep*";
-    (result err) ::= $buff load-content  :init-only "grep buffer" buffer-name: "*Grep*";
-    $buff set-content $dir;
-    $buff clear-all;
-    $buff append-string ["CWD:  " . $dir];
-    $buff append-string ["EXEC: " . $command];
-    $buff append-string "";
-    $fout each do: {| r |
-        $buff append-string $r;
-    };
-    fout := <nil>;
-    $buff append-string "";
-    $buff append-string ["exit(" . $sts ")"];
-    
-    w1 ::= $main get-window-by-name "Window#1";
-    if $w1 else: {
-        $main create-split-vertical-window;
-    };
-    $main bind-buffer "Window#1" $buff;
-    window ::= $main get-window-by-name "Window#1";
-    geom ::= $window get-geom;
-    $geom set! ViewLine 0;
-    $geom set! ViewColumn 0;
-    $window cursor-move-to $geom 0 0;
-    $buff set-protect;
-    $buff no-modify;
-    cd $orig-dir;
-    show-message "Done.";
 
-    return SELF;
+    do-command-async $window "*Grep*" $dir $command;
+    return ALL;
 };
 
 defcommand grep-next desc: "Jump next *Grep* buffer line." {
