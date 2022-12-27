@@ -101,6 +101,8 @@ TaskManager method dispatch () {
     $SysReq clear;
 
     if $min-task {
+        ### set task dispatched
+        result := <t>;
 
         ### save non task env's current working directory
         cwd ::= pwd;
@@ -112,6 +114,19 @@ TaskManager method dispatch () {
         
         ### restore non task env's current working directory
         cd $cwd;
+
+        #
+        # Apply system call request
+        #
+        $SysReq close;
+        try {
+            ### apply request system call from tasn at this tick.
+            apply-syscalls;
+
+        } catch: {| e |
+            $Task_stdout puts "";
+            $Task_stdout puts ["Error at apply-syscalls: " . $e];
+        };
 
         if {$min-task exit?} {
             #
@@ -136,16 +151,6 @@ TaskManager method dispatch () {
                 $p add-child-exit-status ($min-task [$min-task get-exit-status]);
             };
         };
-        result := <t>;
-        $SysReq close;
-        try {
-            ### apply request system call from tasn at this tick.
-            apply-syscalls;
-
-        } catch: {| e |
-            $Task_stdout puts "";
-            $Task_stdout puts ["Error at apply-syscalls: " . $e];
-        };
     };
     
     try {
@@ -166,7 +171,6 @@ TaskManager method enqueue (msg) {
 TaskManager method apply-syscalls () {
     while {! [$SysReq eof?]} do: {
         r ::= $SysReq gets;
-        ### $Task_stdout puts "*** " $r;
         case $r,0
         APPLY_EDITOR {
             (syscall body task) := $r;
