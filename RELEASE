@@ -2935,4 +2935,13 @@
 		  and create new function do-command-async.
 		Add new config variable COMPILE_COMMAND for compile command throw shell string.
 
+2022/12/28
+	pmacs update:
+		Fix Task::set-terminate and terminate method bug.
+		Change TaskManager apply-syscalls error handle output Task_stdout if task exited.
+		Change TaskManager apply-syscalls new-task migration stdio channel parent to child.
+		Add new config variable COMPILE_COMMAND_DIR for compile command execute directory.
+		Change compile editor command use setconf COMPILE_COMMAND, COMPILE_COMMAND_DIR.
+		Fix do-command-async function if window not same buffer binding current window.
+
 #eof
