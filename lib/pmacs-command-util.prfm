@@ -406,13 +406,7 @@ defcommand set-nodos desc: "Unset DOS line mode (aka set UNIX line mode) to curr
 defcommand compile desc: "Run compile command and output result to *Grep* buffer." {
     | main window |
     
-    if {defvar? COMPILE_COMMAND_DIR} {
-        dir := $COMPILE_COMMAND_DIR;
-    } {
-        dir := [pwd : . "/"];
-        defvar COMPILE_COMMAND_DIR $dir;
-    };
-
+    dir := $COMPILE_COMMAND_DIR;
     mini-input-file-chooser $main $window
         init-value: $dir
         prompt: "Directory: "
@@ -422,18 +416,13 @@ defcommand compile desc: "Run compile command and output result to *Grep* buffer
                 return ALL;
             };
             directory := $value;
-            setvar COMPILE_COMMAND_DIR $directory;
+            setconf COMPILE_COMMAND_DIR $directory;
             if {file dir? $directory} else: {
                 show-message :bell ["Not directory: " . $directory];
                 return ALL;
             };
 
-            if {defvar? COMPILE_COMMAND} {
-                command := $COMPILE_COMMAND;
-            } {
-                command := "make -j -f Makefile ";
-                defvar COMPILE_COMMAND $command;
-            };
+            command := $COMPILE_COMMAND;
             mini-input-until-enter $main $window
                 init-value: $command
                 index: [$command len]
@@ -443,7 +432,7 @@ defcommand compile desc: "Run compile command and output result to *Grep* buffer
                         show-message :bell "No compile command specified.";
                         return ALL;
                     };
-                    setvar COMPILE_COMMAND $value;
+                    setconf COMPILE_COMMAND $value;
                     
                     do-command-async $window "*Grep*" $directory $value;
                     return ALL;
@@ -464,12 +453,12 @@ defun do-command-async (window buff-name directory command) {
     $grep-buff puts ["CWD:  " . $directory];
     $grep-buff puts ["EXEC: " . $command];
     $grep-buff puts "";
-    $main bind-buffer "Window#1" [$grep-buff get-buffer];
-    w1 ::= $main get-window-by-name "Window#1";
+    $MainWindow bind-buffer "Window#1" [$grep-buff get-buffer];
+    w1 ::= $MainWindow get-window-by-name "Window#1";
     if $w1 else: {
-        $main create-split-vertical-window;
+        $MainWindow create-split-vertical-window;
     };
-    window ::= $main get-window-by-name "Window#1";
+    window ::= $MainWindow get-window-by-name "Window#1";
     
     task ::= new Task;
     $task set-stdout $grep-buff;
@@ -478,19 +467,21 @@ defun do-command-async (window buff-name directory command) {
     ###
     ### do command
     ###
-    $task proc compile {
+    $task proc [$command split : get 0] {
         (window buff cmd directory) := $ARGS;
         cd $directory;
         sts ::= exec sh -c $cmd;
         println "";
         println "exit(" $sts ")";
         
-        geom ::= $window get-geom;
-        $geom set! ViewLine 0;
-        $geom set! ViewColumn 0;
-        $window cursor-move-to $geom 0 0;
         $buff set-protect;
         $buff no-modify;
+        if {eq? [$window get-buffer] $buff} {
+            geom ::= $window get-geom;
+            $geom set! ViewLine 0;
+            $geom set! ViewColumn 0;
+            $window cursor-move-to $geom 0 0;
+        };
         
     } $window [$grep-buff get-buffer] $command $directory;
 
