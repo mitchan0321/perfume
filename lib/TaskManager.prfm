@@ -132,7 +132,7 @@ TaskManager method dispatch () {
             #
             # proces terminate
             #
-            $Task_stdout puts "";
+            ### $Task_stdout puts "";
             $Task_stdout puts ["Task [" . [$min-task get-name] "] end, status= " [$min-task get-exit-status]];
 
             ### remove from task list TaskManager instance.
@@ -169,17 +169,19 @@ TaskManager method enqueue (msg) {
 };
 
 TaskManager method apply-syscalls () {
-    while {! [$SysReq eof?]} do: {
-        r ::= $SysReq gets;
+    while {r ::= $SysReq gets;} do: {
         case $r,0
         APPLY_EDITOR {
             (syscall body task) := $r;
             try {
-                $task add-request-stat (RESULT [
-                    begin :rebase local: [dict-local] {$body eval};
-                ]);
+                sts ::= begin :rebase local: [dict-local] {$body eval};
+                $task add-request-stat (RESULT $sts);
             } catch: {| e |
-                $task add-request-stat (ERROR $e);
+                if {$task exit?} {
+                    $Task_stdout puts ["Task [" . [$task get-name] "] terminate proc error: <" $e,0 "># " $e,1];
+                } {
+                    $task add-request-stat (ERROR $e);
+                };
             };
         }
         NEW_TASK {
@@ -187,6 +189,10 @@ TaskManager method apply-syscalls () {
             try {
                 t ::= new Task;
                 $t set-parent $task;
+                (i o e) ::= $task get-stdio;
+                $t set-stdin $i;
+                $t set-stdout $o;
+                $t set-stderr $e;
                 $task add-child $t;
                 $task add-request-stat (TASK $t);
                 call $t [(proc $name $body) concat $args];
