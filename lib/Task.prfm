@@ -407,7 +407,7 @@ Task method terminate () {
         if $Coro {$Coro release};
     } catch: {};
 
-    if $TerminateProc {
-        SysCall apply-editor $TerminateProc;
+    if {true? TerminateProc} {
+        TaskManager enqueue (APPLY_EDITOR $TerminateProc [self]);
     };
 };
