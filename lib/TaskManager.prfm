@@ -124,8 +124,8 @@ TaskManager method dispatch () {
             apply-syscalls;
 
         } catch: {| e |
-            $Task_stdout puts "";
-            $Task_stdout puts ["Error at apply-syscalls: " . $e];
+            ### $Task_stdout puts "";
+            $Task_stdout puts [">>>Error at apply-syscalls: " . $e];
         };
 
         if {$min-task exit?} {
@@ -133,7 +133,7 @@ TaskManager method dispatch () {
             # proces terminate
             #
             ### $Task_stdout puts "";
-            $Task_stdout puts ["Task [" . [$min-task get-name] "] end, status= " [$min-task get-exit-status]];
+            $Task_stdout puts [">>>Task [" . [$min-task get-name] "] end, status= " [$min-task get-exit-status]];
 
             ### remove from task list TaskManager instance.
             idx ::= $TaskList find $min-task;
@@ -158,7 +158,7 @@ TaskManager method dispatch () {
         force-wait-task;
 
     } catch: {| e |
-        $Task_stdout puts ["Error at force-wait-task: " . $e];
+        $Task_stdout puts [">>>Error at force-wait-task: <" .  $e,0 "># " $e,1];
     };
     
     return $result;
@@ -178,7 +178,7 @@ TaskManager method apply-syscalls () {
                 $task add-request-stat (RESULT $sts);
             } catch: {| e |
                 if {$task exit?} {
-                    $Task_stdout puts ["Task [" . [$task get-name] "] terminate proc error: <" $e,0 "># " $e,1];
+                    $Task_stdout puts [">>>Task [" . [$task get-name] "] terminate proc error: <" $e,0 "># " $e,1];
                 } {
                     $task add-request-stat (ERROR $e);
                 };
@@ -203,7 +203,7 @@ TaskManager method apply-syscalls () {
             };
         }
         default: {
-            $Task_stdout puts ["Bad SysReq(UNKNOWN): " . $fun ", " $body];
+            $Task_stdout puts [">>>Bad SysReq(UNKNOWN): " . $fun ", " $body];
             $task add-request-stat (ERROR ["Bad SysReq(UNKNOWN): " . $fun ", " $body]);
         };
     };
@@ -223,7 +223,7 @@ TaskManager method force-wait-task () {
         }
         catch: {| e |
             delete-wait-hook $name;
-            $Task_stdout puts ["Bad SysReq at wait: " . $e ", " $name];
+            $Task_stdout puts [">>>Bad SysReq at wait: " . $e ", " $name];
         };
     };
 };
@@ -257,5 +257,5 @@ TaskManager method stdin-ready? () {
 
 TaskManager method panic (msg) {
     $Task_stdout puts "";
-    $Task_stdout puts $msg;
+    $Task_stdout puts [">>>Panic: " . $msg];
 };
