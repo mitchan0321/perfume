@@ -2944,4 +2944,9 @@
 		Change compile editor command use setconf COMPILE_COMMAND, COMPILE_COMMAND_DIR.
 		Fix do-command-async function if window not same buffer binding current window.
 
+2022/12/30
+	pmacs update:
+		Change TaskManager output message format.
+		Change MainWindow bracket-pair do not delayed process.
+
 #eof
