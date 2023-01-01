@@ -6,6 +6,7 @@ Window method init (curs) {
 };
 
 Window method init-constructor () {
+    sets INIT <t>;
     sets WindowList ();
     sets CursWinMini <nil>;
     sets CreateWindowHook <nil>;
@@ -555,6 +556,7 @@ Window method resize-window () {
 	bind-buffer $win $buff;
     };
     roll-to-window $roll-to;
+    sets INIT <nil>;
 };
 
 Window method key-event-loop () {
@@ -656,18 +658,11 @@ Window method key-event-loop () {
                     cursor-update := <nil>;
                 }
                 <t> {
-                    REM {
-                    $main add-background job-id: "00-BRACKETS" after: 0 {
+                    $main add-background job-id: "00-BRACKETS" {
                         if {! [$main mini-input?]} {
                             if {eq? [$window get @name] CombiWindow} {
                                 $window apply-command $main $window <nil> brackets-pair;
                             };
-                        };
-                    };
-                    }; # END REM
-                    if {! [$main mini-input?]} {
-                        if {eq? [$window get @name] CombiWindow} {
-                            $window apply-command $main $window <nil> brackets-pair;
                         };
                     };
                 }
@@ -871,10 +866,16 @@ Window method suspend (*) {
 };
 
 Window method refresh-screen () {
+    sets INIT <t>;
     curs-terminate;
     cur ::= curs-init;
     set-curs $cur;
     resize-window;
+    sets INIT <nil>;
+};
+
+Window method get-init () {
+    return $INIT;
 };
 
 Window method set-input (fd) {
