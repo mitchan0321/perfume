@@ -699,6 +699,8 @@ defcommand set-buffer-tab-width desc: "Set TAB width to current buffer locally. 
 
 defcommand brackets-pair desc: "Highlight pair character if current cursor on parentheses, bracket  or braces." {
     | main window |
+    if {! [$window instance? CombiWindow]} {return SELF};
+    
     $window remove-spot-color-item "BRACKETS-PAIR-S";
     $window remove-spot-color-item "BRACKETS-PAIR-D";
     (height width) ::= $window get-window-size;
