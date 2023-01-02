@@ -652,15 +652,27 @@ Window method key-event-loop () {
 		
 	    window ::= $main get-current-window;
 	    result ::= $window apply-keybind $main $window $k;
+	    window ::= $main get-current-window;
 
             cond
                 {input-ready?} {
                     cursor-update := <nil>;
                 }
                 <t> {
+                    REM {
                     $main add-background job-id: "00-BRACKETS" {
                         if {! [$main mini-input?]} {
                             if {eq? [$window get @name] CombiWindow} {
+                                if {$window active?} {
+                                    $window apply-command $main $window <nil> brackets-pair;
+                                };
+                            };
+                        };
+                    };
+                    }; # END REM
+                    if {! [$main mini-input?]} {
+                        if {eq? [$window get @name] CombiWindow} {
+                            if {$window active?} {
                                 $window apply-command $main $window <nil> brackets-pair;
                             };
                         };
@@ -871,7 +883,6 @@ Window method refresh-screen () {
     cur ::= curs-init;
     set-curs $cur;
     resize-window;
-    sets INIT <nil>;
 };
 
 Window method get-init () {
