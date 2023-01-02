@@ -2947,6 +2947,10 @@
 2022/12/30
 	pmacs update:
 		Change TaskManager output message format.
-		Change MainWindow bracket-pair do not delayed process.
+
+2023/01/02
+	pmacs update:
+		Change MainWindow bracket-pair call do not delayed process.
+		Change INPUT_TIMEOUT 20 -> 30.
 
 #eof
