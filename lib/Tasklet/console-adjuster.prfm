@@ -1,7 +1,7 @@
 new Task : proc console-adjuster {
     loop do: {
         SysCall apply-editor {
-            if {$MainWindow mini-input?} {continue};
+            if {$MainWindow mini-input?} {break};
             
             $MainWindow get-window-list-without-current : each do: {| w |
                 if [$w get-buffer : get-buffer-name : = "*Console*"] {
