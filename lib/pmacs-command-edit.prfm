@@ -34,13 +34,23 @@ defcommand delete-character desc: "Delete character from current buffer at curso
     result ALL;
 };
 
-defcommand delete-word desc: "Delete word from current buffer at cursor point." {
+defcommand delete-word desc: "Delete word from current buffer at cursor point word." {
     | main window |
     $window apply-command $main $window "" select-region-word;
     [$window in-region?] ?? {
         show-message "Word not found.";
         return ALL;
     };
+    $window apply-command $main $window "" cut-region;
+    result ALL;
+};
+
+defcommand delete-word-after-current-point desc: "Delete word from current buffer after current cursor point." {
+    | main window |
+    if {! [$window get-region]} {
+        $window apply-command $main $window "" start-region;
+    };
+    $window apply-command $main $window "" smart-move-forward;
     $window apply-command $main $window "" cut-region;
     result ALL;
 };
