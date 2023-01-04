@@ -2953,4 +2953,9 @@
 		Change MainWindow bracket-pair call do not delayed process.
 		Change INPUT_TIMEOUT 20 -> 30.
 
+2023/01/04
+	pmacs update:
+		Change CombiWindow.key aplphabetic, alphabetic+alt, alphabetic+shift+alt order of key descriptor.
+                Add editor command delete-word-after-current-point.
+
 #eof
