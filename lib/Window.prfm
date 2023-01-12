@@ -582,9 +582,9 @@ Window method keyin-proc (window) {
             continue;
         };
         if $KEY_REPEAT_ACCEL_OFF {
-            setvar KEY_REPEAT_ACCEL 1;
+            setconf KEY_REPEAT_ACCEL 1;
         } {
-            setvar KEY_REPEAT_ACCEL [
+            setconf KEY_REPEAT_ACCEL [
                 if {$rtime <= $KEY_REPEAT_ACCEL_DELAY}
                     1
                     [
