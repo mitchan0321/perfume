@@ -561,115 +561,105 @@ Window method resize-window () {
 
 Window method key-event-loop () {
     main ::= self;
-    key := "";
     
     while {true} do: {
 	if $EventLoopDone {break};
 
 	window ::= $main get-current-window;
-	if {$KeyEvent null?} {
-            try {
-                (rtime i) ::= curs-keyin [$window get-curs] $INPUT_TIMEOUT $INPUT_ENCODING
-                    blink: $BLINK blink-fact: $BLINK_FACT
+        keyin-list ::= keyin-proc $window;
+        keyin-apply $main $window $keyin-list;
+    };
+};
+
+Window method keyin-proc (window) {
+    if {$KeyEvent null?} {
+        try {
+            (rtime i) ::= curs-keyin [$window get-curs] $INPUT_TIMEOUT $INPUT_ENCODING
+                          blink: $BLINK blink-fact: $BLINK_FACT
+            ;;
+        } catch: {| e |
+            show-message :bell ["Error at curs-keyin: <" . [$e car] "># " [$e cdr]];
+            continue;
+        };
+        if $KEY_REPEAT_ACCEL_OFF {
+            setvar KEY_REPEAT_ACCEL 1;
+        } {
+            setvar KEY_REPEAT_ACCEL [
+                if {$rtime <= $KEY_REPEAT_ACCEL_DELAY}
+                    1
+                    [
+                        if {$rtime >= [$KEY_REPEAT_ACCEL_DELAY + $KEY_REPEAT_ACCEL_DURING_TO_MAX]}
+                            [[$KEY_REPEAT_ACCEL_MAXLINE > 0.0] ??? [$KEY_REPEAT_ACCEL_MAXLINE int] 1]
+                            [[$rtime - $KEY_REPEAT_ACCEL_DELAY] / $KEY_REPEAT_ACCEL_DURING_TO_MAX :
+                                * [$KEY_REPEAT_ACCEL_MAXLINE - 1.0] : int : + 2]
+                    ]
                 ;;
-            } catch: {| e |
-                show-message :bell ["Error at curs-keyin: <" . [$e car] "># " [$e cdr]];
-                continue;
-            };
-            if $KEY_REPEAT_ACCEL_OFF {
-                setvar KEY_REPEAT_ACCEL 1;
-            } {
-                setvar KEY_REPEAT_ACCEL [
-                    if {$rtime <= $KEY_REPEAT_ACCEL_DELAY}
-                        1
-                        [
-                            if {$rtime >= [$KEY_REPEAT_ACCEL_DELAY + $KEY_REPEAT_ACCEL_DURING_TO_MAX]}
-                                [[$KEY_REPEAT_ACCEL_MAXLINE > 0.0] ??? [$KEY_REPEAT_ACCEL_MAXLINE int] 1]
-                                [[$rtime - $KEY_REPEAT_ACCEL_DELAY] / $KEY_REPEAT_ACCEL_DURING_TO_MAX :
-                                    * [$KEY_REPEAT_ACCEL_MAXLINE - 1.0] : int : + 2]
-                        ]
-                ];
-            };
-            ### {println $rtime "," $i "," $KEY_REPEAT_ACCEL} >>> "rtime.log";
+            ];
+        };
             
-	    if [$KeyMaps set? $i] {
-		i ::= $KeyMaps get $i;
-	    };
-	} {
-	    i := $KeyEvent;
-	    sets KeyEvent ();
-	};
+        if [$KeyMaps set? $i] {
+            i ::= $KeyMaps get $i;
+        };
+    } {
+        i := $KeyEvent;
+        sets KeyEvent ();
+    };
+    
+    return $i;
+};
 
-	if {$i null?} {
-	    if {background-exists?} {
-		try {
-		    result ::= exec-background;
-		    cond
-                        {eq? $result ALL} {
-                            $main apply {render-all; refresh};
-                        }
-                        {eq? $result REFRESH-ONLY} {
-                            $main apply {refresh};
-                        }
-		    ;;
-		} catch: {| e |
-		    show-message :bell ["Error at background: <" . [$e car] "># " [$e cdr]];
-		};
-            };
+Window method keyin-apply (main window keyin-list) {
+    if {$keyin-list null?} {
+        if {background-exists?} {
             try {
-                if {TaskManager dispatch} {
+                result ::= exec-background;
+                cond
+                {eq? $result ALL} {
                     $main apply {render-all; refresh};
-                };
-            } catch: {| e |
-                TaskManager panic ["Error at TaskManager::dispatch: " . $e];
-                show-message :bell "Error at TaskManager::dispatch, see *Console* buffer.";
-            };
-	    continue;
-	};
-        
-	#######
-	####### for debug display key in
-        #######
-	### show-message ["key in list: " . $i];
-	#######
-	####### for debug display key in
-        #######
-	### if {[$key len] > 80} {key := ""; };
-	### $key append! ["" . [[integer? $i] ??? ["%02x" fmt $i] [result $i]] " "];
-	### $MainWindow display-window-message "MiniBuffer" ["%-100v" fmt $key];
-	### $MainWindow get-minibuffer-window : refresh;
-        #######
-
-        cursor-update := <t>;
-	$i each do: {| k |
-	    if {eq? $k KEY_RESIZE} {
-                $main mini-input-end;
-		$main resize-window;
-		$main apply {render-all; refresh};
-		window ::= $main get-current-window;		
-		continue;
-	    };
-		
-	    window ::= $main get-current-window;
-	    result ::= $window apply-keybind $main $window $k;
-	    window ::= $main get-current-window;
-
-            cond
-                {input-ready?} {
-                    cursor-update := <nil>;
                 }
-                <t> {
-                    REM {
-                    $main add-background job-id: "00-BRACKETS" {
-                        if {! [$main mini-input?]} {
-                            if {eq? [$window get @name] CombiWindow} {
-                                if {$window active?} {
-                                    $window apply-command $main $window <nil> brackets-pair;
-                                };
-                            };
-                        };
-                    };
-                    }; # END REM
+                {eq? $result REFRESH-ONLY} {
+                    $main apply {refresh};
+                }
+		;;
+            } catch: {| e |
+                show-message :bell ["Error at background: <" . [$e car] "># " [$e cdr]];
+            };
+        };
+
+        try {
+            if {TaskManager dispatch} {
+                $main apply {render-all; refresh};
+            };
+        } catch: {| e |
+            TaskManager panic ["Error at TaskManager::dispatch: " . $e];
+            show-message :bell "Error at TaskManager::dispatch, see *Console* buffer.";
+        };
+        return;
+    };
+
+    cursor-update := <t>;
+    $keyin-list each do: {| k |
+        if {eq? $k KEY_RESIZE} {
+            $main mini-input-end;
+            $main resize-window;
+            $main apply {render-all; refresh};
+            window ::= $main get-current-window;
+            continue;
+        };
+		
+        window ::= $main get-current-window;
+        result ::= $window apply-keybind $main $window $k;
+        window ::= $main get-current-window;
+
+        cond
+        {input-ready?} {
+            cursor-update := <nil>;
+        }
+
+        <t> {
+            ### if do brackets-pair in background, uncomment this.
+            REM {
+                $main add-background job-id: "00-BRACKETS" {
                     if {! [$main mini-input?]} {
                         if {eq? [$window get @name] CombiWindow} {
                             if {$window active?} {
@@ -677,22 +667,34 @@ Window method key-event-loop () {
                             };
                         };
                     };
-                }
-                {eq? $result ALL} {
-                    $main apply {render-all; refresh};
-                    if $MiniInput {$MiniWindow apply {render; refresh}};
-                }
-                {eq? $result SELF} {
-                    window ::= $main get-current-window;
-                    $window apply {render; refresh};
-                }
-            ;;
-        };
+                };
+            }; # END REM
 
-        if $cursor-update {
+            ### if do brackets-pair in on-time, uncomment this.
+            if {! [$main mini-input?]} {
+                if {eq? [$window get @name] CombiWindow} {
+                    if {$window active?} {
+                        $window apply-command $main $window <nil> brackets-pair;
+                    };
+                };
+            };
+        }
+
+        {eq? $result ALL} {
+            $main apply {render-all; refresh};
+            if $MiniInput {$MiniWindow apply {render; refresh}};
+        }
+
+        {eq? $result SELF} {
             window ::= $main get-current-window;
-            $window set-cursor;
-        };
+            $window apply {render; refresh};
+        }
+        ;;
+    };
+
+    if $cursor-update {
+        window ::= $main get-current-window;
+        $window set-cursor;
     };
 };
 
