@@ -2958,4 +2958,8 @@
 		Change CombiWindow.key aplphabetic, alphabetic+alt, alphabetic+shift+alt order of key descriptor.
                 Add editor command delete-word-after-current-point.
 
+2023/01/12
+	pmacs update:
+		Change divide Window::key-event-loop to keyin-proc and keyin-apply methods.
+
 #eof
