@@ -2961,5 +2961,6 @@
 2023/01/12
 	pmacs update:
 		Change divide Window::key-event-loop to keyin-proc and keyin-apply methods.
+		Change KEY_REPEAT_ACCEL value set use setconf.
 
 #eof
