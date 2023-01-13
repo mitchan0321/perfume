@@ -93,6 +93,41 @@ SysCall method puts (f r) {
     return $sts;
 };
 
+SysCall method accept (fd) {
+    __checkEnv;
+    TaskManager add-wait-hook [$SELF get-name] ($SELF "A>" {
+        (ifds ofds efds) ::= select ($fd) () () 0;
+        if {$ifds null?} {
+            return <nil>;
+        } {
+            return <t>;
+        };
+    });
+    pause (WAIT 0);
+    TaskManager delete-wait-hook [$SELF get-name];
+    (fd addr port) ::= accept $fd;
+    f ::= new File;
+    $f set! $fd mode: io;
+    $f set-encoding UTF-8;
+    $f set-newline <t>;
+    return ($f $addr $port);
+};
+
+SysCall method recv (f) {
+    __checkEnv;
+    TaskManager add-wait-hook [$SELF get-name] ($SELF "S>" {
+        (ifds ofds efds) ::= select ([$f fd?]) () () 0;
+        if {$ifds null?} {
+            return <nil>;
+        } {
+            return <t>;
+        };
+    });
+    pause (WAIT 0);
+    TaskManager delete-wait-hook [$SELF get-name];
+    return [$f gets];
+};
+
 SysCall method __checkEnv () {
     if {! [defvar? SELF]}         {throw ErrNotTask "Not a Task Environment."};
     if {! [$SELF instance? Task]} {throw ErrNotTask "Not a Task Environment."};
