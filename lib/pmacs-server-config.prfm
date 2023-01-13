@@ -1,0 +1,5 @@
+defun pmacs-server-config () {
+    if [defvar? PMACS-SERVER-PORT] else: {
+	defvar PMACS-SERVER-PORT 12345;
+    };
+};

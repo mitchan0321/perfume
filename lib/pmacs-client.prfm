@@ -1,0 +1,18 @@
+defun pmacs-client () {
+    pmacs-server-config;
+
+    f ::= connect [resolv-host "localhost"] $PMACS-SERVER-PORT;
+    server ::= new File;
+    $server set! $f mode: io;
+    $server set-encoding UTF-8;
+    $server set-newline <t>;
+
+    try {
+        $server puts "Hello world!!";
+        r ::= $server gets;
+        println "recv: " $r;
+    } fin: {
+        $server close;
+    };
+};
+

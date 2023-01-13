@@ -1,0 +1,24 @@
+new Task : proc pmacs-server {
+    pmacs-server-config;
+    
+    l ::= socket-server $PMACS-SERVER-PORT;
+    $SELF set-terminate-proc {
+        close $l;
+    };
+    
+    loop do: {
+        (f a p) ::= SysCall accept $l;
+        println "[" [get-name] "] accept: " $f ", IP: " [host-address-string $a] ", port:" $p;
+        SysCall new-task [get-name] {
+            (f) := $ARGS;
+            $SELF set-terminate-proc {
+                $f close;
+            };
+            
+            r ::= SysCall recv $f;
+            println [get-name] "*** Received: " $r;
+            SysCall sleep 10000;
+        } ($f);
+    };
+};
+
