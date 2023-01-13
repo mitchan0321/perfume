@@ -16,7 +16,7 @@ new Task : proc pmacs-server {
             };
             
             r ::= SysCall recv $f;
-            println [get-name] "*** Received: " $r;
+            println "[" [get-name] "] Received: " $r;
             SysCall sleep 10000;
         } ($f);
     };
