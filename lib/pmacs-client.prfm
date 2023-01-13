@@ -1,4 +1,9 @@
 defun pmacs-client () {
+    if {defvar? PMACS} {
+        println "Can't run under Pmacs environment.";
+        return;
+    };
+
     pmacs-server-config;
 
     f ::= connect [resolv-host "localhost"] $PMACS-SERVER-PORT;
