@@ -2963,4 +2963,13 @@
 		Change divide Window::key-event-loop to keyin-proc and keyin-apply methods.
 		Change KEY_REPEAT_ACCEL value set use setconf.
 
+2023/01/13
+	pmacs update:
+		Add SysCall accept is accept socket fd and return File object in task.
+		Add SysCall recv is recieve socket stream from File object in task.
+		Change TaskManager, child name repair number start 1.
+		Add lib/Tasklet/pmacs-server.prfm
+		Add lib/pmacs-client.prfm
+		Add lib/pmacs-server-config.prfm
+
 #eof
