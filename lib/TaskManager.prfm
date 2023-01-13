@@ -26,7 +26,7 @@ TaskManager method add (task name) {
     if {$TaskList find $task} {
         throw ErrDuplicateTask "Already registerd task.";
     };
-    n := 1;
+    n := 0;
     name ::= "" . $name;
     sname := $name;
     tlist ::= $TaskList map {| i | $i get-name};
