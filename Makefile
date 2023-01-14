@@ -256,6 +256,7 @@ endif
 	install -m 755 pkg/install.sh $(PKG_DIR)
 	install -m 644 pkg/INSTALL    $(PKG_DIR)
 	install -m 644 pkg/pmacs.in   $(PKG_DIR)/bin
+	install -m 644 pkg/pmacs-client.in   $(PKG_DIR)/bin
 	(cd $(PKG_TMP); tar cvzf $(PKG_TAR_NAME) ./pmacs-install)
 
 #eof
