@@ -138,7 +138,7 @@ install:
 	install -m 755 pkg/pmacs.in $(PREFIX)/bin
 	install -m 755 pkg/pmacs-client.in $(PREFIX)/bin
 	install -m 755 pkg/install.sh $(PREFIX)
-	(cd $(PREFIX); sh ./install.sh; rm bin/pmacs.in bin/pmacs-client.in install.sh)
+	(cd $(PREFIX); sh ./install.sh; rm -f bin/pmacs.in bin/pmacs-client.in install.sh)
 
 perfumesh:	$(OBJS) perfumesh.o
 ifeq ($(CORU_USE),yes)
