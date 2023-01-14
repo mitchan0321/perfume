@@ -19,7 +19,16 @@ BufferManager method regist-buffer (buff name) {
 
 BufferManager method unregist-buffer (name) {
     if {$name = "*Scratch*"} {return [$BufferList get $name]};
-    return [$BufferList unset $name];
+    buff ::= $BufferList unset $name;
+    if $buff {
+        proc ::= $buff get-unregist-proc;
+        if {true? proc} {
+            try {$proc eval} catch: {| e |
+                show-message :bell "Error at BufferManager::unregist-buffer, bad unregist-proc.";
+            };
+        };
+    };
+    return $buff;
 };
 
 BufferManager method buffer-order-list () {
