@@ -152,7 +152,7 @@ defun exec (
 	try {$OUT close} catch: {};
 	try {$IN  close} catch: {};
 	try {$ERR close} catch: {};
-        if {true bg} {
+        if {true? bg} {
             status := 0;
         } {
             status ::= wait $pid;
