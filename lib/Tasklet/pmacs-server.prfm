@@ -35,6 +35,11 @@ new Task : proc pmacs-server {
                 };
             };
         } ($f);
+        
+        ### cleaning child process status (ignore).
+        if {$SELF child-exited-any?} {
+            $SELF get-child-exit-status-any;
+        };
     };
 };
 
