@@ -503,19 +503,101 @@ defcommand shell desc: "Suspend pmacs and run shell under pmacs process." {
 
 defcommand git-pull desc: "Git pull (test)." {
     | main window |
-    $main suspend [get-shell] "-c" "git pull; echo '--- Press enter key to continue ---'; read";
+    mini-input-file-chooser $main $window
+    init-value: $GIT_DIR
+    prompt: "(git pull) directory: "
+    enter-proc: {| value |
+        if {[$value len] = 0} {
+            show-message :bell "No directory specified.";
+            return ALL;
+        };
+        directory := $value;
+        setconf GIT_DIR $directory;
+        if {file dir? $directory} else: {
+            show-message :bell ["Not directory: " . $directory];
+            return ALL;
+        };
+
+        command := "pull";
+        file := "";
+        opts := "";
+        exec_command ::= $GIT_COMMAND expand;
+        $main suspend "env" $GIT_ENV [get-shell] "-c" $exec_command;
+        $main suspend [get-shell] "-c" "echo '--- Press enter key to continue ---'; read"
+    }
+    ;;
+
     result ALL;
 };
 
 defcommand git-commit desc: "Git commit (test)." {
     | main window |
-    $main suspend [get-shell] "-c" "git commit .; echo '--- Press enter key to continue ---'; read";
+    mini-input-file-chooser $main $window
+    init-value: $GIT_DIR
+    prompt: "(git commit) directory: "
+    enter-proc: {| value |
+        if {[$value len] = 0} {
+            show-message :bell "No directory specified.";
+            return ALL;
+        };
+        directory := $value;
+        setconf GIT_DIR $directory;
+        if {file dir? $directory} else: {
+            show-message :bell ["Not directory: " . $directory];
+            return ALL;
+        };
+
+        cd $directory;
+        mini-input-file-chooser $main $window
+        init-value: $directory
+        prompt: "(git commit) file: "
+        enter-proc: {| value |
+            if {[$value len] = 0} {
+                show-message :bell "No file specified.";
+                return ALL;
+            };
+            command := "commit";
+            file ::= $value split sep: "/" : last : car;
+            if {$file = ""} {file := "."};
+            opts := "";
+            exec_command ::= $GIT_COMMAND expand;
+            new Task : proc git-commit {
+                (exec_command) := $ARGS;
+                exec "env" $GIT_ENV [get-shell] "-c" $exec_command;
+            } $exec_command;
+        }
+        ;;
+    };
+    
     result ALL;
 };
 
 defcommand git-push desc: "Git push (test)." {
     | main window |
-    $main suspend [get-shell] "-c" "git push; echo '--- Press enter key to continue ---'; read";
+    mini-input-file-chooser $main $window
+    init-value: $GIT_DIR
+    prompt: "(git push) directory: "
+    enter-proc: {| value |
+        if {[$value len] = 0} {
+            show-message :bell "No directory specified.";
+            return ALL;
+        };
+        directory := $value;
+        setconf GIT_DIR $directory;
+        if {file dir? $directory} else: {
+            show-message :bell ["Not directory: " . $directory];
+            return ALL;
+        };
+
+        command := "push";
+        file := "";
+        opts := "";
+        exec_command ::= $GIT_COMMAND expand;
+        $main suspend "env" $GIT_ENV [get-shell] "-c" $exec_command;
+        $main suspend [get-shell] "-c" "echo '--- Press enter key to continue ---'; read"
+    }
+    ;;
+
     result ALL;
 };
 
