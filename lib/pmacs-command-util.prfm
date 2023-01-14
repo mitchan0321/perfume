@@ -521,9 +521,9 @@ defcommand git-pull desc: "Git pull (test)." {
         command := "pull";
         file := "";
         opts := "";
+        post_command := "echo '--- Press enter key to continue ---'; read";
         exec_command ::= $GIT_COMMAND expand;
         $main suspend "env" $GIT_ENV [get-shell] "-c" $exec_command;
-        $main suspend [get-shell] "-c" "echo '--- Press enter key to continue ---'; read"
     }
     ;;
 
@@ -552,6 +552,7 @@ defcommand git-commit desc: "Git commit (test)." {
         if {$file = ""} {file := "."};
         command := "commit";
         opts := "";
+        post_command := "";
         exec_command ::= $GIT_COMMAND expand;
         new Task : proc git-commit {
             (exec_command) := $ARGS;
@@ -583,9 +584,9 @@ defcommand git-push desc: "Git push (test)." {
         command := "push";
         file := "";
         opts := "";
+        post_command := "echo '--- Press enter key to continue ---'; read";
         exec_command ::= $GIT_COMMAND expand;
         $main suspend "env" $GIT_ENV [get-shell] "-c" $exec_command;
-        $main suspend [get-shell] "-c" "echo '--- Press enter key to continue ---'; read"
     }
     ;;
 
