@@ -3,21 +3,37 @@ new Task : proc pmacs-server {
     
     l ::= socket-server $PMACS-SERVER-PORT;
     $SELF set-terminate-proc {
-        close $l;
+        try {close $l} catch: {};
     };
     
     loop do: {
         (f a p) ::= SysCall accept $l;
-        println "[" [get-name] "] accept: " $f ", IP: " [host-address-string $a] ", port:" $p;
+        println "[" [get-name] "] accept: IP: " [host-address-string $a] ", port:" $p;
+
         SysCall new-task [get-name] {
             (f) := $ARGS;
-            $SELF set-terminate-proc {
-                $f close;
-            };
             
             r ::= SysCall recv $f;
-            println "[" [get-name] "] Received: " $r;
-            SysCall sleep 10000;
+            if $r {
+                r ::= $r clean;
+                if {$r at 0 : != "/"} {
+                    r ::= $ENV,HOME . "/" $r;
+                };
+                println "[" [get-name] "] open-file: " $r;
+                SysCall apply-editor {
+                    open-file $r;
+                    target-buff ::= BufferManager get-buffer-by-path $r;
+                    if $target-buff {
+                        $target-buff set-unregist-proc {
+                            $f puts "0";
+                            $f close;
+                            show-message ["(git commit) " . $r " file wrote."];
+                        };
+                        window ::= $MainWindow get-current-window : get-window-name;
+                        $MainWindow bind-buffer $window $target-buff;
+                    };
+                };
+            };
         } ($f);
     };
 };
