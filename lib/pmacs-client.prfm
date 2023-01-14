@@ -1,23 +1,53 @@
 defun pmacs-client () {
+    pmacs-server-config;
+    
+    files ::= $ARGV clone;
+    $files >>;
+    if {and {! [$files null?]} {$files,0 = "-c"}} {
+        $files >>; $files >>;
+    };
+
+    sts := 0;
+    $files each do: {| f |
+        sts ::= pmacs-client-sub $f;
+    };
+
+    exit $sts;
+};
+
+defun pmacs-client-sub (path) {
     if {defvar? PMACS} {
         println "Can't run under Pmacs environment.";
         return;
     };
 
-    pmacs-server-config;
-
-    f ::= connect [resolv-host "localhost"] $PMACS-SERVER-PORT;
+    try {
+        f ::= connect [resolv-host "localhost"] $PMACS-SERVER-PORT;
+    } catch: {
+        return 3; ## not connect
+    };
+    
     server ::= new File;
     $server set! $f mode: io;
     $server set-encoding UTF-8;
     $server set-newline <t>;
 
+    sts := 1; ## server down
     try {
-        $server puts "Hello world!!";
+        $server puts $path;
         r ::= $server gets;
-        println "recv: " $r;
+        if $r {
+            r ::= $r clean;
+            try {
+                sts ::= $r int;
+            } catch: {
+                sts := 2; ## protocol error
+            };
+        };
     } fin: {
         $server close;
     };
+    
+    return $sts;
 };
 
