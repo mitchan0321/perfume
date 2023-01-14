@@ -135,6 +135,10 @@ install:
 	install -m 644 lib/*.keymap $(PREFIX)/lib/perfume/lib
 	install -m 444 lib/pdoc/* $(PREFIX)/lib/perfume/lib/pdoc
 	install -m 444 lib/Tasklet/* $(PREFIX)/lib/perfume/lib/Tasklet
+	install -m 755 pkg/pmacs.in $(PREFIX)/bin
+	install -m 755 pkg/pmacs-client.in $(PREFIX)/bin
+	install -m 755 pkg/install.sh $(PREFIX)
+	(cd $(PREFIX); sh ./install.sh; rm bin/pmacs.in bin/pmacs-client.in install.sh)
 
 perfumesh:	$(OBJS) perfumesh.o
 ifeq ($(CORU_USE),yes)
