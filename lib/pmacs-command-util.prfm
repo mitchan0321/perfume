@@ -554,7 +554,10 @@ defcommand git-commit desc: "Git commit (test)." {
         opts := "";
         post_command := "";
         exec_command ::= $GIT_COMMAND expand;
-        new Task : proc git-commit {
+        t ::= new Task;
+        $t set-stdout $stdout;
+        $t set-stderr $stderr;
+        $t proc git-commit {
             (exec_command) := $ARGS;
             exec "env" $GIT_ENV [get-shell] "-c" $exec_command;
         } $exec_command;
