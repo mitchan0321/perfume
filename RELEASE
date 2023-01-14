@@ -2972,4 +2972,19 @@
 		Add lib/pmacs-client.prfm
 		Add lib/pmacs-server-config.prfm
 
+2023/01/14
+	Makefile
+		Add pmacs and pmacs-client install to $(PREFIX)/bin directory.
+	pmacs update:
+		Add BufferBase::set-unregist-proc, BufferBase::get-unregist-proc are do auto execute procedure API
+		  at buffer killed timing.
+		Change BufferManager::unregist-buffer call BufferBase's unregist procedure if buffer unregisted.
+		Add lib/Tasklet/pmacs-server.prfm for remote file open function under pmacs.
+		Add pkg/pmacs.in and lib/pmacs-client.prfm are for remote file open control external command.
+		Add lib/pmacs-server-config.prfm for pmacs-server configuration file.
+		Add exec :bacground option is no wait child process option for exec utility.
+		Change editor commands git-pull, git-push and git-commit entering previous directory and use
+		  pmacs-server function can git comment input in pmacs.
+		Change pmacs.conf for git-* command configuration.
+
 #eof
