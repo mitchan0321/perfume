@@ -2,6 +2,7 @@ class BufferBase;
 
 BufferBase method base-constructor () {
     set-raise;
+    sets UnRegistProc <nil>;
 };
 
 BufferBase method set-buffer-name (name) {
@@ -33,6 +34,16 @@ BufferBase method set-raise () {
 
 BufferBase method set-raise-low () {
     sets LastRaiseTimestamp 0;
+};
+
+BufferBase method set-unregist-proc (proc) {
+    sets UnRegistProc $proc;
+};
+
+BufferBase method get-unregist-proc () {
+    proc := $UnRegistProc;
+    sets UnRegistProc <nil>;
+    return $proc;
 };
 
 BufferBase method get-raise-timestamp () {
