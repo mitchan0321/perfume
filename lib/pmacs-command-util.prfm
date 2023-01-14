@@ -532,42 +532,33 @@ defcommand git-pull desc: "Git pull (test)." {
 
 defcommand git-commit desc: "Git commit (test)." {
     | main window |
+    directory := $GIT_DIR;
+    cd $directory;
     mini-input-file-chooser $main $window
-    init-value: $GIT_DIR
-    prompt: "(git commit) directory: "
+    init-value: $directory
+    prompt: "(git commit) file: "
     enter-proc: {| value |
         if {[$value len] = 0} {
-            show-message :bell "No directory specified.";
+            show-message :bell "No file specified.";
             return ALL;
         };
-        directory := $value;
+        directory ::= get-dir $value;
+        if {! [file dir? $directory]} {
+            show-message :bell "Bad directory specified.";
+            return ALL;
+        };
         setconf GIT_DIR $directory;
-        if {file dir? $directory} else: {
-            show-message :bell ["Not directory: " . $directory];
-            return ALL;
-        };
-
-        cd $directory;
-        mini-input-file-chooser $main $window
-        init-value: $directory
-        prompt: "(git commit) file: "
-        enter-proc: {| value |
-            if {[$value len] = 0} {
-                show-message :bell "No file specified.";
-                return ALL;
-            };
-            command := "commit";
-            file ::= $value split sep: "/" : last : car;
-            if {$file = ""} {file := "."};
-            opts := "";
-            exec_command ::= $GIT_COMMAND expand;
-            new Task : proc git-commit {
-                (exec_command) := $ARGS;
-                exec "env" $GIT_ENV [get-shell] "-c" $exec_command;
-            } $exec_command;
-        }
-        ;;
-    };
+        file ::= $value split sep: "/" : last : car;
+        if {$file = ""} {file := "."};
+        command := "commit";
+        opts := "";
+        exec_command ::= $GIT_COMMAND expand;
+        new Task : proc git-commit {
+            (exec_command) := $ARGS;
+            exec "env" $GIT_ENV [get-shell] "-c" $exec_command;
+        } $exec_command;
+    }
+    ;;
     
     result ALL;
 };
