@@ -1,3 +1,12 @@
+##
+## exit status:
+##    0 ... normal end
+##    1 ... disconnect from server
+##    2 ... bad protocol
+##    3 ... server down
+##    4 ... bad key (from server)
+##
+
 defun pmacs-client () {
     pmacs-server-config;
     
@@ -32,18 +41,31 @@ defun pmacs-client-sub (path) {
     $server set-encoding UTF-8;
     $server set-newline <t>;
 
-    sts := 1; ## server down
+    sts := 1; ## disconnect from server
     try {
+        $server puts $PMACS-SERVER-KEY;
+        r ::= $server gets;
+        if {nil? $r} {
+            return 1; ## disconnect from server
+        };
+        try {
+            sts ::= $r clean : int;
+        } catch: {
+            return 2; ## protocol error
+        };
+        if {$sts != 0} {return $sts};
+        
         $server puts $path;
         r ::= $server gets;
-        if $r {
-            r ::= $r clean;
-            try {
-                sts ::= $r int;
-            } catch: {
-                sts := 2; ## protocol error
-            };
+        if {nil? $r} {
+            return 1; ## disconnect from server
         };
+        try {
+            sts ::= $r clean : int;
+        } catch: {
+            return 2; ## protocol error
+        };
+        sts := 0;
     } fin: {
         $server close;
     };
