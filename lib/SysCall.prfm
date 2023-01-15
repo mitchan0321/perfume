@@ -20,9 +20,9 @@ SysCall method apply-editor (body) {
     return [$SELF get-result];
 };
 
-SysCall method new-task (name body args) {
+SysCall method new-task (name body args: arg) {
     __checkEnv;
-    TaskManager enqueue (NEW_TASK $name $body $args $SELF);
+    TaskManager enqueue (NEW_TASK $name $body $arg $SELF);
     pause (SLEEP 0);
     return [$SELF get-task];
 };
