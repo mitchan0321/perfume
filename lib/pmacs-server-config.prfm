@@ -2,4 +2,7 @@ defun pmacs-server-config () {
     if [defvar? PMACS-SERVER-PORT] else: {
 	defvar PMACS-SERVER-PORT 12345;
     };
+    if [defvar? PMACS-SERVER-KEY] else: {
+	defvar PMACS-SERVER-KEY "54321";
+    };
 };
