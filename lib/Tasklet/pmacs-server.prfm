@@ -11,7 +11,22 @@ new Task : proc pmacs-server {
         println "[" [get-name] "] accept: IP: " [host-address-string $a] ", port:" $p;
 
         SysCall new-task [get-name] {
+            pmacs-server-config;
             (f) := $ARGS;
+            
+            r ::= SysCall recv $f;
+            if {nil? $r} {
+                $f close;
+                println "[" [get-name] "] disconnect from client.";
+                SysCall exit 1;
+            };
+            if {[$r clean] != $PMACS-SERVER-KEY} {
+                $f puts "4"; ## bad key
+                $f close;
+                println "[" [get-name] "] key authentication failed.";
+                SysCall exit 4;
+            };
+            $f puts "0";  ## key OK
             
             r ::= SysCall recv $f;
             if $r {
@@ -19,7 +34,12 @@ new Task : proc pmacs-server {
                 if {$r at 0 : != "/"} {
                     r ::= $ENV,HOME . "/" $r;
                 };
-                println "[" [get-name] "] open-file: " $r;
+                println "[" [get-name] "] open file: " $r;
+                try {
+                    mtime ::= file stat $r : assoc-value mtime;
+                } catch: {
+                    mtime := 0;
+                };
                 SysCall apply-editor {
                     open-file $r;
                     target-buff ::= BufferManager get-buffer-by-path $r;
@@ -27,7 +47,15 @@ new Task : proc pmacs-server {
                         $target-buff set-unregist-proc {
                             $f puts "0";
                             $f close;
-                            show-message ["(git commit) " . $r " file wrote."];
+                            try {
+                                if {eq? $mtime [file stat $r : assoc-value mtime]} {
+                                    show-message :bell ["(git commit) " . $r " file not changed, do not commit."];
+                                } {
+                                    show-message ["(git commit) " . $r " file wrote."];
+                                };
+                            } catch: {| e |
+                                show-message :bell ["(git commit) " . $r " file not found, <" $e,0 "> #" $e,1];
+                            };
                         };
                         window ::= $MainWindow get-current-window : get-window-name;
                         $MainWindow bind-buffer $window $target-buff;
@@ -40,6 +68,7 @@ new Task : proc pmacs-server {
         while {$SELF child-exited-any?} do: {
             $SELF get-child-exit-status-any;
         };
+        SysCall sleep 1000;
     };
 };
 
