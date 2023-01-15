@@ -1,7 +1,7 @@
 new Task : proc test {
-    t1 ::= SysCall new-task test1 {SysCall exit "test1"} ();
-    t2 ::= SysCall new-task test2 {SysCall sleep 3000; SysCall exit "test2"} ();
-    t3 ::= SysCall new-task test3 {SysCall sleep 10000; SysCall exit "test3"} ();
+    t1 ::= SysCall new-task test1 {SysCall exit "test1"};
+    t2 ::= SysCall new-task test2 {SysCall sleep 3000; SysCall exit "test2"};
+    t3 ::= SysCall new-task test3 {SysCall sleep 10000; SysCall exit "test3"};
     SysCall sleep 5000;
     while {s ::= SysCall wait-any} do: {
         println "Parent exit recv: " $s,0 ", " $s,1;

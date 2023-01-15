@@ -34,7 +34,7 @@ new Task : proc pmacs-server {
                     };
                 };
             };
-        } ($f);
+        } $f;
         
         ### cleaning child process status (ignore).
         while {$SELF child-exited-any?} do: {
