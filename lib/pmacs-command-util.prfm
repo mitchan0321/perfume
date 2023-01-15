@@ -536,20 +536,25 @@ defcommand git-commit desc: "Git commit (test)." {
     cd $directory;
     mini-input-file-chooser $main $window
     init-value: $directory
-    prompt: "(git commit) file: "
+    prompt: "(git commit) file or directory: "
     enter-proc: {| value |
         if {[$value len] = 0} {
             show-message :bell "No file specified.";
             return ALL;
         };
-        directory ::= get-dir $value;
-        if {! [file dir? $directory]} {
-            show-message :bell "Bad directory specified.";
-            return ALL;
+        if {file dir? $value} {
+            directory := $value;
+            file := ".";
+        } {
+            directory ::= get-dir $value;
+            if {! [file dir? $directory]} {
+                show-message :bell "Bad directory specified.";
+                return ALL;
+            };
+            file ::= $value split sep: "/" : last : car;
+            if {$file = ""} {file := "."};
         };
         setconf GIT_DIR $directory;
-        file ::= $value split sep: "/" : last : car;
-        if {$file = ""} {file := "."};
         command := "commit";
         opts := "";
         post_command := "";
