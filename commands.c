@@ -3244,8 +3244,11 @@ cmd_connect(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     struct sockaddr_in serv_addr_in;
     Toy_Type *tport, *thostaddr;
     Toy_Type *tbindport, *tbindhostaddr;
+    Toy_Type *tnoblock;
     unsigned int port, hostaddr;
     unsigned int bindport=0, bindhostaddr=0;
+    int noblock=0;
+    int flags;
 
     if (arglen != 2) goto error;
 
@@ -3259,6 +3262,13 @@ cmd_connect(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     if (tbindhostaddr) {
 	if (GET_TAG(tbindhostaddr) != INTEGER) goto error;
 	bindhostaddr = mpz_get_si(tbindhostaddr->u.biginteger);
+    }
+    
+    tnoblock = hash_get_and_unset_t(nameargs, new_symbol(L"noblock:"));
+    if (tnoblock) {
+        if (! IS_NIL(tnoblock)) {
+            noblock = 1;
+        }
     }
 
     if (hash_get_length(nameargs) > 0) goto error;
@@ -3294,16 +3304,65 @@ cmd_connect(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     serv_addr_in.sin_port = htons((uint16_t)port);
     serv_addr_in.sin_addr.s_addr = htonl((uint32_t)hostaddr);
     
+    if (noblock) {
+        flags = fcntl(socket_fd, F_GETFL);
+        flags |= O_NONBLOCK;
+        fcntl(socket_fd, F_SETFL, flags);
+    }
+    
     sts = connect(socket_fd, (const struct sockaddr*)&serv_addr_in, sizeof(serv_addr_in));
     if (-1 == sts) {
-	return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
+        if (errno != EINPROGRESS) {
+            return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
+        }
     }
 
     return new_integer_si(socket_fd);
 
 error:
     return new_exception(TE_SYNTAX,
-			 L"Syntax error at 'connect', syntax: connect hostaddr port [bind-port: port] [bind-address: address]", interp);
+			 L"Syntax error at 'connect', syntax: connect hostaddr port [bind-port: port] [bind-address: address] [:noblock]", interp);
+}
+
+Toy_Type*
+cmd_isconnect(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    int fd, sts;
+    Toy_Type *tfd;
+    
+    if (list_length(posargs) != 1) goto error;
+    if (hash_get_length(nameargs) != 0) goto error;
+    tfd = list_get_item(posargs);
+    if (GET_TAG(tfd) != INTEGER) goto error;
+    fd = mpz_get_si(tfd->u.biginteger);
+    
+    sts = is_write_ready(fd, 0);
+    if (sts == IRDY_OK) {
+        int optval = 0, result;
+        socklen_t optlen = (socklen_t)sizeof(optval);
+        errno = 0;
+        result = getsockopt(fd, SOL_SOCKET, SO_ERROR, (void *)&optval, &optlen);
+        if (-1 == result) {
+            return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
+        } else {
+            if (0 == optval) {
+                int flags;
+                flags = fcntl(fd, F_GETFL);
+                flags &= ~O_NONBLOCK;
+                fcntl(fd, F_SETFL, flags);
+                return const_T;
+            } else {
+                return new_exception(TE_SYSCALL, decode_error(interp, strerror(optval)), interp);
+            }
+        }
+    }
+    if (sts == IRDY_ERR) {
+        return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
+    }
+    return const_Nil;    
+
+error:
+    return new_exception(TE_SYNTAX,
+			 L"Syntax error at 'connect?', syntax: connect? client-socket-fd", interp);
 }
 
 Toy_Type*
@@ -3749,7 +3808,7 @@ cmd_isbool(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 
 error:
     return new_exception(TE_SYNTAX,
-			 L"Syntax error at 'nil?', syntax: bool? val", interp);
+			 L"Syntax error at 'bool?', syntax: bool? val", interp);
 }
 
 Toy_Type*
@@ -4583,6 +4642,7 @@ int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, L"vector", 	cmd_newvector, 		L"val-list");
     toy_add_func(interp, L"eq?", 	cmd_equal, 		L"val,val");
     toy_add_func(interp, L"connect", 	cmd_connect,		L"addr,port,bind-port:,port,bind-address:,address");
+    toy_add_func(interp, L"connect?", 	cmd_isconnect,		L"file-desc");
     toy_add_func(interp, L"socket-server", cmd_socket_server, 	L"port,bind-address:,address");
     toy_add_func(interp, L"select", 	cmd_select, 		L"read-fds-list,write-fds-list,except-fds-list,timeout");
     toy_add_func(interp, L"accept", 	cmd_accept, 		L"file-desc");
