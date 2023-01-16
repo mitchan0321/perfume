@@ -504,7 +504,7 @@ defcommand shell desc: "Suspend pmacs and run shell under pmacs process." {
 defcommand git-pull desc: "Git pull (test)." {
     | main window |
     mini-input-file-chooser $main $window
-    init-value: $GIT_DIR
+    init-value: [$GIT_DIR . "/"]
     prompt: "(git pull) directory: "
     enter-proc: {| value |
         if {[$value len] = 0} {
@@ -575,7 +575,7 @@ defcommand git-commit desc: "Git commit (test)." {
 defcommand git-push desc: "Git push (test)." {
     | main window |
     mini-input-file-chooser $main $window
-    init-value: $GIT_DIR
+    init-value: [$GIT_DIR . "/"]
     prompt: "(git push) directory: "
     enter-proc: {| value |
         if {[$value len] = 0} {
@@ -604,7 +604,7 @@ defcommand git-push desc: "Git push (test)." {
 defcommand git-diff desc: "Git diff (test)." {
     | main window |
     mini-input-file-chooser $main $window
-    init-value: $GIT_DIR
+    init-value: [$GIT_DIR . "/"]
     prompt: "(git pull) directory: "
     enter-proc: {| value |
         if {[$value len] = 0} {
