@@ -40,6 +40,7 @@ defun pmacs-client-sub (path) {
     $server set! $f mode: io;
     $server set-encoding UTF-8;
     $server set-newline <t>;
+    $server set-readbuffer-max 4096;
 
     sts := 1; ## disconnect from server
     try {
