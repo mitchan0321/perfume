@@ -14,7 +14,7 @@ new Task : proc pmacs-server {
             pmacs-server-config;
             (f) := $ARGS;
             
-            r ::= SysCall recv $f;
+            r ::= SysCall gets $f;
             if {nil? $r} {
                 $f close;
                 println "[" [get-name] "] disconnect from client.";
@@ -28,7 +28,7 @@ new Task : proc pmacs-server {
             };
             $f puts "0";  ## key OK
             
-            r ::= SysCall recv $f;
+            r ::= SysCall gets $f;
             if $r {
                 r ::= $r clean;
                 if {$r at 0 : != "/"} {
