@@ -76,6 +76,19 @@ SysCall method gets (f) {
         TaskManager delete-wait-hook [$SELF get-name];
         return $r;
     }
+    SOCK {
+        TaskManager add-wait-hook [$SELF get-name] ($SELF "S>" {
+            (ifds ofds efds) ::= select ([$f fd?]) () () 0;
+            if {$ifds null?} {
+                return <nil>;
+            } {
+                return <t>;
+            };
+        });
+        pause (WAIT 0);
+        TaskManager delete-wait-hook [$SELF get-name];
+        return [$f gets];
+    }
     default: {
         TaskManager add-wait-hook [$SELF get-name] ($SELF "Q>" {$f ready?});
         r ::= $f gets;
@@ -112,6 +125,7 @@ SysCall method accept (fd) {
     $f set-newline <t>;
     $f set-noblock <t>;
     $f set-readbuffer-max 4096;
+    $f set-tag SOCK;
     return ($f $addr $port);
 };
 
@@ -140,6 +154,7 @@ SysCall method connect (host port) {
     $f set-newline <t>;
     $f set-noblock <t>;
     $f set-readbuffer-max 4096;
+    $f set-tag SOCK;
     return $f;
 };
 
