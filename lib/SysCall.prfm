@@ -110,7 +110,37 @@ SysCall method accept (fd) {
     $f set! $fd mode: io;
     $f set-encoding UTF-8;
     $f set-newline <t>;
+    $f set-noblock <t>;
+    $f set-readbuffer-max 4096;
     return ($f $addr $port);
+};
+
+SysCall method connect (host port) {
+    __checkEnv;
+    fd ::= connect $host $port :noblock;
+    __err_in_syscall__ := <nil>;
+    TaskManager add-wait-hook [$SELF get-name] ($SELF "A<" {
+        sts := <nil>;
+        try {
+            sts ::= connect? $fd;
+        } catch: {| e |
+            setc __err_in_syscall__ $e;
+            sts := <t>;
+        };
+    });
+    pause (WAIT 0);
+    TaskManager delete-wait-hook [$SELF get-name];
+    if $__err_in_syscall__ {
+        $SELF add-request-stat (ERROR $__err_in_syscall__);
+        return <nil>;
+    };
+    f ::= new File;
+    $f set! $fd mode: io;
+    $f set-encoding UTF-8;
+    $f set-newline <t>;
+    $f set-noblock <t>;
+    $f set-readbuffer-max 4096;
+    return $f;
 };
 
 SysCall method recv (f) {
