@@ -224,3 +224,29 @@ retry:
     if ((timeout.tv_sec <= 0) && (timeout.tv_usec <= 0)) return IRDY_TOUT;
     return IRDY_NO;
 }
+
+int
+is_write_ready(int fd, int timeout_m) {
+    struct timeval timeout;
+    int maxfd;
+    fd_set write_fds;
+    int sts;
+
+    timeout.tv_sec = timeout_m / 1000;
+    timeout.tv_usec = (timeout_m % 1000) * 1000;
+
+retry:
+    // fprintf(stderr, "DEBUG: timeout sec = %ld, usec = %ld\n", timeout.tv_sec, timeout.tv_usec);
+    maxfd = fd + 1;
+    FD_ZERO(&write_fds);
+    FD_SET(fd, &write_fds);
+    errno = 0;
+    sts = select(maxfd, NULL, &write_fds, NULL, &timeout);
+    if (-1 == sts) {
+        if (errno == EINTR) goto retry;
+        return IRDY_ERR;
+    }
+    if (FD_ISSET(fd, &write_fds))                        return IRDY_OK;
+    if ((timeout.tv_sec <= 0) && (timeout.tv_usec <= 0)) return IRDY_TOUT;
+    return IRDY_NO;
+}
