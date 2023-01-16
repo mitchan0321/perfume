@@ -601,6 +601,30 @@ defcommand git-push desc: "Git push (test)." {
     result ALL;
 };
 
+defcommand git-diff desc: "Git diff (test)." {
+    | main window |
+    mini-input-file-chooser $main $window
+    init-value: $GIT_DIR
+    prompt: "(git pull) directory: "
+    enter-proc: {| value |
+        if {[$value len] = 0} {
+            show-message :bell "No directory specified.";
+            return ALL;
+        };
+        directory := $value;
+        setconf GIT_DIR $directory;
+        if {file dir? $directory} else: {
+            show-message :bell ["Not directory: " . $directory];
+            return ALL;
+        };
+
+        do-command-async $window "*Git-diff*" $directory "git diff";
+    }
+    ;;
+
+    result ALL;
+};
+
 defcommand show-font desc: "Display current cursor buffer line direct to mini-windodw." {
     | main window |
     buff ::= $window get-buffer;
