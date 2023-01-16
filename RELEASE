@@ -2997,4 +2997,8 @@
 	pmacs update:
 		Add SysCall connect for non-block INET connection make.
 		Add socket buffer length to lib/pmacs-client.prfm.
+		Add SysCall gets support 'SOCK' tag has File stream, it's same as SysCall recv.
+		Change pmacs-server use SysCall recv -> SysCall gets.
+		Add git-diff editor command.
+
 #eof
