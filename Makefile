@@ -137,8 +137,8 @@ install:
 	install -m 444 lib/Tasklet/* $(PREFIX)/lib/perfume/lib/Tasklet
 	install -m 755 pkg/pmacs.in $(PREFIX)/bin
 	install -m 755 pkg/pmacs-client.in $(PREFIX)/bin
-	install -m 755 pkg/install.sh $(PREFIX)
-	(cd $(PREFIX); sh ./install.sh; rm -f bin/pmacs.in bin/pmacs-client.in install.sh)
+	install -m 755 pkg/install.sh $(PREFIX)/pmacs-install.sh
+	(cd $(PREFIX); sh ./pmacs-install.sh; rm -f bin/pmacs.in bin/pmacs-client.in pmacs-install.sh)
 
 perfumesh:	$(OBJS) perfumesh.o
 ifeq ($(CORU_USE),yes)
