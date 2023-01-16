@@ -2987,4 +2987,14 @@
 		  pmacs-server function can git comment input in pmacs.
 		Change pmacs.conf for git-* command configuration.
 
+2023/01/16
+	Makefile
+		Change 'make install' install shell name rename to pmacs-install.sh next removed.
+	commands.c
+		Add :noblock option to connect command for non-block INET conectin, if use this
+		  option next use connect? command.
+		Add connect? command for connect :noblock after tell INET connection status.
+	pmacs update:
+		Add SysCall connect for non-block INET connection make.
+		Add socket buffer length to lib/pmacs-client.prfm.
 #eof
