@@ -680,12 +680,12 @@ Window method keyin-apply (main window keyin-list) {
             };
         }
 
-        {eq? $result ALL} {
+        {and $cursor-update {eq? $result ALL}} {
             $main apply {render-all; refresh};
             if $MiniInput {$MiniWindow apply {render; refresh}};
         }
 
-        {eq? $result SELF} {
+        {and $cursor-update {eq? $result SELF}} {
             window ::= $main get-current-window;
             $window apply {render; refresh};
         }
