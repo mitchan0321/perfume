@@ -656,7 +656,7 @@ Window method keyin-apply (main window keyin-list) {
             cursor-update := <nil>;
         }
 
-        <t> {
+        $cursor-update {
             ### if do brackets-pair in background, uncomment this.
             REM {
                 $main add-background job-id: "00-BRACKETS" {
