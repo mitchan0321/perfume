@@ -521,7 +521,7 @@ defcommand git-pull desc: "Git pull (test)." {
         command := "pull";
         file := "";
         opts := "";
-        post_command := "echo '--- Press enter key to continue ---'; read";
+        post_command := "echo '--- Press enter key to continue ---'; read a";
         exec_command ::= $GIT_COMMAND expand;
         $main suspend "env" $GIT_ENV [get-shell] "-c" $exec_command;
     }
@@ -592,7 +592,7 @@ defcommand git-push desc: "Git push (test)." {
         command := "push";
         file := "";
         opts := "";
-        post_command := "echo '--- Press enter key to continue ---'; read";
+        post_command := "echo '--- Press enter key to continue ---'; read a";
         exec_command ::= $GIT_COMMAND expand;
         $main suspend "env" $GIT_ENV [get-shell] "-c" $exec_command;
     }
