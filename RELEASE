@@ -3007,5 +3007,6 @@
 		  carriage return inserted.
 		Change smart-indent use ALWAYS_SMART_INDENT.
 		Fix Tasklet/console-cleaner.prfm buffer clean execute in SysCall::apply-editor.
+		Add smart-insert omit if terminal pasting.
 
 #eof
