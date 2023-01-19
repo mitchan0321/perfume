@@ -380,7 +380,7 @@ defcommand smart-indent desc: "Formed indent at line or insert more indent." {
     };
 
     cur-pos ::= curs-index-to-pos $str $ex $DEFAULT_TAB_WIDTH;
-    if {$cur-pos < $next-indent} {
+    if {or $ALWAYS_SMART_INDENT {$cur-pos < $next-indent}} {
 	# smart indent
 	new-str ::= [" " repeat $next-indent] . [$str clean];
         $buff line-update $new-str $ey;
