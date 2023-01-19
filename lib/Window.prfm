@@ -638,6 +638,7 @@ Window method keyin-apply (main window keyin-list) {
     };
 
     cursor-update := <t>;
+    setconf SMART_INDENT_CANCEL <nil>;
     $keyin-list each do: {| k |
         if {eq? $k KEY_RESIZE} {
             $main mini-input-end;
@@ -647,15 +648,16 @@ Window method keyin-apply (main window keyin-list) {
             continue;
         };
 		
+        if {input-ready?} {
+            cursor-update := <nil>;
+            setconf SMART_INDENT_CANCEL <t>;
+        };
+
         window ::= $main get-current-window;
         result ::= $window apply-keybind $main $window $k;
         window ::= $main get-current-window;
 
         cond
-        {input-ready?} {
-            cursor-update := <nil>;
-        }
-
         $cursor-update {
             ### if do brackets-pair in background, uncomment this.
             REM {
@@ -696,6 +698,7 @@ Window method keyin-apply (main window keyin-list) {
         window ::= $main get-current-window;
         $window set-cursor;
     };
+    setconf SMART_INDENT_CANCEL <nil>;
 };
 
 Window method send-key-event (event-list) {
