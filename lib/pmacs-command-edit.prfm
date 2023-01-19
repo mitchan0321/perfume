@@ -280,6 +280,12 @@ defcommand paste-buffer desc: "Paste characters from copy buffer into current bu
 
 defcommand smart-newline desc: "Formed indent at current cursor point, insert carriage return and insert indent at new line." {
     | main window |
+    if $SMART_INDENT_CANCEL {
+        ### insert newline
+        $window apply-command $main $window "\r" insert-character;
+        return SELF;
+    };
+
     $window set-freecursor <nil>;
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
