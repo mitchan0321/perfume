@@ -474,13 +474,15 @@ defun do-command-async (window buff-name directory command) {
         println "";
         println "exit(" $sts ")";
         
-        $buff set-protect;
-        $buff no-modify;
-        if {eq? [$window get-buffer] $buff} {
-            geom ::= $window get-geom;
-            $geom set! ViewLine 0;
-            $geom set! ViewColumn 0;
-            $window cursor-move-to $geom 0 0;
+        SysCall apply-editor {
+            $buff set-protect;
+            $buff no-modify;
+            if {eq? [$window get-buffer] $buff} {
+                geom ::= $window get-geom;
+                $geom set! ViewLine 0;
+                $geom set! ViewColumn 0;
+                $window cursor-move-to $geom 0 0;
+            };
         };
         
     } $window [$grep-buff get-buffer] $command $directory;
@@ -619,6 +621,7 @@ defcommand git-diff desc: "Git diff (test)." {
         };
 
         do-command-async $window "*Git-diff*" $directory "git diff";
+        result ALL;
     }
     ;;
 
@@ -643,6 +646,7 @@ defcommand git-status desc: "Git status (test)." {
         };
 
         do-command-async $window "*Git-status*" $directory "git status";
+        result ALL;
     }
     ;;
 
