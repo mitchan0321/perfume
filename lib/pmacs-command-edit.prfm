@@ -357,6 +357,12 @@ defcommand smart-newline desc: "Formed indent at current cursor point, insert ca
 
 defcommand smart-indent desc: "Formed indent at line or insert more indent." {
     | main window |
+    if $SMART_INDENT_CANCEL {
+        ### insert indent
+        $window apply-command $main $window "\t" insert-character;
+        return SELF;
+    };
+
     $window set-freecursor <nil>;
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -558,7 +564,7 @@ defcommand show-character-code desc: "Display cursors point character code at mi
     result SELF;
 };
 
-defcommand input-character-code desc: "Insert specified unicode code point character into current buffer ato cursor point." {
+defcommand input-character-code desc: "Insert specified unicode code point character into current buffer at cursor point." {
     | main window |
 
     mini-input-until-enter $main $window
