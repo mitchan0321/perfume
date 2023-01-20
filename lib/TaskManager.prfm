@@ -259,3 +259,8 @@ TaskManager method panic (msg) {
     $Task_stdout puts "";
     $Task_stdout puts [">>>Panic: " . $msg];
 };
+
+TaskManager method output-console (msg) {
+    $Task_stdout puts $msg;
+};
+
