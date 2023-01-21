@@ -1143,5 +1143,4 @@ defun unsetconf (key) {
     $CONFIG unset $key;
     $CONFIG_RO unset $key;
     $CONFIG_TYPE unset $key;
-    $CONFIG_DESC unset $key;
 };
