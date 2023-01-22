@@ -394,7 +394,7 @@ defcommand smart-indent desc: "Formed indent at line or insert more indent." {
     cur-pos ::= curs-index-to-pos $str $ex $DEFAULT_TAB_WIDTH;
     if {or $ALWAYS_SMART_INDENT {$cur-pos < $next-indent}} {
         last-pos ::= curs-index-to-pos $str [$str len] $DEFAULT_TAB_WIDTH;
-        if {and {$cur-pos >= $last-pos} {or {$str at -1 : = " "} {$str at -1 : = "\t"}}} {
+        if {and {$cur-pos >= $last-pos} {$str =~ '[ \t]+$'}} {
             # insert indent
             in ::= $INDENT_WIDTH - [$cur-pos % $INDENT_WIDTH];
             $buff insert-string-at [" " repeat $in] $ey $ex;
