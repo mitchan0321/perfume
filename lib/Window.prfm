@@ -660,7 +660,7 @@ Window method keyin-apply (main window keyin-list) {
         cond
         $cursor-update {
             ### if do brackets-pair in background, uncomment this.
-            REM {
+            ### REM {
                 $main add-background job-id: "00-BRACKETS" {
                     if {! [$main mini-input?]} {
                         if {eq? [$window get @name] CombiWindow} {
@@ -670,9 +670,10 @@ Window method keyin-apply (main window keyin-list) {
                         };
                     };
                 };
-            }; # END REM
+            ### }; # END REM
 
             ### if do brackets-pair in on-time, uncomment this.
+            REM {
             if {! [$main mini-input?]} {
                 if {eq? [$window get @name] CombiWindow} {
                     if {$window active?} {
@@ -680,6 +681,7 @@ Window method keyin-apply (main window keyin-list) {
                     };
                 };
             };
+            }; ### END REM
         }
 
         {and $cursor-update {eq? $result ALL}} {
