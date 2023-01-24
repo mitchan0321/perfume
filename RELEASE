@@ -3017,4 +3017,8 @@
 		Change theme MODERN and MODERN-DARK, ACTIVE_VERT_LINE_PROTECT.
 		Change config valiable MAX_WINDOW_DIVS to read-only.
 
+2023/01/24
+	pmacs update:
+		Fix backup search string when cancel search mode.
+
 #eof
