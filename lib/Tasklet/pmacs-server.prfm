@@ -8,7 +8,7 @@ new Task : proc pmacs-server {
     
     loop do: {
         (f a p) ::= SysCall accept $l;
-        println "[" [get-name] "] accept: IP: " [host-address-string $a] ", port:" $p;
+        println "[" [get-name] "] accept - IP: " [host-address-string $a] ", port: " $p;
 
         SysCall new-task [get-name] {
             pmacs-server-config;
