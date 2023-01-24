@@ -3020,5 +3020,6 @@
 2023/01/24
 	pmacs update:
 		Fix backup search string when cancel search mode.
+		Fix smart-indent current indent level wrong if previous line is label ('[A-Za-z0-9_]+:').
 
 #eof
