@@ -262,5 +262,10 @@ endif
 	install -m 644 pkg/pmacs.in   $(PKG_DIR)/bin
 	install -m 644 pkg/pmacs-client.in   $(PKG_DIR)/bin
 	(cd $(PKG_TMP); tar cvzf $(PKG_TAR_NAME) ./pmacs-install)
+	if [ ! -d $(HOME)/.pmacs ]; then mkdir $(HOME)/.pmacs; fi
+	if [ ! -f $(HOME)/.pmacs/pmacs.conf ]; then install -m 644 lib/dot-pmacs/pmacs.conf $(HOME)/.pmacs/; fi
+	if [ ! -f $(HOME)/.pmacs/default.key ]; then install -m 644 lib/dot-pmacs/default.key $(HOME)/.pmacs/; fi
+	if [ ! -f $(HOME)/.pmacs/theme.prfm ]; then install -m 644 lib/dot-pmacs/theme.prfm $(HOME)/.pmacs/; fi
+	if [ ! -f $(HOME)/.pmacs/startup.prfm ]; then install -m 644 lib/dot-pmacs/startup.prfm $(HOME)/.pmacs/; fi
 
 #eof
