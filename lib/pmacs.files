@@ -7,7 +7,7 @@ pmacs.files := (
 BufferBase.prfm
 BufferGeom.prfm
 BufferManager.prfm
-CombiWindow.key
+pmacs-default.key
 CombiWindow.prfm
 EditBuffer.prfm
 MiniWindow.prfm
