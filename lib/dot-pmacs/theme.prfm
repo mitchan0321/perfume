@@ -1,0 +1,9 @@
+### user defined theme color
+###   exsample:
+case $THEME
+MODERN {
+    set-color-name COMMENT_HILIGHT              [WUtil color-pair WHITE   WHITE] attr: ($A_ITALIC $A_DIM);
+    set-color-name REGION_HILIGHT               [WUtil color-pair WHITE   WHITE] attr: ($A_DIM $A_STANDOUT);
+    set-color-name STRING_LITERAL_HILIGHT       [WUtil color-pair MAGENTA WHITE];
+}
+;;
