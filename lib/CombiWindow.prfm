@@ -627,12 +627,12 @@ CombiWindow method load-keybind () {
     sets KeyBinding [dict()];
     sets KeyDesc [dict()];
     $LIB_PATH each do: {| i |
-	if {file exists? [$i . "/" $COMBIWINDOW_KEYBINDFILE]} {
+	if {file exists? [$i . "/" $DEFAULT_KEYBINDFILE]} {
 	    try {
-	        load :notrace [$i . "/" $COMBIWINDOW_KEYBINDFILE]
+	        load :notrace [$i . "/" $DEFAULT_KEYBINDFILE]
 	    } catch: {| e |
-		### throw ErrConfiguration ["Error at key-bind file: " . $COMBIWINDOW_KEYBINDFILE ", <" [$e car] "># " [$e cdr]];
-		show-message :bell ["Error at key-bind file: " . $COMBIWINDOW_KEYBINDFILE ", <" [$e car] "># " [$e cdr]];
+		### throw ErrConfiguration ["Error at key-bind file: " . $DEFAULT_KEYBINDFILE ", <" [$e car] "># " [$e cdr]];
+		show-message :bell ["Error at key-bind file: " . $DEFAULT_KEYBINDFILE ", <" [$e car] "># " [$e cdr]];
 		return;
 	    };
 	    break;
