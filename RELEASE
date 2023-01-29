@@ -3022,4 +3022,12 @@
 		Fix backup search string when cancel search mode.
 		Fix smart-indent current indent level wrong if previous line is label ('[A-Za-z0-9_]+:').
 
+2023/01/29
+	pmacs update:
+		Change key bind file name CombiWindow.key -> pmacs-default.key and COMBIWINDOW_KEYBINDFILE
+		  variable name to DEFAULT_KEYBINDFILE and add USER_KEYBINDFILE variable.
+		Change search-next/search-previous key binding to Ctrl+F5/Ctrl+F6.
+		Change key-binding-list sort order. Fn key bind to grouped and DEL,INS,PgUp,PgDn,HOME,END,allow
+		  key groups to less order.
+
 #eof
