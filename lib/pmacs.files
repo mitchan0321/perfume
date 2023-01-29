@@ -52,10 +52,14 @@ pinterp.prfm
 ptrace.prfm
 ts.prfm
 zap.prfm
+zaps.prfm
 resume.prfm
 suspend.prfm
 FloatingWindow.prfm
 FloatingWindowManager.prfm
+Tasklet/console-adjuster.prfm
+Tasklet/console-cleaner.prfm
+Tasklet/pmacs-server.prfm
 
 );
 
