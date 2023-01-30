@@ -732,6 +732,7 @@ Window method get-window-list-without-current () {
 };
     
 Window method mini-input-callback (in-key value) {
+    result := SELF;
     if {! [$MiniInputCallback null?]} {
 	try {
 	    result ::= yield $MiniInputCallback,1 $MainWindow $MiniInputCallback,0 $in-key $value;
