@@ -14,7 +14,7 @@ OBJS		= bulk.o binbulk.o cell.o array.o hash.o list.o parser.o types.o \
 		  eval.o interp.o commands.o methods.o global.o cstack.o util.o \
 		  encoding.o encoding-table.o
 
-############################################################################
+######################################################################################
 ###
 ###   FIX ME
 ###
@@ -117,7 +117,7 @@ endif
 ###
 ###   DONE
 ###
-############################################################################
+######################################################################################
 
 all:		perfumesh
 
@@ -137,7 +137,7 @@ install:
 	install -m 444 lib/Tasklet/* $(PREFIX)/lib/perfume/lib/Tasklet
 	install -m 755 pkg/pmacs.in $(PREFIX)/bin
 	install -m 755 pkg/pmacs-client.in $(PREFIX)/bin
-	install -m 755 pkg/install.sh $(PREFIX)/pmacs-install.sh
+	install -m 755 pkg/pmacs-install.sh $(PREFIX)/pmacs-install.sh
 	(cd $(PREFIX); sh ./pmacs-install.sh; rm -f bin/pmacs.in bin/pmacs-client.in pmacs-install.sh)
 
 perfumesh:	$(OBJS) perfumesh.o
@@ -248,6 +248,7 @@ endif
 	mkdir -p $(PKG_DIR)/lib/perfume/lib
 	mkdir -p $(PKG_DIR)/lib/perfume/lib/pdoc
 	mkdir -p $(PKG_DIR)/lib/perfume/lib/Tasklet
+	mkdir -p $(PKG_DIR)/lib/perfume/lib/dot-pmacs
 	install -m 755 perfumesh  $(PKG_DIR)/bin
 	install -m 644 setup.prfm $(PKG_DIR)/lib/perfume
 	install -m 644 lib/*.prfm $(PKG_DIR)/lib/perfume/lib
@@ -255,17 +256,13 @@ endif
 	install -m 644 lib/*.key  $(PKG_DIR)/lib/perfume/lib
 	install -m 644 lib/*.logo $(PKG_DIR)/lib/perfume/lib
 	install -m 644 lib/*.keymap $(PKG_DIR)/lib/perfume/lib
-	install -m 444 lib/pdoc/* $(PKG_DIR)/lib/perfume/lib/pdoc
-	install -m 444 lib/Tasklet/* $(PKG_DIR)/lib/perfume/lib/Tasklet
+	install -m 644 lib/pdoc/* $(PKG_DIR)/lib/perfume/lib/pdoc
+	install -m 644 lib/Tasklet/* $(PKG_DIR)/lib/perfume/lib/Tasklet
+	install -m 644 lib/dot-pmacs/* $(PKG_DIR)/lib/perfume/lib/dot-pmacs
 	install -m 755 pkg/install.sh $(PKG_DIR)
 	install -m 644 pkg/INSTALL    $(PKG_DIR)
 	install -m 644 pkg/pmacs.in   $(PKG_DIR)/bin
 	install -m 644 pkg/pmacs-client.in   $(PKG_DIR)/bin
 	(cd $(PKG_TMP); tar cvzf $(PKG_TAR_NAME) ./pmacs-install)
-	if [ ! -d $(HOME)/.pmacs ]; then mkdir $(HOME)/.pmacs; fi
-	if [ ! -f $(HOME)/.pmacs/pmacs.conf ]; then install -m 644 lib/dot-pmacs/pmacs.conf $(HOME)/.pmacs/; fi
-	if [ ! -f $(HOME)/.pmacs/default.key ]; then install -m 644 lib/dot-pmacs/default.key $(HOME)/.pmacs/; fi
-	if [ ! -f $(HOME)/.pmacs/theme.prfm ]; then install -m 644 lib/dot-pmacs/theme.prfm $(HOME)/.pmacs/; fi
-	if [ ! -f $(HOME)/.pmacs/startup.prfm ]; then install -m 644 lib/dot-pmacs/startup.prfm $(HOME)/.pmacs/; fi
 
 #eof
