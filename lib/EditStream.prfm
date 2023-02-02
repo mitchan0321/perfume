@@ -41,24 +41,21 @@ EditStream method ready? (timeout: timeout) {
 
 EditStream method puts (nonewline: nonewline args: r) {
     $Buffer ?? {throw FileNotOpen "EditBuffer stream not open."};
-    
-    $r each do: {| i |
-        atomic {
-            len ::= $Buffer get-buffer-length;
-            $len --;
-            len ::= {$len < 0} ??? 0 $len;
-            cur ::= $Buffer get-buffer-line $len;
-            col ::= $cur ??? {$cur len} 0;
-            if {and $cur {$ColLimit > 0} {$cur len : >= $ColLimit}} {
-                r ::= "\r" . $i;
-            } {
-                r := $i;
-            };
-            $Buffer insert-string-at
-                ["" . $r [[true? Newline] ??? [[true? nonewline] ??? "" "\r"] ""]]
-                $len $col
-            ;;
+
+    r ::= $r join sep: "";
+    atomic {
+        len ::= $Buffer get-buffer-length;
+        $len --;
+        len ::= {$len < 0} ??? 0 $len;
+        cur ::= $Buffer get-buffer-line $len;
+        col ::= $cur ??? {$cur len} 0;
+        if {and $cur {$ColLimit > 0} {$cur len : >= $ColLimit}} {
+            r ::= "\r" . $r;
         };
+        $Buffer insert-string-at
+            [$r . [[true? Newline] ??? [[true? nonewline] ??? "" "\r"] ""]]
+            $len $col
+        ;;
     };
     return <t>;
 };
