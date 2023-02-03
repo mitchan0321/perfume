@@ -3029,5 +3029,12 @@
 		Change search-next/search-previous key binding to Ctrl+F5/Ctrl+F6.
 		Change key-binding-list sort order. Fn key bind to grouped and DEL,INS,PgUp,PgDn,HOME,END,allow
 		  key groups to less order.
+2023/02/02
+	pmacs update:
+		Change EditStream if puts args >= 2, convert string sirealize it's args.
+		Change bindings F7 -> search-next, F8 -> search-previous.
+		Fix mini-input-callback no such variable 'result'.
+		Add install $(HOME)/.pmacs template file install script.
+		Add $(HOME)/.pmacs/* files install template.
 
 #eof
