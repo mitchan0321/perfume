@@ -442,7 +442,7 @@ defcommand compile desc: "Run compile command and output result to *Grep* buffer
         }
     ;;
     
-    result All;
+    result ALL;
 };
 
 defun do-command-async (window buff-name directory command) {
