@@ -98,12 +98,17 @@ SysCall method gets (f) {
     ;;
 };
 
-SysCall method puts (f r) {
+SysCall method puts (f args: arg) {
     __checkEnv;
-    TaskManager add-wait-hook [$SELF get-name] ($SELF "Q<" {$f ready-write?});
-    sts ::= $f puts $r;
-    TaskManager delete-wait-hook [$SELF get-name];
-    return $sts;
+    r ::= $arg join sep: "";
+    if {$f instance? Stream} {
+        TaskManager add-wait-hook [$SELF get-name] ($SELF "Q<" {$f ready-write?});
+        sts ::= $f puts $r;
+        TaskManager delete-wait-hook [$SELF get-name];
+        return $sts;
+    } {
+        return [$f puts $r];
+    };
 };
 
 SysCall method accept (fd) {
