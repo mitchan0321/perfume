@@ -3012,8 +3012,8 @@
 2023/01/21
 	pmacs update:
 		Change unsetconf no unset CONFIG_DESC.
-		Fix ALWAYS_SMART_INDENT but if cursor position at last and before character is " " or "\t" 
-		  then insert tab-space.
+		Fix ALWAYS_SMART_INDENT do auto indent but if cursor position at last and before 
+		  character was " " or "\t" then insert tab-space.
 		Change theme MODERN and MODERN-DARK, ACTIVE_VERT_LINE_PROTECT.
 		Change config valiable MAX_WINDOW_DIVS to read-only.
 
