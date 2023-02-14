@@ -1,3 +1,4 @@
+2023/02/15	PRFM_20230215_A34	1.7.1
 2022/12/23	PRFM_20221223_K34	1.7.0
 2022/10/25	PRFM_20221025		1.6.3
 2022/10/06	PRFM_20221006		1.6.2
@@ -2931,7 +2932,7 @@
 2022/12/27
 	pmacs update:
 		Change TaskManager after dispatch process order, SysCall request -> task exit.
-		Change editor command grep, grep-current-word and compile implimentation use Task syste.
+		Change editor command grep, grep-current-word and compile implimentation use Task system.
 		  and create new function do-command-async.
 		Add new config variable COMPILE_COMMAND for compile command throw shell string.
 
@@ -3007,7 +3008,7 @@
 		  carriage return inserted.
 		Change smart-indent use ALWAYS_SMART_INDENT.
 		Fix Tasklet/console-cleaner.prfm buffer clean execute in SysCall::apply-editor.
-		Add smart-insert omit if terminal pasting.
+		Add smart-insert omit if terminal paste.
 
 2023/01/21
 	pmacs update:
@@ -3036,5 +3037,10 @@
 		Fix mini-input-callback no such variable 'result'.
 		Add install $(HOME)/.pmacs template file install script.
 		Add $(HOME)/.pmacs/* files install template.
+
+2023/02/15
+	tag:
+		PRFM_20230215_A34
+		1.7.1
 
 #eof
