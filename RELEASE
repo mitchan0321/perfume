@@ -3043,4 +3043,10 @@
 		PRFM_20230215_A34
 		1.7.1
 
+2023/02/15
+	pmacs update:
+		Add repeat-command and set-times editor command, for execute previous editor
+		  command specified repeat times (default 1 time). Key bindings are Alt+x to repeat
+		  command and ESC to specify times.
+
 #eof
