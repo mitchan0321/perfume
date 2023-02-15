@@ -34,6 +34,11 @@ Window method init-constructor () {
     ### read keymap file
     sets KeyMaps [dict];
     read-keymaps;
+    
+    ### command repeat
+    sets LastCommand <nil>;
+    sets LastCharacter "";
+    sets RepeatTimes 0;
 };
 
 Window method get-curs () {
@@ -905,4 +910,33 @@ Window method input-ready? () {
     if [false? InputFd] {return <nil>};
     if [$InputFd ready?] {return <t>};
     return <nil>;
+};
+
+Window method set-last-command (c) {
+    if {or {eq? $c repeat-command} {eq? $c set-times}} {
+        return;
+    };
+    sets LastCommand $c;
+};
+
+Window method get-last-command () {
+    return $LastCommand;
+};
+
+Window method set-last-character (c) {
+    sets LastCharacter $c;
+};
+
+Window method get-last-character () {
+    return $LastCharacter;
+};
+
+Window method set-repeat-times (t) {
+    sets RepeatTimes $t;
+};
+
+Window method get-repeat-times () {
+    r := $RepeatTimes;
+    sets RepeatTimes 0;
+    return $r;
 };

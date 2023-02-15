@@ -698,12 +698,23 @@ CombiWindow method get-mode () {
 
 CombiWindow method apply-keybind (main window key) {
     show-message "";
+    
+    n ::= $main get-repeat-times;
+    
     if {and [string? $key] [! [get-buffer : protect?]]} {
 	command ::= $KeyBinding get KEY_INPUT_CHAR;
 	body ::= get-command $command;
 	if {block? $body} {
 	    try {
-		result ::= yield $body $main $window $key;
+                if {$n = 0} {
+                    $main set-last-command $command;
+                    $main set-last-character $key;
+                    result ::= yield $body $main $window $key;
+                } {
+                    $main set-last-command $command;
+                    $main set-last-character $key;
+                    result ::= do-repeat $main $window $n;
+                };
 	    }
 	    catch: {| e |
 		show-message :bell ["Error happend at editor command: " . $command ", <" [$e car] "># " [$e cdr]];
@@ -728,7 +739,15 @@ CombiWindow method apply-keybind (main window key) {
     body ::= get-command $command;
     if {block? $body} {
 	try {
-	    result ::= yield $body $main $window;
+            if {$n = 0} {
+                $main set-last-command $command;
+                ### $main set-last-character "";
+                result ::= yield $body $main $window;
+            } {
+                $main set-last-command $command;
+                ### $main set-last-character "";
+                result ::= do-repeat $main $window $n;
+            };
 	}
 	catch: {| e |
 	    show-message :bell ["Error happend at editor command: " . $command ", <" [$e car] "># " [$e cdr]];

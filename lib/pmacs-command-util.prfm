@@ -155,6 +155,7 @@ defcommand execute-editor-command desc: "Execute editor command." {
     mini-input-until-enter $main $window
         prompt: "Editor command: "
         enter-proc: {| value |
+            $main set-last-command $value;
 	    $window apply-command $main $window "" $value; 
 	}
         edit-proc: {| value |
@@ -1068,3 +1069,49 @@ defcommand set-config desc: "Set configuration value." {
     return ALL;
 };
 
+defcommand repeat-command desc: "Repeat last command n times." {
+    | main window |
+    
+    times ::= $main get-repeat-times;
+    do-repeat $main $window $times;
+    return ALL;
+};
+
+defun do-repeat (main window times) {
+    command ::= $main get-last-command;
+    key ::= $main get-last-character;
+    
+    if {nil? $command} {return SELF};
+    key ::= $key ?? "";
+    times ::= {$times = 0} ??? 1 $times;
+    
+    result := <nil>;
+    1 each to: $times do: {
+        result ::= $window apply-command $main $window $key $command;
+    };
+    return $result;
+};
+
+defcommand set-times desc: "Set n times." {
+    | main window |
+    
+    mini-input-until-enter $main $window
+        prompt: "Repeat times: "
+        enter-proc: {| value |
+            try {
+                if {$value = ""} {
+                    times := 0;
+                } {
+                    times ::= $value int;
+                    if {$times < 0} {throw ErrNegative "Negative value"};
+                };
+            } catch: {
+                show-message :bell "Illegal times.";
+                $main set-repeat-times 0;
+                return ALL;
+            };
+            $main set-repeat-times $times;
+        };
+    ;;
+    return ALL;
+};
