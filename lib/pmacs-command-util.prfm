@@ -1092,7 +1092,7 @@ defun do-repeat (main window times) {
     return $result;
 };
 
-defcommand set-times desc: "Set n times." {
+defcommand set-times desc: "Set repeat time." {
     | main window |
     
     mini-input-until-enter $main $window
