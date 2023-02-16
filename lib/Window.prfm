@@ -913,7 +913,7 @@ Window method input-ready? () {
 };
 
 Window method set-last-command (c) {
-    if {or {eq? $c repeat-command} {eq? $c set-times}} {
+    if {$IGNORE_REPEAT get $c} {
         return;
     };
     sets LastCommand $c;
