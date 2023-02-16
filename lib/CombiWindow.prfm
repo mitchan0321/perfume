@@ -706,13 +706,11 @@ CombiWindow method apply-keybind (main window key) {
 	body ::= get-command $command;
 	if {block? $body} {
 	    try {
+                $main set-last-command $command;
+                $main set-last-character $key;
                 if {$n = 0} {
-                    $main set-last-command $command;
-                    $main set-last-character $key;
                     result ::= yield $body $main $window $key;
                 } {
-                    $main set-last-command $command;
-                    $main set-last-character $key;
                     result ::= do-repeat $main $window $n;
                 };
 	    }
@@ -739,13 +737,10 @@ CombiWindow method apply-keybind (main window key) {
     body ::= get-command $command;
     if {block? $body} {
 	try {
+            $main set-last-command $command;
             if {$n = 0} {
-                $main set-last-command $command;
-                ### $main set-last-character "";
                 result ::= yield $body $main $window;
             } {
-                $main set-last-command $command;
-                ### $main set-last-character "";
                 result ::= do-repeat $main $window $n;
             };
 	}
