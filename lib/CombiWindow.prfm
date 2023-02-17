@@ -883,6 +883,17 @@ CombiWindow method end-region () {
     return $reg;
 };
 
+CombiWindow method exchange-region () {
+    geom ::= get-geom;
+    reg := $geom,Region;
+    $reg ?? {return};
+
+    buff ::= get-buffer;
+    (cy cx) ::= get-source-index $buff $geom;
+    $geom set! Region ($cy $cx);
+    cursor-move-to $geom $reg,0 $reg,1;
+};
+
 CombiWindow method in-region? () {
     geom ::= get-geom;
     reg := $geom,Region;
