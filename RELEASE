@@ -3049,4 +3049,9 @@
 		  command specified repeat times (default 1 time). Key bindings are Alt+x to repeat
 		  command and ESC to specify times.
 
+2023/02/17
+	pmacs update:
+		Add exchange-region editor command for exchange start region point and current point
+		  key bind to ALT+x and repeat-command re-assign to ALT+.
+
 #eof
