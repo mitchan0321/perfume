@@ -3054,4 +3054,14 @@
 		Add exchange-region editor command for exchange start region point and current point
 		  key bind to ALT+x and repeat-command re-assign to ALT+.
 
+2023/02/20
+	pmacs update:
+		Add CombiWindow.prfm and do-repeat (in pmacs-command-util.prfm) to keyboard 
+		  macro recoding caller.
+		Add Window.prfm to keyboard macro recording callee.
+		Add editor command start-recording (binding to ALT+1), end-recording (binding to ALT+0)
+		  and execute-record (binding to ALT+comma)
+		Add key binding ALT+1 (start-recording), ALT+0 (end-recording) and ALT+comma (execute-record).
+		Add config variable IGNORE_RECORD for not recording commands define.
+
 #eof
