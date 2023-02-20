@@ -39,6 +39,10 @@ Window method init-constructor () {
     sets LastCommand <nil>;
     sets LastCharacter "";
     sets RepeatTimes 0;
+    
+    ### keyboard macro record
+    sets Recording <nil>;
+    sets RecordingBuffer <nil>;
 };
 
 Window method get-curs () {
@@ -939,4 +943,42 @@ Window method get-repeat-times () {
     r := $RepeatTimes;
     sets RepeatTimes 0;
     return $r;
+};
+
+Window method start-recording () {
+    sets Recording <t>;
+    $RecordingBuffer ?? {
+        sets RecordingBuffer [new EditStream];
+        $RecordingBuffer open "*Recording*";
+    };
+    buff ::= $RecordingBuffer get-buffer;
+    $buff clear-all;
+    show-message "Start recording.";
+};
+
+Window method end-recording () {
+    show-message "End recording.";
+    sets Recording <nil>;
+};
+
+Window method recording? () {
+    return $Recording;
+};
+
+Window method key-record (k c) {
+    $Recording ?? {return};
+    
+    if {$IGNORE_RECORD get $k} {
+        return;
+    };
+    show-message "Recording ...";
+    if {eq? $k insert-character} {
+        $RecordingBuffer puts ["" . $k " " $c];
+    } {
+        $RecordingBuffer puts ["" . $k];
+    };
+};
+
+Window method get-record-buffer () {
+    return $RecordingBuffer;
 };
