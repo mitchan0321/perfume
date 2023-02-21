@@ -1144,7 +1144,7 @@ defcommand execute-record desc: "Execute keyboard macro." {
         if {eq? $ins-char-cmd [$r sub 0 [$ins-char-cmd len]]} {
             result ::= $window apply-command $main $window [$r sub [$ins-char-cmd len : + 1]] [symbol $ins-char-cmd];
         } {
-            result ::= $window apply-command $main $window "" $r;
+            result ::= $window apply-command $main $window "" [symbol $r];
         };
     };
     return ALL;
