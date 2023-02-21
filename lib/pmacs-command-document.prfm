@@ -37,7 +37,7 @@ defcommand pwiki-click-link desc: "Open PWiki document." {
     if {[$link at 0] = "&"} {
         ### if pwiki link form is [[&command]], execute command.
         command ::= $link sub 1;
-        $window apply-command $main $window "" $command;
+        $window apply-command $main $window "" [symbol $command];
         return ALL;
     };
     path ::= $buff get-content;

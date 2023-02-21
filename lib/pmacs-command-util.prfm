@@ -156,7 +156,7 @@ defcommand execute-editor-command desc: "Execute editor command." {
         prompt: "Editor command: "
         enter-proc: {| value |
             $main set-last-command $value;
-	    $window apply-command $main $window "" $value; 
+	    $window apply-command $main $window "" [symbol $value];
 	}
         edit-proc: {| value |
             try {
@@ -195,7 +195,7 @@ defcommand trace-editor-command desc: "Trace editor command and output trace res
             $f puts ["*** Editor command: " . $value];
             err := <nil>;
 	    try {
-                trace {$window apply-command $main $window "" $value} out: [$f fd?];
+                trace {$window apply-command $main $window "" [symbol $value]} out: [$f fd?];
             } catch: {| err |};
             if $err {
                 $f puts ["ERROR: " $err];
