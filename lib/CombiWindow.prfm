@@ -757,9 +757,11 @@ CombiWindow method apply-keybind (main window key) {
     } {
         if {$Prefix null?} {
             map ::= $PrefixMap get DEFAULT;
+            map-name := "";
             default-map := <t>;
         } {
-            map ::= $PrefixMap get $PrefixKey,$Prefix;
+            map-name := $PrefixKey,$Prefix;
+            map ::= $PrefixMap get $map-name;
             default-map := <nil>;
         };
         sets Prefix ();
@@ -802,7 +804,7 @@ CombiWindow method apply-keybind (main window key) {
     
     command ::= $map get $key;
     if {eq? <nil> $command} {
-        show-message :bell ["No binding key: " . $key];
+        show-message :bell ["No binding key: " . [$map-name . [[$map-name = ""] ??? "" " "] $key]];
 	return <nil>;
     };
     body ::= get-command $command;
@@ -825,7 +827,7 @@ CombiWindow method apply-keybind (main window key) {
 	show-message :bell ["Editor command not defined: " . $command];
 	return <nil>;
     };
-    show-message :bell ["Incorrect command at: " . $command];
+    show-message :bell ["Incorrect command at: " . $command ", key map: " $map-name " " $key];
     return <nil>;
 };
 
