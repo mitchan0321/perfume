@@ -88,6 +88,9 @@ CombiWindow method init (main y x line column) {
     load-keybind;
     sets Mode <nil>;
     sets HILIGHT_REGEXP <nil>;
+    sets PrefixList <nil>;
+    sets PrefixDict <nil>;
+    sets CurrentPrefix DEFAULT;
 };
 
 CombiWindow method get-window-size () {
@@ -637,6 +640,24 @@ CombiWindow method load-keybind () {
 	    };
 	    break;
 	};
+    };
+};
+
+CombiWindow method set-prefix (prefix-list) {
+    sets PrefixList $prefix-list;
+    sets PrefixDict [dict $prefix-list];
+};
+
+CombiWindow method set-current-prefix (prefix) {
+    if {and $prefix $PrefixDict $PrefixList} {
+        if {$PrefixDict get $prefix} {
+            sets CurrentPrefix $prefix;
+        } {
+            show-message :bell ["No such prefix key: " . $prefix ", set to default."];
+            sets CurrentPrefix DEFAULT;
+        };
+    } {
+        sets CurrentPrefix DEFAULT;
     };
 };
 
