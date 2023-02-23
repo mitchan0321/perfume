@@ -3064,4 +3064,8 @@
 		Add key binding ALT+1 (start-recording), ALT+0 (end-recording) and ALT+comma (execute-record).
 		Add config variable IGNORE_RECORD for not recording commands define.
 
+2023/02/23
+	pmacs update:
+		Add new feature key prefix binding.
+
 #eof
