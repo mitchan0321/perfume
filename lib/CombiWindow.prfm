@@ -80,17 +80,21 @@ CombiWindow method init (main y x line column) {
     sets Parent $main;
     sets Activate <nil>;
     sets FreeCursor <nil>;
-    sets KeyBinding [dict()];
-    sets KeyDesc [dict()];
     sets SearchSave <nil>;
     sets SearchResult ();
     sets SearchHilight <nil>;
-    load-keybind;
     sets Mode <nil>;
     sets HILIGHT_REGEXP <nil>;
+
+    ### sets KeyBinding [dict()]; ---> $PrefixMap,DEFAULT
+    ### sets KeyDesc [dict()]; ---> $PrefixMapDesc,DEFAULT
     sets PrefixList <nil>;
-    sets PrefixDict <nil>;
-    sets CurrentPrefix DEFAULT;
+    sets PrefixName <nil>;
+    sets PrefixKey <nil>;
+    sets PrefixMap <nil>;       ### dict [( (Name . (key list) ... )]
+    sets PrefixMapDesc <nil>;
+    sets Prefix ();
+    load-keybind;
 };
 
 CombiWindow method get-window-size () {
@@ -627,8 +631,10 @@ CombiWindow method fit-to-cursor (geom l c center: center) {
 };
 
 CombiWindow method load-keybind () {
-    sets KeyBinding [dict()];
-    sets KeyDesc [dict()];
+    if {nil? $PrefixMap} {
+        set-prefix ();
+    };
+    
     $LIB_PATH each do: {| i |
 	if {file exists? [$i . "/" $DEFAULT_KEYBINDFILE]} {
 	    try {
@@ -644,29 +650,53 @@ CombiWindow method load-keybind () {
 };
 
 CombiWindow method set-prefix (prefix-list) {
+    ###
+    ### prefix-list format is: ( ((prefix-key ...) . "name") ... )
+    ###
     sets PrefixList $prefix-list;
-    sets PrefixDict [dict $prefix-list];
-};
-
-CombiWindow method set-current-prefix (prefix) {
-    if {and $prefix $PrefixDict $PrefixList} {
-        if {$PrefixDict get $prefix} {
-            sets CurrentPrefix $prefix;
-        } {
-            show-message :bell ["No such prefix key: " . $prefix ", set to default."];
-            sets CurrentPrefix DEFAULT;
-        };
-    } {
-        sets CurrentPrefix DEFAULT;
+    sets PrefixKey [dict $prefix-list];
+    sets PrefixMap [dict];
+    $PrefixMap set DEFAULT [dict];
+    sets PrefixMapDesc [dict];
+    $PrefixMapDesc set DEFAULT [dict];
+    sets PrefixName [dict];
+    $prefix-list each do: {| i |
+        $PrefixName set [$i cdr] [$i car];
+        $PrefixMap set [$i cdr] [dict];
+        $PrefixMapDesc set [$i cdr] [dict];
     };
 };
 
-CombiWindow method setkey (key command) {
-    $KeyBinding set $key $command;
+CombiWindow method setkey (key command prefix: prefix) {
+    if [set? prefix] else: {
+        prefix := DEFAULT;
+    };
+    if [$PrefixMap set? $prefix] else: {
+        show-message :bell ["No defined prefix name: '" . $prefix "'."];
+        return;
+    };
+    map ::= $PrefixMap get $prefix;
+    $map set $key $command;
 };
 
-CombiWindow method setkeydesc (key desc) {
-    $KeyDesc set $key $desc;
+CombiWindow method setkeydesc (key desc prefix: prefix) {
+    if [set? prefix] else: {
+        prefix := DEFAULT;
+    };
+    if [$PrefixMapDesc set? $prefix] else: {
+        show-message :bell ["No defined prefix name: '" . $prefix "'."];
+        return;
+    };
+    map ::= $PrefixMapDesc get $prefix;
+    $map set $key $desc;
+};
+
+CombiWindow method get-default-binding () {
+    return [$PrefixMap get DEFAULT];
+};
+
+CombiWindow method get-default-desc () {
+    return [$PrefixMapDesc get DEFAULT];
 };
 
 CombiWindow method load-keybind-override (mode) {
@@ -719,11 +749,26 @@ CombiWindow method get-mode () {
 
 CombiWindow method apply-keybind (main window key) {
     show-message "";
+
+    if {$PrefixKey set? [$Prefix . $key]} {
+        sets Prefix [$Prefix . $key];
+        show-message [$PrefixKey get $Prefix];
+        return;
+    } {
+        if {$Prefix null?} {
+            map ::= $PrefixMap get DEFAULT;
+            default-map := <t>;
+        } {
+            map ::= $PrefixMap get $PrefixKey,$Prefix;
+            default-map := <nil>;
+        };
+        sets Prefix ();
+    };
     
     n ::= $main get-repeat-times;
     
-    if {and [string? $key] [! [get-buffer : protect?]]} {
-	command ::= $KeyBinding get KEY_INPUT_CHAR;
+    if {and [string? $key] [! [get-buffer : protect?]] $default-map} {
+	command ::= $map get KEY_INPUT_CHAR;
 	body ::= get-command $command;
 	if {block? $body} {
 	    try {
@@ -741,8 +786,12 @@ CombiWindow method apply-keybind (main window key) {
 		return <nil>;
 	    };
 	    return $result;
-	};
-	show-message :bell ["Incorrect command at: " . $command];
+        };
+        if $command {
+            show-message :bell ["Incorrect command at: " . $command];
+        } {
+            show-message :bell "No binding key.";
+        };
 	return <nil>;
     };
 
@@ -751,7 +800,7 @@ CombiWindow method apply-keybind (main window key) {
         key ::= $key at 0;
     };
     
-    command ::= $KeyBinding get $key;
+    command ::= $map get $key;
     if {eq? <nil> $command} {
         show-message :bell ["No binding key: " . $key];
 	return <nil>;
@@ -781,7 +830,8 @@ CombiWindow method apply-keybind (main window key) {
 };
 
 CombiWindow method get-keybind (k) {
-    return [$KeyBinding get $k];
+    map ::= $PrefixMap get DEFAULT;
+    return [$map get $k];
 };
 
 CombiWindow method apply-command (main window key command) {
