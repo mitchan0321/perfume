@@ -17,8 +17,8 @@ defcommand key-binding-list desc: "Display key binding list and all editor comma
     ### $buff append-string ["%-15v %21v %-14v %-v" fmt ["-" repeat 15] ["-" repeat 21] ["-" repeat 14] ["-" repeat 38]];
     $buff append-string ["%21v %-38v %-v" fmt "Key combination" "Command" "Description"];
     $buff append-string ["%21v %-38v %-v" fmt ["-" repeat 21]   ["-" repeat 38] ["-" repeat 11]];
-    d ::= $window get KeyBinding;
-    desc ::= $window get KeyDesc;
+    d ::= $window get-default-binding;
+    desc ::= $window get-default-desc;
     l := ();
     $d each do: {| k v |
 	if {nil? $v} {continue};
