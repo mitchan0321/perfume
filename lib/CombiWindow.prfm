@@ -86,13 +86,10 @@ CombiWindow method init (main y x line column) {
     sets Mode <nil>;
     sets HILIGHT_REGEXP <nil>;
 
-    ### sets KeyBinding [dict()]; ---> $PrefixMap,DEFAULT
-    ### sets KeyDesc [dict()]; ---> $PrefixMapDesc,DEFAULT
     sets PrefixList <nil>;
     sets PrefixName <nil>;
     sets PrefixKey <nil>;
     sets PrefixMap <nil>;       ### dict [( (Name . (key list) ... )]
-    sets PrefixMapDesc <nil>;
     sets Prefix ();
     load-keybind;
 };
@@ -657,13 +654,10 @@ CombiWindow method set-prefix (prefix-list) {
     sets PrefixKey [dict $prefix-list];
     sets PrefixMap [dict];
     $PrefixMap set DEFAULT [dict];
-    sets PrefixMapDesc [dict];
-    $PrefixMapDesc set DEFAULT [dict];
     sets PrefixName [dict];
     $prefix-list each do: {| i |
         $PrefixName set [$i cdr] [$i car];
         $PrefixMap set [$i cdr] [dict];
-        $PrefixMapDesc set [$i cdr] [dict];
     };
 };
 
@@ -677,26 +671,6 @@ CombiWindow method setkey (key command prefix: prefix) {
     };
     map ::= $PrefixMap get $prefix;
     $map set $key $command;
-};
-
-CombiWindow method setkeydesc (key desc prefix: prefix) {
-    if [set? prefix] else: {
-        prefix := DEFAULT;
-    };
-    if [$PrefixMapDesc set? $prefix] else: {
-        show-message :bell ["No defined prefix name: '" . $prefix "'."];
-        return;
-    };
-    map ::= $PrefixMapDesc get $prefix;
-    $map set $key $desc;
-};
-
-CombiWindow method get-default-binding () {
-    return [$PrefixMap get DEFAULT];
-};
-
-CombiWindow method get-default-desc () {
-    return [$PrefixMapDesc get DEFAULT];
 };
 
 CombiWindow method load-keybind-override (mode) {
@@ -831,9 +805,21 @@ CombiWindow method apply-keybind (main window key) {
     return <nil>;
 };
 
-CombiWindow method get-keybind (k) {
-    map ::= $PrefixMap get DEFAULT;
+CombiWindow method get-prefix-list () {
+    return [$PrefixList map {| i | $i cdr}];
+};
+
+CombiWindow method get-bind-map (prefix) {
+    return [$PrefixMap get $prefix];
+};
+
+CombiWindow method get-keybind (prefix k) {
+    map ::= $PrefixMap get $prefix;
     return [$map get $k];
+};
+
+CombiWindow method get-key-desc () {
+    return $KEY_DESC;
 };
 
 CombiWindow method apply-command (main window key command) {
