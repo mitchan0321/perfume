@@ -1,0 +1,500 @@
+###############################################################################
+##
+## define key description
+##   using: setkeydesc key-symbol key-description
+##
+##     key-description format: "n-[key-group] [key-name]"
+##       n ... list order (sort by ascii order) (not displayed)
+##       key-group ... key groupe name (not displayed)
+##       key-name .... key name symbol (displayed)
+##
+
+defun setkeydesc (key desc) {
+    $KEY_DESC set $key $desc;
+};
+
+if [defvar? KEY_DESC] else: {
+    defvar KEY_DESC [dict ()];
+};
+
+###
+### Press function key
+###
+setkeydesc KEY_F1           "01-[F01] [F01]";
+setkeydesc KEY_F2           "02-[F02] [F02]";
+setkeydesc KEY_F3           "03-[F03] [F03]";
+setkeydesc KEY_F4           "04-[F04] [F04]";
+setkeydesc KEY_F5           "05-[F05] [F05]";
+setkeydesc KEY_F6           "06-[F06] [F06]";
+setkeydesc KEY_F7           "07-[F07] [F07]";
+setkeydesc KEY_F8           "08-[F08] [F08]";
+setkeydesc KEY_F9           "09-[F09] [F09]";
+setkeydesc KEY_F10          "10-[F10] [F10]";
+setkeydesc KEY_F11          "11-[F11] [F11]";
+setkeydesc KEY_F12          "12-[F12] [F12]";
+
+###
+### Press Shift+function key
+###
+setkeydesc KEY_F13          "01-[F01] Shift+[F01]";
+setkeydesc KEY_F14          "02-[F02] Shift+[F02]";
+setkeydesc KEY_F15          "03-[F03] Shift+[F03]";
+setkeydesc KEY_F16          "04-[F04] Shift+[F04]";
+setkeydesc KEY_F17          "05-[F05] Shift+[F05]";
+setkeydesc KEY_F18          "06-[F06] Shift+[F06]";
+setkeydesc KEY_F19          "07-[F07] Shift+[F07]";
+setkeydesc KEY_F20          "08-[F08] Shift+[F08]";
+setkeydesc KEY_F21          "09-[F09] Shift+[F09]";
+setkeydesc KEY_F22          "10-[F10] Shift+[F10]";
+setkeydesc KEY_F23          "11-[F11] Shift+[F11]";
+setkeydesc KEY_F24          "12-[F12] Shift+[F12]";
+
+###
+### Press Control+function key
+###
+setkeydesc KEY_F25          "01-[F01] Ctrl+[F01]";
+setkeydesc KEY_F26          "02-[F02] Ctrl+[F02]";
+setkeydesc KEY_F27          "03-[F03] Ctrl+[F03]";
+setkeydesc KEY_F28          "04-[F04] Ctrl+[F04]";
+setkeydesc KEY_F29          "05-[F05] Ctrl+[F05]";
+setkeydesc KEY_F30          "06-[F06] Ctrl+[F06]";
+setkeydesc KEY_F31          "07-[F07] Ctrl+[F07]";
+setkeydesc KEY_F32          "08-[F08] Ctrl+[F08]";
+setkeydesc KEY_F33          "09-[F09] Ctrl+[F09]";
+setkeydesc KEY_F34          "10-[F10] Ctrl+[F10]";
+setkeydesc KEY_F35          "11-[F11] Ctrl+[F11]";
+setkeydesc KEY_F36          "12-[F12] Ctrl+[F12]";
+
+###
+### Press Shift+Control+function key
+###
+setkeydesc KEY_F37          "01-[F01] Shift+Ctrl+[F01]";
+setkeydesc KEY_F38          "02-[F02] Shift+Ctrl+[F02]";
+setkeydesc KEY_F39          "03-[F03] Shift+Ctrl+[F03]";
+setkeydesc KEY_F40          "04-[F04] Shift+Ctrl+[F04]";
+setkeydesc KEY_F41          "05-[F05] Shift+Ctrl+[F05]";
+setkeydesc KEY_F42          "06-[F06] Shift+Ctrl+[F06]";
+setkeydesc KEY_F43          "07-[F07] Shift+Ctrl+[F07]";
+setkeydesc KEY_F44          "08-[F08] Shift+Ctrl+[F08]";
+setkeydesc KEY_F45          "09-[F09] Shift+Ctrl+[F09]";
+setkeydesc KEY_F46          "10-[F10] Shift+Ctrl+[F10]";
+setkeydesc KEY_F47          "11-[F11] Shift+Ctrl+[F11]";
+setkeydesc KEY_F48          "12-[F12] Shift+Ctrl+[F12]";
+
+###
+### Press Alt+function key
+###
+setkeydesc KEY_F49          "01-[F01] Alt+[F01]";
+setkeydesc KEY_F50          "02-[F02] Alt+[F02]";
+setkeydesc KEY_F51          "03-[F03] Alt+[F03]";
+setkeydesc KEY_F52          "04-[F04] Alt+[F04]";
+setkeydesc KEY_F53          "05-[F05] Alt+[F05]";
+setkeydesc KEY_F54          "06-[F06] Alt+[F06]";
+setkeydesc KEY_F55          "07-[F07] Alt+[F07]";
+setkeydesc KEY_F56          "08-[F08] Alt+[F08]";
+setkeydesc KEY_F57          "09-[F09] Alt+[F09]";
+setkeydesc KEY_F58          "10-[F10] Alt+[F10]";
+setkeydesc KEY_F59          "11-[F11] Alt+[F11]";
+setkeydesc KEY_F60          "12-[F12] Alt+[F12]";
+
+###
+### Press Shift+Alt+function key
+###
+setkeydesc KEY_F61          "01-[F01] Shift+Alt+[F01]";
+setkeydesc KEY_F62          "02-[F02] Shift+Alt+[F02]";
+setkeydesc KEY_F63          "03-[F03] Shift+Alt+[F03]";
+setkeydesc KEY_F64          "04-[F04] Shift+Alt+[F04]";
+setkeydesc KEY_F65          "05-[F05] Shift+Alt+[F05]";
+setkeydesc KEY_F66          "06-[F06] Shift+Alt+[F06]";
+setkeydesc KEY_F67          "07-[F07] Shift+Alt+[F07]";
+setkeydesc KEY_F68          "08-[F08] Shift+Alt+[F08]";
+setkeydesc KEY_F69          "09-[F09] Shift+Alt+[F09]";
+setkeydesc KEY_F70          "10-[F10] Shift+Alt+[F10]";
+setkeydesc KEY_F71          "11-[F11] Shift+Alt+[F11]";
+setkeydesc KEY_F72          "12-[F12] Shift+Alt+[F12]";
+
+###
+### Press Control+Alt+function key
+###
+setkeydesc KEY_F73          "01-[F01] Ctrl+Alt+[F01]";
+setkeydesc KEY_F74          "02-[F02] Ctrl+Alt+[F02]";
+setkeydesc KEY_F75          "03-[F03] Ctrl+Alt+[F03]";
+setkeydesc KEY_F76          "04-[F04] Ctrl+Alt+[F04]";
+setkeydesc KEY_F77          "05-[F05] Ctrl+Alt+[F05]";
+setkeydesc KEY_F78          "06-[F06] Ctrl+Alt+[F06]";
+setkeydesc KEY_F79          "07-[F07] Ctrl+Alt+[F07]";
+setkeydesc KEY_F80          "08-[F08] Ctrl+Alt+[F08]";
+setkeydesc KEY_F81          "09-[F09] Ctrl+Alt+[F09]";
+setkeydesc KEY_F82          "10-[F10] Ctrl+Alt+[F10]";
+setkeydesc KEY_F83          "11-[F11] Ctrl+Alt+[F11]";
+setkeydesc KEY_F84          "12-[F12] Ctrl+Alt+[F12]";
+
+###
+### Press Control+Shift+Alt+function key
+###
+setkeydesc KEY_F85          "01-[F01] Ctrl+Shift+Alt+[F01]";
+setkeydesc KEY_F86          "02-[F02] Ctrl+Shift+Alt+[F02]";
+setkeydesc KEY_F87          "03-[F03] Ctrl+Shift+Alt+[F03]";
+setkeydesc KEY_F88          "04-[F04] Ctrl+Shift+Alt+[F04]";
+setkeydesc KEY_F89          "05-[F05] Ctrl+Shift+Alt+[F05]";
+setkeydesc KEY_F90          "06-[F06] Ctrl+Shift+Alt+[F06]";
+setkeydesc KEY_F91          "07-[F07] Ctrl+Shift+Alt+[F07]";
+setkeydesc KEY_F92          "08-[F08] Ctrl+Shift+Alt+[F08]";
+setkeydesc KEY_F93          "09-[F09] Ctrl+Shift+Alt+[F09]";
+setkeydesc KEY_F94          "10-[F10] Ctrl+Shift+Alt+[F10]";
+setkeydesc KEY_F95          "11-[F11] Ctrl+Shift+Alt+[F11]";
+setkeydesc KEY_F96          "12-[F12] Ctrl+Shift+Alt+[F12]";
+
+### Press ESC
+setkeydesc KEY_ESC          "00-[SEC] [ESC]";
+
+### Press Shift+TAB (Press single TAB ---> see CTRL_I)
+setkeydesc KEY_BTAB         "00-[TAB] Shift+[TAB]";
+
+### Press Backspace
+setkeydesc KEY_BACKSPACE    "00-[BACKSPACE] [BACKSPACE]";
+setkeydesc KEY_DEL          "00-[BACKSPACE] [BACKSPACE]";
+
+### Press Return ---> see CTRL_M
+
+### Press Insert, Shift+Insert, Alt+Insert, Shift+Alt+Insert, Control+Insert
+###   Control+Shift+Insert, Control+Alt+Insert, Control+Shift+Alt+Insert
+setkeydesc KEY_IC           "00-[INS] [INS]";
+setkeydesc KEY_SIC          "00-[INS] Shift+[INS]";
+setkeydesc kIC3             "00-[INS] Alt+[INS]";
+setkeydesc kIC4             "00-[INS] Shift+Alt+[INS]";
+setkeydesc kIC5             "00-[INS] Ctrl+[INS]";
+setkeydesc kIC6             "00-[INS] Ctrl+Shift+[INS]";
+setkeydesc kIC7             "00-[INS] Ctrl+Alt+[INS]";
+setkeydesc kIC8             "00-[INS] Ctrl+Shift+Alt+[INS]";
+
+### Press Delete, Shift+Delete, Alt+Delete, Shift+Alt+Delete, Control+Delete
+###   Control+Shift+Delete, Control+Alt+Delete, Control+Shift+Alt+Delete
+setkeydesc KEY_DC           "00-[DEL] [DEL]";
+setkeydesc KEY_SDC          "00-[DEL] Shift+[DEL]";
+setkeydesc kDC3             "00-[DEL] Alt+[DEL]";
+setkeydesc kDC4             "00-[DEL] Shift+Alt+[DEL]";
+setkeydesc kDC5             "00-[DEL] Ctrl+[DEL]";
+setkeydesc kDC6             "00-[DEL] Ctrl+Shift+[DEL]";
+setkeydesc kDC7             "00-[DEL] Ctrl+Alt+[DEL]";
+setkeydesc kDC8             "00-[DEL] Ctrl+Shift+Alt+[DEL]";
+
+### Press Home, Shift+Home, Alt+Home, Shift+Alt+Home, Control+Home
+###   Control+Shift+Home, Control+Alt+Home, Control+Shift+Alt+Home
+setkeydesc KEY_HOME         "00-[HOME] [HOME]";
+setkeydesc KEY_SHOME        "00-[HOME] Shift+[HOME]";
+setkeydesc kHOM3            "00-[HOME] Alt+[HOME]";
+setkeydesc kHOM4            "00-[HOME] Shift+Alt+[HOME]";
+setkeydesc kHOM5            "00-[HOME] Ctrl+[HOME]";
+setkeydesc kHOM6            "00-[HOME] Ctrl+Shift+[HOME]";
+setkeydesc kHOM7            "00-[HOME] Ctrl+Alt+[HOME]";
+setkeydesc kHOM8            "00-[HOME] Ctrl+Shift+Alt+[HOME]";
+
+### Press End, Shift+End, Alt+End, Shift+Alt+End, Control+End
+###   Control+Shift+End, Control+Alt+End, Control+Shift+Alt+End
+setkeydesc KEY_END          "00-[END] [END]";
+setkeydesc KEY_SEND         "00-[END] Shift+[END]";
+setkeydesc kEND3            "00-[END] Alt+[END]";
+setkeydesc kEND4            "00-[END] Shift+Alt+[END]";
+setkeydesc kEND5            "00-[END] Ctrl+[END]";
+setkeydesc kEND6            "00-[END] Ctrl+Shift+[END]";
+setkeydesc kEND7            "00-[END] Ctrl+Alt+[END]";
+setkeydesc kEND8            "00-[END] Ctrl+Shift+Alt+[END]";
+
+### Press PageUp, Shift+PageUp, Alt+PageUp, Shift+Alt+PageUp, Control+PageUp
+###   Control+Shift+PageUp, Control+Alt+PageUp, Control+Shift+Alt+PageUp
+setkeydesc KEY_PPAGE        "00-[PgUp] [PgUp]";
+setkeydesc KEY_SPREVIOUS    "00-[PgUp] Shift+[PgUp]";
+setkeydesc kPRV3            "00-[PgUp] Alt+[PgUp]";
+setkeydesc kPRV4            "00-[PgUp] Shift+Alt+[PgUp]";
+setkeydesc kPRV5            "00-[PgUp] Ctrl+[PgUp]";
+setkeydesc kPRV6            "00-[PgUp] Ctrl+Shift+[PgUp]";
+setkeydesc kPRV7            "00-[PgUp] Ctrl+Alt+[PgUp]";
+setkeydesc kPRV8            "00-[PgUp] Ctrl+Shift+Alt+[PgUp]";
+
+### Press PageDown, Shift+PageDown, Alt+PageDown, Shift+Alt+PageDown, Control+PageDown
+###   Control+Shift+PageDown, Control+Alt+PageDown, Control+Shift+Alt+PageDown
+setkeydesc KEY_NPAGE        "00-[PgDn] [PgDn]";
+setkeydesc KEY_SNEXT        "00-[PgDn] Shift+[PgDn]";
+setkeydesc kNXT3            "00-[PgDn] Alt+[PgDn]";
+setkeydesc kNXT4            "00-[PgDn] Shift+Alt+[PgDn]";
+setkeydesc kNXT5            "00-[PgDn] Ctrl+[PgDn]";
+setkeydesc kNXT6            "00-[PgDn] Ctrl+Shift+[PgDn]";
+setkeydesc kNXT7            "00-[PgDn] Ctrl+Alt+[PgDn]";
+setkeydesc kNXT8            "00-[PgDn] Ctrl+Shift+Alt+[PgDn]";
+
+### Press DownAllow, Shift+DownAllow, Alt+DownAllow, Shift+Alt+DownAllow, Control+DownAllow,
+###   Control+Shift+DownAllow, Control+Alt+DownAllow, Control+Shift+Alt+DownAllow
+setkeydesc KEY_DOWN         "00-[↓] [↓]";
+setkeydesc KEY_SF           "00-[↓] Shift+[↓]";
+setkeydesc kDN3             "00-[↓] Alt+[↓]";
+setkeydesc kDN4             "00-[↓] Shift+Alt+[↓]";
+setkeydesc kDN5             "00-[↓] Ctrl+[↓]";
+setkeydesc kDN6             "00-[↓] Ctrl+Shift+[↓]";
+setkeydesc kDN7             "00-[↓] Ctrl+Alt+[↓]";
+setkeydesc kDN8             "00-[↓] Ctrl+Shift+Alt+[↓]";
+
+### Press UpAllow, Shift+UpAllow, Alt+UpAllow, Shift+Alt+UpAllow, Control+UpAllow,
+###   Control+Shift+UpAllow, Control+Alt+UpAllow, Control+Shift+Alt+UpAllow
+setkeydesc KEY_UP           "00-[↑] [↑]";
+setkeydesc KEY_SR           "00-[↑] Shift+[↑]";
+setkeydesc kUP3             "00-[↑] Alt+[↑]";
+setkeydesc kUP4             "00-[↑] Shift+Alt+[↑]";
+setkeydesc kUP5             "00-[↑] Ctrl+[↑]";
+setkeydesc kUP6             "00-[↑] Ctrl+Shift+[↑]";
+setkeydesc kUP7             "00-[↑] Ctrl+Alt+[↑]";
+setkeydesc kUP8             "00-[↑] Ctrl+Shift+Alt+[↑]";
+
+### Press RightAllow, Shift+RightAllow, Alt+RightAllow, Shift+Alt+RightAllow, Control+RightAllow,
+###   Control+Shift+RightAllow, Control+Alt+RightAllow, Control+Shift+Alt+RightAllow
+setkeydesc KEY_RIGHT        "00-[→] [→]";
+setkeydesc KEY_SRIGHT       "00-[→] Shift+[→]";
+setkeydesc kRIT3            "00-[→] Alt+[→]";
+setkeydesc kRIT4            "00-[→] Shift+Alt+[→]";
+setkeydesc kRIT5            "00-[→] Ctrl+[→]";
+setkeydesc kRIT6            "00-[→] Ctrl+Shift+[→]";
+setkeydesc kRIT7            "00-[→] Ctrl+Alt+[→]";
+setkeydesc kRIT8            "00-[→] Ctrl+Shift+Alt+[→]";
+
+### Press LeftAllow, Shift+LeftAllow, Alt+LeftAllow, Shift+Alt+LeftAllow, Control+LeftAllow,
+###   Control+Shift+LeftAllow, Control+Alt+LeftAllow, Control+Shift+Alt+LeftAllow
+setkeydesc KEY_LEFT         "00-[←] [←]";
+setkeydesc KEY_SLEFT        "00-[←] Shift+[←]";
+setkeydesc kLFT3            "00-[←] Alt+[←]";
+setkeydesc kLFT4            "00-[←] Shift+Alt+[←]";
+setkeydesc kLFT5            "00-[←] Ctrl+[←]";
+setkeydesc kLFT6            "00-[←] Ctrl+Shift+[←]";
+setkeydesc kLFT7            "00-[←] Ctrl+Alt+[←]";
+setkeydesc kLFT8            "00-[←] Ctrl+Shift+Alt+[←]";
+
+### Press Control+Alphabetic Key
+setkeydesc CTRL_SP          "#-CTRL Ctrl+[SPACE]";
+setkeydesc CTRL_A           "#-CTRL Ctrl+A";
+setkeydesc CTRL_B           "#-CTRL Ctrl+B";
+setkeydesc CTRL_C           "#-CTRL Ctrl+C";
+setkeydesc CTRL_D           "#-CTRL Ctrl+D";
+setkeydesc CTRL_E           "#-CTRL Ctrl+E";
+setkeydesc CTRL_F           "#-CTRL Ctrl+F";
+setkeydesc CTRL_G           "#-CTRL Ctrl+G";
+setkeydesc CTRL_H           "#-CTRL Ctrl+H";
+setkeydesc CTRL_I           "#-CTRL Ctrl+I";
+setkeydesc CTRL_J           "#-CTRL Ctrl+J";
+setkeydesc CTRL_K           "#-CTRL Ctrl+K";
+setkeydesc CTRL_L           "#-CTRL Ctrl+L";
+setkeydesc CTRL_M           "#-CTRL Ctrl+M";
+setkeydesc CTRL_N           "#-CTRL Ctrl+N";
+setkeydesc CTRL_O           "#-CTRL Ctrl+O";
+setkeydesc CTRL_P           "#-CTRL Ctrl+P";
+setkeydesc CTRL_Q           "#-CTRL Ctrl+Q";
+setkeydesc CTRL_R           "#-CTRL Ctrl+R";
+setkeydesc CTRL_S           "#-CTRL Ctrl+S";
+setkeydesc CTRL_T           "#-CTRL Ctrl+T";
+setkeydesc CTRL_U           "#-CTRL Ctrl+U";
+setkeydesc CTRL_V           "#-CTRL Ctrl+V";
+setkeydesc CTRL_W           "#-CTRL Ctrl+W";
+setkeydesc CTRL_X           "#-CTRL Ctrl+X";
+setkeydesc CTRL_Y           "#-CTRL Ctrl+Y";
+setkeydesc CTRL_Z           "#-CTRL Ctrl+Z";
+setkeydesc KEY_GS           "#-CTRL Ctrl+]";	# Control + ]
+setkeydesc KEY_US           "#-CTRL Ctrl+/";	# Control + /
+setkeydesc KEY_FS           "#-CTRL Ctrl+\\";	# Control + \
+setkeydesc KEY_RS           "#-CTRL Ctrl+???";	# Control + ???
+
+### Press Alphabetic Key
+setkeydesc " "              "!-ALPHA [SPACE]";
+setkeydesc "a"              "!-ALPHA a";
+setkeydesc "b"              "!-ALPHA b";
+setkeydesc "c"              "!-ALPHA c";
+setkeydesc "d"              "!-ALPHA d";
+setkeydesc "e"              "!-ALPHA e";
+setkeydesc "f"              "!-ALPHA f";
+setkeydesc "g"              "!-ALPHA g";
+setkeydesc "h"              "!-ALPHA h";
+setkeydesc "i"              "!-ALPHA i";
+setkeydesc "j"              "!-ALPHA j";
+setkeydesc "k"              "!-ALPHA k";
+setkeydesc "l"              "!-ALPHA l";
+setkeydesc "m"              "!-ALPHA m";
+setkeydesc "n"              "!-ALPHA n";
+setkeydesc "o"              "!-ALPHA o";
+setkeydesc "p"              "!-ALPHA p";
+setkeydesc "q"              "!-ALPHA q";
+setkeydesc "r"              "!-ALPHA r";
+setkeydesc "s"              "!-ALPHA s";
+setkeydesc "t"              "!-ALPHA t";
+setkeydesc "u"              "!-ALPHA u";
+setkeydesc "v"              "!-ALPHA v";
+setkeydesc "w"              "!-ALPHA w";
+setkeydesc "x"              "!-ALPHA x";
+setkeydesc "y"              "!-ALPHA y";
+setkeydesc "z"              "!-ALPHA z";
+setkeydesc "A"              "!-ALPHA Shift+a";
+setkeydesc "B"              "!-ALPHA Shift+b";
+setkeydesc "C"              "!-ALPHA Shift+c";
+setkeydesc "D"              "!-ALPHA Shift+d";
+setkeydesc "E"              "!-ALPHA Shift+e";
+setkeydesc "F"              "!-ALPHA Shift+f";
+setkeydesc "G"              "!-ALPHA Shift+g";
+setkeydesc "H"              "!-ALPHA Shift+h";
+setkeydesc "I"              "!-ALPHA Shift+i";
+setkeydesc "J"              "!-ALPHA Shift+j";
+setkeydesc "K"              "!-ALPHA Shift+k";
+setkeydesc "L"              "!-ALPHA Shift+l";
+setkeydesc "M"              "!-ALPHA Shift+m";
+setkeydesc "N"              "!-ALPHA Shift+n";
+setkeydesc "O"              "!-ALPHA Shift+o";
+setkeydesc "P"              "!-ALPHA Shift+p";
+setkeydesc "Q"              "!-ALPHA Shift+q";
+setkeydesc "R"              "!-ALPHA Shift+r";
+setkeydesc "S"              "!-ALPHA Shift+s";
+setkeydesc "T"              "!-ALPHA Shift+t";
+setkeydesc "U"              "!-ALPHA Shift+u";
+setkeydesc "V"              "!-ALPHA Shift+v";
+setkeydesc "W"              "!-ALPHA Shift+w";
+setkeydesc "X"              "!-ALPHA Shift+x";
+setkeydesc "Y"              "!-ALPHA Shift+y";
+setkeydesc "Z"              "!-ALPHA Shift+z";
+setkeydesc "0"              "!-ALPHA 0";
+setkeydesc "1"              "!-ALPHA 1";
+setkeydesc "2"              "!-ALPHA 2";
+setkeydesc "3"              "!-ALPHA 3";
+setkeydesc "4"              "!-ALPHA 4";
+setkeydesc "5"              "!-ALPHA 5";
+setkeydesc "6"              "!-ALPHA 6";
+setkeydesc "7"              "!-ALPHA 7";
+setkeydesc "8"              "!-ALPHA 8";
+setkeydesc "9"              "!-ALPHA 9";
+setkeydesc "`"              "!-ALPHA `";
+setkeydesc "~"              "!-ALPHA ~";
+setkeydesc "!"              "!-ALPHA !";
+setkeydesc "@"              "!-ALPHA @";
+setkeydesc "#"              "!-ALPHA #";
+setkeydesc "$"              "!-ALPHA $";
+setkeydesc "%"              "!-ALPHA %";
+setkeydesc "^"              "!-ALPHA ^";
+setkeydesc "&"              "!-ALPHA &";
+setkeydesc "*"              "!-ALPHA *";
+setkeydesc "("              "!-ALPHA (";
+setkeydesc ")"              "!-ALPHA )";
+setkeydesc "-"              "!-ALPHA -";
+setkeydesc "_"              "!-ALPHA _";
+setkeydesc "="              "!-ALPHA =";
+setkeydesc "+"              "!-ALPHA +";
+setkeydesc "["              "!-ALPHA [";
+setkeydesc "]"              "!-ALPHA ]";
+setkeydesc "{"              "!-ALPHA {";
+setkeydesc "}"              "!-ALPHA }";
+setkeydesc "\\"             "!-ALPHA \\";
+setkeydesc "|"              "!-ALPHA |";
+setkeydesc ";"              "!-ALPHA ;";
+setkeydesc ":"              "!-ALPHA :";
+setkeydesc "\'"             "!-ALPHA \'";
+setkeydesc "\""             "!-ALPHA \"";
+setkeydesc ","              "!-ALPHA ,";
+setkeydesc "."              "!-ALPHA .";
+setkeydesc "<"              "!-ALPHA <";
+setkeydesc ">"              "!-ALPHA >";
+setkeydesc "/"              "!-ALPHA /";
+setkeydesc "?"              "!-ALPHA ?";
+
+### Press Alt+Alphabetic Key
+setkeydesc ALT_a            "*-ALT Alt+a";
+setkeydesc ALT_b            "*-ALT Alt+b";
+setkeydesc ALT_c            "*-ALT Alt+c";
+setkeydesc ALT_d            "*-ALT Alt+d";
+setkeydesc ALT_e            "*-ALT Alt+e";
+setkeydesc ALT_f            "*-ALT Alt+f";
+setkeydesc ALT_g            "*-ALT Alt+g";
+setkeydesc ALT_h            "*-ALT Alt+h";
+setkeydesc ALT_i            "*-ALT Alt+i";
+setkeydesc ALT_j            "*-ALT Alt+j";
+setkeydesc ALT_k            "*-ALT Alt+k";
+setkeydesc ALT_l            "*-ALT Alt+l";
+setkeydesc ALT_m            "*-ALT Alt+m";
+setkeydesc ALT_n            "*-ALT Alt+n";
+setkeydesc ALT_o            "*-ALT Alt+o";
+setkeydesc ALT_p            "*-ALT Alt+p";
+setkeydesc ALT_q            "*-ALT Alt+q";
+setkeydesc ALT_r            "*-ALT Alt+r";
+setkeydesc ALT_s            "*-ALT Alt+s";
+setkeydesc ALT_t            "*-ALT Alt+t";
+setkeydesc ALT_u            "*-ALT Alt+u";
+setkeydesc ALT_v            "*-ALT Alt+v";
+setkeydesc ALT_w            "*-ALT Alt+w";
+setkeydesc ALT_x            "*-ALT Alt+x";
+setkeydesc ALT_y            "*-ALT Alt+y";
+setkeydesc ALT_z            "*-ALT Alt+z";
+
+### Press Shift+Alt+Alphabetic Key
+setkeydesc ALT_A            "*-ALT Alt+A";
+setkeydesc ALT_B            "*-ALT Alt+B";
+setkeydesc ALT_C            "*-ALT Alt+C";
+setkeydesc ALT_D            "*-ALT Alt+D";
+setkeydesc ALT_E            "*-ALT Alt+E";
+setkeydesc ALT_F            "*-ALT Alt+F";
+setkeydesc ALT_G            "*-ALT Alt+G";
+setkeydesc ALT_H            "*-ALT Alt+H";
+setkeydesc ALT_I            "*-ALT Alt+I";
+setkeydesc ALT_J            "*-ALT Alt+J";
+setkeydesc ALT_K            "*-ALT Alt+K";
+setkeydesc ALT_L            "*-ALT Alt+L";
+setkeydesc ALT_M            "*-ALT Alt+M";
+setkeydesc ALT_N            "*-ALT Alt+N";
+setkeydesc ALT_O            "*-ALT Alt+O";
+setkeydesc ALT_P            "*-ALT Alt+P";
+setkeydesc ALT_Q            "*-ALT Alt+Q";
+setkeydesc ALT_R            "*-ALT Alt+R";
+setkeydesc ALT_S            "*-ALT Alt+S";
+setkeydesc ALT_T            "*-ALT Alt+T";
+setkeydesc ALT_U            "*-ALT Alt+U";
+setkeydesc ALT_V            "*-ALT Alt+V";
+setkeydesc ALT_W            "*-ALT Alt+W";
+setkeydesc ALT_X            "*-ALT Alt+X";
+setkeydesc ALT_Y            "*-ALT Alt+Y";
+setkeydesc ALT_Z            "*-ALT Alt+Z";
+setkeydesc ALT_0            "*-ALT Alt+0";
+setkeydesc ALT_1            "*-ALT Alt+1";
+setkeydesc ALT_2            "*-ALT Alt+2";
+setkeydesc ALT_3            "*-ALT Alt+3";
+setkeydesc ALT_4            "*-ALT Alt+4";
+setkeydesc ALT_5            "*-ALT Alt+5";
+setkeydesc ALT_6            "*-ALT Alt+6";
+setkeydesc ALT_7            "*-ALT Alt+7";
+setkeydesc ALT_8            "*-ALT Alt+8";
+setkeydesc ALT_9            "*-ALT Alt+9";
+
+setkeydesc ALT_space            "*-ALT Alt+[SPACE]";
+setkeydesc ALT_exclamation      "*-ALT Alt+!";
+setkeydesc ALT_quote            "*-ALT Alt+\"";
+setkeydesc ALT_number           "*-ALT Alt+#";
+setkeydesc ALT_doller           "*-ALT Alt+$";
+setkeydesc ALT_percent          "*-ALT Alt+%";
+setkeydesc ALT_ampersand        "*-ALT Alt+&";
+setkeydesc ALT_singlequote      "*-ALT Alt+'";
+setkeydesc ALT_leftparenthesis  "*-ALT Alt+(";
+setkeydesc ALT_rightparenthesis "*-ALT Alt+)";
+setkeydesc ALT_asterisk         "*-ALT Alt+*";
+setkeydesc ALT_plus             "*-ALT Alt++";
+setkeydesc ALT_comma            "*-ALT Alt+,";
+setkeydesc ALT_hyphen           "*-ALT Alt+-";
+setkeydesc ALT_period           "*-ALT Alt+.";
+setkeydesc ALT_slash            "*-ALT Alt+/";
+setkeydesc ALT_colon            "*-ALT Alt+:";
+setkeydesc ALT_semicolon        "*-ALT Alt+;";
+setkeydesc ALT_less             "*-ALT Alt+<";
+setkeydesc ALT_equal            "*-ALT Alt+=";
+setkeydesc ALT_greater          "*-ALT Alt+>";
+setkeydesc ALT_question         "*-ALT Alt+?";
+setkeydesc ALT_at               "*-ALT Alt+@";
+setkeydesc ALT_leftbracket      "*-ALT Alt+[";
+setkeydesc ALT_backslash        "*-ALT Alt+\\";
+setkeydesc ALT_rightbracket     "*-ALT Alt+]";
+setkeydesc ALT_caret            "*-ALT Alt+^";
+setkeydesc ALT_underscore       "*-ALT Alt+_";
+setkeydesc ALT_backquote        "*-ALT Alt+`";
+setkeydesc ALT_leftbrace        "*-ALT Alt+{";
+setkeydesc ALT_verticalbar      "*-ALT Alt+|";
+setkeydesc ALT_rightbrace       "*-ALT Alt+}";
+setkeydesc ALT_tilde            "*-ALT Alt+~";
+
+### eof
