@@ -3068,4 +3068,13 @@
 	pmacs update:
 		Add new feature key prefix binding.
 
+2023/02/24
+	pmacs update:
+		Move CombiWindow::setkeydesc to new file lib/pmacs-keydesc.prfm.
+		Add new file lib/pmacs-keydesc.prfm separate from lib/pmacs-default.key.
+		Add CombiWindow::{get-prefix-list,get-bind-map,get-keybyind,get-key-desc}.
+		Add load-keydesc call from WUtil::load-keydesc.
+		Change key-binding-list support for key prefix list.
+		Change show-keycode but support default key prefix only yet.
+
 #eof
