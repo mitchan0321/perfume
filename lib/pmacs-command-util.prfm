@@ -11,7 +11,7 @@ defcommand key-binding-list desc: "Display key binding list and all editor comma
     $buff set-content [$DEFAULT_PWIKI_DIR . "/"];
     $buff clear-all;
 
-    $buff append-string ["<<< Key bindings >>>  {Buffer mode: %v}" fmt $mode];
+    $buff append-string ["<<< Key bindings >>> {Keybind mode: %v} {Buffer mode: %v}" fmt $KEYBIND_MODE $mode];
     ### $buff append-string "";
     ### $buff append-string ["%-15v %21v %-14v %-v" fmt  "Key group"     "Key combinations"  "Key symbol"       "Command"];
     ### $buff append-string ["%-15v %21v %-14v %-v" fmt ["-" repeat 15] ["-" repeat 21] ["-" repeat 14] ["-" repeat 38]];
@@ -52,14 +52,14 @@ defun display-key-binding-list (buff name key-map desc) {
             ls ::= $s split;
             grp ::= $ls get 0;
             modify ::= $ls get 1;
-            $l << ["%-18v%19v %-14v %-38v %-v" fmt $grp $modify $k ["[[" . $v "]]"] [get-command-desc $v]];
+            $l << ["%-17v%21v %-14v %-38v %-v" fmt $grp $modify $k ["[[" . $v "]]"] [get-command-desc $v]];
         } {
-            $l << ["%-18v%19v %-14v %-38v %-v" fmt "" (key input) $k ["[[" . $v "]]"] [get-command-desc $v]];
+            $l << ["%-17v%21v %-14v %-38v %-v" fmt "" (key input) $k ["[[" . $v "]]"] [get-command-desc $v]];
         };
     };
     $buff append-string $name;
     msort $l : each do: {| i |
-	$buff append-string ["" . [$i sub 16 38] [$i sub 53]];
+	$buff append-string ["" . [$i sub 17 38] [$i sub 53]];
     };
 };
 
