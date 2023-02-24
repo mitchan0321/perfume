@@ -13,6 +13,7 @@ WUtil method init () {
     
     init-config;
     init-command-DB;
+    load-keydesc;
 
     # Ommit exit command.
     d ::= dict-func;
@@ -102,6 +103,15 @@ defun init-config () {
 	    };
 	};
 	defvar PMACS_INIT <t>;
+    };
+};
+
+defun load-keydesc () {
+    $LIB_PATH each do: {| i |
+        if {file exists? [$i . "/pmacs-keydesc.prfm"]} {
+            load :notrace [$i . "/pmacs-keydesc.prfm"];
+            break;
+        };
     };
 };
 
