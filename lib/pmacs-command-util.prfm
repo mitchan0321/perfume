@@ -17,26 +17,17 @@ defcommand key-binding-list desc: "Display key binding list and all editor comma
     ### $buff append-string ["%-15v %21v %-14v %-v" fmt ["-" repeat 15] ["-" repeat 21] ["-" repeat 14] ["-" repeat 38]];
     $buff append-string ["%21v %-38v %-v" fmt "Key combination" "Command" "Description"];
     $buff append-string ["%21v %-38v %-v" fmt ["-" repeat 21]   ["-" repeat 38] ["-" repeat 11]];
-    d ::= $window get-default-binding;
-    desc ::= $window get-default-desc;
-    l := ();
-    $d each do: {| k v |
-	if {nil? $v} {continue};
-        if [$desc set? $k] {
-            s ::= $desc get $k;
-            ls ::= $s split;
-            grp ::= $ls get 0;
-            modify ::= $ls get 1;
-            $l << ["%-18v%19v %-14v %-38v %-v" fmt $grp $modify $k ["[[" . $v "]]"] [get-command-desc $v]];
-        } {
-            $l << ["%-18v%19v %-14v %-38v %-v" fmt "" (key input) $k ["[[" . $v "]]"] [get-command-desc $v]];
-        };
-    };
-    msort $l : each do: {| i |
-	$buff append-string ["" . [$i sub 16 38] [$i sub 53]];
-    };
-    
+
+    d ::= $window get-bind-map DEFAULT;
+    desc ::= $window get-key-desc;
+    display-key-binding-list $buff "Default key map" $d $desc;
     $buff append-string "";
+    
+    $window get-prefix-list : each do: {| i |
+        display-key-binding-list $buff ["Prefix: " . $i] [$window get-bind-map $i] $desc;
+        $buff append-string "";
+    };
+        
     $buff append-string "<<< All editor commands >>>";
     $buff append-string ["%-38v %-v" fmt "Command" "Description"];
     $buff append-string ["%-38v %-v" fmt ["-" repeat 38] ["-" repeat 11]];
@@ -50,6 +41,26 @@ defcommand key-binding-list desc: "Display key binding list and all editor comma
     $window set-mode "PWiki";
 
     result SELF;
+};
+
+defun display-key-binding-list (buff name key-map desc) {
+    l := ();
+    $key-map each do: {| k v |
+	if {nil? $v} {continue};
+        if [$desc set? $k] {
+            s ::= $desc get $k;
+            ls ::= $s split;
+            grp ::= $ls get 0;
+            modify ::= $ls get 1;
+            $l << ["%-18v%19v %-14v %-38v %-v" fmt $grp $modify $k ["[[" . $v "]]"] [get-command-desc $v]];
+        } {
+            $l << ["%-18v%19v %-14v %-38v %-v" fmt "" (key input) $k ["[[" . $v "]]"] [get-command-desc $v]];
+        };
+    };
+    $buff append-string $name;
+    msort $l : each do: {| i |
+	$buff append-string ["" . [$i sub 16 38] [$i sub 53]];
+    };
 };
 
 defcommand file-completion desc: "File completion and insert file name to current buffer at cursor position." {
@@ -684,7 +695,7 @@ defcommand show-keycode desc: "Display input keys key code, key sequence and bin
         k := $i;
     };
     $m append! " -> ";
-    $m append! [$window get-keybind [$k car]];
+    $m append! [$window get-keybind DEFAULT [$k car]];
     
     show-message $m;
     result SELF;
