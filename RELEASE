@@ -3076,5 +3076,7 @@
 		Add load-keydesc call from WUtil::load-keydesc.
 		Change key-binding-list support for key prefix list.
 		Change show-keycode but support default key prefix only yet.
+		Fix key-binding-list layout.
+		Add config variable BINDING_MODE, if set emacs choose emacs binding mode other pmacs mode.
 
 #eof
