@@ -20,7 +20,7 @@ defcommand key-binding-list desc: "Display key binding list and all editor comma
 
     d ::= $window get-bind-map DEFAULT;
     desc ::= $window get-key-desc;
-    display-key-binding-list $buff "Default key map" $d $desc;
+    display-key-binding-list $buff "Default key bind" $d $desc;
     $buff append-string "";
     
     $window get-prefix-list : each do: {| i |
