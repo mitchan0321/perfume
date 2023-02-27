@@ -3080,6 +3080,9 @@
 		Add config variable BINDING_MODE, if set emacs choose emacs binding mode other pmacs mode.
 
 2023/02/27
+	String.prfm
+		Add String::expand format indicator like this ${var:ind}.
+		  e.g. --- "${var:%10d}" expand 
 	pmacs update:
 		Add display P(macs) or E(macs) indicator in window status line.
 		Add start-recording-for-append and assign key bind to ALT+2.
