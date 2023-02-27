@@ -35,6 +35,7 @@ String method bool  ()  {if {[self] = "<nil>"} <nil> <t>};
 String method list  ()  {"result " . [self] : eval};
 String method dict  ()  {"result " . [self] : eval};
 String method vector()  {"result " . [self] : eval};
+
 #
 # String::expand
 #   Expand and replace value into string.
@@ -50,10 +51,16 @@ String method expand () {
     [$r reverse] each do: {| i |
 	(start end match) := $i;
 	$l << [$remain sub $end];
-	var ::= symbol [$match sub 2 [$match len : - 1]];
+        vl ::= $match sub 2 [$match len : - 1] : split sep: ":";
+	var ::= symbol [$vl get 0];
+        fmt ::= $vl get 1;
 	try {
 	    el ::= (ref $var) create-block;
-	    $l << [uplevel $el];
+            if {nil? $fmt} {
+                $l << [uplevel $el];
+            } {
+                $l << [$fmt fmt [uplevel $el]];
+            };
 	}
 	catch: {
 	    throw ErrNoSuchVariable> ["No such variable, '" . $var "'."];
