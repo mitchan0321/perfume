@@ -1135,6 +1135,13 @@ defcommand start-recording desc: "Start keyboard macro recording." {
     return SELF;
 };
 
+defcommand start-recording-for-append desc: "Start keyboard macro recording for append to recording buffer." {
+    | main window |
+    
+    $main start-recording-for-append;
+    return SELF;
+};
+
 defcommand end-recording desc: "End keyboard macro recording." {
     | main window |
     

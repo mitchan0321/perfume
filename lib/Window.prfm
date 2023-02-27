@@ -961,6 +961,20 @@ Window method start-recording () {
     show-message "Start recording.";
 };
 
+Window method start-recording-for-append () {
+    sets Recording <t>;
+    $RecordingBuffer ?? {
+        sets RecordingBuffer [new EditStream];
+        $RecordingBuffer open "*Recording*";
+    };
+    if {BufferManager get-buffer-list : find "*Recording*"} 
+    else: {
+        BufferManager regist-buffer [get-record-buffer : get-buffer] "*Recording*"
+    };
+
+    show-message "Start recording for append.";
+};
+
 Window method end-recording () {
     show-message "End recording.";
     sets Recording <nil>;
