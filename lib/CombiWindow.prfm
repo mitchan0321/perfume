@@ -324,9 +324,10 @@ CombiWindow method render-status-line (win buff cy cx y x buff-name) {
     message ::=
         ### " %v%v[%v%v%v%v%v%v] (%d,%d)  <%v> {%v} %v %v"
         ### " %v%v[%v%v%v%v%v%v] (%d,%d)  <%v> {%v} "
-        " %v%v[%v%v%v%v%v%v] %4d,%-3d %v <%v>"
+        " %v:%v%v[%v%v%v%v%v%v] %4d,%-3d %v <%v>"
         fmt
             ### [$win split sep: "#" : get 1]
+            ["" . $KEYBIND_MODE : at 0 : upper]
             [["" . [$buff get-encoding]] at 0]
             [[$buff includeCR?] ??? "d" "u"]
             [[$buff protect?] ??? "%" " "]
