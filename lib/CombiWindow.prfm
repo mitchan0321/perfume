@@ -324,14 +324,12 @@ CombiWindow method render-status-line (win buff cy cx y x buff-name) {
     message ::=
         ### " %v%v[%v%v%v%v%v%v] (%d,%d)  <%v> {%v} %v %v"
         ### " %v%v[%v%v%v%v%v%v] (%d,%d)  <%v> {%v} "
-        " %v:%v%v[%v%v%v%v%v%v] %4d,%-3d %v <%v>"
+        " %v%v[%v%v%v%v%v%v] %4d,%-3d %v <%v>"
         fmt
-            ### [$win split sep: "#" : get 1]
-            ["" . $KEYBIND_MODE : at 0 : upper]
             [["" . [$buff get-encoding]] at 0]
             [[$buff includeCR?] ??? "d" "u"]
-            [[$buff protect?] ??? "%" " "]
             [[$buff modify?] ??? "*" " "]
+            [[$buff protect?] ??? "%" " "]
             [[$buff newfile?] ??? "?" " "]
             [[get-region] ??? "#" " "]
             [$FreeCursor ??? "+" " "]
@@ -343,8 +341,10 @@ CombiWindow method render-status-line (win buff cy cx y x buff-name) {
             ### [[$buff get-path] ?? "*no file*"]
     ;;
     b2 ::= $message display-width;
-    $message append! [" {" . $Mode "} " ["-" repeat $x]];
-
+    $message append! [" {" . $Mode "}"];
+    $message append! [" (" . $KEYBIND_MODE ") "];
+    $message append! ["-" repeat $x];
+    
     curs-print $StatusLineCurs $message $DISPLAY_ENCODING 0 0;
 
     b ::= $message split sep: "<" : get 0 : display-width : + 0;

@@ -66,7 +66,7 @@ defcommand buffer-list desc: "Display all buffers list." {
     $buff append-string "                    or press shortcut key(0-9). Press CTRL+B to name completion.";
     $buff append-string "  * Delete buffer - Move cursor to buffer line and press \"d\" key.";
     $buff append-string "";
-    $buff append-string ["%1v %1v%1v %1v%1v%1v %-${maxlen}w %6v %-7v %-w" expand : fmt "#" "e" "t" "p" "m" "n" "Buffer name" "Length" "Mode" "Content path"];
+    $buff append-string ["%1v %1v%1v %1v%1v%1v %-${maxlen}w %6v %-7v %-w" expand : fmt "#" "e" "t" "m" "p" "n" "Buffer name" "Length" "Mode" "Content path"];
     $buff append-string ["%1v %1v%1v %1v%1v%1v %-${maxlen}w %6v %-7v %-w" expand : fmt "-" "-" "-" "-" "-" "-" "-----------" "------" "----" "------------"];
     shortcut-ind := 1;
     $l each do: {| buff-name |
@@ -76,8 +76,8 @@ defcommand buffer-list desc: "Display all buffers list." {
             [[$shortcut-ind <= 10] ??? [$shortcut-ind % 10] " "]
             [["" . [$display-buffer get-encoding]] at 0]
 	    [[$display-buffer includeCR?] ??? "d" "u"]
-	    [[$display-buffer protect?] ??? "%" " "]
 	    [[$display-buffer modify?]  ??? "*" " "]
+	    [[$display-buffer protect?] ??? "%" " "]
 	    [[$display-buffer newfile?] ??? "?" " "]
 	    ["<" . $buff-name ">"]
 	    [$display-buffer get-buffer-length]
