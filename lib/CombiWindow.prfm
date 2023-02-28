@@ -90,7 +90,9 @@ CombiWindow method init (main y x line column) {
     sets PrefixName <nil>;
     sets PrefixKey <nil>;
     sets PrefixMap <nil>;       ### dict [( (Name . (key list) ... )]
+    sets PrefixDesc <nil>;
     sets Prefix ();
+    sets LastPrefix ();
     load-keybind;
 };
 
@@ -654,12 +656,17 @@ CombiWindow method set-prefix (prefix-list) {
     sets PrefixList $prefix-list;
     sets PrefixKey [dict $prefix-list];
     sets PrefixMap [dict];
+    sets PrefixDesc [dict];
     $PrefixMap set DEFAULT [dict];
     sets PrefixName [dict];
     $prefix-list each do: {| i |
         $PrefixName set [$i cdr] [$i car];
         $PrefixMap set [$i cdr] [dict];
     };
+};
+
+CombiWindow method set-prefix-desc (prefix-name desc) {
+    $PrefixDesc set $prefix-name $desc;
 };
 
 CombiWindow method setkey (key command prefix: prefix) {
@@ -673,6 +680,7 @@ CombiWindow method setkey (key command prefix: prefix) {
     map ::= $PrefixMap get $prefix;
     $map set $key $command;
 };
+
 
 CombiWindow method load-keybind-override (mode) {
     sets HILIGHT_REGEXP <nil>;
@@ -722,12 +730,31 @@ CombiWindow method get-mode () {
     return $Mode;
 };
 
+CombiWindow method cancel-prefix () {
+    sets Prefix ();
+    sets LastPrefix ();
+};
+
+CombiWindow method pop-prefix () {
+    $LastPrefix ->>;
+    sets Prefix [$LastPrefix clone];
+    if {$PrefixDesc set? $PrefixKey,$Prefix} {
+        show-message [$PrefixDesc get $PrefixKey,$Prefix];
+    } {
+        show-message [$PrefixKey get $Prefix];
+    };
+};
+
 CombiWindow method apply-keybind (main window key) {
     show-message "";
 
     if {$PrefixKey set? [$Prefix . $key]} {
         sets Prefix [$Prefix . $key];
-        show-message [$PrefixKey get $Prefix];
+        if {$PrefixDesc set? $PrefixKey,$Prefix} {
+            show-message [$PrefixDesc get $PrefixKey,$Prefix];
+        } {
+            show-message [$PrefixKey get $Prefix];
+        };
         return;
     } {
         if {$Prefix null?} {
@@ -739,6 +766,7 @@ CombiWindow method apply-keybind (main window key) {
             map ::= $PrefixMap get $map-name;
             default-map := <nil>;
         };
+        sets LastPrefix [$Prefix clone];
         sets Prefix ();
     };
     
