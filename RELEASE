@@ -3090,5 +3090,9 @@
 2023/02/28
 	pmacs update:
 		Change status line and buffer-list modify mark (*) and protect mark (%) position change.
+		Add command set-prefix-desc for if input prefix key display description string in mini-window.
+		Add cancel-prefix and pop-prefix for key in prefix control editor command.
+		Add if CTRL+G input in mini-window do exit mini-input routine.
+		Define key bind emacs mode each prefix + CTRL_G for cancel-prefix.
 
 #eof
