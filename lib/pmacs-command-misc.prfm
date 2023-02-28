@@ -33,7 +33,19 @@ defcommand internal-stat desc: "Display interpriter internal status." {
 
     result ALL;
 };
-    
+
+defcommand cancel-prefix desc: "Cancel prefix." {
+    | main window |
+    $window cancel-prefix;
+    return ALL;
+};
+
+defcommand pop-prefix desc: "Pop last prefix." {
+    | main window |
+    $window pop-prefix;
+    return ALL;
+};
+
 defcommand mini-move-message desc: "Demo background." {
     | main window |
     buff ::= $window get-buffer;
