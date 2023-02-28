@@ -3094,5 +3094,6 @@
 		Add cancel-prefix and pop-prefix for key in prefix control editor command.
 		Add if CTRL+G input in mini-window do exit mini-input routine.
 		Define key bind emacs mode each prefix + CTRL_G for cancel-prefix.
+		Add prefix menu on pmacs mode.
 
 #eof
