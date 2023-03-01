@@ -24,15 +24,15 @@ defcommand key-binding-list desc: "Display key binding list and all editor comma
     $buff append-string "";
     
     $window get-prefix-list : each do: {| i |
-        display-key-binding-list $buff ["Prefix: " . $i] [$window get-bind-map $i] $desc;
+        display-key-binding-list $buff ["Prefix key: " . [$window get-prefix-key $i] " / Name: " $i] [$window get-bind-map $i] $desc;
         $buff append-string "";
     };
         
     $buff append-string "<<< All editor commands >>>";
-    $buff append-string ["%-38v %-v" fmt "Command" "Description"];
-    $buff append-string ["%-38v %-v" fmt ["-" repeat 38] ["-" repeat 11]];
+    $buff append-string ["%-38v %-39v %-v" fmt "Open command document" "Show key bindings" "Description"];
+    $buff append-string ["%-38v %-39v %-v" fmt ["-" repeat 38] ["-" repeat 39] ["-" repeat 11]];
     msort [$EditorCommand keys :string] : each do: {| i |
-        $buff append-string ["%-38v %-v" fmt ["[[" . $i "]]"] [get-command-desc $i]];
+        $buff append-string ["%-38v %-39v %-v" fmt ["[[" . $i "]]"] ["[[?" . $i "]]"] [get-command-desc $i]];
     };
     $buff no-modify;
     $buff set-protect;
