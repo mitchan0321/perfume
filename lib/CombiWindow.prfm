@@ -838,6 +838,10 @@ CombiWindow method get-prefix-list () {
     return [$PrefixList map {| i | $i cdr}];
 };
 
+CombiWindow method get-prefix-key (name) {
+    return $PrefixName,$name;
+};
+
 CombiWindow method get-bind-map (prefix) {
     return [$PrefixMap get $prefix];
 };
@@ -845,6 +849,30 @@ CombiWindow method get-bind-map (prefix) {
 CombiWindow method get-keybind (prefix k) {
     map ::= $PrefixMap get $prefix;
     return [$map get $k];
+};
+
+CombiWindow method get-key-bindings (command) {
+    result := ();
+    map ::= get-bind-map DEFAULT;
+    $map each do: {| k v |
+        if {nil? $v} {continue};
+        if {$command = $v} {
+            $result <<- ["" . $k];
+        };
+    };
+    maps ::= get-prefix-list;
+    $maps each do: {| name |
+        prefix ::= get-prefix-key $name;
+        map ::= get-bind-map $name;
+        $map ?? {continue};
+        $map each do: {| k v |
+            if {nil? $v} {continue};
+            if {$command = $v} {
+                $result <<- [$prefix . ["" . $k]];
+            };
+        };
+    };
+    return $result;
 };
 
 CombiWindow method get-key-desc () {
