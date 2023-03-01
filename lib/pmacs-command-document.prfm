@@ -40,6 +40,30 @@ defcommand pwiki-click-link desc: "Open PWiki document." {
         $window apply-command $main $window "" [symbol $command];
         return ALL;
     };
+    if {[$link at 0] = "?"} {
+        ### if pwiki link form is [[?command]], show-keybindings.
+        command ::= $link sub 1;
+        keys ::= $window get-key-bindings $command;
+        if {$keys null?} {
+            show-message ["No binding key for: " . $command];
+            return ALL;
+        };
+        if {$keys len : = 1} {
+            show-message ["" . $keys,0 " -> " $command];
+            return ALL;
+        };
+        result := "";
+        0 each to: [$keys len : - 2] do: {| i |
+            $result append! $keys,$i;
+            $result append! ", ";
+        };
+        $result append! [$keys get [$keys len : - 1]];
+        $result append! " -> ";
+        $result append! $command;
+        show-message $result;
+        return ALL;
+    };
+    
     path ::= $buff get-content;
     if {[$link at 0] = "/"} {
         dir := "";
