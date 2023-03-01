@@ -3096,4 +3096,12 @@
 		Define key bind emacs mode each prefix + CTRL_G for cancel-prefix.
 		Add prefix menu on pmacs mode.
 
+2023/03/01
+	pmacs update:
+		Add CombiWindow::get-key-bindings for create and return command assigned key bindings.
+		Change key-binding-list display [[&command]] link for key bindings show.
+		Change pwiki-click-link if [[?command]] linked this, show command assigned key bindings
+		  to mini-window buffer.
+		Add command menu implimentated by prefix key.
+
 #eof
