@@ -236,6 +236,33 @@ defun get-next-search (y x str buff) {
     return ($y $x);
 };
 
+defun get-next-search-length (y x str buff) {
+    r ::= $buff get-buffer-line $y;
+    $r ?? {return <nil>};
+
+    sl ::= $r =~ :all $str;
+    if $sl {
+        sl ::= $sl filter {| el | [$el get 0] >= $x};
+        if {$sl null?} else: {
+            return ($y [$sl car : car] [[$sl car : get 1] - [$sl car : get 0]]);
+        };
+    };
+    
+    result := <nil>;
+    $buff buffer-select [$y + 1] [$buff get-buffer-length] {
+        | src l |
+        sl ::= $src =~ :all $str;
+        if $sl {
+            result := ($l [$sl car : car] [[$sl car : get 1] - [$sl car : get 0]]);
+        };
+        if $result {break};
+    };
+    if $result {
+        return $result;
+    };
+    return <nil>;
+};
+
 defun get-next-search-text (y x str buff) {
     r ::= $buff get-buffer-line $y;
     $r ?? {return ($y $x)};

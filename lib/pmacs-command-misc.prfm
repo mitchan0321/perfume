@@ -197,4 +197,3 @@ defcommand para-alphabet desc: "Demo background." {
 defcommand test desc: "Test command." {
     show-message ["Local: " . [info local] ", Closure: " [info closure]];
 };
-

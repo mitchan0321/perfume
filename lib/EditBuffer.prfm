@@ -580,11 +580,8 @@ EditBuffer method replace-buffer (froms tos) {
         s ::= $Src get $i;
         if {$s = ""} {continue};
         
-        len ::= $s len;
         (result n) ::= $s replace-return-times :all $froms $tos;
         if {$n = 0} {continue};
-##        [self] cut-region $i 0 $i $len;
-##        [self] insert-string-at $result $i 0;
         [self] line-update $result $i;
         $c ++ $n;
     };
@@ -606,11 +603,8 @@ EditBuffer method replace-region (froms tos start end) {
         s ::= $Src get $i;
         if {$s = ""} {continue};
         
-        len ::= $s len;
         (result n) ::= $s replace-return-times :all $froms $tos;
         if {$n = 0} {continue};
-##        [self] cut-region $i 0 $i $len;
-##        [self] insert-string-at $result $i 0;
         [self] line-update $result $i;
         $c ++ $n;
     };

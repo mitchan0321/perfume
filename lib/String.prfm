@@ -148,3 +148,36 @@ String method replace-return-times (all: all pattern replace-string) {
 
     return ($result $count);
 };
+
+String method replace-return-times-with-start (pattern replace-string at) {
+    l := ();
+    count := 0;
+
+    pattern ::= case [type? $pattern]
+		RQUOTE   {result $pattern}
+		default: {result [["" . $pattern] rquote]}
+    ;
+	
+    r ::= [self] =~ :all $pattern;
+
+    if {nil? $r} then: {return ([self] $count)};
+    r ::= $r filter {| i | [$i get 0] >= $at};
+    
+    remain := [self];
+    $r each do: {| i |
+	(start end match) := $i;
+	$l << [$remain sub $end];
+	$l << $replace-string;
+	remain ::= $remain sub 0 $start;
+        $count ++;
+        break;  ### only first search result
+    };
+    $l << $remain;
+
+    result := "";
+    $l each do: {| i |
+        $result append! $i;
+    };
+
+    return ($result $count);
+};
