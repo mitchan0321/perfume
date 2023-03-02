@@ -3108,5 +3108,7 @@
 	pmacs update:
 		Add config variable PMACS_MENU for show menu at ESC- prefix key pressed.
 		Add replace-region-with-query editor command for replace buffer by user query.
+		Add MiniInputUtil::mini-input-until-cancel, and refactaring replace-region-with-query
+		  by use mini-input-until-cancel.
 
 #eof
