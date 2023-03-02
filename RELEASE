@@ -3107,5 +3107,6 @@
 2023/03/02
 	pmacs update:
 		Add config variable PMACS_MENU for show menu at ESC- prefix key pressed.
+		Add replace-region-with-query editor command for replace buffer by user query.
 
 #eof
