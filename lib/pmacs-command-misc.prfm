@@ -197,3 +197,17 @@ defcommand para-alphabet desc: "Demo background." {
 defcommand test desc: "Test command." {
     show-message ["Local: " . [info local] ", Closure: " [info closure]];
 };
+
+defcommand test2 desc: "Test command." {
+    | main window |
+    
+    mini-input-until-cancel $main $window
+    keyin-proc: {| value in-key term |
+        if {and {string? $in-key} {$in-key at 0 : = "y"}} {
+            $term <t>;
+        };
+        result ALL;
+    }
+    ;
+    return ALL;
+};

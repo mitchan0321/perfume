@@ -96,6 +96,36 @@ defun mini-input-y-or-n
     };
 };
 
+defun mini-input-until-cancel
+    (
+        main
+        window
+        prompt: prompt
+        cancel-proc: cancel-proc
+        keyin-proc: keyin-proc
+        return-status: status
+    ) {
+
+    if {set? prompt}          else: {prompt := "mini-input prompt: "};
+    if {set? cancel-proc}     else: {cancel-proc := {show-message "Canceled."}};
+    if {set? keyin-proc}      else: {keyin-proc := {}};
+    if {set? status}          else: {status := ALL};
+    
+    $main mini-input-start "" prompt: $prompt;
+    $main add-mini-input-callback $window {| main window in-key value |
+        if {eq? $in-key KEY_ESC} {
+            $main mini-input-end;
+            yield $cancel-proc;
+            return $status;
+        };
+        if {! [nil? $in-key]} {
+            $main mini-input-value-override "" 0;
+            yield $keyin-proc $value $in-key [fun (t) {if $t {$main mini-input-end}}];
+            return $status;
+        };
+    };
+};
+
 defun mini-input-y-or-n-or-esc-sync
     (
         main

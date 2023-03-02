@@ -568,51 +568,85 @@ defcommand replace-region-with-query desc: "Replace regex string to specified st
             mini-input-until-enter $main $window
                 prompt: ["Query replace string [" . $froms "] to: "]
                 enter-proc: {| value |
+                    repvalue := $value;
                     buff ::= $window get-buffer;
                     geom ::= $window get-geom;
                     (y x) ::= $window get-source-index $buff $geom;
                     end ::= $buff get-buffer-length;
                     c := 0;
                     sts ::= get-next-search-length $y $x [$froms rquote] $buff;
-                    while {result $sts} do: {
+                    if $sts {
                         (y x len) := $sts;
-                        if {$y >= $end} {break};
-
-                        $window cursor-move-to $geom $y $x;
+                        $window cursor-move-to-fit-center $geom $y $x;
                         $window set-spot-color-item REPLACE $y $x $len SEARCH_CURRENT_HILIGHT;
                         $window apply {render; refresh};
-                        
-                        endf := <nil>;
-                        mini-input-y-or-n-or-esc-sync $main $window
-                            prompt: "Replace? y(replace) / n(no replace) / [ESC](cancel)"
-                            no-proc: {
-                                $x ++ $len;
+                    } {
+                        show-message "No replace string.";
+                        return ALL;
+                    };
+                    
+                    mini-input-until-cancel $main $window
+                        prompt: "Replace? y(replace) / n(no replace) / [ESC](cancel): "
+                        cancel-proc: {
+                            $window remove-spot-color-item REPLACE;
+                            $window apply {render; refresh};
+                            show-message ["Replace [" . $froms "] to [" $repvalue "] " $c " times completed."];
+                            result ALL;
+                        }
+                        keyin-proc: {| value in-key term |
+                            procf := <nil>;
+                            cond
+                            {nil? $sts} {
+                                $term <t>;
                                 $window remove-spot-color-item REPLACE;
                                 $window apply {render; refresh};
-                                setc endf <nil>;
+                                break;
                             }
-                            yes-proc: {
+                            <t> {
+                                (y x len) := $sts;
+                                if {$y >= $end} {
+                                    $term <t>;
+                                    $window remove-spot-color-item REPLACE;
+                                    $window apply {render; refresh};
+                                    break;
+                                };
+                            }
+                            {and {string? $in-key} {$in-key at 0 : = "y"}} {
                                 src ::= $buff get-buffer-line $y;
-                                (result n) ::=  $src replace-return-times-with-start [$froms rquote] $value $x;
+                                (result n) ::=  $src replace-return-times-with-start [$froms rquote] $repvalue $x;
                                 $buff line-update $result $y;
                                 $c ++ $n;
-                                $x ++ [$value len];
-                                $window remove-spot-color-item REPLACE;
-                                $window apply {render; refresh};
-                                setc endf <nil>;
+                                $x ++ [$repvalue len];
+                                procf := <t>;
+                                break;
                             }
-                            cancel-proc: {
-                                $window remove-spot-color-item REPLACE;
-                                $window apply {render; refresh};
-                                setc endf <t>;
+                            {and {string? $in-key} {$in-key at 0 : = "n"}} {
+                                $x ++ $len;
+                                procf := <t>;
+                                break;
                             }
-                        ;;
-                        if $endf {break};
-                        sts ::= get-next-search-length $y $x [$froms rquote] $buff;
-                    };
-
-                    $window remove-spot-color-item REPLACE;
-                    show-message ["Replace [" . $froms "] to [" $value "] " $c " times completed."];
+                            ;;
+                            
+                            if $procf {
+                                _sts ::= get-next-search-length $y $x [$froms rquote] $buff;
+                                setc sts $_sts;
+                                if $sts {
+                                    (y x len) := $sts;
+                                    $window cursor-move-to-fit-center $geom $y $x;
+                                    $window set-spot-color-item REPLACE $y $x $len SEARCH_CURRENT_HILIGHT;
+                                    $window apply {render; refresh};
+                                } {
+                                    $term <t>;
+                                    $window remove-spot-color-item REPLACE;
+                                    $window apply {render; refresh};
+                                    show-message ["Replace [" . $froms "] to [" $repvalue "] " $c " times completed."];
+                                    result ALL;
+                                };
+                                procf := <nil>;
+                            };
+                        }
+                    ;;
+                    
                     result ALL;
 	        }
             ;;
