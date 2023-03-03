@@ -186,6 +186,15 @@ defcommand search-next desc: "Search forward for previous text/regex." {
     ;
 
     $window cursor-move-to-fit-center $geom $y $x;
+    sts ::= get-next-search-length $y $x [$str rquote] $buff;
+    if $sts {
+        (dummyy dummyx len) := $sts;
+        $window set-spot-color-item SEARCH $y $x $len SEARCH_CURRENT_HILIGHT;
+        $main add-background after: 3000 job-id: "00-SEARCH" {
+            $window remove-spot-color-item SEARCH;
+        };
+    };
+    
     return SELF;
 };
 
@@ -206,6 +215,15 @@ defcommand search-previous desc: "Search backward for previous text/regex." {
     ;
 
     $window cursor-move-to-fit-center $geom $y $x;
+    sts ::= get-next-search-length $y $x [$str rquote] $buff;
+    if $sts {
+        (dummyy dummyx len) := $sts;
+        $window set-spot-color-item SEARCH $y $x $len SEARCH_CURRENT_HILIGHT;
+        $main add-background after: 3000 job-id: "00-SEARCH" {
+            $window remove-spot-color-item SEARCH;
+        };
+    };
+
     return SELF;
 };
 
