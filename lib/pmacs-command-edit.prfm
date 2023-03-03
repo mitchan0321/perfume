@@ -558,7 +558,7 @@ defcommand replace-region desc: "Replace regex string to specified string at cur
     result ALL;
 };
 
-defcommand replace-region-with-query desc: "Replace regex string to specified string with query."  {
+defcommand replace-buffer-with-query desc: "Replace regex string to specified string with query."  {
     | main window |
 
     mini-input-until-enter $main $window
