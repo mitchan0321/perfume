@@ -186,7 +186,7 @@ defcommand search-next desc: "Search forward for previous text/regex." {
     ;
 
     $window cursor-move-to-fit-center $geom $y $x;
-    sts ::= get-next-search-length $y $x [$str rquote] $buff;
+    sts ::= get-next-search-length $y $x [$str rquote] $buff $SEARCH_MODE;
     if $sts {
         (dummyy dummyx len) := $sts;
         $window set-spot-color-item SEARCH $y $x $len SEARCH_CURRENT_HILIGHT;
@@ -215,11 +215,11 @@ defcommand search-previous desc: "Search backward for previous text/regex." {
     ;
 
     $window cursor-move-to-fit-center $geom $y $x;
-    sts ::= get-next-search-length $y $x [$str rquote] $buff;
+    sts ::= get-next-search-length $y $x [$str rquote] $buff $SEARCH_MODE;
     if $sts {
         (dummyy dummyx len) := $sts;
         $window set-spot-color-item SEARCH $y $x $len SEARCH_CURRENT_HILIGHT;
-        $main add-background after: 3000 job-id: "00-SEARCH" {
+        $main add-background after: 3000 job-id: ["00-SEARCH" . [$buff get-buffer-name]] {
             $window remove-spot-color-item SEARCH;
         };
     };
@@ -254,11 +254,15 @@ defun get-next-search (y x str buff) {
     return ($y $x);
 };
 
-defun get-next-search-length (y x str buff) {
+defun get-next-search-length (y x str buff mode) {
     r ::= $buff get-buffer-line $y;
     $r ?? {return <nil>};
 
-    sl ::= $r =~ :all $str;
+    sl ::= case $mode
+        regex    {$r =~ :all $str}
+        default: {$r =~ :all :text $str}
+    ;;
+    
     if $sl {
         sl ::= $sl filter {| el | [$el get 0] >= $x};
         if {$sl null?} else: {
@@ -269,7 +273,11 @@ defun get-next-search-length (y x str buff) {
     result := <nil>;
     $buff buffer-select [$y + 1] [$buff get-buffer-length] {
         | src l |
-        sl ::= $src =~ :all $str;
+        sl ::= case $mode
+            regex    {sl ::= $src =~ :all $str}
+            default: {sl ::= $src =~ :all :text $str}
+        ;;
+
         if $sl {
             result := ($l [$sl car : car] [[$sl car : get 1] - [$sl car : get 0]]);
         };

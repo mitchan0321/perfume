@@ -574,7 +574,7 @@ defcommand replace-buffer-with-query desc: "Replace regex string to specified st
                     (y x) ::= $window get-source-index $buff $geom;
                     end ::= $buff get-buffer-length;
                     c := 0;
-                    sts ::= get-next-search-length $y $x [$froms rquote] $buff;
+                    sts ::= get-next-search-length $y $x [$froms rquote] $buff regex;
                     if $sts {
                         (y x len) := $sts;
                         $window cursor-move-to-fit-center $geom $y $x;
@@ -628,7 +628,7 @@ defcommand replace-buffer-with-query desc: "Replace regex string to specified st
                             ;;
                             
                             if $procf {
-                                _sts ::= get-next-search-length $y $x [$froms rquote] $buff;
+                                _sts ::= get-next-search-length $y $x [$froms rquote] $buff regex;
                                 setc sts $_sts;
                                 if $sts {
                                     (y x len) := $sts;
