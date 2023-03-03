@@ -3107,8 +3107,12 @@
 2023/03/02
 	pmacs update:
 		Add config variable PMACS_MENU for show menu at ESC- prefix key pressed.
-		Add replace-region-with-query editor command for replace buffer by user query.
-		Add MiniInputUtil::mini-input-until-cancel, and refactaring replace-region-with-query
+		Add replace-buffer-with-query editor command for replace buffer by user query.
+		Add MiniInputUtil::mini-input-until-cancel, and refactaring replace-buffer-with-query
 		  by use mini-input-until-cancel.
+
+2023/03/03
+	pmacs update:
+		Add search-next and search-previous becomes to hilibht to found text.
 
 #eof
