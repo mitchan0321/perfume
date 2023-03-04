@@ -1,0 +1,47 @@
+loop-count := 300;
+
+new Task : proc star {
+    (count) := $ARGS;
+    
+    window ::= SysCall apply-editor {
+        $MainWindow get-current-window;
+    };
+    (sy sx) ::= SysCall apply-editor {
+        $window get-screen-size;
+    };
+    (buff geom) ::= SysCall apply-editor {
+        result ([$window get-buffer] [$window get-geom]);
+    };
+    lstart := $geom,ViewLine;
+    color := (BLACK RED GREEN YELLOW BLUE MAGENTA CYAN WHITE);
+    colordb ::= vector;
+    $color each do: {| x |
+        $color each do: {| y |
+            if {eq? $x $y} {continue};
+            $colordb append! [symbol ["" . $x "." $y]];
+        };
+    };
+        
+    1 each to: $count do: {| i |
+        y ::= [rand] * $sy : + $lstart : int;
+        src ::= $buff get-buffer-line $y;
+        $src ?? {continue};
+        x ::= [rand] * [$src len] : int;
+        if {$src at $x : = " "} {continue};
+        c ::= $colordb get [[rand] * [$colordb len] : int];
+        t ::= [rand] * 12000 : + 3000 : int;
+        t := 5000;
+        tag ::= "STAR-" . $i;
+        SysCall apply-editor {
+            $window set-spot-color-item $tag $y $x 1 $c;
+            begin local: [dict ((t . $t) (tag . $tag))] {
+                $MainWindow add-background after: $t {
+                    $window remove-spot-color-item $tag;
+                };
+            };
+        };
+        SysCall sleep 100;
+    };
+
+} $loop-count;
+
