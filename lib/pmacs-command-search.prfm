@@ -260,7 +260,7 @@ defun get-next-search-length (y x str buff mode) {
 
     sl ::= case $mode
         regex    {$r =~ :all $str}
-        default: {$r =~ :all :text $str}
+        default: {$r =~ :all :text :nocase $str}
     ;;
     
     if $sl {
@@ -275,7 +275,7 @@ defun get-next-search-length (y x str buff mode) {
         | src l |
         sl ::= case $mode
             regex    {sl ::= $src =~ :all $str}
-            default: {sl ::= $src =~ :all :text $str}
+            default: {sl ::= $src =~ :all :text :nocase $str}
         ;;
 
         if $sl {
