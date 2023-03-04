@@ -3115,4 +3115,9 @@
 	pmacs update:
 		Add search-next and search-previous becomes to hilibht to found text.
 
+2023/03/04
+	pmacs update:
+		Fix get-next-search-length if SEARCH_MODE is text add option :nocase.
+		Add new tasklet star.prfm.
+
 #eof
