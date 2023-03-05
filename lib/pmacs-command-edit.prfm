@@ -579,7 +579,6 @@ defcommand replace-buffer-with-query desc: "Replace regex string to specified st
                         (y x len) := $sts;
                         $window cursor-move-to-fit-center $geom $y $x;
                         $window set-spot-color-item REPLACE $y $x $len SEARCH_CURRENT_HILIGHT;
-                        $window apply {render; refresh};
                     } {
                         show-message "No replace string.";
                         return ALL;
@@ -589,7 +588,6 @@ defcommand replace-buffer-with-query desc: "Replace regex string to specified st
                         prompt: "Replace? y(replace) / n(no replace) / [ESC](cancel): "
                         cancel-proc: {
                             $window remove-spot-color-item REPLACE;
-                            $window apply {render; refresh};
                             show-message ["Replace [" . $froms "] to [" $repvalue "] " $c " times completed."];
                             result ALL;
                         }
@@ -599,7 +597,6 @@ defcommand replace-buffer-with-query desc: "Replace regex string to specified st
                             {nil? $sts} {
                                 $term <t>;
                                 $window remove-spot-color-item REPLACE;
-                                $window apply {render; refresh};
                                 break;
                             }
                             <t> {
@@ -607,7 +604,6 @@ defcommand replace-buffer-with-query desc: "Replace regex string to specified st
                                 if {$y >= $end} {
                                     $term <t>;
                                     $window remove-spot-color-item REPLACE;
-                                    $window apply {render; refresh};
                                     break;
                                 };
                             }
@@ -634,11 +630,9 @@ defcommand replace-buffer-with-query desc: "Replace regex string to specified st
                                     (y x len) := $sts;
                                     $window cursor-move-to-fit-center $geom $y $x;
                                     $window set-spot-color-item REPLACE $y $x $len SEARCH_CURRENT_HILIGHT;
-                                    $window apply {render; refresh};
                                 } {
                                     $term <t>;
                                     $window remove-spot-color-item REPLACE;
-                                    $window apply {render; refresh};
                                     show-message ["Replace [" . $froms "] to [" $repvalue "] " $c " times completed."];
                                     result ALL;
                                 };
