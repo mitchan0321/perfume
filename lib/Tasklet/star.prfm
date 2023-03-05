@@ -21,17 +21,18 @@ new Task : proc star {
             $colordb append! [symbol ["" . $x "." $y]];
         };
     };
-        
+    total := 0;
     1 each to: $count do: {| i |
         y ::= [rand] * $sy : + $lstart : int;
         src ::= $buff get-buffer-line $y;
-        $src ?? {continue};
+        $src ?? {redo};
         x ::= [rand] * [$src len] : int;
-        if {$src at $x : = " "} {continue};
+        if {$src at $x : = " "} {redo};
         c ::= $colordb get [[rand] * [$colordb len] : int];
         t ::= [rand] * 12000 : + 3000 : int;
-        t := 5000;
-        tag ::= "STAR-" . $i;
+        ### t := 500;
+        tag ::= "
+        STAR-" . $i;
         SysCall apply-editor {
             $window set-spot-color-item $tag $y $x 1 $c;
             begin local: [dict ((t . $t) (tag . $tag))] {
@@ -40,8 +41,10 @@ new Task : proc star {
                 };
             };
         };
-        SysCall sleep 100;
+        $total ++;
+        SysCall sleep 200;
     };
+    println "[" [get-name] "] total count: " $total;
 
 } $loop-count;
 
