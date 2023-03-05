@@ -1,0 +1,32 @@
+new Task : proc cd-test {
+    t1 ::= SysCall new-task etc {
+        1 each to: 10 do: {
+            cd "/etc";
+            SysCall sleep 100;
+            println [get-name] " CWD: " [pwd]; 
+        };
+    };
+
+    t2 ::= SysCall new-task home {
+        1 each to: 10 do: {
+            cd "/home/mit-sato";
+            SysCall sleep 100;
+            println [get-name] " CWD: " [pwd]; 
+        };
+    };
+    
+    t3 ::= SysCall new-task root {
+        1 each to: 10 do: {
+            cd "/";
+            SysCall sleep 100;
+            println [get-name] " CWD: " [pwd]; 
+        };
+    };
+
+    cd "/tmp";
+    1 each to: 10 do: {
+        SysCall sleep 100;
+        println [get-name] " CWD: " [pwd];
+    };
+};
+
