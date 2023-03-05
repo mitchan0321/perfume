@@ -3120,4 +3120,9 @@
 		Fix get-next-search-length if SEARCH_MODE is text add option :nocase.
 		Add new tasklet star.prfm.
 
+2023/03/05
+	pmacs update:
+		Delete dupulicate window render/refresh.
+		Change TaskManager dispatch all runnable tasks.
+
 #eof
