@@ -76,82 +76,30 @@ TaskManager method dispatch () {
     sets LastDispatch $now;
     
     #
-    # search most min sleep time task (all list element linear scan)
+    # search min sleep time task (all list element linear scan)
     #
-    min-wait := 1;
-    min-task := <nil>;
+    run-task-list := ();
     $TaskList each do: {| t |
         if {$t tickable?} {
             wait ::= $t time-elapsed $tick;
             
             if {$wait <= 0} {
-                if {$wait < $min-wait} {
-                    min-wait := $wait;
-                    min-task := $t;     # run task candidate
-                };
+                $run-task-list <<- $t;
             };
         };
     };
-    
-    #
-    # run most min sleep task
-    # if task was executed, then return <t>
-    #
+
+    ### task(s) executed.
     result := <nil>;
-    $SysReq clear;
 
-    if $min-task {
-        ### set task dispatched
+    ### save non task env's current working directory
+    cwd ::= pwd;
+    $run-task-list each do: {| t |
+        dispatch-sub $t;
         result := <t>;
-
-        ### save non task env's current working directory
-        cwd ::= pwd;
-        
-        ### dispatch to min task
-        $Task_stdin close;
-        $min-task run;
-        $Task_stdin clear-eof;
-        
-        ### restore non task env's current working directory
-        cd $cwd;
-
-        #
-        # Apply system call request
-        #
-        $SysReq close;
-        try {
-            ### apply request system call from tasn at this tick.
-            apply-syscalls;
-
-        } catch: {| e |
-            ### $Task_stdout puts "";
-            $Task_stdout puts [">>>Error at apply-syscalls: " . $e];
-        };
-
-        if {$min-task exit?} {
-            #
-            # proces terminate
-            #
-            ### $Task_stdout puts "";
-            $Task_stdout puts [">>>Task [" . [$min-task get-name] "] end, status= " [$min-task get-exit-status]];
-
-            ### remove from task list TaskManager instance.
-            idx ::= $TaskList find $min-task;
-            if $idx {
-                $TaskList delete! $idx
-            };
-            
-            ### remove wait hook.
-            delete-wait-hook [$min-task get-name];
-            
-            ### remove parents child list and add to parents child status.
-            p ::= $min-task get-parent;
-            if $p {
-                $p remove-child $min-task;
-                $p add-child-exit-status ($min-task [$min-task get-exit-status]);
-            };
-        };
     };
+    ### restore non task env's current working directory
+    cd $cwd;
     
     try {
         ### check and force to activate waiting task.
@@ -160,8 +108,58 @@ TaskManager method dispatch () {
     } catch: {| e |
         $Task_stdout puts [">>>Error at force-wait-task: <" .  $e,0 "># " $e,1];
     };
-    
+
     return $result;
+};
+
+TaskManager method dispatch-sub (min-task) {
+    #
+    # run task
+    # if task was executed, then return <t>
+    #
+    $SysReq clear;
+
+    ### dispatch to min task
+    $Task_stdin close;
+    $min-task run;
+    $Task_stdin clear-eof;
+    
+    #
+    # Apply system call request
+    #
+    $SysReq close;
+    try {
+        ### apply request system call from tasn at this tick.
+        apply-syscalls;
+        
+    } catch: {| e |
+        ### $Task_stdout puts "";
+        $Task_stdout puts [">>>Error at apply-syscalls: " . $e];
+    };
+    
+    if {$min-task exit?} {
+        #
+        # proces terminate
+        #
+        ### $Task_stdout puts "";
+        $Task_stdout puts [">>>Task [" . [$min-task get-name] "] end, status= " [$min-task get-exit-status]];
+        
+        ### remove from task list TaskManager instance.
+        idx ::= $TaskList find $min-task;
+        if $idx {
+            $TaskList delete! $idx
+        };
+        
+        ### remove wait hook.
+        delete-wait-hook [$min-task get-name];
+        
+        ### remove parents child list and add to parents child status.
+        p ::= $min-task get-parent;
+        if $p {
+            $p remove-child $min-task;
+            $p add-child-exit-status ($min-task [$min-task get-exit-status]);
+        };
+    };
 };
 
 TaskManager method enqueue (msg) {
