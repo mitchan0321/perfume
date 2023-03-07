@@ -10,7 +10,7 @@ new Task : proc pmacs-server {
         (f a p) ::= SysCall accept $l;
         println "[" [get-name] "] accept - IP: " [host-address-string $a] ", port: " $p;
 
-        SysCall new-task [get-name] {
+        t ::= SysCall new-task [get-name] {
             pmacs-server-config;
             (f) := $ARGS;
             
@@ -65,9 +65,8 @@ new Task : proc pmacs-server {
         } $f;
         
         ### cleaning child process status (ignore).
-        while {$SELF child-exited-any?} do: {
-            $SELF get-child-exit-status-any;
-        };
+        sts ::= SysCall wait $t;
+        println "[" [get-name] "] child status= " $sts;
         SysCall sleep 1000;
     };
 };
