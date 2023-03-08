@@ -3125,4 +3125,14 @@
 		Delete dupulicate window render/refresh.
 		Change TaskManager dispatch all runnable tasks.
 
+2023/03/08
+	pmacs update:
+		Change config values:
+		  INPUT_TIMEOUT(30->10),
+		  INTERP_ITIMER_INTERVAL(30->20), 
+		  BLINK_FACT(4->5).
+		Change ncurses::curs_keyin const value no_input_count 3 -> 8.
+		Change pmacs-server wait child for SysCall wait.
+		Add new tasklet 'cd-test' for task independent current directory.
+
 #eof
