@@ -3135,4 +3135,9 @@
 		Change pmacs-server wait child for SysCall wait.
 		Add new tasklet 'cd-test' for task independent current directory.
 
+2023/03/13
+	pmacs update:
+		Fix key-binding-list long key name format leaked.
+		Add pmacs menu item [o]ther -> [!]shell.
+
 #eof
