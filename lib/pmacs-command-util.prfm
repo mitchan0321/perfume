@@ -52,14 +52,14 @@ defun display-key-binding-list (buff name key-map desc) {
             ls ::= $s split;
             grp ::= $ls get 0;
             modify ::= $ls get 1;
-            $l << ["%-17v%21v %-14v %-38v %-v" fmt $grp $modify $k ["[[" . $v "]]"] [get-command-desc $v]];
+            $l << ["%-17v%21v %-20v %-38v %-v" fmt $grp $modify $k ["[[" . $v "]]"] [get-command-desc $v]];
         } {
-            $l << ["%-17v%21v %-14v %-38v %-v" fmt "" (key input) $k ["[[" . $v "]]"] [get-command-desc $v]];
+            $l << ["%-17v%21v %-20v %-38v %-v" fmt "" (key input) $k ["[[" . $v "]]"] [get-command-desc $v]];
         };
     };
     $buff append-string $name;
     msort $l : each do: {| i |
-	$buff append-string ["" . [$i sub 17 38] [$i sub 53]];
+	$buff append-string ["" . [$i sub 17 38] [$i sub 59]];
     };
 };
 
