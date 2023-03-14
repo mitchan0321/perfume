@@ -29,10 +29,12 @@ defcommand key-binding-list desc: "Display key binding list and all editor comma
     };
         
     $buff append-string "<<< All editor commands >>>";
-    $buff append-string ["%-38v %-39v %-v" fmt "Open command document" "Show key bindings" "Description"];
-    $buff append-string ["%-38v %-39v %-v" fmt ["-" repeat 38] ["-" repeat 39] ["-" repeat 11]];
+    $buff append-string ["%v / %v" fmt "Open command document" "Show key bindings"];
+    $buff append-string "  Description";
+    $buff append-string ["%v" fmt ["-" repeat [38 * 2]]];
     msort [$EditorCommand keys :string] : each do: {| i |
-        $buff append-string ["%-38v %-39v %-v" fmt ["[[" . $i "]]"] ["[[?" . $i "]]"] [get-command-desc $i]];
+        $buff append-string ["%v / %v" fmt ["[[" . $i "]]"] ["[[?" . $i "]]"]];
+        $buff append-string ["  " . [get-command-desc $i]];
     };
     $buff no-modify;
     $buff set-protect;
