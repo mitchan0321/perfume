@@ -3140,4 +3140,8 @@
 		Fix key-binding-list long key name format leaked.
 		Add pmacs menu item [o]ther -> [!]shell.
 
+2023/03/14
+	pmacs update
+		Change key-binding-list 2 lines display all commands section.
+
 #eof
