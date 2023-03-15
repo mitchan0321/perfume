@@ -3141,7 +3141,13 @@
 		Add pmacs menu item [o]ther -> [!]shell.
 
 2023/03/14
-	pmacs update
+	pmacs update:
 		Change key-binding-list 2 lines display all commands section.
+
+2023/03/15
+	pmacs update:
+		Change separate function get-keybind-string use from pwiki-click-link.
+		Change key-binding-list use get-keybind-string function and list key bindings
+		  list directly when list all commands section.
 
 #eof
