@@ -1161,20 +1161,17 @@ defcommand execute-record desc: "Execute keyboard macro." {
     
     buff ::= $main get-record-buffer;
     $buff ?? {return ALL};
-    
     $buff clear;
     ins-char-cmd := "insert-character";
     while {r ::= $buff gets} do: {
         if {"" = $r} {continue};
         if {eq? $ins-char-cmd [$r sub 0 [$ins-char-cmd len]]} {
-            begin {
-                result ::= $window apply-command $main $window [$r sub [$ins-char-cmd len : + 1]] [symbol $ins-char-cmd];
-            };
+            result ::= $window apply-command $main $window [$r sub [$ins-char-cmd len : + 1]] [symbol $ins-char-cmd];
         } {
-            begin {
-                result ::= $window apply-command $main $window "" [symbol $r];
-            };
+            result ::= $window apply-command $main $window "" [symbol $r];
         };
+        buff ::= $main get-record-buffer;
+        $buff ?? {return ALL};
     };
     return ALL;
 };
