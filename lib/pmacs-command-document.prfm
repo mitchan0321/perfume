@@ -43,24 +43,16 @@ defcommand pwiki-click-link desc: "Open PWiki document." {
     if {[$link at 0] = "?"} {
         ### if pwiki link form is [[?command]], show-keybindings.
         command ::= $link sub 1;
-        keys ::= $window get-key-bindings $command;
-        if {$keys null?} {
-            show-message ["No binding key for: " . $command];
-            return ALL;
+        result ::= get-keybind-string $window $command;
+        if {$result = ""} {
+            if {get-command $command} {
+                show-message ["No binding key for: " . $command];
+            } {
+                show-message ["No defined command: " . $command];
+            };
+        } {
+            show-message [$result . " -> " $command];
         };
-        if {$keys len : = 1} {
-            show-message ["" . $keys,0 " -> " $command];
-            return ALL;
-        };
-        result := "";
-        0 each to: [$keys len : - 2] do: {| i |
-            $result append! $keys,$i;
-            $result append! ", ";
-        };
-        $result append! [$keys get [$keys len : - 1]];
-        $result append! " -> ";
-        $result append! $command;
-        show-message $result;
         return ALL;
     };
     
@@ -96,6 +88,23 @@ defcommand pwiki-click-link desc: "Open PWiki document." {
     $next-buff set-previous-buffer [$buff get-buffer-name];
     
     return ALL;
+};
+
+defun get-keybind-string (window command) {
+    keys ::= $window get-key-bindings $command;
+    if {$keys null?} {
+        return "";
+    };
+    if {$keys len : = 1} {
+        return ["" . $keys,0];
+    };
+    result := "";
+    0 each to: [$keys len : - 2] do: {| i |
+        $result append! $keys,$i;
+        $result append! ", ";
+    };
+    $result append! [$keys get [$keys len : - 1]];
+    return $result;
 };
 
 defun create-directory-if-not-exists (path) {
