@@ -20,7 +20,7 @@ void*
 malloc_wrapper(size_t new) {
     void *p;
 
-    p = GC_malloc(new);
+    p = GC_MALLOC(new);
     ALLOC_SAFE(p);
 
     return p;
@@ -30,10 +30,10 @@ void*
 realloc_wrapper(void* ptr, size_t old, size_t new) {
     void *p;
 
-    p = GC_malloc(new);
+    p = GC_MALLOC(new);
     ALLOC_SAFE(p);
     memcpy(p, ptr, (old<new)?old:new);
-    GC_free(ptr);
+    /* GC_free(ptr); */
 
     return p;
 }
