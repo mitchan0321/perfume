@@ -3150,4 +3150,10 @@
 		Change key-binding-list use get-keybind-string function and list key bindings
 		  list directly when list all commands section.
 
+2023/03/16
+	pmacs update:
+		Add theme color item 'INVERT' for EDIT_BUFFER inverted color.
+		Change search-{next,previous} spot color to SEARCH_CURRENT_HILIGHT to INVERT.
+		Fix execute-record local variable isolate.
+
 #eof
