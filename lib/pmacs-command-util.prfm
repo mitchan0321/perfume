@@ -1157,21 +1157,19 @@ defcommand end-recording desc: "End keyboard macro recording." {
 };
 
 defcommand execute-record desc: "Execute keyboard macro." {
-    | main window |
+    | __main __window |
     
-    buff ::= $main get-record-buffer;
-    $buff ?? {return ALL};
-    $buff clear;
-    ins-char-cmd := "insert-character";
-    while {r ::= $buff gets} do: {
-        if {"" = $r} {continue};
-        if {eq? $ins-char-cmd [$r sub 0 [$ins-char-cmd len]]} {
-            result ::= $window apply-command $main $window [$r sub [$ins-char-cmd len : + 1]] [symbol $ins-char-cmd];
+    __buff ::= $__main get-record-buffer;
+    $__buff ?? {return ALL};
+    $__buff clear;
+    __ins-char-cmd := "insert-character";
+    while {__r ::= $__buff gets} do: {
+        if {"" = $__r} {continue};
+        if {eq? $__ins-char-cmd [$__r sub 0 [$__ins-char-cmd len]]} {
+            result ::= $__window apply-command $__main $__window [$__r sub [$__ins-char-cmd len : + 1]] [symbol $__ins-char-cmd];
         } {
-            result ::= $window apply-command $main $window "" [symbol $r];
+            result ::= $__window apply-command $__main $__window "" [symbol $__r];
         };
-        buff ::= $main get-record-buffer;
-        $buff ?? {return ALL};
     };
     return ALL;
 };
