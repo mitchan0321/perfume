@@ -24,12 +24,12 @@ defcommand key-binding-list desc: "Display key binding list and all editor comma
     $buff append-string "";
     
     $window get-prefix-list : each do: {| i |
-        display-key-binding-list $buff ["Prefix key: " . [$window get-prefix-key $i] " / Name: " $i] [$window get-bind-map $i] $desc;
+        display-key-binding-list $buff ["Prefix key: " . [$window get-prefix-key $i : map {| j | symbol [getkeydesc $j]}] " / Name: " $i] [$window get-bind-map $i] $desc;
         $buff append-string "";
     };
         
     $buff append-string "<<< All editor commands >>>";
-    $buff append-string ["%v <- %v" fmt "Open command document" "Key bindings"];
+    $buff append-string ["%v <- %v" fmt "Command" "Key bindings"];
     $buff append-string "  Description";
     $buff append-string ["%v" fmt ["-" repeat [38 * 2]]];
     msort [$EditorCommand keys :string] : each do: {| i |

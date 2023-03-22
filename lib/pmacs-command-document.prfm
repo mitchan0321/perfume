@@ -95,13 +95,20 @@ defun get-keybind-string (window command) {
     if {$keys null?} {
         return "";
     };
+    keys ::= $keys map {| i |
+        if {list? $i} {
+            $i map {| j | symbol [getkeydesc $j]};
+        } {
+            symbol [getkeydesc $i];
+        };
+    };
     if {$keys len : = 1} {
         return ["" . $keys,0];
     };
     result := "";
     0 each to: [$keys len : - 2] do: {| i |
         $result append! $keys,$i;
-        $result append! ", ";
+        $result append! " , ";
     };
     $result append! [$keys get [$keys len : - 1]];
     return $result;
