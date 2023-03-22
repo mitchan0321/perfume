@@ -3166,4 +3166,10 @@
 		PRFM_20230321
 		1.7.2
 
+2023/03/22
+	pmacs update:
+		Change key-binding-list format, all commands section display key name.
+		Change emacs keybind mode KEY_ESC g and ALT+g separated.
+		Add utility function getkeydesc at pmacs-keydesc.
+
 #eof
