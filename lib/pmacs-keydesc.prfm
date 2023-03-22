@@ -13,6 +13,13 @@ defun setkeydesc (key desc) {
     $KEY_DESC set $key $desc;
 };
 
+defun getkeydesc (key) {
+    if {$KEY_DESC set? $key} {
+        return [$KEY_DESC,$key split : get 1];
+    };
+    return $key;
+};
+
 if [defvar? KEY_DESC] else: {
     defvar KEY_DESC [dict ()];
 };
