@@ -912,7 +912,7 @@ Window method set-input (fd) {
 
 Window method input-ready? () {
     if [false? InputFd] {return <nil>};
-    if [$InputFd ready?] {return <t>};
+    if [$InputFd ready? timeout: $INPUT_TIMEOUT] {return <t>};
     return <nil>;
 };
 
