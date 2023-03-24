@@ -8,6 +8,7 @@ BufferBase.prfm
 BufferGeom.prfm
 BufferManager.prfm
 pmacs-default.key
+pmacs-keydesc.prfm
 CombiWindow.prfm
 EditBuffer.prfm
 MiniWindow.prfm
