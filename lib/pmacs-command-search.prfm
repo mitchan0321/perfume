@@ -192,6 +192,7 @@ defcommand search-next desc: "Search forward for previous text/regex." {
         $window set-spot-color-item SEARCH $y $x $len INVERT;
         $main add-background after: 3000 job-id: "00-SEARCH" {
             $window remove-spot-color-item SEARCH;
+            result ALL;
         };
     };
     
@@ -221,6 +222,7 @@ defcommand search-previous desc: "Search backward for previous text/regex." {
         $window set-spot-color-item SEARCH $y $x $len INVERT;
         $main add-background after: 3000 job-id: ["00-SEARCH" . [$buff get-buffer-name]] {
             $window remove-spot-color-item SEARCH;
+            result ALL;
         };
     };
 

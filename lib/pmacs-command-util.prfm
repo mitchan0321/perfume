@@ -482,6 +482,9 @@ defun do-command-async (window buff-name directory command) {
     task ::= new Task;
     $task set-stdout $grep-buff;
     $task set-stderr $grep-buff;
+    $task set-terminate-proc {
+        $MainWindow set-force-update;
+    };
     
     ###
     ### do command
