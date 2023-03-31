@@ -3172,4 +3172,10 @@
 		Change emacs keybind mode KEY_ESC g and ALT+g separated.
 		Add utility function getkeydesc at pmacs-keydesc.
 
+2023/03/31
+	pmacs update:
+		Add system call 'SysCall update-screen' for update editor screen.
+		Add force update screen when output data to '*Console*'.
+		Add SysCall update-screen to pmacs-server, console-adjuster and star tasklets.
+
 #eof
