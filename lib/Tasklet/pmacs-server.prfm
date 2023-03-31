@@ -59,6 +59,7 @@ new Task : proc pmacs-server {
                         };
                         window ::= $MainWindow get-current-window : get-window-name;
                         $MainWindow bind-buffer $window $target-buff;
+                        SysCall update-screen;
                     };
                 };
             };

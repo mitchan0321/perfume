@@ -38,6 +38,7 @@ new Task : proc star {
             begin local: [dict ((t . $t) (tag . $tag))] {
                 $MainWindow add-background after: $t {
                     $window remove-spot-color-item $tag;
+                    result ALL;
                 };
             };
         };
