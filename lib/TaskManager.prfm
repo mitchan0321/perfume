@@ -11,7 +11,17 @@ TaskManager method init () {
     
     sets Task_stdout [new EditStream];
     $Task_stdout open "*Console*";
-
+    _puts ::= $Task_stdout method? puts;
+    $Task_stdout method puts (*) {
+        r ::= call $_puts $*;
+        $MainWindow get-window-list : each do: {| i |
+            if {$i get-buffer : get-buffer-name : = "*Console*"} {
+                $MainWindow set-force-update;
+            };
+        };
+        return $r;
+    };
+    
     sets Task_stdin [new Stream];
     $Task_stdin set-limit 1024;
 
