@@ -157,6 +157,7 @@ defun pmacs (trace: t) {
             };
             
             $MainWindow add-background job-id: "50-PINTERP-WATCHDOG" $body;
+            result NONE;
         };
         yield $body $MainWindow <nil>;
 
