@@ -43,6 +43,9 @@ Window method init-constructor () {
     ### keyboard macro record
     sets Recording <nil>;
     sets RecordingBuffer <nil>;
+    
+    ### force update screen
+    sets ForceUpdate <nil>;
 };
 
 Window method get-curs () {
@@ -619,29 +622,30 @@ Window method keyin-proc (window) {
 
 Window method keyin-apply (main window keyin-list) {
     if {$keyin-list null?} {
+        update := <nil>;
         if {background-exists?} {
             try {
                 result ::= exec-background;
                 cond
                 {eq? $result ALL} {
-                    $main apply {render-all; refresh};
-                }
-                {eq? $result REFRESH-ONLY} {
-                    $main apply {refresh};
+                    update := <t>;
                 }
 		;;
             } catch: {| e |
                 show-message :bell ["Error at background: <" . [$e car] "># " [$e cdr]];
             };
         };
-
+        
+        sets ForceUpdate <nil>;
         try {
-            if {TaskManager dispatch} {
-                $main apply {render-all; refresh};
-            };
+            TaskManager dispatch;
         } catch: {| e |
             TaskManager panic ["Error at TaskManager::dispatch: " . $e];
             show-message :bell "Error at TaskManager::dispatch, see *Console* buffer.";
+        };
+        
+        if {or $ForceUpdate $update} {
+            $main apply {render-all; refresh};
         };
         return;
     };
@@ -671,25 +675,28 @@ Window method keyin-apply (main window keyin-list) {
             ### if do brackets-pair in background, uncomment this.
             ### REM {
                 $main add-background job-id: "00-BRACKETS" {
+                    _result := NONE;
                     if {! [$main mini-input?]} {
                         if {eq? [$window get @name] CombiWindow} {
                             if {$window active?} {
                                 $window apply-command $main $window <nil> brackets-pair;
+                                _result := ALL;
                             };
                         };
                     };
+                    result $_result;
                 };
             ### }; # END REM
 
             ### if do brackets-pair in on-time, uncomment this.
             REM {
-            if {! [$main mini-input?]} {
-                if {eq? [$window get @name] CombiWindow} {
-                    if {$window active?} {
-                        $window apply-command $main $window <nil> brackets-pair;
+                if {! [$main mini-input?]} {
+                    if {eq? [$window get @name] CombiWindow} {
+                        if {$window active?} {
+                            $window apply-command $main $window <nil> brackets-pair;
+                        };
                     };
                 };
-            };
             }; ### END REM
         }
 
@@ -1000,4 +1007,8 @@ Window method key-record (k c) {
 
 Window method get-record-buffer () {
     return $RecordingBuffer;
+};
+
+Window method set-force-update () {
+    sets ForceUpdate <t>;
 };
