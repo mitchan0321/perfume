@@ -178,6 +178,10 @@ SysCall method recv (f) {
     return [$f gets];
 };
 
+SysCall method update-screen () {
+    $MainWindow set-force-update;
+};
+
 SysCall method __checkEnv () {
     if {! [defvar? SELF]}         {throw ErrNotTask "Not a Task Environment."};
     if {! [$SELF instance? Task]} {throw ErrNotTask "Not a Task Environment."};
