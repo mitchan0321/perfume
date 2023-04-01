@@ -43,6 +43,7 @@ new Task : proc star {
             };
         };
         $total ++;
+        SysCall update-screen;
         SysCall sleep 200;
     };
     println "[" [get-name] "] total count: " $total;
