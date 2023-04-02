@@ -608,7 +608,24 @@ Window method keyin-proc (window) {
                 ;;
             ];
         };
-            
+        
+        ###
+        ### mouse escape?
+        ###
+        if {and {[$i len] > 1} {eq? [$i get 0] KEY_BACKSPACE}} {
+            ### mal data cancel "\0o033[M?0o127?" out range cursor column
+            apply {render-all; refresh};
+            return ();
+        };
+        if {eq? [$i get 0] KEY_ESC} {
+            if {and {string? [$i get 1]} {[[$i get 1] sub 0 2] = "[M"}} {
+                ### It is mouse event !!
+                show-message ["Mouse event: " . [[$i get 1] sub 2]];
+                apply {render-all; refresh};
+                return ();
+            };
+        };
+
         if [$KeyMaps set? $i] {
             i ::= $KeyMaps get $i;
         };
