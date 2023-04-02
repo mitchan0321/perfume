@@ -3178,4 +3178,8 @@
 		Add force update screen when output data to '*Console*'.
 		Add SysCall update-screen to pmacs-server, console-adjuster and star tasklets.
 
+2023/04/02
+	pmacs update:
+		Add mouse event driver.
+
 #eof
