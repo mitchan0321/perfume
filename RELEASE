@@ -3181,4 +3181,8 @@
 		Add pinterp watch-dog return result NONE.
 		Add background result ALL.
 
+2023/04/02
+	pmacs update:
+		Add mouse event driver.
+
 #eof
