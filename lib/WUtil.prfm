@@ -1158,3 +1158,19 @@ defun unsetconf (key) {
     $CONFIG_RO unset $key;
     $CONFIG_TYPE unset $key;
 };
+
+defun mouse-on () {
+    if {$ENV,TERM =~ :nocase 'xterm'} {
+        if {defvar? stdout_orig} {
+            $stdout_orig puts :nonewline ["" uimport! (0o33 0x5b 0x3f 0x31 0x30 0x30 0x30 0x68)];
+        };
+    };
+};
+
+defun mouse-off () {
+    if {$ENV,TERM =~ :nocase 'xterm'} {
+        if {defvar? stdout_orig} {
+            $stdout_orig puts :nonewline ["" uimport! (0o33 0x5b 0x3f 0x31 0x30 0x30 0x30 0x6c)];
+        };
+    };
+};
