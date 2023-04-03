@@ -3185,4 +3185,15 @@
 	pmacs update:
 		Add mouse event driver.
 
+2023/04/03
+	pmacs update:
+		Add mouse operation features.
+		  Add mouse handling feature to Window.prfm.
+		  Add new mouse command - 
+		    mouse-smooth-scroll-up
+		    mouse-smooth-scroll-down
+		    mouse-point
+		  Add new keybindngs to pmacs-default.key and pmacs-keydesc.prfm files.
+		  Add new config variable for mouse operation MOUSE_WHEEL_COUNT.
+
 #eof
