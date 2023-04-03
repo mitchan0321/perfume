@@ -624,6 +624,13 @@ Window method keyin-proc (window) {
                 apply {render-all; refresh};
                 return ();
             };
+        } {
+            if {eq? [$i get 0] KEY_MOUSE} {
+                ### It is mouse event !!
+                show-message ["Mouse event: " . [$i get 1]];
+                apply {render-all; refresh};
+                return ();
+            };
         };
 
         if [$KeyMaps set? $i] {
