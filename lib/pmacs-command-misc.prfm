@@ -211,3 +211,7 @@ defcommand test2 desc: "Test command." {
     ;
     return ALL;
 };
+
+defcommand nop desc: "Not operation command." {
+    result NONE;
+};
