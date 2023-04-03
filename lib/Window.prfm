@@ -627,9 +627,9 @@ Window method keyin-proc (window) {
                 window-focus-at $s,0;
                 set-mouse-event $e,0 $s,1 $s,2;
                 send-mouse-event;
-                ### show-message ["Mouse event: " . $e,0 "," $s];
+                ###show-message ["Mouse event: " . $e,0 "," $s];
+                apply {render-all; refresh};
             };
-            apply {render-all; refresh};
             return ();
         };
 
