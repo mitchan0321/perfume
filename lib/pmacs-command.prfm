@@ -11,6 +11,7 @@ command-files := (
     "pmacs-command-util.prfm"
     "pmacs-command-dired.prfm"
     "pmacs-command-document.prfm"
+    "pmacs-command-mouse.prfm"
     "pmacs-command-misc.prfm"
 );
 
