@@ -1,0 +1,32 @@
+defcommand mouse-smooth-scroll-up desc: "Mouse wheel up." {
+    | main window |
+    c ::= [defvar? MOUSE_WHEEL_COUNT] ??? {result $MOUSE_WHEEL_COUNT} 1;
+    1 each to: $c do: {
+        $window apply-command $main $window "" smooth-scroll-up;
+    };
+    result ALL;
+};
+
+defcommand mouse-smooth-scroll-down desc: "Mouse wheel down." {
+    | main window |
+    c ::= [defvar? MOUSE_WHEEL_COUNT] ??? {result $MOUSE_WHEEL_COUNT} 1;
+    1 each to: $c do: {
+        $window apply-command $main $window "" smooth-scroll-down;
+    };
+    result ALL;
+};
+
+defcommand mouse-point desc: "Move cursor to mouse click point." {
+    | main window |
+    (ev y x) ::= $main get-mouse-event;
+    $ev ?? {return SELF};
+    
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    $geom set! CursorLine $y;
+    $geom set! IndexColumn.SAVE [$geom,ViewColumn + $x];
+    (sy sx) ::= $window get-source-index $buff $geom;
+    $window cursor-move-to $geom $sy $sx;
+    result ALL;
+};
+
