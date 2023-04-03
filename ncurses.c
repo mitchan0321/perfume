@@ -42,6 +42,143 @@ error:
 }
 
 Toy_Type*
+func_curses_mouse_on(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    mmask_t newmask, oldmask;
+
+    if (list_length(posargs) != 0) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    newmask = ALL_MOUSE_EVENTS;
+    mousemask(newmask, &oldmask);
+    return const_T;
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'curs-mouse-on', syntax: curs-mouse-on", interp);
+}
+
+Toy_Type*
+func_curses_mouse_off(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    mmask_t newmask, oldmask;
+
+    if (list_length(posargs) != 0) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    newmask = 0;
+    mousemask(newmask, &oldmask);
+    return const_T;
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'curs-mouse-off', syntax: curs-mouse-off", interp);
+}
+
+Toy_Type*
+func_curses_get_mouse(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    MEVENT mevent;
+    Toy_Type *result;
+    Toy_Type *event;
+
+    if (list_length(posargs) != 0) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+    
+    if(getmouse(&mevent) != OK) return const_Nil;
+    
+    result = new_list(NULL);
+    event = new_list(NULL);
+    if (mevent.bstate & BUTTON1_PRESSED) list_append(event, new_symbol(L"BUTTON1_PRESSED"));
+    if (mevent.bstate & BUTTON1_RELEASED) list_append(event, new_symbol(L"BUTTON1_RELEASED"));
+    if (mevent.bstate & BUTTON1_CLICKED) list_append(event, new_symbol(L"BUTTON1_CLICKED"));
+    if (mevent.bstate & BUTTON1_DOUBLE_CLICKED) list_append(event, new_symbol(L"BUTTON1_DOUBLE_CLICKED"));
+    if (mevent.bstate & BUTTON1_TRIPLE_CLICKED) list_append(event, new_symbol(L"BUTTON1_TRIPLE_CLICKED"));
+    if (mevent.bstate & BUTTON2_PRESSED) list_append(event, new_symbol(L"BUTTON2_PRESSED"));
+    if (mevent.bstate & BUTTON2_RELEASED) list_append(event, new_symbol(L"BUTTON2_RELEASED"));
+    if (mevent.bstate & BUTTON2_CLICKED) list_append(event, new_symbol(L"BUTTON2_CLICKED"));
+    if (mevent.bstate & BUTTON2_DOUBLE_CLICKED) list_append(event, new_symbol(L"BUTTON2_DOUBLE_CLICKED"));
+    if (mevent.bstate & BUTTON2_TRIPLE_CLICKED) list_append(event, new_symbol(L"BUTTON2_TRIPLE_CLICKED"));
+    if (mevent.bstate & BUTTON3_PRESSED) list_append(event, new_symbol(L"BUTTON3_PRESSED"));
+    if (mevent.bstate & BUTTON3_RELEASED) list_append(event, new_symbol(L"BUTTON3_RELEASED"));
+    if (mevent.bstate & BUTTON3_CLICKED) list_append(event, new_symbol(L"BUTTON3_CLICKED"));
+    if (mevent.bstate & BUTTON3_DOUBLE_CLICKED) list_append(event, new_symbol(L"BUTTON3_DOUBLE_CLICKED"));
+    if (mevent.bstate & BUTTON3_TRIPLE_CLICKED) list_append(event, new_symbol(L"BUTTON3_TRIPLE_CLICKED"));
+    if (mevent.bstate & BUTTON4_PRESSED) list_append(event, new_symbol(L"BUTTON4_PRESSED"));
+    if (mevent.bstate & BUTTON4_RELEASED) list_append(event, new_symbol(L"BUTTON4_RELEASED"));
+    if (mevent.bstate & BUTTON4_CLICKED) list_append(event, new_symbol(L"BUTTON4_CLICKED"));
+    if (mevent.bstate & BUTTON4_DOUBLE_CLICKED) list_append(event, new_symbol(L"BUTTON4_DOUBLE_CLICKED"));
+    if (mevent.bstate & BUTTON4_TRIPLE_CLICKED) list_append(event, new_symbol(L"BUTTON4_TRIPLE_CLICKED"));
+    if (mevent.bstate & BUTTON5_PRESSED) list_append(event, new_symbol(L"BUTTON5_PRESSED"));
+    if (mevent.bstate & BUTTON5_RELEASED) list_append(event, new_symbol(L"BUTTON5_RELEASED"));
+    if (mevent.bstate & BUTTON5_CLICKED) list_append(event, new_symbol(L"BUTTON5_CLICKED"));
+    if (mevent.bstate & BUTTON5_DOUBLE_CLICKED) list_append(event, new_symbol(L"BUTTON5_DOUBLE_CLICKED"));
+    if (mevent.bstate & BUTTON5_TRIPLE_CLICKED) list_append(event, new_symbol(L"BUTTON5_TRIPLE_CLICKED"));
+    if (mevent.bstate & BUTTON_SHIFT) list_append(event, new_symbol(L"BUTTON_SHIFT"));
+    if (mevent.bstate & BUTTON_CTRL) list_append(event, new_symbol(L"BUTTON_CTRL"));
+    if (mevent.bstate & BUTTON_ALT) list_append(event, new_symbol(L"BUTTON_ALT"));
+    if (mevent.bstate & REPORT_MOUSE_POSITION) list_append(event, new_symbol(L"REPORT_MOUSE_POSITION"));
+    
+    list_append(result, event);
+    list_append(result, new_integer_si(mevent.y));
+    list_append(result, new_integer_si(mevent.x));
+
+    return result;
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'curs-get-mouse', syntax: curs-get-mouse", interp);
+}
+
+Toy_Type*
+func_curses_get_event_window(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    WINDOW *win;
+    Toy_Type *winl, *winc;
+    Toy_Type *tx, *ty;
+    int scrnx, scrny;
+    int winx, winy;
+    int i;
+
+    if (list_length(posargs) != 3) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+    
+    winl = list_get_item(posargs);
+    posargs = list_next(posargs);
+    ty = list_get_item(posargs);
+    posargs = list_next(posargs);
+    tx = list_get_item(posargs);
+    
+    if (GET_TAG(winl) != LIST) goto error;
+    if (GET_TAG(ty) != INTEGER) goto error;
+    if (GET_TAG(tx) != INTEGER) goto error;
+    
+    scrny = mpz_get_si(ty->u.biginteger);
+    scrnx = mpz_get_si(tx->u.biginteger);
+    
+    winc = list_get_item(winl);
+    winl = list_next(winl);
+    i = 0;
+    while (winc) {
+        if (GET_TAG(winc) != CONTAINER) goto error;
+        if (wcscmp(cell_get_addr(winc->u.container.desc), L"CURSES") != 0) goto error;
+        win = winc->u.container.data;
+        winy = scrny;
+        winx = scrnx;
+        if (wmouse_trafo(win, &winy, &winx, 0) == true) {
+            Toy_Type *result;
+            result = new_list(NULL);
+            list_append(result, new_integer_si(i));
+            list_append(result, new_integer_si(winy));
+            list_append(result, new_integer_si(winx));
+            return result;
+        }
+        
+        winc = list_get_item(winl);
+        winl = list_next(winl);
+        i ++;
+    };
+    return const_Nil;
+    
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'curs-get-event-window', syntax: curs-get-event-window (curs-list ...) screen-y screen-x", interp);
+}
+
+
+Toy_Type*
 func_curses_getscreensize(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     WINDOW *w;
     Toy_Type *container;
@@ -1439,6 +1576,10 @@ error:
 int
 toy_add_func_ncurses(Toy_Interp* interp) {
     toy_add_func(interp, L"curs-init",		func_curses_init,		NULL);
+    toy_add_func(interp, L"curs-mouse-on",	func_curses_mouse_on,		NULL);
+    toy_add_func(interp, L"curs-mouse-off",	func_curses_mouse_off,		NULL);
+    toy_add_func(interp, L"curs-get-mouse",	func_curses_get_mouse,		NULL);
+    toy_add_func(interp, L"curs-get-event-window",func_curses_get_event_window,	L"curs-list,screen-y,screen-x");
     toy_add_func(interp, L"curs-get-screen-size",func_curses_getscreensize,	L"window");
     toy_add_func(interp, L"curs-terminate",	func_curses_terminate,		NULL);
     toy_add_func(interp, L"curs-create-window",	func_curses_createwindow,	L"window,y,x,line,column");
