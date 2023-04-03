@@ -46,6 +46,11 @@ Window method init-constructor () {
     
     ### force update screen
     sets ForceUpdate <nil>;
+    
+    ### mouse event;
+    sets MouseEvent <nil>;
+    sets MouseEvent_y 0;
+    sets MouseEvent_x 0;
 };
 
 Window method get-curs () {
@@ -620,9 +625,9 @@ Window method keyin-proc (window) {
             s ::= curs-get-event-window [get-window-list : map {| i | $i get-curs}] $e,1 $e,2;
             if $s {
                 window-focus-at $s,0;
-                show-message ["Mouse event: " . $e,0 "," $s];
-            } {
-                show-message ["Mouse event(out): " . $e];
+                set-mouse-event $e,0 $s,1 $s,2;
+                send-mouse-event;
+                ### show-message ["Mouse event: " . $e,0 "," $s];
             };
             apply {render-all; refresh};
             return ();
@@ -1034,5 +1039,45 @@ Window method set-force-update () {
 
 Window method window-focus-at (idx) {
     l ::= get-window-list : map {| i | $i get-window-name};
-    roll-to-window [$l get $idx];
+    if {$l,$idx = [get-current-window : get-window-name]} {return};
+    roll-to-window $l,$idx;
 };
+
+Window method set-mouse-event (event y x) {
+    sets MouseEvent $event;
+    sets MouseEvent_y $y;
+    sets MouseEvent_x $x;
+};
+
+Window method get-mouse-event () {
+    return ($MouseEvent $MouseEvent_y $MouseEvent_x);
+};
+
+Window method send-mouse-event () {
+    (event y x) ::= get-mouse-event;
+    button := "";
+    cond 
+        {$event find BUTTON1_PRESSED}  {$button append! "MOUSE_Prs_1"; break}
+        {$event find BUTTON2_PRESSED}  {$button append! "MOUSE_Prs_2"; break}
+        {$event find BUTTON3_PRESSED}  {$button append! "MOUSE_Prs_3"; break}
+        {$event find BUTTON4_PRESSED}  {$button append! "MOUSE_Prs_4"; break}
+        {$event find BUTTON5_PRESSED}  {$button append! "MOUSE_Prs_5"; break}
+        {$event find BUTTON1_RELEASED} {$button append! "MOUSE_Rel_1"; break}
+        {$event find BUTTON2_RELEASED} {$button append! "MOUSE_Rel_2"; break}
+        {$event find BUTTON3_RELEASED} {$button append! "MOUSE_Rel_3"; break}
+        {$event find BUTTON4_RELEASED} {$button append! "MOUSE_Rel_4"; break}
+        {$event find BUTTON5_RELEASED} {$button append! "MOUSE_Rel_5"; break}
+    ;;
+    cond
+        {$event find BUTTON_CTRL}      {$button append! "_CTRL"}
+        {$event find BUTTON_ALT}       {$button append! "_ALT"}
+    ;;
+    
+    if {$button != ""} {
+        send-key-event ([symbol $button]);
+        return $button;
+    };
+
+    return <nil>;
+};
+
