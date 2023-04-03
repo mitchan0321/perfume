@@ -612,25 +612,20 @@ Window method keyin-proc (window) {
         ###
         ### mouse escape?
         ###
-        if {and {[$i len] > 1} {eq? [$i get 0] KEY_BACKSPACE}} {
-            ### mal data cancel "\0o033[M?0o127?" out range cursor column
+        if {eq? [$i get 0] KEY_MOUSE} {
+            ### It is mouse event !!
+            e ::= curs-get-mouse;
+            if $e else: {return ()};
+            
+            s ::= curs-get-event-window [get-window-list : map {| i | $i get-curs}] $e,1 $e,2;
+            if $s {
+                window-focus-at $s,0;
+                show-message ["Mouse event: " . $e,0 "," $s];
+            } {
+                show-message ["Mouse event(out): " . $e];
+            };
             apply {render-all; refresh};
             return ();
-        };
-        if {eq? [$i get 0] KEY_ESC} {
-            if {and {string? [$i get 1]} {[[$i get 1] sub 0 2] = "[M"}} {
-                ### It is mouse event !!
-                show-message ["Mouse event: " . [[$i get 1] sub 2]];
-                apply {render-all; refresh};
-                return ();
-            };
-        } {
-            if {eq? [$i get 0] KEY_MOUSE} {
-                ### It is mouse event !!
-                show-message ["Mouse event: " . [$i get 1]];
-                apply {render-all; refresh};
-                return ();
-            };
         };
 
         if [$KeyMaps set? $i] {
@@ -1035,4 +1030,9 @@ Window method get-record-buffer () {
 
 Window method set-force-update () {
     sets ForceUpdate <t>;
+};
+
+Window method window-focus-at (idx) {
+    l ::= get-window-list : map {| i | $i get-window-name};
+    roll-to-window [$l get $idx];
 };
