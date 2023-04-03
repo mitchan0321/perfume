@@ -1160,17 +1160,9 @@ defun unsetconf (key) {
 };
 
 defun mouse-on () {
-    if {$ENV,TERM =~ :nocase 'xterm'} {
-        if {defvar? stdout_orig} {
-            $stdout_orig puts :nonewline ["" uimport! (0o33 0x5b 0x3f 0x31 0x30 0x30 0x30 0x68)];
-        };
-    };
+    curs-mouse-on;
 };
 
 defun mouse-off () {
-    if {$ENV,TERM =~ :nocase 'xterm'} {
-        if {defvar? stdout_orig} {
-            $stdout_orig puts :nonewline ["" uimport! (0o33 0x5b 0x3f 0x31 0x30 0x30 0x30 0x6c)];
-        };
-    };
+    curs-mouse-off;
 };
