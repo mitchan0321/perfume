@@ -1048,6 +1048,7 @@ Window method window-focus-at (idx) {
     l ::= get-window-list : map {| i | $i get-window-name};
     if {$l,$idx = [get-current-window : get-window-name]} {return <nil>};
     roll-to-window $l,$idx;
+    set-last-mouse-event <nil> 0 0;
     return <t>;
 };
 
