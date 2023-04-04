@@ -27,10 +27,17 @@ defcommand pwiki-click-link desc: "Open PWiki document." {
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     (ey ex) ::= $window get-source-index $buff $geom;
+    sts ::= pwiki-open-link $main $window $buff $geom $ey $ex;
+    if $sts else: {
+        $window apply-command $main $window "\r" insert-character;
+    };
+    return ALL;
+};
+
+defun pwiki-open-link (main window buff geom ey ex) {
     str ::= cursor-on-search-regex $ey $ex $PWIKI_LINK $buff;
     $str ?? {
-        $window apply-command $main $window "\r" insert-character;
-        return ALL;
+        return <nil>;
     };
 
     link ::= $str sub 2 [$str len : - 2];
@@ -53,7 +60,7 @@ defcommand pwiki-click-link desc: "Open PWiki document." {
         } {
             show-message [$result . " -> " $command];
         };
-        return ALL;
+        return <t>;
     };
     
     path ::= $buff get-content;
@@ -78,7 +85,7 @@ defcommand pwiki-click-link desc: "Open PWiki document." {
         };
         $result ?? {
             show-message :bell ["Open Failed, path: " . $new-path " ("  $err ")"];
-            return SELF;
+            return <t>;
             if {$buff enc-error?} {
                 show-message :bell "File decode error occured!! Try ALT-e and specify another encoding for re-load.";
             };
@@ -87,7 +94,7 @@ defcommand pwiki-click-link desc: "Open PWiki document." {
     $main bind-buffer [$window get-window-name] $next-buff;
     $next-buff set-previous-buffer [$buff get-buffer-name];
     
-    return ALL;
+    return <t>;
 };
 
 defun get-keybind-string (window command) {
@@ -248,10 +255,17 @@ defcommand man-click-link desc: "Open man document." {
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     (ey ex) ::= $window get-source-index $buff $geom;
+    sts ::= man-open-link $main $window $buff $geom $ey $ex;
+    if $sts else: {
+        show-message :bell "No man topic.";
+    };
+    result ALL;
+};
+
+defun man-open-link (main window buff geom ey ex) {
     str ::= cursor-on-search-regex $ey $ex $MAN_LINK $buff;
     $str ?? {
-        show-message :bell "No man topic.";
-        return ALL;
+        return <nil>;
     };
 
     buff ::= $window get-buffer;
@@ -265,7 +279,7 @@ defcommand man-click-link desc: "Open man document." {
     next-buff ::= $window get-buffer;
     $next-buff set-previous-buffer $buff-name;
 
-    return ALL;
+    return <t>;
 };
 
 defcommand man-link-back desc: "Back to previous man document." {
