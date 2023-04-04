@@ -48,7 +48,13 @@ func_curses_mouse_on(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int 
     if (list_length(posargs) != 0) goto error;
     if (hash_get_length(nameargs) > 0) goto error;
 
-    newmask = ALL_MOUSE_EVENTS;
+    newmask = 
+          BUTTON1_PRESSED | BUTTON1_RELEASED
+        | BUTTON2_PRESSED | BUTTON2_RELEASED
+        | BUTTON3_PRESSED | BUTTON3_RELEASED
+        | BUTTON4_PRESSED | BUTTON4_RELEASED
+        | BUTTON5_PRESSED | BUTTON5_RELEASED
+        | BUTTON_CTRL | BUTTON_ALT;
     mousemask(newmask, &oldmask);
     return const_T;
 

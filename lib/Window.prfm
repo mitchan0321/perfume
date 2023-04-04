@@ -624,11 +624,15 @@ Window method keyin-proc (window) {
             
             s ::= curs-get-event-window [get-window-list : map {| i | $i get-curs}] $e,1 $e,2;
             if $s {
-                window-focus-at $s,0;
+                if [window-focus-at $s,0] {
+                    ### if <t> focus change.
+                    apply {render-all; refresh};
+                    return ();
+                };
                 set-mouse-event $e,0 $s,1 $s,2;
                 send-mouse-event;
                 ###show-message ["Mouse event: " . $e,0 "," $s];
-                apply {render-all; refresh};
+                ###apply {render-all; refresh};
             };
             return ();
         };
@@ -1039,8 +1043,9 @@ Window method set-force-update () {
 
 Window method window-focus-at (idx) {
     l ::= get-window-list : map {| i | $i get-window-name};
-    if {$l,$idx = [get-current-window : get-window-name]} {return};
+    if {$l,$idx = [get-current-window : get-window-name]} {return <nil>};
     roll-to-window $l,$idx;
+    return <t>;
 };
 
 Window method set-mouse-event (event y x) {
