@@ -51,6 +51,9 @@ Window method init-constructor () {
     sets MouseEvent <nil>;
     sets MouseEvent_y 0;
     sets MouseEvent_x 0;
+    sets MouseLastEvent_window <nil>;
+    sets MouseLastEvent_y 0;
+    sets MouseLastEvent_x 0;
 };
 
 Window method get-curs () {
@@ -1058,6 +1061,16 @@ Window method get-mouse-event () {
     return ($MouseEvent $MouseEvent_y $MouseEvent_x);
 };
 
+Window method set-last-mouse-event (window y x) {
+    sets MouseLastEvent_window $window;
+    sets MouseLastEvent_y $y;
+    sets MouseLastEvent_x $x;
+};
+
+Window method get-last-mouse-event () {
+    return ($MouseLastEvent_window $MouseLastEvent_y $MouseLastEvent_x);
+};
+
 Window method send-mouse-event () {
     (event y x) ::= get-mouse-event;
     button := "";
@@ -1073,6 +1086,8 @@ Window method send-mouse-event () {
         {$event find BUTTON4_RELEASED} {$button append! "MOUSE_Rel_4"; break}
         {$event find BUTTON5_RELEASED} {$button append! "MOUSE_Rel_5"; break}
     ;;
+    if {$button = ""} {return <nil>};
+    
     cond
         {$event find BUTTON_CTRL}      {$button append! "_CTRL"}
         {$event find BUTTON_ALT}       {$button append! "_ALT"}
