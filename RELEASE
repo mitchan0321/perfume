@@ -3196,4 +3196,18 @@
 		  Add new keybindngs to pmacs-default.key and pmacs-keydesc.prfm files.
 		  Add new config variable for mouse operation MOUSE_WHEEL_COUNT.
 
+2023/04/04
+	pmacs update:
+		Add main window last mouse state memory and access function set-last-mouse-event
+		  and get-last-mouse-event.
+		Change non operation editor command name nop -> .nop
+		Change key-binding-list not show start "." editor command.
+		Add editor commands mouse-point-region, mouse-point-region-append and mouse-cut-or-paste.
+		Add new key bind:
+		  mouse-point-region <- Mouse1-Rel
+		  copy-region <- Mouse3-Rel	
+		  mouse-point-region-append <- Ctrl+Mouse1-Prs
+		  mouse-cut-or-paste <- Ctrl+Mouse3-Rel
+
+
 #eof
