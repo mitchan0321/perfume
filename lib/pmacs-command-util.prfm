@@ -33,6 +33,7 @@ defcommand key-binding-list desc: "Display key binding list and all editor comma
     $buff append-string "  Description";
     $buff append-string ["%v" fmt ["-" repeat [38 * 2]]];
     msort [$EditorCommand keys :string] : each do: {| i |
+        if {"" . $i : at 0 : = "."} {continue};
         binds ::= get-keybind-string $window $i;
         if {$binds != ""} {
             $buff append-string ["%v <- %v" fmt ["[[" . $i "]]"] $binds];
@@ -54,6 +55,7 @@ defun display-key-binding-list (buff name key-map desc) {
     l := ();
     $key-map each do: {| k v |
 	if {nil? $v} {continue};
+        if {"" . $v : at 0 : = "."} {continue};
         if [$desc set? $k] {
             s ::= $desc get $k;
             ls ::= $s split;
