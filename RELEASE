@@ -3208,6 +3208,7 @@
 		  copy-region <- Mouse3-Rel	
 		  mouse-point-region-append <- Ctrl+Mouse1-Prs
 		  mouse-cut-or-paste <- Ctrl+Mouse3-Rel
-
+		Add mouse browsing command mouse-pwiki-click-link and mouse-man-click-link.
+		Add mouse browsing key bind in Mode-PWiki.key, Mode-Interp.key and Mode-Man.key.
 
 #eof
