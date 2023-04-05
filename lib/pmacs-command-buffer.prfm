@@ -61,7 +61,7 @@ defcommand buffer-list desc: "Display all buffers list." {
     maxlen ::= $l map {| _i | $_i display-width : + 2} : max;
     if {$maxlen < ["Buffer name" display-width]} {maxlen ::= "Buffer name" display-width};
 
-    $buff append-string "<<< Buffer list >>>";
+    $buff append-string "--- Buffer list ---";
     $buff append-string "  * Select buffer - Move cursor to buffer line and press Enter key";
     $buff append-string "                    or press shortcut key(0-9). Press CTRL+B to name completion.";
     $buff append-string "  * Delete buffer - Move cursor to buffer line and press \"d\" key.";
@@ -98,20 +98,19 @@ defcommand jump-to-buffer desc: "Switch to specified the buffer in buffer list."
     (line col) ::= $window get-source-index $buff $geom;
     r ::= $buff get-buffer-line $line;
     $r ?? {
-	show-message :bell "No buffer name specified.";
+	show-message "No buffer name specified.";
 	return SELF;
     };
-    l ::= $r =~ '\<[^\>]+\>';
+    l ::= $r =~ $BUFFER_LINK;
     if {nil? $l} {
-	show-message :bell "No buffer name specified.";
+	show-message "No buffer name specified.";
 	return SELF;
     };
 
     s ::= $l car : get 2;
-    s ::= $s sub 1 [$s len : - 1];
     target-buff ::= BufferManager find-buffer $s;
     $target-buff ?? {
-	show-message :bell "No buffer name specified.";
+	show-message "No buffer name specified.";
 	return SELF;
     };
     $main bind-buffer [$window get-window-name] $target-buff;
