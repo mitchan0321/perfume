@@ -866,6 +866,7 @@ defcommand brackets-pair desc: "Highlight pair character if current cursor on pa
     geom ::= $window get-geom;
     (y x) ::= $window get-source-index $buff $geom;
     v ::= $buff get-vector;
+    if {$y >= [$v len]} {return NONE};
     start := $geom,ViewLine;
     end ::= $geom,ViewLine + $height : - 1;
     cur-char ::= $v at $y $x;
