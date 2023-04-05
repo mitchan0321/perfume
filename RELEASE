@@ -3211,4 +3211,11 @@
 		Add mouse browsing command mouse-pwiki-click-link and mouse-man-click-link.
 		Add mouse browsing key bind in Mode-PWiki.key, Mode-Interp.key and Mode-Man.key.
 
+2023/04/05
+	pmacs update:
+		Add hit count to search command prompt.
+		Add buffer-list buffer name clickable.
+		Add link back button bind to man mode, pwiki mode, dired mode.
+		Fix brackets-pair command (array boundary error).
+
 #eof
