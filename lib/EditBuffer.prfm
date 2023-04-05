@@ -27,6 +27,7 @@ EditBuffer method init-constructor () {
     } {
         sets Encoding UTF-8F;
     };
+    sets SearchCount 0;
 };
 
 EditBuffer method string () {
@@ -525,11 +526,13 @@ EditBuffer method cut-region (sy sx ey ex) {
 };
 
 EditBuffer method search (str) {
+    sets SearchCount 0;
     if {$str = ""} {return ()};
     
     result := ();
     last := $result;
     i := -1;
+    count := 0;
     rstr ::= $str rquote;
     if {[get-buffer-length] = 0} {return $result};
     $Src each do: {| r |
@@ -546,9 +549,15 @@ EditBuffer method search (str) {
 	$slist ?? {continue};
 	$slist each do: {| e |
 	    last ::= $last append! ($i $e);
+            $count ++;
 	};
     };
+    sets SearchCount $count;
     return $result;
+};
+
+EditBuffer method get-search-count () {
+    return $SearchCount;
 };
 
 EditBuffer method mark (y x) {
