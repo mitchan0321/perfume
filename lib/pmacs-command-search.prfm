@@ -12,8 +12,8 @@ defcommand search-backward desc: "Start search text/regex backward." {
     return [search-sub $main $window <nil>];
 };
 
-defun search-prompt (dir mode) {
-    $dir ??? ["Search " . $mode " [forward]: "] ["Search " . $mode " [backward]: "];
+defun search-prompt (dir mode count) {
+    $dir ??? ["Search " . $mode " [forward] (" $count " hit): "] ["Search " . $mode " [backward] (" $count " hit): "];
 };
 
 defun search-sub (main window dir) {
@@ -40,7 +40,7 @@ defun search-sub (main window dir) {
 
     mini-input-until-enter $main $window 
         init-value: $str
-        prompt: [search-prompt $dir $SEARCH_MODE]
+        prompt: [search-prompt $dir $SEARCH_MODE [$__buff_in_clojure__ get-search-count]]
         cancel-proc: {
 	    $window cancel-search [$window get-search-string];
 	    show-message "Canceled.";
@@ -108,6 +108,7 @@ defun search-sub (main window dir) {
                 } {
                     $window set-search-result [$__buff_in_clojure__ search $value];
                 };
+                $MainWindow set-mini-input-prompt [search-prompt $dir $SEARCH_MODE [$__buff_in_clojure__ get-search-count]];
                 $window stay-search;
                 $main send-key-event (KEY_DOWN);
                 return ALL;
@@ -120,12 +121,14 @@ defun search-sub (main window dir) {
                 } {
                     $window set-search-result [$__buff_in_clojure__ search $value];
                 };
+                $MainWindow set-mini-input-prompt [search-prompt $dir $SEARCH_MODE [$__buff_in_clojure__ get-search-count]];
                 $window stay-search;
                 $main send-key-event (KEY_UP);
                 return ALL;
             };
             if {eq? $in-key CTRL_V} {
                 $window set-search-result [$__buff_in_clojure__ search $value];
+                $MainWindow set-mini-input-prompt [search-prompt $dir $SEARCH_MODE [$__buff_in_clojure__ get-search-count]];
                 $window move-to-next-search;
                 return ALL;
             };
@@ -134,9 +137,9 @@ defun search-sub (main window dir) {
                     regex {setconf SEARCH_MODE text}
                     text  {setconf SEARCH_MODE regex}
                 ;;
-                $MainWindow set-mini-input-prompt [search-prompt $dir $SEARCH_MODE];
                 $window reset-search;
                 $window set-search-result [$__buff_in_clojure__ search $value];
+                $MainWindow set-mini-input-prompt [search-prompt $dir $SEARCH_MODE [$__buff_in_clojure__ get-search-count]];
                 $window stay-search;
                 if $dir {
                     $main send-key-event (KEY_DOWN);
@@ -149,12 +152,14 @@ defun search-sub (main window dir) {
 	           {eq? $in-key KEY_BACKSPACE} {eq? $in-key kDC5}} {
                 $window reset-search;
                 $window set-search-result [$__buff_in_clojure__ search $value];
+                $MainWindow set-mini-input-prompt [search-prompt $dir $SEARCH_MODE [$__buff_in_clojure__ get-search-count]];
                 $window move-to-next-search;
                 return ALL;
             };
             if {string? $in-key} {
                 $window reset-search;
                 $window set-search-result [$__buff_in_clojure__ search $value];
+                $MainWindow set-mini-input-prompt [search-prompt $dir $SEARCH_MODE [$__buff_in_clojure__ get-search-count]];
                 $window stay-search;
                 if $dir {
                     $main send-key-event (KEY_DOWN);
