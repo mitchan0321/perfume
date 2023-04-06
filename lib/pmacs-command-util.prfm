@@ -470,6 +470,16 @@ defun do-command-async (window buff-name directory command) {
     BufferManager unregist-buffer $buff-name;
     grep-buff ::= new EditStream;
     $grep-buff open $buff-name;
+    _puts ::= $grep-buff method? puts;
+    $grep-buff method puts (*) {
+        r ::= call $_puts $*;
+        $MainWindow get-window-list : each do: {| i |
+            if {$i get-buffer : get-buffer-name : = $buff-name} {
+                $MainWindow set-force-update;
+            };
+        };
+        return $r;
+    };
     $grep-buff get-buffer : set-content $directory;
     $grep-buff puts ["CWD:  " . $directory];
     $grep-buff puts ["EXEC: " . $command];
