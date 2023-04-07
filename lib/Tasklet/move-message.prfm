@@ -29,4 +29,5 @@ new Task : proc move-message {
     SysCall apply-editor {
         show-message "Done.";
     };
+    SysCall update-screen;
 };
