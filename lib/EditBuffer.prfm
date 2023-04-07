@@ -548,6 +548,7 @@ EditBuffer method search (str) {
 	};
 	$slist ?? {continue};
 	$slist each do: {| e |
+            if {$e,2 = ""} {continue};
 	    last ::= $last append! ($i $e);
             $count ++;
 	};
