@@ -3218,4 +3218,8 @@
 		Add link back button bind to man mode, pwiki mode, dired mode.
 		Fix brackets-pair command (array boundary error).
 
+2023/04/07
+	pmacs update:
+		Fix if search result string is null, omit it.
+
 #eof
