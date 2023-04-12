@@ -3222,4 +3222,10 @@
 	pmacs update:
 		Fix if search result string is null, omit it.
 
+2023/04/12
+	pmacs update:
+		Add dired clickable file name.
+		Add mouse-dired-click-link command.
+		Add $HOME/.perfume install at pkg install.sh script.
+
 #eof
