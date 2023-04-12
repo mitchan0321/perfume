@@ -157,7 +157,7 @@ DiredBuffer method update () {
                 [if [$Group set? $d,gid] $Group,[$d get gid] $d,gid]
                 [strftime "%Y/%m/%d %H:%M" $d,mtime]
                 $d,size
-                [if {$d,type != "l"} $d,name [$d,name . "|->" $d,symbolic-link]]
+                [if {$d,type != "l"} [$d,name . "|"] [$d,name . "|->" $d,symbolic-link]]
                 ### $d,name
             ;;
             append-string $s;
