@@ -18,5 +18,6 @@ if [ ! -f ${CONFDIR}/pmacs.conf ]; then install -m 644 ${DOTPMACS}/pmacs.conf ${
 if [ ! -f ${CONFDIR}/default.key ]; then install -m 644 ${DOTPMACS}/default.key ${CONFDIR}; fi
 if [ ! -f ${CONFDIR}/theme.conf ]; then install -m 644 ${DOTPMACS}/theme.conf ${CONFDIR}; fi
 if [ ! -f ${CONFDIR}/startup.prfm ]; then install -m 644 ${DOTPMACS}/startup.prfm ${CONFDIR}; fi
+if [ ! -f ${HOME}/.perfume ]; then install -m 644 ${DOTPMACS}/dot-perfume ${HOME}/.perfume; fi
 
 exit 0
