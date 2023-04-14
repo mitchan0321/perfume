@@ -3228,4 +3228,13 @@
 		Add mouse-dired-click-link command.
 		Add $HOME/.perfume install at pkg install.sh script.
 
+2023/04/14
+	lib/Object.prfm
+		Fix cond ?? nil-condition-part if cond is block and after evaluation
+		  is symbol then return after evaluation symbol.
+		Fix cond ??? then-condition-part else-condition-part if cond is block 
+		  and after evaluation is symbol then return then-condition-part.
+	pmacs update:
+		Change if no buffer mode evaluation yet display mode to "-".
+
 #eof
