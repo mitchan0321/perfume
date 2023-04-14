@@ -11,7 +11,9 @@ Object method ?? (a) {
 };
 
 Block method ?? (a) {
-    return [[[self] eval] ?? $a];
+    s ::= [self] eval;
+    if {symbol? $s} {return $s};
+    return [$s ?? $a];
 };
 
 Bool method ?? (a) {
@@ -29,7 +31,12 @@ Object method ??? (a b) {
 };
 
 Block method ??? (a b) {
-    return [[[self] eval] ??? $a $b];
+    s ::= [self] eval;
+    if {symbol? $s} {
+        if {block? $a} {return [$a eval]};
+        return $a
+    };
+    return [$s ??? $a $b];
 };
 
 Bool method ??? (a b) {
