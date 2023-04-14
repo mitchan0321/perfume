@@ -119,7 +119,7 @@ endif
 ###
 ######################################################################################
 
-all:		perfumesh
+all:	extlib/coru/coru.a perfumesh
 
 install:
 	if [ ! -d $(PREFIX)/lib/perfume ]; then mkdir $(PREFIX)/lib/perfume; fi
@@ -141,10 +141,12 @@ install:
 	(cd $(PREFIX); sh ./pmacs-install.sh; rm -f bin/pmacs.in bin/pmacs-client.in pmacs-install.sh)
 
 perfumesh:	$(OBJS) perfumesh.o
+	$(CC) $(OBJS) perfumesh.o $(LIB) -o perfumesh
+
+extlib/coru/coru.a:	extlib/coru/coru.c extlib/coru/coru.h extlib/coru/coru_platform.c extlib/coru/coru_platform.h extlib/coru/coru_util.h
 ifeq ($(CORU_USE),yes)
 	(cd extlib/coru; $(MAKE))
 endif
-	$(CC) $(OBJS) perfumesh.o $(LIB) -o perfumesh
 
 perfumesh.o:	$(SRCS) $(HDRS) perfumesh.c
 	$(CC) $(CFLAGS) $(INCLUDE) perfumesh.c -o perfumesh.o
