@@ -81,7 +81,7 @@ defcommand buffer-list desc: "Display all buffers list." {
 	    [[$display-buffer newfile?] ??? "?" " "]
 	    ["<" . $buff-name ">"]
 	    [$display-buffer get-buffer-length]
-            [$display-buffer get-buffer-mode]
+            [{$display-buffer get-buffer-mode} ?? "-"]
 	    [$display-buffer get-content]
         ];
         $shortcut-ind ++;
