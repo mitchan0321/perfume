@@ -641,7 +641,7 @@ defcommand git-diff desc: "Git diff (test)." {
     | main window |
     mini-input-file-chooser $main $window
     init-value: $GIT_DIR
-    prompt: "(git pull) directory: "
+    prompt: "(git diff) directory: "
     enter-proc: {| value |
         if {[$value len] = 0} {
             show-message :bell "No directory specified.";
@@ -666,7 +666,7 @@ defcommand git-status desc: "Git status (test)." {
     | main window |
     mini-input-file-chooser $main $window
     init-value: $GIT_DIR
-    prompt: "(git pull) directory: "
+    prompt: "(git status) directory: "
     enter-proc: {| value |
         if {[$value len] = 0} {
             show-message :bell "No directory specified.";
