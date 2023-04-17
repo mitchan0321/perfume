@@ -3237,4 +3237,8 @@
 	pmacs update:
 		Change if no buffer mode evaluation yet display mode to "-".
 
+2023/04/17
+	pmacs update:
+		Add key bindings ALT_c -> list-config, ALT_s -> set-config.
+
 #eof
