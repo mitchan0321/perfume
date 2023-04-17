@@ -982,17 +982,19 @@ defcommand list-config desc: "Display configuration list." {
     kmax ::= $CONFIG keys :string : map {| i | $i len} : max;
     
     $buff append-string "<<< Configuration list >>>";
-    $buff append-string [["%-${kmax}v %-16v %-2v %-7v %-v" expand] fmt "Key" "Value" "RO" "Type" "Description"];
-    $buff append-string [["%-${kmax}v %-16v %-2v %-7v %-v" expand] fmt ["-" repeat $kmax] ["-" repeat 16] ["-" repeat 2] ["-" repeat 7] ["-" repeat 11]];
+    $buff append-string [["%-${kmax}v %-2v %-7v %-v" expand] fmt "Key" "RO" "Type" "Value"];
+    $buff append-string "  Description";
+    $buff append-string [["%-${kmax}v %-2v %-7v %-v" expand] fmt ["-" repeat $kmax] ["-" repeat 2] ["-" repeat 7] ["-" repeat 5]];
 
     msort [$CONFIG keys :string] : each do: {| i |
-        $buff append-string [["%-${kmax}v %!-16v %-2v %-7v %-v" expand] fmt
+        $buff append-string [["%-${kmax}v %!-2v %-7v %-v" expand] fmt
             $i
-            [setvar [symbol $i]]
             [$CONFIG_RO,$i ??? "RO" ""]
             $CONFIG_TYPE,$i
-            [$CONFIG_DESC,$i ?? ""]
-        ]
+            [setvar [symbol $i]]
+        ];
+        $buff append-string ["  " . [$CONFIG_DESC,$i ?? ""]];
+        $buff append-string "--";
         ;;
     };
     $buff no-modify;
