@@ -3240,6 +3240,9 @@
 2023/04/17
 	pmacs update:
 		Add key bindings ALT_c -> list-config, ALT_s -> set-config.
+
+2023/04/18
+	pmacs update:
 		Change list-config format.
 
 #eof
