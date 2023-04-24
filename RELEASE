@@ -3245,4 +3245,9 @@
 	pmacs update:
 		Change list-config format.
 
+2023/04/24
+	pmacs update:
+		Change config value BUFFER_LINK and DIRED_FILE_LINK to read only.
+		Change list-config format.
+
 #eof
