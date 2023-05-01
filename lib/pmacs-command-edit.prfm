@@ -265,6 +265,14 @@ defcommand paste-buffer desc: "Paste characters from copy buffer into current bu
     if [$window get-region] {
         (sy sx) ::= $window end-region;
         (ey ex) ::= $window get-source-index $buff $geom;
+        if {$sy > $ey} {
+            (sy ey) := ($ey $sy);
+            (sx ex) := ($ex $sx);
+        } {
+            if {$sx > $ex} {
+                (sx ex) := ($ex $sx);
+            };
+        };
         (line col) ::= $window delete-region $sy $sx $ey $ex;
     } {
         (sy sx) ::= $window get-source-index $buff $geom;
