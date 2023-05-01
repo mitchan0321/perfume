@@ -35,7 +35,7 @@ defun pipe (in: in out: out append: append args: blocks) {
     then: {
 	case [type? $in]
 	    OBJECT {
-	        if {or [eq? $in,@name Stream] [eq? $in,@name File]} else: {
+	        if {or [$in instance? Stream] [$in instance? File]} else: {
 		    throw ErrSyntax $syntax;
 		};
 	    }
@@ -63,10 +63,10 @@ defun pipe (in: in out: out append: append args: blocks) {
     then: {
 	case [type? $out]
 	    OBJECT {
-	        if {or [eq? $out,@name Stream] [eq? $out,@name File]} else: {
+	        if {or [$out instance? Stream] [$out instance? File]} else: {
 		    throw ErrSyntax $syntax;
 		};
-		if {eq? $out,@name Stream} then: {
+		if {$out instance? Stream} then: {
 		    $out set-nolimit;
 		}
 	    }
