@@ -1,3 +1,4 @@
+2023/05/01	PRFM_20230501		1.8.0
 2023/03/21	PRFM_20230321		1.7.2
 2023/02/15	PRFM_20230215_A34	1.7.1
 2022/12/23	PRFM_20221223_K34	1.7.0
@@ -3249,5 +3250,18 @@
 	pmacs update:
 		Change config value BUFFER_LINK and DIRED_FILE_LINK to read only.
 		Change list-config format.
+
+2023/05/01
+	lib/NullStream.prfm
+		Add new Stream class for no effect I/O.
+	lib/exec.prfm
+		Change option paramater err-to-stdout: Bool -> err-to: Stream for output error
+		  to programable.
+	lib/pipe.exec
+		Change accectable in: and out: parameter for Stream instance (include NullStream).
+	pmacs update:
+		Fix paste-buffer if region selected and (sy sx) > (ey ex) occurd wrong paste string.
+		Change man editor command for man output error to stderr to ignore.
+		Change OS type detect logic use pipe out: parameter given NullStream object.
 
 #eof
