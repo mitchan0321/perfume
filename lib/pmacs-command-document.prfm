@@ -224,7 +224,7 @@ defun exec-man (main window cur-buff topic) {
         os ::= new Stream;
         $os set-nolimit;
         ### sts ::= {exec proc-enc: $MAN_ENCODING "/bin/sh" "-c" [$MAN_PREFIX expand]} redirect-out $os $os;
-        sts ::= pipe out: $os {exec :err-to-stdout proc-enc: $MAN_ENCODING "/bin/sh" "-c" [$MAN_PREFIX expand]};
+        sts ::= pipe out: $os {exec err-to: [new NullStream] proc-enc: $MAN_ENCODING "/bin/sh" "-c" [$MAN_PREFIX expand]};
         $os close;
         
         man-buff ::= new EditBuffer;
