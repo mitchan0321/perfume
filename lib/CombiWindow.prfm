@@ -1056,6 +1056,14 @@ CombiWindow method cut-region (sy sx ey ex) {
 };
 
 CombiWindow method delete-region (sy sx ey ex) {
+    if {$sy > $ey} {
+        (sy ey) := ($ey $sy);
+        (sx ex) := ($ex $sx);
+    } {
+        if {$sx > $ex} {
+            (sx ex) := ($ex $sx);
+        };
+    };
     buff ::= get-buffer;
     ret ::= $buff cut-region $sy $sx $ey $ex;
     result ::= $ret get 1;
