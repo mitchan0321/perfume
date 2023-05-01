@@ -3263,5 +3263,8 @@
 		Fix paste-buffer if region selected and (sy sx) > (ey ex) occurd wrong paste string.
 		Change man editor command for man output error to stderr to ignore.
 		Change OS type detect logic use pipe out: parameter given NullStream object.
+	tag:
+		PRFM_20230501
+		1.8.0
 
 #eof
