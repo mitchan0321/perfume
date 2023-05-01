@@ -5,7 +5,7 @@ load-class PollingManager;
 defun exec (
 	proc-enc: enc
 	pty: pty
-	err-to-stdout: err-to-stdout
+	err-to: errout
 	args: args
         background: bg)
 {
@@ -124,20 +124,20 @@ defun exec (
                 i ::= $ERR gets;
 		if $i {
                     if {dict [$ERR stat] : get early-exit} {
-                        if {true? err-to-stdout} {
-                            $stdout puts :nonewline $i;
+                        if {set? errout} {
+                            $errout puts :nonewline $i;
                         } {
                             $stderr puts :nonewline $i;
                         }
                     } {
-                        if {true? err-to-stdout} {
-                            $stdout puts $i;
+                        if {set? errout} {
+                            $errout puts $i;
                         } {
                             $stderr puts $i;
                         }
                     };
-                    if {true? err-to-stdout} {
-                        $stdout flush;
+                    if {set? errout} {
+                        $errout flush;
                     } {
                         $stderr flush;
                     }
