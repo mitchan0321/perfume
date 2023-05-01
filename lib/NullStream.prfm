@@ -1,0 +1,129 @@
+# Class name: NullStream
+#
+# Description:
+#   This class is internal input/output object like the File class object.
+#
+#   Impliment methods are:
+#     Stream::eof?   --- is eof?
+#     Stream::close  --- close stream object.
+#     Stream::ready? --- if available internal buffer then return <t>.
+#     Stream::puts   --- put string.
+#     Stream::gets   --- get string.
+#     Stream::flush  --- flush internal buffer.
+#     Stream::stat   --- return status list.
+#     Stream::each   --- each all queue.
+#     Stream::clear  --- clear error.
+#     Stream::set-newline  --- set newline mode.
+#     -- Thease methods are File clases same name methods specification.
+#
+#     Stream::set-comode --- set co-routine mode.
+#     Stream::set-limit ---- set buffer length limit.
+#     Stream::set-nolimit -- set buffer length nolimit.
+#     Stream::get-count ---- get buffer length.
+#     Stream::set-itemlimit -- set buffer item limit.
+#     -- Thease methods are Stream clases special methods.
+#
+
+class NullStream Stream;
+
+NullStream method init (args: a) {
+    sets tag <nil>;
+    return <nil>;
+};
+
+NullStream method eof? () {
+    return <t>;
+};
+
+NullStream method close () {
+    return <t>;
+};
+
+NullStream method clear-eof () {
+    return <nil>;
+};
+
+NullStream method clear () {
+    return <nil>;
+};
+
+NullStream method ready? (timeout: timeout) {
+    return <t>;
+};
+
+NullStream method ready-write? () {
+    return <t>;
+};
+
+NullStream method puts (nonewline: nonewline args: r) {
+    return <t>;
+};
+
+NullStream method in-pooling? () {
+    return <nil>;
+};
+
+NullStream method gets (nonewline: nonewline) {
+    return <nil>;
+};
+
+NullStream method gets-nowait () {
+    return <nil>;
+};
+
+NullStream method flush () {
+    return <t>;
+};
+
+NullStream method stat () {
+    return (
+	    (fd . <nil>) (mode . io) (path . <nil>) (eof . <t>)
+	    (limit . 0) (count . 0) (newline . <t>)
+	    (itemlimit . 0) (itemcount . 0)
+            (comode . <t>) (tag . $tag)
+	   );
+};
+
+NullStream method each (do: body) {
+    return <nil>;
+};
+
+NullStream method set-comode () {
+    return <t>;
+};
+
+NullStream method set-nocomode () {
+    return <t>;
+};
+
+NullStream method set-limit (l) {
+    return <t>;
+};
+
+NullStream method set-nolimit () {
+    return <t>;
+};
+
+NullStream method set-itemlimit (l) {
+    return <t>;
+};
+
+NullStream method get-count () {
+    return <t>;
+};
+
+NullStream method string () {
+    "NullStream";
+};
+
+NullStream method set-newline (m) {
+    return <t>;
+};
+
+NullStream method set-tag (t) {
+    sets tag $t;
+};
+
+NullStream method get-tag () {
+    return $tag;
+};
