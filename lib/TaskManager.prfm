@@ -88,13 +88,14 @@ TaskManager method dispatch () {
     #
     # search min sleep time task (all list element linear scan)
     #
-    run-task-list := ();
+    min := 0;
+    min-task := <nil>;
     $TaskList each do: {| t |
         if {$t tickable?} {
             wait ::= $t time-elapsed $tick;
-            
-            if {$wait <= 0} {
-                $run-task-list <<- $t;
+            if {$wait < $min} {
+                min := $wait;
+                min-task := $t;
             };
         };
     };
@@ -102,14 +103,17 @@ TaskManager method dispatch () {
     ### task(s) executed.
     result := <nil>;
 
-    ### save non task env's current working directory
-    cwd ::= pwd;
-    $run-task-list each do: {| t |
-        dispatch-sub $t;
+    if $min-task {
+        ### save non task env's current working directory
+        cwd ::= pwd;
+
+        ### dispatch one task
+        dispatch-sub $min-task;
         result := <t>;
+
+        ### restore non task env's current working directory
+        cd $cwd;
     };
-    ### restore non task env's current working directory
-    cd $cwd;
     
     try {
         ### check and force to activate waiting task.
@@ -131,6 +135,7 @@ TaskManager method dispatch-sub (min-task) {
 
     ### dispatch to min task
     $Task_stdin close;
+    set-itimer $INTERP_ITIMER_INTERVAL;
     $min-task run;
     $Task_stdin clear-eof;
     
