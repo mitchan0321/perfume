@@ -1058,6 +1058,16 @@ get_now_time() {
     return r;
 }
 
+static unsigned long long int
+iget_now_time() {
+    struct timeval s;
+    unsigned long long int r;
+
+    gettimeofday(&s, NULL);
+    r = ((unsigned long long int)s.tv_sec * 1000) + ((unsigned long long int)s.tv_usec / 1000);
+    return r;
+}
+
 Toy_Type*
 func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     WINDOW *w;
@@ -1069,11 +1079,15 @@ func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     Toy_Type *inlist, *result, *result_list;
     encoder_error_info *enc_error_info;
     static int pending_key = -1;
-    static unsigned long int curs_blink = 0;
-    static double time_prev=0.0, time_now=0.0, time_on_repeat=0.0;
+    static unsigned long long int curs_blink_now = 0;
+    static unsigned long long int curs_blink_last = 0;
+    static unsigned long long int curs_blink_past = 0;
+    static int curs_blink_on = 0;
+    static double time_prev = 0.0, time_now = 0.0, time_on_repeat = 0.0;
     static int no_input_count = 0;
     static int on_repeat = 0;
-    int blink, blink_fact = 3;
+    unsigned long long int blink_fact = 500;
+    int blink = 0;
     Toy_Type *tblink, *tblink_fact;
 
     blink = 0;
@@ -1123,14 +1137,25 @@ func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     incell = new_cell(L"");
     inlist = result = new_list(NULL);
 
-    curs_blink ++;
     switch (blink) {
     case 0:
         curs_set(1); // always cursor on
         break;
     case 1:
-        // curs_set(((curs_blink >> 4) % 2) ? 0 : 1); // blink even
-        curs_set(((curs_blink >> blink_fact) % 4) ? 1 : 0); // blink 3:1
+        curs_blink_now = iget_now_time();
+        curs_blink_past = curs_blink_now - curs_blink_last;
+        if (curs_blink_on == 1) {
+            if ((curs_blink_past / 3) >= blink_fact) {
+                curs_blink_on = 0;
+                curs_blink_last = curs_blink_now;
+            }
+        } else {
+            if ((curs_blink_past / 1) >= blink_fact) {
+                curs_blink_on = 1;
+                curs_blink_last = curs_blink_now;
+            }
+        }
+        curs_set(curs_blink_on);
         break;
     default:
         curs_set(1); // always cursor on
