@@ -39,7 +39,11 @@ Task method init () {
 };
 
 Task method string () {
-    "<Task> name=" . $Name ", state=" $State ", parent=" [$Parent ??? [$Parent get-name] <nil>];
+    "<Task> name=" . $Name 
+    ", state=" $State 
+    ", parent=" [$Parent ??? [$Parent get-name] <nil>]
+    ", sleep=" $Sleep
+    ;;
 };
 
 Task method set-name (name) {
@@ -248,11 +252,22 @@ Task method set-sleep () {
 };
 
 Task method set-pause () {
-    sets State P;
+    if {! [eq? $State P]} {
+        sets _PrevState $State;
+        sets State P;
+        return P;
+    };
+    return <nil>;
 };
 
 Task method set-resume () {
-    sets State S;
+    if {eq? $State P} {
+        if {sets? _PrevState} {
+            sets State $_PrevState;
+            return $State;
+        };
+    };
+    return <nil>;
 };
 
 Task method clear-syscall () {
