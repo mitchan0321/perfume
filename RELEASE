@@ -3277,5 +3277,6 @@
 		Change Task::string format.
 		Fix restore previous State at Task::resume if before Task::suspend.
 		Fix LastDispatch time unit sec -> msec.
+		Change curs-keyin BLINK_FACT unit, bit count -> msec.
 
 #eof
