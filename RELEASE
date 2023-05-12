@@ -3272,4 +3272,10 @@
 		Change task dispatch algorythm, one task dispatch at one scheduled iteration.
 		Change task dispatch algorythm, reset itimer before task dispatch.
 
+2023/05/12
+	pmacs update:
+		Change Task::string format.
+		Fix restore previous State at Task::resume if before Task::suspend.
+		Fix LastDispatch time unit sec -> msec.
+
 #eof
