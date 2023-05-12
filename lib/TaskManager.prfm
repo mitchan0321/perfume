@@ -7,7 +7,7 @@ TaskManager method init () {
         };
     };
     sets TaskList ();
-    sets LastDispatch [time-of-day];
+    sets LastDispatch [time-of-day :msec];
     
     sets Task_stdout [new EditStream];
     $Task_stdout open "*Console*";
