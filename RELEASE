@@ -3282,5 +3282,7 @@
 2023/05/15
 	commands.c
 		Add neq? command for if not equal two parameters return <t>.
+	pmacs update:
+		Change mode key-map Mod-Interp.key file. Dismis Perfume keyword hilight.
 
 #eof
