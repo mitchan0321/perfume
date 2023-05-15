@@ -3083,11 +3083,12 @@ error:
 			 L"Syntax error at 'vector', syntax: vector [(val ...)]", interp);
 }
 
+static int cond_eq(Toy_Type *ta, Toy_Type *tb);
 
 Toy_Type*
 cmd_equal(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *a, *b;
-    int ta, tb;
+    int r;
 
     if (arglen != 2) goto error;
     if (hash_get_length(nameargs) > 0) goto error;
@@ -3096,146 +3097,164 @@ cmd_equal(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     posargs = list_next(posargs);
     b = list_get_item(posargs);
 
+    r = cond_eq(a, b);
+    if (r) {
+        return const_T;
+    } else {
+        return const_Nil;
+    }
+    
+error:
+    return new_exception(TE_SYNTAX,
+			 L"Syntax error at 'eq?', syntax: eq? val1 val2", interp);
+}
+
+Toy_Type*
+cmd_notequal(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *a, *b;
+    int r;
+
+    if (arglen != 2) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    a = list_get_item(posargs);
+    posargs = list_next(posargs);
+    b = list_get_item(posargs);
+
+    r = cond_eq(a, b);
+    if (r) {
+        return const_Nil;
+    } else {
+        return const_T;
+    }
+    
+error:
+    return new_exception(TE_SYNTAX,
+			 L"Syntax error at 'neq?', syntax: neq? val1 val2", interp);
+}
+
+static int
+cond_eq(Toy_Type *a, Toy_Type *b) {
+    int ta, tb;
+
     ta = GET_TAG(a);
     tb = GET_TAG(b);
 
+    if (ta != tb) {
+        return 0;
+    }
+    
     switch (ta) {
     case BOOL:
-	if (tb != BOOL) return const_Nil;
-	if (a->u.tbool.value == b->u.tbool.value) return const_T;
-	return const_Nil;
+	if (a->u.tbool.value == b->u.tbool.value) return 1;
+	return 0;
 	break;
 
     case SYMBOL:
-	if (tb != SYMBOL) return const_Nil;
-	if (wcscmp(cell_get_addr(a->u.symbol.cell), cell_get_addr(b->u.symbol.cell)) == 0) return const_T;
-	return const_Nil;
+	if (wcscmp(cell_get_addr(a->u.symbol.cell), cell_get_addr(b->u.symbol.cell)) == 0) return 1;
+	return 0;
 	break;
 
     case LIST:
-	if (tb != LIST) return const_Nil;
-	if (a == b) return const_T;
-	return const_Nil;
+	if (a == b) return 1;
+	return 0;
 	break;
 
     case INTEGER:
-	if (tb != INTEGER) return const_Nil;
-	if (0 == (mpz_cmp(a->u.biginteger, b->u.biginteger))) return const_T;
-	return const_Nil;
+	if (0 == (mpz_cmp(a->u.biginteger, b->u.biginteger))) return 1;
+	return 0;
 	break;
 
     case REAL:
-	if (tb != REAL) return const_Nil;
-	if (a->u.real == b->u.real) return const_T;
-	return const_Nil;
+	if (a->u.real == b->u.real) return 1;
+	return 0;
 	break;
 
     case STRING:
-	if (tb != STRING) return const_Nil;
-	if (wcscmp(cell_get_addr(a->u.string), cell_get_addr(b->u.string)) == 0)
-	    return const_T;
-	return const_Nil;
+	if (cell_cmp(a->u.string, b->u.string) == 0) return 1;
+	return 0;
 	break;
 
     case SCRIPT:
-	if (tb != SCRIPT) return const_Nil;
-	if (a == b) return const_T;
-	return const_Nil;
+	if (a == b) return 1;
+	return 0;
 	break;
 
     case STATEMENT:
-	if (tb != STATEMENT) return const_Nil;
-	if (a == b) return const_T;
-	return const_Nil;
+	if (a == b) return 1;
+	return 0;
 	break;
 
     case NATIVE:
-	if (tb != NATIVE) return const_Nil;
-	if (a == b) return const_T;
-	return const_Nil;
+	if (a == b) return 1;
+	return 0;
 	break;
 
     case OBJECT:
-	if (tb != OBJECT) return const_Nil;
-	if (a == b) return const_T;
-	return const_Nil;
+	if (a == b) return 1;
+	return 0;
 	break;
 
     case EXCEPTION:
-	if (tb != EXCEPTION) return const_Nil;
-	if (a == b) return const_T;
-	return const_Nil;
+	if (a == b) return 1;
+	return 0;
 	break;
 
     case CLOSURE:
-	if (tb != CLOSURE) return const_Nil;
-	if (a == b) return const_T;
-	return const_Nil;
+	if (a == b) return 1;
+	return 0;
 	break;
 
     case FUNC:
-	if (tb != FUNC) return const_Nil;
-	if (a == b) return const_T;
-	return const_Nil;
+	if (a == b) return 1;
+	return 0;
 	break;
 
     case CONTROL:
-	if (tb != CONTROL) return const_Nil;
-	if (a == b) return const_T;
-	return const_Nil;
+	if (a == b) return 1;
+	return 0;
 	break;
 
     case CONTAINER:
-	if (tb != CONTAINER) return const_Nil;
-	if (a == b) return const_T;
-	return const_Nil;
+	if (a == b) return 1;
+	return 0;
 	break;
 
     case RQUOTE:
-	if (tb != RQUOTE) return const_Nil;
-	if (wcscmp(cell_get_addr(a->u.rquote), cell_get_addr(b->u.rquote)) == 0)
-	    return const_T;
-	return const_Nil;
+	if (wcscmp(cell_get_addr(a->u.rquote), cell_get_addr(b->u.rquote)) == 0) return 1;
+	return 0;
 	break;
 
     case BIND:
-	if (tb != BIND) return const_Nil;
-	if (a == b) return const_T;
-	return const_Nil;
+	if (a == b) return 1;
+	return 0;
 	break;
 
     case DICT:
-	if (tb != DICT) return const_Nil;
-	if (a == b) return const_T;
-	return const_Nil;
+	if (a == b) return 1;
+	return 0;
 	break;
 
     case VECTOR:
-	if (tb != VECTOR) return const_Nil;
-	if (a == b) return const_T;
-	return const_Nil;
+	if (a == b) return 1;
+	return 0;
 	break;
 
     case BULK:
-	if (tb != BULK) return const_Nil;
-	if (a == b) return const_T;
-	return const_Nil;
+	if (a == b) return 1;
+	return 0;
 	break;
 
     case INTR:
-	if (tb != INTR) return const_Nil;
-	return const_T;
+	return 1;
+	if (a == b) return 1;
 	break;
 
     default:
 	break;
     }
 
-    return const_Nil;
-
-error:
-    return new_exception(TE_SYNTAX,
-			 L"Syntax error at 'eq?', syntax: eq? val1 val2", interp);
+    return 0;
 }
 
 Toy_Type*
@@ -4641,6 +4660,7 @@ int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, L"dict-closure", cmd_closuredict, 	L"body");
     toy_add_func(interp, L"vector", 	cmd_newvector, 		L"val-list");
     toy_add_func(interp, L"eq?", 	cmd_equal, 		L"val,val");
+    toy_add_func(interp, L"neq?", 	cmd_notequal, 		L"val,val");
     toy_add_func(interp, L"connect", 	cmd_connect,		L"addr,port,bind-port:,port,bind-address:,address");
     toy_add_func(interp, L"connect?", 	cmd_isconnect,		L"file-desc");
     toy_add_func(interp, L"socket-server", cmd_socket_server, 	L"port,bind-address:,address");
