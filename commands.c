@@ -3171,7 +3171,7 @@ cond_eq(Toy_Type *a, Toy_Type *b) {
 	break;
 
     case STRING:
-	if (cell_cmp(a->u.string, b->u.string) == 0) return 1;
+        if (cell_cmp(a->u.string, b->u.string) == 0) return 1;
 	return 0;
 	break;
 
@@ -3246,8 +3246,8 @@ cond_eq(Toy_Type *a, Toy_Type *b) {
 	break;
 
     case INTR:
-	return 1;
 	if (a == b) return 1;
+	return 0;
 	break;
 
     default:
