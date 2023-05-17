@@ -181,3 +181,13 @@ String method replace-return-times-with-start (pattern replace-string at) {
 
     return ($result $count);
 };
+
+String method repeat (times) {
+    result := "";
+    if {$times = 0} {return $result};
+    self ::= self;
+    1 each to: $times do: {
+	$result append! $self;
+    };
+    return $result;
+};
