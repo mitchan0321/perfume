@@ -62,10 +62,12 @@ defcommand buffer-list desc: "Display all buffers list." {
     maxlen ::= $l map {| _i | $_i display-width : + 2} : max;
     if {$maxlen < ["Buffer name" display-width]} {maxlen ::= "Buffer name" display-width};
 
-    $buff append-string "[[ Buffer list ]]";
-    $buff append-string "  * Select buffer - Move cursor to buffer line and press Enter key";
-    $buff append-string "                    or press shortcut key(0-9). Press ALT+B to name completion.";
-    $buff append-string "  * Delete buffer - Move cursor to buffer line and press \"d\" key.";
+    $buff append-string  "[[ Buffer list ]]";
+    $buff append-string  "  * Select buffer - Move cursor to buffer line and press Enter key";
+    $buff append-string ["                    or press shortcut key(0-9). Press " . 
+                         [get-keybind-string $window "buffer-list-completion" : replace ',' "or"] " to name completion."];
+    $buff append-string ["  * Delete buffer - Move cursor to buffer line and press \"" .
+                         [get-keybind-string $window "buffer-list-delete" : replace ',' "or"] "\" key."];
     $buff append-string "";
     $buff append-string [$format expand : fmt "#" "e" "t" "m" "p" "n" "Buffer name" "Length" "Mode" "Content path"];
     $buff append-string [$format expand : fmt "-" "-" "-" "-" "-" "-" "-----------" "------" "----" "------------"];
