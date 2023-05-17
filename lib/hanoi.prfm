@@ -1,0 +1,10 @@
+defun hanoi (n from to work do: body) {
+    if {! [set? body]} {
+        body := {| _n _f _t | println "move " $_n " from " $_f " to " $_t};
+    };
+    if {$n > 0} {
+        hanoi [$n - 1] $from $work $to do: $body;
+        yield $body $n $from $to;
+        hanoi [$n - 1] $work $to $from do: $body;
+    };
+};
