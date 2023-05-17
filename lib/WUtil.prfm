@@ -905,16 +905,6 @@ Vector method at (y x) {
     return [get $y : at $x];
 };
 
-String method repeat (times) {
-    result := "";
-    if {$times = 0} {return $result};
-    self ::= self;
-    1 each to: $times do: {
-	$result append! $self;
-    };
-    return $result;
-};
-
 defun open-file (name) {
     path ::= path-adjust [
         {[$name at 0] = "/"} ???
