@@ -3328,7 +3328,13 @@ cmd_connect(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
         flags |= O_NONBLOCK;
         fcntl(socket_fd, F_SETFL, flags);
     }
-    
+
+    flags = fcntl(socket_fd, F_GETFD, 0);
+    if (flags >= 0) {
+	flags |= FD_CLOEXEC;
+	fcntl(socket_fd, F_SETFD, flags);
+    }
+
     sts = connect(socket_fd, (const struct sockaddr*)&serv_addr_in, sizeof(serv_addr_in));
     if (-1 == sts) {
         if (errno != EINPROGRESS) {
@@ -3390,7 +3396,7 @@ cmd_socket_server(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     struct sockaddr_in serv_addr_in;
     Toy_Type *tport, *thostaddr;
     unsigned int port, hostaddr=0;
-    int val;
+    int val, flags;
 
     if (arglen != 1) goto error;
 
@@ -3426,6 +3432,12 @@ cmd_socket_server(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     sts = listen(socket_fd, SOMAXCONN);
     if (-1 == sts) {
 	return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
+    }
+
+    flags = fcntl(socket_fd, F_GETFD, 0);
+    if (flags >= 0) {
+        flags |= FD_CLOEXEC;
+        fcntl(socket_fd, F_SETFD, flags);
     }
 
     return new_integer_si(socket_fd);
@@ -3568,7 +3580,7 @@ cmd_accept(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     int fd;
     struct sockaddr_in client_addr_in;
     socklen_t client_addr_in_size;
-    int sts;
+    int sts, flags;
     Toy_Type *result;
 
     if (list_length(posargs) != 1) goto error;
@@ -3594,6 +3606,12 @@ retry:
     list_append(result, new_integer_si(sts));
     list_append(result, new_integer_si(ntohl(client_addr_in.sin_addr.s_addr)));
     list_append(result, new_integer_si((int)ntohs(client_addr_in.sin_port)));
+
+    flags = fcntl(sts, F_GETFD, 0);
+    if (flags >= 0) {
+        flags |= FD_CLOEXEC;
+        fcntl(sts, F_SETFD, flags);
+    }
 
     return result;
 
