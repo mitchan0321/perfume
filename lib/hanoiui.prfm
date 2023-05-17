@@ -27,7 +27,7 @@ defun display-hanoi (n l m r) {
         (($l,$i d1) ($m,$i d2) ($r,$i d3)) each do: {| j |
             (y v) := $j;
             if $y {
-                $v ::= $fmt fmt " " ["<" repeat $y] "|" [">" repeat $y] " ";
+                $v ::= $fmt fmt " " [["" uimport! ([0x30 + $y])] repeat $y] "|" [["" uimport! ([0x30 + $y])] repeat $y] " ";
             } {
                 $v ::= $fmt fmt " " " " "|" " " " ";
             };
