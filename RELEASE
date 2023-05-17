@@ -3289,4 +3289,13 @@
 	pmacs update:
 		Change buffer-list hader and body line format indicator commonized.
 
+2023/05/17
+	lib/hanoi.prfm, lib/hanoiui.prfm
+		Add new game.
+	lib/String.prfm
+		Add String::repeat from pmacs WUtil.
+	pmacs update:
+		Change buffer-list display help text use get-keybind-string for buffer-list-completion key-bind and buffer-list-delete key-bind.
+		Remove String::repeat from WUtil.
+
 #eof
