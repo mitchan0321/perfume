@@ -1,0 +1,42 @@
+defun hanoiui (n) {
+    left := ();
+    mid := ();
+    right := ();
+    $n each to: 1 do: {| i | $left <<- $i};
+    display-hanoi $n $left $mid $right;
+    
+    hanoi $n left right mid do: {| _n f t |
+        case $f
+            left  {$left ->>}
+            mid   {$mid ->>}
+            right {$right ->>}
+        ;;
+        case $t
+            left  {$left <<- $_n}
+            mid   {$mid <<- $_n}
+            right {$right <<- $_n}
+        ;;
+        display-hanoi $n $left $mid $right;
+    };
+};
+
+defun display-hanoi (n l m r) {
+    result := ();
+    fmt ::= "%2v%${n}v%v%-${n}v%2v" expand;
+    [$n - 1] each to: 0 do: {| i |
+        (($l,$i d1) ($m,$i d2) ($r,$i d3)) each do: {| j |
+            (y v) := $j;
+            if $y {
+                $v ::= $fmt fmt " " ["<" repeat $y] "|" [">" repeat $y] " ";
+            } {
+                $v ::= $fmt fmt " " " " "|" " " " ";
+            };
+        };
+        $result <<- [$d1 . $d2 $d3];
+    };
+    $result each do: {| i |
+        println $i;
+    };
+    println [[$fmt fmt "--" ["-" repeat $n] "-" ["-" repeat $n] "--"] repeat 3];
+    println "";
+};
