@@ -1,7 +1,7 @@
 ###
 ### Set options initial value
 ###
-OPTIONS =
+OPTIONS = -gdwarf-4
 OPTLIBS =
 OPTLIBS2 =
 
