@@ -3300,4 +3300,8 @@
 		Change buffer-list display help text use get-keybind-string for buffer-list-completion key-bind and buffer-list-delete key-bind.
 		Remove String::repeat from WUtil.
 
+2023/05/18
+	Makefile
+		Fix for valgrind debug run that clang14 output valgrind unreadable debug info by DWARF5, change DWARF4 CFLAG is -gdwarf-4.
+
 #eof
