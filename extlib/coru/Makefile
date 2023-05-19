@@ -19,7 +19,7 @@ SHELL = /bin/sh
 ifdef DEBUG
 override CFLAGS += -O0 -g3
 else
-override CFLAGS += -Os
+override CFLAGS += -Os -gdwarf-4
 endif
 ifdef WORD
 override CFLAGS += -m$(WORD)
