@@ -2,6 +2,8 @@
 ### Set options initial value
 ###
 OPTIONS = -gdwarf-4
+# Note: if you build external libraries, you need specify CC flag before ./configure like this: 'export CFLAGS=-gdwarf-4'
+
 OPTLIBS =
 OPTLIBS2 =
 
