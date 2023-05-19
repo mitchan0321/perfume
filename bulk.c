@@ -40,6 +40,7 @@ bulk_load_file(Bulk *bulk, const char *file, int encoder) {
 
     error_info = GC_MALLOC(sizeof(encoder_error_info));
     ALLOC_SAFE(error_info);
+    memset(error_info, 0, sizeof(encoder_error_info));
     
     bulk->length = size;
     bulk->allocsize = (size+1)*sizeof(wchar_t);

@@ -1,3 +1,4 @@
+#include <string.h>
 #include "types.h"
 #include "toy.h"
 
@@ -7,6 +8,7 @@ new_list(Toy_Type *item) {
 
     list = GC_MALLOC(sizeof(Toy_Type));
     ALLOC_SAFE(list);
+    memset((void*)list, 0, sizeof(Toy_Type));
 
     list->tag = LIST;
     list->u.list.nextp = NULL;
@@ -21,6 +23,7 @@ new_cons(Toy_Type *car, Toy_Type *cdr) {
 
     list = GC_MALLOC(sizeof(Toy_Type));
     ALLOC_SAFE(list);
+    memset((void*)list, 0, sizeof(Toy_Type));
 
     list->tag = LIST;
     list->u.list.item = car;

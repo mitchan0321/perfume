@@ -6,6 +6,7 @@
 #include <locale.h>
 #define __USE_XOPEN
 #include <wchar.h>
+#include <string.h>
 
 #include "toy.h"
 #include "interp.h"
@@ -447,6 +448,8 @@ func_curses_print(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     }
     enc_error_info = GC_MALLOC(sizeof(encoder_error_info));
     ALLOC_SAFE(enc_error_info);
+    memset(enc_error_info, 0, sizeof(encoder_error_info));
+
     c = encode_unicode_to_raw(message->u.string, iencoder, enc_error_info);
     if (NULL == c) {
 	return new_exception(TE_BADENCODEBYTE, enc_error_info->message, interp);
@@ -1134,6 +1137,8 @@ func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 
     enc_error_info = GC_MALLOC(sizeof(encoder_error_info));
     ALLOC_SAFE(enc_error_info);
+    memset(enc_error_info, 0, sizeof(encoder_error_info));
+
     incell = new_cell(L"");
     inlist = result = new_list(NULL);
 

@@ -3982,6 +3982,7 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 
     enc_error_info = GC_MALLOC(sizeof(encoder_error_info));
     ALLOC_SAFE(enc_error_info);
+    memset(enc_error_info, 0, sizeof(encoder_error_info));
     
     if (hash_get_and_unset_t(nameargs, const_nonewline)) {
 	flag_nonewline = 1;
@@ -4243,6 +4244,7 @@ mth_file_puts(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 
     enc_error_info = GC_MALLOC(sizeof(encoder_error_info));
     ALLOC_SAFE(enc_error_info);
+    memset(enc_error_info, 0, sizeof(encoder_error_info));
 
     if (hash_get_and_unset_t(nameargs, const_nonewline)) {
 	flag_nonewline = 1;

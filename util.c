@@ -105,6 +105,7 @@ encode_dirent(Toy_Interp *interp, wchar_t *name, encoder_error_info **info) {
 
     error_info = GC_MALLOC(sizeof(encoder_error_info));
     ALLOC_SAFE(error_info);
+    memset(error_info, 0, sizeof(encoder_error_info));
     *info = error_info;
 
     iencoder = NENCODE_RAW;
@@ -141,6 +142,7 @@ decode_dirent(Toy_Interp *interp, char *name, encoder_error_info **info) {
 
     error_info = GC_MALLOC(sizeof(encoder_error_info));
     ALLOC_SAFE(error_info);
+    memset(error_info, 0, sizeof(encoder_error_info));
     *info = error_info;
 
     iencoder = NENCODE_RAW;
@@ -191,6 +193,7 @@ decode_error(Toy_Interp *interp, char *str) {
     
     enc_error_info = GC_MALLOC(sizeof(encoder_error_info));
     ALLOC_SAFE(enc_error_info);
+    memset(enc_error_info, 0, sizeof(encoder_error_info));
     c = decode_raw_to_unicode(new_cell(to_wchar(str)), iencoder, enc_error_info);
     if (c == NULL) {
         return to_wchar(str);

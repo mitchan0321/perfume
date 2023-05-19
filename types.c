@@ -17,6 +17,7 @@ new_bool(int val) {
     Toy_Type *o;
     o = GC_MALLOC_ATOMIC(sizeof(Toy_Type));
     ALLOC_SAFE(o);
+    memset(o, 0, sizeof(Toy_Type));
 
     o->tag = BOOL;
     o->u.tbool.value = val;
@@ -31,6 +32,7 @@ new_symbol(wchar_t *symbol) {
 
     o = GC_MALLOC(sizeof(Toy_Type));
     ALLOC_SAFE(o);
+    memset(o, 0, sizeof(Toy_Type));
 
     o->tag = SYMBOL;
     o->u.symbol.cell = new_cell(symbol);
@@ -53,6 +55,7 @@ new_ref(wchar_t *ref) {
     Toy_Type *o;
     o = GC_MALLOC(sizeof(Toy_Type));
     ALLOC_SAFE(o);
+    memset(o, 0, sizeof(Toy_Type));
 
     o->tag = REF;
     o->u.ref.cell = new_cell(ref);
@@ -66,6 +69,7 @@ new_integer(mpz_t integer) {
 
     o = GC_MALLOC(sizeof(Toy_Type));
     ALLOC_SAFE(o);
+    memset(o, 0, sizeof(Toy_Type));
 
     o->tag = INTEGER;
     mpz_init(o->u.biginteger);
@@ -124,6 +128,7 @@ new_real(double real) {
     Toy_Type *o;
     o = GC_MALLOC_ATOMIC(sizeof(Toy_Type));
     ALLOC_SAFE(o);
+    memset(o, 0, sizeof(Toy_Type));
 
     o->tag = REAL;
     o->u.real = real;
@@ -136,6 +141,8 @@ new_string_str(wchar_t *string) {
     Cell *c;
     o = GC_MALLOC(sizeof(Toy_Type));
     ALLOC_SAFE(o);
+    memset(o, 0, sizeof(Toy_Type));
+
     c = new_cell(string);
     if (NULL == c) return NULL;
 
@@ -149,6 +156,7 @@ new_string_cell(Cell *string) {
     Toy_Type *o;
     o = GC_MALLOC(sizeof(Toy_Type));
     ALLOC_SAFE(o);
+    memset(o, 0, sizeof(Toy_Type));
 
     o->tag = STRING;
     o->u.string = string;
@@ -160,6 +168,7 @@ new_script(Toy_Type *statement_list) {
     Toy_Type *o;
     o = GC_MALLOC(sizeof(Toy_Type));
     ALLOC_SAFE(o);
+    memset(o, 0, sizeof(Toy_Type));
 
     o->tag = SCRIPT;
     o->u.statement_list = statement_list;
@@ -171,6 +180,7 @@ new_statement(Toy_Type *item_list, int line) {
     Toy_Type *o;
     o = GC_MALLOC(sizeof(Toy_Type));
     ALLOC_SAFE(o);
+    memset(o, 0, sizeof(Toy_Type));
 
     o->tag = STATEMENT;
     o->u.statement.item_list = item_list;
@@ -189,6 +199,7 @@ new_block(Toy_Type *block_body) {
     Toy_Type *o;
     o = GC_MALLOC(sizeof(Toy_Type));
     ALLOC_SAFE(o);
+    memset(o, 0, sizeof(Toy_Type));
 
     o->tag = BLOCK;
     o->u.block_body = block_body;
@@ -200,6 +211,7 @@ new_eval(Toy_Type *eval_body) {
     Toy_Type *o;
     o = GC_MALLOC(sizeof(Toy_Type));
     ALLOC_SAFE(o);
+    memset(o, 0, sizeof(Toy_Type));
 
     o->tag = EVAL;
     o->u.eval_body = eval_body;
@@ -213,6 +225,7 @@ new_native(Toy_Type* (*cfunc)(Toy_Interp*, Toy_Type*, struct _hash*, int arglen)
     Toy_Type *o;
     o = GC_MALLOC(sizeof(Toy_Type));
     ALLOC_SAFE(o);
+    memset(o, 0, sizeof(Toy_Type));
 
     o->tag = NATIVE;
     o->u.native.cfunc = cfunc;
@@ -225,6 +238,7 @@ new_object(wchar_t *name, struct _hash* slots, Toy_Type *delegate_list) {
     Toy_Type *o;
     o = GC_MALLOC(sizeof(Toy_Type));
     ALLOC_SAFE(o);
+    memset(o, 0, sizeof(Toy_Type));
 
     o->tag = OBJECT;
     o->u.object.slots = slots;
@@ -239,6 +253,7 @@ new_exception(wchar_t *code, wchar_t *desc, Toy_Interp *interp) {
 
     o = GC_MALLOC(sizeof(Toy_Type));
     ALLOC_SAFE(o);
+    memset(o, 0, sizeof(Toy_Type));
 
     o->tag = EXCEPTION;
     o->u.exception.code = new_cell(code);
@@ -266,6 +281,7 @@ new_closure(Toy_Type *block_body, Toy_Env* env, int script_id) {
     Toy_Type *o;
     o = GC_MALLOC(sizeof(Toy_Type));
     ALLOC_SAFE(o);
+    memset(o, 0, sizeof(Toy_Type));
 
     o->tag = CLOSURE;
     SET_SCRIPT_ID(block_body, script_id);
@@ -289,6 +305,7 @@ new_func(Toy_Type *argspec_list, int posarglen, Array *posargarray, Hash *nameda
     Toy_Type *o;
     o = GC_MALLOC(sizeof(Toy_Type));
     ALLOC_SAFE(o);
+    memset(o, 0, sizeof(Toy_Type));
 
     o->tag = FUNC;
     o->u.func.argspec = argspec;
@@ -310,6 +327,7 @@ new_control(int code, Toy_Type *ret_value) {
     Toy_Type *o;
     o = GC_MALLOC(sizeof(Toy_Type));
     ALLOC_SAFE(o);
+    memset(o, 0, sizeof(Toy_Type));
 
     o->tag = CONTROL;
     o->u.control.code = code;
@@ -322,6 +340,7 @@ new_container(void *container, wchar_t *desc) {
     Toy_Type *o;
     o = GC_MALLOC(sizeof(Toy_Type));
     ALLOC_SAFE(o);
+    memset(o, 0, sizeof(Toy_Type));
 
     o->tag = CONTAINER;
     o->u.container.data = container;
@@ -334,6 +353,7 @@ new_getmacro(Toy_Type *obj, Toy_Type *para) {
     Toy_Type *o;
     o = GC_MALLOC(sizeof(Toy_Type));
     ALLOC_SAFE(o);
+    memset(o, 0, sizeof(Toy_Type));
 
     o->tag = GETMACRO;
     o->u.getmacro.obj = obj;
@@ -346,6 +366,7 @@ new_initmacro(Toy_Type *class, Toy_Type *param) {
     Toy_Type *o;
     o = GC_MALLOC(sizeof(Toy_Type));
     ALLOC_SAFE(o);
+    memset(o, 0, sizeof(Toy_Type));
 
     o->tag = INITMACRO;
     o->u.initmacro.class = class;
@@ -358,6 +379,7 @@ new_alias(struct _hash *slot, Toy_Type *key) {
     Toy_Type *o;
     o = GC_MALLOC(sizeof(Toy_Type));
     ALLOC_SAFE(o);
+    memset(o, 0, sizeof(Toy_Type));
 
     o->tag = ALIAS;
     o->u.alias.slot = slot;
@@ -371,6 +393,8 @@ new_rquote(wchar_t *string) {
     Cell *c;
     o = GC_MALLOC(sizeof(Toy_Type));
     ALLOC_SAFE(o);
+    memset(o, 0, sizeof(Toy_Type));
+
     c = new_cell(string);
     if (NULL == c) return NULL;
 
@@ -384,7 +408,8 @@ new_bind(Toy_Type *bind_var) {
     Toy_Type *o;
     o = GC_MALLOC(sizeof(Toy_Type));
     ALLOC_SAFE(o);
-    
+    memset(o, 0, sizeof(Toy_Type));
+
     o->tag = BIND;
     o->u.bind_var = bind_var;
     return o;
@@ -395,6 +420,7 @@ new_dict(struct _hash *dict) {
     Toy_Type *o;
     o = GC_MALLOC(sizeof(Toy_Type));
     ALLOC_SAFE(o);
+    memset(o, 0, sizeof(Toy_Type));
     
     o->tag = DICT;
     SET_NOPRINTABLE(o);
@@ -407,6 +433,7 @@ new_vector(struct _array *vector) {
     Toy_Type *o;
     o = GC_MALLOC(sizeof(Toy_Type));
     ALLOC_SAFE(o);
+    memset(o, 0, sizeof(Toy_Type));
     
     o->tag = VECTOR;
     SET_NOPRINTABLE(o);
@@ -419,6 +446,7 @@ new_binbulk_t(struct _binbulk *bulk) {
     Toy_Type *o;
     o = GC_MALLOC(sizeof(Toy_Type));
     ALLOC_SAFE(o);
+    memset(o, 0, sizeof(Toy_Type));
     
     o->tag = BULK;
     SET_NOPRINTABLE(o);
@@ -503,6 +531,7 @@ new_coroutine(Toy_Interp *interp, Toy_Type* script) {
 
     o = GC_MALLOC(sizeof(Toy_Type));
     ALLOC_SAFE(o);
+    memset(o, 0, sizeof(Toy_Type));
 
     o->tag = COROUTINE;
     o->u.coroutine = GC_MALLOC(sizeof(Toy_Coroutine));
@@ -568,6 +597,8 @@ new_intr(int nintr) {
 
     o = GC_MALLOC(sizeof(Toy_Type));
     ALLOC_SAFE(o);
+    memset(o, 0, sizeof(Toy_Type));
+
     o->tag = INTR;
     o->u.nintr = nintr;
     return o;
@@ -581,6 +612,7 @@ toy_clone(Toy_Type *obj) {
     case INTEGER:
 	dest = GC_MALLOC(sizeof(Toy_Type));
 	ALLOC_SAFE(dest);
+        memset(dest, 0, sizeof(Toy_Type));
 	dest->tag = obj->tag;
 	mpz_init(dest->u.biginteger);
 	mpz_set(dest->u.biginteger, obj->u.biginteger);
@@ -588,12 +620,14 @@ toy_clone(Toy_Type *obj) {
     case REAL:
 	dest = GC_MALLOC(sizeof(Toy_Type));
 	ALLOC_SAFE(dest);
+        memset(dest, 0, sizeof(Toy_Type));
 	dest->tag = obj->tag;
 	dest->u.real = obj->u.real;
 	break;
     case STRING:
 	dest = GC_MALLOC(sizeof(Toy_Type));
 	ALLOC_SAFE(dest);
+        memset(dest, 0, sizeof(Toy_Type));
 	dest->tag = obj->tag;
         // dest->u.string = new_cell(cell_get_addr(obj->u.string));
         dest->u.string = cell_clone(obj->u.string);
