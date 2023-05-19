@@ -3304,4 +3304,8 @@
 	Makefile
 		Fix for valgrind debug run that clang14 output valgrind unreadable debug info by DWARF5, change DWARF4 CFLAG is -gdwarf-4.
 
+2023/05/19
+	*
+		Fix struct initialize after GC_MALLOC for valgrind memory checker less messages.
+
 #eof
