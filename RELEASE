@@ -3308,4 +3308,8 @@
 	*
 		Fix struct initialize after GC_MALLOC for valgrind memory checker less messages.
 
+2023/05/20
+	pmacs update:
+		Change vertical line separate character and vertical line colors.
+
 #eof
