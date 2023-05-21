@@ -1201,3 +1201,56 @@ defcommand execute-record desc: "Execute keyboard macro." {
     };
     return ALL;
 };
+
+defcommand terminal desc: "Shell terminal in buffer." {
+    | main window |
+    buff-name := "*Terminal*";
+    BufferManager unregist-buffer $buff-name;
+    buff ::= new EditStream;
+    $buff open $buff-name;
+    _puts ::= $buff method? puts;
+    $buff method puts (*) {
+        r ::= call $_puts $*;
+        $MainWindow get-window-list : each do: {| i |
+            if {$i get-buffer : get-buffer-name : = $buff-name} {
+                $MainWindow set-force-update;
+            };
+        };
+        return $r;
+    };
+    $buff get-buffer : set-content $ENV,HOME;
+    $MainWindow bind-buffer [$MainWindow get-current-window] [$buff get-buffer];
+    
+    task ::= new Task;
+    $task set-stdout $buff;
+    $task set-stderr $buff;
+    $task set-terminate-proc {
+        ### do something
+    };
+    
+    ###
+    ### do command
+    ###
+    $task proc "shell-terminal" {
+        (window buff cmd directory) := $ARGS;
+        cd $directory;
+        sts ::= exec sh -c $cmd;
+        println "";
+        println "exit(" $sts ")";
+        
+        SysCall apply-editor {
+            $buff set-protect;
+            $buff no-modify;
+            if {eq? [$window get-buffer] $buff} {
+                geom ::= $window get-geom;
+                $geom set! ViewLine 0;
+                $geom set! ViewColumn 0;
+                $window cursor-move-to $geom 0 0;
+            };
+        };
+        
+    } $window [$grep-buff get-buffer] $command $directory;
+
+    return;
+};
+
