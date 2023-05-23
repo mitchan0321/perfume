@@ -1281,6 +1281,7 @@ defcommand terminal-enter-command desc: "Shell terminal command enter." {
     prompt ::= $stream get-prompt;
     if {$prompt = [$r sub 0 [$prompt len]]} {r ::= $r sub [$prompt len]};
     $buff append-string "";
+    $window cursor-move-to $geom [$buff get-buffer-length : - 1] 0;
     $task_stdin puts $r;
     return ALL;
 };
