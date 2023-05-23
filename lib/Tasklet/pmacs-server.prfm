@@ -49,12 +49,12 @@ new Task : proc pmacs-server {
                             $f close;
                             try {
                                 if {eq? $mtime [file stat $r : assoc-value mtime]} {
-                                    show-message :bell ["(git commit) " . $r " file not changed, do not commit."];
+                                    show-message :bell ["(pmacs-server) " . $r " file not changed, do not commit."];
                                 } {
-                                    show-message ["(git commit) " . $r " file wrote."];
+                                    show-message ["(pmacs-server) " . $r " file wrote."];
                                 };
                             } catch: {| e |
-                                show-message :bell ["(git commit) " . $r " file not found, <" $e,0 "> #" $e,1];
+                                show-message :bell ["(pmacs-server) " . $r " file not found, <" $e,0 "> #" $e,1];
                             };
                         };
                         window ::= $MainWindow get-current-window : get-window-name;
