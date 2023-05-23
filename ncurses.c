@@ -1279,7 +1279,7 @@ valid_return:
         no_input_count = 0;
     } else {
 	no_input_count ++;
-	if (no_input_count >= 8) {
+	if (no_input_count >= 4) {
             time_on_repeat = 0.0;
             on_repeat = 0;
         } else if (on_repeat) {
