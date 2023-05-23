@@ -220,34 +220,67 @@ defun exec-man (main window cur-buff topic) {
     ltopic ::= $topic split;
     buff-name ::= if {$ltopic len : >= 2} {"Man=" . $ltopic,1 "(" $ltopic,0 ")"} {"Man=" . $topic};
     man-buff ::= BufferManager find-buffer $buff-name;
-    if $man-buff else: {
-        os ::= new Stream;
-        $os set-nolimit;
-        ### sts ::= {exec proc-enc: $MAN_ENCODING "/bin/sh" "-c" [$MAN_PREFIX expand]} redirect-out $os $os;
-        sts ::= pipe out: $os {exec err-to: [new NullStream] proc-enc: $MAN_ENCODING "/bin/sh" "-c" [$MAN_PREFIX expand]};
-        $os close;
-        
-        man-buff ::= new EditBuffer;
-        (result err) ::= $man-buff load-content
-            :init-only
-            ["man " . $topic]
-            buffer-name: $buff-name
-        ;
-        $man-buff clear-all;
-        $man-buff set-content [$DEFAULT_PWIKI_DIR . "/"];
-        
-        $os each do: {| r |
-            $man-buff append-string [curs-col $r];
-        };
-        os := <nil>;
-        $man-buff set-protect;
-        $man-buff no-modify;
+    if $man-buff {
+        $main bind-buffer [$window get-window-name] $man-buff;
+    } {
+        do-man-async $window $buff-name $ENV,HOME [$MAN_PREFIX expand] $MAN_ENCODING;
     };
-    $main bind-buffer [$window get-window-name] $man-buff;
-    geom ::= $window get-geom;
-    $window cursor-move-to $geom 0 0;
-    $man-buff set-previous-buffer [$cur-buff get-buffer-name];
+    return ALL;
+};
 
+defun do-man-async (window buff-name directory command enc) {
+    BufferManager unregist-buffer $buff-name;
+    man-buff ::= new EditStream;
+    $man-buff open $buff-name;
+    _puts ::= $man-buff method? puts;
+    $man-buff method puts (*) {
+        r ::= call $_puts ([curs-col [$* join sep: ""]]);
+        $MainWindow get-window-list : each do: {| i |
+            if {$i get-buffer : get-buffer-name : = $buff-name} {
+                $MainWindow set-force-update;
+            };
+        };
+        return $r;
+    };
+    $man-buff get-buffer : set-content $directory;
+    $MainWindow bind-buffer "Window#1" [$man-buff get-buffer];
+    w1 ::= $MainWindow get-window-by-name "Window#1";
+    if $w1 else: {
+        $MainWindow create-split-vertical-window;
+    };
+    window ::= $MainWindow get-window-by-name "Window#1";
+    
+    task ::= new Task;
+    $task set-stdout $man-buff;
+    $task set-stderr $man-buff;
+    $task set-terminate-proc {
+        $MainWindow set-force-update;
+    };
+    
+    ###
+    ### do command
+    ###
+    $task proc [$command split : get 0] {
+        (window buff cmd directory enc) := $ARGS;
+        cd $directory;
+        sts ::= exec err-to: [new NullStream] proc-enc: $enc sh -c $cmd;
+        println "";
+        println "exit(" $sts ")";
+        
+        SysCall apply-editor {
+            $buff set-protect;
+            $buff no-modify;
+            if {eq? [$window get-buffer] $buff} {
+                geom ::= $window get-geom;
+                $geom set! ViewLine 0;
+                $geom set! ViewColumn 0;
+                $window cursor-move-to $geom 0 0;
+            };
+        };
+        
+    } $window [$man-buff get-buffer] $command $directory $enc;
+
+    return;
 };
 
 defcommand man-click-link desc: "Open man document." {
