@@ -6,6 +6,7 @@ EditStream method init (args: args) {
     sets Locate 0;
     sets Newline <t>;
     sets ColLimit 80;
+    sets Prompt "";
 };
 
 EditStream method open (name) {
@@ -99,4 +100,12 @@ EditStream method set-newline (m) {
 EditStream method set-columnlimit (l) {
     sets ColLimit $l;
     return $l;
+};
+
+EditStream method set-prompt (p) {
+    sets Prompt $p;
+};
+
+EditStream method get-prompt () {
+    return $Prompt;
 };
