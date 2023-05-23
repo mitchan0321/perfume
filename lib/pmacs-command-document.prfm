@@ -243,12 +243,12 @@ defun do-man-async (window buff-name directory command enc) {
         return $r;
     };
     $man-buff get-buffer : set-content $directory;
-    $MainWindow bind-buffer "Window#1" [$man-buff get-buffer];
-    w1 ::= $MainWindow get-window-by-name "Window#1";
+    $MainWindow bind-buffer [$window get-window-name] [$man-buff get-buffer];
+    w1 ::= $MainWindow get-window-by-name [$window get-window-name];
     if $w1 else: {
         $MainWindow create-split-vertical-window;
     };
-    window ::= $MainWindow get-window-by-name "Window#1";
+    window ::= $MainWindow get-window-by-name [$window get-window-name];
     
     task ::= new Task;
     $task set-stdout $man-buff;
@@ -265,7 +265,7 @@ defun do-man-async (window buff-name directory command enc) {
         cd $directory;
         sts ::= exec err-to: [new NullStream] proc-enc: $enc sh -c $cmd;
         println "";
-        println "exit(" $sts ")";
+        println "man command exit with status " $sts;
         
         SysCall apply-editor {
             $buff set-protect;
