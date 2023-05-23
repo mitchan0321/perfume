@@ -1205,25 +1205,48 @@ defcommand execute-record desc: "Execute keyboard macro." {
 defcommand terminal desc: "Shell terminal in buffer." {
     | main window |
     buff-name := "*Terminal*";
-    BufferManager unregist-buffer $buff-name;
-    buff ::= new EditStream;
-    $buff open $buff-name;
-    _puts ::= $buff method? puts;
-    $buff method puts (*) {
-        r ::= call $_puts $*;
-        $MainWindow get-window-list : each do: {| i |
-            if {$i get-buffer : get-buffer-name : = $buff-name} {
-                $MainWindow set-force-update;
+    buff ::= BufferManager find-buffer $buff-name;
+    if $buff {
+        $main bind-buffer [$window get-window-name] $buff;
+        return ALL;
+    };
+    
+    stream ::= new EditStream;
+    $stream open $buff-name;
+    _puts ::= $stream method? puts;
+    $stream method puts (*) {
+        _r ::= call $_puts $*;
+        $MainWindow get-window-list : each do: {| _i |
+            _buff ::= $_i get-buffer;
+            if $_buff {
+                if {$_buff get-buffer-name : = $buff-name} {
+                    _geom ::= $_i get-geom;
+                    _y ::= $_buff get-buffer-length;
+                    if {$_y >= 1} {
+                        _x ::= $_buff get-buffer-line [$_y - 1] : len;
+                        $_i cursor-move-to $_geom [$_y - 1] $_x;
+                    };
+                    break;
+                };
             };
         };
-        return $r;
+        $MainWindow set-force-update;
+        nl ::= $* find [symbol ":nonewline"];
+        if $nl {
+            set-prompt [$* delete $nl : join sep: ""];
+        } {
+            set-prompt ""
+        };
+        return $_r;
     };
-    $buff get-buffer : set-content $ENV,HOME;
-    $MainWindow bind-buffer [$MainWindow get-current-window] [$buff get-buffer];
+    buff ::= $stream get-buffer;
+    $buff set-content $ENV,HOME;
+    $buff set-unregist-proc {try {zap "shell-terminal"} catch: {}};
+    $main bind-buffer [$window get-window-name] $buff;
     
     task ::= new Task;
-    $task set-stdout $buff;
-    $task set-stderr $buff;
+    $task set-stdout $stream;
+    $task set-stderr $stream;
     $task set-terminate-proc {
         ### do something
     };
@@ -1232,25 +1255,32 @@ defcommand terminal desc: "Shell terminal in buffer." {
     ### do command
     ###
     $task proc "shell-terminal" {
-        (window buff cmd directory) := $ARGS;
+        (window buff directory shell) := $ARGS;
         cd $directory;
-        sts ::= exec sh -c $cmd;
-        println "";
-        println "exit(" $sts ")";
+        sts ::= exec err-to: $stdout $shell -i;
         
-        SysCall apply-editor {
-            $buff set-protect;
-            $buff no-modify;
-            if {eq? [$window get-buffer] $buff} {
-                geom ::= $window get-geom;
-                $geom set! ViewLine 0;
-                $geom set! ViewColumn 0;
-                $window cursor-move-to $geom 0 0;
-            };
-        };
+        println "[Terminal exited with status " $sts "]";
         
-    } $window [$grep-buff get-buffer] $command $directory;
+    } $window [$stream get-buffer] $ENV,HOME $TERMINAL_SHELL;
 
-    return;
+    return ALL;
 };
 
+defcommand terminal-enter-command desc: "Shell terminal command enter." {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    task ::= TaskManager get-task "shell-terminal";
+    if {! $task} {return ALL};
+    
+    task_stdin ::= $task get-stdio : get 0;
+    stream ::= $task get-stdio : get 1;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    r ::= $buff get-buffer-line $ey;
+    if {! $r} {return ALL};
+    prompt ::= $stream get-prompt;
+    if {$prompt = [$r sub 0 [$prompt len]]} {r ::= $r sub [$prompt len]};
+    $buff append-string "";
+    $task_stdin puts $r;
+    return ALL;
+};
