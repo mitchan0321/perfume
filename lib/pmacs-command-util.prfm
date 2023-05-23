@@ -1257,7 +1257,7 @@ defcommand terminal desc: "Shell terminal in buffer." {
     $task proc "shell-terminal" {
         (window buff directory shell) := $ARGS;
         cd $directory;
-        sts ::= exec err-to: $stdout $shell -i;
+        sts ::= exec err-to: $stdout [get-shell] "-c" $shell;
         
         println "[Terminal exited with status " $sts "]";
         
