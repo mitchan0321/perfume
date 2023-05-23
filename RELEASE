@@ -3312,4 +3312,14 @@
 	pmacs update:
 		Change vertical line separate character and vertical line colors.
 
+2023/05/23
+	ncurses.c
+		Change repeat detect times, 8 -> 4.
+	pmacs update:
+		Change pmacs-server message, (git-commit) -> (pmacs-server).
+		Add EditStream::set-prompt/get-prompt for process prompt holder if input line use :nonewline set.
+		Change man command use task, omit use pipe.
+		Add terminal command for unix shell command execute in buffer.
+		Add new Mode 'Term' for terminal editor command.
+
 #eof
