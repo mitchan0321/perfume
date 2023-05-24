@@ -1257,7 +1257,7 @@ defcommand terminal desc: "Shell terminal in buffer." {
     $task proc "shell-terminal" {
         (window buff directory shell) := $ARGS;
         cd $directory;
-        sts ::= exec err-to: $stdout [get-shell] "-c" $shell;
+        sts ::= exec :pty err-to: $stdout [get-shell] "-c" $shell;
         
         println "[Terminal exited with status " $sts "]";
         
@@ -1277,9 +1277,12 @@ defcommand terminal-enter-command desc: "Shell terminal command enter." {
     stream ::= $task get-stdio : get 1;
     (ey ex) ::= $window get-source-index $buff $geom;
     r ::= $buff get-buffer-line $ey;
-    if {! $r} {return ALL};
+    if {! $r} {r := ""};
     prompt ::= $stream get-prompt;
     if {$prompt = [$r sub 0 [$prompt len]]} {r ::= $r sub [$prompt len]};
+    if {$r != ""} {
+        $window apply-command $main $window "" mark;
+    };
     $buff append-string "";
     $window cursor-move-to $geom [$buff get-buffer-length : - 1] 0;
     $task_stdin puts $r;
