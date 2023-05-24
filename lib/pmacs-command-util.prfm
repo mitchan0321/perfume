@@ -1241,7 +1241,7 @@ defcommand terminal desc: "Shell terminal in buffer." {
     };
     buff ::= $stream get-buffer;
     $buff set-content $ENV,HOME;
-    $buff set-unregist-proc {try {zap "shell-terminal"} catch: {}};
+    $buff set-unregist-proc {try {zap $TERMINAL_TASK} catch: {}};
     $main bind-buffer [$window get-window-name] $buff;
     
     task ::= new Task;
@@ -1254,7 +1254,7 @@ defcommand terminal desc: "Shell terminal in buffer." {
     ###
     ### do command
     ###
-    $task proc "shell-terminal" {
+    $task proc $TERMINAL_TASK {
         (window buff directory shell) := $ARGS;
         cd $directory;
         sts ::= exec :pty err-to: $stdout [get-shell] "-c" $shell;
@@ -1270,11 +1270,11 @@ defcommand terminal-enter-command desc: "Shell terminal command enter." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
-    task ::= TaskManager get-task "shell-terminal";
+    task ::= get-terminal-task;
     if {! $task} {return ALL};
     
-    task_stdin ::= $task get-stdio : get 0;
-    stream ::= $task get-stdio : get 1;
+    task_stdin ::= get-terminal-task-stdin;
+    stream ::= get-terminal-task-stdout;
     (ey ex) ::= $window get-source-index $buff $geom;
     r ::= $buff get-buffer-line $ey;
     if {! $r} {r := ""};
@@ -1286,5 +1286,69 @@ defcommand terminal-enter-command desc: "Shell terminal command enter." {
     $buff append-string "";
     $window cursor-move-to $geom [$buff get-buffer-length : - 1] 0;
     $task_stdin puts $r;
+    return ALL;
+};
+
+defun get-terminal-task () {
+    task ::= TaskManager get-task $TERMINAL_TASK;
+    return $task;
+};
+
+defun get-terminal-task-stdin () {
+    task ::= TaskManager get-task $TERMINAL_TASK;
+    stream := <nil>;
+    if $task {
+        stream ::= $task get-stdio : get 0;
+    };
+    return $stream;
+};
+
+defun get-terminal-task-stdout () {
+    task ::= TaskManager get-task $TERMINAL_TASK;
+    stream := <nil>;
+    if $task {
+        stream ::= $task get-stdio : get 1;
+    };
+    return $stream;
+};
+
+defun get-terminal-task-stderr () {
+    task ::= TaskManager get-task $TERMINAL_TASK;
+    stream := <nil>;
+    if $task {
+        stream ::= $task get-stdio : get 2;
+    };
+    return $stream;
+};
+
+defcommand terminal-send-break desc: "Send BREAK to shell terminal." {
+    stream ::= get-terminal-task-stdin;
+    if $stream {
+        $stream puts :nonewline ["" uimport! (3)];
+    };
+    return ALL;
+};
+
+defcommand terminal-send-eof desc: "Send EOF to shell terminal." {
+    stream ::= get-terminal-task-stdin;
+    if $stream {
+        $stream puts :nonewline ["" uimport! (4)];
+    };
+    return ALL;
+};
+
+defcommand terminal-send-quit desc: "Send QUIT to shell terminal." {
+    stream ::= get-terminal-task-stdin;
+    if $stream {
+        $stream puts :nonewline ["" uimport! (0x1C)];
+    };
+    return ALL;
+};
+
+defcommand terminal-send-suspend desc: "Send SUSPEND to shell terminal." {
+    stream ::= get-terminal-task-stdin;
+    if $stream {
+        $stream puts :nonewline ["" uimport! (26)];
+    };
     return ALL;
 };
