@@ -3322,4 +3322,8 @@
 		Add terminal command for unix shell command execute in buffer.
 		Add new Mode 'Term' for terminal editor command.
 
+2023/05/24
+	pmacs update:
+		Add terminal-enter-command set mark before command execute.
+
 #eof
