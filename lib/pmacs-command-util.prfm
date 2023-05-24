@@ -1286,6 +1286,35 @@ defcommand terminal-enter-command desc: "Shell terminal command enter." {
     $buff append-string "";
     $window cursor-move-to $geom [$buff get-buffer-length : - 1] 0;
     $task_stdin puts $r;
+    
+    ### cd command emuration
+    l ::= $r split;
+    if {$l get 0 : = "cd"} {
+        if {$l len : = 1} {
+            path := $ENV,HOME
+        } {
+            dir ::= $l get 1;
+            if {$dir at 0 : = "~"} {
+                path ::= $dir replace '^~' $ENV,HOME;
+            } {
+                if {$dir at 0 : = "/"} {
+                    path ::= path-adjust $dir;
+                } {
+                    if {$buff get-content-dir : = "/"} {
+                        path ::= path-adjust ["/" . $dir];
+                    } {
+                        path ::= path-adjust [$buff get-content-dir : . "/" $dir];
+                    };
+                };
+            };
+            if {neq? [get-path-condition $path : get 0] DIRECTORY} {
+                path ::= $buff get-content-dir;
+            };
+        };
+        $buff set-content $path;
+        show-message ["(cd) " . $path];
+    };
+    
     return ALL;
 };
 
