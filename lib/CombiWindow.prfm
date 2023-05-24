@@ -669,6 +669,15 @@ CombiWindow method set-prefix (prefix-list) {
     };
 };
 
+CombiWindow method add-prefix (prefix-list) {
+    $prefix-list each do: {| i |
+        $PrefixList <<- $i;
+        $PrefixName set [$i cdr] [$i car];
+        $PrefixMap set [$i cdr] [dict];
+    };
+    sets PrefixKey [dict $PrefixList];
+};
+
 CombiWindow method set-prefix-desc (prefix-name desc) {
     $PrefixDesc set $prefix-name $desc;
 };
