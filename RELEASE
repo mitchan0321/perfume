@@ -3287,7 +3287,7 @@
 
 2023/05/16
 	pmacs update:
-		Change buffer-list hader and body line format indicator commonized.
+		Change buffer-list header and body line format indicator commonized.
 
 2023/05/17
 	lib/hanoi.prfm, lib/hanoiui.prfm
@@ -3337,5 +3337,6 @@
 		  terminal-send-suspend: send suspend key code to terminal process -> Ctrl+\ Ctrl+Z
 		Change pmacs.conf terminal shell values.
 		Change no menu mode prefix define.
+		Add cd command simuration at terminal-enter-command.
 
 #eof
