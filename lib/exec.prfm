@@ -84,7 +84,7 @@ defun exec (
                 sts := <t>;
             } {
                 try {
-                    (in out exp) ::= select ([$IN fd?] [$ERR fd?]) () () 50;
+                    (in out exp) ::= select ([$IN fd?] [$ERR fd?]) () () 5;
                 } catch: {}
             };
             result $sts;
