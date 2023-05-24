@@ -484,12 +484,12 @@ defun do-command-async (window buff-name directory command) {
     $grep-buff puts ["CWD:  " . $directory];
     $grep-buff puts ["EXEC: " . $command];
     $grep-buff puts "";
-    $MainWindow bind-buffer "Window#1" [$grep-buff get-buffer];
     w1 ::= $MainWindow get-window-by-name "Window#1";
     if $w1 else: {
-        $MainWindow create-split-vertical-window;
+        $MainWindow create-split-vertical-window window-name: "Window#1";
     };
     window ::= $MainWindow get-window-by-name "Window#1";
+    $MainWindow bind-buffer "Window#1" [$grep-buff get-buffer];
     
     task ::= new Task;
     $task set-stdout $grep-buff;
