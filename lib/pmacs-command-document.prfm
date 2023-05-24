@@ -235,11 +235,6 @@ defun do-man-async (window buff-name directory command enc) {
     _puts ::= $man-buff method? puts;
     $man-buff method puts (*) {
         r ::= call $_puts ([curs-col [$* join sep: ""]]);
-        $MainWindow get-window-list : each do: {| i |
-            if {$i get-buffer : get-buffer-name : = $buff-name} {
-                $MainWindow set-force-update;
-            };
-        };
         return $r;
     };
     $man-buff get-buffer : set-content $directory;
@@ -265,7 +260,7 @@ defun do-man-async (window buff-name directory command enc) {
         cd $directory;
         sts ::= exec err-to: [new NullStream] proc-enc: $enc sh -c $cmd;
         println "";
-        println "man command exit with status " $sts;
+        println "Exit man command with status " $sts ".";
         
         SysCall apply-editor {
             $buff set-protect;
