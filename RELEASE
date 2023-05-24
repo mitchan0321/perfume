@@ -3323,7 +3323,19 @@
 		Add new Mode 'Term' for terminal editor command.
 
 2023/05/24
+	lib/exec.prfm
+		Change wait timer value 50 -> 5.
 	pmacs update:
 		Add terminal-enter-command set mark before command execute.
+		Add add-prefix command for Mode file prefix key define.
+		Add Mode-Term.key prefix Ctrl+\ for send key event.
+		Change man async procedure do not update screen untile man command end.
+		Add editor commands are:
+		  terminal-send-break: send break key code to terminal process -> Ctrl+\ Ctrl+C
+		  terminal-send-eof: send eof key code to terminal process -> Ctrl+\ Ctrl+D
+		  terminal-send-quit: send quit key code to terminal process -> Ctrl+\ Ctrl+\
+		  terminal-send-suspend: send suspend key code to terminal process -> Ctrl+\ Ctrl+Z
+		Change pmacs.conf terminal shell values.
+		Change no menu mode prefix define.
 
 #eof
