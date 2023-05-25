@@ -421,4 +421,21 @@ MONO-GREEN {
 default: {result <nil>}
 ;;
 
+if {pipe out: [new NullStream] {exec uname} : = "FreeBSD"} {
+    case $THEME
+    MODERN {
+        set-color-name INACTIVE_STATUS_LINE         [WUtil color-pair WHITE   BLACK   ] attr: ($A_STANDOUT $A_BOLD $A_ITALIC);
+        set-color-name INACTIVE_STATUS_LINE_2       [WUtil color-pair WHITE   BLACK   ] attr: ($A_DIM);
+        set-color-name INACTIVE_VERT_LINE           [WUtil color-pair WHITE   BLACK   ] attr: ($A_DIM);
+        set-color-name INACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair WHITE   BLACK   ] attr: ($A_DIM);
+    }
+    MODERN-DARK {
+        set-color-name INACTIVE_STATUS_LINE         [WUtil color-pair BLACK   WHITE   ] attr: ($A_STANDOUT $A_BOLD $A_ITALIC);
+        set-color-name INACTIVE_STATUS_LINE_2       [WUtil color-pair BLACK   WHITE   ] attr: ($A_DIM);
+        set-color-name INACTIVE_VERT_LINE           [WUtil color-pair BLACK   WHITE   ] attr: ($A_DIM);
+        set-color-name INACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair BLACK   WHITE   ] attr: ($A_DIM);
+    }
+}
+;;
+
 [result :last] ?? {throw ErrNoTheme "Not defined theme."};
