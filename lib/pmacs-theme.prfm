@@ -110,7 +110,7 @@ MODERN {
     set-color-name ACTIVE_VERT_LINE_HILIGHT     [WUtil color-pair WHITE   BLUE    ];
     set-color-name ACTIVE_VERT_LINE_PROTECT_HILIGHT [WUtil color-pair WHITE  GREEN] attr: ($A_BOLD);
     set-color-name INACTIVE_EDIT_BUFFER         [WUtil color-pair BLACK   WHITE   ];
-    set-color-name INACTIVE_STATUS_LINE         [WUtil color-pair BLACK   WHITE   ] attr: ($A_STANDOUT $A_BOLD $A_ITALIC);
+    set-color-name INACTIVE_STATUS_LINE         [WUtil color-pair WHITE   BLACK   ] attr: ($A_STANDOUT $A_BOLD $A_ITALIC);
     set-color-name INACTIVE_STATUS_LINE_2       [WUtil color-pair WHITE   BLACK   ] attr: ($A_DIM $A_STANDOUT);
     set-color-name INACTIVE_VERT_LINE           [WUtil color-pair WHITE   BLACK   ] attr: ($A_DIM $A_STANDOUT);
     set-color-name INACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair WHITE   BLACK   ] attr: ($A_DIM $A_STANDOUT);
@@ -150,7 +150,7 @@ MODERN-DARK {
     set-color-name ACTIVE_VERT_LINE_HILIGHT     [WUtil color-pair BLACK   BLUE    ];
     set-color-name ACTIVE_VERT_LINE_PROTECT_HILIGHT [WUtil color-pair BLACK  GREEN] attr: ($A_BOLD);
     set-color-name INACTIVE_EDIT_BUFFER         [WUtil color-pair WHITE   BLACK   ];
-    set-color-name INACTIVE_STATUS_LINE         [WUtil color-pair BLACK   WHITE   ] attr: ($A_STANDOUT $A_BOLD $A_ITALIC);
+    set-color-name INACTIVE_STATUS_LINE         [WUtil color-pair WHITE   BLACK   ] attr: ($A_STANDOUT $A_BOLD $A_ITALIC);
     set-color-name INACTIVE_STATUS_LINE_2       [WUtil color-pair WHITE   BLACK   ] attr: ($A_DIM $A_STANDOUT);
     set-color-name INACTIVE_VERT_LINE           [WUtil color-pair WHITE   BLACK   ] attr: ($A_DIM $A_STANDOUT);
     set-color-name INACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair WHITE   BLACK   ] attr: ($A_DIM $A_STANDOUT);
