@@ -3339,4 +3339,8 @@
 		Change no menu mode prefix define.
 		Add cd command simuration at terminal-enter-command.
 
+2023/05/25
+	pmacs update:
+		Change MODERN and MODERN-DARK themes inactive window border color.
+
 #eof
