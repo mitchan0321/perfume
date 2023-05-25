@@ -420,6 +420,7 @@ MONO-GREEN {
 
 default: {result <nil>}
 ;;
+[result :last] ?? {throw ErrNoTheme "Not defined theme."};
 
 if {pipe out: [new NullStream] {exec uname} : = "FreeBSD"} {
     case $THEME
@@ -438,4 +439,3 @@ if {pipe out: [new NullStream] {exec uname} : = "FreeBSD"} {
 }
 ;;
 
-[result :last] ?? {throw ErrNoTheme "Not defined theme."};
