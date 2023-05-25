@@ -400,6 +400,19 @@ CombiWindow method render-vertical-line () {
 	if {$start >= $y} {start := [$y - 1]};
     };
 
+    0 each to: [$y - 1] do: {| i |
+	curs-print $VerticalLineCurs " " $DISPLAY_ENCODING $i 0;
+	if $Activate {
+            if {$buff protect?} {
+                apply-color $VerticalLineCurs $i 0 1 ACTIVE_VERT_LINE_PROTECT_HILIGHT;
+            } {
+                apply-color $VerticalLineCurs $i 0 1 ACTIVE_VERT_LINE_HILIGHT;
+            }
+	} {
+            apply-color $VerticalLineCurs $i 0 1 INACTIVE_VERT_LINE_HILIGHT;
+	};
+    };
+    
     0 each to: $lines do: {| i |
 	curs-print $VerticalLineCurs $VERT_BAR_CHAR $DISPLAY_ENCODING [$i + $start] 0;
 	if $Activate {
