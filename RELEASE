@@ -3343,4 +3343,8 @@
 	pmacs update:
 		Change MODERN and MODERN-DARK themes inactive window border color.
 
+2023/05/26
+	pmacs update:
+		Add OS type indicate config value name is OSTYPE. eg) "Linux", "FreeBSD"...
+
 #eof
