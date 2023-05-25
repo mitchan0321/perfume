@@ -422,7 +422,8 @@ default: {result <nil>}
 ;;
 [result :last] ?? {throw ErrNoTheme "Not defined theme."};
 
-if {pipe out: [new NullStream] {exec uname} : = "FreeBSD"} {
+### if {pipe out: [new NullStream] {exec uname} : = "FreeBSD"} {
+if {$OSTYPE = "FreeBSD"} {
     case $THEME
     MODERN {
         set-color-name INACTIVE_STATUS_LINE         [WUtil color-pair WHITE   BLACK   ] attr: ($A_STANDOUT $A_BOLD $A_ITALIC);
