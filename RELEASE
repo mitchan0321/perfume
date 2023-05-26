@@ -1,3 +1,4 @@
+
 2023/05/01	PRFM_20230501		1.8.0
 2023/03/21	PRFM_20230321		1.7.2
 2023/02/15	PRFM_20230215_A34	1.7.1
@@ -3346,5 +3347,8 @@
 2023/05/26
 	pmacs update:
 		Add OS type indicate config value name is OSTYPE. eg) "Linux", "FreeBSD"...
+		Fix ColLimit over process at EditStream::puts.
+		Fix shell-terminal exec omit err-to: arg.
+		Fix prompt detect if input length less than prompt length.
 
 #eof
