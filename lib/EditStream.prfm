@@ -48,16 +48,22 @@ EditStream method puts (nonewline: nonewline args: r) {
         len ::= $Buffer get-buffer-length;
         if {$len > 0} {$len --};
         cur ::= $Buffer get-buffer-line $len;
-        col ::= $cur ??? {$cur len} 0;
+        cur ::= $cur ?? "";
+        col ::= $cur len;
         if {and $cur {$ColLimit > 0} {$col >= $ColLimit}} {
             $Buffer append-string "";
             $len ++;
             col := 0;
         };
-        $Buffer insert-string-at
-            [$r . [[true? Newline] ??? [[true? nonewline] ??? "" "\r"] ""]]
-            $len $col
-        ;;
+        r ::= $r . [[true? Newline] ??? [[true? nonewline] ??? "" "\r"] ""]; 
+        while {$r len : > $ColLimit} do: {
+            $Buffer insert-string-at [$r sub 0 $ColLimit] $len $col;
+            $Buffer append-string "";
+            $len ++;
+            col := 0;
+            r ::= $r sub $ColLimit;
+        };
+        $Buffer insert-string-at $r $len $col;
     };
     return <t>;
 };
