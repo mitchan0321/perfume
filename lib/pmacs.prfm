@@ -60,7 +60,9 @@ defun pmacs (trace: t) {
 	$MainWindow create-minibuffer-window <nil>;
 	$MainWindow create-full-window;
         $MainWindow set-input $stdin_orig;
-        mouse-off;
+        if {curs-mouse?} {
+            mouse-off;
+        };
 
         if {[$ARGV len] <= 3} {
             buff ::= new EditBuffer;

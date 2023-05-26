@@ -57,6 +57,9 @@ NO_LAZY_CALL = no
 ### If you use to co-routine library 'coru' set yes, if use 'pcl' set otherwise.
 CORU_USE = yes
 
+### If you use mouse on pmacs text editor.
+MOUSE = no
+
 ifeq ($(NCURSES),yes)
   OPTIONS	+= -DNCURSES
   SRCS		+= ncurses.c
@@ -68,6 +71,10 @@ ifeq ($(NCURSES),yes)
     OPTLIBS	+= -lncursesw
     OPTLIBS2	+= -lncursesw
   endif
+endif
+
+ifeq ($(MOUSE),yes)
+  OPTIONS	+= -DMOUSE
 endif
 
 ifeq ($(EVAL_STAT),yes)

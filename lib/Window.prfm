@@ -616,28 +616,30 @@ Window method keyin-proc (window) {
                 ;;
             ];
         };
-        
-        ###
-        ### mouse escape?
-        ###
-        if {eq? [$i get 0] KEY_MOUSE} {
-            ### It is mouse event !!
-            e ::= curs-get-mouse;
-            if $e else: {return ()};
+       
+	if {curs-mouse?} { 
+            ###
+            ### mouse escape?
+            ###
+            if {eq? [$i get 0] KEY_MOUSE} {
+                ### It is mouse event !!
+                e ::= curs-get-mouse;
+                if $e else: {return ()};
             
-            s ::= curs-get-event-window [get-window-list : map {| i | $i get-curs}] $e,1 $e,2;
-            if $s {
-                if [window-focus-at $s,0] {
-                    ### if <t> focus change.
-                    apply {render-all; refresh};
-                    return ();
+                s ::= curs-get-event-window [get-window-list : map {| i | $i get-curs}] $e,1 $e,2;
+                if $s {
+                    if [window-focus-at $s,0] {
+                        ### if <t> focus change.
+                        apply {render-all; refresh};
+                        return ();
+                    };
+                    set-mouse-event $e,0 $s,1 $s,2;
+                    send-mouse-event;
+                    ###show-message ["Mouse event: " . $e,0 "," $s];
+                    ###apply {render-all; refresh};
                 };
-                set-mouse-event $e,0 $s,1 $s,2;
-                send-mouse-event;
-                ###show-message ["Mouse event: " . $e,0 "," $s];
-                ###apply {render-all; refresh};
+                return ();
             };
-            return ();
         };
 
         if [$KeyMaps set? $i] {
@@ -1044,6 +1046,7 @@ Window method set-force-update () {
     sets ForceUpdate <t>;
 };
 
+if {curs-mouse?} {
 Window method window-focus-at (idx) {
     l ::= get-window-list : map {| i | $i get-window-name};
     if {$l,$idx = [get-current-window : get-window-name]} {return <nil>};
@@ -1101,4 +1104,4 @@ Window method send-mouse-event () {
 
     return <nil>;
 };
-
+}; ### end mouse

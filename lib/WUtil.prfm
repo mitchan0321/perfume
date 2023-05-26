@@ -1150,9 +1150,13 @@ defun unsetconf (key) {
 };
 
 defun mouse-on () {
-    curs-mouse-on;
+    if [curs-mouse?] {
+    	curs-mouse-on;
+    };
 };
 
 defun mouse-off () {
-    curs-mouse-off;
+    if [curs-mouse?] {
+        curs-mouse-off;
+    };
 };

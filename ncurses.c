@@ -42,6 +42,7 @@ error:
     return new_exception(TE_SYNTAX, L"Syntax error at 'curs-init', syntax: curs-init", interp);
 }
 
+#ifdef MOUSE
 Toy_Type*
 func_curses_mouse_on(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     mmask_t newmask, oldmask;
@@ -184,6 +185,16 @@ error:
     return new_exception(TE_SYNTAX, L"Syntax error at 'curs-get-event-window', syntax: curs-get-event-window (curs-list ...) screen-y screen-x", interp);
 }
 
+Toy_Type*
+func_curses_ismouse(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    return const_T;
+};
+#else
+Toy_Type*
+func_curses_ismouse(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    return const_Nil;
+};
+#endif /* MOUSE */
 
 Toy_Type*
 func_curses_getscreensize(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
@@ -1612,10 +1623,13 @@ error:
 int
 toy_add_func_ncurses(Toy_Interp* interp) {
     toy_add_func(interp, L"curs-init",		func_curses_init,		NULL);
+#ifdef MOUSE
     toy_add_func(interp, L"curs-mouse-on",	func_curses_mouse_on,		NULL);
     toy_add_func(interp, L"curs-mouse-off",	func_curses_mouse_off,		NULL);
     toy_add_func(interp, L"curs-get-mouse",	func_curses_get_mouse,		NULL);
     toy_add_func(interp, L"curs-get-event-window",func_curses_get_event_window,	L"curs-list,screen-y,screen-x");
+#endif /* MOUSE */
+    toy_add_func(interp, L"curs-mouse?",	func_curses_ismouse,		NULL);
     toy_add_func(interp, L"curs-get-screen-size",func_curses_getscreensize,	L"window");
     toy_add_func(interp, L"curs-terminate",	func_curses_terminate,		NULL);
     toy_add_func(interp, L"curs-create-window",	func_curses_createwindow,	L"window,y,x,line,column");

@@ -1,3 +1,5 @@
+if {curs-mouse?} {
+
 defcommand mouse-smooth-scroll-up desc: "Mouse wheel up." {
     | main window |
     c ::= [defvar? MOUSE_WHEEL_COUNT] ??? {result $MOUSE_WHEEL_COUNT} 1;
@@ -170,4 +172,4 @@ defcommand mouse-dired-click-link desc: "Mouse click open file dired." {
     result ALL;
 };
 
-
+};  ### end mouse
