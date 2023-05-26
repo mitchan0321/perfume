@@ -1257,7 +1257,11 @@ defcommand terminal desc: "Shell terminal in buffer." {
     $task proc $TERMINAL_TASK {
         (window buff directory shell) := $ARGS;
         cd $directory;
-        sts ::= exec :pty err-to: $stdout [get-shell] "-c" $shell;
+        if {$OSTYPE = "FreeBSD"} {
+            sts ::= exec err-to: $stdout [get-shell] "-c" $shell;
+        } {
+            sts ::= exec :pty err-to: $stdout [get-shell] "-c" $shell;
+        };
         
         println "[Terminal exited with status " $sts "]";
         
