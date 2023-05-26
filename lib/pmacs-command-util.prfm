@@ -1258,9 +1258,9 @@ defcommand terminal desc: "Shell terminal in buffer." {
         (window buff directory shell) := $ARGS;
         cd $directory;
         if {$OSTYPE = "FreeBSD"} {
-            sts ::= exec err-to: $stdout [get-shell] "-c" $shell;
+            sts ::= exec [get-shell] "-c" $shell;
         } {
-            sts ::= exec :pty err-to: $stdout [get-shell] "-c" $shell;
+            sts ::= exec :pty [get-shell] "-c" $shell;
         };
         
         println "[Terminal exited with status " $sts "]";
@@ -1283,7 +1283,15 @@ defcommand terminal-enter-command desc: "Shell terminal command enter." {
     r ::= $buff get-buffer-line $ey;
     if {! $r} {r := ""};
     prompt ::= $stream get-prompt;
-    if {$prompt = [$r sub 0 [$prompt len]]} {r ::= $r sub [$prompt len]};
+    if {$prompt = [$r sub 0 [$prompt len]]} {
+        r ::= $r sub [$prompt len];
+    } {
+        if {[$r len] <= [$prompt len]} {
+            if {$r = [$prompt sub 0 [$r len]]} {
+                r := "";
+            };
+        };
+    };
     if {$r != ""} {
         $window apply-command $main $window "" mark;
     };
