@@ -58,7 +58,7 @@ NO_LAZY_CALL = no
 CORU_USE = yes
 
 ### If you use mouse on pmacs text editor.
-MOUSE = no
+MOUSE = yes
 
 ifeq ($(NCURSES),yes)
   OPTIONS	+= -DNCURSES
