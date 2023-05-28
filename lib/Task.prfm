@@ -36,6 +36,7 @@ Task method init () {
     sets __stderr <nil>;
     
     sets TerminateProc <nil>;
+    sets Client <nil>;
 };
 
 Task method string () {
@@ -425,4 +426,12 @@ Task method terminate () {
     if {true? TerminateProc} {
         TaskManager enqueue (APPLY_EDITOR $TerminateProc [self]);
     };
+};
+
+Task method set-client (c) {
+    sets Client $c;
+};
+
+Task method get-client () {
+    return $Client;
 };
