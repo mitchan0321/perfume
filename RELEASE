@@ -3352,7 +3352,12 @@
 		Fix prompt detect if input length less than prompt length.
 
 2023/05/29
+	exec.prfm
+		Add pid-proc: {body} for internal process id given to block body.
 	methods.c
 		Change File::gets for property if noblock is <t> case, no block return.
+	pmacs update:
+		Add Task::{set,get}-client for task client data setter/getter.
+		Fix sub shell pid wait when shell exited.
 
 #eof
