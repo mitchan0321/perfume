@@ -37,10 +37,10 @@ PollingManager method eval-queue () {
 	(cond body) := $item;
         if {block? $cond} {
             c ::= yield $cond;
-            while {true? c} do: {
-                yield $body;
-                c ::= yield $cond;
-            };
+            if $c {
+		yield $body;
+		break;
+	    };
         };
     };
 };

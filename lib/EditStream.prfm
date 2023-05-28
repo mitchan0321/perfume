@@ -50,19 +50,20 @@ EditStream method puts (nonewline: nonewline args: r) {
         cur ::= $Buffer get-buffer-line $len;
         cur ::= $cur ?? "";
         col ::= $cur len;
-        if {and $cur {$ColLimit > 0} {$col >= $ColLimit}} {
+        if {$col >= $ColLimit} {
             $Buffer append-string "";
             $len ++;
             col := 0;
         };
         r ::= $r . [[true? Newline] ??? [[true? nonewline] ??? "" "\r"] ""]; 
-        while {$r len : > $ColLimit} do: {
-            $Buffer insert-string-at [$r sub 0 $ColLimit] $len $col;
+        REM {
+        while {[$r len : + $col] > $ColLimit} do: {
+            $Buffer insert-string-at [$r sub 0 [$ColLimit - $col]] $len $col;
             $Buffer append-string "";
             $len ++;
             col := 0;
-            r ::= $r sub $ColLimit;
-        };
+            r ::= $r sub [$ColLimit - $col];
+        }};
         $Buffer insert-string-at $r $len $col;
     };
     return <t>;
@@ -105,6 +106,7 @@ EditStream method set-newline (m) {
 };
 
 EditStream method set-columnlimit (l) {
+    if {$l <= 0} {l := 80};
     sets ColLimit $l;
     return $l;
 };
