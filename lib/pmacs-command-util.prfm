@@ -1260,7 +1260,8 @@ defcommand terminal desc: "Shell terminal in buffer." {
     $task set-stdout $stream;
     $task set-stderr $stream;
     $task set-terminate-proc {
-        ### do something
+        pid ::= $task get-client;
+        wait $pid;
     };
     
     ###
@@ -1270,9 +1271,9 @@ defcommand terminal desc: "Shell terminal in buffer." {
         (window buff directory shell) := $ARGS;
         cd $directory;
         if {$OSTYPE = "FreeBSD"} {
-            sts ::= exec :pty [get-shell] "-c" $shell;
+            sts ::= exec :pty  pid-proc: {| pid | set-client $pid} [get-shell] "-c" $shell;
         } {
-            sts ::= exec :pty [get-shell] "-c" $shell;
+            sts ::= exec :pty  pid-proc: {| pid | set-client $pid} [get-shell] "-c" $shell;
         };
         
         println "[Terminal exited with status " $sts "]";
