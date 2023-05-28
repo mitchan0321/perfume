@@ -4059,9 +4059,7 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
         
         /*
          * EOFの場合：
-         * ・errnoがEAGAINの場合は呼び出し元にException(TE_IOAGAIN)を返す。
-         *     -> 2022/05/16 Exception を返さず1文字入力に戻るよう変更、これにより ErrIOAgain を発生する箇所はなくなった。
-         *     -> errnoがEAGAINの場合、再度入力可能か試みる。最大3秒待ちが発生するが、これを超えると Exception を返す。
+         * ・errnoがEAGAINの場合、再度入力可能か試みる。最大0.3秒待ちが発生するが、これを超えると Exception を返す。
          * ・errnoがEINTRの場合は1文字入力に戻る。
          * ・cbuff が 0 バイトの場合は <nil> (EOF) を返す。
          * ・cbuff に文字がある場合は、デコードして返す。
@@ -4074,7 +4072,7 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
                 clearerr(f->fd);
                 while (is_read_ready(fileno(f->fd), 100) != IRDY_OK) {
                     i ++;
-                    if (i > 30) {
+                    if (i > 3) {
                         return new_exception(TE_IOAGAIN, L"No data available at File::gets, canceled.", interp);
                     }
                     clearerr(f->fd);
@@ -4177,12 +4175,15 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
          * ・現在ファイルは noblock が設定されているので、1文字読み込みを試みる。
          *   - 通常ファイル、ソケットの場合は、データがあれば入力され、なければ EOF が返る。
          *   - tty の場合は、LFが入力されるまで ttyドライバによりブロックされる。
-         * ・EOF でかつ errno が EAGAIN の場合はデータが届いていないことを意味するため、
-         *   さらに 0.1秒データの到着を待つ(is_read_ready)。
-         *   - is_read_ready でエラー(IRDY_ERR) の場合は Exception を返す。
-         *   - データOK(IRDY_OK) であれば、0.1秒待つ間にデータが到着したことを示すため、入力へ戻る。
-         *   - タイムアウト(IRDY_TOUT) であれば、データが0.1秒以内にデータが到着しなかったことを示す
-         *     ため、満了と判断し cbuff をデコードし返す。
+         * ・EOF でかつ errno が EAGAIN の場合はデータが届いていないことを意味する。
+         *   ### 2023/05/29 以下 '###' 部分ロジック削除。
+         *   ### ため、
+         *   ### さらに 0.1秒データの到着を待つ(is_read_ready)。
+         *   ### - is_read_ready でエラー(IRDY_ERR) の場合は Exception を返す。
+         *   ### - データOK(IRDY_OK) であれば、0.1秒待つ間にデータが到着したことを示すため、入力へ戻る。
+         *   ### - タイムアウト(IRDY_TOUT) であれば、データが0.1秒以内にデータが到着しなかったことを示す
+         *   ###   ため、満了と判断し cbuff をデコードし返す。
+         *     noblock = <t> のがめ、ここでデータ満了と判断し cbuff をデコードし返す。
          *     この場合、行が LF で満了していないため、early-exit インジケータをオンにする。
          *     early-exit インジケータがオンの場合、アプリケーション側では、この行に LF が無いものと
          *     判断する必要がある。
@@ -4192,6 +4193,9 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
             errno = 0;
             int nc = fgetc(f->fd);
             if ((EOF == nc) && (errno == EAGAIN)) {
+                /* comment out
+                 * 2023/05/29 
+                 *
                 // fprintf(stderr, "DEBUG: EAGAIN (2), nc=%d\n", nc);
                 clearerr(f->fd);
                 int sts = is_read_ready(fileno(f->fd), 100);
@@ -4206,16 +4210,27 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
                     continue;
                 }
                 if (IRDY_TOUT == sts) {
-                    Cell *c = decode_raw_to_unicode(cbuff, f->input_encoding, enc_error_info);
-                    if (enc_error_info->errorno != 0) {
-                        f->enc_error = 1;
-                    }
-                    if (NULL == c) {
-                        return new_exception(TE_BADENCODEBYTE, enc_error_info->message, interp);
-                    }
-                    f->early_exit = 1;
-                    return new_string_cell(c);
+                 *
+                 * end comment
+                 */
+
+                Cell *c = decode_raw_to_unicode(cbuff, f->input_encoding, enc_error_info);
+                if (enc_error_info->errorno != 0) {
+                    f->enc_error = 1;
                 }
+                if (NULL == c) {
+                    return new_exception(TE_BADENCODEBYTE, enc_error_info->message, interp);
+                }
+                f->early_exit = 1;
+                return new_string_cell(c);
+
+                /* comment out
+                 * 2023/05/29 
+                 *
+                }
+                 *
+                 * end comment
+                 */
             }
             if (EOF != nc) {
                 ungetc(nc, f->fd);
