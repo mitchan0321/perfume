@@ -3,12 +3,13 @@
 load-class PollingManager;
 
 defun exec (
-	proc-enc: enc
-	pty: pty
-	err-to: errout
-	args: args
-        background: bg)
-{
+    proc-enc: enc
+    pty: pty
+    err-to: errout
+    args: args
+    background: bg
+    pid-proc: pproc
+) {
     args ::= $args map {| i | "" . $i};
     command ::= $args >>;
 
@@ -19,6 +20,9 @@ defun exec (
     };
 
     pid := $d,pid;
+    if {set? pproc} {
+        yield $pproc $pid;
+    };
 
     ttin := $stdin;
 
