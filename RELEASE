@@ -3353,6 +3353,6 @@
 
 2023/05/29
 	methods.c
-		Change File::gets for property noblock == <t> case, no block return.
+		Change File::gets for property if noblock is <t> case, no block return.
 
 #eof
