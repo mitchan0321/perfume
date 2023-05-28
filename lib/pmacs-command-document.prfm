@@ -255,7 +255,7 @@ defun do-man-async (window buff-name directory command enc) {
     ###
     ### do command
     ###
-    $task proc [$command split : get 0] {
+    $task proc man-task {
         (window buff cmd directory enc) := $ARGS;
         cd $directory;
         sts ::= exec err-to: [new NullStream] proc-enc: $enc sh -c $cmd;
