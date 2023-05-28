@@ -1270,7 +1270,7 @@ defcommand terminal desc: "Shell terminal in buffer." {
         (window buff directory shell) := $ARGS;
         cd $directory;
         if {$OSTYPE = "FreeBSD"} {
-            sts ::= exec [get-shell] "-c" $shell;
+            sts ::= exec :pty [get-shell] "-c" $shell;
         } {
             sts ::= exec :pty [get-shell] "-c" $shell;
         };
