@@ -548,35 +548,37 @@ Window method add-create-window-hook (hook) {
 };
 
 Window method resize-window () {
-    set buffer-bind [dict ()];
-    $MiniWindow destroy;
-    curs-destroy-window $CursWinMini;
-    $WindowList each do: {| w |
-        $buffer-bind set [$w get-window-name] [$w get-buffer];
-	$w destroy;
+    atomic {
+        set buffer-bind [dict ()];
+        $MiniWindow destroy;
+        curs-destroy-window $CursWinMini;
+        $WindowList each do: {| w |
+            $buffer-bind set [$w get-window-name] [$w get-buffer];
+            $w destroy;
+        };
+        roll-to ::= $WindowList car : get-window-name;
+        sets WindowList ();
+        curs-destroy-window $CursWin;
+        
+        (y x) ::= curs-get-screen-size $RootWin;
+        sets CursWin [curs-create-window $RootWin 0 0 [$y - 1] [$x - $ROOT_WINDOW_RIGHT_MARGIN]];
+        create-minibuffer-window $MiniWindow;
+        if {block? $CreateWindowHook} {
+            $CreateWindowHook eval;
+        } {
+            create-full-window;
+        };
+        
+        $WindowList each do: {| w |
+            win ::= $w get-window-name;
+            $win ?? {return};
+            buff ::= $buffer-bind get $win;
+            $buff ?? {return};
+            bind-buffer $win $buff;
+        };
+        roll-to-window $roll-to;
+        sets INIT <nil>;
     };
-    roll-to ::= $WindowList car : get-window-name;
-    sets WindowList ();
-    curs-destroy-window $CursWin;
-
-    (y x) ::= curs-get-screen-size $RootWin;
-    sets CursWin [curs-create-window $RootWin 0 0 [$y - 1] [$x - $ROOT_WINDOW_RIGHT_MARGIN]];
-    create-minibuffer-window $MiniWindow;
-    if {block? $CreateWindowHook} {
-	$CreateWindowHook eval;
-    } {
-	create-full-window;
-    };
-
-    $WindowList each do: {| w |
-	win ::= $w get-window-name;
-	$win ?? {return};
-	buff ::= $buffer-bind get $win;
-	$buff ?? {return};
-	bind-buffer $win $buff;
-    };
-    roll-to-window $roll-to;
-    sets INIT <nil>;
 };
 
 Window method key-event-loop () {
