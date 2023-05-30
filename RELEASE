@@ -3359,4 +3359,9 @@
 		Add Task::{set,get}-client for task client data setter/getter.
 		Fix sub shell pid wait when shell exited.
 
+2023/05/30
+	pmacs update:
+		Change Window::resize-window to atomicaly.
+		Change terminal task EditStream::puts override method to SysCall apply-editor block.
+
 #eof
