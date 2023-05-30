@@ -1215,7 +1215,7 @@ defcommand terminal desc: "Shell terminal in buffer." {
     $stream open $buff-name;
     _puts ::= $stream method? puts;
     $stream method puts (*) {
-        SysCall apply-editor {
+        atomic {
             _win := <nil>;
             _buff := <nil>;
             _geom := <nil>;
