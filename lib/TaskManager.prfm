@@ -11,6 +11,7 @@ TaskManager method init () {
     
     sets Task_stdout [new EditStream];
     $Task_stdout open "*Console*";
+    $Task_stdout set-columnlimit 128;
     _puts ::= $Task_stdout method? puts;
     $Task_stdout method puts (*) {
         r ::= call $_puts $*;
