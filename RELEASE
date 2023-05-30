@@ -3363,5 +3363,6 @@
 	pmacs update:
 		Change Window::resize-window to atomicaly.
 		Change terminal task EditStream::puts override method to SysCall apply-editor block.
+		Fix sub shell kill before pid wait at terminal editor command.
 
 #eof
