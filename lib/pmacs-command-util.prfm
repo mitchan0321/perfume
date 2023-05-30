@@ -1215,39 +1215,44 @@ defcommand terminal desc: "Shell terminal in buffer." {
     $stream open $buff-name;
     _puts ::= $stream method? puts;
     $stream method puts (*) {
-        _win := <nil>;
-        _buff := <nil>;
-        _geom := <nil>;
-        $MainWindow get-window-list : each do: {| _i |
-            _buff ::= $_i get-buffer;
-            if {$_buff get-buffer-name : = $buff-name} {
-                _win := $_i;
-                _geom ::= $_i get-geom;
-                _y ::= $_buff get-buffer-length;
-                break;
+        SysCall apply-editor {
+            _win := <nil>;
+            _buff := <nil>;
+            _geom := <nil>;
+            $MainWindow get-window-list : each do: {| _i |
+                _buff ::= $_i get-buffer;
+                if {$_buff get-buffer-name : = $buff-name} {
+                    _win := $_i;
+                    _geom ::= $_i get-geom;
+                    _y ::= $_buff get-buffer-length;
+                    break;
+                };
             };
-        };
-        if $_win {
-            (_sy _sx) ::= $_win get-screen-size;
-            [self] set-columnlimit [[$_sx > 80] ??? [$_sx - 1] 80];
-        };
-        _r ::= call $_puts $*;
-        nl ::= $* find [symbol ":nonewline"];
-        if $nl {
-            _p ::= $* delete $nl : join sep: "";
-            set-prompt $_p;
-        } {
-            set-prompt ""
-        };
-        if $_win {
-            if {$_y >= 1} {
-                _y ::= $_y - 1;
+            if $_win {
+                (_sy _sx) ::= $_win get-screen-size;
+                [self] set-columnlimit [[$_sx > 80] ??? [$_sx - 1] 80];
+            };
+
+            _r ::= call $_puts $*;
+
+            nl ::= $* find [symbol ":nonewline"];
+            if $nl {
+                _p ::= $* delete $nl : join sep: "";
+                set-prompt $_p;
             } {
-                _y := 0;
+                set-prompt ""
             };
-            _x ::= $_buff get-buffer-line $_y : len;
-            $_i cursor-move-to $_geom $_y $_x;
-            $MainWindow set-force-update;
+        
+            if $_win {
+                if {$_y >= 1} {
+                    _y ::= $_y - 1;
+                } {
+                    _y := 0;
+                };
+                _x ::= $_buff get-buffer-line $_y : len;
+                $_i cursor-move-to $_geom $_y $_x;
+                $MainWindow set-force-update;
+            };
         };
         return $_r;
     };
@@ -1261,7 +1266,7 @@ defcommand terminal desc: "Shell terminal in buffer." {
     $task set-stderr $stream;
     $task set-terminate-proc {
         pid ::= $task get-client;
-        wait $pid;
+        try {wait $pid} catch: {};
     };
     
     ###
