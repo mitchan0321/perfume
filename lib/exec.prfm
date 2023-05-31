@@ -79,7 +79,7 @@ defun exec (
             try {
                 sts ::= or [$ttin eof?] [$IN eof?] [$ERR eof?];
                 if $sts {
-                    yield $vbody ["[exec] " . "stdin: " [$ttin eof?] ", stdout: " [$IN eof?] ", stderr: " [$ERR eof?]];
+                    yield $vbody ["[exec] eof status= " . "stdin: " [$ttin eof?] ", stdout: " [$IN eof?] ", stderr: " [$ERR eof?]];
                 };
                 ### result [and [$IN eof?] [$ERR eof?]];
             } catch: {
