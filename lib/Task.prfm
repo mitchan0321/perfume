@@ -435,3 +435,7 @@ Task method set-client (c) {
 Task method get-client () {
     return $Client;
 };
+
+Task method output-log (m) {
+    TaskManager output-console $m;
+};
