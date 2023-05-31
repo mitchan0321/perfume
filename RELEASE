@@ -3365,4 +3365,11 @@
 		Change terminal task EditStream::puts override method to SysCall apply-editor block.
 		Fix sub shell kill before pid wait at terminal editor command.
 
+2023/05/31
+	exec.prfm
+		Add option exec verbose: {| message | log-output-body}.
+	pmacs update:
+		Add Task::output-log method.
+		Add verbose output given to exec command at terminate command.
+
 #eof
