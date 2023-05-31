@@ -9,9 +9,11 @@ defun exec (
     args: args
     background: bg
     pid-proc: pproc
+    verbose: vbody;
 ) {
     args ::= $args map {| i | "" . $i};
     command ::= $args >>;
+    if {! [set? vbody]} {vbody := {}};
 
     if {set? pty} {
         d ::= dict [fork-exec :pty $command $args];
@@ -20,6 +22,7 @@ defun exec (
     };
 
     pid := $d,pid;
+    yield $vbody ["[exec] pid= " . $pid];
     if {set? pproc} {
         yield $pproc $pid;
     };
@@ -72,17 +75,32 @@ defun exec (
 	poll ::= new PollingManager;
 
 	$poll set-exit-condition-block {
+            sts := <nil>;
             try {
-                result [and [$IN eof?] [$ERR eof?]];
+                sts ::= or [$ttin eof?] [$IN eof?] [$ERR eof?];
+                if $sts {
+                    yield $vbody ["[exec] " . "stdin: " [$ttin eof?] ", stdout: " [$IN eof?] ", stderr: " [$ERR eof?]];
+                };
+                ### result [and [$IN eof?] [$ERR eof?]];
             } catch: {
-                result <t>;
+                sts := <t>;
             };
+            result $sts;
 	};
         
 	$poll set-wait-block {
-            if [$stdin eof?] {$OUT close};
-            if [$IN eof?]    {$IN close};
-            if [$ERR eof?]   {$ERR close};
+            if [$ttin eof?] {
+                $OUT close;
+                yield $vbody "[exec] $stdin closed, delivery close to OUT.";
+            };
+            if [$IN eof?] {
+                $IN close;
+                yield $vbody "[exec] $IN closed.";
+            };
+            if [$ERR eof?] {
+                $ERR close;
+                yield $vbody "[exec] $ERR closed.";
+            };
             sts := <nil>;
             if {or {$ttin ready?} {$IN ready?} {$ERR ready?}} {
                 sts := <t>;
