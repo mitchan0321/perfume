@@ -1278,11 +1278,12 @@ defcommand terminal desc: "Shell terminal in buffer." {
     $task proc $TERMINAL_TASK {
         (window buff directory shell) := $ARGS;
         cd $directory;
-        if {$OSTYPE = "FreeBSD"} {
-            sts ::= exec :pty  pid-proc: {| pid | set-client $pid} [get-shell] "-c" $shell;
-        } {
-            sts ::= exec :pty  pid-proc: {| pid | set-client $pid} [get-shell] "-c" $shell;
-        };
+        sts ::= exec 
+            :pty  
+            pid-proc: {| pid | set-client $pid}
+            verbose: {| m | output-log $m}
+            [get-shell] "-c" $shell
+        ;;
         
         println "[Terminal exited with status " $sts "]";
         
