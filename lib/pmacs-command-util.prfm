@@ -1276,18 +1276,19 @@ defcommand terminal desc: "Shell terminal in buffer." {
     ### do command
     ###
     $task proc $TERMINAL_TASK {
-        (window buff directory shell) := $ARGS;
+        (window buff directory shell env) := $ARGS;
         cd $directory;
         sts ::= exec 
             :pty  
             pid-proc: {| pid | set-client $pid}
+            environ: $env
             verbose: {| m | output-log $m}
-            [get-shell] "-c" $shell
+            $shell "-i"
         ;;
         
         println "[Terminal exited with status " $sts "]";
         
-    } $window [$stream get-buffer] $ENV,HOME $TERMINAL_SHELL;
+    } $window [$stream get-buffer] $ENV,HOME $TERMINAL_SHELL $TERMINAL_ENV;
 
     return ALL;
 };
