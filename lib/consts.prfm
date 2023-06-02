@@ -3,3 +3,16 @@
 #
 if {defvar? PI} else: {defvar PI 3.14159265358979323846};
 if {defvar? E}  else: {defvar E 2.7182818284590452354};
+
+#
+# signal values
+#
+if {defvar? SIGHUP}  else: {defvar SIGHUP  1};
+if {defvar? SIGINT}  else: {defvar SIGINT  2};
+if {defvar? SIGQUIT} else: {defvar SIGQUIT 3};
+if {defvar? SIGKILL} else: {defvar SIGKILL 9};
+if {defvar? SIGTERM} else: {defvar SIGTERM 15};
+if {defvar? SIGUSR1} else: {defvar SIGUSR1 10};
+if {defvar? SIGUSR2} else: {defvar SIGUSR2 12};
+if {defvar? SIGSTOP} else: {defvar SIGSTOP 19};
+if {defvar? SIGTSTP} else: {defvar SIGTSTP 20};
