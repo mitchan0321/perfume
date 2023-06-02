@@ -1238,18 +1238,23 @@ defcommand terminal desc: "Shell terminal in buffer." {
             nl ::= $* find [symbol ":nonewline"];
             if $nl {
                 _p ::= $* delete $nl : join sep: "";
-                set-prompt $_p;
             } {
-                set-prompt ""
+                _p := "";
             };
-        
+            set-prompt $_p;
+                
             if $_win {
                 if {$_y >= 1} {
-                    _y ::= $_y - 1;
+                    if {$_p = ""} {
+                        _x := 0;
+                    } {
+                        _y ::= $_y - 1;
+                        _x ::= $_buff get-buffer-line $_y : len;
+                    };
                 } {
                     _y := 0;
+                    _x ::= $_buff get-buffer-line $_y : len;
                 };
-                _x ::= $_buff get-buffer-line $_y : len;
                 $_i cursor-move-to $_geom $_y $_x;
                 $MainWindow set-force-update;
             };
@@ -1317,8 +1322,8 @@ defcommand terminal-enter-command desc: "Shell terminal command enter." {
         $window apply-command $main $window "" mark;
     };
     $buff append-string "";
-    $window cursor-move-to $geom [$buff get-buffer-length : - 1] 0;
     $task_stdin puts $r;
+    $window cursor-move-to $geom [$buff get-buffer-length : - 1] 0;
     
     ### cd command emuration
     l ::= $r split;
