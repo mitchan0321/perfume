@@ -3384,5 +3384,6 @@
 		Change exec option given spec for exec utility, use environ: option.
 		Add TERMINAL_ENV config for terminal shell given environment variable.
 		Fix send terminal code support for FreeBSD, Ctrl+C and Ctrl+\, but not support code Ctrl+Z.
+		Change terminal shell kill impl use kill $SIGHUP command.
 
 #eof
