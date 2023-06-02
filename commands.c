@@ -2685,6 +2685,7 @@ cmd_forkandexec(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     encoder_error_info *error_info;
     int ispty = 0;
     Toy_Type *pty;
+    Toy_Type *env, *envl, *envv;
 
     pty = hash_get_and_unset_t(nameargs, new_symbol(L"pty:"));
     if (pty) {
@@ -2693,6 +2694,16 @@ cmd_forkandexec(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
                 ispty = 1;
             }
         }
+    }
+    env = hash_get_and_unset_t(nameargs, new_symbol(L"environ:"));
+    if (env) {
+        if (GET_TAG(env) != LIST) goto error;
+        envl = env;
+	while (! IS_LIST_NULL(envl)) {
+            envv = list_get_item(envl);
+            if (GET_TAG(envv) != STRING) goto error;
+            envl = list_next(envl);
+	}
     }
     
     if (hash_get_length(nameargs) > 0) goto error;
@@ -2777,6 +2788,14 @@ cmd_forkandexec(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
         setpgrp();
 #endif /* __FreeBSD__ */
 
+        /* set environment */
+        envl = env;
+	while (! IS_LIST_NULL(envl)) {
+            envv = list_get_item(envl);
+            putenv(to_char(cell_get_addr(envv->u.string)));
+            envl = list_next(envl);
+	}
+
         /* execute command */
 	execvp(argv[0], argv);
 	exit(255);
@@ -2814,7 +2833,7 @@ cmd_forkandexec(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     return result;
 
 error:
-    return new_exception(TE_SYNTAX, L"Syntax error, syntax: fork-exec [ :pty ] command [arg ...] | [(arg ...)]", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error, syntax: fork-exec [ :pty ] [ environ: (\"name=value\" ...) ] command [arg ...] | [(arg ...)]", interp);
 }
 
 Toy_Type*
@@ -4575,6 +4594,62 @@ cmd_pid(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     return new_integer_si(getpid());
 }
 
+Toy_Type*
+cmd_kill(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    int sig;
+    int pid;
+    int sts;
+    Toy_Type *t;
+    
+    if (arglen != 2) goto error;
+    if (hash_get_length(nameargs) != 0) goto error;
+    t = list_get_item(posargs);
+    if (GET_TAG(t) != INTEGER) goto error;
+    sig = mpz_get_si(t->u.biginteger);
+    posargs = list_next(posargs);
+    t = list_get_item(posargs);
+    if (GET_TAG(t) != INTEGER) goto error;
+    pid = mpz_get_si(t->u.biginteger);
+
+    sts = kill(pid, sig);
+    if (-1 == sts) {
+        return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
+    }
+    return const_T;
+    
+error:
+    return new_exception(TE_SYNTAX,
+			 L"Syntax error at 'kill', syntax: kill signal pid", interp);
+}
+
+Toy_Type*
+cmd_killpg(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    int sig;
+    int pid;
+    int sts;
+    Toy_Type *t;
+    
+    if (arglen != 2) goto error;
+    if (hash_get_length(nameargs) != 0) goto error;
+    t = list_get_item(posargs);
+    if (GET_TAG(t) != INTEGER) goto error;
+    sig = mpz_get_si(t->u.biginteger);
+    posargs = list_next(posargs);
+    t = list_get_item(posargs);
+    if (GET_TAG(t) != INTEGER) goto error;
+    pid = mpz_get_si(t->u.biginteger);
+
+    sts = killpg(pid, sig);
+    if (-1 == sts) {
+        return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
+    }
+    return const_T;
+    
+error:
+    return new_exception(TE_SYNTAX,
+			 L"Syntax error at 'kill', syntax: killpg signal pid", interp);
+}
+
 #ifdef EVAL_STAT
 Toy_Type*
 cmd_evalstat(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
@@ -4730,6 +4805,8 @@ int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, L"atomic",	cmd_atomic, 		L"body");
     toy_add_func(interp, L"set-locale",	cmd_setlocale, 		L"locale");
     toy_add_func(interp, L"pid",    	cmd_pid, 		NULL);
+    toy_add_func(interp, L"kill",    	cmd_kill, 		L"signal,pid");
+    toy_add_func(interp, L"killpg",    	cmd_killpg, 		L"signal,pid");
 
 #ifdef EVAL_STAT
     toy_add_func(interp, L"eval-stat",	cmd_evalstat, 		NULL);
