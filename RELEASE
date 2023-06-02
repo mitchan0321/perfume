@@ -3386,4 +3386,8 @@
 		Fix send terminal code support for FreeBSD, Ctrl+C and Ctrl+\, but not support code Ctrl+Z.
 		Change terminal shell kill impl use kill $SIGHUP command.
 
+2023/06/03
+	pmacs update:
+		Fix terminal puts to buffer from sub-shell read line impl.
+
 #eof
