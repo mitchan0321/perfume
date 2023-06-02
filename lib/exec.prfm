@@ -6,20 +6,34 @@ defun exec (
     proc-enc: enc
     pty: pty
     err-to: errout
-    args: args
     background: bg
     pid-proc: pproc
-    verbose: vbody;
+    environ: env
+    verbose: vbody
+    args: args
 ) {
     args ::= $args map {| i | "" . $i};
     command ::= $args >>;
+    command ::= $command ?? "";
     if {! [set? vbody]} {vbody := {}};
 
+    fork-args := ();
     if {set? pty} {
-        d ::= dict [fork-exec :pty $command $args];
-    } {
-        d ::= dict [fork-exec $command $args];
+        $fork-args concat! (:pty);
     };
+    if {set? env} {
+        $fork-args concat! (environ: $env);
+    };
+    if {$command = ""} {
+        throw ErrExecProgram "Program not specified.";
+    };
+    $fork-args concat! ($command);
+    if {! [$args null?]} {
+        $fork-args concat! $args;
+    };
+    
+    yield $vbody ["[exec] command args= " . $fork-args];
+    d ::= dict [call fork-exec $fork-args];
 
     pid := $d,pid;
     yield $vbody ["[exec] pid= " . $pid];
