@@ -1386,6 +1386,14 @@ defun get-terminal-task-stderr () {
 };
 
 defcommand terminal-send-break desc: "Send BREAK to shell terminal." {
+    if {$OSTYPE = "FreeBSD"} {
+        t ::= get-terminal-task;
+        $t ?? {return ALL};
+        pid ::= $t get-client;
+        killpg $SIGINT $pid;
+        return ALL;
+    };
+
     stream ::= get-terminal-task-stdin;
     if $stream {
         $stream puts :nonewline ["" uimport! (3)];
@@ -1402,6 +1410,14 @@ defcommand terminal-send-eof desc: "Send EOF to shell terminal." {
 };
 
 defcommand terminal-send-quit desc: "Send QUIT to shell terminal." {
+    if {$OSTYPE = "FreeBSD"} {
+        t ::= get-terminal-task;
+        $t ?? {return ALL};
+        pid ::= $t get-client;
+        killpg $SIGQUIT $pid;
+        return ALL;
+    };
+    
     stream ::= get-terminal-task-stdin;
     if $stream {
         $stream puts :nonewline ["" uimport! (0x1C)];
@@ -1410,6 +1426,11 @@ defcommand terminal-send-quit desc: "Send QUIT to shell terminal." {
 };
 
 defcommand terminal-send-suspend desc: "Send SUSPEND to shell terminal." {
+    if {$OSTYPE = "FreeBSD"} {
+        show-message :bell "Not supported terminal code ^Z on this platform.";
+        return ALL;
+    };
+    
     stream ::= get-terminal-task-stdin;
     if $stream {
         $stream puts :nonewline ["" uimport! (26)];
