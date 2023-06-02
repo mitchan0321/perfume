@@ -1266,10 +1266,8 @@ defcommand terminal desc: "Shell terminal in buffer." {
     $task set-stderr $stream;
     $task set-terminate-proc {
         pid ::= $task get-client;
-        try {
-            exec err-to: [new NullStream] "/bin/kill" "-HUP" $pid;
-            wait $pid;
-        } catch: {};
+        try {kill $SIGHUP $pid} catch: {};
+        try {wait $pid} catch: {};
     };
     
     ###
