@@ -3372,4 +3372,16 @@
 		Add Task::output-log method.
 		Add verbose output given to exec command at terminate command.
 
+2023/06/02
+	commands.c
+		Add environ: ("name=val" ...) option for set sub-process environment variable to fork-exec command.
+		Add kill and killpg command for send signal to process or process group.
+	lib/consts.prfm
+		Add signal value for send signal command kill and killpg.
+	lib/exec.prfm
+		Add environ: ("name=value" ...) option for set sub-process environment variable to exec utility.
+	pmacs update:
+		Change exec option given spec for exec utility, use environ: option.
+		Add TERMINAL_ENV config for terminal shell given environment variable.
+
 #eof
