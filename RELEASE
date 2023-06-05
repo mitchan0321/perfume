@@ -3371,7 +3371,7 @@
 		Add option exec verbose: {| message | log-output-body}.
 	pmacs update:
 		Add Task::output-log method.
-		Add verbose output given to exec command at terminate command.
+		Add verbose output given for exec command terminated.
 
 2023/06/02
 	commands.c
