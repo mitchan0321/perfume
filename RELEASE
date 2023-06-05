@@ -1,3 +1,4 @@
+2023/06/05	PRFM_20230605		1.8.1
 2023/05/01	PRFM_20230501		1.8.0
 2023/03/21	PRFM_20230321		1.7.2
 2023/02/15	PRFM_20230215_A34	1.7.1
@@ -3389,5 +3390,10 @@
 2023/06/03
 	pmacs update:
 		Fix terminal puts to buffer from sub-shell read line impl.
+
+2023/06/05
+	tag:
+		PRFM_20230605
+		1.8.1
 
 #eof
