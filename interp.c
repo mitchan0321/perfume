@@ -202,6 +202,8 @@ interp_setup(Toy_Interp* interp, int argc, char **argv, char **envp, char *dir) 
     Toy_Type *obj;
     Toy_Func_Trace_Info *trace_info;
     wchar_t *wdir = NULL;
+    Cell *c;
+    encoder_error_info *e;
 
     delegate = new_list(const_Object);
 
@@ -261,13 +263,7 @@ interp_setup(Toy_Interp* interp, int argc, char **argv, char **envp, char *dir) 
     /* set BUILD */
     hash_set_t(interp->globals, const_BUILD, new_string_str(BUILD));
 
-    /* set ARGV */
-    l = argl = new_list(NULL);
-    for (i=0; i<argc; i++) {
-	l = list_append(l, new_string_str(to_wchar(argv[i])));
-    }
     gdict = interp->globals;
-    hash_set_t(gdict, const_ARGV, argl);
     if (dir) {
         wchar_t *p;
         int plen;
@@ -286,6 +282,18 @@ interp_setup(Toy_Interp* interp, int argc, char **argv, char **envp, char *dir) 
     hash_set_t(gdict, const_DEFAULT_SCRIPT_ENCODING, new_symbol(DEFAULT_SCRIPT_ENCODING));
     hash_set_t(gdict, const_DEFAULT_DIRENT_ENCODING, new_symbol(DEFAULT_DIRENT_ENCODING));
     hash_set_t(gdict, const_DEFAULT_ERRSTR_ENCODING, new_symbol(DEFAULT_ERRSTR_ENCODING));
+
+    /* set ARGV */
+    l = argl = new_list(NULL);
+    for (i=0; i<argc; i++) {
+        c = decode_dirent(interp, argv[i], &e);
+        if (0 == c) {
+            l = list_append(l, new_string_str(to_wchar(argv[i])));
+        } else {
+            l = list_append(l, new_string_cell(c));
+        }
+    }
+    hash_set_t(gdict, const_ARGV, argl);
     
     /* set ENV */
     l = envl = new_list(new_symbol(L"dict"));
