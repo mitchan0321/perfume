@@ -3399,4 +3399,8 @@
 	interp.c
 		Fix argv map to $ARGV meka decode encoding type with DEFAULT_DIRENT_ENCODING.
 
+2023/06/08
+	perfumesh.c
+		Add args encoding by decode_dirent util function, default encoding is UTF-8.
+
 #eof
