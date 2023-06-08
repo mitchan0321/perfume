@@ -20,6 +20,8 @@ int main(int argc, char **argv, char **envp) {
     char *dir = NULL;
     char **argp;
     int i;
+    Cell *encc;
+    encoder_error_info *ence;
 
     /* detect -D configuration argument */
 
@@ -46,7 +48,12 @@ int main(int argc, char **argv, char **envp) {
 
 		/* batch command execute */
 		
-		bulk_set_string(b, to_wchar(argp[2]));
+                encc = decode_dirent(interp, argp[2], &ence);
+                if (0 == encc) {
+                    bulk_set_string(b, to_wchar(argp[2]));
+                } {
+                    bulk_set_string(b, cell_get_addr(encc));
+                };
 		any = toy_parse_start(b);
 		if (NULL == any) {
 		    fwprintf(stderr, L"no memory\n");
@@ -85,7 +92,12 @@ int main(int argc, char **argv, char **envp) {
 	    /* batch file load and execute */
 
 	    cmdl = new_list(new_symbol(L"load"));
-	    list_append(cmdl, new_string_str(to_wchar(argp[1])));
+            encc = decode_dirent(interp, argp[1], &ence);
+            if (0 == encc) {
+                list_append(cmdl, new_string_str(to_wchar(argp[1])));
+            } {
+                list_append(cmdl, new_string_cell(encc));
+            };
 	    any = toy_call(interp, cmdl);
 	    if (GET_TAG(any) == EXCEPTION) {
 		fwprintf(stdout, L"EXCEPTION: %ls\n", to_string(any));
