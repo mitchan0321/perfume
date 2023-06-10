@@ -3403,4 +3403,8 @@
 	perfumesh.c
 		Add args encoding by decode_dirent util function, default encoding is UTF-8.
 
+2023/06/11
+	pmacs update:
+		Change status line format, ommit key-bind mode and add "Mode:" to mode indicator.
+
 #eof
