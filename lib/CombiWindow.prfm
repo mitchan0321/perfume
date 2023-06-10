@@ -343,8 +343,8 @@ CombiWindow method render-status-line (win buff cy cx y x buff-name) {
             ### [[$buff get-path] ?? "*no file*"]
     ;;
     b2 ::= $message display-width;
-    $message append! [" {" . $Mode "}"];
-    $message append! [" (" . $KEYBIND_MODE ") "];
+    $message append! [" {Mode:" . $Mode "}"];
+    ### $message append! [" (" . $KEYBIND_MODE ") "];
     ### $message append! ["-" repeat $x];
     
     curs-print $StatusLineCurs $message $DISPLAY_ENCODING 0 0;
