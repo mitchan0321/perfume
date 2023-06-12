@@ -3407,4 +3407,8 @@
 	pmacs update:
 		Change status line format, ommit key-bind mode and add "Mode:" to mode indicator.
 
+2023/06/12
+	pmacs update:
+		Change status line 'Mode' format, add $KEYBIND_MODE prefix.
+
 #eof
