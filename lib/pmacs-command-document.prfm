@@ -237,6 +237,7 @@ defun do-man-async (window buff-name directory command enc) {
         r ::= call $_puts ([curs-col [$* join sep: ""]]);
         return $r;
     };
+    $man-buff set-columnlimit 256;
     $man-buff get-buffer : set-content $directory;
     $MainWindow bind-buffer [$window get-window-name] [$man-buff get-buffer];
     w1 ::= $MainWindow get-window-by-name [$window get-window-name];
