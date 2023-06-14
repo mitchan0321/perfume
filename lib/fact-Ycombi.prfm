@@ -2,14 +2,11 @@
 # [Y [fun (f) {fun (x) {if {$x <= 1} then: {return 1}; $x * [$f [$x - 1]]}}]] X
 
 defun fact-Ycombi (x) {
-    println [
-        [Y [
-	    fun (f) {
-	        fun (x) {
-	            if {$x <= 1} then: {return 1};
-		    $x * [$f [$x - 1]];
-	        }
-	    }
-        ]] $x;
-    ];
+    Y [
+        fun (f) {
+            fun (x) {
+                [$x <= 1] ??? 1 {$x * [$f [$x - 1]]}
+            }
+        }
+    ] : $x;
 };
