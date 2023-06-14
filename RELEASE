@@ -3411,4 +3411,8 @@
 	pmacs update:
 		Change status line 'Mode' format, add $KEYBIND_MODE prefix.
 
+2023/06/14
+	pmacs update:
+		Change pmacs-server/pmacs-client if file is directory occurd an error '5'.
+
 #eof
