@@ -66,7 +66,6 @@ defun pmacs-client-sub (path) {
         } catch: {
             return 2; ## protocol error
         };
-        sts := 0;
     } fin: {
         $server close;
     };

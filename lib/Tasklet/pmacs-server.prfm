@@ -41,15 +41,24 @@ new Task : proc pmacs-server {
                     mtime := 0;
                 };
                 SysCall apply-editor {
-                    open-file $r;
+                    (sts err) ::= open-file $r;
                     target-buff ::= BufferManager get-buffer-by-path $r;
+                    if {! $sts} {
+                        $f puts "5";
+                        $f close;
+                        if $target-buff {
+                            $MainWindow delete-buffer $target-buff;
+                        };
+                        show-message :bell ["(pmacs-server) file not opened - " . $err];
+                        return;
+                    };
                     if $target-buff {
                         $target-buff set-unregist-proc {
                             $f puts "0";
                             $f close;
                             try {
                                 if {eq? $mtime [file stat $r : assoc-value mtime]} {
-                                    show-message :bell ["(pmacs-server) " . $r " file not changed, do not commit."];
+                                    show-message :bell ["(pmacs-server) " . $r " file not changed."];
                                 } {
                                     show-message ["(pmacs-server) " . $r " file wrote."];
                                 };
