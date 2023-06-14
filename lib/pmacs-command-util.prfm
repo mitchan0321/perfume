@@ -481,6 +481,7 @@ defun do-command-async (window buff-name directory command) {
         return $r;
     };
     $grep-buff get-buffer : set-content $directory;
+    $grep-buff set-columnlimit 1024;
     $grep-buff puts ["CWD:  " . $directory];
     $grep-buff puts ["EXEC: " . $command];
     $grep-buff puts "";
