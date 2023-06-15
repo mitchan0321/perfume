@@ -41,8 +41,7 @@ new Task : proc pmacs-server {
                     mtime := 0;
                 };
                 SysCall apply-editor {
-                    (sts err) ::= open-file $r;
-                    target-buff ::= BufferManager get-buffer-by-path $r;
+                    (sts err target-buff) ::= open-file $r;
                     if {! $sts} {
                         $f puts "5";
                         $f close;
@@ -58,7 +57,7 @@ new Task : proc pmacs-server {
                             $f close;
                             try {
                                 if {eq? $mtime [file stat $r : assoc-value mtime]} {
-                                    show-message :bell ["(pmacs-server) " . $r " file not changed."];
+                                    show-message ["(pmacs-server) " . $r " file not changed."];
                                 } {
                                     show-message ["(pmacs-server) " . $r " file wrote."];
                                 };

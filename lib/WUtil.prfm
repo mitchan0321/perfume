@@ -912,7 +912,7 @@ defun open-file (name) {
             [pwd : . "/" $name]
     ];
     buff ::= new EditBuffer;
-    (result err) ::= $buff load-content $path;
+    (result err buff) ::= $buff load-content $path : <<- $buff;
 };
 
 defun get-current-buffer-dir (window) {
