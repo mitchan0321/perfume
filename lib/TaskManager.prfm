@@ -158,6 +158,12 @@ TaskManager method dispatch-sub (min-task) {
         # proces terminate
         #
         ### $Task_stdout puts "";
+        st ::= $min-task get-stacktrace;
+        if $st {
+            $st split sep: "\n" : each do: {| sti |
+                $Task_stdout puts [">>>Task [" . [$min-task get-name] "] stack trace: " $sti];
+            };
+        };
         $Task_stdout puts [">>>Task [" . [$min-task get-name] "] end, status= " [$min-task get-exit-status]];
         
         ### remove from task list TaskManager instance.
