@@ -489,6 +489,11 @@ coroutine_handl(void *context) {
     // co->u.coroutine->interp->cstack_id = 0;
     co->u.coroutine->interp->co_parent->co_value = result;
     co->u.coroutine->state = CO_STS_DONE;
+    if (EXCEPTION == GET_TAG(result)) {
+        if (result->u.exception.msg_list) {
+            co->u.coroutine->stacktrace = list_get_item(list_next(result->u.exception.msg_list));
+        }
+    }
     // cstack_release(id);
     // co->u.coroutine->coro_id = 0;
     cstack_release_clear(id);
