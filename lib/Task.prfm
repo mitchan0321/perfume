@@ -37,6 +37,7 @@ Task method init () {
     
     sets TerminateProc <nil>;
     sets Client <nil>;
+    sets StackTrace <nil>;
 };
 
 Task method string () {
@@ -140,6 +141,7 @@ Task method run () {
 
     } catch: {| e |
         ### set error indicate variable e
+        sets StackTrace [$Coro get-stacktrace];
     } fin: {
         ### save task current working directory
         sets CWD [pwd];
@@ -434,6 +436,10 @@ Task method set-client (c) {
 
 Task method get-client () {
     return $Client;
+};
+
+Task method get-stacktrace () {
+    return $StackTrace;
 };
 
 Task method output-log (m) {
