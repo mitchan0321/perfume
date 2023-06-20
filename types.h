@@ -207,6 +207,7 @@ typedef struct _toy_coroutine {
 #else
     coroutine_t coro_id;
 #endif /* CORU_USE */
+    struct _toy_type *stacktrace;
 } Toy_Coroutine;
 
 /*
