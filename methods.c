@@ -5576,6 +5576,29 @@ error2:
 }
 
 Toy_Type*
+mth_coro_get_stacktrace(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *self;
+    Toy_Coroutine *co;
+
+    self = SELF(interp);
+    if (GET_TAG(self) != COROUTINE) goto error2;
+    if (arglen != 0) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    co = self->u.coroutine;
+    if (co->stacktrace) {
+        return co->stacktrace;
+    }
+    return const_Nil;
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'get-stacktrace', syntax: Coro get-stacktrace", interp);
+
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
 mth_bulk_append(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *self, *c;
     struct _binbulk *bulk;
@@ -6146,6 +6169,7 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, L"Coro", L"release", 	mth_coro_release, 	NULL);
     toy_add_method(interp, L"Coro", L"stat", 		mth_coro_stat, 		NULL);
     toy_add_method(interp, L"Coro", L"eval", 		mth_coro_eval, 		L"body");
+    toy_add_method(interp, L"Coro", L"get-stacktrace",	mth_coro_get_stacktrace,NULL);
 
     toy_add_method(interp, L"Bulk", L"append", 		mth_bulk_append,	L"val");
     toy_add_method(interp, L"Bulk", L"get", 		mth_bulk_get,		NULL);
