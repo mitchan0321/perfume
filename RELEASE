@@ -3415,4 +3415,13 @@
 	pmacs update:
 		Change pmacs-server/pmacs-client if file is directory occurd an error '5'.
 
+2023/06/20
+	lib/expand-syntax.prfm
+		Delete :notrace option from load-tasklet.
+	methods.c, types.[ch]
+		Add Coro::get-stacktrace for get the stack trace info from co-routine if occurd it.
+	pmacs update:
+		Add get-stacktrace for get the co-routin occurd exception stacktrace.
+		Add log output Task stack trace if occurd it in Task.
+
 #eof
