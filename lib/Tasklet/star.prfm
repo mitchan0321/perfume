@@ -31,8 +31,7 @@ new Task : proc star {
         c ::= $colordb get [[rand] * [$colordb len] : int];
         t ::= [rand] * 12000 : + 3000 : int;
         ### t := 500;
-        tag ::= "
-        STAR-" . $i;
+        tag ::= "STAR-" . $i;
         SysCall apply-editor {
             $window set-spot-color-item $tag $y $x 1 $c;
             begin local: [dict ((t . $t) (tag . $tag))] {
