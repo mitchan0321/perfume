@@ -3424,4 +3424,8 @@
 		Add get-stacktrace for get the co-routin occurd exception stacktrace.
 		Add log output Task stack trace if occurd it in Task.
 
+2023/06/23
+	pmacs update:
+		Fix *Scratch* buffer line limit separate bug when output is multi lines.
+
 #eof
