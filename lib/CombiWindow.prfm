@@ -974,19 +974,18 @@ CombiWindow method display-evaluation () {
                     if {$lim < 0} {lim := 0};
                 } {
                     lim := $INTERP_LIMIT_LEN;
+                    if {integer? $lim} else: {lim := 0};
                 };
-                
-                if {$lim > 0} {
-                    while {[$r len] > $lim} do: {
-                        r2 ::= [$r sub 0 $lim] . " \\";
-                        $r2 split sep: "\n" : each do: {| r3 |
+
+                $r split sep: "\n" : each do: {| r2 |
+                    if {$lim > 0} {
+                        while {[$r2 len] > $lim} do: {
+                            r3 ::= [$r2 sub 0 $lim] . " \\";
                             $buff append-string $r3;
+                            r2 ::= $r2 sub $lim;
                         };
-                        r ::= $r sub $lim;
                     };
-                };
-                $r split sep: "\n" : each do: {| r3 |
-                    $buff append-string $r3;
+                    $buff append-string $r2;
                 };
             };
 	    update-display := <t>;
