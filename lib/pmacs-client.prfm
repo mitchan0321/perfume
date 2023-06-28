@@ -18,6 +18,9 @@ defun pmacs-client () {
 
     sts := 0;
     $files each do: {| f |
+        if {$f at 0 : != "/"} {
+            f ::= [pwd] . "/" $f;
+        };
         sts ::= pmacs-client-sub $f;
     };
 
@@ -26,7 +29,7 @@ defun pmacs-client () {
 
 defun pmacs-client-sub (path) {
     if {defvar? PMACS} {
-        println "Can't run under Pmacs environment.";
+        println "Can't run under Pmacs environment."; #'
         return;
     };
 
