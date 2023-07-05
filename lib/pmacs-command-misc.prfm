@@ -194,6 +194,30 @@ defcommand para-alphabet desc: "Demo background." {
     result ALL;
 };
 
+defcommand make-command-pdoc desc: "Make command pdoc template." {
+    | main window |
+    buff ::= $window get-buffer;
+    command-name ::= $buff get-buffer-name : split sep: "." : get 0;
+    $buff append-string "....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+....0";
+    $buff append-string "";
+    $buff append-string "【コマンド名】";
+    $buff append-string ["\t" . $command-name];
+    $buff append-string "";
+    $buff append-string "【概要】";
+    $buff append-string ["\t" . [get-command-desc $command-name]];
+    $buff append-string "";
+    $buff append-string "【説明】";
+    $buff append-string "";
+    $buff append-string "【現在のキーバインドを表示する】";
+    $buff append-string ["\t[[?" . $command-name "]]"];
+    $buff append-string "";
+    $buff append-string "【ヘルプに戻る】";
+    $buff append-string "\t[[&help]]";
+    $buff append-string "";
+    $buff append-string "....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+....0";
+    return ALL;
+};
+
 defcommand test desc: "Test command." {
     show-message ["Local: " . [info local] ", Closure: " [info closure]];
 };
