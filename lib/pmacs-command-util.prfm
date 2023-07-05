@@ -4,6 +4,7 @@
 
 defcommand key-binding-list desc: "Display key binding list and all editor commands." {
     | main window |
+    cur-buff ::= $window get-buffer;
     mode ::= $window get-mode;
     BufferManager unregist-buffer "*Key Binding*";
     buff ::= new EditBuffer;
@@ -46,6 +47,7 @@ defcommand key-binding-list desc: "Display key binding list and all editor comma
     $buff set-protect;
     
     $main bind-buffer [$window get-window-name] $buff;
+    $buff set-previous-buffer [$cur-buff get-buffer-name];
     $window set-mode "PWiki";
 
     result SELF;
