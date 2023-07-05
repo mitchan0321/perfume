@@ -350,6 +350,7 @@ defcommand man-previous-link desc: "Jump to previous man link." {
 
 defcommand help desc: "Open pmacs manual." {
     | main window |
+    cur-buff ::= $window get-buffer;
     help-path ::= $DEFAULT_PWIKI_DIR . $DEFAULT_PWIKI_HOME_FILE;
     buff ::= BufferManager get-buffer-by-path $help-path;
     $buff ?? {
@@ -362,6 +363,7 @@ defcommand help desc: "Open pmacs manual." {
         };
     };
     $main bind-buffer [$window get-window-name] $buff;
-    
+    $buff set-previous-buffer [$cur-buff get-buffer-name];
+
     return ALL;
 };
