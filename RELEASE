@@ -3432,4 +3432,10 @@
 	pmacs update:
 		Fix pmacs-client if argument is relative path then make full path.
 
+2023/07/05
+	pmacs update:
+		Add previous buffer name to help buffer.
+		Add previous buffer name to key-binding-list buffer.
+		Add make-command-pdoc for create template editor command PWiki file.
+
 #eof
