@@ -2,16 +2,13 @@
 
 <<< Package description >>>
 
-1. Package name: pmacs-install-YYYYMMDD-amd64-ubuntu20.tar.gz
-   This package for Linux distribution Ubuntu-20.04TLS, arch x86_64(AMD64).
-
-2. Package name: pmacs-install-YYYYMMDD-amd64-ubuntu22.tar.gz
+1. Package name: pmacs-install-YYYYMMDD-amd64-ubuntu22.tar.gz
    This package for Linux distribution Ubuntu-22.04TLS, arch x86_64(AMD64).
 
-3. Package name: pmacs-install-YYYYMMDD-amd64-redhat8.tar.gz
+2. Package name: pmacs-install-YYYYMMDD-amd64-redhat9.tar.gz
    This package for Linux distribution Red Hat Enterprise Linux 8, arch x86_64(AMD64).
 
-4. Package name: pmacs-install-YYYYMMDD-amd64-freebsd.tar.gz
+3. Package name: pmacs-install-YYYYMMDD-amd64-freebsd.tar.gz
    This package for FreeBSD, arch x86_64(AMD64).
 
 
@@ -22,7 +19,7 @@
         (ex) If you install into your home directory.
 
         cd $HOME
-        tar xvzf pmacs-install-YYYYMMDD-amd64-XXX.tar.gz	[ Specify package name you downloaded ]
+        tar xvzf pmacs-install-YYYYMMDD-amd64-OSTYPE.tar.gz	[ Specify package name you downloaded ]
 
 2. Enter package directory.
 
