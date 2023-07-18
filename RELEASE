@@ -3442,5 +3442,6 @@
 	pmacs update:
 		Change TERMINAL_ENV environment value TERM=pmacs -> TERM=dumb.
 		Add keybind ALT_v to show-keycode.
+		Add start message to terminal editor command.
 
 #eof
