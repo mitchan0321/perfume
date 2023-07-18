@@ -3438,4 +3438,9 @@
 		Add previous buffer name to key-binding-list buffer.
 		Add make-command-pdoc for create template editor command PWiki file.
 
+2023/07/18
+	pmacs update:
+		Change TERMINAL_ENV environment value TERM=pmacs -> TERM=dumb.
+		Add keybind ALT_v to show-keycode.
+
 #eof
