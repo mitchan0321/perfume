@@ -211,6 +211,9 @@ defcommand make-command-pdoc desc: "Make command pdoc template." {
     $buff append-string "【現在のキーバインドを表示する】";
     $buff append-string ["\t[[?" . $command-name "]]"];
     $buff append-string "";
+    $buff append-string "【キーバインド一覧に戻る】";
+    $buff append-string "\t[[&key-binding-list]]";
+    $buff append-string "";
     $buff append-string "【ヘルプに戻る】";
     $buff append-string "\t[[&help]]";
     $buff append-string "";
