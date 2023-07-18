@@ -14,25 +14,25 @@ defcommand previous-page desc: "Page down current window." {
     result SELF;
 };
 
-defcommand cursor-down desc: "Move cursor to down current windodw."{
+defcommand cursor-down desc: "Move cursor down in current windodw."{
     | main window |
     $window move-down;
     result SELF;
 };
 
-defcommand cursor-up desc: "Move cursor to up current window." {
+defcommand cursor-up desc: "Move cursor up in current window." {
     | main window |
     $window move-up;
     result SELF;
 };
 
-defcommand cursor-right desc: "Move cursor to right current window." {
+defcommand cursor-right desc: "Move cursor right in current window." {
     | main window |
     $window move-right;
     result SELF;
 };
 
-defcommand cursor-left desc: "Move cursor to left current window." {
+defcommand cursor-left desc: "Move cursor left in current window." {
     | main window |
     $window move-left;
     result SELF;
