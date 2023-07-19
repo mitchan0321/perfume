@@ -1268,7 +1268,8 @@ defcommand terminal desc: "Shell terminal in buffer." {
     $buff set-content $ENV,HOME;
     $buff set-unregist-proc {try {zap $TERMINAL_TASK} catch: {}};
     $main bind-buffer [$window get-window-name] $buff;
-    $buff append-string "*** Type CTRL+\\ to send process keycode."; 
+    $buff append-string "Start pmacs terminal emulator.";
+    $buff append-string "Type CTRL+\\ to send process keycode."; 
     $buff append-string "";
     $buff append-string "";
     
