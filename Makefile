@@ -7,14 +7,16 @@ OPTIONS = -gdwarf-4
 OPTLIBS =
 OPTLIBS2 =
 
-HDRS		= bulk.h binbulk.h cell.h array.h error.h hash.h interp.h parser.h \
-		  toy.h types.h config.h global.h cstack.h util.h encoding.h
-SRCS		= bulk.c binbulk.c cell.c array.c hash.c list.c parser.c types.c \
-		  eval.c interp.c commands.c methods.c global.c cstack.c util.c \
-		  encoding.c encoding-table.c
-OBJS		= bulk.o binbulk.o cell.o array.o hash.o list.o parser.o types.o \
-		  eval.o interp.o commands.o methods.o global.o cstack.o util.o \
-		  encoding.o encoding-table.o
+INCLUDE	= -I/usr/local/include -I.
+
+HDRS	= bulk.h binbulk.h cell.h array.h error.h hash.h interp.h parser.h \
+	  toy.h types.h config.h global.h cstack.h util.h encoding.h
+SRCS	= bulk.c binbulk.c cell.c array.c hash.c list.c parser.c types.c \
+	  eval.c interp.c commands.c methods.c global.c cstack.c util.c \
+	  encoding.c encoding-table.c
+OBJS	= bulk.o binbulk.o cell.o array.o hash.o list.o parser.o types.o \
+	  eval.o interp.o commands.o methods.o global.o cstack.o util.o \
+	  encoding.o encoding-table.o
 
 ######################################################################################
 ###
@@ -98,11 +100,15 @@ endif
 
 ifeq ($(shell uname),FreeBSD)
 	CFLAGS	= -Wall -O2 -c -g $(OPTIONS)
-	INCLUDE	= -I/usr/local/include -I. -I./extlib/coru
+  ifeq ($(CORU_USE),yes)
+	INCLUDE	+= -I./extlib/coru
+  endif
 	LIB	= -static -L/usr/lib -L/lib -L/usr/local/lib -lm -lpthread -lgmp -lgc -lonigmo $(OPTLIBS)
 else
 	CFLAGS	= -Wall -O2 -c -g $(OPTIONS)
-	INCLUDE	= -I/usr/local/include -I. -I./extlib/coru
+  ifeq ($(CORU_USE),yes)
+	INCLUDE	+= -I./extlib/coru
+  endif
 	LIB	= -L/usr/lib -L/lib -L/usr/local/lib -lm -lpthread -lgmp -lgc -lonigmo $(OPTLIBS)
 endif
 
@@ -115,12 +121,16 @@ endif
 
 ### for memory debuging build.
 #CFLAGS		= -Wall -c -g -DPROF $(OPTIONS)
-#INCLUDE		= -I/usr/local/include -I. -I./extlib/coru
+#ifeq ($(CORU_USE),yes)
+#INCLUDE		+= -I./extlib/coru
+#endif
 #LIB		= -L/usr/local/lib -lm -lonigmo -lgmp $(OPTLIBS)
 
 ### for profiling build.
 #CFLAGS		= -Wall -c -g -pg -DPROF $(OPTIONS)
-#INCLUDE		= -I/usr/local/include -I. -I./extlib/coru
+#ifeq ($(CORU_USE),yes)
+#INCLUDE		+= -I./extlib/coru
+#endif
 #LIB		= -pg -L/usr/local/lib -lonigmo -lgmp $(OPTLIBS)
 
 ###
@@ -152,8 +162,8 @@ install:
 perfumesh:	$(OBJS) perfumesh.o
 	$(CC) $(OBJS) perfumesh.o $(LIB) -o perfumesh
 
-extlib/coru/coru.a:	extlib/coru/coru.c extlib/coru/coru.h extlib/coru/coru_platform.c extlib/coru/coru_platform.h extlib/coru/coru_util.h
 ifeq ($(CORU_USE),yes)
+extlib/coru/coru.a:	extlib/coru/coru.c extlib/coru/coru.h extlib/coru/coru_platform.c extlib/coru/coru_platform.h extlib/coru/coru_util.h
 	(cd extlib/coru; $(MAKE))
 endif
 
