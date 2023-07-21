@@ -157,6 +157,7 @@ install:
 	install -m 755 pkg/pmacs.in $(PREFIX)/bin
 	install -m 755 pkg/pmacs-client.in $(PREFIX)/bin
 	install -m 755 pkg/pmacs-install.sh $(PREFIX)/pmacs-install.sh
+	install -m 644 RELEASE $(PREFIX)/lib/perfume
 	(cd $(PREFIX); sh ./pmacs-install.sh; rm -f bin/pmacs.in bin/pmacs-client.in pmacs-install.sh)
 
 ifeq ($(CORU_USE),yes)
@@ -289,6 +290,7 @@ endif
 	install -m 644 pkg/INSTALL    $(PKG_DIR)
 	install -m 644 pkg/pmacs.in   $(PKG_DIR)/bin
 	install -m 644 pkg/pmacs-client.in   $(PKG_DIR)/bin
+	install -m 644 RELEASE $(PKG_DIR)/lib/perfume
 	(cd $(PKG_TMP); tar cvzf $(PKG_TAR_NAME) ./pmacs-install)
 
 #eof
