@@ -159,12 +159,17 @@ install:
 	install -m 755 pkg/pmacs-install.sh $(PREFIX)/pmacs-install.sh
 	(cd $(PREFIX); sh ./pmacs-install.sh; rm -f bin/pmacs.in bin/pmacs-client.in pmacs-install.sh)
 
-perfumesh:	$(OBJS) perfumesh.o
-	$(CC) $(OBJS) perfumesh.o $(LIB) -o perfumesh
-
 ifeq ($(CORU_USE),yes)
 extlib/coru/coru.a:	extlib/coru/coru.c extlib/coru/coru.h extlib/coru/coru_platform.c extlib/coru/coru_platform.h extlib/coru/coru_util.h
 	(cd extlib/coru; $(MAKE))
+
+perfumesh:	$(OBJS) perfumesh.o extlib/coru/coru.a
+	$(CC) $(OBJS) perfumesh.o $(LIB) -o perfumesh
+
+else
+perfumesh:	$(OBJS) perfumesh.o
+	$(CC) $(OBJS) perfumesh.o $(LIB) -o perfumesh
+
 endif
 
 perfumesh.o:	$(SRCS) $(HDRS) perfumesh.c
