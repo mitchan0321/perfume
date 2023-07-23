@@ -3444,4 +3444,8 @@
 		Add keybind ALT_v to show-keycode.
 		Add start message to terminal editor command.
 
+2023/07/23
+	pmacs update:
+		Add keybind Ctrl+Alt+HOME -> top-of-buffer, Ctrl+Alt+END -> bottom-of-buffer.
+
 #eof
