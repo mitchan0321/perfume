@@ -100,7 +100,7 @@ set-color-name WHITE.WHITE     [WUtil color-pair WHITE   WHITE   ];
 case $THEME
 MODERN {
     set-color-name EDIT_BUFFER                  [WUtil color-pair BLACK   WHITE   ];
-    set-color-name INVERT                       [WUtil color-pair WHITE   BLACK   ];
+    set-color-name INVERT                       [WUtil color-pair WHITE   CYAN    ];
     set-color-name ACTIVE_STATUS_LINE           [WUtil color-pair WHITE   BLACK   ] attr: ($A_STANDOUT $A_BOLD $A_ITALIC);
     set-color-name ACTIVE_STATUS_LINE_2         [WUtil color-pair WHITE   BLUE    ] attr: ($A_BOLD);
     set-color-name ACTIVE_STATUS_LINE_PROTECT   [WUtil color-pair WHITE   BLACK   ] attr: ($A_STANDOUT $A_BOLD $A_ITALIC);
@@ -140,7 +140,7 @@ MODERN {
 
 MODERN-DARK {
     set-color-name EDIT_BUFFER                  [WUtil color-pair WHITE   BLACK   ];
-    set-color-name INVERT                       [WUtil color-pair BLACK   WHITE   ];
+    set-color-name INVERT                       [WUtil color-pair MAGENTA WHITE   ];
     set-color-name ACTIVE_STATUS_LINE           [WUtil color-pair WHITE   BLUE    ] attr: ($A_STANDOUT $A_BOLD $A_ITALIC);
     set-color-name ACTIVE_STATUS_LINE_2         [WUtil color-pair WHITE   BLUE    ] attr: ($A_BOLD);
     set-color-name ACTIVE_STATUS_LINE_PROTECT   [WUtil color-pair WHITE   GREEN   ] attr: ($A_STANDOUT $A_BOLD $A_ITALIC);
