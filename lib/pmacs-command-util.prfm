@@ -311,8 +311,10 @@ defcommand send-eof desc: "Send EOF to current running process or perfume interp
 defcommand cd desc: "Change current directory at pmacs globally." {
     | main window |
     
+    pwd ::= pwd;
+    if {$pwd = "/"} else: {pwd ::= $pwd . "/"};
     mini-input-file-chooser $main $window
-        init-value: [pwd : . "/"] 
+        init-value: $pwd
         prompt: "Directory: "
         enter-proc: {| value |
             if {[$value len] = 0} {
