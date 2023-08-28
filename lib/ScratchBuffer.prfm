@@ -34,5 +34,7 @@ ScratchBuffer method load-content (path) {
 };
 
 ScratchBuffer method get-content-dir () {
-    return [pwd];
+    dir ::= pwd;
+    if {$dir = "/"} else: {dir ::= $dir . "/"};
+    return $dir;
 };
