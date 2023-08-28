@@ -3448,4 +3448,19 @@
 	pmacs update:
 		Add keybind Ctrl+Alt+HOME -> top-of-buffer, Ctrl+Alt+END -> bottom-of-buffer.
 
+2023/08/28
+	pmacs update:
+		Fix EditBuffer::get-content-dir if result is directory then add "/" to last.
+		  But if directory is "/" do not it.
+		Fix ScratchBuffer::get-content-dir if result is not "/" then add "/" to last.
+		Fix line-input utility function, if intput key is CTRL_G then convert to KEY_ESC send.
+		Fix get-current-buffer-dir utility function, add return path "/" to last, if directory
+		  is not "/".
+		Change bellow editor commands to use EditBuffer::get-content-dir method for 
+		  mini-input-file-chooser initial value.
+		  Commands are: open-file, view-file, save-buffer, save-buffer-as
+		Change read-grep-file command if initial directory is "/" do not append "/" to last.
+		Change grep command if initial directory is "/" do not append "/" to last.
+		Change cd command if initial directory is "/" do not append "/" to last.
+
 #eof
