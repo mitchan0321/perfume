@@ -283,7 +283,7 @@ defun line-input (curs disp-line disp-col input-len cur-index cur-val key-in) {
             break;
         }
         {eq? $key-in CTRL_G} {
-            $MainWindow mini-input-end;
+            $MainWindow send-key-event (KEY_ESC);
             break;
         }
     ;;
@@ -916,16 +916,29 @@ defun open-file (name) {
 };
 
 defun get-current-buffer-dir (window) {
-    $window ?? {return [pwd]};
+    pwd ::= pwd;
+    if {$pwd = "/"} else: {pwd ::= $pwd . "/"};
+    $window ?? {return $pwd};
     
     buff ::= $window get-buffer;
-    $buff ?? {return [pwd]};
+    $buff ?? {return $pwd};
+    
     path ::= $buff get-path;
-    $path ?? {return [pwd]};
-    if {file dir? $path} {return $path};
+    $path ?? {return $pwd};
+    
+    if {file dir? $path} {
+        if {$path = "/"} else: {
+            if {$path at -1 : = "/"} else: {
+                path ::= $path . "/";
+            };
+        };
+        return $path;
+    };
+
     dir ::= $path split sep: "/";
     $dir ->>;
     path ::= $dir join sep: "/";
+    if {$path = "/"} else: {path ::= $path . "/"};
     return $path;
 };
 
