@@ -5,8 +5,9 @@
 defcommand open-file desc: "Open specified file. If occured file decode error, set protect mode to the buffer." {
     | main window |
     
-    mini-input-file-chooser $main $window 
-        init-value: [get-current-buffer-dir $window : . "/"]
+    cbuff ::= $window get-buffer;
+    mini-input-file-chooser $main $window
+        init-value: [$cbuff get-content-dir]
         prompt: "Open file: "
         enter-proc: {| value |
 	    if {[$value len] = 0} {
@@ -58,8 +59,9 @@ defcommand open-file desc: "Open specified file. If occured file decode error, s
 defcommand view-file desc: "Open specified file by protect mode." {
     | main window |
 
+    cbuff ::= $window get-buffer;
     mini-input-file-chooser $main $window 
-        init-value: [get-current-buffer-dir $window : . "/"]
+        init-value: [$cbuff get-content-dir]
         prompt: "View file: "
         enter-proc: {| value |
 	    if {[$value len] = 0} {
@@ -109,8 +111,9 @@ defcommand view-file desc: "Open specified file by protect mode." {
 defcommand read-file desc: "Open specified file and insert file data to current buffer at cursor position previous line." {
     | main window |
 
-    mini-input-file-chooser $main $window 
-        init-value: [get-current-buffer-dir $window : . "/"]
+    cbuff ::= $window get-buffer;
+    mini-input-file-chooser $main $window
+        init-value: [$cbuff get-content-dir]
         prompt: "Read file: "
         enter-proc: {| value |
 	    if {[$value len] = 0} {
@@ -172,8 +175,9 @@ defcommand save-buffer desc: "Save current buffer to origin file." {
     path ::= $__buff_in_clojure__ get-path;
 
     if {or {nil? $path} {$path = ""}} {
+        cbuff ::= $window get-buffer;
         mini-input-file-chooser $main $window
-            init-value: [get-current-buffer-dir $window : . "/"]
+            init-value: [$cbuff get-content-dir]
             prompt: "Save file name: "
 	    enter-proc: {| value |
 		path ::= path-adjust [
@@ -262,8 +266,9 @@ defcommand save-buffer-as desc: "Save current buffer to specified file." {
     __buff_in_clojure__ ::= $window get-buffer;
     path ::= $__buff_in_clojure__ get-path;
 
+    cbuff ::= $window get-buffer;
     mini-input-file-chooser $main $window
-        init-value: [get-current-buffer-dir $window : . "/"]
+        init-value: [$cbuff get-content-dir]
         prompt: "Save file name: "
         enter-proc: {| value |
 	    path ::= path-adjust [
@@ -328,8 +333,10 @@ defcommand exit desc: "Exit pmacs editor. If you have an unsaved buffer, pmacs w
 defcommand read-grep-file desc: "Read specified file and new create the *Grep* buffer." {
     | main window |
     
+    pwd ::= pwd;
+    if {$pwd = "/"} else: {pwd ::= $pwd . "/"};
     mini-input-file-chooser $main $window
-        init-value: [pwd : . "/"]
+        init-value: $pwd
         prompt: "Read grep file: "
         enter-proc: {| value |
             if {[$value len] = 0} {
