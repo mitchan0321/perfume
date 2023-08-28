@@ -645,8 +645,12 @@ EditBuffer method get-content () {
 
 EditBuffer method get-content-dir () {
     dir ::= path-adjust [get-content];
-    if [file dir? $dir] {return $dir};
+    if [file dir? $dir] {
+        if {$dir = "/"} else: {dir ::= $dir . "/"};
+        return $dir
+    };
     dir ::= path-adjust [$dir . "/.."];
+    if {$dir = "/"} else: {dir ::= $dir . "/"};
     return $dir;
 };
 
