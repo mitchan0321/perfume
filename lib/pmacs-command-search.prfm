@@ -390,7 +390,7 @@ defun get-previous-search-text (y x str buff) {
 defcommand grep desc: "Run grep on the entered text." {
     | main window |
     buff ::= $window get-buffer;
-    dir ::= [$buff get-content-dir] . "/";
+    dir ::= $buff get-content-dir;
 
     mini-input-file-chooser $main $window 
         init-value: $dir
