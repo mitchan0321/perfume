@@ -107,7 +107,7 @@ defcommand file-completion desc: "File completion and insert file name to curren
     f ::= $l ->>;
     f ::= $f ?? "";
     if {$l null?} {
-        dir ::= $buff get-content-dir : . "/";
+        dir ::= $buff get-content-dir;
     } {
         if {and {$l len : = 1} {$l get 0 : = ""}} {
             dir := "/";
@@ -115,7 +115,7 @@ defcommand file-completion desc: "File completion and insert file name to curren
             if {$r at $start : = "/"} {
                 dir ::= $l join sep: "/" : . "/";
             } {
-                dir ::= $buff get-content-dir : . "/" [$l join sep: "/"] : . "/";
+                dir ::= $buff get-content-dir : . [$l join sep: "/"] : . "/";
             };
         };
     };

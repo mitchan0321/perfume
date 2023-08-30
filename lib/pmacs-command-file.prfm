@@ -17,7 +17,7 @@ defcommand open-file desc: "Open specified file. If occured file decode error, s
             path ::= path-adjust [
 		{[$value sub 0 1] = "/"} ???
 		    $value
-		    [get-current-buffer-dir $window : . "/" $value]
+		    [get-current-buffer-dir $window : . $value]
 	    ];
             (stat path message) ::= get-path-condition $path;
             case $stat
@@ -71,7 +71,7 @@ defcommand view-file desc: "Open specified file by protect mode." {
             path ::= path-adjust [
 		{[$value sub 0 1] = "/"} ???
 		    $value
-		    [get-current-buffer-dir $window : . "/" $value]
+		    [get-current-buffer-dir $window : . $value]
 	    ];
             (stat path message) ::= get-path-condition $path;
             case $stat
@@ -123,7 +123,7 @@ defcommand read-file desc: "Open specified file and insert file data to current 
             path ::= path-adjust [
 		{[$value sub 0 1] = "/"} ???
 		    $value
-		    [get-current-buffer-dir $window : . "/" $value]
+		    [get-current-buffer-dir $window : . $value]
 	    ];
 	    buff ::= $window get-buffer;
             geom ::= $window get-geom;
@@ -183,7 +183,7 @@ defcommand save-buffer desc: "Save current buffer to origin file." {
 		path ::= path-adjust [
                     {[$value sub 0 1] = "/"} ???
                         $value
-                        [get-current-buffer-dir $window : . "/" $value]
+                        [get-current-buffer-dir $window : . $value]
                 ];
 
 		if [file exists? $path] {
@@ -274,7 +274,7 @@ defcommand save-buffer-as desc: "Save current buffer to specified file." {
 	    path ::= path-adjust [
                 {[$value sub 0 1] = "/"} ???
 		    $value
-                    [get-current-buffer-dir $window : . "/" $value]
+                    [get-current-buffer-dir $window : . $value]
             ];
 
 	    if [file exists? $path] {

@@ -441,7 +441,7 @@ defcommand grep-current-word desc: "Run grep on the near cursor point word." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
-    dir ::= [$buff get-content-dir] . "/";
+    dir ::= $buff get-content-dir;
 
     orig_geom ::= $geom clone;
     $window apply-command $main $window "" select-region-word;
