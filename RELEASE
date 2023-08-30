@@ -3463,4 +3463,8 @@
 		Change grep command if initial directory is "/" do not append "/" to last.
 		Change cd command if initial directory is "/" do not append "/" to last.
 
+2023/08/30
+	pmacs update:
+		Fix EditBuffer::get-currentdir and get-current-buffer-dir calling, do not repare last "/".
+
 #eof
