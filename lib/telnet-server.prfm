@@ -1,0 +1,61 @@
+defun telnet-server (file: file port: port) {
+    
+    pid-list := ();
+
+    if [set? file] else: {file := "/dev/null"};
+    if [set? port] else: {port := 8023};
+    
+    # create listen port
+
+    lfd ::= socket-server $port;
+
+    try {
+	println "Listening file descriptor: " $lfd;
+	client-list ::= dict;
+	client-addr ::= dict;
+    
+	loop do: {
+            
+            $pid-list each do: {| p |
+                wait $p;
+            };
+            pid-list := ();
+
+	    # check listen port for connect request from client
+
+	    (ifds ofds efds) ::= select ($lfd) () () 10;
+
+	    if [$ifds null?] else: {
+
+	        # proseed client connect request
+
+		(fd addr port) ::= accept $lfd;
+		f ::= new File;
+		$f set! $fd mode: io;
+		$f set-encoding UTF-8;
+		$f set-newline <t>;
+		println "Connect client from " [host-address-string $addr];
+                telnet-server-send-file $f $file $pid-list;
+            };
+        };
+    }
+    fin: {
+	close $lfd
+    };
+};
+
+defun telnet-server-send-file (sock file pid-list) {
+    pid ::= fork;
+    if {$pid != 0} {
+        $pid-list <<- $pid;
+        $sock close;
+        return;
+    };
+    f ::= new File init: ($file mode: i);
+    $f each do: {| r |
+        $sock puts [$r . "\r"];
+    };
+    $sock close;
+    $f close;
+    exit 0;
+};
