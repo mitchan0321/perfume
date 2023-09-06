@@ -3467,4 +3467,13 @@
 	pmacs update:
 		Fix EditBuffer::get-currentdir and get-current-buffer-dir calling, do not repare last "/".
 
+2023/09/06
+	commands.c
+		Add wait command to new option :nowait for non-block mode child process wait,
+		  and return value format change int::exitstatus => list::(pid exitstatus).
+	lib/exec.prfm, pipe.prfm
+		Change call wait command.
+	lib/telnet.prfm, telnet-server.prfm
+		Add sample socket application for telnet file delivery server and client.
+		
 #eof
