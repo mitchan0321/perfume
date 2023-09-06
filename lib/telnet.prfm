@@ -10,10 +10,28 @@ defun telnet (host enc: enc port: port) {
     $server set-newline <nil>;
     $server set-ignore-cr <t>;
     
-    while {s ::= $server gets} do: {
-        $stdout puts $s;
+    try {
+        loop do: {
+	    if {$stdin ready?} {
+	        message ::= $stdin gets;
+	        if [$stdin eof?] then: {
+		    println "Telnet client exit.";
+		    return;
+		};
+		$server puts [$message . "\r"];
+	    };
+	    if {$server ready?} {
+	        message ::= $server gets;
+	        if [nil? $message] then: {
+		    println "Disconnect from telnet server.";
+                    return;
+		};
+		println $message;
+	    };
+	};
+    }
+    fin: {
+	$server close;
     };
-    
-    $server close;
 };
 
