@@ -15,11 +15,17 @@ defun telnet-server (file: file port: port) {
 	client-addr ::= dict;
     
 	loop do: {
-            
-            $pid-list each do: {| p |
-                wait $p;
-            };
-            pid-list := ();
+
+            pid-list ::=
+                $pid-list filter {| p |
+                    try {
+                        (rpid sts) ::= wait :noblock $p;
+                    } catch: {
+                        rpid := -1;
+                    };
+                    {$rpid = 0} ??? <t> <nil>;
+                }
+            ;;
 
 	    # check listen port for connect request from client
 
@@ -34,7 +40,7 @@ defun telnet-server (file: file port: port) {
 		$f set! $fd mode: io;
 		$f set-encoding UTF-8;
 		$f set-newline <t>;
-		println "Connect client from " [host-address-string $addr];
+		println "Connect client from " [host-address-string $addr] ":" $port;
                 telnet-server-send-file $f $file $pid-list;
             };
         };
