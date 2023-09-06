@@ -14,5 +14,7 @@ defun telnet (host enc: enc port: port) {
         if {$s = ""} {continue};
         $stdout puts $s;
     };
+    
+    $server close;
 };
 
