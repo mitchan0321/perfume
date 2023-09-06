@@ -2901,25 +2901,40 @@ Toy_Type*
 cmd_wait(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     int wsts, pid, ssts;
     Toy_Type *tpid;
+    Toy_Type *result;
+    Toy_Type *noblock;
 
     if (arglen != 1) goto error;
+    
+    noblock = hash_get_and_unset_t(nameargs, new_symbol(L"noblock:"));
     if (hash_get_length(nameargs) > 0) goto error;
     
     tpid = list_get_item(posargs);
     if (GET_TAG(tpid) != INTEGER) goto error;
 
     pid = mpz_get_si(tpid->u.biginteger);
-    ssts = waitpid(pid, &wsts, 0);
+    if (noblock) { 
+        ssts = waitpid(pid, &wsts, WNOHANG);
+    } else {
+        ssts = waitpid(pid, &wsts, 0);
+    }
+    
     if (-1 == ssts) {
 	return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
     }
 	
-    return new_integer_si(WEXITSTATUS(wsts));
+    result = new_list(NULL);
+    list_append(result, new_integer_si(ssts));
+    if (0 == ssts) {
+        list_append(result, new_integer_si(0));
+    } else {
+        list_append(result, new_integer_si(WEXITSTATUS(wsts)));
+    }
+    return result;
 
 error:
-    return new_exception(TE_SYNTAX, L"Syntax error, syntax: wait pid", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error, syntax: wait [:noblock] pid", interp);
 }
-
 
 Toy_Type*
 cmd_read(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
