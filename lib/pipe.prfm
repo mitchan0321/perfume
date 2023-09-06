@@ -148,7 +148,7 @@ defun pipe (in: in out: out append: append args: blocks) {
 	$stdin clear;
 	$stdout flush;
 
-	if {false? CO-MODE} then: {try {loop {s ::= wait -1}} catch: {}};
+	if {false? CO-MODE} then: {try {loop {(rpid sts) ::= wait -1}} catch: {}};
 	if {block? $old-trap}
 	    then: {trap SIGPIPE $old-trap}
 	    else: {trap SIGPIPE}
