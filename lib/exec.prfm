@@ -191,7 +191,7 @@ defun exec (
         if {true? bg} {
             status := 0;
         } {
-            status ::= wait $pid;
+            (rpid status) ::= wait $pid;
             if {$status = 255} then: {
                 throw ErrExecProgram "Can\'t execute program." #'
             };
