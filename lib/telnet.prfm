@@ -7,7 +7,7 @@ defun telnet (host enc: enc port: port) {
     server ::= new File;
     $server set! $f mode: io;
     $server set-encoding $enc;
-    $server set-newline <nil>;
+    $server set-newline <t>;
     $server set-ignore-cr <t>;
     
     try {
@@ -19,6 +19,7 @@ defun telnet (host enc: enc port: port) {
 		    return;
 		};
 		$server puts [$message . "\r"];
+                $server flush;
 	    };
 	    if {$server ready?} {
 	        message ::= $server gets;
@@ -26,7 +27,11 @@ defun telnet (host enc: enc port: port) {
 		    println "Disconnect from telnet server.";
                     return;
 		};
-		println $message;
+                l ::= $message split sep: "\n";
+                if {$l last : car : = ""} {$l ->>};
+                $l each do: {| r |
+                    println $r;
+                };
 	    };
 	};
     }
