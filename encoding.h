@@ -19,6 +19,13 @@
 #define NENCODE_EUCJP			(3)
 #define NENCODE_SJIS			(4)
 
+/* encoding symbol */
+#define SENCODE_RAW			(L"RAW")
+#define SENCODE_UTF8			(L"UTF-8")
+#define SENCODE_UTF8F			(L"UTF-8F")
+#define SENCODE_EUCJP			(L"EUC-JP")
+#define SENCODE_SJIS			(L"Shift-JIS")
+
 /* encoder/decoder error code */
 #define EENCODE_BADENCODING		(1)
 #define EENCODE_LESSLENGTH		(2)
@@ -47,5 +54,16 @@ extern wchar_t JISX0208_to_Unicode[65536];
 extern int jisencoder_setup_done;
 void JisEncoder_Setup();
 #define JISENCODER_INIT()	if (jisencoder_setup_done == 0) {JisEncoder_Setup();}
+
+/* encoder functions */
+Cell*raw_decoder(Cell *raw, encoder_error_info *error_info);
+Cell*raw_encoder(Cell *unicode, encoder_error_info *error_info);
+Cell*utf8_decoder(Cell *raw, encoder_error_info *error_info);
+Cell*utf8f_decoder(Cell *raw, encoder_error_info *error_info);
+Cell*utf8_encoder(Cell *unicode, encoder_error_info *error_info);
+Cell*eucjp_decoder(Cell *raw, encoder_error_info *error_info);
+Cell*eucjp_encoder(Cell *unicode, encoder_error_info *error_info);
+Cell*sjis_decoder(Cell *raw, encoder_error_info *error_info);
+Cell*sjis_encoder(Cell *unicode, encoder_error_info *error_info);
 
 #endif /* __ENCODING__ */
