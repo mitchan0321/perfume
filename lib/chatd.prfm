@@ -25,6 +25,7 @@ defun chatd () {
 		$f set! $fd mode: io;
 		$f set-encoding UTF-8;
 		$f set-newline <t>;
+                $f set-ignore-cr <t>;
 		$client-list set $fd $f;
 		$client-addr set $fd ["%v:%v" fmt [host-address-string $addr] $port];
 		println "Connect client from " $client-addr,$fd;
@@ -54,7 +55,8 @@ defun chatd () {
 		(dmy ofds dmy) ::= select () [$client-list keys :string : map {| k | $k int}] () 0;
 		$ofds each do: {| c-out |
 		    if {$c-out = $c-in} then: {continue};
-		    $client-list,$c-out puts $message;
+		    $client-list,$c-out puts [$message . "\r"];
+                    $client-list,$c-out flush;
 		    println "Message delivery [" $message "] to " $client-addr,$c-out;
 		};
 	    };

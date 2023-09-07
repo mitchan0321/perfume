@@ -6,7 +6,7 @@ defun chat (host) {
     $server set! $f mode: io;
     $server set-encoding UTF-8;
     $server set-newline <t>;
-#    println "*** " [$server stat];
+    $server set-ignore-cr <t>;
 
     try {
         loop do: {
@@ -20,7 +20,8 @@ defun chat (host) {
 		    println "Chat client exit.";
 		    return;
 		};
-		$server puts [$message clean];
+		$server puts [$message . "\r"];
+                $server flush;
 	    };
 	    if {$server ready?} {
 	        message ::= $server gets;
