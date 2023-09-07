@@ -1,15 +1,14 @@
 #include "toy.h"
 #include "encoding.h"
 
-Cell*raw_decoder(Cell *raw, encoder_error_info *error_info);
-Cell*raw_encoder(Cell *unicode, encoder_error_info *error_info);
-Cell*utf8_decoder(Cell *raw, encoder_error_info *error_info);
-Cell*utf8f_decoder(Cell *raw, encoder_error_info *error_info);
-Cell*utf8_encoder(Cell *unicode, encoder_error_info *error_info);
-Cell*eucjp_decoder(Cell *raw, encoder_error_info *error_info);
-Cell*eucjp_encoder(Cell *unicode, encoder_error_info *error_info);
-Cell*sjis_decoder(Cell *raw, encoder_error_info *error_info);
-Cell*sjis_encoder(Cell *unicode, encoder_error_info *error_info);
+static wchar_t *ENCODING_NAME_DEFS[] = {
+    SENCODE_RAW,	// index: 0 ... RAW encoding (no encoding, byte data stream)
+    SENCODE_UTF8,	// index: 1 ... UTF-8 encoding
+    SENCODE_UTF8F,	// index: 2 ... UTF-8F encoding
+    SENCODE_EUCJP,	// index: 3 ... EUC-JP encoding
+    SENCODE_SJIS,	// index: 4 ... Shift-JIS encoding
+    0
+};
 
 typedef struct _encoder_methods {
     Cell*(*raw_to_unicode)(Cell *raw, encoder_error_info *error_info);
@@ -23,15 +22,6 @@ static encoder_methods Encoder_methods[] = {
     {eucjp_decoder, eucjp_encoder},	// NENCODE_EUCJP
     {sjis_decoder, sjis_encoder},	// NENCODE_SJIS
     {0, 0}
-};
-
-static wchar_t *ENCODING_NAME_DEFS[] = {
-    L"RAW",		// index: 0 ... RAW encoding (no encoding, byte data stream)
-    L"UTF-8",		// index: 1 ... UTF-8 encoding
-    L"UTF-8F",		// index: 2 ... UTF-8F encoding
-    L"EUC-JP",		// index: 3 ... EUC-JP encoding
-    L"Shift-JIS",	// index: 4 ... Shift-JIS encoding
-    0
 };
 
 wchar_t*
