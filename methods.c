@@ -3775,6 +3775,7 @@ typedef struct _toy_file {
     int ignore_cr;
     int include_cr;
     int enc_error;
+    int raw_io;
     Toy_Type *tag;
 } Toy_File;
 
@@ -3828,6 +3829,7 @@ mth_file_init(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     f->enc_error = 0;
     f->readbuffer_max = READBUFFER_MAX_DEFAULT;
     f->early_exit = 0;
+    f->raw_io = 0;
     hash_set_t(self, const_Holder, new_container(f, L"FILE"));
 
     enc = hash_get_t(interp->globals, const_DEFAULT_FILE_ENCODING);
@@ -4469,6 +4471,7 @@ mth_file_stat(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     list_append(l, new_cons(new_symbol(L"include-cr"), f->include_cr ? const_T : const_Nil));
     list_append(l, new_cons(new_symbol(L"encode-error"), f->enc_error ? const_T : const_Nil));
     list_append(l, new_cons(new_symbol(L"tag"), f->tag ? f->tag : const_Nil));
+    list_append(l, new_cons(new_symbol(L"rawio"), f->raw_io ? const_T : const_Nil));
 
     return l;
 
@@ -4952,6 +4955,42 @@ mth_file_gettag(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
 
 error:
     return new_exception(TE_SYNTAX, L"Syntax error at 'get-tag', syntax: File get-tag", interp);
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
+mth_file_setrawio(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Hash *self;
+    Toy_Type *container, *flag;
+    Toy_File *f;
+    int iflag = 0;
+
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    flag = list_get_item(posargs);
+    if (IS_NIL(flag)) {
+	iflag = 0;	// set bufferd io
+    } else {
+	iflag = 1;	// set raw io
+    }
+
+    self = SELF_HASH(interp);
+    container = hash_get_t(self, const_Holder);
+    if (NULL == container) goto error2;
+    f = container->u.container.data;
+
+    if (iflag) {
+	f->raw_io = 1;
+	return const_T;
+    } else {
+	f->raw_io = 0;
+	return const_Nil;
+    }
+    
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'set-rawio', syntax: File set-rawio t | nil", interp);
 error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
 }
@@ -6143,6 +6182,7 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, L"File", L"set-readbuffer-max", 	mth_file_setreadbuffer_max,	L"val");
     toy_add_method(interp, L"File", L"set-tag", 	mth_file_settag,	L"val");
     toy_add_method(interp, L"File", L"get-tag", 	mth_file_gettag,	NULL);
+    toy_add_method(interp, L"File", L"set-rawio", 	mth_file_setrawio,	L"val");
 
     toy_add_method(interp, L"Block", L"eval", 		mth_block_eval, 	NULL);
 
