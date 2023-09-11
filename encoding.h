@@ -8,7 +8,7 @@
 
 /*
  * Indicate the maximum encoding name index; range is 0 to ENCODING_NAME_MAX.
- * Now ready encodings are RAW, UTF-8, EUC-JP and Shift-JIS.
+ * Now ready encodings are RAW, UTF-8, UTF-8F, EUC-JP and Shift-JIS.
  */
 #define ENCODING_NAME_MAX		(4)
 
