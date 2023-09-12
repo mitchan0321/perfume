@@ -9,6 +9,8 @@ defun telnet (host enc: enc port: port) {
     $server set-encoding $enc;
     $server set-newline <t>;
     $server set-ignore-cr <t>;
+    $server set-noblock <t>;
+    ### $server set-nobuffer;
     
     try {
         loop do: {
@@ -24,13 +26,16 @@ defun telnet (host enc: enc port: port) {
 	    if {$server ready?} {
 	        message ::= $server gets;
 	        if [nil? $message] then: {
-		    println "Disconnect from telnet server.";
+                    println "Disconnect from telnet server.";
                     return;
-		};
+                };
+                $stdout puts :nonewline $message;
+                REM {
                 l ::= $message split sep: "\n";
                 if {$l last : car : = ""} {$l ->>};
                 $l each do: {| r |
                     println $r;
+                };
                 };
 	    };
 	};
