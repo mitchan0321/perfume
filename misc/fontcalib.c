@@ -23,10 +23,18 @@ int main(int argc, char **argv) {
         return 1;
     }
 
+#ifdef __FreeBSD__
+    tcgetattr(0, &tm);
+#else
     ioctl(0, TCGETS, &tm);
+#endif
     tm_save = tm;
     cfmakeraw(&tm);
+#ifdef __FreeBSD__
+    tcsetattr(0, TCSANOW, &tm);
+#else
     ioctl(0, TCSETS, &tm);
+#endif
 
     fprintf(stdout, "\e[H\e[2J"); /* cursor home and clear */
     fflush(stdout);
@@ -42,7 +50,12 @@ int main(int argc, char **argv) {
         fprintf(fp, "%d\n", w);
     }
     
+#ifdef __FreeBSD__
+    tcsetattr(0, TCSANOW, &tm_save);
+#else
     ioctl(0, TCSETS, &tm_save);
+#endif
+    
     fprintf(stdout, "\n");
     fclose(fp);
 
