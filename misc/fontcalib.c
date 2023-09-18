@@ -71,18 +71,20 @@ get_char_width(unsigned int c, unsigned char *buff) {
     if (-1 == l) return -1;
     if (r != '[') return -1;
     l = read(0, &r, 1);
+    if (-1 == l) return -1;
     while (r != ';') {
-        if (-1 == l) return -1;
         acc_y *= 10;
         acc_y += (r - '0');
         l = read(0, &r, 1);
+        if (-1 == l) return -1;
     }
     l = read(0, &r, 1);
+    if (-1 == l) return -1;
     while (r != 'R') {
-        if (-1 == l) return -1;
         acc_x *= 10;
         acc_x += (r - '0');
         l = read(0, &r, 1);
+        if (-1 == l) return -1;
     }
 
     return acc_x - 1;
