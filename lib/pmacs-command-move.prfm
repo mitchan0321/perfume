@@ -658,3 +658,67 @@ defcommand goto desc: "Jump to specified line in buffer." {
     
     result ALL;
 };
+
+defcommand all-window-scroll-up desc: "Scroll up all window." {
+    | main window |
+    $main get-window-list : each do: {| i |
+        $i apply-command $main $i "" smooth-scroll-up;
+    };
+    result ALL;
+};
+
+defcommand all-window-scroll-down desc: "Scroll down all window." {
+    | main window |
+    $main get-window-list : each do: {| i |
+        $i apply-command $main $i "" smooth-scroll-down;
+    };
+    result ALL;
+};
+
+defcommand all-window-scroll-right desc: "Scroll right all window." {
+    | main window |
+    $main get-window-list : each do: {| i |
+        $i apply-command $main $i "" smooth-scroll-right;
+    };
+    result ALL;
+};
+
+defcommand all-window-scroll-left desc: "Scroll left all window." {
+    | main window |
+    $main get-window-list : each do: {| i |
+        $i apply-command $main $i "" smooth-scroll-left;
+    };
+    result ALL;
+};
+
+defcommand all-window-page-down desc: "Page down all window." {
+    | main window |
+    $main get-window-list : each do: {| i |
+        $i apply-command $main $i "" next-page;
+    };
+    result ALL;
+};
+
+defcommand all-window-page-up desc: "Page up all window." {
+    | main window |
+    $main get-window-list : each do: {| i |
+        $i apply-command $main $i "" previous-page;
+    };
+    result ALL;
+};
+
+defcommand all-window-top-of-buffer desc: "Top of buffer all window." {
+    | main window |
+    $main get-window-list : each do: {| i |
+        $i apply-command $main $i "" top-of-buffer;
+    };
+    result ALL;
+};
+
+defcommand all-window-bottom-of-buffer desc: "Bottom of buffer all window." {
+    | main window |
+    $main get-window-list : each do: {| i |
+        $i apply-command $main $i "" bottom-of-buffer;
+    };
+    result ALL;
+};
