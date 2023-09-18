@@ -3482,4 +3482,8 @@
 		  all-window-scroll-left, all-window-page-down, all-window-page-up, all-window-top-of-buffer,
 		  all-window-bottom-of-buffer. Key bind to Ctrl+Shift+Alt+[↑],[↓],[→],[←],[PgDn],[PgUp],[HOME],[END].
 
+2023/09/19
+	pmacs update:
+		Fix execute-macro if window forcus change, set new window for apply.
+
 #eof
