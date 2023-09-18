@@ -3475,5 +3475,11 @@
 		Change call wait command.
 	lib/telnet.prfm, telnet-server.prfm
 		Add sample socket application for telnet file delivery server and client.
-		
+
+2023/09/18
+	pmacs update:
+		Add editor commands, all-window-scroll-up, all-window-scroll-down, all-window-scroll-right,
+		  all-window-scroll-left, all-window-page-down, all-window-page-up, all-window-top-of-buffer,
+		  all-window-bottom-of-buffer. Key bind to Ctrl+Shift+Alt+[↑],[↓],[→],[←],[PgDn],[PgUp],[HOME],[END].
+
 #eof
