@@ -1201,6 +1201,7 @@ defcommand execute-record desc: "Execute keyboard macro." {
     __ins-char-cmd := "insert-character";
     while {__r ::= $__buff gets} do: {
         if {"" = $__r} {continue};
+        __window ::= $__main get-current-window;
         if {eq? $__ins-char-cmd [$__r sub 0 [$__ins-char-cmd len]]} {
             result ::= $__window apply-command $__main $__window [$__r sub [$__ins-char-cmd len : + 1]] [symbol $__ins-char-cmd];
         } {
