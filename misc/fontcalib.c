@@ -6,50 +6,86 @@
 #include <termios.h>
 #include <sys/ioctl.h>
 
+int get_char_width(unsigned int i, unsigned char *buff);
 int to_utf8(unsigned int c, unsigned char *utf8s);
 
 int main(int argc, char **argv) {
     unsigned int i;
     unsigned char buff[5];
-    
-    for (i=0x20; i<=0x2ffff; i++) {
-        if ((i % 32) == 0) {
-            fprintf(stdout, "\n");
-            fprintf(stdout, "%05x: ", i);
-        }
-        if (to_utf8(i, buff)) {
-            fprintf(stdout, "%s", buff);
-        }
-    }
-    
-    /*
-    char buff[100];
-    int s, i, val;
+    int w;
     struct termios tm, tm_save;
+    int c;
+    FILE *fp;
     
-    fprintf(stdout, "\e[6n");
-    fflush(stdout);
-    
+    fp = fopen("rename-to-your-font-name.fcab","w");
+    if (fp == NULL) {
+        fprintf(stderr, "can't open calibration file.\n");
+        return 1;
+    }
+
     ioctl(0, TCGETS, &tm);
     tm_save = tm;
     cfmakeraw(&tm);
     ioctl(0, TCSETS, &tm);
 
-    s = read(0, buff, 1);
-    while (1) {
-        if (s > 0) {
-            fprintf(stdout, "%02x", buff[0]);
-            if (buff[0] == 'R') break;
-        } else if ((s == -1) && (errno != EAGAIN)) {
-            break;
-        }
-        s = read(0, buff, 1);
+    fprintf(stdout, "\e[H\e[2J"); /* cursor home and clear */
+    fflush(stdout);
+    
+    for (i=0; i<0x20; i++) {
+        fprintf(fp, "%d\n", 1);
     }
+    
+    for (i=0x20; i<=0x2ffff; i++) {
+        w = get_char_width(i, buff);
+        if (-1 == w) break;
+        fprintf(stdout, "\t%06x\t%s:\t%d\n", i, buff, w);
+        fprintf(fp, "%d\n", w);
+    }
+    
     ioctl(0, TCSETS, &tm_save);
     fprintf(stdout, "\n");
-    */
-    
+    fclose(fp);
+
     return 0;
+}
+
+int
+get_char_width(unsigned int c, unsigned char *buff) {
+    int s;
+    char r, l;
+    int acc_y=0, acc_x=0;
+    
+    s = to_utf8(c, buff);
+    if (0 == s) return 0;
+    
+    fprintf(stdout, "\e[H");    /* cursor home */
+    fflush(stdout);
+    fprintf(stdout, "%s", buff);
+    fflush(stdout);
+    fprintf(stdout, "\e[6n");   /* cursor position report request -> return "u+001bu+005by;xR" */
+    fflush(stdout);
+    l = read(0, &r, 1);
+    if (-1 == l) return -1;
+    if (r != '\e') return -1;
+    l = read(0, &r, 1);
+    if (-1 == l) return -1;
+    if (r != '[') return -1;
+    l = read(0, &r, 1);
+    while (r != ';') {
+        if (-1 == l) return -1;
+        acc_y *= 10;
+        acc_y += (r - '0');
+        l = read(0, &r, 1);
+    }
+    l = read(0, &r, 1);
+    while (r != 'R') {
+        if (-1 == l) return -1;
+        acc_x *= 10;
+        acc_x += (r - '0');
+        l = read(0, &r, 1);
+    }
+
+    return acc_x - 1;
 }
 
 int
