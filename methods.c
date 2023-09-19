@@ -3172,7 +3172,7 @@ display_width(wchar_t *item) {
         w = wcwidth((wchar_t)*p);
         if (w <= 0) {
             if (w < 0) {
-                cl = 1;  // if u+fffd font width is 2, set to 2
+                cl = 2;  // if u+fffd font width is 2, set to 2
             } else {
                 cl = 1;
             }
