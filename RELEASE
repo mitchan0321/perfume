@@ -3485,5 +3485,6 @@
 2023/09/19
 	pmacs update:
 		Fix execute-macro if window forcus change, set new window for apply.
+		Change unknown character font and combining character font.
 
 #eof
