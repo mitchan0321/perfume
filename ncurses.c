@@ -591,7 +591,8 @@ static wchar_t *control_character_font [35] = {
     L"\u241f",  // US   0x1f
     L"\u2421",  // DEL  0x7f
     L"\ufffd",  // Unknown character (width = -1)
-    L"\u2423",  // Combining character (width = 0)
+    // L"\u2423",  // Combining character (width = 0)
+    L"\u25a1",  // Combining character (width = 0)
 };
 
 Toy_Type*
@@ -694,7 +695,7 @@ func_curses_render_line(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, i
             if (w <= 0) {
                 if (w < 0) {
                     cp = control_character_font[33];
-                    rendaring_data[i].display_width = 1; // if u+fffd font width is 2, set to 2
+                    rendaring_data[i].display_width = 2; // if u+fffd font width is 2, set to 2
                 } else {
                     cp = control_character_font[34];
                     rendaring_data[i].display_width = 1;
@@ -1370,7 +1371,7 @@ func_curses_pos_to_index(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, 
             // if (w < 0) {
             if (w <= 0) {
                 if (w < 0) {
-                    rendaring_data[i].display_width = 1;  // if u+fffd font width is 2, set to 2
+                    rendaring_data[i].display_width = 2;  // if u+fffd font width is 2, set to 2
                 } else {
                     rendaring_data[i].display_width = 1;
                 }
@@ -1465,7 +1466,7 @@ func_curses_index_to_pos(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, 
             // if (w < 0) {
             if (w <= 0) {
                 if (w < 0) {
-                    rendaring_data[i].display_width = 1;  // if u+fffd font width is 2, set to 2
+                    rendaring_data[i].display_width = 2;  // if u+fffd font width is 2, set to 2
                 } else {
                     rendaring_data[i].display_width = 1;
                 }
