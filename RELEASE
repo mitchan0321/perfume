@@ -3483,6 +3483,8 @@
 		  all-window-bottom-of-buffer. Key bind to Ctrl+Shift+Alt+[↑],[↓],[→],[←],[PgDn],[PgUp],[HOME],[END].
 
 2023/09/19
+	methods.c
+		Change unknown character font width (u+fffd width to 2).
 	pmacs update:
 		Fix execute-macro if window forcus change, set new window for apply.
 		Change unknown character font and combining character font.
