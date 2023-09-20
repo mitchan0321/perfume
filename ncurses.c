@@ -7,6 +7,7 @@
 #define __USE_XOPEN
 #include <wchar.h>
 #include <string.h>
+#include <sys/time.h>
 
 #include "toy.h"
 #include "interp.h"
@@ -17,7 +18,7 @@
 #include "cstack.h"
 #include "util.h"
 #include "encoding.h"
-#include "sys/time.h"
+#include "fclib.h"
 
 Toy_Type*
 func_curses_init(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
@@ -690,7 +691,7 @@ func_curses_render_line(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, i
 	    rendaring_data[i].display_width = 1;
         } else {
             int w;
-            w = (int)wcwidth((wchar_t)p[i]);
+            w = (int)fcl_get_width((wchar_t)p[i]);
             // if (w < 0) {
             if (w <= 0) {
                 if (w < 0) {
@@ -1367,7 +1368,7 @@ func_curses_pos_to_index(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, 
 	    rendaring_data[i].display_width = 1;
         } else {
             int w;
-            w = (int)wcwidth((wchar_t)p[i]);
+            w = (int)fcl_get_width((wchar_t)p[i]);
             // if (w < 0) {
             if (w <= 0) {
                 if (w < 0) {
@@ -1462,7 +1463,7 @@ func_curses_index_to_pos(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, 
 	    rendaring_data[i].display_width = 1;
         } else {
             int w;
-            w = (int)wcwidth((wchar_t)p[i]);
+            w = (int)fcl_get_width((wchar_t)p[i]);
             // if (w < 0) {
             if (w <= 0) {
                 if (w < 0) {
@@ -1621,6 +1622,39 @@ error:
     return new_exception(TE_SYNTAX, L"Syntax error at 'curs-set', syntax: curs-set 0 | 1", interp);
 }
 
+Toy_Type*
+func_init_font_calib(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *fp;
+    int sts;
+    
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (arglen != 1) goto error;
+
+    fp = list_get_item(posargs);
+    if (GET_TAG(fp) != STRING) goto error;
+    sts = fcl_read_cab_file(to_char(cell_get_addr(fp->u.string)));
+    if (0 == sts) {
+        return const_Nil;
+    }
+    
+    return const_T;
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'init-font-calib', syntax: init-font-calib \"path-to-fcab-file\"", interp);
+}
+
+Toy_Type*
+func_reset_font_calib(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (arglen != 0) goto error;
+
+    fcl_reset();
+    return const_T;
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'reset-font-calib', syntax: reset-font-calib", interp);
+}
+
 int
 toy_add_func_ncurses(Toy_Interp* interp) {
     toy_add_func(interp, L"curs-init",		func_curses_init,		NULL);
@@ -1652,9 +1686,11 @@ toy_add_func_ncurses(Toy_Interp* interp) {
     toy_add_func(interp, L"curs-keyin",		func_curses_keyin,		L"window,timeout,encoding");
     toy_add_func(interp, L"curs-pos-to-index",	func_curses_pos_to_index,	L"string,pos,tab-width");
     toy_add_func(interp, L"curs-index-to-pos",	func_curses_index_to_pos,	L"string,index,tab-width");
-    toy_add_func(interp, L"curs-flash",		func_curses_flash,		NULL);    
-    toy_add_func(interp, L"curs-col",		func_curses_col,		L"string");    
-    toy_add_func(interp, L"curs-set",		func_curses_set,		L"integer");    
+    toy_add_func(interp, L"curs-flash",		func_curses_flash,		NULL);
+    toy_add_func(interp, L"curs-col",		func_curses_col,		L"string");
+    toy_add_func(interp, L"curs-set",		func_curses_set,		L"integer");
+    toy_add_func(interp, L"init-font-calib",	func_init_font_calib,		L"path-to-fcab");
+    toy_add_func(interp, L"reset-font-calib",	func_reset_font_calib,		NULL);
     return 0;
 }
 

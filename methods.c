@@ -21,6 +21,7 @@
 #include "cstack.h"
 #include "util.h"
 #include "encoding.h"
+#include "fclib.h"
 
 Toy_Type* cmd_fun(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen);
 
@@ -3169,7 +3170,7 @@ display_width(wchar_t *item) {
     len = 0;
     p = item;
     while (*p) {
-        w = wcwidth((wchar_t)*p);
+        w = fcl_get_width((wchar_t)*p);
         if (w <= 0) {
             if (w < 0) {
                 cl = 2;  // if u+fffd font width is 2, set to 2
