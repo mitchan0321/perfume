@@ -10,13 +10,13 @@ OPTLIBS2 =
 INCLUDE	= -I/usr/local/include -I.
 
 HDRS	= bulk.h binbulk.h cell.h array.h error.h hash.h interp.h parser.h \
-	  toy.h types.h config.h global.h cstack.h util.h encoding.h
+	  toy.h types.h config.h global.h cstack.h util.h encoding.h fclib.h
 SRCS	= bulk.c binbulk.c cell.c array.c hash.c list.c parser.c types.c \
 	  eval.c interp.c commands.c methods.c global.c cstack.c util.c \
-	  encoding.c encoding-table.c
+	  encoding.c encoding-table.c fclib.c
 OBJS	= bulk.o binbulk.o cell.o array.o hash.o list.o parser.o types.o \
 	  eval.o interp.o commands.o methods.o global.o cstack.o util.o \
-	  encoding.o encoding-table.o
+	  encoding.o encoding-table.o fclib.o
 
 ######################################################################################
 ###
@@ -154,6 +154,7 @@ install:
 	install -m 644 lib/*.keymap $(PREFIX)/lib/perfume/lib
 	install -m 444 lib/pdoc/* $(PREFIX)/lib/perfume/lib/pdoc
 	install -m 444 lib/Tasklet/* $(PREFIX)/lib/perfume/lib/Tasklet
+	install -m 644 misc/default.fcab $(PREFIX)/lib/perfume/lib
 	install -m 755 pkg/pmacs.in $(PREFIX)/bin
 	install -m 755 pkg/pmacs-client.in $(PREFIX)/bin
 	install -m 755 pkg/pmacs-install.sh $(PREFIX)/pmacs-install.sh
@@ -229,6 +230,9 @@ encoding-table.o: encoding-table.c $(HDRS)
 	awk -f jisconv.awk < doc/jis0208.txt
 	$(CC) $(CFLAGS) -O0 $(INCLUDE) encoding-table.c -o encoding-table.o
 
+fclib.o:	fclib.c $(HDRS)
+	$(CC) $(CFLAGS) $(INCLUDE) fclib.c -o fclib.o
+
 ###
 ### Compile optional feature
 ###
@@ -286,6 +290,7 @@ endif
 	install -m 644 lib/pdoc/* $(PKG_DIR)/lib/perfume/lib/pdoc
 	install -m 644 lib/Tasklet/* $(PKG_DIR)/lib/perfume/lib/Tasklet
 	install -m 644 lib/dot-pmacs/* $(PKG_DIR)/lib/perfume/lib/dot-pmacs
+	install -m 644 misc/default.fcab $(PKG_DIR)/lib/perfume/lib
 	install -m 755 pkg/install.sh $(PKG_DIR)
 	install -m 644 pkg/INSTALL    $(PKG_DIR)
 	install -m 644 pkg/pmacs.in   $(PKG_DIR)/bin
