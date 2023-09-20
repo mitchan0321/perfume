@@ -1623,7 +1623,7 @@ error:
 }
 
 Toy_Type*
-func_init_font_calib(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+func_load_font_calib(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *fp;
     int sts;
     
@@ -1640,7 +1640,7 @@ func_init_font_calib(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int 
     return const_T;
 
 error:
-    return new_exception(TE_SYNTAX, L"Syntax error at 'init-font-calib', syntax: init-font-calib \"path-to-fcab-file\"", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'load-font-calib', syntax: load-font-calib \"path-to-fcab-file\"", interp);
 }
 
 Toy_Type*
@@ -1689,7 +1689,7 @@ toy_add_func_ncurses(Toy_Interp* interp) {
     toy_add_func(interp, L"curs-flash",		func_curses_flash,		NULL);
     toy_add_func(interp, L"curs-col",		func_curses_col,		L"string");
     toy_add_func(interp, L"curs-set",		func_curses_set,		L"integer");
-    toy_add_func(interp, L"init-font-calib",	func_init_font_calib,		L"path-to-fcab");
+    toy_add_func(interp, L"load-font-calib",	func_load_font_calib,		L"path-to-fcab");
     toy_add_func(interp, L"reset-font-calib",	func_reset_font_calib,		NULL);
     return 0;
 }
