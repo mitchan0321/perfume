@@ -38,7 +38,7 @@ fcl_read_cab_file(char *fname) {
     uc = 0x20;
     while (NULL != fgets(buff, 32, fp)) {
         switch (buff[0]) {
-        case 0:
+        case 0: case '\n':
             w = 0;
             break;
         case '0':
