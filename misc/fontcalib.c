@@ -39,15 +39,22 @@ int main(int argc, char **argv) {
     fprintf(stdout, "\e[H\e[2J"); /* cursor home and clear */
     fflush(stdout);
     
+    /* ommit font calib file begining at character 0x20 */
+    /*
     for (i=0; i<0x20; i++) {
         fprintf(fp, "%d\n", 1);
     }
+    */
     
     for (i=0x20; i<=0x2ffff; i++) {
         w = get_char_width(i, buff);
         if (-1 == w) break;
         fprintf(stdout, "\t%06x\t%s:\t%d\n", i, buff, w);
-        fprintf(fp, "%d\n", w);
+        if (0 == (i % 0x10)) {
+            fprintf(fp, "%d\t%s\t%06x\n", w, buff, i);
+        } else {
+            fprintf(fp, "%d\t%s\n", w, buff);
+        }
     }
     
 #ifdef __FreeBSD__
