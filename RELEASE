@@ -3489,4 +3489,13 @@
 		Fix execute-macro if window forcus change, set new window for apply.
 		Change unknown character font and combining character font.
 
+20023/09/20
+	fclib.[ch]
+		New feature font glyph width calibration and get library.
+	Makefile
+		Add compile fclib.[ch] and install misc/default.fcab file.
+	pmacs update:
+		Change font width get method XOPEN library wcwidth(3) change to use font calibration
+		  library function fcl_get_width(3).
+
 #eof
