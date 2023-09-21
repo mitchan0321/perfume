@@ -9,12 +9,14 @@
 static int _fclib_init = 0;
 
 /* font width bit map table */
-static uint32_t _fbmap[FCL_MAXNUMCHAR/16];
+static uint32_t _fbmap[FCL_MAXNUMCHAR/FCL_NUMGROUPS];
+
+#define BUFFSIZE        256
 
 int
 fcl_read_cab_file(char *fname) {
     FILE *fp;
-    char buff[32];
+    char buff[BUFFSIZE];
     int i;
     int uc;
     int w;
@@ -22,7 +24,7 @@ fcl_read_cab_file(char *fname) {
     if (_fclib_init) return 1;  /* already initialized */
     
     /* clear bitmap */
-    for (i=0; i<FCL_MAXNUMCHAR/16; i++) {
+    for (i=0; i<FCL_MAXNUMCHAR/FCL_NUMGROUPS; i++) {
         _fbmap[i] = 0;
     }
 
@@ -36,9 +38,9 @@ fcl_read_cab_file(char *fname) {
     
     /* start at character 0x20 */
     uc = 0x20;
-    while (NULL != fgets(buff, 32, fp)) {
+    while (NULL != fgets(buff, BUFFSIZE, fp)) {
         switch (buff[0]) {
-        case 0: case '\n':
+        case 0: case '\n': case '\r':
             w = 0;
             break;
         case '0':
@@ -52,6 +54,18 @@ fcl_read_cab_file(char *fname) {
             break;
         case '3':
             w = 3;
+            break;
+        case '4':
+            w = 4;
+            break;
+        case '5':
+            w = 5;
+            break;
+        case '6':
+            w = 6;
+            break;
+        case '7':
+            w = 7;
             break;
         default:
             w = 1;
