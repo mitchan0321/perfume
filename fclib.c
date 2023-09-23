@@ -87,13 +87,21 @@ fcl_reset(char *fname) {
 
 int
 fcl_get_width(wchar_t uc) {
-    int w;
+    int w, lw;
 
     w = wcwidth(uc);
     
     if (0 == _fclib_init) return w;
     if (uc >= FCL_MAXNUMCHAR) return w;
-    if ((w == -1) || (w == 0)) return w;
-
-    return FCL_GET(_fbmap, uc);
+    if (w == -1) return w;
+    
+    lw = FCL_GET(_fbmap, uc);
+    if (lw == 0) {
+        if (w == 1) {
+            // U+1242b hack
+            return FCL_GRPBITMASK + 2;
+        }
+    }
+    if (w == 0) return 0;
+    return lw;
 }
