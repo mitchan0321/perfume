@@ -3739,6 +3739,87 @@ error2:
 }
 
 Toy_Type*
+mth_string_uencode(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *self;
+    Toy_Type *enc;
+    int ienc;
+    Cell *src, *dest;
+    encoder_error_info *enc_error_info;
+
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (arglen != 1) goto error;
+
+    self = SELF(interp);
+    if (GET_TAG(self) != STRING) goto error2;
+    
+    enc = list_get_item(posargs);
+    if (GET_TAG(enc) != SYMBOL) goto error;
+    ienc = get_encoding_index(cell_get_addr(enc->u.symbol.cell));
+    if (-1 == ienc) {
+        return new_exception(TE_BADENCODER, L"Bad encoder specified.", interp);
+    }
+
+    enc_error_info = GC_MALLOC(sizeof(encoder_error_info));
+    ALLOC_SAFE(enc_error_info);
+    memset(enc_error_info, 0, sizeof(encoder_error_info));
+
+    src = self->u.string;
+    dest = encode_unicode_to_raw(src, ienc, enc_error_info);
+    if (NULL == dest) {
+        return new_exception(TE_BADENCODEBYTE, enc_error_info->message, interp);
+    }
+
+    return new_string_cell(dest);
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'uencode', syntax: String uencode encoding", interp);
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
+mth_string_udecode(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *self;
+    Toy_Type *enc;
+    int ienc;
+    Cell *src, *dest;
+    encoder_error_info *enc_error_info;
+
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (arglen != 1) goto error;
+
+    self = SELF(interp);
+    if (GET_TAG(self) != STRING) goto error2;
+    
+    enc = list_get_item(posargs);
+    if (GET_TAG(enc) != SYMBOL) goto error;
+    ienc = get_encoding_index(cell_get_addr(enc->u.symbol.cell));
+    if (-1 == ienc) {
+        return new_exception(TE_BADENCODER, L"Bad encoder specified.", interp);
+    }
+
+    enc_error_info = GC_MALLOC(sizeof(encoder_error_info));
+    ALLOC_SAFE(enc_error_info);
+    memset(enc_error_info, 0, sizeof(encoder_error_info));
+
+    src = self->u.string;
+    dest = decode_raw_to_unicode(src, ienc, enc_error_info);
+    if (NULL == dest) {
+        if (enc_error_info->errorno == EENCODE_LESSLENGTH) {
+            return new_exception(TE_BADENCODELESSLENGTH, enc_error_info->message, interp);
+        }
+        return new_exception(TE_BADENCODEBYTE, enc_error_info->message, interp);
+    }
+
+    return new_string_cell(dest);
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'uencode', syntax: String uencode encoding", interp);
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
 mth_block_eval(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *closure, *result;
 
@@ -6160,6 +6241,8 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, L"String", L"numeric?",	mth_string_isnum,	NULL);
     toy_add_method(interp, L"String", L"alphanumeric?",	mth_string_isalnum,	NULL);
     toy_add_method(interp, L"String", L"display-width",	mth_string_display_width,NULL);
+    toy_add_method(interp, L"String", L"udecode",	mth_string_udecode,     L"encoding");
+    toy_add_method(interp, L"String", L"uencode",	mth_string_uencode,     L"encoding");
 
     toy_add_method(interp, L"File", L"init", 		mth_file_init, 		L"mode:,mode,file-path");
     toy_add_method(interp, L"File", L"open", 		mth_file_open, 		L"mode:,mode,file-path");
