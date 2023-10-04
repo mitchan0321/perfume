@@ -3498,4 +3498,16 @@
 		Change font width get method XOPEN library wcwidth(3) change to use font calibration
 		  library function fcl_get_width(3).
 
+2023/10/04
+	error.h
+		Add error define TE_BADENCODELESSLENGTH if decode UTF-8/EUC-JP/Shift-JIS occurd error,
+		  it meaning less byte after character return this.
+	encode.[ch]
+		Add encoding name EUC-JPF and Shift-JISF for fake return if occured deco de error.
+	methods.c
+		Add String::udecode for decode RAW encoding string to specified encode string.
+		Add String::uencode for Unicode string to specified encode and return RAW encoding string.
+	pmacs update:
+		Change encoder EUC-JP -> EUC-JPF, Shift-JIS -> Shift-JISF.
+
 #eof
