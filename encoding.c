@@ -6,7 +6,9 @@ static wchar_t *ENCODING_NAME_DEFS[] = {
     SENCODE_UTF8,	// index: 1 ... UTF-8 encoding
     SENCODE_UTF8F,	// index: 2 ... UTF-8F encoding
     SENCODE_EUCJP,	// index: 3 ... EUC-JP encoding
-    SENCODE_SJIS,	// index: 4 ... Shift-JIS encoding
+    SENCODE_EUCJPF,	// index: 4 ... EUC-JP encoding
+    SENCODE_SJIS,	// index: 5 ... Shift-JIS encoding
+    SENCODE_SJISF,	// index: 6 ... Shift-JIS encoding
     0
 };
 
@@ -20,7 +22,9 @@ static encoder_methods Encoder_methods[] = {
     {utf8_decoder, utf8_encoder},	// NENCODE_UTF8
     {utf8f_decoder, utf8_encoder},	// NENCODE_UTF8F
     {eucjp_decoder, eucjp_encoder},	// NENCODE_EUCJP
+    {eucjpf_decoder, eucjp_encoder},	// NENCODE_EUCJPF
     {sjis_decoder, sjis_encoder},	// NENCODE_SJIS
+    {sjisf_decoder, sjis_encoder},	// NENCODE_SJISF
     {0, 0}
 };
 
@@ -430,8 +434,111 @@ utf8_encoder(Cell *unicode, encoder_error_info *error_info) {
     e->pos = i;				        		\
     e->message = L"Bad EUC-JP sequence";
 
+#define HAS_ERROR_SETE_LESS(e) 					\
+    e->errorno = EENCODE_LESSLENGTH;    			\
+    e->pos = i;				        		\
+    e->message = L"Less length EUC-JP sequence";
+
 Cell*
 eucjp_decoder(Cell *raw, encoder_error_info *error_info) {
+    Cell *result;
+    wchar_t *p, c, c2, cr;
+    int len, i;
+    wchar_t *buff;
+
+    JISENCODER_INIT();
+
+    error_info->errorno = 0;
+    error_info->pos = 0;
+    error_info->message = L"";
+
+    p = cell_get_addr(raw);
+    len = cell_get_length(raw);
+    result = new_cell(L"");
+
+    for (i=0; i<len; ) {
+	c = p[i];
+	if ((c >= 0) && (c <= 0x7f)) {
+	    /* ascii */
+	    cell_add_char(result, c);
+	    i++;
+
+	} else if ((c >= 0xa1) && (c <= 0xfe)) {
+	    i++;
+	    if (i >= len) {
+		/* lost data euc_jp 2nd byte, broken file? */
+		cell_add_char(result, c);
+                HAS_ERROR_SETE_LESS(error_info);
+		goto error;
+	    }
+
+	    c2 = p[i];
+	    if ((c2 >= 0xa1) && (c2 <= 0xfe)) {
+		cr = JISX0208_to_Unicode[(((c & 0x7f) << 8) | (c2 & 0x7f)) & 0xffff];
+		if (cr == 0) {
+		    /* not JISX0208 character */
+		    cell_add_char(result, c);
+                    cell_add_char(result, c2);
+                    HAS_ERROR_SETE(error_info);
+                    goto error;
+		} else {
+		    /* valid JISX0208 character */
+		    cell_add_char(result, cr);
+		}
+	    } else {
+		/* less data euc_jp 2nd byte */
+		cell_add_char(result, c);
+		cell_add_char(result, c2);
+                HAS_ERROR_SETE(error_info);
+                goto error;
+	    }
+	    i++;
+
+	} else if (c == 0x8E) {
+	    /* JISX0201 character prefix found */
+	    i++;
+	    if (i >= len) {
+		/* lost data euc_jp JISX0201 2nd byte, broken file? */
+		cell_add_char(result, c);
+                HAS_ERROR_SETE(error_info);
+                goto error;
+	    }
+
+	    c2 = p[i];
+	    if ((c2 >= 0xA1) && (c2 <= 0xDF)) {
+		/* JISX0201 character found */
+		cell_add_char(result, 0xFF61 - 0xA1 + c2);
+	    } else {
+		/* not JISX0201 character */
+		cell_add_char(result, c);
+		cell_add_char(result, c2);
+                HAS_ERROR_SETE(error_info);
+                goto error;
+	    }
+	    i++;
+	    
+	} else {
+	    /* not JISX0208 and not JISX0201 character */
+	    cell_add_char(result, c);
+	    i++;
+	}
+    }
+    
+    return result;
+
+error:
+    if (error_info) {
+	buff = GC_MALLOC(256*sizeof(wchar_t));
+	ALLOC_SAFE(buff);
+	swprintf(buff, 256, L"%ls, at %d bytes.", error_info->message, error_info->pos);
+	error_info->message = buff;
+    }
+	    
+    return NULL;
+}
+
+Cell*
+eucjpf_decoder(Cell *raw, encoder_error_info *error_info) {
     Cell *result;
     wchar_t *p, c, c2, cr;
     int len, i;
@@ -458,8 +565,8 @@ eucjp_decoder(Cell *raw, encoder_error_info *error_info) {
 	    if (i >= len) {
 		/* lost data euc_jp 2nd byte, broken file? */
 		cell_add_char(result, c);
-                HAS_ERROR_SETE(error_info);
-		break;
+                HAS_ERROR_SETE_LESS(error_info);
+                break;
 	    }
 
 	    c2 = p[i];
@@ -629,8 +736,13 @@ sjis2jis(wchar_t src) {
     e->pos = i;				        		\
     e->message = L"Bad Shift-JIS sequence";
 
+#define HAS_ERROR_SETS_LESS(e) 					\
+    e->errorno = EENCODE_LESSLENGTH;    			\
+    e->pos = i;				        		\
+    e->message = L"Less length Shift-JIS sequence";
+
 Cell*
-sjis_decoder(Cell *raw, encoder_error_info *error_info) {
+sjisf_decoder(Cell *raw, encoder_error_info *error_info) {
     Cell *result;
     wchar_t *p, c, c2, cr;
     int len, i;
@@ -662,7 +774,7 @@ sjis_decoder(Cell *raw, encoder_error_info *error_info) {
 	    if (i >= len) {
 		/* lost data Shift-JIS 2nd byte, broken file? */
 		cell_add_char(result, c);
-                HAS_ERROR_SETS(error_info);
+                HAS_ERROR_SETS_LESS(error_info);
 		break;
 	    }
 
@@ -694,6 +806,86 @@ sjis_decoder(Cell *raw, encoder_error_info *error_info) {
     }
     
     return result;
+}
+
+Cell*
+sjis_decoder(Cell *raw, encoder_error_info *error_info) {
+    Cell *result;
+    wchar_t *p, c, c2, cr;
+    int len, i;
+    wchar_t *buff;
+
+    JISENCODER_INIT();
+
+    error_info->errorno = 0;
+    error_info->pos = 0;
+    error_info->message = L"";
+
+    p = cell_get_addr(raw);
+    len = cell_get_length(raw);
+    result = new_cell(L"");
+
+    for (i=0; i<len; ) {
+	c = p[i];
+	if ((c >= 0) && (c <= 0x7f)) {
+	    /* ascii */
+	    cell_add_char(result, c);
+	    i++;
+
+	} else if ((c >= 0xA1) && (c <= 0xDF)) {
+	    /* JISX0201 character found */
+	    cell_add_char(result, 0xFF61 - 0xA1 + c);
+	    i++;
+	    
+	} else if (((c >= 0x81) && (c <= 0x9f)) || ((c >= 0xe0) && (c <= 0xff))) {
+	    i++;
+	    if (i >= len) {
+		/* lost data Shift-JIS 2nd byte, broken file? */
+		cell_add_char(result, c);
+                HAS_ERROR_SETS_LESS(error_info);
+		goto error;
+	    }
+
+	    c2 = p[i];
+	    if (((c2 >= 0x40) && (c2 <= 0x7e)) || ((c2 >= 0x80) && (c2 <= 0xfc))) {
+		cr = JISX0208_to_Unicode[sjis2jis(((c << 8) | c2) & 0xffff)];
+		if (cr == 0) {
+		    /* not JISX0208 character */
+		    cell_add_char(result, c);
+		    cell_add_char(result, c2);
+                    HAS_ERROR_SETS(error_info);
+                    goto error;
+		} else {
+		    /* valid JISX0208 character */
+		    cell_add_char(result, cr);
+		}
+	    } else {
+		/* less data Shift-JIS 2nd byte */
+		cell_add_char(result, c);
+		cell_add_char(result, c2);
+                HAS_ERROR_SETS(error_info);
+		goto error;
+	    }
+	    i++;
+
+	} else {
+	    /* not JISX0208 and not JISX0201 character */
+	    cell_add_char(result, c);
+	    i++;
+	}
+    }
+    
+    return result;
+
+error:
+    if (error_info) {
+	buff = GC_MALLOC(256*sizeof(wchar_t));
+	ALLOC_SAFE(buff);
+	swprintf(buff, 256, L"%ls, at %d bytes.", error_info->message, error_info->pos);
+	error_info->message = buff;
+    }
+	    
+    return NULL;
 }
 
 Cell*

@@ -10,21 +10,25 @@
  * Indicate the maximum encoding name index; range is 0 to ENCODING_NAME_MAX.
  * Now ready encodings are RAW, UTF-8, UTF-8F, EUC-JP and Shift-JIS.
  */
-#define ENCODING_NAME_MAX		(4)
+#define ENCODING_NAME_MAX		(6)
 
 /* encoding index */
 #define NENCODE_RAW			(0)
 #define NENCODE_UTF8			(1)
 #define NENCODE_UTF8F			(2)
 #define NENCODE_EUCJP			(3)
-#define NENCODE_SJIS			(4)
+#define NENCODE_EUCJPF			(4)
+#define NENCODE_SJIS			(5)
+#define NENCODE_SJISF			(6)
 
 /* encoding symbol */
 #define SENCODE_RAW			(L"RAW")
 #define SENCODE_UTF8			(L"UTF-8")
 #define SENCODE_UTF8F			(L"UTF-8F")
 #define SENCODE_EUCJP			(L"EUC-JP")
+#define SENCODE_EUCJPF			(L"EUC-JPF")
 #define SENCODE_SJIS			(L"Shift-JIS")
+#define SENCODE_SJISF			(L"Shift-JISF")
 
 /* encoder/decoder error code */
 #define EENCODE_BADENCODING		(1)
@@ -62,8 +66,10 @@ Cell*utf8_decoder(Cell *raw, encoder_error_info *error_info);
 Cell*utf8f_decoder(Cell *raw, encoder_error_info *error_info);
 Cell*utf8_encoder(Cell *unicode, encoder_error_info *error_info);
 Cell*eucjp_decoder(Cell *raw, encoder_error_info *error_info);
+Cell*eucjpf_decoder(Cell *raw, encoder_error_info *error_info);
 Cell*eucjp_encoder(Cell *unicode, encoder_error_info *error_info);
 Cell*sjis_decoder(Cell *raw, encoder_error_info *error_info);
+Cell*sjisf_decoder(Cell *raw, encoder_error_info *error_info);
 Cell*sjis_encoder(Cell *unicode, encoder_error_info *error_info);
 
 #endif /* __ENCODING__ */
