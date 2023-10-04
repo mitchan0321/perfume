@@ -747,10 +747,10 @@ defcommand set-encoder desc: "Set encoding to current buffer next reload file. Y
             case  $in-key
                 "u" {enc := "UTF-8F"}
                 "U" {enc := "UTF-8F"}
-                "e" {enc := "EUC-JP"}
-                "E" {enc := "EUC-JP"}
-                "s" {enc := "Shift-JIS"}
-                "S" {enc := "Shift-JIS"}
+                "e" {enc := "EUC-JPF"}
+                "E" {enc := "EUC-JPF"}
+                "s" {enc := "Shift-JISF"}
+                "S" {enc := "Shift-JISF"}
                 "r" {enc := "RAW"}
                 "R" {enc := "RAW"}
             ;;
@@ -783,10 +783,10 @@ defcommand set-buffer-encoder desc: "Set buffer encoding to current buffer." {
             case  $in-key
                 "u" {enc := "UTF-8F"}
                 "U" {enc := "UTF-8F"}
-                "e" {enc := "EUC-JP"}
-                "E" {enc := "EUC-JP"}
-                "s" {enc := "Shift-JIS"}
-                "S" {enc := "Shift-JIS"}
+                "e" {enc := "EUC-JPF"}
+                "E" {enc := "EUC-JPF"}
+                "s" {enc := "Shift-JISF"}
+                "S" {enc := "Shift-JISF"}
                 "r" {enc := "RAW"}
                 "R" {enc := "RAW"}
             ;;
