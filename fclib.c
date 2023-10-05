@@ -80,7 +80,7 @@ fcl_read_cab_file(char *fname) {
 }
 
 int
-fcl_reset(char *fname) {
+fcl_reset() {
     _fclib_init = 0;
     return 1;
 }
