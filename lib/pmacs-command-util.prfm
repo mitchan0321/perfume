@@ -745,12 +745,12 @@ defcommand set-encoder desc: "Set encoding to current buffer next reload file. Y
         keyin-proc: {| value in-key |
             enc := <nil>;
             case  $in-key
-                "u" {enc := "UTF-8F"}
-                "U" {enc := "UTF-8F"}
-                "e" {enc := "EUC-JPF"}
-                "E" {enc := "EUC-JPF"}
-                "s" {enc := "Shift-JISF"}
-                "S" {enc := "Shift-JISF"}
+                "u" {enc := "UTF-8/F"}
+                "U" {enc := "UTF-8/F"}
+                "e" {enc := "EUC-JP/F"}
+                "E" {enc := "EUC-JP/F"}
+                "s" {enc := "Shift-JIS/F"}
+                "S" {enc := "Shift-JIS/F"}
                 "r" {enc := "RAW"}
                 "R" {enc := "RAW"}
             ;;
@@ -781,12 +781,12 @@ defcommand set-buffer-encoder desc: "Set buffer encoding to current buffer." {
         keyin-proc: {| value in-key |
             enc := <nil>;
             case  $in-key
-                "u" {enc := "UTF-8F"}
-                "U" {enc := "UTF-8F"}
-                "e" {enc := "EUC-JPF"}
-                "E" {enc := "EUC-JPF"}
-                "s" {enc := "Shift-JISF"}
-                "S" {enc := "Shift-JISF"}
+                "u" {enc := "UTF-8/F"}
+                "U" {enc := "UTF-8/F"}
+                "e" {enc := "EUC-JP/F"}
+                "E" {enc := "EUC-JP/F"}
+                "s" {enc := "Shift-JIS/F"}
+                "S" {enc := "Shift-JIS/F"}
                 "r" {enc := "RAW"}
                 "R" {enc := "RAW"}
             ;;

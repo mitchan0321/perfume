@@ -41,7 +41,7 @@ defun pmacs-client-sub (path) {
     
     server ::= new File;
     $server set! $f mode: io;
-    $server set-encoding UTF-8;
+    $server set-encoding UTF-8/F;
     $server set-newline <t>;
     $server set-readbuffer-max 4096;
 

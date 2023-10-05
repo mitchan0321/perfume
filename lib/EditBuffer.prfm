@@ -25,7 +25,7 @@ EditBuffer method init-constructor () {
     if {defvar? DEFAULT_EDIT_ENCODING} {
         sets Encoding $DEFAULT_EDIT_ENCODING;
     } {
-        sets Encoding UTF-8F;
+        sets Encoding UTF-8/F;
     };
     sets SearchCount 0;
 };
@@ -120,7 +120,7 @@ EditBuffer method load-content (path init-only: init-flag buffer-name: buff-name
 };
 
 EditBuffer method set-encoding (enc) {
-    if [("EUC-JP" "EUC-JPF" "Shift-JIS" "Shift-JISF" "UTF-8" "UTF-8F" "RAW") find $enc] else: {return <nil>};
+    if [("EUC-JP" "EUC-JP/F" "Shift-JIS" "Shift-JIS/F" "UTF-8" "UTF-8/F" "RAW") find $enc] else: {return <nil>};
     sets Encoding [symbol $enc];
 };
 

@@ -44,7 +44,7 @@ defun exec (
     ttin := $stdin;
 
     if {set? enc} else: {
-        set enc UTF-8F;
+        set enc UTF-8/F;
     };
 
     out := $d,left;
