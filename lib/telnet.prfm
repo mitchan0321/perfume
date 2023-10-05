@@ -6,37 +6,54 @@ defun telnet (host enc: enc port: port) {
     f ::= connect [resolv-host $host] $port;
     server ::= new File;
     $server set! $f mode: io;
-    $server set-encoding $enc;
-    $server set-newline <t>;
-    $server set-ignore-cr <t>;
-    $server set-noblock <t>;
-    ### $server set-nobuffer;
+    $server set-rawio <t>;
+    $stdin set-rawio <t>;
     
+    omessage := "";
+    imessage := "";
     try {
         loop do: {
 	    if {$stdin ready?} {
 	        message ::= $stdin gets;
-	        if [$stdin eof?] then: {
+	        if [nil? $message] then: {
 		    println "Telnet client exit.";
 		    return;
-		};
-		$server puts [$message . "\r"];
+                };
+                $omessage append! $message;
+                try {
+                    o ::= $omessage udecode UTF-8/F;
+                } catch: {| e |
+                    if {eq? [$e car] ErrBadEncodeLessLength} {
+                        continue;
+                    };
+                    println "Decode error: " $omessage;
+                    omessage := "";
+                    continue;
+                };
+		$server puts $o;
                 $server flush;
+                omessage := "";
 	    };
-	    if {$server ready?} {
+	    if {$server ready? timeout: 10} {
 	        message ::= $server gets;
 	        if [nil? $message] then: {
                     println "Disconnect from telnet server.";
                     return;
                 };
-                $stdout puts :nonewline $message;
-                REM {
-                l ::= $message split sep: "\n";
-                if {$l last : car : = ""} {$l ->>};
-                $l each do: {| r |
-                    println $r;
+                $imessage append! $message;
+                try {
+                    o ::= $imessage udecode $enc;
+                } catch: {| e |
+                    if {eq? [$e car] ErrBadEncodeLessLength} {
+                        continue;
+                    };
+                    println "Decode error: " $imessage;
+                    imessage := "";
+                    continue;
                 };
-                };
+                
+                $stdout puts :nonewline $o;
+                imessage := "";
 	    };
 	};
     }
