@@ -3513,6 +3513,8 @@
 2023/10/05
 	encode.[ch]
 		Change encoding define, UTF-8F -> UTF-8/F, EUC-JPF -> EUC-JP/F, Shift-JISF -> Shift-JIS/F.
+	methods.c
+		Add implement RAW I/O stream input mode in File::gets.
 	pmacs update:
 		Change encoding using name UTF-8F -> UTF-8/F, EUC-JPF -> EUC-JP/F, Shift-JISF -> Shift-JIS/F.
 
