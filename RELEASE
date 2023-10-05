@@ -3510,4 +3510,10 @@
 	pmacs update:
 		Change encoder EUC-JP -> EUC-JPF, Shift-JIS -> Shift-JISF.
 
+2023/10/05
+	encode.[ch]
+		Change encoding define, UTF-8F -> UTF-8/F, EUC-JPF -> EUC-JP/F, Shift-JISF -> Shift-JIS/F.
+	pmacs update:
+		Change encoding using name UTF-8F -> UTF-8/F, EUC-JPF -> EUC-JP/F, Shift-JISF -> Shift-JIS/F.
+
 #eof
