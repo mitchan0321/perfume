@@ -1,9 +1,10 @@
-defun telnet-server (file: file port: port) {
+defun telnet-server (file: file port: port test: test) {
     
     pid-list := ();
 
     if [set? file] else: {file := "/dev/null"};
     if [set? port] else: {port := 8023};
+    if [set? test] else: {test := <nil>};
     
     # create listen port
 
@@ -41,7 +42,7 @@ defun telnet-server (file: file port: port) {
 		$f set-encoding RAW;
 		$f set-newline <t>;
 		println "Connect client from " [host-address-string $addr] ":" $port;
-                telnet-server-send-file $f $file $pid-list;
+                telnet-server-send-file $f $file $pid-list $test;
             };
         };
     }
@@ -50,7 +51,7 @@ defun telnet-server (file: file port: port) {
     };
 };
 
-defun telnet-server-send-file (sock file pid-list) {
+defun telnet-server-send-file (sock file pid-list test) {
     pid ::= fork;
     if {$pid != 0} {
         $pid-list <<- $pid;
@@ -60,7 +61,18 @@ defun telnet-server-send-file (sock file pid-list) {
     f ::= new File init: ($file mode: i);
     $f set-encoding RAW;
     $f each do: {| r |
-        $sock puts [$r . "\r"];
+        if $test {
+            while {$r len : > 0} do: {
+                o ::= $r sub 0 17;
+                r ::= $r sub 17;
+                $sock puts :nonewline $o;
+                $sock flush;
+                sleep 10;
+            };
+            $sock puts "\r";
+        } {
+            $sock puts [$r . "\r"];
+        };
     };
     $sock close;
     $f close;
