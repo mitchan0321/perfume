@@ -38,7 +38,7 @@ defun telnet-server (file: file port: port) {
 		(fd addr port) ::= accept $lfd;
 		f ::= new File;
 		$f set! $fd mode: io;
-		$f set-encoding UTF-8;
+		$f set-encoding RAW;
 		$f set-newline <t>;
 		println "Connect client from " [host-address-string $addr] ":" $port;
                 telnet-server-send-file $f $file $pid-list;
@@ -58,6 +58,7 @@ defun telnet-server-send-file (sock file pid-list) {
         return;
     };
     f ::= new File init: ($file mode: i);
+    $f set-encoding RAW;
     $f each do: {| r |
         $sock puts [$r . "\r"];
     };
