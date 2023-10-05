@@ -24,11 +24,11 @@
 /* encoding symbol */
 #define SENCODE_RAW			(L"RAW")
 #define SENCODE_UTF8			(L"UTF-8")
-#define SENCODE_UTF8F			(L"UTF-8F")
+#define SENCODE_UTF8F			(L"UTF-8/F")
 #define SENCODE_EUCJP			(L"EUC-JP")
-#define SENCODE_EUCJPF			(L"EUC-JPF")
+#define SENCODE_EUCJPF			(L"EUC-JP/F")
 #define SENCODE_SJIS			(L"Shift-JIS")
-#define SENCODE_SJISF			(L"Shift-JISF")
+#define SENCODE_SJISF			(L"Shift-JIS/F")
 
 /* encoder/decoder error code */
 #define EENCODE_BADENCODING		(1)
