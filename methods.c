@@ -3842,6 +3842,7 @@ error2:
 #define FMODE_APPEND	        (3)
 #define FMODE_INOUT	        (4)
 #define READBUFFER_MAX_DEFAULT  (0)    /* default is no-limit */
+#define READBUFFER_MAX_DEFVALUE (4096) /* default 4096 bytes */
 
 typedef struct _toy_file {
     FILE *fd;
@@ -4094,13 +4095,6 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 
     if (feof(f->fd)) return const_Nil;
 
-    if (f->r_pending) {
-	cbuff = new_cell(cell_get_addr(f->r_pending));
-	f->r_pending = NULL;
-    } else {
-	cbuff = new_cell(L"");
-    }
-    
     /*
      * 通常 File::gets は LF が入力されるまでデータを取り込み、1行単位でアプリケーションへ返す。
      * ただし、socket などの場合で noblock を指定した場合や、1行が readbuffer_max を超えた場合、
@@ -4109,6 +4103,54 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
      * その early-exit フラグは gets の処理前にクリアする。
      */
     f->early_exit = 0;
+    
+    /*
+    ** RAW I/O モードの時は、直接 read(2) システムコールを利用する。
+    ** 入力データのでコードは行わない。エンコーディングに RAW を指定して読み込んだ場合と同じになる。
+    ** read(2)の結果が 0 の場合、socket の接続先が切断したことを示すので <nil> を返す。
+    ** -1 の場合で errno が EINTR, EAGAIN, EWOULDBLOCK の場合は ErrIOAgain を返す。
+    */
+    if (f->raw_io) {
+        unsigned char *rbuff;
+        int rsize, rsts;
+        int i;
+        Cell *rcell;
+        
+        rsize = (f->readbuffer_max==0) ? READBUFFER_MAX_DEFVALUE : f->readbuffer_max;
+        rbuff = GC_MALLOC(rsize);
+        ALLOC_SAFE(rbuff);
+        rsts = read(fileno(f->fd), rbuff, rsize);
+        if (rsts == 0) return const_Nil;
+        if (-1 == rsts) {
+            switch (errno) {
+            case EAGAIN:      /* fall thru */
+#if (EAGAIN != EWOULDBLOCK)
+            case EWOULDBLOCK: /* fall thru */
+#endif
+            case EINTR:
+                return new_exception(TE_IOAGAIN, L"Retry read, will be read blocking or interrupts occur.", interp);
+            default:
+                return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
+            }
+        }
+        
+        rcell = new_cell(L"");
+        for (i=0; i<rsts; i++) {
+            cell_add_char(rcell, (wchar_t)rbuff[i]);
+        }
+        return new_string_cell(rcell);
+    }
+
+    /*
+    ** 前回からのペンディングデータがあった場合、読み込みバッファに設定する。
+    ** 無かった場合は読み込みバッファを初期化する。
+    */
+    if (f->r_pending) {
+	cbuff = new_cell(cell_get_addr(f->r_pending));
+	f->r_pending = NULL;
+    } else {
+	cbuff = new_cell(L"");
+    }
     
     while (1) {
         /*
@@ -4277,9 +4319,9 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
             errno = 0;
             int nc = fgetc(f->fd);
             if ((EOF == nc) && (errno == EAGAIN)) {
-                /* comment out
-                 * 2023/05/29 
-                 *
+                /* comment out -------------------------------------------------------
+                ** 2023/05/29 
+                **
                 // fprintf(stderr, "DEBUG: EAGAIN (2), nc=%d\n", nc);
                 clearerr(f->fd);
                 int sts = is_read_ready(fileno(f->fd), 100);
@@ -4294,9 +4336,9 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
                     continue;
                 }
                 if (IRDY_TOUT == sts) {
-                 *
-                 * end comment
-                 */
+                **
+                ** end comment -------------------------------------------------------
+                */
 
                 Cell *c = decode_raw_to_unicode(cbuff, f->input_encoding, enc_error_info);
                 if (enc_error_info->errorno != 0) {
@@ -4980,6 +5022,7 @@ mth_file_setreadbuffer_max(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs
     f = container->u.container.data;
 
     tsize = list_get_item(posargs);
+    if (GET_TAG(tsize) != INTEGER) goto error;
     bsize = mpz_get_si(tsize->u.biginteger);
     if (bsize < 0) goto error;
     
