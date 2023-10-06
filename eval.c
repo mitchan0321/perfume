@@ -1078,7 +1078,7 @@ toy_call_init(Toy_Interp *interp, Toy_Type *object, Toy_Type *args) {
     } else {
 	posargs = NULL;
     }
-    namedargs = new_hash(NULL);
+    namedargs = new_hash();
 
     switch (GET_TAG(method)) {
     case NATIVE:
