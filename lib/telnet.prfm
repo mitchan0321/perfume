@@ -17,7 +17,7 @@ defun telnet (host enc: enc port: port) {
                 try {
                     omessage ::= $stdin gets;
                 } catch: {
-                    println "\nBad encoding from stdin.";
+                    println "\nBad encoding input from stdin.";
                     continue;
                 };
 	        if [nil? $omessage] then: {
