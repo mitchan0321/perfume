@@ -6,38 +6,38 @@ defun telnet (host enc: enc port: port) {
     f ::= connect [resolv-host $host] $port;
     server ::= new File;
     $server set! $f mode: io;
+    $server set-output-encoding RAW;
+    $server set-newline <t>;
     $server set-rawio <t>;
-    $stdin set-rawio <t>;
     
-    omessage := "";
     imessage := "";
     try {
         loop do: {
 	    if {$stdin ready?} {
-	        message ::= $stdin gets;
-	        if [nil? $message] then: {
-		    println "Telnet client exit.";
-		    return;
-                };
-                $omessage append! $message;
                 try {
-                    o ::= $omessage udecode UTF-8/F;
-                } catch: {| e |
-                    if {eq? [$e car] ErrBadEncodeLessLength} {
-                        continue;
-                    };
-                    println "Decode error: " $omessage;
-                    omessage := "";
+                    omessage ::= $stdin gets;
+                } catch: {
+                    println "\nBad encoding from stdin.";
                     continue;
                 };
-		$server puts $o;
+	        if [nil? $omessage] then: {
+		    println "\nTelnet client exit.";
+		    return;
+                };
+		$server puts [$omessage uencode [symbol ["" . $enc "/F"]]];
                 $server flush;
-                omessage := "";
-	    };
+            };
+            
 	    if {$server ready? timeout: 10} {
 	        message ::= $server gets;
 	        if [nil? $message] then: {
-                    println "Disconnect from telnet server.";
+                    if {$imessage != ""} {
+                        try {
+                            o ::= $imessage udecode [symbol ["" . $enc "/F"]];
+                            $stdout puts $o;
+                        } catch: {};
+                    };
+                    println "\nDisconnect from telnet server.";
                     return;
                 };
                 $imessage append! $message;
