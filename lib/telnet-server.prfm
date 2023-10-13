@@ -67,11 +67,14 @@ defun telnet-server-send-file (sock file pid-list test) {
                 r ::= $r sub 17;
                 $sock puts :nonewline $o;
                 $sock flush;
-                sleep 10;
+                sleep 20;
             };
             $sock puts "\r";
+            $sock flush;
+            sleep 20;
         } {
             $sock puts [$r . "\r"];
+            $sock flush;
         };
     };
     $sock close;
