@@ -3518,4 +3518,8 @@
 	pmacs update:
 		Change encoding using name UTF-8F -> UTF-8/F, EUC-JPF -> EUC-JP/F, Shift-JISF -> Shift-JIS/F.
 
+2023/10/15
+	pmacs update:
+		Change set-times editor command to display guidance.
+
 #eof
