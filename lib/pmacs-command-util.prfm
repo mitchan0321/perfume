@@ -1166,6 +1166,7 @@ defcommand set-times desc: "Set repeat time." {
                 return ALL;
             };
             $main set-repeat-times $times;
+            show-message ["Repeat next command " . $times " times."];
         };
     ;;
     return ALL;
