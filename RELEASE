@@ -3522,4 +3522,8 @@
 	pmacs update:
 		Change set-times editor command to display guidance.
 
+2023/10/16
+	pmacs update:
+		Add key-record at execute-editor-command if command executed.
+
 #eof
