@@ -182,6 +182,7 @@ defcommand execute-editor-command desc: "Execute editor command." {
         enter-proc: {| value |
             $main set-last-command $value;
 	    $window apply-command $main $window "" [symbol $value];
+            $main key-record [symbol $value] <nil>;
 	}
         edit-proc: {| value |
             try {
