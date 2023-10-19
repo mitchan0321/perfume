@@ -3526,4 +3526,8 @@
 	pmacs update:
 		Add key-record at execute-editor-command if command executed.
 
+2023/10/19
+	lib/copy.prfm
+		Change file mode set to RAW I/O mode for input.
+
 #eof
