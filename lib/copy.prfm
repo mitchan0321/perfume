@@ -3,18 +3,14 @@ defun copy (from to) {
     dest := <nil>;
     try {
         src := `File($from mode: i);
-        $src set-newline <t>;
-        $src set-readbuffer-max 4096;
-        $src set-encoding RAW;
+        $src set-rawio <t>;
         
         dest := `File($to mode: o);
         $dest set-newline <nil>;
         $dest set-encoding RAW;
         
-        r ::= $src gets;
-        while {! [nil? $r]} do: {
+        while {r ::= $src gets} do: {
             $dest puts :nonewline $r;
-            r ::= $src gets;
         };
     }
     fin: {
