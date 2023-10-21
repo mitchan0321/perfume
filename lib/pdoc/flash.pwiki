@@ -1,19 +1,17 @@
 ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+....0
 
 【コマンド名】
-	dired-sort-by-name-ascending
+	flash
 
 【概要】
-	Sort by file name ascending on dired buffer.
+	Flash screen and beep occurs.
 
 【説明】
-	このコマンドはディレクトリエディタから起動されます。詳細はディレクトリエディタ  [[dired]] を
-	参照願います。
-	
-	ディレクトリエディタにおいて、ファイルリストを名前の昇順にソートします。
+	これはテスト用のコマンドです。
+	画面をフラッシュします。
 
 【現在のキーバインドを表示する】
-	[[?dired-sort-by-name-ascending]]
+	[[?flash]]
 
 【キーバインド一覧に戻る】
 	[[&key-binding-list]]

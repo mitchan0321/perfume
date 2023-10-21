@@ -1,19 +1,15 @@
 ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+....0
 
 【コマンド名】
-	dired-sort-by-name-ascending
+	start-recording-for-append
 
 【概要】
-	Sort by file name ascending on dired buffer.
+	Start keyboard macro recording for append to recording buffer.
 
 【説明】
-	このコマンドはディレクトリエディタから起動されます。詳細はディレクトリエディタ  [[dired]] を
-	参照願います。
-	
-	ディレクトリエディタにおいて、ファイルリストを名前の昇順にソートします。
 
 【現在のキーバインドを表示する】
-	[[?dired-sort-by-name-ascending]]
+	[[?start-recording-for-append]]
 
 【キーバインド一覧に戻る】
 	[[&key-binding-list]]

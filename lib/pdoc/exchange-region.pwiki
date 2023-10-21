@@ -1,19 +1,18 @@
 ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+....0
 
 【コマンド名】
-	dired-sort-by-name-ascending
+	exchange-region
 
 【概要】
-	Sort by file name ascending on dired buffer.
+	Exchange region current to start point.
 
 【説明】
-	このコマンドはディレクトリエディタから起動されます。詳細はディレクトリエディタ  [[dired]] を
-	参照願います。
-	
-	ディレクトリエディタにおいて、ファイルリストを名前の昇順にソートします。
+	[[start-region]] コマンドによりリージョンを選択中に、現在のカーソル位置とリージョンの開始
+	位置もしくは終了位置を入れ替えます。
+	このコマンドによりカーソル位置は入れ替わりますが、リージョンの選択範囲は変わりません。
 
 【現在のキーバインドを表示する】
-	[[?dired-sort-by-name-ascending]]
+	[[?exchange-region]]
 
 【キーバインド一覧に戻る】
 	[[&key-binding-list]]

@@ -1,19 +1,18 @@
 ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+....0
 
 【コマンド名】
-	dired-sort-by-name-ascending
+	exit
 
 【概要】
-	Sort by file name ascending on dired buffer.
+	Exit pmacs editor. If you have an unsaved buffer, pmacs was show message and don't exit.
 
 【説明】
-	このコマンドはディレクトリエディタから起動されます。詳細はディレクトリエディタ  [[dired]] を
-	参照願います。
-	
-	ディレクトリエディタにおいて、ファイルリストを名前の昇順にソートします。
+	Pmacs を終了します。
+	保存されていないバッファが存在する場合はエラーが表示され終了しません。その場合は、それらの
+	バッファを保存または破棄した後、再度本コマンドを実行します。
 
 【現在のキーバインドを表示する】
-	[[?dired-sort-by-name-ascending]]
+	[[?exit]]
 
 【キーバインド一覧に戻る】
 	[[&key-binding-list]]

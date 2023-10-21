@@ -1,19 +1,18 @@
 ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+....0
 
 【コマンド名】
-	dired-sort-by-name-ascending
+	end-recording
 
 【概要】
-	Sort by file name ascending on dired buffer.
+	End keyboard macro recording.
 
 【説明】
-	このコマンドはディレクトリエディタから起動されます。詳細はディレクトリエディタ  [[dired]] を
-	参照願います。
-	
-	ディレクトリエディタにおいて、ファイルリストを名前の昇順にソートします。
+	[[start-recording]] もしくは [[start-recording-for-append]] で開始したキーボードマクロの
+	記録を終了します。
+	記録したキーボードマクロは [[execute-record]] により再生されます。
 
 【現在のキーバインドを表示する】
-	[[?dired-sort-by-name-ascending]]
+	[[?end-recording]]
 
 【キーバインド一覧に戻る】
 	[[&key-binding-list]]

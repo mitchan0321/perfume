@@ -1,19 +1,16 @@
 ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+....0
 
 【コマンド名】
-	dired-sort-by-name-ascending
+	fit-to-bottom
 
 【概要】
-	Sort by file name ascending on dired buffer.
+	Move current cursor position fit to window bottom edge and scroll down.
 
 【説明】
-	このコマンドはディレクトリエディタから起動されます。詳細はディレクトリエディタ  [[dired]] を
-	参照願います。
-	
-	ディレクトリエディタにおいて、ファイルリストを名前の昇順にソートします。
+	現在のカーソルのある行を、現在のウィンドウの最下行に移動します。
 
 【現在のキーバインドを表示する】
-	[[?dired-sort-by-name-ascending]]
+	[[?fit-to-bottom]]
 
 【キーバインド一覧に戻る】
 	[[&key-binding-list]]
