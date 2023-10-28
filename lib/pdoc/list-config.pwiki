@@ -1,16 +1,16 @@
 ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+....0
 
 【コマンド名】
-	kill-interp
+	list-config
 
 【概要】
-	Kill current running process and perfume interpriter under *Scratch* buffer.
+	Display configuration list.
 
 【説明】
-	*Scratch* バッファで実行しているコマンドを強制的に停止し、インタプリタを再起動します。
+	現在のコンフィグ値の一覧を表示します。
 
 【現在のキーバインドを表示する】
-	[[?kill-interp]]
+	[[?list-config]]
 
 【キーバインド一覧に戻る】
 	[[&key-binding-list]]

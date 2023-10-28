@@ -1,16 +1,17 @@
 ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+....0
 
 【コマンド名】
-	kill-interp
+	input-character-code
 
 【概要】
-	Kill current running process and perfume interpriter under *Scratch* buffer.
+	Insert specified unicode code point character into current buffer at cursor point.
 
 【説明】
-	*Scratch* バッファで実行しているコマンドを強制的に停止し、インタプリタを再起動します。
+	ミニバッファより Unicode コードポイントを入力し、バッファのカーソル位置に指定した文字を挿入
+	します。
 
 【現在のキーバインドを表示する】
-	[[?kill-interp]]
+	[[?input-character-code]]
 
 【キーバインド一覧に戻る】
 	[[&key-binding-list]]

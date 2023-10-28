@@ -1,16 +1,16 @@
 ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+....0
 
 【コマンド名】
-	kill-interp
+	jump-to-buffer
 
 【概要】
-	Kill current running process and perfume interpriter under *Scratch* buffer.
+	Switch to specified the buffer in buffer list.
 
 【説明】
-	*Scratch* バッファで実行しているコマンドを強制的に停止し、インタプリタを再起動します。
+	BListモードでのバッファリスト内のカーソルが示すバッファを、現在のウィンドウで開きます。
 
 【現在のキーバインドを表示する】
-	[[?kill-interp]]
+	[[?jump-to-buffer]]
 
 【キーバインド一覧に戻る】
 	[[&key-binding-list]]

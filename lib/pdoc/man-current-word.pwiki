@@ -1,16 +1,17 @@
 ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+....0
 
 【コマンド名】
-	kill-interp
+	man-current-word
 
 【概要】
-	Kill current running process and perfume interpriter under *Scratch* buffer.
+	Open man document on near cursor point word.
 
 【説明】
-	*Scratch* バッファで実行しているコマンドを強制的に停止し、インタプリタを再起動します。
+	現在のカーソル位置にあるワードをキーワードとして新たにマニュアルページを開きます。
+	[[man]] コマンドでセクションを省略してマニュアルページを開いた場合と同じ動作となります。
 
 【現在のキーバインドを表示する】
-	[[?kill-interp]]
+	[[?man-current-word]]
 
 【キーバインド一覧に戻る】
 	[[&key-binding-list]]

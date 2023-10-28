@@ -1,16 +1,16 @@
 ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+....0
 
 【コマンド名】
-	kill-interp
+	make-command-pdoc
 
 【概要】
-	Kill current running process and perfume interpriter under *Scratch* buffer.
+	Make command pdoc template.
 
 【説明】
-	*Scratch* バッファで実行しているコマンドを強制的に停止し、インタプリタを再起動します。
+	コマンド用PWikiページのテンプレートを作成します。
 
 【現在のキーバインドを表示する】
-	[[?kill-interp]]
+	[[?make-command-pdoc]]
 
 【キーバインド一覧に戻る】
 	[[&key-binding-list]]

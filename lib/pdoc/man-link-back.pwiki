@@ -1,16 +1,17 @@
 ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+....0
 
 【コマンド名】
-	kill-interp
+	man-link-back
 
 【概要】
-	Kill current running process and perfume interpriter under *Scratch* buffer.
+	Back to previous man document.
 
 【説明】
-	*Scratch* バッファで実行しているコマンドを強制的に停止し、インタプリタを再起動します。
+	[[man-click-link]] コマンドなどで、あるマニュアルページの表示から別のマニュアルページを表示
+	した際に、本コマンドにより元のマニュアルページの表示に戻ります。
 
 【現在のキーバインドを表示する】
-	[[?kill-interp]]
+	[[?man-link-back]]
 
 【キーバインド一覧に戻る】
 	[[&key-binding-list]]

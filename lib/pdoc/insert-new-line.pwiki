@@ -1,16 +1,16 @@
 ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+....0
 
 【コマンド名】
-	kill-interp
+	insert-new-line
 
 【概要】
-	Kill current running process and perfume interpriter under *Scratch* buffer.
+	Insert new line into current buffer over line at cursor point.
 
 【説明】
-	*Scratch* バッファで実行しているコマンドを強制的に停止し、インタプリタを再起動します。
+	カーソル位置の行の前に空行を挿入します。カーソル位置は、挿入された行の先頭に移動します。
 
 【現在のキーバインドを表示する】
-	[[?kill-interp]]
+	[[?insert-new-line]]
 
 【キーバインド一覧に戻る】
 	[[&key-binding-list]]

@@ -1,16 +1,16 @@
 ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+....0
 
 【コマンド名】
-	kill-interp
+	mini-move-message
 
 【概要】
-	Kill current running process and perfume interpriter under *Scratch* buffer.
+	Demo background.
 
 【説明】
-	*Scratch* バッファで実行しているコマンドを強制的に停止し、インタプリタを再起動します。
+	テスト用コマンド。
 
 【現在のキーバインドを表示する】
-	[[?kill-interp]]
+	[[?mini-move-message]]
 
 【キーバインド一覧に戻る】
 	[[&key-binding-list]]

@@ -1,16 +1,17 @@
 ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+....0
 
 【コマンド名】
-	kill-interp
+	mouse-buffer-click-link
 
 【概要】
-	Kill current running process and perfume interpriter under *Scratch* buffer.
+	Mouse click open buffer.
 
 【説明】
-	*Scratch* バッファで実行しているコマンドを強制的に停止し、インタプリタを再起動します。
+	バッファリスト（BListモード）において、バッファ名のリンク部分をマウスでクリックした際に、
+	そのバッファを開きます。
 
 【現在のキーバインドを表示する】
-	[[?kill-interp]]
+	[[?mouse-buffer-click-link]]
 
 【キーバインド一覧に戻る】
 	[[&key-binding-list]]
