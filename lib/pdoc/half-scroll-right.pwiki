@@ -1,16 +1,16 @@
 ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+....0
 
 【コマンド名】
-	move-half-down
+	half-scroll-right
 
 【概要】
-	Page half down current window.
+	Half scroll right current window.
 
 【説明】
-	ウィンドウのビューポイントをウィンドウのサイズの半分だけ下に移動します。
+	バッファの右方向にウィンドウサイズの半分スクロールします。
 
 【現在のキーバインドを表示する】
-	[[?move-half-down]]
+	[[?half-scroll-right]]
 
 【キーバインド一覧に戻る】
 	[[&key-binding-list]]

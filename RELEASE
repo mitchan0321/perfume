@@ -3530,4 +3530,12 @@
 	lib/copy.prfm
 		Change file mode set to RAW I/O mode for input.
 
+2023/11/02
+	pmacs update:
+		Change editor command name:
+		  move-half-up -> half-next-page
+		  move-half-dwon -> half-previous-page
+		  move-half-right -> half-scroll-right
+		  move-half-left -> half-scroll-left
+
 #eof
