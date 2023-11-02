@@ -94,7 +94,7 @@ defcommand cursor-left-with-region desc: "Start select region and move cursor to
     result SELF;
 };
 
-defcommand move-half-up desc: "Page half up current window." {
+defcommand half-next-page desc: "Half page up current window." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -113,7 +113,7 @@ defcommand move-half-up desc: "Page half up current window." {
     result SELF;
 };
 
-defcommand move-half-down desc: "Page half down current window." {
+defcommand half-previous-page desc: "Half page down current window." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -129,7 +129,7 @@ defcommand move-half-down desc: "Page half down current window." {
     result SELF;
 };
 
-defcommand move-half-right desc: "Page half right current window." {
+defcommand half-scroll-right desc: "Half scroll right current window." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
@@ -142,7 +142,7 @@ defcommand move-half-right desc: "Page half right current window." {
     result SELF;
 };
 
-defcommand move-half-left desc: "Page half left current window." {
+defcommand half-scroll-left desc: "Half scroll left current window." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;

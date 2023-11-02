@@ -266,7 +266,7 @@ defun mini-input-file-chooser
             return ALL;
         };
         if {or {eq? $in-key kDN5} {eq? $in-key KEY_NPAGE}} {
-            $window apply-command $main $window "" move-half-up;
+            $window apply-command $main $window "" half-next-page;
             return ALL;
         };
         if {eq? $in-key KEY_UP} {
@@ -274,7 +274,7 @@ defun mini-input-file-chooser
             return ALL;
         };
         if {or {eq? $in-key kUP5} {eq? $in-key KEY_PPAGE}} {
-            $window apply-command $main $window "" move-half-down;
+            $window apply-command $main $window "" half-previous-page;
             return ALL;
         };
         if {eq? $in-key "/"} {
