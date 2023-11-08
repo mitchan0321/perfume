@@ -3538,4 +3538,17 @@
 		  move-half-right -> half-scroll-right
 		  move-half-left -> half-scroll-left
 
+2023/11/08
+	pmacs update:
+		Add editor commands are: search-word-forward and search-word-backward,
+		  search text or regexp string specified value at mini buffer.
+		Change editor commands are: search-forward and search-backward,
+		  if buffer length large than $SEARCH_WORD_THRESHOLD, change search methods to
+		  search-word-forward or search-word-backward.
+		Change mini input key binding, Ctrl+[DEL] to clear mini buffer all text.
+		Add key bindings are:
+		  Alt+f -> search-word-forward
+		  Alt+r -> search-word-backward
+		Add config value SEARCH_WORD_THRESHOLD.
+
 #eof
