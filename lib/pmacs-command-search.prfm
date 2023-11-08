@@ -4,11 +4,23 @@
 
 defcommand search-forward desc: "Start search text/regex forward." {
     | main window |
+    buff ::= $window get-buffer;
+    len ::= $buff get-buffer-length;
+    if {$len > $SEARCH_WORD_THRESHOLD} {
+        return [$window apply-command $main $window "" search-word-forward];
+    };
+    
     return [search-sub $main $window <t>];
 };
 
 defcommand search-backward desc: "Start search text/regex backward." {
     | main window |
+    buff ::= $window get-buffer;
+    len ::= $buff get-buffer-length;
+    if {$len > $SEARCH_WORD_THRESHOLD} {
+        return [$window apply-command $main $window "" search-word-backward];
+    };
+    
     return [search-sub $main $window <nil>];
 };
 
@@ -174,6 +186,66 @@ defun search-sub (main window dir) {
     return SELF;
 };
 
+defcommand search-word-forward desc: "Search word forward." {
+    | main window |
+    search-word-sub $main $window <t>;
+};
+
+defcommand search-word-backward desc: "Search word backward." {
+    | main window |
+    search-word-sub $main $window <nil>;
+};
+
+defun search-word-prompt (dir mode) {
+    $dir ??? ["Search " . $mode " [forward]: "] ["Search " . $mode " [backward]: "];
+};
+
+defun search-word-sub (main window dir) {
+    __buff_in_clojure__ ::= $window get-buffer;
+
+    str := "";
+    if [$window get-region] {
+        buff ::= $window get-buffer;
+        geom ::= $window get-geom;
+        (sy sx) ::= $window end-region;
+        (ey ex) ::= $window get-source-index $buff $geom;
+        $window copy-region $sy $sx $ey $ex;
+        str ::= $window get-copy-buffer;
+        setvar SearchString $str;
+    };
+
+    mini-input-until-enter $main $window 
+        init-value: $SearchString
+        prompt: [search-word-prompt $dir $SEARCH_MODE]
+        cancel-proc: {
+	    $window cancel-search [$window get-search-string];
+	    show-message "Canceled.";
+	    return ALL;
+        }
+        enter-proc: {| value |
+            setvar SearchString $value;
+	    sts ::= $dir ??? {
+                $window apply-command $main $window "" search-next;
+            } {
+                $window apply-command $main $window "" search-previous;
+            };
+            return $sts;
+        }
+        keyin-proc: {| value in-key |
+            if {eq? $in-key CTRL_T} {
+                case $SEARCH_MODE
+                    regex {setconf SEARCH_MODE text}
+                    text  {setconf SEARCH_MODE regex}
+                ;;
+                $MainWindow set-mini-input-prompt [search-word-prompt $dir $SEARCH_MODE];
+                return ALL;
+            };
+        }
+    ;;
+
+    return SELF;
+};
+
 defcommand search-next desc: "Search forward for previous text/regex." {
     | main window |
     buff ::= $window get-buffer;
@@ -182,14 +254,18 @@ defcommand search-next desc: "Search forward for previous text/regex." {
     str ::= $window get-search-string;
     if {$str = ""} {
         show-message :bell "No set search string, execute 'search' command first.";
-        return SELF;
+        return ALL;
     };
-    $window mark;
     (y x) ::= case $SEARCH_MODE
         regex    {get-next-search      $ey $ex [$str rquote] $buff;}
         default: {get-next-search-text $ey $ex [$str rquote] $buff;}
     ;
+    if {and [$ey = $y] [$ex = $x]} {
+        show-message "No search result.";
+        return ALL;
+    };
 
+    $window mark;
     $window cursor-move-to-fit-center $geom $y $x;
     sts ::= get-next-search-length $y $x [$str rquote] $buff $SEARCH_MODE;
     if $sts {
@@ -197,11 +273,12 @@ defcommand search-next desc: "Search forward for previous text/regex." {
         $window set-spot-color-item SEARCH $y $x $len INVERT;
         $main add-background after: 3000 job-id: "00-SEARCH" {
             $window remove-spot-color-item SEARCH;
-            result ALL;
+            return ALL;
         };
+        return ALL;
     };
-    
-    return SELF;
+    show-message "No search result.";
+    return ALL;
 };
 
 defcommand search-previous desc: "Search backward for previous text/regex." {
@@ -212,14 +289,18 @@ defcommand search-previous desc: "Search backward for previous text/regex." {
     str ::= $window get-search-string;
     if {$str = ""} {
         show-message :bell "No set search string, execute 'search' command first.";
-        return SELF;
+        return ALL;
     };
-    $window mark;
     (y x) ::= case $SEARCH_MODE
         regex    {get-previous-search      $ey $ex [$str rquote] $buff;}
         default: {get-previous-search-text $ey $ex [$str rquote] $buff;}
     ;
+    if {and [$ey = $y] [$ex = $x]} {
+        show-message "No search result.";
+        return ALL;
+    };
 
+    $window mark;
     $window cursor-move-to-fit-center $geom $y $x;
     sts ::= get-next-search-length $y $x [$str rquote] $buff $SEARCH_MODE;
     if $sts {
@@ -227,11 +308,12 @@ defcommand search-previous desc: "Search backward for previous text/regex." {
         $window set-spot-color-item SEARCH $y $x $len INVERT;
         $main add-background after: 3000 job-id: ["00-SEARCH" . [$buff get-buffer-name]] {
             $window remove-spot-color-item SEARCH;
-            result ALL;
+            return ALL;
         };
+        return ALL;
     };
-
-    return SELF;
+    show-message "No search result.";
+    return ALL;
 };
 
 defun get-next-search (y x str buff) {
