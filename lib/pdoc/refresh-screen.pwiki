@@ -1,0 +1,31 @@
+....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+....0
+
+【コマンド名】
+	refresh-screen
+
+【概要】
+	Refresh and redraw screen all.
+
+【説明】
+	ウィンドウを再描画します。
+	加えて、以下の設定ファイルが再読み込みされます。
+
+	  $LIB_PATH/lib/pmacs-default.key
+	  $LIB_PATH/lib/Mode-*.key
+	  $LIB_PATH/lib/pmacs-theme.prfm
+	  $HOME/.pmacs/default.key
+	  $HOME/.pmacs/Mode-*.key
+	  $HOME/.pmacs/theme.prfm
+
+	Pmacs実行中に上記のファイルを更新した際は、本コマンドで読み込ませることが可能です。
+
+【現在のキーバインドを表示する】
+	[[?refresh-screen]]
+
+【キーバインド一覧に戻る】
+	[[&key-binding-list]]
+
+【ヘルプに戻る】
+	[[&help]]
+
+....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+....0

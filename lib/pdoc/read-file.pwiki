@@ -1,17 +1,17 @@
 ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+....0
 
 【コマンド名】
-	man-previous-link
+	read-file
 
 【概要】
-	Jump to previous man link.
+	Open specified file and insert file data to current buffer at cursor position previous line.
 
 【説明】
-	Manモードにて、バッファ内のカーソル位置以前にある前のマニュアルページへのリンクにカーソルを
-	移動します。
+	カーソルのある行の前にミニウィンドウで指定したファイルを読み込み挿入します。
+	ミニウィンドウによるファイルの指定方法いついては [[open-file]] を参照してください。
 
 【現在のキーバインドを表示する】
-	[[?man-previous-link]]
+	[[?read-file]]
 
 【キーバインド一覧に戻る】
 	[[&key-binding-list]]

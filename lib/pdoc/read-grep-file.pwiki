@@ -1,17 +1,18 @@
 ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+....0
 
 【コマンド名】
-	man-previous-link
+	read-grep-file
 
 【概要】
-	Jump to previous man link.
+	Read specified file and new create the *Grep* buffer.
 
 【説明】
-	Manモードにて、バッファ内のカーソル位置以前にある前のマニュアルページへのリンクにカーソルを
-	移動します。
+	*Grep* バッファにファイルを読み込みます。
+	読み込まれたファイルがUNIXの 'grep -nH' コマンドによる出力フォーマットと同じ場合、
+	[[grep-next]] や [[grep-previous]] コマンドでファイルへのジャンプが可能です。
 
 【現在のキーバインドを表示する】
-	[[?man-previous-link]]
+	[[?read-grep-file]]
 
 【キーバインド一覧に戻る】
 	[[&key-binding-list]]

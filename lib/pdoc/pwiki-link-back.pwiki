@@ -1,17 +1,17 @@
 ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+....0
 
 【コマンド名】
-	man-previous-link
+	pwiki-link-back
 
 【概要】
-	Jump to previous man link.
+	Back to previous PWiki document.
 
 【説明】
-	Manモードにて、バッファ内のカーソル位置以前にある前のマニュアルページへのリンクにカーソルを
-	移動します。
+	[[pwiki-click-link]] コマンドなどで、あるPWikiドキュメントの表示から別のドキュメントを表示
+	した際に、本コマンドにより元のPWikiドキュメントの表示に戻ります。
 
 【現在のキーバインドを表示する】
-	[[?man-previous-link]]
+	[[?pwiki-link-back]]
 
 【キーバインド一覧に戻る】
 	[[&key-binding-list]]
