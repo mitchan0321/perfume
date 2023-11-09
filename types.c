@@ -40,7 +40,7 @@ new_symbol(wchar_t *symbol) {
 
     p = cell_get_addr(o->u.symbol.cell);
     l = cell_get_length(o->u.symbol.cell);
-    if (p[l-1] == L':') {
+    if ((l > 0) && (p[l-1] == L':')) {
 	o->tag |= TAG_NAMED_MASK;
     }
     if (p[0] == L':') {
