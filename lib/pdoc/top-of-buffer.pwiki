@@ -1,16 +1,16 @@
 ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+....0
 
 【コマンド名】
-	bottom-of-buffer
+	top-of-buffer
 
 【概要】
-	Move cursor to bottom of buffer.
+	Move cursor to top of buffer.
 
 【説明】
-	カーソルをバッファの一番最後であるEOFの位置へ移動します。
+	カーソルをバッファの一番先頭へ移動します。
 
 【現在のキーバインドを表示する】
-	[[?bottom-of-buffer]]
+	[[?top-of-buffer]]
 
 【キーバインド一覧に戻る】
 	[[&key-binding-list]]

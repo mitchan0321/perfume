@@ -7,6 +7,10 @@
 	Start keyboard macro recording for append to recording buffer.
 
 【説明】
+	キーボードマクロの記録を開始します。今までのキーボードマクロに追加する形で記録されます。
+	記録を終了するには、[[end-recording]] を実行します。
+	記録したキーボードマクロは [[execute-record]] により再生されます。
+	既に記録済みのマクロを破棄して記録を開始する場合は [[start-recording]] を実行します。
 
 【現在のキーバインドを表示する】
 	[[?start-recording-for-append]]

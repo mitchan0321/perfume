@@ -1,16 +1,17 @@
 ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+....0
 
 【コマンド名】
-	bottom-of-buffer
+	split-vertical-window-4
 
 【概要】
-	Move cursor to bottom of buffer.
+	Split window four divisions vertical.
 
 【説明】
-	カーソルをバッファの一番最後であるEOFの位置へ移動します。
+	ウインドウを垂直方向に4分割します。
+	コマンド実行時のアクティブウィンドウが左に配置されます。
 
 【現在のキーバインドを表示する】
-	[[?bottom-of-buffer]]
+	[[?split-vertical-window-4]]
 
 【キーバインド一覧に戻る】
 	[[&key-binding-list]]

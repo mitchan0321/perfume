@@ -7,6 +7,10 @@
 	Start keyboard macro recording.
 
 【説明】
+	キーボードマクロの記録を開始します。記録開始にあたり、今までのキーボードマクロは消去されます。
+	記録を終了するには、[[end-recording]] を実行します。
+	記録したキーボードマクロは [[execute-record]] により再生されます。
+	既に記録済みのマクロに追記する場合は [[start-recording-for-append]] を実行します。
 
 【現在のキーバインドを表示する】
 	[[?start-recording]]

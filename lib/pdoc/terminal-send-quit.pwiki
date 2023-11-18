@@ -1,16 +1,16 @@
 ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+....0
 
 【コマンド名】
-	bottom-of-buffer
+	terminal-send-quit
 
 【概要】
-	Move cursor to bottom of buffer.
+	Send QUIT to shell terminal.
 
 【説明】
-	カーソルをバッファの一番最後であるEOFの位置へ移動します。
+	シェルターミナルバッファ（*Terminal*）で動いているシェルに、QUIT (Ctrl+|)を与えます。
 
 【現在のキーバインドを表示する】
-	[[?bottom-of-buffer]]
+	[[?terminal-send-quit]]
 
 【キーバインド一覧に戻る】
 	[[&key-binding-list]]
