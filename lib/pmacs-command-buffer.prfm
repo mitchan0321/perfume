@@ -68,6 +68,8 @@ defcommand buffer-list desc: "Display all buffers list." {
                          [get-keybind-string $window "buffer-list-completion" : replace ',' "or"] " to name completion."];
     $buff append-string ["  * Delete buffer - Move cursor to buffer line and press \"" .
                          [get-keybind-string $window "buffer-list-delete" : replace ',' "or"] "\" key."];
+    $buff append-string ["  * Save buffer - Move cursor to buffer line and press \"" .
+                         [get-keybind-string $window "buffer-list-save" : replace ',' "or"] "\" key."];
     $buff append-string "";
     $buff append-string [$format expand : fmt "#" "e" "t" "m" "p" "n" "Buffer name" "Length" "Mode" "Content path"];
     $buff append-string [$format expand : fmt "-" "-" "-" "-" "-" "-" "-----------" "------" "----" "------------"];
@@ -319,6 +321,42 @@ defcommand buffer-list-delete desc: "Delete the selected buffer in buffer list."
     };
     $main delete-buffer $target-buff;
     $window apply-command $main $window "" buffer-list;
+
+    result ALL;
+};
+
+defcommand buffer-list-save desc: "Save the selected buffer in buffer list." {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (line col) ::= $window get-source-index $buff $geom;
+    r ::= $buff get-buffer-line $line;
+    $r ?? {
+	show-message :bell "No buffer name specified.";
+	return SELF;
+    };
+    l ::= $r =~ '\<[^\>]+\>';
+    if {nil? $l} {
+	show-message :bell "No buffer name specified.";
+	return SELF;
+    };
+
+    s ::= $l car : get 2;
+    s ::= $s sub 1 [$s len : - 1];
+    target-buff ::= BufferManager find-buffer $s;
+    $target-buff ?? {
+	show-message :bell "No buffer name specified.";
+	return SELF;
+    };
+
+    if [$target-buff modify?] {
+        $main bind-buffer [$window get-window-name] $target-buff;
+        $main refresh;
+        $window apply-command $main $window "" save-buffer;
+        result ALL;
+    } {
+	show-message "Buffer not modified.";
+    };
 
     result ALL;
 };
