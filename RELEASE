@@ -3551,4 +3551,9 @@
 		  Alt+r -> search-word-backward
 		Add config value SEARCH_WORD_THRESHOLD.
 
+2023/11/19
+	pmacs update:
+		Add editor command buffer-list-save for bind to buffer and call save-buffer.
+		Add key bind at BList mode "s" to buffer-list-save.
+
 #eof
