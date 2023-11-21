@@ -350,10 +350,10 @@ defcommand buffer-list-save desc: "Save the selected buffer in buffer list." {
     };
 
     if [$target-buff modify?] {
-        $main bind-buffer [$window get-window-name] $target-buff;
-        $main refresh;
-        $window apply-command $main $window "" save-buffer;
-        result ALL;
+        $main set-mini-input-end-hook {
+            $window apply-command $main $window "" buffer-list;
+        };
+        save-buffer $main $window $target-buff;
     } {
 	show-message "Buffer not modified.";
     };
