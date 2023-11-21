@@ -3556,4 +3556,13 @@
 		Add editor command buffer-list-save for bind to buffer and call save-buffer.
 		Add key bind at BList mode "s" to buffer-list-save.
 
+2023/11/21
+	pmacs update:
+		Add Window::set-mini-input-end-hook method and execute $MiniInputEndHook
+		  at mini input end timming afger 100 msec background.
+		Change buffer-list-save to use function save-buffer next call buffer-list
+		  use set-mini-input-end-hook.
+		Change save-buffer editor command to use saparated function save-buffer.
+		Add new function save-buffer separated from editor command save-buffer.
+
 #eof
