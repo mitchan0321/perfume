@@ -171,13 +171,17 @@ defcommand read-file desc: "Open specified file and insert file data to current 
 
 defcommand save-buffer desc: "Save current buffer to origin file." {
     | main window |
-    __buff_in_clojure__ ::= $window get-buffer;
-    path ::= $__buff_in_clojure__ get-path;
+    buff ::= $window get-buffer;
+    save-buffer $main $window $buff;
+    result ALL;
+};
 
-    if {or {nil? $path} {$path = ""}} {
-        cbuff ::= $window get-buffer;
+defun save-buffer (main window buff) {
+    path ::= $buff get-path;
+    path ::= $path ?? "";
+    if {$path = ""} {
         mini-input-file-chooser $main $window
-            init-value: [$cbuff get-content-dir]
+            init-value: [$buff get-content-dir]
             prompt: "Save file name: "
 	    enter-proc: {| value |
 		path ::= path-adjust [
@@ -194,24 +198,24 @@ defcommand save-buffer desc: "Save current buffer to origin file." {
 			    return ALL;
                         }
                         yes-proc: {
-			    (result err) ::= $__buff_in_clojure__ save-content path: $path;
+			    (result err) ::= $buff save-content path: $path;
 			    if $result {
 				show-message "Save Done.";
 			    } {
 				show-message :bell ["Save Failed, path: " . $path " (" $err ")"];
 			    };
-			    $MainWindow bind-buffer [$window get-window-name] $__buff_in_clojure__;
+			    $main bind-buffer [$window get-window-name] $buff;
 			    return ALL;
 			}
                     ;;
 		} {
-		    (result err) ::= $__buff_in_clojure__ save-content path: $path;
+		    (result err) ::= $buff save-content path: $path;
 		    if $result {
 			show-message "Save Done.";
 		    } {
 			show-message :bell ["Save Failed, path: " . $path " (" $err ")"];
 		    };
-                    $MainWindow bind-buffer [$window get-window-name] $__buff_in_clojure__;
+                    $main bind-buffer [$window get-window-name] $buff;
 		    return ALL;
 		};
             }
@@ -220,7 +224,7 @@ defcommand save-buffer desc: "Save current buffer to origin file." {
         return ALL;
     };
 
-    if [$__buff_in_clojure__ modified-by-another-process] {
+    if [$buff modified-by-another-process] {
         show-message "" :bell;
         mini-input-fully-yes-or-no $main $window
             prompt: ["Maybe this file modified by another process. Really save file? (" . $path ") [yes or ESC]: "]
@@ -229,7 +233,7 @@ defcommand save-buffer desc: "Save current buffer to origin file." {
                 return ALL;
             }
             yes-proc: { 
-                (result err) ::= $__buff_in_clojure__ save-content;
+                (result err) ::= $buff save-content;
                 if $result {
                     show-message "Save Done.";
                 } {
@@ -247,7 +251,7 @@ defcommand save-buffer desc: "Save current buffer to origin file." {
                 return ALL;
             }
             yes-proc: {
-                (result err) ::= $__buff_in_clojure__ save-content;
+                (result err) ::= $buff save-content;
                 if $result {
                     show-message "Save Done.";
                 } {
