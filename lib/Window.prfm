@@ -20,6 +20,9 @@ Window method init-constructor () {
     ## MiniInputCallback list form is: (window closure)
     sets MiniInputCallback ();
 
+    ### mini-input-end-hook
+    sets MiniInputEndHook <nil>;
+
     ## Event loop exit flag
     sets EventLoopDone <nil>;
 
@@ -790,9 +793,10 @@ Window method mini-input-callback (in-key value) {
 	}
 	catch: {| e |
 	    show-message :bell ["Error happend at mini window input callback, <" . [$e car] "># " [$e cdr]];
-	    return <nil>;
+            result := <nil>;
 	};
     };
+    
     return $result;
 };
 
@@ -805,6 +809,27 @@ Window method mini-input-end () {
     sets MiniInputSave <nil>;
     $MiniWindow diactivate;
     $MiniWindow clear;
+
+    if {block? $MiniInputEndHook} {
+        _body_ := $MiniInputEndHook;
+        add-background after: 100 {
+            try {
+                $_body_ eval;
+            } catch: {| e |
+                show-message :bell ["Error happend at mini-input-end-hook, <" . [$e car] "># " [$e cdr]];
+            };
+            result ALL;
+        };
+        sets MiniInputEndHook <nil>;
+    };
+};
+
+Window method set-mini-input-end-hook (hook) {
+    if {block? $hook} {
+        sets MiniInputEndHook $hook;
+    } {
+        sets MiniInputEndHook <nil>;
+    };
 };
 
 Window method mini-input? () {
