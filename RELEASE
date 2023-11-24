@@ -3565,4 +3565,8 @@
 		Change save-buffer editor command to use saparated function save-buffer.
 		Add new function save-buffer separated from editor command save-buffer.
 
+2023/11/24
+	pmacs update:
+		Change search-word-* UI, input previous search word if press CTRL_F or CTRL_R.
+
 #eof
