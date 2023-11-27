@@ -306,6 +306,202 @@ Window method create-split-cross-window-sub (win-name) {
     $WindowList car : activate;
 };
 
+Window method create-split-tridivide1-window (window-name: win-name) {
+    if {set? win-name} else: {
+        win-name := "Window#1";
+    };
+
+    main ::= self;
+    hook := {$main create-split-tridivide1-window-sub $win-name};
+    add-create-window-hook $hook;
+    $hook eval;
+};
+
+Window method create-split-tridivide2-window (window-name: win-name) {
+    if {set? win-name} else: {
+        win-name := "Window#1";
+    };
+
+    main ::= self;
+    hook := {$main create-split-tridivide2-window-sub $win-name};
+    add-create-window-hook $hook;
+    $hook eval;
+};
+
+Window method create-split-tridivide3-window (window-name: win-name) {
+    if {set? win-name} else: {
+        win-name := "Window#1";
+    };
+
+    main ::= self;
+    hook := {$main create-split-tridivide3-window-sub $win-name};
+    add-create-window-hook $hook;
+    $hook eval;
+};
+
+Window method create-split-tridivide4-window (window-name: win-name) {
+    if {set? win-name} else: {
+        win-name := "Window#1";
+    };
+
+    main ::= self;
+    hook := {$main create-split-tridivide4-window-sub $win-name};
+    add-create-window-hook $hook;
+    $hook eval;
+};
+
+Window method create-split-tridivide1-window-sub (win-name) {
+    buff-list ::= get-buffer-list $win-name;
+    sets WindowList ();
+
+    (l c) ::= curs-get-screen-size $CursWin;
+    y0 := 0;
+    y1 ::= [$l / 2] real : * $HORIZONTAL_DIV_RATIO : int;
+    if {$y1 < $MIN_WINDOW_HEIGHT} {y1 := $MIN_WINDOW_HEIGHT};
+    x0 := 0;
+    x1 ::= [$c / 2] real : * $VERTICAL_DIV_RATIO : int;
+    if {$x1 < $MIN_WINDOW_WIDTH} {x1 := $MIN_WINDOW_WIDTH};
+
+    win ::= new CombiWindow init: ([self] 0 0 $y1 $x1);
+    $win set-window-name $win-name;
+    $WindowList <<- $win;
+
+    win-name ::= next-window-name $win-name;
+    win ::= new CombiWindow init: ([self] 0 $x1 $y1 [$c - $x1]);
+    $win set-window-name $win-name;
+    $WindowList <<- $win;
+
+    win-name ::= next-window-name $win-name;
+    if {[$l - $y1] >= $MIN_WINDOW_HEIGHT} {
+        win ::= new CombiWindow init: ([self] $y1 0 [$l - $y1] $c);
+        $win set-window-name $win-name;
+        $WindowList <<- $win;
+    };
+
+    $WindowList cdr : each do: {| i | $i diactivate};
+
+    $WindowList each do: {| w |
+        buff ::= $buff-list >>;
+        $buff ?? {buff ::= $w get-buffer};
+	$MainWindow bind-buffer [$w get-window-name] $buff;
+    };
+    $WindowList car : activate;
+};
+
+Window method create-split-tridivide2-window-sub (win-name) {
+    buff-list ::= get-buffer-list $win-name;
+    sets WindowList ();
+
+    (l c) ::= curs-get-screen-size $CursWin;
+    y0 := 0;
+    y1 ::= [$l / 2] real : * $HORIZONTAL_DIV_RATIO : int;
+    if {$y1 < $MIN_WINDOW_HEIGHT} {y1 := $MIN_WINDOW_HEIGHT};
+    x0 := 0;
+    x1 ::= [$c / 2] real : * $VERTICAL_DIV_RATIO : int;
+    if {$x1 < $MIN_WINDOW_WIDTH} {x1 := $MIN_WINDOW_WIDTH};
+
+    win ::= new CombiWindow init: ([self] 0 0 $l $x1);
+    $win set-window-name $win-name;
+    $WindowList <<- $win;
+
+    win-name ::= next-window-name $win-name;
+    win ::= new CombiWindow init: ([self] 0 $x1 $y1 [$c - $x1]);
+    $win set-window-name $win-name;
+    $WindowList <<- $win;
+
+    win-name ::= next-window-name $win-name;
+    if {[$l - $y1] >= $MIN_WINDOW_HEIGHT} {
+        win ::= new CombiWindow init: ([self] $y1 $x1 [$l - $y1] [$c - $x1]);
+        $win set-window-name $win-name;
+        $WindowList <<- $win;
+    };
+
+    $WindowList cdr : each do: {| i | $i diactivate};
+
+    $WindowList each do: {| w |
+        buff ::= $buff-list >>;
+        $buff ?? {buff ::= $w get-buffer};
+	$MainWindow bind-buffer [$w get-window-name] $buff;
+    };
+    $WindowList car : activate;
+};
+
+Window method create-split-tridivide3-window-sub (win-name) {
+    buff-list ::= get-buffer-list $win-name;
+    sets WindowList ();
+
+    (l c) ::= curs-get-screen-size $CursWin;
+    y0 := 0;
+    y1 ::= [$l / 2] real : * $HORIZONTAL_DIV_RATIO : int;
+    if {$y1 < $MIN_WINDOW_HEIGHT} {y1 := $MIN_WINDOW_HEIGHT};
+    x0 := 0;
+    x1 ::= [$c / 2] real : * $VERTICAL_DIV_RATIO : int;
+    if {$x1 < $MIN_WINDOW_WIDTH} {x1 := $MIN_WINDOW_WIDTH};
+
+    win ::= new CombiWindow init: ([self] 0 0 $y1 $c);
+    $win set-window-name $win-name;
+    $WindowList <<- $win;
+
+    win-name ::= next-window-name $win-name;
+    win ::= new CombiWindow init: ([self] $y1 0 [$l - $y1] $x1);
+    $win set-window-name $win-name;
+    $WindowList <<- $win;
+
+    win-name ::= next-window-name $win-name;
+    if {[$l - $y1] >= $MIN_WINDOW_HEIGHT} {
+        win ::= new CombiWindow init: ([self] $y1 $x1 [$l - $y1] [$c - $x1]);
+        $win set-window-name $win-name;
+        $WindowList <<- $win;
+    };
+
+    $WindowList cdr : each do: {| i | $i diactivate};
+
+    $WindowList each do: {| w |
+        buff ::= $buff-list >>;
+        $buff ?? {buff ::= $w get-buffer};
+	$MainWindow bind-buffer [$w get-window-name] $buff;
+    };
+    $WindowList car : activate;
+};
+
+Window method create-split-tridivide4-window-sub (win-name) {
+    buff-list ::= get-buffer-list $win-name;
+    sets WindowList ();
+
+    (l c) ::= curs-get-screen-size $CursWin;
+    y0 := 0;
+    y1 ::= [$l / 2] real : * $HORIZONTAL_DIV_RATIO : int;
+    if {$y1 < $MIN_WINDOW_HEIGHT} {y1 := $MIN_WINDOW_HEIGHT};
+    x0 := 0;
+    x1 ::= [$c / 2] real : * $VERTICAL_DIV_RATIO : int;
+    if {$x1 < $MIN_WINDOW_WIDTH} {x1 := $MIN_WINDOW_WIDTH};
+
+    win ::= new CombiWindow init: ([self] 0 0 $y1 $x1);
+    $win set-window-name $win-name;
+    $WindowList <<- $win;
+
+    win-name ::= next-window-name $win-name;
+    win ::= new CombiWindow init: ([self] $y1 0 [$l - $y1] $x1);
+    $win set-window-name $win-name;
+    $WindowList <<- $win;
+
+    win-name ::= next-window-name $win-name;
+    if {[$l - $y1] >= $MIN_WINDOW_HEIGHT} {
+        win ::= new CombiWindow init: ([self] 0 $x1 $l [$c - $x1]);
+        $win set-window-name $win-name;
+        $WindowList <<- $win;
+    };
+
+    $WindowList cdr : each do: {| i | $i diactivate};
+
+    $WindowList each do: {| w |
+        buff ::= $buff-list >>;
+        $buff ?? {buff ::= $w get-buffer};
+	$MainWindow bind-buffer [$w get-window-name] $buff;
+    };
+    $WindowList car : activate;
+};
+
 Window method get-buffer-list (win-name) {
     buff-list := ();
     orig-win ::= get-window-by-name $win-name;

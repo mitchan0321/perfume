@@ -70,6 +70,34 @@ defcommand split-cross-window desc: "Split window four divisions cross." {
     result ALL;
 };
 
+defcommand split-tridivide1-window desc: "Split window tri divisions 1." {
+    | main window |
+    name ::= $window get-window-name;
+    $main create-split-tridivide1-window window-name: $name;
+    result ALL;
+};
+
+defcommand split-tridivide2-window desc: "Split window tri divisions 2." {
+    | main window |
+    name ::= $window get-window-name;
+    $main create-split-tridivide2-window window-name: $name;
+    result ALL;
+};
+
+defcommand split-tridivide3-window desc: "Split window tri divisions 3." {
+    | main window |
+    name ::= $window get-window-name;
+    $main create-split-tridivide3-window window-name: $name;
+    result ALL;
+};
+
+defcommand split-tridivide4-window desc: "Split window tri divisions 4." {
+    | main window |
+    name ::= $window get-window-name;
+    $main create-split-tridivide4-window window-name: $name;
+    result ALL;
+};
+
 defcommand dismiss-current-window desc: "Dismiss the current window and expand another window full screen." {
     | main window |
     $window apply-command $main [$main get-current-window] "" roll-current-window-backward;
