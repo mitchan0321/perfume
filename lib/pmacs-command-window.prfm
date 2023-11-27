@@ -70,28 +70,28 @@ defcommand split-cross-window desc: "Split window four divisions cross." {
     result ALL;
 };
 
-defcommand split-tridivide1-window desc: "Split window tri-divide 1." {
+defcommand split-tridivide1-window desc: "Split window three divisions pattern 1." {
     | main window |
     name ::= $window get-window-name;
     $main create-split-tridivide1-window window-name: $name;
     result ALL;
 };
 
-defcommand split-tridivide2-window desc: "Split window tri-divide 2." {
+defcommand split-tridivide2-window desc: "Split window three divisions pattern 2." {
     | main window |
     name ::= $window get-window-name;
     $main create-split-tridivide2-window window-name: $name;
     result ALL;
 };
 
-defcommand split-tridivide3-window desc: "Split window tri-divide 3." {
+defcommand split-tridivide3-window desc: "Split window three divisions pattern 3." {
     | main window |
     name ::= $window get-window-name;
     $main create-split-tridivide3-window window-name: $name;
     result ALL;
 };
 
-defcommand split-tridivide4-window desc: "Split window tri-divide 4." {
+defcommand split-tridivide4-window desc: "Split window three divisions pattern 4." {
     | main window |
     name ::= $window get-window-name;
     $main create-split-tridivide4-window window-name: $name;
