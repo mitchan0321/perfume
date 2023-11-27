@@ -3569,4 +3569,12 @@
 	pmacs update:
 		Change search-word-* UI, input previous search word if press CTRL_F or CTRL_R.
 
+2023/11/27
+	pmacs update:
+		Add new window split pattern, command name and bindings are:
+		  split-tridivide1-window <- ALT_F1
+		  split-tridivide2-window <- ALT_F2
+		  split-tridivide3-window <- ALT_F3
+		  split-tridivide4-window <- ALT_F4
+
 #eof
