@@ -3577,4 +3577,8 @@
 		  split-tridivide3-window <- ALT_F3
 		  split-tridivide4-window <- ALT_F4
 
+2023/11/29
+	pmacs update:
+		Fix execute-record, delay next step macro execute at after execute mini-input editor command.
+
 #eof
