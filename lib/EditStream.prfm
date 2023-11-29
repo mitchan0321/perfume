@@ -78,6 +78,13 @@ EditStream method gets (nonewline: nonewline) {
     return $r;
 };
 
+EditStream method ungets (n) {
+    atomic {
+        $Locate -- $n;
+        if {$Locate < 0} {Locate := 0};
+    };
+};
+
 EditStream method flush () {
     return <t>;
 };
