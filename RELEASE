@@ -3581,4 +3581,8 @@
 	pmacs update:
 		Fix execute-record, delay next step macro execute at after execute mini-input editor command.
 
+2023/11/30
+	pmacs update:
+		Fix execute-record in mini-input mode.
+
 #eof
