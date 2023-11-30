@@ -1209,6 +1209,14 @@ defun execute-record (__main __window __buff) {
     while {__r ::= $__buff gets} do: {
         if {"" = $__r} {continue};
         
+        if {$__main mini-input?} {
+            $__main set-mini-input-end-hook {
+                $__buff ungets 1;
+                execute-record $__main $__window $__buff;
+            };
+            break;
+        };
+
         __window ::= $__main get-current-window;
         if {eq? $__ins-char-cmd [$__r sub 0 [$__ins-char-cmd len]]} {
             result ::= $__window apply-command $__main $__window [$__r sub [$__ins-char-cmd len : + 1]] [symbol $__ins-char-cmd];

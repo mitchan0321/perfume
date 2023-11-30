@@ -992,7 +992,7 @@ Window method mini-input-callback (in-key value) {
             result := <nil>;
 	};
     };
-    
+
     return $result;
 };
 
