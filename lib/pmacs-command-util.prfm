@@ -1475,3 +1475,13 @@ defcommand terminal-send-suspend desc: "Send SUSPEND to shell terminal." {
     };
     return ALL;
 };
+
+defcommand terminal-bottom-of-buffer desc: "Move cursor to terminal buffer tail." {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+
+    $window apply-command $main $window "" bottom-of-buffer;
+    $window apply-command $main $window "" cursor-left;
+    return ALL;
+};
