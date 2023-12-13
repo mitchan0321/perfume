@@ -3588,6 +3588,10 @@
 		Fix execute-record in mini-input mode.
 		Add editor command terminal-bottom-of-buffer <- Ctrl+Alt+[↓], Ctrl+[END].
 
+2023/12/13
+	Makefile
+		Chagen package files permission.
+
 2023/12/23
 	tag:
 		PRFM_20231223_K35
