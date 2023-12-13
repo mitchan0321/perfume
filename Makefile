@@ -272,7 +272,7 @@ ifeq ($(shell uname -p),aarch64)
 else
 	cp -r $(PKG_EXTLIB_DIR)/libpcl*.so*    $(PKG_DIR)/lib
 endif
-	chmod 644 $(PKG_DIR)/lib/lib*
+	chmod 444 $(PKG_DIR)/lib/lib*
 endif
 	mkdir -p $(PKG_DIR)/bin
 	mkdir -p $(PKG_DIR)/lib/perfume
@@ -280,22 +280,22 @@ endif
 	mkdir -p $(PKG_DIR)/lib/perfume/lib/pdoc
 	mkdir -p $(PKG_DIR)/lib/perfume/lib/Tasklet
 	mkdir -p $(PKG_DIR)/lib/perfume/lib/dot-pmacs
-	install -m 755 perfumesh  $(PKG_DIR)/bin
-	install -m 644 setup.prfm $(PKG_DIR)/lib/perfume
-	install -m 644 lib/*.prfm $(PKG_DIR)/lib/perfume/lib
-	install -m 644 lib/*.conf $(PKG_DIR)/lib/perfume/lib
-	install -m 644 lib/*.key  $(PKG_DIR)/lib/perfume/lib
-	install -m 644 lib/*.logo $(PKG_DIR)/lib/perfume/lib
-	install -m 644 lib/*.keymap $(PKG_DIR)/lib/perfume/lib
-	install -m 644 lib/pdoc/* $(PKG_DIR)/lib/perfume/lib/pdoc
-	install -m 644 lib/Tasklet/* $(PKG_DIR)/lib/perfume/lib/Tasklet
-	install -m 644 lib/dot-pmacs/* $(PKG_DIR)/lib/perfume/lib/dot-pmacs
-	install -m 644 misc/default.fcab $(PKG_DIR)/lib/perfume/lib
-	install -m 755 pkg/install.sh $(PKG_DIR)
-	install -m 644 pkg/INSTALL    $(PKG_DIR)
-	install -m 644 pkg/pmacs.in   $(PKG_DIR)/bin
-	install -m 644 pkg/pmacs-client.in   $(PKG_DIR)/bin
-	install -m 644 RELEASE $(PKG_DIR)/lib/perfume
+	install -m 555 perfumesh  $(PKG_DIR)/bin
+	install -m 444 setup.prfm $(PKG_DIR)/lib/perfume
+	install -m 444 lib/*.prfm $(PKG_DIR)/lib/perfume/lib
+	install -m 444 lib/*.conf $(PKG_DIR)/lib/perfume/lib
+	install -m 444 lib/*.key  $(PKG_DIR)/lib/perfume/lib
+	install -m 444 lib/*.logo $(PKG_DIR)/lib/perfume/lib
+	install -m 444 lib/*.keymap $(PKG_DIR)/lib/perfume/lib
+	install -m 444 lib/pdoc/* $(PKG_DIR)/lib/perfume/lib/pdoc
+	install -m 444 lib/Tasklet/* $(PKG_DIR)/lib/perfume/lib/Tasklet
+	install -m 444 lib/dot-pmacs/* $(PKG_DIR)/lib/perfume/lib/dot-pmacs
+	install -m 444 misc/default.fcab $(PKG_DIR)/lib/perfume/lib
+	install -m 555 pkg/install.sh $(PKG_DIR)
+	install -m 444 pkg/INSTALL    $(PKG_DIR)
+	install -m 444 pkg/pmacs.in   $(PKG_DIR)/bin
+	install -m 444 pkg/pmacs-client.in   $(PKG_DIR)/bin
+	install -m 444 RELEASE $(PKG_DIR)/lib/perfume
 	(cd $(PKG_TMP); tar cvzf $(PKG_TAR_NAME) ./pmacs-install)
 
 #eof
