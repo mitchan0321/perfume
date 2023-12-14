@@ -342,7 +342,11 @@ defun path-adjust (path) {
 defun get-dir (path) {
     l ::= $path split sep: "/";
     $l ->>;
-    path-adjust [$l join sep: "/"];
+    result ::= path-adjust [$l join sep: "/"];
+    if {$result != "/"} {
+        $result append! "/";
+    };
+    return $result;
 };
 
 defun show-files-in-window (main window dir) {

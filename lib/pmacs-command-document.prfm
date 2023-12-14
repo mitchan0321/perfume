@@ -74,7 +74,7 @@ defun pwiki-open-link (main window buff geom ey ex) {
         };
     };
     
-    new-path ::= [$dir = ""] ??? [$link . ".pwiki"] [path-adjust [$dir . "/" $link ".pwiki"]];
+    new-path ::= [$dir = ""] ??? [$link . ".pwiki"] [path-adjust [$dir . $link ".pwiki"]];
     next-buff ::= BufferManager get-buffer-by-path $new-path;
     $next-buff ?? {
         next-buff ::= new EditBuffer;
