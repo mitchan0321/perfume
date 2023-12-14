@@ -3592,6 +3592,10 @@
 	Makefile
 		Chagen package files permission.
 
+2023/12/14
+	pmacs update:
+		Fix get-dir function if path name not equal "/" add "/" to last it.
+
 2023/12/23
 	tag:
 		PRFM_20231223_K35
