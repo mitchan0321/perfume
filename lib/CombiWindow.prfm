@@ -89,7 +89,7 @@ CombiWindow method init (main y x line column) {
     sets PrefixList <nil>;
     sets PrefixName <nil>;
     sets PrefixKey <nil>;
-    sets PrefixMap <nil>;       ### dict [( (Name . (key list) ... )]
+    sets PrefixMap <nil>;       ### dict [( (Name . (key list) ... ))]
     sets PrefixDesc <nil>;
     sets Prefix ();
     sets LastPrefix ();
