@@ -218,6 +218,18 @@ $KeyMaps set (KEY_ESC "[20;6~") (KEY_F45);   # shift+ctrl+
 $KeyMaps set (KEY_ESC "[21;6~") (KEY_F46);   # shift+ctrl+
 $KeyMaps set (KEY_ESC "[23;6~") (KEY_F47);   # shift+ctrl+
 $KeyMaps set (KEY_ESC "[24;6~") (KEY_F48);   # shift+ctrl+
+$KeyMaps set (KEY_ESC "[1;3P")  (KEY_F49);   # alt+f1
+$KeyMaps set (KEY_ESC "[1;3Q")  (KEY_F50);   # alt+f2
+$KeyMaps set (KEY_ESC "[1;3R")  (KEY_F51);   # alt+f3
+$KeyMaps set (KEY_ESC "[1;3S")  (KEY_F52);   # alt+f4
+$KeyMaps set (KEY_ESC "[15;3~") (KEY_F53);   # alt+f5
+$KeyMaps set (KEY_ESC "[17;3~") (KEY_F54);   # alt+f6
+$KeyMaps set (KEY_ESC "[18;3~") (KEY_F55);   # alt+f7
+$KeyMaps set (KEY_ESC "[19;3~") (KEY_F56);   # alt+f8
+$KeyMaps set (KEY_ESC "[20;3~") (KEY_F57);   # alt+f9
+$KeyMaps set (KEY_ESC "[21;3~") (KEY_F58);   # alt+f10
+$KeyMaps set (KEY_ESC "[23;3~") (KEY_F59);   # alt+f11
+$KeyMaps set (KEY_ESC "[24;3~") (KEY_F60);   # alt+f12
 ## $KeyMaps set (KEY_ESC "") (KEY_F49);   # alt+  ... Alt key combination is preemptived by system
 ## $KeyMaps set (KEY_ESC "") (KEY_F50);   # alt+  ... Alt key combination is preemptived by system
 ## $KeyMaps set (KEY_ESC "") (KEY_F51);   # alt+  ... Alt key combination is preemptived by system
