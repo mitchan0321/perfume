@@ -17,7 +17,7 @@ Task method init () {
     #   R ... Running
     #   S ... Sleep
     #   P ... Pause
-    #   Z ... zap
+    #   Z ... Zap
     #   X ... eXit
     #   W ... Wait
     sets State I;
