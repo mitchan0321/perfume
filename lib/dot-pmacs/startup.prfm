@@ -3,3 +3,9 @@
 load-tasklet console-adjuster;  # run '*Console*' buffer adjuster.
 load-tasklet console-cleaner;   # run '*Console*' buffer clean.
 #load-tasklet pmacs-server;      # run pmacs-server (default no start for your computer security).
+
+### start mouse functions
+mouse-on;
+
+### start Font Calibration Library (fix to your path)
+load-font-calib "/usr/local/lib/perfume/lib/default.fcab";

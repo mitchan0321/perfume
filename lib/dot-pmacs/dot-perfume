@@ -1,1 +1,2 @@
+### rename to ".pmacs" and copy to your home directory this file.
 $LIB_PATH << [$BASE_PATH . "/lib/perfume/lib/Tasklet"];
