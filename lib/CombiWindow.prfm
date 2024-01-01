@@ -85,6 +85,7 @@ CombiWindow method init (main y x line column) {
     sets SearchHilight <nil>;
     sets Mode <nil>;
     sets HILIGHT_REGEXP <nil>;
+    sets HILIGHT_REGEXP_ML <nil>;
 
     sets PrefixList <nil>;
     sets PrefixName <nil>;
@@ -204,11 +205,13 @@ CombiWindow method render () {
     ### if run word, search and region hilight at immediately, following this:
     ###
     set-word-hilight $buff $geom $geom,ViewLine [$geom,ViewLine + $y : - 1];
+    set-word-hilight-ml $buff $geom $geom,ViewLine [$geom,ViewLine + $y : - 1];
     set-spot-color $buff $geom;
     set-search-hilight $buff $geom;
     set-region-hilight $buff $geom $y $x;
 };
 
+### !!! Not used method !!!
 CombiWindow method render-line () {
     ### if $Activate {geom-trimming};
     ### if $Activate {activate};
@@ -710,6 +713,7 @@ CombiWindow method setkey (key command prefix: prefix) {
 
 CombiWindow method load-keybind-override (mode) {
     sets HILIGHT_REGEXP <nil>;
+    sets HILIGHT_REGEXP_ML <nil>;
     load-keybind;
     key-path := $MODE_FILE,$mode;
     $key-path ?? {
@@ -1475,6 +1479,50 @@ CombiWindow method set-word-hilight (buff geom start end) {
     };
 };
 
+CombiWindow method set-word-hilight-ml (buff geom start end) {
+    if {false? HILIGHT_REGEXP_ML} {return};
+
+    (y x) ::= get-source-index $buff $geom;
+    (sy sx) ::= get-screen-size;
+    ### start := $geom,ViewLine;
+    ### end ::= $start + $sy : - 1;
+
+    start ::= $start - 50;
+    if {$start < 0} {start := 0};
+    end ::= $end + 50;
+    len ::= $buff get-buffer-length;
+    if {$end > len} {end := $len};
+    target-src := "";
+    sum-len := 0;
+    len-index ::= vector;
+    $buff select-buffer $start $end {| src |
+        $target-src append! [$src . "\n"];
+        $len-index append! $sum-len;
+        sum-len ::= $sum-len + [$src len] : + 1;
+    };
+    if {[$len-index len] <= 0} {return};
+    
+    $HILIGHT_REGEXP_ML each do: {| i |
+	regex ::= $i car;
+	color ::= $i cdr : car;
+	result := ();
+	last := $result;
+        l ::= $src =~ :all $regex;
+        if $l {
+            $l each do: {| m |
+                line := 0;
+                lstart := 0;
+                lend := 0;
+                [$len-index len] each to: 0 do: {
+                    if 
+                };
+                $last append! ($line (($lstart $lend)));
+            };
+        };
+	set-word-hilight-color $geom $buff $result $color;
+    };
+};
+
 CombiWindow method set-spot-color (buff geom) {
     $geom,SpotColor each do: {| k v | 
         try {
@@ -1486,6 +1534,11 @@ CombiWindow method set-spot-color (buff geom) {
     };
 };
 
+### list struct
+### ( 
+###   ( line (( start end optional-string )))
+###   ....
+### )
 CombiWindow method set-word-hilight-color (geom buff list color) {
     (scr-y scr-x) ::= get-screen-size;
 
