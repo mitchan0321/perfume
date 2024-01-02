@@ -211,6 +211,7 @@ CombiWindow method render () {
     set-region-hilight $buff $geom $y $x;
 };
 
+REM {
 ### !!! Not used method !!!
 CombiWindow method render-line () {
     ### if $Activate {geom-trimming};
@@ -265,6 +266,7 @@ CombiWindow method render-line () {
     ###
     set-word-hilight $buff $geom $i $i;
     set-region-hilight $buff $geom $y $x;
+};
 };
 
 CombiWindow method set-eof-mark (geom buff y x) {
@@ -1453,12 +1455,7 @@ CombiWindow method set-search-hilight (buff geom) {
 };
 
 CombiWindow method set-word-hilight (buff geom start end) {
-    if {false? HILIGHT_REGEXP} {return};
-
-    (y x) ::= get-source-index $buff $geom;
-    (sy sx) ::= get-screen-size;
-    ### start := $geom,ViewLine;
-    ### end ::= $start + $sy : - 1;
+    if {nil? $HILIGHT_REGEXP} {return};
 
     $HILIGHT_REGEXP each do: {| i |
 	regex ::= $i car;
@@ -1475,51 +1472,82 @@ CombiWindow method set-word-hilight (buff geom start end) {
 	    };
 	    $line ++;
 	};
-	set-word-hilight-color $geom $buff $result $color;
+        try {
+            set-word-hilight-color $geom $buff $result $color;
+        } catch: {| e |
+            show-message ["ERR: " . $e];
+        };
     };
 };
 
 CombiWindow method set-word-hilight-ml (buff geom start end) {
-    if {false? HILIGHT_REGEXP_ML} {return};
+    if {nil? $HILIGHT_REGEXP_ML} {return};
 
-    (y x) ::= get-source-index $buff $geom;
-    (sy sx) ::= get-screen-size;
-    ### start := $geom,ViewLine;
-    ### end ::= $start + $sy : - 1;
-
-    start ::= $start - 50;
-    if {$start < 0} {start := 0};
-    end ::= $end + 50;
+    bstart ::= $start - 50;
+    if {$bstart < 0} {bstart := 0};
+    bend ::= $end + 50;
     len ::= $buff get-buffer-length;
-    if {$end > len} {end := $len};
+    if {$bend > $len} {bend := $len};
     target-src := "";
     sum-len := 0;
     len-index ::= vector;
-    $buff select-buffer $start $end {| src |
+    $buff buffer-select $bstart $bend {| src |
         $target-src append! [$src . "\n"];
         $len-index append! $sum-len;
         sum-len ::= $sum-len + [$src len] : + 1;
     };
     if {[$len-index len] <= 0} {return};
-    
+
     $HILIGHT_REGEXP_ML each do: {| i |
 	regex ::= $i car;
 	color ::= $i cdr : car;
-	result := ();
-	last := $result;
-        l ::= $src =~ :all $regex;
+        l ::= $target-src =~ :all $regex;
         if $l {
+            result := ();
+            last := $result;
             $l each do: {| m |
-                line := 0;
-                lstart := 0;
-                lend := 0;
-                [$len-index len] each to: 0 do: {
-                    if 
+                (ts te tt) := $m;
+                sline := 0;
+                eline := 0;
+                scol := 0;
+                ecol := 0;
+                [$len-index len : - 1] each to: 0 do: {| j |
+                    if {$len-index,$j <= $ts} {
+                        sline := $j;
+                        scol ::= $ts - $len-index,$j;
+                        break;
+                    };
                 };
-                $last append! ($line (($lstart $lend)));
+                [$len-index len : - 1] each to: 0 do: {| k |
+                    if {$len-index,$k <= $te} {
+                        eline := $k;
+                        ecol ::= $te - $len-index,$k;
+                        break;
+                    };
+                };
+                if {$sline = $eline} {
+                    $last append! ([$sline + $bstart] ([$scol + 0] [$ecol + 0]));
+                } {
+                    line ::= $sline + $bstart;
+                    llen ::= [[$buff get-buffer-line $line] ?? ""] len;
+                    $last append! ($line ([$scol + 0] [$llen + 0]));
+                    line ::= $eline + $bstart;
+                    $last append! ($line (0 [$ecol + 0]));
+                    if {[$eline - $sline] >= 2} {
+                        [$sline + 1] each to: [$eline - 1] do: {| m |
+                            line ::= $m + $bstart;
+                            llen ::= [[$buff get-buffer-line $line] ?? ""] len;
+                            $last append! ($line (0 $llen));
+                        };
+                    };
+                };
+            };
+            try {
+                set-word-hilight-color $geom $buff $result $color;
+            } catch: {| e |
+                show-message ["ERR: " . $e];
             };
         };
-	set-word-hilight-color $geom $buff $result $color;
     };
 };
 
@@ -1534,11 +1562,13 @@ CombiWindow method set-spot-color (buff geom) {
     };
 };
 
-### list struct
+###
+### list structure
 ### ( 
-###   ( line (( start end optional-string )))
+###   ( line ( start end [optional-string-match-text] ))
 ###   ....
 ### )
+###
 CombiWindow method set-word-hilight-color (geom buff list color) {
     (scr-y scr-x) ::= get-screen-size;
 
