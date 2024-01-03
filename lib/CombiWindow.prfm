@@ -1467,10 +1467,10 @@ CombiWindow method set-word-hilight (buff geom start end) {
 	    l ::= $src =~ :all $regex;
 	    if $l {
 		$l each do: {| m |
-		    $last append! ([$line + 0] $m);
+		    $last append! ($line $m);
 		};
 	    };
-	    $line ++;
+	    line ::= $line + 1;
 	};
         try {
             set-word-hilight-color $geom $buff $result $color;
@@ -1526,13 +1526,13 @@ CombiWindow method set-word-hilight-ml (buff geom start end) {
                     };
                 };
                 if {$sline = $eline} {
-                    $last append! ([$sline + $bstart] ([$scol + 0] [$ecol + 0]));
+                    $last append! ([$sline + $bstart] ($scol $ecol));
                 } {
                     line ::= $sline + $bstart;
                     llen ::= [[$buff get-buffer-line $line] ?? ""] len;
-                    $last append! ($line ([$scol + 0] [$llen + 0]));
+                    $last append! ($line ($scol $llen));
                     line ::= $eline + $bstart;
-                    $last append! ($line (0 [$ecol + 0]));
+                    $last append! ($line (0 $ecol));
                     if {[$eline - $sline] >= 2} {
                         [$sline + 1] each to: [$eline - 1] do: {| m |
                             line ::= $m + $bstart;
