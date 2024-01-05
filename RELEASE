@@ -3606,4 +3606,8 @@
 		Add C style multi line comment syntax hilight.
 		Add 'Mode-C.key' and 'Mode-Java multi line comment hilight regexp.
 
+2024/01/05
+	pmacs update:
+		Add :debug option to show-message function, for output log to *Console* buffer.
+
 #eof
