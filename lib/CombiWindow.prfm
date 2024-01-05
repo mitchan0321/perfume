@@ -211,64 +211,6 @@ CombiWindow method render () {
     set-region-hilight $buff $geom $y $x;
 };
 
-REM {
-### !!! Not used method !!!
-CombiWindow method render-line () {
-    ### if $Activate {geom-trimming};
-    ### if $Activate {activate};
-
-    win ::= get-window-name;
-    buff ::= get-buffer;
-    buff-name ::= $buff get-buffer-name;
-    geom ::= get-geom;
-    (y x) ::= curs-get-screen-size $BufferCurs;
-    (cy cx) ::= get-source-index $buff $geom;
-
-    if {$cy > [$buff get-buffer-length]} {
-	$geom set! ViewLine 0;
-	$geom set! CursorLine [$buff get-buffer-length];
-	$geom set! ViewColumn 0;
-	$geom set! CursorColumn 0;
-	$geom set! IndexColumn.SAVE 0;
-	(cy cx) ::= get-source-index $buff $geom;
-    };
-
-    render-status-line $win $buff $cy $cx $y $x $buff-name;
-    ### render-vertical-line;
-
-    i := $geom,CursorLine;
-    src ::= $buff get-buffer-line [$geom,ViewLine + $i];
-    $src ?? {src := ""};
-
-    ### erase line
-    curs-render-line
-        $BufferCurs
-        $i 0 0 [" " repeat $x]
-        $DEFAULT_TAB_WIDTH $DISPLAY_ENCODING
-    ;
-
-    try {
-        curs-render-line
-	    $BufferCurs
-            $i $geom,ViewColumn 0 $src
-            $DEFAULT_TAB_WIDTH $DISPLAY_ENCODING
-        ;
-    }
-    catch: {| e |
-        show-message :bell ["Error at curs-render-line, <" . [$e car] ">."];
-        break;
-    };
-
-    set-eof-mark $geom $buff $y $x;
-
-    ###
-    ### if run word, search and region hilight at immediately, following this:
-    ###
-    set-word-hilight $buff $geom $i $i;
-    set-region-hilight $buff $geom $y $x;
-};
-};
-
 CombiWindow method set-eof-mark (geom buff y x) {
     if {[$geom,ViewLine + $y : - 1] >= [$buff get-buffer-length]} {
 	if {[[$buff get-buffer-length] - $geom,ViewLine] < $y} {
