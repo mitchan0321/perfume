@@ -295,7 +295,16 @@ defun string-width (str tab-width) {
     return [curs-index-to-pos $str [$str len] $tab-width];
 };
 
-defun show-message (msg wait: msec bell: bell) {
+defun show-message (wait: msec bell: bell debug: debug args: msgl) {
+    msg ::= $msgl join sep: "";
+
+    if {true? debug} {
+        msg ::= "Debug: " . $msg;
+        try {
+            TaskManager output-console [">>>" . $msg];
+        } catch: { ### do nothing
+        };
+    };
     if {true? MainWindow} {
 	try {
             [$MainWindow get-minibuffer-window] ?? {throw ErrNoMiniBuffer "No MiniBuffer for debugging."};
