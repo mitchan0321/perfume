@@ -4106,7 +4106,7 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     
     /*
     ** RAW I/O モードの時は、直接 read(2) システムコールを利用する。
-    ** 入力データのでコードは行わない。エンコーディングに RAW を指定して読み込んだ場合と同じになる。
+    ** 入力データのデコードは行わない。エンコーディングに RAW を指定して読み込んだ場合と同じになる。
     ** read(2)の結果が 0 の場合、socket の接続先が切断したことを示すので <nil> を返す。
     ** -1 の場合で errno が EINTR, EAGAIN, EWOULDBLOCK の場合は ErrIOAgain を返す。
     */
