@@ -3610,4 +3610,10 @@
 	pmacs update:
 		Add :debug option to show-message function, for output log to *Console* buffer.
 
+2024/01/17
+	doc/manual.{odt,pdf}
+		Change text font mincho(NOTO font) to gothic(yu-min).
+	pmacs update:
+		Change BLACKETS_PAIR color at theme MODERN and MODERN-DARK.
+
 #eof
