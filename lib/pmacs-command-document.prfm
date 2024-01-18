@@ -45,7 +45,7 @@ defun pwiki-open-link (main window buff geom ey ex) {
         ### if pwiki link form is [[&command]], execute command.
         command ::= $link sub 1;
         $window apply-command $main $window "" [symbol $command];
-        return ALL;
+        return <t>;
     };
     if {[$link at 0] = "?"} {
         ### if pwiki link form is [[?command]], show-keybindings.
@@ -60,6 +60,13 @@ defun pwiki-open-link (main window buff geom ey ex) {
         } {
             show-message [$result . " -> " $command];
         };
+        return <t>;
+    };
+    
+    if {[$link at 0] = "@"} {
+        ### if pwiki link form is [[@URL]], execute Web browser.
+        url ::= $link sub 1;
+        do-command $WEB_BROWSER_EXEC "WEB-BROWSER" ($url);
         return <t>;
     };
     
@@ -95,6 +102,21 @@ defun pwiki-open-link (main window buff geom ey ex) {
     $next-buff set-previous-buffer [$buff get-buffer-name];
     
     return <t>;
+};
+
+defun do-command (command task-name params) {
+    ###
+    ### do command
+    ###
+    task ::= new Task;
+    $task proc ["do-command:" . $task-name] {
+        (command params) := $ARGS;
+        cmdline ::= [$command literal] . [$params inject "" do: {| s i | $s . [" " . [$i literal]]}];
+        println "[" [get-name] "] command line: " $cmdline;
+        sts ::= exec "/bin/sh" "-c" $cmdline;
+    } $command $params;
+
+    return;
 };
 
 defun get-keybind-string (window command) {
