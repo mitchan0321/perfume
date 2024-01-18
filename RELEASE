@@ -3612,7 +3612,7 @@
 
 2024/01/17
 	doc/manual.{odt,pdf}
-		Change text font mincho(NOTO font) to gothic(yu-min).
+		Change text font mincho(NOTO font) to gothic(yu gothic font).
 	pmacs update:
 		Change BLACKETS_PAIR color at theme MODERN and MODERN-DARK.
 
