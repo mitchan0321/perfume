@@ -3616,4 +3616,8 @@
 	pmacs update:
 		Change BLACKETS_PAIR color at theme MODERN and MODERN-DARK.
 
+2024/01/18
+	pmacs update:
+		Add pwiki link [[@URL]] for execute $WEB_BROWSER_EXEC config value with URL.
+
 #eof
