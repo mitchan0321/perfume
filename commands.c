@@ -4065,6 +4065,53 @@ error:
 }
 
 Toy_Type*
+cmd_controltype(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *item;
+    Toy_Type *result;
+
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) != 0) goto error;
+
+    item = list_get_item(posargs);
+    if (CONTROL != GET_TAG(item)) return const_Nil;
+
+    result = new_list(NULL);
+    switch (item->u.control.code) {
+    case CTRL_RETURN:
+        list_append(result, new_symbol(L"RETURN"));
+        list_append(result, item->u.control.ret_value);
+        break;
+    case CTRL_GOTO:
+        list_append(result, new_symbol(L"GOTO"));
+        list_append(result, item->u.control.ret_value);
+        break;
+    case CTRL_BREAK:
+        list_append(result, new_symbol(L"BREAK"));
+        list_append(result, item->u.control.ret_value);
+        break;
+    case CTRL_CONTINUE:
+        list_append(result, new_symbol(L"CONTINUE"));
+        list_append(result, const_Nil);
+        break;
+    case CTRL_REDO:
+        list_append(result, new_symbol(L"REDO"));
+        list_append(result, const_Nil);
+        break;
+    case CTRL_RETRY:
+        list_append(result, new_symbol(L"RETRY"));
+        list_append(result, const_Nil);
+        break;
+    default:
+        return const_Nil;
+    }
+    return result;
+    
+error:
+    return new_exception(TE_SYNTAX,
+			 L"Syntax error at 'control-type?', syntax: control-type? val", interp);
+}
+
+Toy_Type*
 cmd_cstack_release(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *t;
     int slot;
@@ -4798,6 +4845,7 @@ int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, L"bulk?", 	cmd_isbulk,		L"val");
     toy_add_func(interp, L"intr?", 	cmd_isintr,		L"val");
     toy_add_func(interp, L"control?", 	cmd_iscontrol,		L"val");
+    toy_add_func(interp, L"control-type?",cmd_controltype,	L"val");
     toy_add_func(interp, L"cstack-release", cmd_cstack_release, L"slot");
     toy_add_func(interp, L"coro-id", 	cmd_coroid, 		NULL);
     toy_add_func(interp, L"REM", 	cmd_remark, 		L"val");
