@@ -3620,4 +3620,8 @@
 	pmacs update:
 		Add pwiki link [[@URL]] for execute $WEB_BROWSER_EXEC config value with URL.
 
+2024/01/21
+	commands.c
+		Add control-type? command for get control type indicator.
+
 #eof
