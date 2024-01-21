@@ -152,7 +152,7 @@ install:
 	install -m 644 lib/*.key $(PREFIX)/lib/perfume/lib
 	install -m 644 lib/*.logo $(PREFIX)/lib/perfume/lib
 	install -m 644 lib/*.keymap $(PREFIX)/lib/perfume/lib
-	install -m 444 lib/pdoc/* $(PREFIX)/lib/perfume/lib/pdoc
+	install -m 444 lib/pdoc/*.pwiki $(PREFIX)/lib/perfume/lib/pdoc
 	install -m 444 lib/Tasklet/* $(PREFIX)/lib/perfume/lib/Tasklet
 	install -m 644 misc/default.fcab $(PREFIX)/lib/perfume/lib
 	install -m 755 pkg/pmacs.in $(PREFIX)/bin
@@ -287,7 +287,7 @@ endif
 	install -m 444 lib/*.key  $(PKG_DIR)/lib/perfume/lib
 	install -m 444 lib/*.logo $(PKG_DIR)/lib/perfume/lib
 	install -m 444 lib/*.keymap $(PKG_DIR)/lib/perfume/lib
-	install -m 444 lib/pdoc/* $(PKG_DIR)/lib/perfume/lib/pdoc
+	install -m 444 lib/pdoc/*.pwiki $(PKG_DIR)/lib/perfume/lib/pdoc
 	install -m 444 lib/Tasklet/* $(PKG_DIR)/lib/perfume/lib/Tasklet
 	install -m 444 lib/dot-pmacs/* $(PKG_DIR)/lib/perfume/lib/dot-pmacs
 	install -m 444 misc/default.fcab $(PKG_DIR)/lib/perfume/lib
