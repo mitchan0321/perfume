@@ -3624,4 +3624,9 @@
 	commands.c
 		Add control-type? command for get control type indicator.
 
+2024/01/29
+	ncurses.c
+		Change curs-clear, curs-wipe and curs-bgclolor few optimized, become to flicker less at
+		  refresh timing.
+
 #eof
