@@ -350,8 +350,9 @@ Toy_Type*
 func_curses_clear(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     WINDOW *w;
     Toy_Type *container;
-    int i, j;
+    int i;
     int y, x;
+    char buff[1024];
 
     if (hash_get_length(nameargs) > 0) goto error;
     if (arglen != 1) goto error;
@@ -366,11 +367,15 @@ func_curses_clear(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 
     werase(w);
     getmaxyx(w, y, x);
+    for (i=0; i<x; i++) {
+        if (i>=1024) break;
+        buff[i] = ' ';
+    };
+    buff[(x<1024) ? x : 1023] = 0;
+        
     for (i=0; i<y; i++) {
-	for (j=0; j<x; j++) {
-	    wmove(w, i, j);
-	    wprintw(w, " ");
-	}
+        wmove(w, i, 0);
+        wprintw(w, "%s", buff);
     }
     return const_T;
 
@@ -383,8 +388,9 @@ Toy_Type*
 func_curses_wipe(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     WINDOW *w;
     Toy_Type *container;
-    int i, j;
+    int i;
     int y, x;
+    char buff[1024];
 
     if (hash_get_length(nameargs) > 0) goto error;
     if (arglen != 1) goto error;
@@ -399,11 +405,15 @@ func_curses_wipe(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
 
     wclear(w);
     getmaxyx(w, y, x);
+    for (i=0; i<x; i++) {
+        if (i>=1024) break;
+        buff[i] = ' ';
+    };
+    buff[(x<1024) ? x : 1023] = 0;
+        
     for (i=0; i<y; i++) {
-	for (j=0; j<x; j++) {
-	    wmove(w, i, j);
-	    wprintw(w, " ");
-	}
+        wmove(w, i, 0);
+        wprintw(w, "%s", buff);
     }
     return const_T;
 
@@ -654,7 +664,7 @@ func_curses_render_line(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, i
     posargs = list_next(posargs);
 
     getmaxyx(w, win_size_y, win_size_x);
-
+    
     iencoder = get_encoding_index(cell_get_addr(encoding->u.string));
     if (-1 == iencoder) {
 	return new_exception(TE_BADENCODER, L"Bad encoder specified.", interp);
@@ -811,7 +821,8 @@ func_curses_setbgcolor(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, in
     WINDOW *w;
     Toy_Type *container, *colorp;
     int icolorp;
-    int y, x, i, j;
+    int y, x, i;
+    char buff[1024];
 
     if (hash_get_length(nameargs) > 0) goto error;
     if (arglen != 2) goto error;
@@ -832,11 +843,15 @@ func_curses_setbgcolor(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, in
 
     wcolor_set(w, icolorp, NULL);
     getmaxyx(w, y, x);
+    for (i=0; i<x; i++) {
+        if (i>=1024) break;
+        buff[i] = ' ';
+    };
+    buff[(x<1024) ? x : 1023] = 0;
+        
     for (i=0; i<y; i++) {
-	for (j=0; j<x; j++) {
-	    wmove(w, i, j);
-	    wprintw(w, " ");
-	}
+        wmove(w, i, 0);
+        wprintw(w, "%s", buff);
     }
     
     return const_T;
