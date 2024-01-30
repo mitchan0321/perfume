@@ -128,7 +128,7 @@ MODERN {
     set-color-name COMMENT_HILIGHT              [WUtil color-pair BLUE    WHITE   ] attr: ($A_ITALIC $A_DIM);
     set-color-name ALERT_HILIGHT                [WUtil color-pair RED     WHITE   ] attr: ($A_ITALIC);
     set-color-name PWIKI_LINK                   [WUtil color-pair BLUE    WHITE   ] attr: ($A_UNDERLINE);
-    set-color-name DIRED_DIRECTORY              [WUtil color-pair BLUE    WHITE   ];
+    set-color-name DIRED_DIRECTORY              [WUtil color-pair GREEN   WHITE   ];
     set-color-name DIRED_SYMLINK                [WUtil color-pair MAGENTA WHITE   ];
     set-color-name DIRED_DEV                    [WUtil color-pair YELLOW  WHITE   ];
     set-color-name DIRED_MARKED                 [WUtil color-pair WHITE   BLUE    ];
@@ -168,7 +168,7 @@ MODERN-DARK {
     set-color-name COMMENT_HILIGHT              [WUtil color-pair CYAN    BLACK   ] attr: ($A_ITALIC);
     set-color-name ALERT_HILIGHT                [WUtil color-pair RED     BLACK   ] attr: ($A_ITALIC);
     set-color-name PWIKI_LINK                   [WUtil color-pair CYAN    BLACK   ] attr: ($A_UNDERLINE);
-    set-color-name DIRED_DIRECTORY              [WUtil color-pair CYAN    BLACK   ];
+    set-color-name DIRED_DIRECTORY              [WUtil color-pair GREEN   BLACK   ];
     set-color-name DIRED_SYMLINK                [WUtil color-pair MAGENTA BLACK   ];
     set-color-name DIRED_DEV                    [WUtil color-pair YELLOW  BLACK   ];
     set-color-name DIRED_MARKED                 [WUtil color-pair WHITE   BLUE    ];
