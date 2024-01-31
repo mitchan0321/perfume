@@ -3629,4 +3629,8 @@
 		Change curs-clear, curs-wipe and curs-bgclolor few optimized, become to flicker less at
 		  refresh timing.
 
+2024/01/31
+	pmacs update:
+		Change config variable WEB_BROWSER_EXEC(string) -> WEB_BROWSER_LIST(list of string).
+
 #eof
