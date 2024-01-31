@@ -66,7 +66,12 @@ defun pwiki-open-link (main window buff geom ey ex) {
     if {[$link at 0] = "@"} {
         ### if pwiki link form is [[@URL]], execute Web browser.
         url ::= $link sub 1;
-        do-command $WEB_BROWSER_EXEC "WEB-BROWSER" ($url);
+        $WEB_BROWSER_LIST each do: {| exec |
+            if {file exec? $exec} {
+                do-command $exec "WEB-BROWSER" ($url);
+                break;
+            };
+        };
         return <t>;
     };
     
