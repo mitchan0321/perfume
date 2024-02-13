@@ -1,3 +1,4 @@
+2024/02/14	PRFM_20240214		1.9.1
 2023/12/23	PRFM_20231223_K35	1.9.0
 2023/06/05	PRFM_20230605		1.8.1
 2023/05/01	PRFM_20230501		1.8.0
@@ -3632,5 +3633,10 @@
 2024/01/31
 	pmacs update:
 		Change config variable WEB_BROWSER_EXEC(string) -> WEB_BROWSER_LIST(list of string).
+
+2024/02/14
+	tag:
+		PRFM_20240214
+		1.9.1
 
 #eof
