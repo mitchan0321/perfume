@@ -216,17 +216,18 @@ typedef struct _toy_coroutine {
  *      +--------+--------+
  *   +0 |    script id    |
  *      +--------+--------+
- *   +2 |@#$***! |%%%%%%%%|
+ *   +2 |@#$***!-|%%%%%%%%|
  *      +--------+--------+
  *
- *	%: type field
- *	@: named arg flag
- *	#: switch arg flag
- *	$: lazy flag
- *	***:
- *	   # of position parameters (0-6),
- *	   if less than 7 and only position parameters.
- *	!: no printable
+ *      %: type field
+ *      @: named arg flag
+ *      #: switch arg flag
+ *      $: lazy flag
+ *      ***:
+ *         Number of position parameters (0-6),
+ *         if less than 7 and only position parameters.
+ *      !: no printable
+ *      -: reserved
  */
 typedef struct _toy_type {
     u_int32_t tag;
