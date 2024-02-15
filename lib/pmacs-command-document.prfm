@@ -260,8 +260,14 @@ defun do-man-async (window buff-name directory command enc) {
     man-buff ::= new EditStream;
     $man-buff open $buff-name;
     _puts ::= $man-buff method? puts;
+    cnt := 50;
     $man-buff method puts (*) {
         r ::= call $_puts ([curs-col [$* join sep: ""]]);
+        $cnt --;
+        if {$cnt = 0} {
+            # early display man header
+            $MainWindow set-force-update;
+        };
         return $r;
     };
     $man-buff set-columnlimit 256;
