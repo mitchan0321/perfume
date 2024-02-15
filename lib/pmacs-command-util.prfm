@@ -479,11 +479,15 @@ defun do-command-async (window buff-name directory command) {
     grep-buff ::= new EditStream;
     $grep-buff open $buff-name;
     _puts ::= $grep-buff method? puts;
+    cnt := 0;
     $grep-buff method puts (*) {
         r ::= call $_puts $*;
+        $cnt ++;
         $MainWindow get-window-list : each do: {| i |
             if {$i get-buffer : get-buffer-name : = $buff-name} {
-                $MainWindow set-force-update;
+                if {$cnt % 20 : = 0} {
+                    $MainWindow set-force-update;
+                };
             };
         };
         return $r;
