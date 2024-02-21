@@ -3645,4 +3645,8 @@
 		Change mouse operation link click from MOUSE_Prs_1 to MOUSE_Rel_1
 		  at BList mode, Dired mode, Interp mode, Man mode, PWiki mode and default mode.
 
+2024/02/21
+	ncurses.c
+		Change unknown character and combinated character substitute glyph, and define glyph width macro.
+
 #eof
