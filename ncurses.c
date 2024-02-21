@@ -601,9 +601,26 @@ static wchar_t *control_character_font [35] = {
     L"\u241e",  // RS   0x1e
     L"\u241f",  // US   0x1f
     L"\u2421",  // DEL  0x7f
-    L"\ufffd",  // Unknown character (width = -1)
-    // L"\u2423",  // Combining character (width = 0)
+
+// define for unknown character substitute glyph "?" at control_character_font[33]
+// #define UN_CHAR_WIDTH 2
+// L"\ufffd",  // Unknown character (width = -1)
+
+// define for unknown character substitute glyph "_" at control_character_font[33]
+#define UN_CHAR_WIDTH 2
+    L"\u2423",  // Unknown character (width = -1)
+
+// define for combinated character substitute glyph "_" at control_character_font[34]
+// #define CB_CHAR_WIDTH 2
+// L"\u2423",  // Combining character (width = 0)
+
+// define for combinated character substitute glyph "[]" at control_character_font[34]
+#define CB_CHAR_WIDTH 1
     L"\u25a1",  // Combining character (width = 0)
+
+// define combinated character show (comment out because buggy)
+// #define SHOW_CB_FONT 1
+// #define CB_CHAR_WIDTH 2
 };
 
 Toy_Type*
@@ -702,14 +719,18 @@ func_curses_render_line(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, i
         } else {
             int w;
             w = (int)fcl_get_width((wchar_t)p[i]);
-            // if (w < 0) {
+            // if (w < 0) { // }
             if (w <= 0) {
                 if (w < 0) {
                     cp = control_character_font[33];
-                    rendaring_data[i].display_width = 2; // if u+fffd font width is 2, set to 2
+                    rendaring_data[i].display_width = UN_CHAR_WIDTH; // if u+fffd font width is 2, set to 2
                 } else {
+#ifdef SHOW_CB_FONT
+                    cp = &p[i];
+#else
                     cp = control_character_font[34];
-                    rendaring_data[i].display_width = 1;
+#endif /* SHOW_CB_FONT */
+                    rendaring_data[i].display_width = CB_CHAR_WIDTH;
                 }
                 codep = new_cell(NULL);
                 cell_add_char(codep, cp[0]);
@@ -1384,12 +1405,12 @@ func_curses_pos_to_index(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, 
         } else {
             int w;
             w = (int)fcl_get_width((wchar_t)p[i]);
-            // if (w < 0) {
+            // if (w < 0) { // }
             if (w <= 0) {
                 if (w < 0) {
-                    rendaring_data[i].display_width = 2;  // if u+fffd font width is 2, set to 2
+                    rendaring_data[i].display_width = UN_CHAR_WIDTH;  // if u+fffd font width is 2, set to 2
                 } else {
-                    rendaring_data[i].display_width = 1;
+                    rendaring_data[i].display_width = CB_CHAR_WIDTH;
                 }
             } else {
                 if (w == 0) {
@@ -1479,12 +1500,12 @@ func_curses_index_to_pos(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, 
         } else {
             int w;
             w = (int)fcl_get_width((wchar_t)p[i]);
-            // if (w < 0) {
+            // if (w < 0) { // }
             if (w <= 0) {
                 if (w < 0) {
-                    rendaring_data[i].display_width = 2;  // if u+fffd font width is 2, set to 2
+                    rendaring_data[i].display_width = UN_CHAR_WIDTH;  // if u+fffd font width is 2, set to 2
                 } else {
-                    rendaring_data[i].display_width = 1;
+                    rendaring_data[i].display_width = CB_CHAR_WIDTH;
                 }
             } else {
                 if (w == 0) {
