@@ -607,8 +607,12 @@ static wchar_t *control_character_font [35] = {
 // L"\ufffd",  // Unknown character (width = -1)
 
 // define for unknown character substitute glyph "_" at control_character_font[33]
-#define UN_CHAR_WIDTH 2
-    L"\u2423",  // Unknown character (width = -1)
+// #define UN_CHAR_WIDTH 2
+// L"\u2423",  // Unknown character (width = -1)
+
+// define for unknown character substitute glyph "X" at control_character_font[33]
+#define UN_CHAR_WIDTH 1
+    L"\u2591",  // Unknown character (width = -1)
 
 // define for combinated character substitute glyph "_" at control_character_font[34]
 // #define CB_CHAR_WIDTH 2
