@@ -46,6 +46,10 @@ defcommand pop-prefix desc: "Pop last prefix." {
     return ALL;
 };
 
+defcommand show-version desc: "Show pmacs version." {
+    show-message "Version: " $VERSION ", Build: " $BUILD;
+};
+
 defcommand mini-move-message desc: "Demo background." {
     | main window |
     buff ::= $window get-buffer;
