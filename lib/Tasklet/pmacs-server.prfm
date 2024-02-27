@@ -1,7 +1,13 @@
 new Task : proc pmacs-server {
     pmacs-server-config;
-    
-    l ::= socket-server $PMACS-SERVER-PORT;
+
+    try {
+        l ::= socket-server $PMACS-SERVER-PORT;
+    } catch: {| e |
+        show-message :bell "pmacs-server: socket error <" [$e car] "> #" [$e cdr];
+        throw $e;
+    };
+        
     $SELF set-terminate-proc {
         try {close $l} catch: {};
     };
