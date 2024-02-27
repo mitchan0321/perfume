@@ -4,7 +4,8 @@ new Task : proc pmacs-server {
     try {
         l ::= socket-server $PMACS-SERVER-PORT;
     } catch: {| e |
-        show-message :bell "pmacs-server: socket error <" [$e car] "> #" [$e cdr];
+        show-message :bell "pmacs-server: socket error - <" [$e car] "> #" [$e cdr];
+        SysCall update-screen;
         throw $e;
     };
         
