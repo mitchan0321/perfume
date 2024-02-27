@@ -3649,4 +3649,9 @@
 	ncurses.c
 		Change unknown character and combinated character substitute glyph, and define glyph width macro.
 
+2024/02/28
+	pmacs update:
+		Add show-version editor command.
+		Add show error message if pmacs-server occured at server socket create.
+
 #eof
