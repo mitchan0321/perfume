@@ -101,14 +101,8 @@ new_interp(wchar_t* name, int stack_size, Toy_Interp* parent,
 	interp->trace_fd = 2;
 	interp->debug = 0;
 	interp->debug_in = 0;
-#ifdef HAS_GCACHE
-	interp->gcache = new_hash();
-	interp->cache_hit = 0;
-	interp->cache_missing = 0;
-#endif /* HAS_GCACHE */
 	hash_set_t(interp->scripts, const_atscriptid,
 		   new_integer_si(interp->script_id));
-
 	interp->cstack = 0;
 	interp->cstack_size = 0;
 	interp->coroid = 0;
@@ -159,11 +153,6 @@ new_interp(wchar_t* name, int stack_size, Toy_Interp* parent,
 	
 	interp->scripts = parent->scripts;
 	interp->script_id = parent->script_id;
-#ifdef HAS_GCACHE
-	interp->gcache = parent->gcache;
-	interp->cache_hit = parent->cache_hit;
-	interp->cache_missing = parent->cache_missing;
-#endif /* HAS_GCACHE */
 	interp->trace = parent->trace;
 	interp->trace_fd = parent->trace_fd;
 	interp->debug = parent->debug;

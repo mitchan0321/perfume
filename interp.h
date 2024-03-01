@@ -35,8 +35,5 @@ int		toy_add_methods(Toy_Interp *interp);
 wchar_t*	get_stack_trace(Toy_Interp* interp, Cell* stack);
 wchar_t*	get_script_path(Toy_Interp* interp, int id);
 Toy_Type*       script_apply_trace_info(Toy_Type *script, Toy_Func_Trace_Info *trace_info);
-#ifdef HAS_GCACHE
-void		gcache_clear(Toy_Interp* interp);
-#endif
 
 #endif /* __INTERP__ */

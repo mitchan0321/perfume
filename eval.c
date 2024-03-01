@@ -703,21 +703,9 @@ search_method(Toy_Interp *interp, Toy_Type *object, Toy_Type *method) {
 	return object;
 
     case OBJECT:
-#ifdef HAS_GCACHE
-	m = hash_get_method_cache(interp->gcache, object, method);
-	if (m) {
-	    interp->cache_hit ++;
-	    return m;
-	}
-#endif
-
 	h = object->u.object.slots;
 	m = hash_get_t(h, method);
 	if (m) {
-#ifdef HAS_GCACHE
-	    hash_set_method_cache(interp->gcache, object, method, m);
-	    interp->cache_missing ++;
-#endif
 	    return m;
 	} else {
 	    l = object->u.object.delegate_list;
@@ -735,10 +723,6 @@ search_method(Toy_Interp *interp, Toy_Type *object, Toy_Type *method) {
 
 		m = search_method(interp, ho, method);
 		if (GET_TAG(m) != EXCEPTION) {
-#ifdef HAS_GCACHE
-		    hash_set_method_cache(interp->gcache, object, method, m);
-		    interp->cache_missing ++;
-#endif
 		    return m;
 		}
 		l = list_next(l);

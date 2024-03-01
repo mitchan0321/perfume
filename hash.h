@@ -5,7 +5,7 @@
 #include <t_gc.h>
 #include "types.h"
 
-#define HASH_INIT_BUCKET	(13)
+#define HASH_INIT_BUCKET	(8)
 
 
 struct hash_bucket {
@@ -17,7 +17,7 @@ struct hash_bucket {
 
 typedef struct _hash {
     int bucket_size;
-    struct hash_bucket **bucket;
+    struct hash_bucket *bucket;
     int items;
     int synonyms;
 } Hash;
@@ -31,8 +31,6 @@ struct _toy_type*	hash_get(Hash *hash, const wchar_t *key);
 struct _toy_type*	hash_get_t(Hash *hash, const struct _toy_type *key);
 struct _toy_type*	hash_get_and_unset(Hash *hash, const wchar_t *key);
 struct _toy_type*	hash_get_and_unset_t(Hash *hash, const struct _toy_type *key);
-Hash*			hash_unset(Hash *hash, const wchar_t *key);
-Hash*			hash_unset_t(Hash *hash, const struct _toy_type *key);
 int			hash_is_exists(Hash *hash, const wchar_t *key);
 int			hash_is_exists_t(Hash *hash, const struct _toy_type *key);
 int			hash_link(Hash *hash, const wchar_t *key,

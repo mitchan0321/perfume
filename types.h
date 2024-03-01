@@ -153,13 +153,6 @@ typedef struct _toy_interp {
        command functions (in commands.c and methods.c). */
     Toy_Func_Trace_Info *trace_info;
 
-#ifdef HAS_GCACHE
-    /* global cache */
-    struct _hash *gcache;
-    int cache_hit;
-    int cache_missing;
-#endif /* HAS_GCACHE */
-
     /* trace flag */
     int trace;
     int trace_fd;

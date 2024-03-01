@@ -84,9 +84,6 @@ mth_object_method(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 
     h = SELF_HASH(interp);
     hash_set_t(h, cmd, res);
-#ifdef HAS_GCACHE
-    gcache_clear(interp);
-#endif
 
     return res;
 

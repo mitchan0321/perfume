@@ -2584,19 +2584,6 @@ error:
     return new_exception(TE_SYNTAX, L"Syntax error, syntax: lazy {closure}", interp);
 }
 
-#ifdef HAS_GCACHE
-Toy_Type*
-cmd_cacheinfo(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
-    Toy_Type *l;
-    l = new_list(NULL);
-    list_append(l, new_integer_si(hash_get_length(interp->gcache)));
-    list_append(l, new_integer_si(interp->cache_hit));
-    list_append(l, new_integer_si(interp->cache_missing));
-
-    return l;
-}
-#endif /* HAS_GCACHE */
-
 Toy_Type*
 cmd_begin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *body, *result, *local;
