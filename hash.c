@@ -11,7 +11,7 @@ static struct hash_bucket* hash_add_to_bucket(
     const unsigned int org_index,
     const wchar_t *key,
     const int key_len,
-    struct _toy_type *item,
+    const struct _toy_type *item,
     int bucket_size,
     int key_re_alloc
 );
@@ -69,7 +69,7 @@ hash_set(Hash *hash, const wchar_t *key, const struct _toy_type *item) {
             index,
             key,
             wcslen(key) + 1,
-            (struct _toy_type*)item,
+            item,
             hash->bucket_size,
             1
         ))
@@ -111,7 +111,7 @@ hash_set_t(Hash *hash, const struct _toy_type *key, const struct _toy_type *item
                 idx,
                 cell_get_addr(caddr),
                 cell_get_length(caddr) + 1,
-                (struct _toy_type*)item,
+                item,
                 hash->bucket_size,
                 1
             ))
@@ -134,7 +134,7 @@ hash_add_to_bucket(
     const unsigned int org_index,
     const wchar_t *key,
     const int key_len,
-    struct _toy_type *item,
+    const struct _toy_type *item,
     int bucket_size,
     int key_re_alloc
 ) {
@@ -144,18 +144,20 @@ hash_add_to_bucket(
 
     index = org_index % bucket_size;
 
-    if (bucket == NULL) {
+    if (hash->bucket == NULL) {
 	int bsize;
+        struct hash_bucket *lbucket;
 
 	bsize = sizeof(struct hash_bucket) * hash->bucket_size;
-	bucket = GC_MALLOC(bsize);
-	ALLOC_SAFE(bucket);
-	memset(bucket, 0, bsize);
-	hash->bucket = bucket;
+        lbucket = GC_MALLOC(bsize);
+	ALLOC_SAFE(lbucket);
+	memset(lbucket, 0, bsize);
+	hash->bucket = lbucket;
+        bucket = lbucket;
     }
 
-    b = &bucket[index];
-    if (NULL == bucket[index].key) {
+    b = &(bucket[index]);
+    if (NULL == b->key) {
 	
 	/* new item into new bucket */
 
@@ -169,7 +171,7 @@ hash_add_to_bucket(
 	}
 
 	b->index = org_index;
-	b->item = item;
+	b->item = (struct _toy_type*)item;
 	b->next = 0;
 
 	hash->items++;
@@ -192,7 +194,7 @@ hash_add_to_bucket(
 
 		/* replace item */
 
-		b->item = item;
+		b->item = (struct _toy_type*)item;
 		return bucket;
 	    }
 	}
@@ -216,7 +218,7 @@ hash_add_to_bucket(
     }
 
     bs->index = org_index;
-    bs->item = item;
+    bs->item = (struct _toy_type*)item;
     bs->next = 0;
     b->next = bs;
 
@@ -265,7 +267,7 @@ hash_rehash(Hash *hash) {
     hash->synonyms = 0;
 
     for (i=0; i<(hash->bucket_size); i++) {
-        b = &hash->bucket[i];
+        b = &(hash->bucket[i]);
 	if (NULL != b->key) {
 	    while (b) {
 		if (NULL ==
@@ -304,7 +306,7 @@ hash_get(Hash *hash, const wchar_t *key) {
 
     index = HASH_MAKE_KEY(key) % hash->bucket_size;
 
-    b = &hash->bucket[index];
+    b = &(hash->bucket[index]);
     if (NULL == b->key) return NULL;
     
     while (b) {
@@ -333,7 +335,7 @@ hash_get_alias(Hash *hash, const wchar_t *key) {
 
     index = HASH_MAKE_KEY(key) % hash->bucket_size;
 
-    b = &hash->bucket[index];
+    b = &(hash->bucket[index]);
     if (NULL == b->key) return NULL;
     
     while (b) {
@@ -366,7 +368,7 @@ hash_get_t(Hash *hash, const struct _toy_type *key) {
 	    caddr = key->u.ref.cell;
 	}
 
-	b = &hash->bucket[index];
+	b = &(hash->bucket[index]);
         if (NULL == b->key) return NULL;
         
 	while (b) {
@@ -436,26 +438,43 @@ hash_get_and_unset_sub(Hash *hash, unsigned int org_index, const wchar_t *key) {
     unsigned int index;
 
     index = org_index % hash->bucket_size;
-    b = &hash->bucket[index];
+    b = &(hash->bucket[index]);
     if (NULL == b->key) return NULL;
     
     bb = NULL;
     while (b) {
 	if (0 == wcscmp(b->key, key)) {
-	    hash->items--;
-	    if (GET_TAG(b->item) == ALIAS) {
-		return hash_get_t(b->item->u.alias.slot, b->item->u.alias.key);
-            } else {
-                item = b->item;
-                if (bb) {
-                    bb->next = b->next;
-                }
+            item = b->item;
+            if (bb) {
+                bb->next = b->next;
                 b->key = NULL;
                 b->index = 0;
                 b->item = NULL;
                 b->next = NULL;
-                hash->items--;
-                
+            } else {
+                if (b->next) {
+                    struct hash_bucket *next;
+                    next = b->next;
+                    b->key = b->next->key;
+                    b->index = b->next->index;
+                    b->item = b->next->item;
+                    b->next = b->next->next;
+                    next->key = NULL;
+                    next->index = 0;
+                    next->item = NULL;
+                    next->next = NULL;
+                } else {
+                    b->key = NULL;
+                    b->index = 0;
+                    b->item = NULL;
+                    b->next = NULL;
+                }
+            }
+            hash->items--;
+            
+	    if (GET_TAG(item) == ALIAS) {
+		return hash_get_t(item->u.alias.slot, item->u.alias.key);
+            } else {
                 return item;
 	    }
         }
@@ -513,7 +532,7 @@ hash_is_exists_sub(Hash *hash, unsigned int org_index, const wchar_t *key) {
     unsigned int index;
 
     index = org_index % hash->bucket_size;
-    b = &hash->bucket[index];
+    b = &(hash->bucket[index]);
     if (NULL == b->key) return 0;
     
     while (b) {
@@ -541,7 +560,7 @@ hash_get_keys(Hash *hash) {
     sl = l;
 
     for (i=0; i<(hash->bucket_size); i++) {
-        b = &hash->bucket[i];
+        b = &(hash->bucket[i]);
         if (NULL == b->key) continue;
 
         while (b) {
@@ -568,7 +587,7 @@ hash_get_keys_str(Hash *hash) {
     sl = l;
 
     for (i=0; i<(hash->bucket_size); i++) {
-        b = &hash->bucket[i];
+        b = &(hash->bucket[i]);
         if (NULL == b->key) continue;
 
         while (b) {
@@ -595,7 +614,7 @@ hash_get_pairs(Hash *hash) {
     sl = l;
 
     for (i=0; i<(hash->bucket_size); i++) {
-        b = &hash->bucket[i];
+        b = &(hash->bucket[i]);
         if (NULL == b->key) continue;
 
         while (b) {
@@ -633,7 +652,7 @@ hash_get_pairs_str(Hash *hash) {
     sl = l;
 
     for (i=0; i<(hash->bucket_size); i++) {
-        b = &hash->bucket[i];
+        b = &(hash->bucket[i]);
         if (NULL == b->key) continue;
 
         while (b) {
@@ -709,7 +728,7 @@ hash_debug_dump(Hash *hash) {
 	    wprintf(L"bucket[%d] is not used\n", i);
 	} else {
 	    wprintf(L"bucket[%d] dump:\n", i);
-	    b = &hash->bucket[i];
+	    b = &(hash->bucket[i]);
 	    while (b) {
 		wprintf(L"  key: \"%ls\"\n", b->key);
 		b = b->next;
