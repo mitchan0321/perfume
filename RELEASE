@@ -3654,4 +3654,10 @@
 		Add show-version editor command.
 		Add show error message if pmacs-server occured at server socket create.
 
+2024/03/01
+	*
+		Delete HAS_GCACHE option.
+	hash.[ch]
+		Change hash's internal pointer array becomes to has value array, for cache hit ratio.
+
 #eof
