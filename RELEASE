@@ -3661,4 +3661,8 @@
 	hash.[ch]
 		Change hash's internal pointer array becomes to has value array, for cache hit ratio.
 
+2024/03/06
+	pmacs update:
+		Change BUFFER_LINK regex and buffer-list header string.
+
 #eof
