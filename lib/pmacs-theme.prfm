@@ -133,7 +133,7 @@ MODERN {
     set-color-name DIRED_DEV                    [WUtil color-pair YELLOW  WHITE   ];
     set-color-name DIRED_MARKED                 [WUtil color-pair WHITE   BLUE    ];
     set-color-name INTERP_PROMPT_HILIGHT        [WUtil color-pair GREEN   WHITE   ] attr: ($A_ITALIC $A_UNDERLINE $A_BOLD);
-    set-color-name BRACKETS_PAIR                [WUtil color-pair BLACK   CYAN    ] attr: ($A_BOLD);
+    set-color-name BRACKETS_PAIR                [WUtil color-pair CYAN    BLACK   ] attr: ($A_STANDOUT $A_BOLD);
     set-color-name NORMAL_TEXT                  [WUtil color-pair BLACK   WHITE   ];
     true;
 }
@@ -173,7 +173,7 @@ MODERN-DARK {
     set-color-name DIRED_DEV                    [WUtil color-pair YELLOW  BLACK   ];
     set-color-name DIRED_MARKED                 [WUtil color-pair WHITE   BLUE    ];
     set-color-name INTERP_PROMPT_HILIGHT        [WUtil color-pair GREEN   BLACK   ] attr: ($A_ITALIC $A_UNDERLINE $A_BOLD);
-    set-color-name BRACKETS_PAIR                [WUtil color-pair WHITE   BLUE    ] attr: ($A_BOLD);
+    set-color-name BRACKETS_PAIR                [WUtil color-pair WHITE   CYAN    ] attr: ($A_BOLD);
     set-color-name NORMAL_TEXT                  [WUtil color-pair WHITE   BLACK   ];
     true;
 }
@@ -213,7 +213,7 @@ LIGHT {
     set-color-name DIRED_DEV                    [WUtil color-pair YELLOW  WHITE   ];
     set-color-name DIRED_MARKED                 [WUtil color-pair WHITE   BLUE    ];
     set-color-name INTERP_PROMPT_HILIGHT        [WUtil color-pair GREEN   WHITE   ];
-    set-color-name BRACKETS_PAIR                [WUtil color-pair BLACK   YELLOW  ];
+    set-color-name BRACKETS_PAIR                [WUtil color-pair CYAN    WHITE   ] attr: ($A_STANDOUT $A_BOLD);
     set-color-name NORMAL_TEXT                  [WUtil color-pair BLACK   WHITE   ];
     true;
 }
