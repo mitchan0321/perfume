@@ -56,7 +56,7 @@ toy_eval_script(Toy_Interp* interp, Toy_Type *script) {
 #endif /* EVAL_STAT */
 
     if ((((unsigned long)(&baria_dist)) - ((unsigned long)cstack_get_safe_addr())) < (MP_PAGESIZE*8)) {
-	return new_exception(TE_STACKOVERFLOW, L"C stack approaches the barrier.", interp);
+	return new_exception(TE_STACKOVERFLOW, L"C stack pointer entered the barrier area.", interp);
     }
 
     SIG_ACTION();
