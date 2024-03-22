@@ -79,6 +79,12 @@ defun display-key-binding-list (buff name key-map desc) {
 
 defcommand file-completion desc: "File completion and insert file name to current buffer at cursor position." {
     | main window |
+    if $SMART_INDENT_CANCEL {
+        ### insert indent
+        $window apply-command $main $window "\t" insert-character;
+        return SELF;
+    };
+
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     (y x) ::= $window get-source-index $buff $geom;
