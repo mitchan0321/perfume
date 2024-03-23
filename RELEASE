@@ -3665,4 +3665,12 @@
 	pmacs update:
 		Change BUFFER_LINK regex and buffer-list header string.
 
+2024/03/22
+	eval.c
+		Change message at ErrStackOverflow error.
+	pmacs update:
+		Change BRACKETS_PAIR color at theme MODERN, MODERN-DARK and LIGHT.
+		Change key repeat accel coding style.
+		Add \t key input cancel if SMART_INDENT_CANCEL is true at file-completion command.
+
 #eof
