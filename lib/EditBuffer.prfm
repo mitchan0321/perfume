@@ -565,6 +565,10 @@ EditBuffer method mark (y x) {
     $MarkBuffer << ($y $x);
 };
 
+EditBuffer method pop-mark () {
+    $MarkBuffer >>;
+};
+
 EditBuffer method get-mark (y x) {
     result ::= $MarkBuffer >>;
     $result ?? {return <nil>};
