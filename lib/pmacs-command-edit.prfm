@@ -182,6 +182,8 @@ defcommand select-region-all desc: "Select region at current buffers all charact
     $window apply-command $main $window "" top-of-buffer;
     $window apply-command $main $window "" start-region;
     $window apply-command $main $window "" bottom-of-buffer;
+    $window pop-mark;
+    $window pop-mark;
     result ALL;
 };
 
