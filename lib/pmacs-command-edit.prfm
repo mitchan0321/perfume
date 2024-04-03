@@ -263,6 +263,7 @@ defcommand paste-buffer desc: "Paste characters from copy buffer into current bu
 	show-message :bell "Copy buffer is empty.";
 	return SELF;
     };
+    $window mark;
     geom ::= $window get-geom;
     if [$window get-region] {
         (sy sx) ::= $window end-region;
