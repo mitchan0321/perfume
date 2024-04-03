@@ -265,7 +265,7 @@ defun line-input (curs disp-line disp-col input-len cur-index cur-val key-in) {
             (command char new-y new-x) ::= $v backdelete-character-at 0 $cur-index;
             break;
         }
-        {eq? $key-in KEY_DC} {
+        {or [eq? $key-in KEY_DC] [eq? $key-in CTRL_D]} {
             (command char new-y new-x) ::= $v delete-character-at 0 $cur-index;
             break;
         }
