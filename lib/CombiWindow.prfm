@@ -1544,6 +1544,11 @@ CombiWindow method mark () {
     show-message "Marked.";
 };
 
+CombiWindow method pop-mark () {
+    buff ::= get-buffer;
+    $buff pop-mark;
+};
+
 CombiWindow method goto-mark () {
     buff ::= get-buffer;
     geom ::= get-geom;
