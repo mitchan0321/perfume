@@ -3677,5 +3677,8 @@
 	pmacs update:
 		Add set mark command in top-of-buffer, bottom-of-buffer and select-region-all.
 		Fix BUFFER_LINK regex.
+		Add buffer name fixer, delete space first and bottom in buffer name,
+		  replace '<', '>' to '(', ')' in buffer name.
+		Add CTRL_D key bind for delete character into mini-buffer input.
 
 #eof
