@@ -3673,4 +3673,9 @@
 		Change key repeat accel coding style.
 		Add \t key input cancel if SMART_INDENT_CANCEL is true at file-completion command.
 
+2024/04/03
+	pmacs update:
+		Add set mark command in top-of-buffer, bottom-of-buffer and select-region-all.
+		Fix BUFFER_LINK regex.
+
 #eof
