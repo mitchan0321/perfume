@@ -8,6 +8,9 @@ BufferManager method init () {
 BufferManager method regist-buffer (buff name) {
     i := 1;
     if {$name = ""} {name := "*no named*"};
+    name ::= $name clean;
+    name ::= $name replace :all '<' "(";
+    name ::= $name replace :all '>' ")";
     name-orig := $name;
     while {$BufferList set? $name} do: {
 	$i ++;
