@@ -264,6 +264,7 @@ defcommand top-of-buffer desc: "Move cursor to top of buffer." {
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
     (y x) ::= $window get-screen-size;
+    $window mark;
 
     $window set-freecursor <nil>;
     $geom set! ViewLine 0;
@@ -281,6 +282,7 @@ defcommand bottom-of-buffer desc: "Move cursor to bottom of buffer." {
     geom ::= $window get-geom;
     (y x) ::= $window get-screen-size;
     buff-len ::= $buff get-buffer-length;
+    $window mark;
 
     $window set-freecursor <nil>;
     $geom set! ViewLine 0;
