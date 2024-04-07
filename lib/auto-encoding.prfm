@@ -1,5 +1,5 @@
 defun auto-encoding (file) {
-    enc := (UTF-8/F EUC-JP/F Shift-JIS/F);
+    enc := (UTF-8/F EUC-JP/F Shift-JIS/F UTF-16LE/F UTF-16BE/F);
     limit := 30;
     if [file dir?  $file] then: {return <nil>};
     if [file read? $file] else: {return <nil>};

@@ -4,11 +4,15 @@
 static wchar_t *ENCODING_NAME_DEFS[] = {
     SENCODE_RAW,	// index: 0 ... RAW encoding (no encoding, byte data stream)
     SENCODE_UTF8,	// index: 1 ... UTF-8 encoding
-    SENCODE_UTF8F,	// index: 2 ... UTF-8F encoding
+    SENCODE_UTF8F,	// index: 2 ... UTF-8/F encoding
     SENCODE_EUCJP,	// index: 3 ... EUC-JP encoding
-    SENCODE_EUCJPF,	// index: 4 ... EUC-JP encoding
+    SENCODE_EUCJPF,	// index: 4 ... EUC-JP/F encoding
     SENCODE_SJIS,	// index: 5 ... Shift-JIS encoding
-    SENCODE_SJISF,	// index: 6 ... Shift-JIS encoding
+    SENCODE_SJISF,	// index: 6 ... Shift-JIS/F encoding
+    SENCODE_UTF16LE,	// index: 7 ... UTF-16LE encoding
+    SENCODE_UTF16LEF,	// index: 8 ... UTF-16LE/F encoding
+    SENCODE_UTF16BE,	// index: 9 ... UTF-16BE encoding
+    SENCODE_UTF16BEF,	// index: 10 ... UTF-16BE/F encoding
     0
 };
 
@@ -25,6 +29,10 @@ static encoder_methods Encoder_methods[] = {
     {eucjpf_decoder, eucjp_encoder},	// NENCODE_EUCJPF
     {sjis_decoder, sjis_encoder},	// NENCODE_SJIS
     {sjisf_decoder, sjis_encoder},	// NENCODE_SJISF
+    {utf16le_decoder, utf16le_encoder},	// NENCODE_UTF16LE
+    {utf16lef_decoder, utf16le_encoder},// NENCODE_UTF16LEF
+    {utf16be_decoder, utf16be_encoder},	// NENCODE_UTF16BE
+    {utf16bef_decoder, utf16be_encoder},// NENCODE_UTF16BEF
     {0, 0}
 };
 
@@ -929,6 +937,416 @@ sjis_encoder(Cell *unicode, encoder_error_info *error_info) {
 		cell_add_char(result, ((cr     ) & 0xff));
 	    }
 	}
+    }
+    
+    return result;
+}
+
+/* 
+ * UTF-16LE decoder/encoder.
+ */
+#define HAS_ERROR_SETU16LE(e)    				\
+    e->errorno = EENCODE_BADSEQUENCEU16;    			\
+    e->pos = i;				        		\
+    e->message = L"Bad UTF-16LE sequence";
+
+#define HAS_ERROR_SETU16LE_LESS(e) 				\
+    e->errorno = EENCODE_LESSLENGTH;    			\
+    e->pos = i;				        		\
+    e->message = L"Less length UTF-16LE sequence";
+
+Cell*
+utf16lef_decoder(Cell *raw, encoder_error_info *error_info) {
+    Cell *result;
+    wchar_t *p, c, c2, cr, cr2;
+    int len, i;
+
+    error_info->errorno = 0;
+    error_info->pos = 0;
+    error_info->message = L"";
+
+    p = cell_get_addr(raw);
+    len = cell_get_length(raw);
+    result = new_cell(L"");
+
+    for (i=0; i<len; i++) {
+	c = p[i];
+        i++;
+        if (i >= len) {
+            /* lost data UTF16LE 2nd byte, broken file? */
+            cell_add_char(result, c);
+            HAS_ERROR_SETU16LE_LESS(error_info);
+            break;
+        }
+        c2 = p[i];
+        cr = (c2 << 8) | (c & 0xff);
+        
+        if ((cr >= 0xdc00) && (cr <= 0xdfff)) {
+            /* bad UTF16LE sequence */
+            cell_add_char(result, c);
+            cell_add_char(result, c2);
+            HAS_ERROR_SETU16LE(error_info);
+            
+        } else if ((cr >= 0xd800) && (cr <= 0xdbff)) {
+            /* UTF16LE sequence 1st surrogte found */
+            i++;
+            if (i >= len) {
+                /* lost data UTF16LE 2nd suroogate 1st byte, broken file? */
+                cell_add_char(result, c);
+                cell_add_char(result, c2);
+                HAS_ERROR_SETU16LE_LESS(error_info);
+                break;
+            }
+            c = p[i];
+
+            i++;
+            if (i >= len) {
+                /* lost data UTF16LE 2nd surrogate 2nd byte, broken file? */
+                cell_add_char(result, cr);
+                cell_add_char(result, c);
+                HAS_ERROR_SETU16LE_LESS(error_info);
+                break;
+            }
+            c2 = p[i];
+            cr2 = (c2 << 8) | (c & 0xff);
+
+            if (! ((cr2 >= 0xdc00) && (cr2 <= 0xdfff))) {
+                /* bad UTF16LE sequence */
+                cell_add_char(result, cr);
+                cell_add_char(result, cr2);
+                HAS_ERROR_SETU16LE(error_info);
+
+            } else {
+                /* success retrebe 2nd surrogate pair */
+                cell_add_char(result, (((cr - 0xd800) << 10) + 0x10000 + (cr2 - 0xdc00)));
+            }
+
+        } else {
+            /* valid, non surrogate pair character */
+            cell_add_char(result, cr);
+        }
+    }
+    
+    return result;
+}
+
+Cell*
+utf16le_decoder(Cell *raw, encoder_error_info *error_info) {
+    Cell *result;
+    wchar_t *p, c, c2, cr, cr2;
+    int len, i;
+    wchar_t *buff;
+
+    error_info->errorno = 0;
+    error_info->pos = 0;
+    error_info->message = L"";
+
+    p = cell_get_addr(raw);
+    len = cell_get_length(raw);
+    result = new_cell(L"");
+
+    for (i=0; i<len; i++) {
+	c = p[i];
+        i++;
+        if (i >= len) {
+            /* lost data UTF16LE 2nd byte, broken file? */
+            cell_add_char(result, c);
+            HAS_ERROR_SETU16LE_LESS(error_info);
+            goto error;
+        }
+        c2 = p[i];
+        cr = (c2 << 8) | (c & 0xff);
+        
+        if ((cr >= 0xdc00) && (cr <= 0xdfff)) {
+            /* bad UTF16LE sequence */
+            cell_add_char(result, c);
+            cell_add_char(result, c2);
+            HAS_ERROR_SETU16LE(error_info);
+            goto error;
+            
+        } else if ((cr >= 0xd800) && (cr <= 0xdbff)) {
+            /* UTF16LE sequence 1st surrogte found */
+            i++;
+            if (i >= len) {
+                /* lost data UTF16LE 2nd suroogate 1st byte, broken file? */
+                cell_add_char(result, c);
+                cell_add_char(result, c2);
+                HAS_ERROR_SETU16LE_LESS(error_info);
+                goto error;
+            }
+            c = p[i];
+
+            i++;
+            if (i >= len) {
+                /* lost data UTF16LE 2nd surrogate 2nd byte, broken file? */
+                cell_add_char(result, cr);
+                cell_add_char(result, c);
+                HAS_ERROR_SETU16LE_LESS(error_info);
+                goto error;
+            }
+            c2 = p[i];
+            cr2 = (c2 << 8) | (c & 0xff);
+
+            if (! ((cr2 >= 0xdc00) && (cr2 <= 0xdfff))) {
+                /* bad UTF16LE sequence */
+                cell_add_char(result, cr);
+                cell_add_char(result, cr2);
+                HAS_ERROR_SETU16LE(error_info);
+                goto error;
+
+            } else {
+                /* success retrebe 2nd surrogate pair */
+                cell_add_char(result, (((cr - 0xd800) << 10) + 0x10000 + (cr2 - 0xdc00)));
+            }
+
+        } else {
+            /* valid, non surrogate pair character */
+            cell_add_char(result, cr);
+        }
+    }
+    
+    return result;
+
+error:
+    if (error_info) {
+	buff = GC_MALLOC(256*sizeof(wchar_t));
+	ALLOC_SAFE(buff);
+	swprintf(buff, 256, L"%ls, at %d bytes.", error_info->message, error_info->pos);
+	error_info->message = buff;
+    }
+	    
+    return NULL;
+}
+
+Cell*
+utf16le_encoder(Cell *unicode, encoder_error_info *error_info) {
+    Cell *result;
+    wchar_t *p, c;
+    int len, i;
+
+    p = cell_get_addr(unicode);
+    len = cell_get_length(unicode);
+    result = new_cell(L"");
+
+    for (i=0; i<len; i++) {
+        c = p[i];
+        if (p[i] < 0x10000) {
+            /* output BMP code area */
+            cell_add_char(result, (c  & 0xff));
+            cell_add_char(result, ((c >> 8)  & 0xff));
+
+        } else {
+            /* output 1st surrogate word */
+            cell_add_char(result, (((c - 0x10000) >> 10) + 0xd800) & 0xff);
+            cell_add_char(result, ((((c - 0x10000) >> 10) + 0xd800) >> 8) & 0xff);
+            cell_add_char(result, (((c - 0x10000) & 0x3ff) + 0xdc00) & 0xff);
+            cell_add_char(result, (((((c - 0x10000) & 0x3ff) + 0xdc00) >> 8)) & 0xff);
+        }
+    }
+    
+    return result;
+}
+
+/* 
+ * UTF-16BE decoder/encoder.
+ */
+#define HAS_ERROR_SETU16BE(e)    				\
+    e->errorno = EENCODE_BADSEQUENCEU16;    			\
+    e->pos = i;				        		\
+    e->message = L"Bad UTF-16BE sequence";
+
+#define HAS_ERROR_SETU16BE_LESS(e) 				\
+    e->errorno = EENCODE_LESSLENGTH;    			\
+    e->pos = i;				        		\
+    e->message = L"Less length UTF-16BE sequence";
+
+Cell*
+utf16bef_decoder(Cell *raw, encoder_error_info *error_info) {
+    Cell *result;
+    wchar_t *p, c, c2, cr, cr2;
+    int len, i;
+
+    error_info->errorno = 0;
+    error_info->pos = 0;
+    error_info->message = L"";
+
+    p = cell_get_addr(raw);
+    len = cell_get_length(raw);
+    result = new_cell(L"");
+
+    for (i=0; i<len; i++) {
+	c = p[i];
+        i++;
+        if (i >= len) {
+            /* lost data UTF16BE 2nd byte, broken file? */
+            cell_add_char(result, c);
+            HAS_ERROR_SETU16BE_LESS(error_info);
+            break;
+        }
+        c2 = p[i];
+        cr = (c << 8) | (c2 & 0xff);
+        
+        if ((cr >= 0xdc00) && (cr <= 0xdfff)) {
+            /* bad UTF16BE sequence */
+            cell_add_char(result, c);
+            cell_add_char(result, c2);
+            HAS_ERROR_SETU16BE(error_info);
+            
+        } else if ((cr >= 0xd800) && (cr <= 0xdbff)) {
+            /* UTF16BE sequence 1st surrogte found */
+            i++;
+            if (i >= len) {
+                /* lost data UTF16BE 2nd suroogate 1st byte, broken file? */
+                cell_add_char(result, c);
+                cell_add_char(result, c2);
+                HAS_ERROR_SETU16BE_LESS(error_info);
+                break;
+            }
+            c = p[i];
+
+            i++;
+            if (i >= len) {
+                /* lost data UTF16BE 2nd surrogate 2nd byte, broken file? */
+                cell_add_char(result, cr);
+                cell_add_char(result, c);
+                HAS_ERROR_SETU16BE_LESS(error_info);
+                break;
+            }
+            c2 = p[i];
+            cr2 = (c << 8) | (c2 & 0xff);
+
+            if (! ((cr2 >= 0xdc00) && (cr2 <= 0xdfff))) {
+                /* bad UTF16BE sequence */
+                cell_add_char(result, cr);
+                cell_add_char(result, cr2);
+                HAS_ERROR_SETU16BE(error_info);
+
+            } else {
+                /* success retrebe 2nd surrogate pair */
+                cell_add_char(result, (((cr - 0xd800) << 10) + 0x10000 + (cr2 - 0xdc00)));
+            }
+
+        } else {
+            /* valid, non surrogate pair character */
+            cell_add_char(result, cr);
+        }
+    }
+    
+    return result;
+}
+
+Cell*
+utf16be_decoder(Cell *raw, encoder_error_info *error_info) {
+    Cell *result;
+    wchar_t *p, c, c2, cr, cr2;
+    int len, i;
+    wchar_t *buff;
+
+    error_info->errorno = 0;
+    error_info->pos = 0;
+    error_info->message = L"";
+
+    p = cell_get_addr(raw);
+    len = cell_get_length(raw);
+    result = new_cell(L"");
+
+    for (i=0; i<len; i++) {
+	c = p[i];
+        i++;
+        if (i >= len) {
+            /* lost data UTF16BE 2nd byte, broken file? */
+            cell_add_char(result, c);
+            HAS_ERROR_SETU16BE_LESS(error_info);
+            goto error;
+        }
+        c2 = p[i];
+        cr = (c << 8) | (c2 & 0xff);
+        
+        if ((cr >= 0xdc00) && (cr <= 0xdfff)) {
+            /* bad UTF16BE sequence */
+            cell_add_char(result, c);
+            cell_add_char(result, c2);
+            HAS_ERROR_SETU16BE(error_info);
+            goto error;
+            
+        } else if ((cr >= 0xd800) && (cr <= 0xdbff)) {
+            /* UTF16BE sequence 1st surrogte found */
+            i++;
+            if (i >= len) {
+                /* lost data UTF16BE 2nd suroogate 1st byte, broken file? */
+                cell_add_char(result, c);
+                cell_add_char(result, c2);
+                HAS_ERROR_SETU16BE_LESS(error_info);
+                goto error;
+            }
+            c = p[i];
+
+            i++;
+            if (i >= len) {
+                /* lost data UTF16BE 2nd surrogate 2nd byte, broken file? */
+                cell_add_char(result, cr);
+                cell_add_char(result, c);
+                HAS_ERROR_SETU16BE_LESS(error_info);
+                goto error;
+            }
+            c2 = p[i];
+            cr2 = (c << 8) | (c2 & 0xff);
+
+            if (! ((cr2 >= 0xdc00) && (cr2 <= 0xdfff))) {
+                /* bad UTF16BE sequence */
+                cell_add_char(result, cr);
+                cell_add_char(result, cr2);
+                HAS_ERROR_SETU16BE(error_info);
+                goto error;
+
+            } else {
+                /* success retrebe 2nd surrogate pair */
+                cell_add_char(result, (((cr - 0xd800) << 10) + 0x10000 + (cr2 - 0xdc00)));
+            }
+
+        } else {
+            /* valid, non surrogate pair character */
+            cell_add_char(result, cr);
+        }
+    }
+    
+    return result;
+
+error:
+    if (error_info) {
+	buff = GC_MALLOC(256*sizeof(wchar_t));
+	ALLOC_SAFE(buff);
+	swprintf(buff, 256, L"%ls, at %d bytes.", error_info->message, error_info->pos);
+	error_info->message = buff;
+    }
+	    
+    return NULL;
+}
+
+Cell*
+utf16be_encoder(Cell *unicode, encoder_error_info *error_info) {
+    Cell *result;
+    wchar_t *p, c;
+    int len, i;
+
+    p = cell_get_addr(unicode);
+    len = cell_get_length(unicode);
+    result = new_cell(L"");
+
+    for (i=0; i<len; i++) {
+        c = p[i];
+        if (p[i] < 0x10000) {
+            /* output BMP code area */
+            cell_add_char(result, ((c >> 8)  & 0xff));
+            cell_add_char(result, (c  & 0xff));
+
+        } else {
+            /* output 1st surrogate word */
+            cell_add_char(result, ((((c - 0x10000) >> 10) + 0xd800) >> 8) & 0xff);
+            cell_add_char(result, (((c - 0x10000) >> 10) + 0xd800) & 0xff);
+            cell_add_char(result, (((((c - 0x10000) & 0x3ff) + 0xdc00) >> 8)) & 0xff);
+            cell_add_char(result, ((((c - 0x10000) & 0x3ff) + 0xdc00) & 0xff));
+        }
     }
     
     return result;
