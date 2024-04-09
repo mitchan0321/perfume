@@ -275,7 +275,7 @@ CombiWindow method render-status-line (win buff cy cx y x buff-name) {
         ### " %v%v[%v%v%v%v%v%v] (%d,%d)  <%v> {%v} "
         " %v%v[%v%v%v%v%v%v] %4d,%-3d %v <%v>"
         fmt
-            [["" . [$buff get-encoding]] at 0]
+            [$buff get-encoding-digest]
             [[$buff includeCR?] ??? "d" "u"]
             [[$buff modify?] ??? "*" " "]
             [[$buff protect?] ??? "%" " "]

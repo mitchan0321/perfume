@@ -79,7 +79,7 @@ defcommand buffer-list desc: "Display all buffers list." {
 	$buff append-string [
 	    $format expand : fmt
             [[$shortcut-ind <= 10] ??? [$shortcut-ind % 10] " "]
-            [["" . [$display-buffer get-encoding]] at 0]
+            [$display-buffer get-encoding-digest]
 	    [[$display-buffer includeCR?] ??? "d" "u"]
 	    [[$display-buffer modify?]  ??? "*" " "]
 	    [[$display-buffer protect?] ??? "%" " "]

@@ -742,7 +742,7 @@ defcommand show-keycode desc: "Display input keys key code, key sequence and bin
     result SELF;
 };
 
-defcommand set-encoder desc: "Set encoding to current buffer next reload file. You can specified UTF-8, EUC-JP, Shift-JIS and RAW encoding. This command need the buffer is protected." {
+defcommand set-encoder desc: "Set encoding to current buffer next reload file. You can specified UTF-8, UTF-16LE, UTF-16BE, EUC-JP, Shift-JIS and RAW encoding. This command need the buffer is protected." {
     | main window |
     buff ::= $window get-buffer;
     if {$buff modify?} {
@@ -751,13 +751,15 @@ defcommand set-encoder desc: "Set encoding to current buffer next reload file. Y
     };
 
     mini-input-until-enter $main $window
-        prompt: ["Encoding UTF-8(u)/EUC-JP(e)/Shift-JIS(s)/RAW(r) [current is " .
+        prompt: ["Encoding UTF-8,16LE,16BE(u,l,b)/EUC-JP(e)/Shift-JIS(s)/RAW(r) [current is " .
             ["" . [$buff get-encoding]] "]: "]
         keyin-proc: {| value in-key |
             enc := <nil>;
             case  $in-key
                 "u" {enc := "UTF-8/F"}
                 "U" {enc := "UTF-8/F"}
+                "l" {enc := "UTF-16LE/F"}
+                "b" {enc := "UTF-16BE/F"}
                 "e" {enc := "EUC-JP/F"}
                 "E" {enc := "EUC-JP/F"}
                 "s" {enc := "Shift-JIS/F"}
@@ -787,13 +789,15 @@ defcommand set-buffer-encoder desc: "Set buffer encoding to current buffer." {
     buff ::= $window get-buffer;
 
     mini-input-until-enter $main $window
-        prompt: ["Encoding UTF-8(u)/EUC-JP(e)/Shift-JIS(s)/RAW(r) [current is " .
+        prompt: ["Encoding UTF-8,16LE,16BE(u,l,b)/EUC-JP(e)/Shift-JIS(s)/RAW(r) [current is " .
             ["" . [$buff get-encoding]] "]: "]
         keyin-proc: {| value in-key |
             enc := <nil>;
             case  $in-key
                 "u" {enc := "UTF-8/F"}
                 "U" {enc := "UTF-8/F"}
+                "l" {enc := "UTF-16LE/F"}
+                "b" {enc := "UTF-16BE/F"}
                 "e" {enc := "EUC-JP/F"}
                 "E" {enc := "EUC-JP/F"}
                 "s" {enc := "Shift-JIS/F"}

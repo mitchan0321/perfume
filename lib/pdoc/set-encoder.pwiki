@@ -16,9 +16,11 @@
 	してみてください。
 	エンコーディングはミニウィンドウでのプロンプトに続いて、以下の種類の中から選択します。
 
-		Encoding UTF-8(u)/EUC-JP(e)/Shift-JIS(s)/RAW(r) [current is UTF-8/F]:
+		Encoding UTF-8,16LE,16BE(u,l,b)/EUC-JP(e)/Shift-JIS(s)/RAW(r) [current is UTF-8/F]:
 
 	u または U ... UTF-8
+	l ............ UTF-16LE
+	b ............ UTF-16BE
 	e または E ... EUC-JP
 	s または S ... Shift-JIS
 	r または R ... RAW

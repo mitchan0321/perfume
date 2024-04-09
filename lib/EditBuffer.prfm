@@ -120,12 +120,19 @@ EditBuffer method load-content (path init-only: init-flag buffer-name: buff-name
 };
 
 EditBuffer method set-encoding (enc) {
-    if [("EUC-JP" "EUC-JP/F" "Shift-JIS" "Shift-JIS/F" "UTF-8" "UTF-8/F" "RAW") find $enc] else: {return <nil>};
+    if [("EUC-JP" "EUC-JP/F" "Shift-JIS" "Shift-JIS/F" "UTF-8" "UTF-8/F" "UTF-16LE" "UTF-16LE/F" "UTF-16BE" "UTF-16BE/F" "RAW") find $enc] else: {return <nil>};
     sets Encoding [symbol $enc];
 };
 
 EditBuffer method get-encoding () {
     return $Encoding;
+};
+
+EditBuffer method get-encoding-digest () {
+    e ::= "" . $Encoding;
+    if [$e =~ '^UTF-16LE'] {return "l"};
+    if [$e =~ '^UTF-16BE'] {return "b"};
+    return [$e at 0];
 };
 
 EditBuffer method reload-content () {
