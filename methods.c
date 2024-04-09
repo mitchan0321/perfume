@@ -3846,7 +3846,6 @@ typedef struct _toy_file {
     int mode;
     int newline;
     Toy_Type *path;
-    Cell *r_pending;
     int readbuffer_max;
     int early_exit;
     int noblock;
@@ -3857,6 +3856,8 @@ typedef struct _toy_file {
     int enc_error;
     int raw_io;
     Toy_Type *tag;
+    int pend;           // has pending character, store by UNGETC macro
+    int pendc[4];       // the pending character, return from FGETC macro
 } Toy_File;
 
 void
@@ -3869,7 +3870,6 @@ file_finalizer(void *obj, void *client_data) {
 	fclose(o->fd);
 	o->fd = NULL;
 	o->path = NULL;
-	o->r_pending = NULL;
     }
 
     return;
@@ -3910,6 +3910,8 @@ mth_file_init(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     f->readbuffer_max = READBUFFER_MAX_DEFAULT;
     f->early_exit = 0;
     f->raw_io = 0;
+    f->pend = 0;
+    f->pendc[0]=0; f->pendc[1]=0; f->pendc[2]=0; f->pendc[3]=0;
     hash_set_t(self, const_Holder, new_container(f, L"FILE"));
 
     enc = hash_get_t(interp->globals, const_DEFAULT_FILE_ENCODING);
@@ -4050,13 +4052,68 @@ error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
+/* FGETC/UNGETC macro for read file boundary bytes */
+#define FGETC(bound, f, c)                      \
+        if (f->pend) {                          \
+            c[0] = f->pendc[0];                 \
+            c[1] = f->pendc[1];                 \
+            c[2] = f->pendc[2];                 \
+            c[3] = f->pendc[3];                 \
+            f->pend = 0;                        \
+        } else {                                \
+            int _ix = 0;                        \
+            switch (bound) {                    \
+            case 4:                             \
+                c[_ix] = fgetc(f->fd);          \
+                _ix ++;                         \
+            case 3:                             \
+                c[_ix] = fgetc(f->fd);          \
+                _ix ++;                         \
+            case 2:                             \
+                c[_ix] = fgetc(f->fd);          \
+                _ix ++;                         \
+            case 1:                             \
+                c[_ix] = fgetc(f->fd);          \
+            }                                   \
+            f->pend = 0;                        \
+        }
+
+#define UNGETC(boud, f, c)                      \
+        f->pendc[0] = c[0];                     \
+        f->pendc[1] = c[1];                     \
+        f->pendc[2] = c[2];                     \
+        f->pendc[3] = c[3];                     \
+        f->pend = 1;
+/* END: FGETC/UNGETC macro */
+
+/* ADDCHAR macro for append character file boundary bytes */
+#define ADDCHAR(bound, cell, c)                 \
+        {                                       \
+            int _ix = 0;                        \
+            switch (bound) {                    \
+            case 4:                             \
+                cell_add_char(cell, c[_ix]);    \
+                _ix ++;                         \
+            case 3:                             \
+                cell_add_char(cell, c[_ix]);    \
+                _ix ++;                         \
+            case 2:                             \
+                cell_add_char(cell, c[_ix]);    \
+                _ix ++;                         \
+            case 1:                             \
+                cell_add_char(cell, c[_ix]);    \
+            }                                   \
+        }
+/* END: ADDCHAR macro */
+
 Toy_Type*
 mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Hash *self;
     Toy_File *f;
     Toy_Type *container;
     Cell *cbuff;
-    int c;
+    int c[4], nc[4];
+    int boundary;
     int flag_nonewline=0, flag_nocontrol=0;
     encoder_error_info *enc_error_info;
 
@@ -4138,16 +4195,8 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
         return new_string_cell(rcell);
     }
 
-    /*
-    ** 前回からのペンディングデータがあった場合、読み込みバッファに設定する。
-    ** 無かった場合は読み込みバッファを初期化する。
-    */
-    if (f->r_pending) {
-	cbuff = new_cell(cell_get_addr(f->r_pending));
-	f->r_pending = NULL;
-    } else {
-	cbuff = new_cell(L"");
-    }
+    cbuff = new_cell(L"");
+    boundary = get_encoding_file_boundary(f->input_encoding);
     
     while (1) {
         /*
@@ -4158,20 +4207,21 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
          *   (注)coocked モードの場合～Perfumeでは設定方法がないため tty は常に coocked モードである。
          */
         errno = 0;
-        c = fgetc(f->fd);
+        FGETC(boundary, f, c);
         
         /*
          * 読み込んだ文字が CR であるとき、次の一文字を先読みして、
          * それが LF であった場合、include_cr インジケータをオンにする。
          * そして、ignore_cr が設定されている場合は、CR 文字は無視する。
          */
-        if ('\r' == c) {
+        if (is_encoding_char_equal(f->input_encoding, '\r', c)) {
             errno = 0;
-            int nc = fgetc(f->fd);
-            if (EOF != nc) {
-                ungetc(nc, f->fd);
+            FGETC(boundary, f, nc);
+            if (! is_encoding_char_eof(f->input_encoding, nc)) {
+                UNGETC(boundary, f, nc);
             }
-            if (('\n' == nc) || (EOF == nc)) {
+            if (is_encoding_char_equal(f->input_encoding, '\n', nc) 
+                || is_encoding_char_eof(f->input_encoding, nc)) {
                 f->include_cr = 1;
                 if (f->ignore_cr) {
                     clearerr(f->fd);
@@ -4182,28 +4232,24 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
         
         /*
          * EOFの場合：
-         * ・errnoがEAGAINの場合、再度入力可能か試みる。最大0.3秒待ちが発生するが、これを超えると Exception を返す。
+         * ・errnoがEAGAINの場合、再度入力可能か試みる。最大1.0秒待ちが発生するが、これを超えると Exception を返す。
          * ・errnoがEINTRの場合は1文字入力に戻る。
          * ・cbuff が 0 バイトの場合は <nil> (EOF) を返す。
          * ・cbuff に文字がある場合は、デコードして返す。
          */
-        if (EOF == c) {
-            // if ((errno == EAGAIN) && (! feof(f->fd))) { //}
+        if (is_encoding_char_eof(f->input_encoding, c)) {
             if (errno == EAGAIN) {
-                // fprintf(stderr, "DEBUG: EAGAIN (1), eof=%d, c=%d\n", feof(f->fd), c);
                 int i = 0;
                 clearerr(f->fd);
                 while (is_read_ready(fileno(f->fd), 100) != IRDY_OK) {
                     i ++;
-                    if (i > 3) {
+                    if (i > 10) {
                         return new_exception(TE_IOAGAIN, L"No data available at File::gets, canceled.", interp);
                     }
                     clearerr(f->fd);
                 }
 		clearerr(f->fd);
                 continue;
-                // f->r_pending = cbuff;
-                // return new_exception(TE_IOAGAIN, L"No data available at File::gets, try again.", interp);
 	    }
             
             if (errno == EINTR) {
@@ -4211,7 +4257,6 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
                 continue;
             }
 	    
-	    f->r_pending = NULL;
 	    if (cell_get_length(cbuff) == 0) {
 		return const_Nil;
 	    } else {
@@ -4231,24 +4276,25 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
          * ・印字可能文字であれば cbuff に追加する。
          * ・そうでなければ (プロパティ)!nocontrol であれば cbuff に追加する。
          */
-        if (('\n' == c) || ('\r' == c)) {
+        if (is_encoding_char_equal(f->input_encoding, '\n', c) 
+            || is_encoding_char_equal(f->input_encoding, '\r', c)) {
             if (! flag_nonewline) {
                 if (! flag_nocontrol) {
-                    cell_add_char(cbuff, c);
+                    ADDCHAR(boundary, cbuff, c);
                 }
             } else {
-                if ('\r' == c) {
+                if (is_encoding_char_equal(f->input_encoding, '\r', c)) {
                     if (! flag_nocontrol) {
-                        cell_add_char(cbuff, c);
+                        ADDCHAR(boundary, cbuff, c);
                     }
                 }
             }
         } else {
-            if (wcisprint(c)) {
-                cell_add_char(cbuff, c);
+            if (wcisprint(c[0])) {  // XXX: fix me!!
+                ADDCHAR(boundary, cbuff, c);
             } else {
                 if (! flag_nocontrol) {
-                    cell_add_char(cbuff, c);
+                    ADDCHAR(boundary, cbuff, c);
                 }
             }
         }
@@ -4257,7 +4303,8 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
          * 最終的な文字返却判定を行う。
          * 読んだ文字が LF または (プロパティ)!ignore_cr かつ CR の場合、cbuff をデコードして返す。
          */
-	if (('\n' == c) || (('\r' == c) && (f->ignore_cr == 0))) {
+	if (is_encoding_char_equal(f->input_encoding, '\n', c)
+            || (is_encoding_char_equal(f->input_encoding, '\r', c) && (f->ignore_cr == 0))) {
 	    Cell *c = decode_raw_to_unicode(cbuff, f->input_encoding, enc_error_info);
             if (enc_error_info->errorno != 0) {
                 f->enc_error = 1;
@@ -4299,44 +4346,16 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
          *   - 通常ファイル、ソケットの場合は、データがあれば入力され、なければ EOF が返る。
          *   - tty の場合は、LFが入力されるまで ttyドライバによりブロックされる。
          * ・EOF でかつ errno が EAGAIN の場合はデータが届いていないことを意味する。
-         *   ### 2023/05/29 以下 '###' 部分ロジック削除。
-         *   ### ため、
-         *   ### さらに 0.1秒データの到着を待つ(is_read_ready)。
-         *   ### - is_read_ready でエラー(IRDY_ERR) の場合は Exception を返す。
-         *   ### - データOK(IRDY_OK) であれば、0.1秒待つ間にデータが到着したことを示すため、入力へ戻る。
-         *   ### - タイムアウト(IRDY_TOUT) であれば、データが0.1秒以内にデータが到着しなかったことを示す
-         *   ###   ため、満了と判断し cbuff をデコードし返す。
-         *     noblock = <t> のがめ、ここでデータ満了と判断し cbuff をデコードし返す。
-         *     この場合、行が LF で満了していないため、early-exit インジケータをオンにする。
-         *     early-exit インジケータがオンの場合、アプリケーション側では、この行に LF が無いものと
-         *     判断する必要がある。
+         *   noblock = <t> のため、ここでデータ満了と判断し cbuff をデコードし返す。
+         *   この場合、行が LF で満了していないため、early-exit インジケータをオンにする。
+         *   early-exit インジケータがオンの場合、アプリケーション側では、この行に LF が無いものと
+         *   判断する必要がある。
          * ・EOFでない場合は、データがすでに到着しているため、正規の1文字入力へ戻る(EOFを除く)。
          */
         if (cell_get_length(cbuff) > 0) {
             errno = 0;
             int nc = fgetc(f->fd);
             if ((EOF == nc) && (errno == EAGAIN)) {
-                /* comment out -------------------------------------------------------
-                ** 2023/05/29 
-                **
-                // fprintf(stderr, "DEBUG: EAGAIN (2), nc=%d\n", nc);
-                clearerr(f->fd);
-                int sts = is_read_ready(fileno(f->fd), 100);
-                if (IRDY_ERR == sts) {
-                    wchar_t *buff;
-                    buff = GC_MALLOC(64*sizeof(wchar_t));
-                    ALLOC_SAFE(buff);
-                    swprintf(buff, 64, L"File select timeout error(%d).", errno);
-                    return new_exception(TE_FILEACCESS, buff, interp);
-                }
-                if (IRDY_OK == sts) {
-                    continue;
-                }
-                if (IRDY_TOUT == sts) {
-                **
-                ** end comment -------------------------------------------------------
-                */
-
                 Cell *c = decode_raw_to_unicode(cbuff, f->input_encoding, enc_error_info);
                 if (enc_error_info->errorno != 0) {
                     f->enc_error = 1;
@@ -4346,14 +4365,6 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
                 }
                 f->early_exit = 1;
                 return new_string_cell(c);
-
-                /* comment out
-                 * 2023/05/29 
-                 *
-                }
-                 *
-                 * end comment
-                 */
             }
             if (EOF != nc) {
                 ungetc(nc, f->fd);
@@ -4409,24 +4420,23 @@ mth_file_puts(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 
     while (posargs) {
         if (STRING == GET_TAG(list_get_item(posargs))) {
-            unicode = list_get_item(posargs)->u.string;
+            unicode = new_cell(cell_get_addr(list_get_item(posargs)->u.string));
         } else {
             unicode = new_cell(to_string_call(interp, list_get_item(posargs)));
         }
+	if (flag_nonewline == 0) {
+	    cell_add_char(unicode, L'\n');
+	}
 	raw = encode_unicode_to_raw(unicode, f->output_encoding, enc_error_info);
 	if (NULL == raw) {
 	    return new_exception(TE_BADENCODEBYTE, enc_error_info->message, interp);
 	}
         p = cell_get_addr(raw);
-        // c = fputs(to_char(p), f->fd);
         for (i=0; i<cell_get_length(raw); i++) {
             unsigned char wc;
             wc = p[i];
             c = fwrite(&wc, 1, 1, f->fd);
         }
-	if (flag_nonewline == 0) {
-	    c = fputs("\n", f->fd);
-	}
 	fflush(f->fd);
 
 	if (EOF == c) {
