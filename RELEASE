@@ -3681,4 +3681,12 @@
 		  replace '<', '>' to '(', ')' in buffer name.
 		Add CTRL_D key bind for delete character into mini-buffer input.
 
+2024/04/09
+	encoding.[ch]
+		Add support UTF-16LE, UTF-16LE/F, UTF-16BE and UTF-16BE/F support.
+	methods.c
+		Add support UTF-16LE, UTF-16LE/F, UTF-16BE and UTF-16BE/F support at File::gets and File::puts.
+	pmacs update:
+		Add support UTF-16LE/F and UTF-16BE/F support.
+
 #eof
