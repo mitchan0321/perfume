@@ -19,21 +19,23 @@ static wchar_t *ENCODING_NAME_DEFS[] = {
 typedef struct _encoder_methods {
     Cell*(*raw_to_unicode)(Cell *raw, encoder_error_info *error_info);
     Cell*(*unicode_to_raw)(Cell *raw, encoder_error_info *error_info);
+    int boundary;
+    int (*char_equal)(int dest, int *src_array);
 } encoder_methods;
 
 static encoder_methods Encoder_methods[] = {
-    {raw_decoder, raw_encoder},		// NENCODE_RAW
-    {utf8_decoder, utf8_encoder},	// NENCODE_UTF8
-    {utf8f_decoder, utf8_encoder},	// NENCODE_UTF8F
-    {eucjp_decoder, eucjp_encoder},	// NENCODE_EUCJP
-    {eucjpf_decoder, eucjp_encoder},	// NENCODE_EUCJPF
-    {sjis_decoder, sjis_encoder},	// NENCODE_SJIS
-    {sjisf_decoder, sjis_encoder},	// NENCODE_SJISF
-    {utf16le_decoder, utf16le_encoder},	// NENCODE_UTF16LE
-    {utf16lef_decoder, utf16le_encoder},// NENCODE_UTF16LEF
-    {utf16be_decoder, utf16be_encoder},	// NENCODE_UTF16BE
-    {utf16bef_decoder, utf16be_encoder},// NENCODE_UTF16BEF
-    {0, 0}
+    {raw_decoder, raw_encoder, 1, char_equal_single_byte},	// NENCODE_RAW
+    {utf8_decoder, utf8_encoder, 1, char_equal_single_byte},	// NENCODE_UTF8
+    {utf8f_decoder, utf8_encoder, 1, char_equal_single_byte},	// NENCODE_UTF8F
+    {eucjp_decoder, eucjp_encoder, 1, char_equal_single_byte},	// NENCODE_EUCJP
+    {eucjpf_decoder, eucjp_encoder, 1, char_equal_single_byte},	// NENCODE_EUCJPF
+    {sjis_decoder, sjis_encoder, 1, char_equal_single_byte},	// NENCODE_SJIS
+    {sjisf_decoder, sjis_encoder, 1, char_equal_single_byte},	// NENCODE_SJISF
+    {utf16le_decoder, utf16le_encoder, 2, char_equal_u16le},	// NENCODE_UTF16LE
+    {utf16lef_decoder, utf16le_encoder, 2, char_equal_u16le},	// NENCODE_UTF16LEF
+    {utf16be_decoder, utf16be_encoder, 2, char_equal_u16be},	// NENCODE_UTF16BE
+    {utf16bef_decoder, utf16be_encoder, 2, char_equal_u16be},	// NENCODE_UTF16BEF
+    {0, 0, 0, 0}
 };
 
 wchar_t*
@@ -55,6 +57,38 @@ get_encoding_index(wchar_t *enc_name) {
     /* if return -1, invalid string enc_name */
     return -1;
 }
+
+int
+get_encoding_file_boundary(int enc) {
+    /* if enc_idex range over, return 1 */
+    if ((enc < 0) ||
+	(enc > ENCODING_NAME_MAX)) return 1;
+
+    return Encoder_methods[enc].boundary;
+}
+
+int
+is_encoding_char_equal(int enc, int dest, int *src_array) {
+    /* if enc_idex range over, return 0 */
+    if ((enc < 0) ||
+        (enc > ENCODING_NAME_MAX)) return 1;
+    
+    return Encoder_methods[enc].char_equal(dest, src_array);
+};
+
+int
+is_encoding_char_eof(int enc, int *src_array) {
+    int i;
+    
+    /* if enc_idex range over, return 0 */
+    if ((enc < 0) ||
+        (enc > ENCODING_NAME_MAX)) return 1;
+    
+    for (i=0; i<Encoder_methods[enc].boundary; i++) {
+        if (src_array[i] == EOF) return 1;
+    };
+    return 0;
+};
 
 Cell*
 decode_raw_to_unicode(Cell *raw, int enc, encoder_error_info *error_info) {
@@ -1350,4 +1384,19 @@ utf16be_encoder(Cell *unicode, encoder_error_info *error_info) {
     }
     
     return result;
+}
+
+int
+char_equal_single_byte(int src, int *dest_array) {
+    return (src == dest_array[0]);
+}
+
+int
+char_equal_u16le(int src, int *dest_array) {
+    return ((src == dest_array[0]) && (0 == dest_array[1]));
+}
+
+int
+char_equal_u16be(int src, int *dest_array) {
+    return ((src == dest_array[1]) && (0 == dest_array[0]));
 }
