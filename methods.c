@@ -4290,7 +4290,7 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
                 }
             }
         } else {
-            if (wcisprint(c[0])) {  // XXX: fix me!!
+            if (! is_encoding_char_ctrl(f->input_encoding, c)) {
                 ADDCHAR(boundary, cbuff, c);
             } else {
                 if (! flag_nocontrol) {
