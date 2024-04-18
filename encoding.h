@@ -64,6 +64,7 @@ Cell*	 encode_unicode_to_raw(Cell *unicode, int enc, encoder_error_info *error_i
 int	 get_encoding_file_boundary(int enc);
 int	 is_encoding_char_equal(int enc, int dest, int *src_array);
 int	 is_encoding_char_eof(int enc, int *src_array);
+int	 is_encoding_char_ctrl(int enc, int *src_array);
 
 /* for JIS converter */
 extern wchar_t Unicode_to_JISX0208[65536];
@@ -93,5 +94,8 @@ Cell*utf16be_encoder(Cell *unicode, encoder_error_info *error_info);
 int char_equal_single_byte(int dest, int *src_array);
 int char_equal_u16le(int dest, int *src_array);
 int char_equal_u16be(int dest, int *src_array);
+int char_ctrl_single_byte(int *src_array);
+int char_ctrl_u16le(int *src_array);
+int char_ctrl_u16be(int *src_array);
 
 #endif /* __ENCODING__ */

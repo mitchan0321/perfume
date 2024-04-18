@@ -1,3 +1,4 @@
+#include <ctype.h>
 #include "toy.h"
 #include "encoding.h"
 
@@ -21,20 +22,21 @@ typedef struct _encoder_methods {
     Cell*(*unicode_to_raw)(Cell *raw, encoder_error_info *error_info);
     int boundary;
     int (*char_equal)(int dest, int *src_array);
+    int (*char_is_ctrl)(int *src_array);
 } encoder_methods;
 
 static encoder_methods Encoder_methods[] = {
-    {raw_decoder, raw_encoder, 1, char_equal_single_byte},	// NENCODE_RAW
-    {utf8_decoder, utf8_encoder, 1, char_equal_single_byte},	// NENCODE_UTF8
-    {utf8f_decoder, utf8_encoder, 1, char_equal_single_byte},	// NENCODE_UTF8F
-    {eucjp_decoder, eucjp_encoder, 1, char_equal_single_byte},	// NENCODE_EUCJP
-    {eucjpf_decoder, eucjp_encoder, 1, char_equal_single_byte},	// NENCODE_EUCJPF
-    {sjis_decoder, sjis_encoder, 1, char_equal_single_byte},	// NENCODE_SJIS
-    {sjisf_decoder, sjis_encoder, 1, char_equal_single_byte},	// NENCODE_SJISF
-    {utf16le_decoder, utf16le_encoder, 2, char_equal_u16le},	// NENCODE_UTF16LE
-    {utf16lef_decoder, utf16le_encoder, 2, char_equal_u16le},	// NENCODE_UTF16LEF
-    {utf16be_decoder, utf16be_encoder, 2, char_equal_u16be},	// NENCODE_UTF16BE
-    {utf16bef_decoder, utf16be_encoder, 2, char_equal_u16be},	// NENCODE_UTF16BEF
+    {raw_decoder, raw_encoder, 1, char_equal_single_byte, char_ctrl_single_byte},	// NENCODE_RAW
+    {utf8_decoder, utf8_encoder, 1, char_equal_single_byte, char_ctrl_single_byte},	// NENCODE_UTF8
+    {utf8f_decoder, utf8_encoder, 1, char_equal_single_byte, char_ctrl_single_byte},	// NENCODE_UTF8F
+    {eucjp_decoder, eucjp_encoder, 1, char_equal_single_byte, char_ctrl_single_byte},	// NENCODE_EUCJP
+    {eucjpf_decoder, eucjp_encoder, 1, char_equal_single_byte, char_ctrl_single_byte},	// NENCODE_EUCJPF
+    {sjis_decoder, sjis_encoder, 1, char_equal_single_byte, char_ctrl_single_byte},	// NENCODE_SJIS
+    {sjisf_decoder, sjis_encoder, 1, char_equal_single_byte, char_ctrl_single_byte},	// NENCODE_SJISF
+    {utf16le_decoder, utf16le_encoder, 2, char_equal_u16le, char_ctrl_u16le},		// NENCODE_UTF16LE
+    {utf16lef_decoder, utf16le_encoder, 2, char_equal_u16le, char_ctrl_u16le},		// NENCODE_UTF16LEF
+    {utf16be_decoder, utf16be_encoder, 2, char_equal_u16be, char_ctrl_u16be},		// NENCODE_UTF16BE
+    {utf16bef_decoder, utf16be_encoder, 2, char_equal_u16be, char_ctrl_u16be},		// NENCODE_UTF16BEF
     {0, 0, 0, 0}
 };
 
@@ -74,6 +76,15 @@ is_encoding_char_equal(int enc, int dest, int *src_array) {
         (enc > ENCODING_NAME_MAX)) return 1;
     
     return Encoder_methods[enc].char_equal(dest, src_array);
+};
+
+int
+is_encoding_char_ctrl(int enc, int *src_array) {
+    /* if enc_idex range over, return 0 */
+    if ((enc < 0) ||
+        (enc > ENCODING_NAME_MAX)) return 1;
+    
+    return Encoder_methods[enc].char_is_ctrl(src_array);
 };
 
 int
@@ -1387,16 +1398,31 @@ utf16be_encoder(Cell *unicode, encoder_error_info *error_info) {
 }
 
 int
-char_equal_single_byte(int src, int *dest_array) {
-    return (src == dest_array[0]);
+char_equal_single_byte(int dest, int *src_array) {
+    return (dest == src_array[0]);
 }
 
 int
-char_equal_u16le(int src, int *dest_array) {
-    return ((src == dest_array[0]) && (0 == dest_array[1]));
+char_ctrl_single_byte(int *src_array) {
+    return (! wcisprint(src_array[0]));
 }
 
 int
-char_equal_u16be(int src, int *dest_array) {
-    return ((src == dest_array[1]) && (0 == dest_array[0]));
+char_equal_u16le(int dest, int *src_array) {
+    return ((dest == src_array[0]) && (0 == src_array[1]));
+}
+
+int
+char_ctrl_u16le(int *src_array) {
+    return ((! wcisprint(src_array[0])) && (0 == src_array[1]));
+}
+
+int
+char_equal_u16be(int dest, int *src_array) {
+    return ((dest == src_array[1]) && (0 == src_array[0]));
+}
+
+int
+char_ctrl_u16be(int *src_array) {
+    return ((! wcisprint(src_array[1])) && (0 == src_array[0]));
 }
