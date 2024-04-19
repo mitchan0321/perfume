@@ -5127,6 +5127,65 @@ error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
+
+Toy_Type*
+mth_file_seek(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Hash *self;
+    Toy_Type *container;
+    Toy_File *f;
+    Toy_Type *item;
+    int whence, sts;
+    long pos;
+    
+    if (arglen != 2) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    item = list_get_item(posargs);
+    if (SYMBOL != GET_TAG(item)) goto error;
+    if (0 == wcscmp(cell_get_addr(item->u.symbol.cell), L"set")) {
+        whence = SEEK_SET;
+    } else if (0 == wcscmp(cell_get_addr(item->u.symbol.cell), L"cur")) {
+        whence = SEEK_CUR;
+    } else if (0 == wcscmp(cell_get_addr(item->u.symbol.cell), L"end")) {
+        whence = SEEK_END;
+    } else {
+        goto error;
+    }
+
+    posargs = list_next(posargs);
+    item = list_get_item(posargs);
+    if (INTEGER != GET_TAG(item)) goto error;
+    pos = mpz_get_si(item->u.biginteger);
+
+    self = SELF_HASH(interp);
+    container = hash_get_t(self, const_Holder);
+    if (NULL == container) goto error2;
+    f = container->u.container.data;
+
+    if (NULL == f->fd) {
+	return new_exception(TE_FILEACCESS, L"File not open.", interp);
+    }
+    if (! ((pos == 0) && (whence == SEEK_CUR))) {
+        sts = fseek(f->fd, pos, whence);
+        if (-1 == sts) {
+            return new_exception(TE_FILEACCESS, decode_error(interp, strerror(errno)), interp);
+        }
+        f->pend = 0;
+    }
+    
+    pos = ftell(f->fd);
+    if (-1 == pos) {
+        return new_exception(TE_FILEACCESS, decode_error(interp, strerror(errno)), interp);
+    }
+    
+    return new_integer_si(pos);
+    
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'seek', syntax: File seek [set | cur | end] position", interp);
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
 Toy_Type*
 mth_dict_set(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *o, *val;
@@ -6317,6 +6376,7 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, L"File", L"set-tag", 	mth_file_settag,	L"val");
     toy_add_method(interp, L"File", L"get-tag", 	mth_file_gettag,	NULL);
     toy_add_method(interp, L"File", L"set-rawio", 	mth_file_setrawio,	L"val");
+    toy_add_method(interp, L"File", L"seek", 		mth_file_seek,		L"whence,val");
 
     toy_add_method(interp, L"Block", L"eval", 		mth_block_eval, 	NULL);
 
