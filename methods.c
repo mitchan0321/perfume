@@ -3811,7 +3811,7 @@ mth_string_udecode(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int ar
     return new_string_cell(dest);
 
 error:
-    return new_exception(TE_SYNTAX, L"Syntax error at 'uencode', syntax: String uencode encoding", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'udecode', syntax: String udecode encoding", interp);
 error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
 }
@@ -5127,7 +5127,6 @@ error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
-
 Toy_Type*
 mth_file_seek(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Hash *self;
@@ -5182,6 +5181,126 @@ mth_file_seek(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     
 error:
     return new_exception(TE_SYNTAX, L"Syntax error at 'seek', syntax: File seek [set | cur | end] position", interp);
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
+mth_file_getb(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Hash *self;
+    Toy_Type *container;
+    Toy_File *f;
+    Toy_Type *item;
+    int readsize;
+    unsigned char *rbuff;
+    int i;
+    int rsts;
+    Toy_Type *result, *l;
+    
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    item = list_get_item(posargs);
+    if (INTEGER != GET_TAG(item)) goto error;
+    readsize = mpz_get_si(item->u.biginteger);
+
+    self = SELF_HASH(interp);
+    container = hash_get_t(self, const_Holder);
+    if (NULL == container) goto error2;
+    f = container->u.container.data;
+
+    if (NULL == f->fd) {
+	return new_exception(TE_FILEACCESS, L"File not open.", interp);
+    }
+    if ((FMODE_INPUT != f->mode) && (FMODE_INOUT != f->mode)) {
+	return new_exception(TE_FILEACCESS, L"Bad file access mode.", interp);
+    }
+    
+    rbuff = GC_MALLOC(readsize);
+    ALLOC_SAFE(rbuff);
+    
+    if (f->raw_io) {
+        rsts = read(fileno(f->fd), rbuff, readsize);
+        if (rsts == 0) return const_Nil;
+        if (-1 == rsts) {
+            switch (errno) {
+            case EAGAIN:      /* fall thru */
+#if (EAGAIN != EWOULDBLOCK)
+            case EWOULDBLOCK: /* fall thru */
+#endif
+            case EINTR:
+                return new_exception(TE_IOAGAIN, L"Retry read, will be read blocking or interrupts occur.", interp);
+            default:
+                return new_exception(TE_SYSCALL, decode_error(interp, strerror(errno)), interp);
+            }
+        }
+        
+    } else {
+        rsts = fread(rbuff, 1, readsize, f->fd);
+        if (rsts == 0) return const_Nil;
+    }
+    
+    l = result = new_list(NULL);
+    for (i=0; i<rsts; i++) {
+        l = list_append(l, new_integer_si(rbuff[i]));
+    }
+    return result;
+    
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'getb', syntax: File getb size", interp);
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
+mth_file_putb(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Hash *self;
+    Toy_Type *container;
+    Toy_File *f;
+    Toy_Type *item;
+    int buffsize;
+    unsigned char *rbuff;
+    int i;
+    Toy_Type *l, *c;
+    int rsts;
+    
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    item = list_get_item(posargs);
+    if (LIST != GET_TAG(item)) goto error;
+
+    self = SELF_HASH(interp);
+    container = hash_get_t(self, const_Holder);
+    if (NULL == container) goto error2;
+    f = container->u.container.data;
+
+    if (NULL == f->fd) {
+	return new_exception(TE_FILEACCESS, L"File not open.", interp);
+    }
+    if ((FMODE_OUTPUT != f->mode) && (FMODE_APPEND != f->mode) && (FMODE_INOUT != f->mode)) {
+	return new_exception(TE_FILEACCESS, L"Bad file access mode.", interp);
+    }
+    
+    buffsize = list_length(item);
+    if (0 == buffsize) return 0;
+    
+    rbuff = GC_MALLOC(buffsize);
+    ALLOC_SAFE(rbuff);
+    l = item;
+    for (i=0; i<buffsize; i++) {
+        c = list_get_item(l);
+        if (INTEGER != GET_TAG(c)) goto error;
+        rbuff[i] = mpz_get_si(c->u.biginteger);
+        l = list_next(l);
+    }
+    rsts = fwrite(rbuff, 1, buffsize, f->fd);
+    fflush(f->fd);
+    
+    return new_integer_si(rsts);
+    
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'putb', syntax: File putb (char ...)", interp);
 error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
 }
@@ -6377,6 +6496,8 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, L"File", L"get-tag", 	mth_file_gettag,	NULL);
     toy_add_method(interp, L"File", L"set-rawio", 	mth_file_setrawio,	L"val");
     toy_add_method(interp, L"File", L"seek", 		mth_file_seek,		L"whence,val");
+    toy_add_method(interp, L"File", L"getb", 		mth_file_getb,		L"val");
+    toy_add_method(interp, L"File", L"putb", 		mth_file_putb,		L"val");
 
     toy_add_method(interp, L"Block", L"eval", 		mth_block_eval, 	NULL);
 

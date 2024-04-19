@@ -3691,6 +3691,10 @@
 
 2024/04/19
 	methods.c
-		Add File:seek method.
+		Add File:seek method for seek file position.
+
+2024/04/20
+	methods.c
+		Add File::getb and File::putb, for get or put byte stream from/to file.
 
 #eof
