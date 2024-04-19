@@ -3689,4 +3689,8 @@
 	pmacs update:
 		Add encoding UTF-16LE/F and UTF-16BE/F.
 
+2024/04/19
+	methods.c
+		Add File:seek method.
+
 #eof
