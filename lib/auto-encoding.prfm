@@ -3,6 +3,17 @@ defun auto-encoding (file) {
     limit := 30;
     if [file dir?  $file] then: {return <nil>};
     if [file read? $file] else: {return <nil>};
+
+    # detect BOM 
+    try {
+        f := `File ($file mode: i);
+        (c0 c1) ::= $f getb 2;
+        $f close;
+        if {and {$c0 = 0xfe} {$c1 = 0xff}} {return UTF-16BE/F};
+        if {and {$c0 = 0xff} {$c1 = 0xfe}} {return UTF-16LE/F};
+    } catch: {};
+    
+    # has no BOM
     $enc each do: {| i |
         f := <nil>;
         try {
