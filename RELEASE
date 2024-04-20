@@ -3696,5 +3696,7 @@
 2024/04/20
 	methods.c
 		Add File::getb and File::putb, for get or put byte stream from/to file.
+	lib/auto-encoding.prfm
+		Add detect BOM for encoding type UTF-16LE and UTF-16BE.
 
 #eof
