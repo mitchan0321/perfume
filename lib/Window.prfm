@@ -532,6 +532,19 @@ Window method next-window-name (win) {
     return ["Window#" . $n];
 };
 
+Window method next-visible-window-name (winobj) {
+    n ::= $WindowList find $winobj;
+    n ::= $n ??? {$n + 1} 0;
+    if {$n >= [$WindowList len]} {n := 0};
+    return [$WindowList get $n];
+};
+
+Window method previous-window-name (win) {
+    n ::= $win split sep: "#" : get 1 : int : - 1;
+    if {$n < 1} {n := $MAX_WINDOW_DIVS};
+    return ["Window#" . $n];
+};
+
 Window method get-window-by-name (window-name) {
     window := <nil>;
     $WindowList each do: {| i |

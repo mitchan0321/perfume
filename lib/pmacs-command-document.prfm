@@ -247,11 +247,11 @@ defun exec-man (main window cur-buff topic) {
     ltopic ::= $topic split;
     buff-name ::= if {$ltopic len : >= 2} {"Man=" . $ltopic,1 "(" $ltopic,0 ")"} {"Man=" . $topic};
     man-buff ::= BufferManager find-buffer $buff-name;
-    if $man-buff {
-        $main bind-buffer [$window get-window-name] $man-buff;
-    } {
+    #if $man-buff {
+    #    $main bind-buffer [$window get-window-name] $man-buff;
+    #} {
         do-man-async $window $buff-name $ENV,HOME [$MAN_PREFIX expand] $MAN_ENCODING;
-    };
+    #};
     return ALL;
 };
 
@@ -270,15 +270,19 @@ defun do-man-async (window buff-name directory command enc) {
         };
         return $r;
     };
-    $man-buff set-columnlimit 256;
     $man-buff get-buffer : set-content $directory;
-    $MainWindow bind-buffer [$window get-window-name] [$man-buff get-buffer];
-    w1 ::= $MainWindow get-window-by-name [$window get-window-name];
-    if $w1 else: {
-        $MainWindow create-split-vertical-window;
+    $man-buff set-columnlimit 256;
+    # $MainWindow bind-buffer [$window get-window-name] [$man-buff get-buffer];
+    ## w1 ::= $MainWindow get-window-by-name [$MainWindow next-window-name [$window get-window-name]];
+    ## w1 ::= $MainWindow get-window-by-name "Window#1";
+    if [$MainWindow get-window-list : len : <= 1] then: {
+        # $MainWindow create-split-vertical-window;
+        $MainWindow create-split-vertical-window window-name: [$window get-window-name];
     };
-    window ::= $MainWindow get-window-by-name [$window get-window-name];
-    
+    # window ::= $MainWindow get-window-by-name [$window get-window-name];
+    # window ::= $MainWindow get-window-by-name "Window#1";
+    $MainWindow bind-buffer [$MainWindow next-visible-window-name $window : get-window-name] [$man-buff get-buffer];
+
     task ::= new Task;
     $task set-stdout $man-buff;
     $task set-stderr $man-buff;
