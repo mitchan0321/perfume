@@ -281,7 +281,7 @@ defun do-man-async (window buff-name directory command enc) {
     };
     # window ::= $MainWindow get-window-by-name [$window get-window-name];
     # window ::= $MainWindow get-window-by-name "Window#1";
-    $MainWindow bind-buffer [$MainWindow next-visible-window-name $window : get-window-name] [$man-buff get-buffer];
+    $MainWindow bind-buffer [$MainWindow next-visible-window $window : get-window-name] [$man-buff get-buffer];
 
     task ::= new Task;
     $task set-stdout $man-buff;

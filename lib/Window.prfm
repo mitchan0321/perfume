@@ -532,10 +532,14 @@ Window method next-window-name (win) {
     return ["Window#" . $n];
 };
 
-Window method next-visible-window-name (winobj) {
-    n ::= $WindowList find $winobj;
-    n ::= $n ??? {$n + 1} 0;
-    if {$n >= [$WindowList len]} {n := 0};
+Window method next-visible-window (winobj) {
+    n ::= $WindowList map {| i | $i get-window-name} : find [$winobj get-window-name];
+    n ::= if $n {
+            $n + 1;
+            if {$n >= [$WindowList len]} 0 $n;
+        }
+        0
+    ;;
     return [$WindowList get $n];
 };
 
