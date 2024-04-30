@@ -3,6 +3,7 @@
 #include <setjmp.h>
 #include <signal.h>
 #include <string.h>
+#include <errno.h>
 #include <unistd.h>
 #include "types.h"
 #include "global.h"
@@ -217,8 +218,14 @@ control_goto:
 	cbuff = to_char(buff);
 	sts = write(interp->trace_fd, cbuff, strlen(cbuff));
 	if (-1 == sts) {
-	    fwprintf(stderr, L"Error occured at trace write.\n");
-	}
+            /* 
+	    fprintf(stderr, "Error occured at trace write, error= %s, fd= %d\n", 
+                strerror(errno),
+                interp->trace_fd
+            );
+            */
+            interp->trace = 0;
+        }
     }
 
     if (IS_LIST_NULL(l)) {

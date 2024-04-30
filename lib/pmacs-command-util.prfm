@@ -234,7 +234,9 @@ defcommand trace-editor-command desc: "Trace editor command and output trace res
             };
             $f puts  "***";
             $f puts  "";
+            $f flush;
             $f close;
+            f := <nil>;
             show-message ["Wrote tracefile to: " . [pwd] "/" "pmacs-trace.txt"];
 	}
         edit-proc: {| value |
