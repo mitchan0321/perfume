@@ -214,7 +214,7 @@ defcommand man desc: "Open man document on the entered text." {
                 show-message :bell "Enter man topic name.";
                 return ALL;
             };
-            exec-man $main $window $buff $value;
+            exec-man $main $window $buff $value :stay;
             return ALL;
         }
     ;;
@@ -243,19 +243,23 @@ defcommand man-current-word desc: "Open man document on near cursor point word."
     return ALL;
 };
 
-defun exec-man (main window cur-buff topic) {
+defun exec-man (main window cur-buff topic stay: stay) {
     ltopic ::= $topic split;
     buff-name ::= if {$ltopic len : >= 2} {"Man=" . $ltopic,1 "(" $ltopic,0 ")"} {"Man=" . $topic};
     man-buff ::= BufferManager find-buffer $buff-name;
-    #if $man-buff {
-    #    $main bind-buffer [$window get-window-name] $man-buff;
-    #} {
-        do-man-async $window $buff-name $ENV,HOME [$MAN_PREFIX expand] $MAN_ENCODING;
-    #};
+    if {and {true? stay} $man-buff} {
+        $main bind-buffer [$window get-window-name] $man-buff;
+    } {
+        if {true? stay} {
+            do-man-async $window $buff-name $ENV,HOME [$MAN_PREFIX expand] $MAN_ENCODING stay: <t>;
+        } {
+            do-man-async $window $buff-name $ENV,HOME [$MAN_PREFIX expand] $MAN_ENCODING stay: <nil>;
+       };
+    };
     return ALL;
 };
 
-defun do-man-async (window buff-name directory command enc) {
+defun do-man-async (window buff-name directory command enc stay: stay) {
     BufferManager unregist-buffer $buff-name;
     man-buff ::= new EditStream;
     $man-buff open $buff-name;
@@ -275,14 +279,18 @@ defun do-man-async (window buff-name directory command enc) {
     # $MainWindow bind-buffer [$window get-window-name] [$man-buff get-buffer];
     ## w1 ::= $MainWindow get-window-by-name [$MainWindow next-window-name [$window get-window-name]];
     ## w1 ::= $MainWindow get-window-by-name "Window#1";
-    if [$MainWindow get-window-list : len : <= 1] then: {
-        # $MainWindow create-split-vertical-window;
-        $MainWindow create-split-vertical-window window-name: [$window get-window-name];
+    if {true? stay} {
+        $MainWindow bind-buffer [$window get-window-name] [$man-buff get-buffer];
+    } {
+        if [$MainWindow get-window-list : len : <= 1] then: {
+            # $MainWindow create-split-vertical-window;
+            $MainWindow create-split-vertical-window window-name: [$window get-window-name];
+        };
+        # window ::= $MainWindow get-window-by-name [$window get-window-name];
+        # window ::= $MainWindow get-window-by-name "Window#1";
+        $MainWindow bind-buffer [$MainWindow next-visible-window $window : get-window-name] [$man-buff get-buffer];
     };
-    # window ::= $MainWindow get-window-by-name [$window get-window-name];
-    # window ::= $MainWindow get-window-by-name "Window#1";
-    $MainWindow bind-buffer [$MainWindow next-visible-window $window : get-window-name] [$man-buff get-buffer];
-
+    
     task ::= new Task;
     $task set-stdout $man-buff;
     $task set-stderr $man-buff;
@@ -340,7 +348,7 @@ defun man-open-link (main window buff geom ey ex) {
     topic ::= $str split sep: "(" : get 0 : lower;
     section ::= $str split sep: "(" : get 1 : at 0;
     show-message ["Man topic: " . $section " " $topic];
-    exec-man $main $window $buff [$section . " " $topic];
+    exec-man $main $window $buff [$section . " " $topic] :stay;
 
     next-buff ::= $window get-buffer;
     $next-buff set-previous-buffer $buff-name;
