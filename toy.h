@@ -37,15 +37,6 @@ void	  def_global();
 
 #define ALLOC_SAFE(x)	if (!x) {printf("alloc failed.\n"); exit(255);}
 
-
-#ifdef __FreeBSD__
-#	define SETJMP(x)	_setjmp(x)
-#	define LONGJMP(x,y)	_longjmp(x,y)
-#else
-#	define SETJMP(x)	setjmp(x)
-#	define LONGJMP(x,y)	longjmp(x,y)
-#endif /* __FreeBSD__ */
-
 /* define control code for return, break, continue, redo, retry and goto */
 #define CTRL_RETURN		1
 #define CTRL_BREAK		2
@@ -58,10 +49,6 @@ void	  def_global();
 #define CO_STS_INIT		0
 #define CO_STS_RUN		1
 #define CO_STS_DONE		2
-
-/* may be not use */
-#define STACK_BARRIER		0xDEADBEEF
-#define STACK_BARRIER_SIZE	(4096/sizeof(int))
 
 /* define mprotect page size */
 #define MP_ALIGN		(0x0fff)

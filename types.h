@@ -340,11 +340,6 @@ typedef struct _toy_type {
 	/* RQUOTE */
 	Cell *rquote;
 
-#if 0
-	/* CALL/CC */
-	CallCC *callcc_buff;
-#endif
-
 	/* BIND */
 	struct _toy_type *bind_var;
 
@@ -372,7 +367,6 @@ typedef struct _toy_script {
     Bulk *src;
     Toy_Type *script;
 } Toy_Script;
-
 
 Toy_Type*	new_bool(int val);
 Toy_Type*	new_symbol(wchar_t *atom);

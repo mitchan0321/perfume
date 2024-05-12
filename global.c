@@ -15,7 +15,6 @@ void def_global() {
     const_Exception = new_symbol(L"Exception");
     const_RQuote = new_symbol(L"RQuote");
     const_Object = new_symbol(L"Object");
-    const_CallCC = new_symbol(L"CallCC");
     const_Dict = new_symbol(L"Dict");
     const_Vector = new_symbol(L"Vector");
     const_Bulk = new_symbol(L"Bulk");
