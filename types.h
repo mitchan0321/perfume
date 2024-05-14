@@ -402,7 +402,6 @@ Toy_Type*	new_getmacro(Toy_Type *obj, Toy_Type *para);
 Toy_Type*	new_initmacro(Toy_Type *obj, Toy_Type *param);
 Toy_Type*	new_alias(struct _hash *slot, Toy_Type *key);
 Toy_Type*	new_rquote(wchar_t *string);
-Toy_Type*	new_callcc();
 Toy_Type*	new_bind(Toy_Type *bind_var);
 Toy_Type*	new_dict(struct _hash *dict);
 Toy_Type*	new_vector(struct _array *vector);
