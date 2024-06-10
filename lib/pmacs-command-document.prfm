@@ -251,15 +251,15 @@ defun exec-man (main window cur-buff topic stay: stay) {
         $main bind-buffer [$window get-window-name] $man-buff;
     } {
         if {true? stay} {
-            do-man-async $window $buff-name $ENV,HOME [$MAN_PREFIX expand] $MAN_ENCODING stay: <t>;
+            do-man-async $window $buff-name $cur-buff $ENV,HOME [$MAN_PREFIX expand] $MAN_ENCODING stay: <t>;
         } {
-            do-man-async $window $buff-name $ENV,HOME [$MAN_PREFIX expand] $MAN_ENCODING stay: <nil>;
+            do-man-async $window $buff-name $cur-buff $ENV,HOME [$MAN_PREFIX expand] $MAN_ENCODING stay: <nil>;
        };
     };
     return ALL;
 };
 
-defun do-man-async (window buff-name directory command enc stay: stay) {
+defun do-man-async (window buff-name cur-buff directory command enc stay: stay) {
     BufferManager unregist-buffer $buff-name;
     man-buff ::= new EditStream;
     $man-buff open $buff-name;
@@ -276,19 +276,16 @@ defun do-man-async (window buff-name directory command enc stay: stay) {
     };
     $man-buff get-buffer : set-content $directory;
     $man-buff set-columnlimit 256;
-    # $MainWindow bind-buffer [$window get-window-name] [$man-buff get-buffer];
-    ## w1 ::= $MainWindow get-window-by-name [$MainWindow next-window-name [$window get-window-name]];
-    ## w1 ::= $MainWindow get-window-by-name "Window#1";
     if {true? stay} {
         $MainWindow bind-buffer [$window get-window-name] [$man-buff get-buffer];
     } {
-        if [$MainWindow get-window-list : len : <= 1] then: {
-            # $MainWindow create-split-vertical-window;
+        if [$MainWindow get-window-list : len : <= 1] {
             $MainWindow create-split-vertical-window window-name: [$window get-window-name];
+            $MainWindow bind-buffer [$window get-window-name] $cur-buff;
+            $MainWindow bind-buffer [$MainWindow next-visible-window $window : get-window-name] [$man-buff get-buffer];
+        } {
+            $MainWindow bind-buffer [$MainWindow next-visible-window $window : get-window-name] [$man-buff get-buffer];
         };
-        # window ::= $MainWindow get-window-by-name [$window get-window-name];
-        # window ::= $MainWindow get-window-by-name "Window#1";
-        $MainWindow bind-buffer [$MainWindow next-visible-window $window : get-window-name] [$man-buff get-buffer];
     };
     
     task ::= new Task;
