@@ -3699,4 +3699,8 @@
 	lib/auto-encoding.prfm
 		Add detect BOM for encoding type UTF-16LE and UTF-16BE.
 
+2024/06/10
+	pmacs update:
+		Fix man-current-word window layout bug.
+
 #eof
