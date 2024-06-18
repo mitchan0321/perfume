@@ -2,7 +2,7 @@
 ### Pmacs editor utility command definition.
 ###
 
-defcommand key-binding-list desc: "Display key binding list and all editor commands." {
+defcommand key-binding-list desc: "Display key binding list." {
     | main window |
     cur-buff ::= $window get-buffer;
     mode ::= $window get-mode;
@@ -31,7 +31,25 @@ defcommand key-binding-list desc: "Display key binding list and all editor comma
         display-key-binding-list $buff ["Prefix key: " . [$window get-prefix-key $i : map {| j | symbol [getkeydesc $j]}] " / Name: " $i] [$window get-bind-map $i] $desc;
         $buff append-string "";
     };
+    $buff no-modify;
+    $buff set-protect;
+    
+    $main bind-buffer [$window get-window-name] $buff;
+    $buff set-previous-buffer [$cur-buff get-buffer-name];
+    $window set-mode "PWiki";
+    
+    result ALL;
+};
         
+defcommand all-command-list desc: "Display all editor commands." {
+    | main window |
+    cur-buff ::= $window get-buffer;
+    BufferManager unregist-buffer "*Editor Commands*";
+    buff ::= new EditBuffer;
+    $buff load-content "editor commands" :init-only buffer-name: "*Editor Commands*";
+    $buff set-content [$DEFAULT_PWIKI_DIR . "/"];
+    $buff clear-all;
+
     $buff append-string "<<< All editor commands >>>";
     $buff append-string ["%v <- %v" fmt "Command" "Key bindings"];
     $buff append-string "  Description";
@@ -53,7 +71,7 @@ defcommand key-binding-list desc: "Display key binding list and all editor comma
     $buff set-previous-buffer [$cur-buff get-buffer-name];
     $window set-mode "PWiki";
 
-    result SELF;
+    result ALL;
 };
 
 defun display-key-binding-list (buff name key-map desc) {
@@ -1499,5 +1517,35 @@ defcommand terminal-bottom-of-buffer desc: "Move cursor to terminal buffer tail.
 
     $window apply-command $main $window "" bottom-of-buffer;
     $window apply-command $main $window "" cursor-left;
+    return ALL;
+};
+
+defcommand terminal-cursor-down desc: "Move cursor down in terminal buffer." {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+
+    $window apply-command $main $window "" cursor-down;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    r ::= $buff get-buffer-line $ey;
+    if {! $r} {
+        $window apply-command $main $window "" cursor-left;
+    };
+    
+    return ALL;
+};
+
+defcommand terminal-cursor-right desc: "Move cursor right in terminal buffer." {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+
+    $window apply-command $main $window "" cursor-right;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    r ::= $buff get-buffer-line $ey;
+    if {! $r} {
+        $window apply-command $main $window "" cursor-left;
+    };
+    
     return ALL;
 };

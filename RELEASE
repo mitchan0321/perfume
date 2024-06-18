@@ -3703,4 +3703,9 @@
 	pmacs update:
 		Fix man-current-word window layout bug.
 
+2024/06/18
+	pmacs update:
+		Add all-command-list editor command, divide from key-binding-list command.
+		Add terminal-cursor-down, terminal-cursor-right for terminal mode key bindings.
+
 #eof
