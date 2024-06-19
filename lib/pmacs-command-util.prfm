@@ -15,7 +15,8 @@ defcommand key-binding-list desc: "Display key binding list." {
     $buff append-string  "<<< Key bindings >>>";
     $buff append-string ["  Keybind mode: %v" fmt $KEYBIND_MODE];
     $buff append-string ["  Buffer mode: %v" fmt $mode ];
-    $buff append-string "";
+    $buff append-string  "  * show all editor command list => [[&all-command-list]]";
+    $buff append-string  "";
     ### $buff append-string "";
     ### $buff append-string ["%-15v %21v %-14v %-v" fmt  "Key group"     "Key combinations"  "Key symbol"       "Command"];
     ### $buff append-string ["%-15v %21v %-14v %-v" fmt ["-" repeat 15] ["-" repeat 21] ["-" repeat 14] ["-" repeat 38]];
@@ -51,6 +52,7 @@ defcommand all-command-list desc: "Display all editor commands." {
     $buff clear-all;
 
     $buff append-string "<<< All editor commands >>>";
+    $buff append-string "";
     $buff append-string ["%v <- %v" fmt "Command" "Key bindings"];
     $buff append-string "  Description";
     $buff append-string ["%v" fmt ["-" repeat [38 * 2]]];
