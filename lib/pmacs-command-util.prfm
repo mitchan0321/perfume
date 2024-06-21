@@ -1028,6 +1028,7 @@ defcommand list-config desc: "Display configuration list." {
     pkmax ::= $kmax - 13;
     
     $buff append-string "<<< Configuration list >>>";
+    $buff append-string "";
     $buff append-string [["%-${kmax}v %-v" expand] fmt "Key" "Value"];
     $buff append-string [["  %-${pkmax}v %7v %-2v %-v" expand] fmt [" " repeat $pkmax] "Type" "RO" "Description"];
     $buff append-string [["%-${kmax}v %-v" expand] fmt ["-" repeat $kmax] "-----------"];
