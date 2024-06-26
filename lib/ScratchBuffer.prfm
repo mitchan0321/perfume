@@ -6,7 +6,7 @@ ScratchBuffer method init () {
     
     sets Src [vector (
 	"Welcome to Perfume/Pmacs world !!"
-	"  <<< Pmacsの使い方について >>>"
+	"  <<< Pmacsの使い方 >>>"
         "    1. クイックスタートメニューはこちら --> [[00quick-start]]"
         "    2. Pmacsマニュアルはこちら --> [[00start]]"
 	"    3. 終了方法"
