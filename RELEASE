@@ -1,3 +1,4 @@
+2024/06/26	PRFM_20240626		1.10.0
 2024/02/14	PRFM_20240214		1.9.1
 2023/12/23	PRFM_20231223_K35	1.9.0
 2023/06/05	PRFM_20230605		1.8.1
@@ -3707,5 +3708,14 @@
 	pmacs update:
 		Add all-command-list editor command, divide from key-binding-list command.
 		Add terminal-cursor-down, terminal-cursor-right for terminal mode key bindings.
+
+2024/06/26
+	doc/manual.*
+		Update.
+	pmacs update:
+		Change *Scratch* buffer start message.
+	tag:
+		PRFM_20240626
+		1.10.0
 
 #eof
