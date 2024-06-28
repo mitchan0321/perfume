@@ -63,13 +63,22 @@ defcommand buffer-list desc: "Display all buffers list." {
     if {$maxlen < ["Buffer name" display-width]} {maxlen ::= "Buffer name" display-width};
 
     $buff append-string  "<<< Buffer list >>>";
+    REM {
     $buff append-string  "  * Select buffer - Move cursor to buffer line and press Enter key";
-    $buff append-string ["                    or press shortcut key(0-9). Press " . 
-                         [get-keybind-string $window "buffer-list-completion" : replace ',' "or"] " to name completion."];
+    $buff append-string ["    or press shortcut key(0-9). Press " . 
+        [get-keybind-string $window "buffer-list-completion" : replace ',' "or"] " to name completion."];
     $buff append-string ["  * Delete buffer - Move cursor to buffer line and press \"" .
-                         [get-keybind-string $window "buffer-list-delete" : replace ',' "or"] "\" key."];
+        [get-keybind-string $window "buffer-list-delete" : replace ',' "or"] "\" key."];
     $buff append-string ["  * Save buffer - Move cursor to buffer line and press \"" .
-                         [get-keybind-string $window "buffer-list-save" : replace ',' "or"] "\" key."];
+        [get-keybind-string $window "buffer-list-save" : replace ',' "or"] "\" key."];
+    $buff append-string ["  * Open another window - Move cursor to buffer line and press \"" .
+        [get-keybind-string $window "buffer-list-open-next-window" : replace ',' "or"] "\" or \""
+        [get-keybind-string $window "buffer-list-open-previous-window" : replace ',' "or"] "\" key."];
+    $buff append-string ["  * Save buffer name - Move cursor to buffer line and press \"" .
+        [get-keybind-string $window "buffer-list-store-buffer" : replace ',' "or"] "\" key."];
+    };
+    $buff append-string "  Help: [ENTER] or \"0\"--\"9\" open buffer, [Oo]pen other window,";
+    $buff append-string "        [s]save buffer, [d]elete buffer, [m]emory buffer name";
     $buff append-string "";
     $buff append-string [$format expand : fmt "#" "e" "t" "m" "p" "n" "Buffer name" "Length" "Mode" "Content path"];
     $buff append-string [$format expand : fmt "-" "-" "-" "-" "-" "-" "-----------" "------" "----" "------------"];
@@ -264,13 +273,12 @@ defun jump-to-buffer-shortcut (key main window) {
     $buff buffer-select 0 [$buff get-buffer-length : - 1] {| r |
         if {$r =~ $key} {
             found := <t>;
-            l ::= $r =~ '\<[^\>]+\>';
+            l ::= $r =~ $BUFFER_LINK;
             if {nil? $l} {
                 show-message :bell "No buffer name specified.";
                 return SELF;
             };
             s ::= $l car : get 2;
-            s ::= $s sub 1 [$s len : - 1];
             target-buff ::= BufferManager find-buffer $s;
             $target-buff ?? {
                 show-message :bell "No buffer name specified.";
@@ -294,14 +302,13 @@ defcommand buffer-list-delete desc: "Delete the selected buffer in buffer list."
 	show-message :bell "No buffer name specified.";
 	return SELF;
     };
-    l ::= $r =~ '\<[^\>]+\>';
+    l ::= $r =~ $BUFFER_LINK;
     if {nil? $l} {
 	show-message :bell "No buffer name specified.";
 	return SELF;
     };
 
     s ::= $l car : get 2;
-    s ::= $s sub 1 [$s len : - 1];
     target-buff ::= BufferManager find-buffer $s;
     $target-buff ?? {
 	show-message :bell "No buffer name specified.";
@@ -335,14 +342,13 @@ defcommand buffer-list-save desc: "Save the selected buffer in buffer list." {
 	show-message :bell "No buffer name specified.";
 	return SELF;
     };
-    l ::= $r =~ '\<[^\>]+\>';
+    l ::= $r =~ $BUFFER_LINK;
     if {nil? $l} {
 	show-message :bell "No buffer name specified.";
 	return SELF;
     };
 
     s ::= $l car : get 2;
-    s ::= $s sub 1 [$s len : - 1];
     target-buff ::= BufferManager find-buffer $s;
     $target-buff ?? {
 	show-message :bell "No buffer name specified.";
@@ -359,4 +365,109 @@ defcommand buffer-list-save desc: "Save the selected buffer in buffer list." {
     };
 
     result ALL;
+};
+
+defcommand store-buffer desc: "Store current window buffer name." {
+    | main window |
+    buff ::= $window get-buffer;
+    name ::= $buff get-buffer-name;
+    setconf BUFFER_MEMORY $name;
+    show-message "Store buffer name: " $name;
+    result ALL;
+};
+
+defcommand bind-stored-buffer desc: "Bind stored buffer to current window." {
+    | main window |
+    buff ::= BufferManager find-buffer $BUFFER_MEMORY;
+    if $buff {
+        $main bind-buffer [$window get-window-name] $buff;
+    } {
+        show-message "Buffer name not found: " $BUFFER_MEMORY;
+    };
+    result ALL;
+};
+
+defcommand buffer-list-store-buffer desc: "Store current buffer list line buffer name." {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (line col) ::= $window get-source-index $buff $geom;
+    r ::= $buff get-buffer-line $line;
+    $r ?? {
+	show-message "No buffer name specified.";
+	return SELF;
+    };
+    l ::= $r =~ $BUFFER_LINK;
+    if {nil? $l} {
+	show-message "No buffer name specified.";
+	return SELF;
+    };
+
+    s ::= $l car : get 2;
+    setconf BUFFER_MEMORY $s;
+    show-message "Store buffer name: " $s;
+    result ALL;
+};
+
+
+defcommand buffer-list-open-next-window desc: "Open current buffer on next window." {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (line col) ::= $window get-source-index $buff $geom;
+    r ::= $buff get-buffer-line $line;
+    $r ?? {
+	show-message "No buffer name specified.";
+	return SELF;
+    };
+    l ::= $r =~ $BUFFER_LINK;
+    if {nil? $l} {
+	show-message "No buffer name specified.";
+	return SELF;
+    };
+    buff-name ::= $l car : get 2;
+    cwin ::= $main get-current-window;
+    if {$main get-window-list : len : <= 1} {
+        $main create-split-vertical-window window-name: [$cwin get-window-name];
+    };
+    owin ::= $main get-window-list-without-current : car;
+    cbuff ::= BufferManager find-buffer $buff-name;
+    if $cbuff {
+        $main bind-buffer [$owin get-window-name] $cbuff;
+        $main roll-current-window;
+    } {
+        show-message "No such buffer: " $buff-name;
+    };
+    return ALL;
+};
+
+defcommand buffer-list-open-previous-window desc: "Open current buffer on previous window." {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (line col) ::= $window get-source-index $buff $geom;
+    r ::= $buff get-buffer-line $line;
+    $r ?? {
+	show-message "No buffer name specified.";
+	return SELF;
+    };
+    l ::= $r =~ $BUFFER_LINK;
+    if {nil? $l} {
+	show-message "No buffer name specified.";
+	return SELF;
+    };
+    buff-name ::= $l car : get 2;
+    cwin ::= $main get-current-window;
+    if {$main get-window-list : len : <= 1} {
+        $main create-split-vertical-window window-name: [$cwin get-window-name];
+    };
+    owin ::= $main get-window-list-without-current : last : car;
+    cbuff ::= BufferManager find-buffer $buff-name;
+    if $cbuff {
+        $main bind-buffer [$owin get-window-name] $cbuff;
+        $main roll-current-window-backward;
+    } {
+        show-message "No such buffer: " $buff-name;
+    };
+    return ALL;
 };
