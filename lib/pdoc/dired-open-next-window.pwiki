@@ -1,10 +1,10 @@
 ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+....0
 
 【コマンド名】
-	dired-open-other-window
+	dired-open-next-window
 
 【概要】
-	Open file or directory at cursor point file with other window.
+	Open file or directory at cursor point file with next window.
 
 【説明】
 	このコマンドはディレクトリエディタから起動されます。詳細はディレクトリエディタ  [[dired]] を
@@ -15,7 +15,7 @@
 	指定されたものがディレクトリである場合は、ディレクトリエディタを別のウィンドウで開きます。
 
 【現在のキーバインドを表示する】
-	[[?dired-open-other-window]]
+	[[?dired-open-next-window]]
 
 【キーバインド一覧に戻る】
 	[[&key-binding-list]]
@@ -24,3 +24,4 @@
 	[[&help]]
 
 ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+....0
+
