@@ -2,19 +2,6 @@
 ### Pmacs editor misc command definition.
 ###
 
-defcommand send-to-task desc: "Send input line to Task's common Stream." {
-    | main window |
-    buff ::= $window get-buffer;
-    geom ::= $window get-geom;
-    (ey ex) ::= $window get-source-index $buff $geom;
-    str ::= $buff get-buffer-line $ey;
-    $window apply-command $main $window "" bottom-of-buffer;
-    $buff append-string "";
-    $window move-down;
-    TaskManager send-to-task $str;
-    result SELF;
-};
-
 defcommand internal-stat desc: "Display interpriter internal status." {
     | main window |
     w :wide;
@@ -32,22 +19,6 @@ defcommand internal-stat desc: "Display interpriter internal status." {
     slist;
 
     result ALL;
-};
-
-defcommand cancel-prefix desc: "Cancel prefix." {
-    | main window |
-    $window cancel-prefix;
-    return ALL;
-};
-
-defcommand pop-prefix desc: "Pop last prefix." {
-    | main window |
-    $window pop-prefix;
-    return ALL;
-};
-
-defcommand show-version desc: "Show pmacs version." {
-    show-message "Version: " $VERSION ", Build: " $BUILD;
 };
 
 defcommand mini-move-message desc: "Demo background." {
