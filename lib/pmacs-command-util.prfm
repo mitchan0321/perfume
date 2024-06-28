@@ -2,6 +2,22 @@
 ### Pmacs editor utility command definition.
 ###
 
+defcommand cancel-prefix desc: "Cancel prefix." {
+    | main window |
+    $window cancel-prefix;
+    return ALL;
+};
+
+defcommand pop-prefix desc: "Pop last prefix." {
+    | main window |
+    $window pop-prefix;
+    return ALL;
+};
+
+defcommand show-version desc: "Show pmacs version." {
+    show-message "Version: " $VERSION ", Build: " $BUILD;
+};
+
 defcommand key-binding-list desc: "Display key binding list." {
     | main window |
     cur-buff ::= $window get-buffer;
@@ -1551,4 +1567,37 @@ defcommand terminal-cursor-right desc: "Move cursor right in terminal buffer." {
     };
     
     return ALL;
+};
+
+defcommand send-to-task desc: "Send input line to Task's common Stream." {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    str ::= $buff get-buffer-line $ey;
+    $window apply-command $main $window "" bottom-of-buffer;
+    $buff append-string "";
+    $window move-down;
+    TaskManager send-to-task $str;
+    result SELF;
+};
+
+defcommand store-buffer desc: "Store current window buffer name." {
+    | main window |
+    buff ::= $window get-buffer;
+    name ::= $buff get-buffer-name;
+    setconf BUFFER_MEMORY $name;
+    show-message "Store buffer name: " $name;
+    result ALL;
+};
+
+defcommand bind-stored-buffer desc: "Bind stored buffer to current window." {
+    | main window |
+    buff ::= BufferManager find-buffer $BUFFER_MEMORY;
+    if $buff {
+        $main bind-buffer [$window get-window-name] $buff;
+    } {
+        show-message "Buffer name not found: " $BUFFER_MEMORY;
+    };
+    result ALL;
 };
