@@ -115,7 +115,7 @@ DiredBuffer method update () {
     
     append-string ["<<< " . [get-content] " >>>  {Filter: " $Filter ", Sort: " $SortMode "}"];
     append-string "  Help: [ENTER] open, [Nn]ame [Tt]ime [Ss]ize sort, [f]ilter, [d]elete, [r]ename";
-    append-string "        open [o]ther window, change [m]ode, [D]elete dir, [M]ake dir, co[p]y link";
+    append-string "        open [Oo]ther window, change [m]ode, [D]elete dir, [M]ake dir, co[p]y link";
     append-string "        [SPACE] mark, e[X]ecute delete marked, [c]lear all marks, [u]pdate";
     append-string "";
     
