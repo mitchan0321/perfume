@@ -76,6 +76,17 @@ defcommand dired-open desc: "Open file or directory at cursor point file on dire
 
 defcommand dired-open-next-window desc: "Open file or directory at cursor point file with next window." {
     | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    r ::= $buff get-buffer-line $ey;
+    if $r {
+        l ::= $r split sep: "|";
+        if {[$l len] < 2} {
+            return SELF;
+        };
+    };
+
     cwin ::= $main get-current-window;
     if {$main get-window-list : len : <= 1} {
         $main create-split-vertical-window window-name: [$cwin get-window-name];
@@ -86,6 +97,17 @@ defcommand dired-open-next-window desc: "Open file or directory at cursor point 
 
 defcommand dired-open-previous-window desc: "Open file or directory at cursor point file with previous window." {
     | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ey ex) ::= $window get-source-index $buff $geom;
+    r ::= $buff get-buffer-line $ey;
+    if $r {
+        l ::= $r split sep: "|";
+        if {[$l len] < 2} {
+            return SELF;
+        };
+    };
+
     cwin ::= $main get-current-window;
     if {$main get-window-list : len : <= 1} {
         $main create-split-vertical-window window-name: [$cwin get-window-name];
