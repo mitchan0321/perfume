@@ -1581,23 +1581,3 @@ defcommand send-to-task desc: "Send input line to Task's common Stream." {
     TaskManager send-to-task $str;
     result SELF;
 };
-
-defcommand store-buffer desc: "Store current window buffer name." {
-    | main window |
-    buff ::= $window get-buffer;
-    name ::= $buff get-buffer-name;
-    setconf BUFFER_MEMORY $name;
-    show-message "Store buffer name: " $name;
-    result ALL;
-};
-
-defcommand bind-stored-buffer desc: "Bind stored buffer to current window." {
-    | main window |
-    buff ::= BufferManager find-buffer $BUFFER_MEMORY;
-    if $buff {
-        $main bind-buffer [$window get-window-name] $buff;
-    } {
-        show-message "Buffer name not found: " $BUFFER_MEMORY;
-    };
-    result ALL;
-};
