@@ -3728,5 +3728,13 @@
 		Add keybind ALT+o to store-buffer.
 		Add keybind ALT+O to bind-stored-buffer.
 		Add config variable BUFFER_MEMORY for buffer name store.
+		Change buffer-list header format.
+		Add store-buffer and bind-stored-buffer command for memory buffer name and
+		  bind the memrey buffer name to windodw.
+		Add buffer-list-store-buffer for memory buffer name in *Buffer List* buffer.
+		Add buffer-list-open-next-window and buffer-list-open-previous-window for
+		  open another window in *Buffer List* buffer.
+		Add keybind "o" to buffer-list-open-next-window at BList mode.
+		Add keybind "O" to buffer-list-open-previous-window at BList mode.
 
 #eof
