@@ -3718,4 +3718,15 @@
 		PRFM_20240626
 		1.10.0
 
+2024/06/28
+	pmacs update:
+		Rename command dired-open-other-window -> dired-open-next-window.
+		Add command dired-open-previous-window.
+		Add keybind O at dired mode for open file previous window.
+		Add command store-buffer for store buffer name at current window.
+		Add command bind-stored-buffer for bind stored buffer at current window.
+		Add keybind ALT+o to store-buffer.
+		Add keybind ALT+O to bind-stored-buffer.
+		Add config variable BUFFER_MEMORY for buffer name store.
+
 #eof
