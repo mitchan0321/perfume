@@ -1,3 +1,7 @@
+###
+### Pmacs editor mouse command definition.
+###
+
 if {curs-mouse?} {
 
 defcommand mouse-smooth-scroll-up desc: "Mouse wheel up." {
@@ -146,6 +150,48 @@ defcommand mouse-buffer-click-link desc: "Mouse click open buffer." {
         return NONE;
     };
     $window apply-command $main $window "" jump-to-buffer;
+    $window end-region;
+    $main set-last-mouse-event <nil> 0 0;
+    result ALL;
+};
+
+defcommand mouse-buffer-click-next-window desc: "Mouse click open buffer at next window." {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ev y x) ::= $main get-mouse-event;
+    $geom set! CursorLine $y;
+    $geom set! IndexColumn.SAVE [$geom,ViewColumn + $x];
+    (ey ex) ::= $window get-source-index $buff $geom;
+    str ::= cursor-on-search-regex $ey $ex $BUFFER_LINK $buff;
+    $str ?? {
+        $window cursor-move-to $geom $ey $ex;
+        $window end-region;
+        $main set-last-mouse-event $window $y $x;
+        return NONE;
+    };
+    $window apply-command $main $window "" buffer-list-open-next-window;
+    $window end-region;
+    $main set-last-mouse-event <nil> 0 0;
+    result ALL;
+};
+
+defcommand mouse-buffer-click-previous-window desc: "Mouse click open buffer at previous window." {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ev y x) ::= $main get-mouse-event;
+    $geom set! CursorLine $y;
+    $geom set! IndexColumn.SAVE [$geom,ViewColumn + $x];
+    (ey ex) ::= $window get-source-index $buff $geom;
+    str ::= cursor-on-search-regex $ey $ex $BUFFER_LINK $buff;
+    $str ?? {
+        $window cursor-move-to $geom $ey $ex;
+        $window end-region;
+        $main set-last-mouse-event $window $y $x;
+        return NONE;
+    };
+    $window apply-command $main $window "" buffer-list-open-previous-window;
     $window end-region;
     $main set-last-mouse-event <nil> 0 0;
     result ALL;
