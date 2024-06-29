@@ -78,7 +78,7 @@ defcommand buffer-list desc: "Display all buffers list." {
         [get-keybind-string $window "buffer-list-store-buffer" : replace ',' "or"] "\" key."];
     };
     $buff append-string "  Help: [ENTER] or \"0\"--\"9\" open buffer, [Oo]pen other window,";
-    $buff append-string "        [s]save buffer, [d]elete buffer, [m]emory buffer name";
+    $buff append-string "        [s]ave buffer, [d]elete buffer, [m]emory buffer name";
     $buff append-string "";
     $buff append-string [$format expand : fmt "#" "e" "t" "m" "p" "n" "Buffer name" "Length" "Mode" "Content path"];
     $buff append-string [$format expand : fmt "-" "-" "-" "-" "-" "-" "-----------" "------" "----" "------------"];
