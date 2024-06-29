@@ -3737,4 +3737,11 @@
 		Add keybind "o" to buffer-list-open-next-window at BList mode.
 		Add keybind "O" to buffer-list-open-previous-window at BList mode.
 
+2024/06/29
+	pmacs update:
+		Add keybind Alt+(mouse scroll down) -> all-window-scrall-down.
+		Add keybind Alt+(mouse scroll up) -> all-window-scrall-up.
+		Add keybind Ctrl+Alt+(mouse scroll down) -> all-window-page-down.
+		Add keybind Ctrl+Alt+(mouse scroll up) -> all-window-page-up.
+
 #eof
