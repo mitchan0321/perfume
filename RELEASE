@@ -3744,4 +3744,10 @@
 		Add keybind Ctrl+Alt+(mouse scroll down) -> all-window-page-down.
 		Add keybind Ctrl+Alt+(mouse scroll up) -> all-window-page-up.
 
+2024/06/29
+	pmacs update:
+		Add mouse-buffer-click-next-window and mouse-buffer-click-previous-window.
+		Add keybind Ctrl+(mouse 1 release) -> mouse-buffer-click-next-window.
+		Add keybind Alt+(mouse 1 release) -> mouse-buffer-click-previous-window.
+
 #eof
