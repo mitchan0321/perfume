@@ -3749,5 +3749,8 @@
 		Add mouse-buffer-click-next-window and mouse-buffer-click-previous-window.
 		Add keybind Ctrl+(mouse 1 release) -> mouse-buffer-click-next-window.
 		Add keybind Alt+(mouse 1 release) -> mouse-buffer-click-previous-window.
+		Change DiredBuffer format, like a unix 'ls -l'.
 
 #eof
+
+
