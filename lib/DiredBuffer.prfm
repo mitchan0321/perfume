@@ -4,8 +4,9 @@ DiredBuffer method init () {
     base-constructor;
     init-constructor;
 
-    sets Perms [vector("---" "--x" "-w-" "-wx" "r--" "r-x" "rw-" "rwx")];
-    sets Bits  [vector("---" "--S" "-G-" "-GS" "U--" "U-S" "UG-" "UGS")];
+    sets Perms0 [vector("---" "--x" "-w-" "-wx" "r--" "r-x" "rw-" "rwx")];
+    sets Perms1 [vector("--S" "--s" "-wS" "-ws" "r-S" "r-s" "rwS" "rws")];
+    sets Perms2 [vector("--T" "--t" "-wT" "-wt" "r-T" "r-t" "rwT" "rwt")];
 
     d ::= dict; awk sep: ":" {$d set $3 $1} "/etc/passwd";
     sets User $d;
@@ -18,9 +19,9 @@ DiredBuffer method init () {
                             # s=size ascending, S=size descending
 
     ########## "f  perm  usr  grp  mod      sz     file"
-    sets Fmt-s "%1v%-14v %-8v %-8v %-v%-10v %5v%4v %v%-2v";
-    ########## "f  perm     usr  grp  mod sz  file"
-    sets Fmt   "%1v%1v%-13v %!-8v %!-8v %-v %9v|%v";
+    sets Fmt-s "%1v%-10v %-8v %-8v %-v%-8v %5v%4v %v%-2v";
+    ########## "f  perm     usr   grp   mod sz  file"
+    sets Fmt   "%1v%1v%-9v %!-8v %!-8v %-v %9v|%v";
     
     sets Filter     '.*';
     
@@ -155,7 +156,7 @@ DiredBuffer method update () {
                 [mkperm $d,perm]
                 [if [$User set? $d,uid] $User,[$d get uid] $d,uid]
                 [if [$Group set? $d,gid] $Group,[$d get gid] $d,gid]
-                [strftime "%Y/%m/%d %H:%M" $d,mtime]
+                [strftime "%y/%m/%d %H:%M" $d,mtime]
                 $d,size
                 [if {$d,type != "l"} [$d,name . "|"] [$d,name . "|->" $d,symbolic-link]]
                 ### $d,name
@@ -174,11 +175,22 @@ DiredBuffer method update () {
 DiredBuffer method mkperm (p) {
     result := "";
     f ::= "%04o" fmt $p;
-    $result append! [$Perms get [$f at 1 : int]];
-    $result append! [$Perms get [$f at 2 : int]];
-    $result append! [$Perms get [$f at 3 : int]];
-    $result append! ",";
-    $result append! [$Bits  get [$f at 0 : int]];
+    sugbit ::= $f at 0 : int;
+    if {$sugbit && 4 : != 0} {
+        $result append! [$Perms1 get [$f at 1 : int]];
+    } {
+        $result append! [$Perms0 get [$f at 1 : int]];
+    };
+    if {$sugbit && 2 : != 0} {
+        $result append! [$Perms1 get [$f at 2 : int]];
+    } {
+        $result append! [$Perms0 get [$f at 2 : int]];
+    };
+    if {$sugbit && 1 : != 0} {
+        $result append! [$Perms2 get [$f at 3 : int]];
+    } {
+        $result append! [$Perms0 get [$f at 3 : int]];
+    };
     return $result;
 };
 
