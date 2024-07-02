@@ -3751,4 +3751,10 @@
 		Add keybind Alt+(mouse 1 release) -> mouse-buffer-click-previous-window.
 		Change DiredBuffer format, like a unix 'ls -l'.
 
+2024/07/02
+	pmacs update:
+		Add mouse-dired-click-next-window and mouse-dired-click-previous-window.
+		Add keybind Ctrl+(mouse 1 release) -> mouse-dired-click-next-window.
+		Add keybind Alt+(mouse 1 release) -> mouse-dired-click-previous-window.
+
 #eof
