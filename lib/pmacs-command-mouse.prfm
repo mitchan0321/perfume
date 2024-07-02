@@ -218,4 +218,46 @@ defcommand mouse-dired-click-link desc: "Mouse click open file dired." {
     result ALL;
 };
 
+defcommand mouse-dired-click-next-window desc: "Mouse click open file at next window on dired." {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ev y x) ::= $main get-mouse-event;
+    $geom set! CursorLine $y;
+    $geom set! IndexColumn.SAVE [$geom,ViewColumn + $x];
+    (ey ex) ::= $window get-source-index $buff $geom;
+    str ::= cursor-on-search-regex $ey $ex $DIRED_FILE_LINK $buff;
+    $str ?? {
+        $window cursor-move-to $geom $ey $ex;
+        $window end-region;
+        $main set-last-mouse-event $window $y $x;
+        return NONE;
+    };
+    $window apply-command $main $window "" dired-open-next-window;
+    $window end-region;
+    $main set-last-mouse-event <nil> 0 0;
+    result ALL;
+};
+
+defcommand mouse-dired-click-previous-window desc: "Mouse click open file at previous window on dired." {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (ev y x) ::= $main get-mouse-event;
+    $geom set! CursorLine $y;
+    $geom set! IndexColumn.SAVE [$geom,ViewColumn + $x];
+    (ey ex) ::= $window get-source-index $buff $geom;
+    str ::= cursor-on-search-regex $ey $ex $DIRED_FILE_LINK $buff;
+    $str ?? {
+        $window cursor-move-to $geom $ey $ex;
+        $window end-region;
+        $main set-last-mouse-event $window $y $x;
+        return NONE;
+    };
+    $window apply-command $main $window "" dired-open-previous-window;
+    $window end-region;
+    $main set-last-mouse-event <nil> 0 0;
+    result ALL;
+};
+
 };  ### end mouse
