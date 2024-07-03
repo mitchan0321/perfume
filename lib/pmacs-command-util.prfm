@@ -1047,7 +1047,7 @@ defcommand list-config desc: "Display configuration list." {
     $buff append-string "";
     $buff append-string [["%-${kmax}v %-v" expand] fmt "Key" "Value"];
     $buff append-string [["  %-${pkmax}v %7v %-2v %-v" expand] fmt [" " repeat $pkmax] "Type" "RO" "Description"];
-    $buff append-string [["%-${kmax}v %-v" expand] fmt ["-" repeat $kmax] "-----------"];
+    $buff append-string [["%-${kmax}v %-v" expand] fmt ["-" repeat [$kmax - 3] : . " --"] "-----------"];
 
     msort [$CONFIG keys :string] : each do: {| i |
         sep := "";
