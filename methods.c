@@ -5508,7 +5508,10 @@ mth_vector_append(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     o = SELF(interp);
     if (GET_TAG(o) != VECTOR) goto error2;
 
-    array_append(o->u.vector, toy_clone(item));
+    if (NULL == array_append(o->u.vector, toy_clone(item))) {
+        return new_exception(TE_ARRAYBOUNDARY, L"Array append error.", interp);
+    }
+    
     return item;
 
 error:
@@ -5795,7 +5798,7 @@ mth_vector_insert(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 	return new_exception(TE_ARRAYBOUNDARY, L"Bad insert index.", interp);
     }
 
-    return const_T;
+    return val;
 
 error:
     return new_exception(TE_SYNTAX, L"Syntax error at 'insert!', syntax: Vector insert! at val", interp);
