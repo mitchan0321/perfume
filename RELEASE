@@ -3757,4 +3757,13 @@
 		Add keybind Ctrl+(mouse 1 release) -> mouse-dired-click-next-window.
 		Add keybind Alt+(mouse 1 release) -> mouse-dired-click-previous-window.
 
+2024/07/06
+	array.[ch]
+		Add method array_insert and array_delete.
+	methods.c
+		Add method Vector::insert! and Vector::delete! for insert or delete at specified item.
+	pmacs update:
+		Change Vector::insert-string-at, Vector::delete-character-at and Vector::delete-region
+		  becomes to use Vector::insert! and Vector::delete! methods.
+	
 #eof
