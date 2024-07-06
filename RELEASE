@@ -3765,5 +3765,5 @@
 	pmacs update:
 		Change Vector::insert-string-at, Vector::delete-character-at and Vector::delete-region
 		  becomes to use Vector::insert! and Vector::delete! methods.
-	
+
 #eof
