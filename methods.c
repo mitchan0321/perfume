@@ -5772,6 +5772,67 @@ error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
+
+Toy_Type*
+mth_vector_insert(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *o, *at, *val;
+    int idx;
+
+    if (arglen != 2) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    o = SELF(interp);
+    if (GET_TAG(o) != VECTOR) goto error2;
+
+    at = list_get_item(posargs);
+    if (GET_TAG(at) != INTEGER) goto error;
+    idx = mpz_get_si(at->u.biginteger);
+
+    posargs = list_next(posargs);
+    val = list_get_item(posargs);
+    
+    if (NULL == array_insert(o->u.vector, idx, val)) {
+	return new_exception(TE_ARRAYBOUNDARY, L"Bad insert index.", interp);
+    }
+
+    return const_T;
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'insert!', syntax: Vector insert! at val", interp);
+
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
+mth_vector_delete(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *o, *at, *val;
+    int idx;
+
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+
+    o = SELF(interp);
+    if (GET_TAG(o) != VECTOR) goto error2;
+
+    at = list_get_item(posargs);
+    if (GET_TAG(at) != INTEGER) goto error;
+    idx = mpz_get_si(at->u.biginteger);
+
+   
+    if (NULL == (val = array_delete(o->u.vector, idx))) {
+	return new_exception(TE_ARRAYBOUNDARY, L"Bad delete index.", interp);
+    }
+
+    return val;
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'delete!', syntax: Vector delete! at", interp);
+
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
 Toy_Type*
 mth_coro_next(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *self;
@@ -6519,6 +6580,8 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, L"Vector", L"each", 		mth_vector_each, 	L"do:,body");
     toy_add_method(interp, L"Vector", L"swap", 		mth_vector_swap, 	L"val,val");
     toy_add_method(interp, L"Vector", L"resize",	mth_vector_resize, 	L"val");
+    toy_add_method(interp, L"Vector", L"insert!",	mth_vector_insert, 	L"val,val");
+    toy_add_method(interp, L"Vector", L"delete!",	mth_vector_delete, 	L"val");
 
     toy_add_method(interp, L"Coro", L"next", 		mth_coro_next, 		NULL);
     toy_add_method(interp, L"Coro", L"release", 	mth_coro_release, 	NULL);
