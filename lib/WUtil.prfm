@@ -496,34 +496,6 @@ Vector method insert-string-at-next (char line at) {
     return ($command $ay $ax $by $bx);
 };
 
-Vector method insert-character-at (char line at) {
-    self ::= self;
-    if {$char = "\r"} {
-	$self append! "";
-        i ::= $self len : - 2;
-        while {$i >= [$line + 1]}  do: {
-	    $self set [$i + 1] [$self get $i];
-	    i ::= $i - 1;
-	};
-	s ::= $self get $line;
-	s1 ::= $s sub 0 $at;
-	s2 ::= $s sub $at;
-	$self set $line $s1;
-	if {$line < [$self len : - 1]} {$self set [$line + 1] $s2};
-        at := 0;
-	line ::= $line + 1;
-	return ($line $at);
-    };
-
-    if {[$self len] <= $line} {$self append! ""};
-    s ::= $self get $line;
-    s1 ::= $s sub 0 $at;
-    s2 ::= $s sub $at;
-    $self set $line [$s1 . $char $s2];
-    at ::= $at + 1;
-    return ($line $at);
-};
-
 Vector method insert-string-at (str line at) {
     if {$str = ""} {
         if {$line >= [self : len]} {self : append! ""};
@@ -531,7 +503,6 @@ Vector method insert-string-at (str line at) {
     };
     
     l ::= $str split sep: "\r";
-#    if {and {[self : len] = 0} {$l,0 = ""}} {$l >>};
     times ::= $l len;
     self ::= self;
     i := 1;
@@ -550,19 +521,25 @@ Vector method insert-string-at (str line at) {
 	    line ::= $self len : - 1;
 	};
 	if {$i = $times} {break};
-	$self append! "";
-	[$self len : - 2] each to: $line do: {
-	    | j |
-	    if {$line = $j} {
-		s1 ::= $self get $j : sub 0 $at;
-		s2 ::= $self get $j : sub $at;
-		$self set [$j + 1] $s2;
-		$self set $j $s1;
-	    } {
-		$self set [$j + 1] [$self get $j];
-	    };
-	};
-	$i ++;
+	#$self append! "";
+	#[$self len : - 2] each to: $line do: {
+	#    | j |
+	#    if {$line = $j} {
+	#	s1 ::= $self get $j : sub 0 $at;
+	#	s2 ::= $self get $j : sub $at;
+	#	$self set [$j + 1] $s2;
+	#	$self set $j $s1;
+	#    } {
+	#	$self set [$j + 1] [$self get $j];
+	#    };
+	#};
+        $self insert! $line "";
+        s1 ::= $self get [$line + 1] : sub 0 $at;
+        s2 ::= $self get [$line + 1] : sub $at;
+        $self set [$line + 1] $s2;
+        $self set [$line - 0] $s1;
+        
+        $i ++;
 	$line ++;
 	at := 0;
     };
@@ -584,12 +561,17 @@ Vector method delete-character-at (line at) {
 	return (insert-string-at "" 0 0);
     };
     if {$len = 0} {
-	i := $line;
-	while {$i < [$self len : - 1]} do: {
-	    $self set $i [$self get [$i + 1]];
-	    i ::= $i + 1;
+        #i ::= $line + 1;
+        #while {$i < [$self len : - 1]} do: {
+	#    $self set $i [$self get [$i + 1]];
+	#    i ::= $i + 1;
+        #};
+        #$self resize [$self len : - 1];
+        if {$line = [$self len : - 1]} {
+            $self resize [$self len : - 1];
+        } {
+            $self set [$line + 0] [$self delete! [$line + 1]];
         };
-	$self resize [$self len : - 1];
         if {$line >= [$self len]} {
             return (insert-string-at "" $line 0);
         };
@@ -607,10 +589,11 @@ Vector method delete-character-at (line at) {
             };
 	    return (insert-string-at "\r" $line $len);
 	};
-	[$line + 1] each to: [$self len : - 2] do: {| i |
-	    $self set $i [$self get [$i + 1]];
-	};
-	$self resize [$self len : - 1];
+        #[$line + 1] each to: [$self len : - 2] do: {| i |
+	#    $self set $i [$self get [$i + 1]];
+	#};
+	#$self resize [$self len : - 1];
+        $self delete! [$line + 1];
         if {$line >= [$self len]} {
             return (insert-string-at "" $line 0);
         };
@@ -720,10 +703,10 @@ Vector method delete-region (start-line start-column end-line end-column) {
 	s2 ::= $r sub $end-column;
         self : set $start-line [$s1 . $s2];
 	$result-str append! $str;
-#	if {and $at-last {[self : len] >= 1} {[self : get [self : len : - 1]] = ""}} {
-#	    self : resize [self : len : - 1];
-#	};
-	return (insert-string-at $result-str $result-start-line $result-start-column);
+	if {and $at-last {[self : len] >= 1} {[self : get [self : len : - 1]] = ""}} {
+	    self : resize [self : len : - 1];
+	};
+        return (insert-string-at $result-str $result-start-line $result-start-column);
     };
 
     ## Regin into 2 lines.
@@ -737,10 +720,11 @@ Vector method delete-region (start-line start-column end-line end-column) {
 	if {[self : len : - 1] <= $end-line} {
 	    self : resize [self : len : - 1];
 	} {
-	    $end-line each to: [self : len : - 2] do: {| i |
-	        self : set $i [self : get [$i + 1]];
-	    };
-	    self : resize [self : len : - 1];
+            #$end-line each to: [self : len : - 2] do: {| i |
+	    #    self : set $i [self : get [$i + 1]];
+	    #};
+	    #self : resize [self : len : - 1];
+            self : delete! $end-line;
 	};
 	if {and $at-last {[self : len] >= 1} {[self : get [self : len : - 1]] = ""}} {
 	    self : resize [self : len : - 1];
@@ -760,11 +744,18 @@ Vector method delete-region (start-line start-column end-line end-column) {
     s2 ::= self : get $end-line : sub  $end-column;
     self : set $start-line [$s1 . $s2];
     n ::= $end-line - $start-line;
-    [$end-line + 1] each to: [self : len : - 1] do: {| i |
-	if {$i >= [self : len]} {break};
-	self : set [$i - $n] [self : get $i];
+    #[$end-line + 1] each to: [self : len : - 1] do: {| i |
+    #    if {$i >= [self : len]} {break};
+    #    self : set [$i - $n] [self : get $i];
+    #};
+    #self : resize [self : len : - $n];
+    1 each to: $n do: {
+        self : delete! [$start-line + 1];
     };
-    self : resize [self : len : - $n];
+    #if {$end-line >= [self : len]} {
+    #    self : resize [self : len : - 1];
+    #};
+    
     if {and $at-last {[self : len] >= 1} {[self : get [self : len : - 1]] = ""}} {
         self : resize [self : len : - 1];
     };
