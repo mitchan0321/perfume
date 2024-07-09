@@ -50,11 +50,17 @@ array_set(Array *array, struct _toy_type *item, int pos) {
 
 struct _toy_type*
 array_get(Array *array, int pos) {
+    struct _toy_type *item;
+
     if (NULL == array) return NULL;
 
     if ((pos < 0) || (pos >= array->cur_size)) return NULL;
 
-    return &array->array[pos];
+    item = GC_MALLOC(sizeof(struct _toy_type));
+    ALLOC_SAFE(item);
+    memcpy(item, &array->array[pos], sizeof(struct _toy_type));
+
+    return item;
 }
 
 int
