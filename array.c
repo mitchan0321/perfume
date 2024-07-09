@@ -58,7 +58,7 @@ array_get(Array *array, int pos) {
 
     item = GC_MALLOC(sizeof(struct _toy_type));
     ALLOC_SAFE(item);
-    memcpy(item, &array->array[pos], sizeof(struct _toy_type));
+    *item = array->array[pos];
 
     return item;
 }
@@ -184,7 +184,8 @@ array_delete(Array *array, int pos) {
 
     item = GC_MALLOC(sizeof(struct _toy_type));
     ALLOC_SAFE(item);
-    memcpy(item, &array->array[pos], sizeof(struct _toy_type));
+    *item = array->array[pos];
+
     array->cur_size --;
     for (i=pos; i<array->cur_size; i++) {
         array->array[i] = array->array[i+1];
