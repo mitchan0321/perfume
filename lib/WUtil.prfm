@@ -579,7 +579,7 @@ Vector method delete-character-at (line at) {
     };
     if {$at >= $len} {
 	if {[$line + 1] = [$self len]} {
-	    return (<nil> "" $line $len);
+	    return (insert-string-at "" $line $len);
 	};
 	$self set $line [$self,$line . [$self get [$line + 1]]];
 	if {$line = [$self len : - 2]} {
@@ -608,6 +608,11 @@ Vector method delete-character-at (line at) {
 
 Vector method backdelete-character-at (line at) {
     self ::= self;
+    if {and {$line >= 1} {$line >= [$self len]}} {
+        if {[$self get [$line - 1]] != ""} {
+            return (insert-string-at-next "" [$line - 1] [$self get [$line - 1] : len]);
+        };
+    };
     if {$at = 0} {
 	if {$line = 0} {
 	    return (<nil> "" 0 0);
