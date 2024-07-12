@@ -255,7 +255,7 @@ defcommand select-region-word desc: "Select region in current buffer at word nea
     result SELF;
 };
 
-defcommand paste-buffer desc: "Paste characters from copy buffer into current buffer at cursor point."{
+defcommand paste-buffer desc: "Paste characters from copy buffer into current buffer at cursor point." {
     | main window |
     buff ::= $window get-buffer;
     str ::= $window get-copy-buffer;

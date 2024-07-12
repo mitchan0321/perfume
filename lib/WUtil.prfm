@@ -499,7 +499,7 @@ Vector method insert-string-at-next (char line at) {
 Vector method insert-string-at (str line at) {
     if {$str = ""} {
         if {$line >= [self : len]} {self : append! ""};
-        return (delete-region $line 0 $line 0);
+        return (delete-region $line $at $line $at);
     };
     
     l ::= $str split sep: "\r";
@@ -678,8 +678,10 @@ Vector method delete-region (start-line start-column end-line end-column) {
     if {$start-line < 0} {
 	start-line := 0;
     };
+    is-eof := <nil>;
     if {$end-line >= [self : len]} {
 	end-line ::= self : len : - 1;
+        is-eof := <t>;
 	if {$end-line < 0} {
 	    end-line := 0;
 	};
@@ -708,6 +710,9 @@ Vector method delete-region (start-line start-column end-line end-column) {
 	s2 ::= $r sub $end-column;
         self : set $start-line [$s1 . $s2];
 	$result-str append! $str;
+        if $is-eof {
+            $result-str append! "\r";
+        };
 	if {and $at-last {[self : len] >= 1} {[self : get [self : len : - 1]] = ""}} {
 	    self : resize [self : len : - 1];
 	};
@@ -720,6 +725,9 @@ Vector method delete-region (start-line start-column end-line end-column) {
 	$result-str append! [self : get $start-line : sub $start-column];
 	$result-str append! "\r";
 	$result-str append! [self : get $end-line : sub 0 $end-column];
+        if $is-eof {
+            $result-str append! "\r";
+        };
 	s2 ::= self : get $end-line : sub  $end-column;
         self : set $start-line [$s1 . $s2];
 	if {[self : len : - 1] <= $end-line} {
@@ -746,6 +754,9 @@ Vector method delete-region (start-line start-column end-line end-column) {
 	$result-str append! "\r";
     };
     $result-str append! [self : get $end-line : sub 0 $end-column];
+    if $is-eof {
+        $result-str append! "\r";
+    };
     s2 ::= self : get $end-line : sub  $end-column;
     self : set $start-line [$s1 . $s2];
     n ::= $end-line - $start-line;
@@ -780,8 +791,10 @@ Vector method copy-region (start-line start-column end-line end-column) {
     if {$start-line < 0} {
 	start-line := 0;
     };
+    is-eof := <nil>;
     if {$end-line >= [self : len]} {
 	end-line ::= self : len : - 1;
+        is-eof := <t>;
 	if {$end-line < 0} {
 	    end-line := 0;
 	};
@@ -801,6 +814,9 @@ Vector method copy-region (start-line start-column end-line end-column) {
 	r ::= self : get $start-line;
 	str ::= $r sub $start-column $end-column;
 	$result-str append! $str;
+        if $is-eof {
+            $result-str append! "\r";
+        };
 	return (insert-string-at $result-str $start-line $start-column);
     };
 
@@ -810,6 +826,9 @@ Vector method copy-region (start-line start-column end-line end-column) {
 	$result-str append! [$self get $start-line : sub $start-column];
 	$result-str append! "\r";
 	$result-str append! [$self get $end-line : sub 0 $end-column];
+        if $is-eof {
+            $result-str append! "\r";
+        };
 	return (insert-string-at $result-str $start-line $start-column);
     };
 
@@ -821,6 +840,9 @@ Vector method copy-region (start-line start-column end-line end-column) {
 	$result-str append! "\r";
     };
     $result-str append! [self : get $end-line : sub 0 $end-column];
+    if $is-eof {
+	$result-str append! "\r";
+    };
     return (insert-string-at $result-str $start-line $start-column);
 };
 
