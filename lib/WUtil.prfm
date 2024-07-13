@@ -659,6 +659,8 @@ Vector method append-string (str) {
 };
 
 Vector method line-update (str y) {
+    if {$y >= [self : len]} {return (<nil> 0 0)};
+    
     r ::= [self] get $y;
     [self] set $y $str;
     result := (line-update $r $y);
@@ -686,6 +688,9 @@ Vector method delete-region (start-line start-column end-line end-column) {
 	    end-line := 0;
 	};
 	end-column ::= self : get [self : len : - 1] : len;
+    };
+    if {$start-line >= [self : len]} {
+	return (<nil> 0 0 0);
     };
     if {$start-column > [self : get $start-line : len]} {
 	start-column := [self : get $start-line : len];
@@ -799,6 +804,9 @@ Vector method copy-region (start-line start-column end-line end-column) {
 	    end-line := 0;
 	};
 	end-column ::= self : get [self : len : - 1] : len;
+    };
+    if {$start-line >= [self : len]} {
+	return (<nil> "" 0 0);
     };
     if {$start-column > [self : get $start-line : len]} {
 	start-column := [self : get $start-line : len];

@@ -330,11 +330,13 @@ EditBuffer method insert-string-at (input y x) {
     sets Modify <t>;
     if {true? Src} {
         if {$y >= [$Src len]} {
-            # $UndoBuffer << (backdelete-character-at [$Src len : + 1] 0);
             $UndoBuffer << (backdelete-character-at [$Src len] 0);
         };
 	result ::= $Src insert-string-at $input $y $x;
-	if $result,0 {$UndoBuffer << $result; sets RedoBuffer ()};
+	if $result,0 {
+            $UndoBuffer << $result;
+            sets RedoBuffer ();
+        };
 	return ($result,3 $result,4);
     };
     return (0 0);
@@ -346,7 +348,10 @@ EditBuffer method delete-character-at (y x) {
     sets Modify <t>;
     if {true? Src} {
 	result ::= $Src delete-character-at $y $x;
-	if $result,0 {$UndoBuffer << $result; sets RedoBuffer ()};
+	if $result,0 {
+            $UndoBuffer << $result; 
+            sets RedoBuffer ();
+        };
 	return ($result,2 $result,3 $result,1);
     };
     return (0 0 "");
@@ -358,7 +363,10 @@ EditBuffer method backdelete-character-at (y x) {
     sets Modify <t>;
     if {true? Src} {
 	result ::= $Src backdelete-character-at $y $x;
-	if $result,0 {$UndoBuffer << $result; sets RedoBuffer ()};
+	if $result,0 {
+            $UndoBuffer << $result; 
+            sets RedoBuffer ();
+        };
 	return ($result,2 $result,3 $result,1);
     };
     return (0 0 "");
@@ -370,7 +378,10 @@ EditBuffer method append-string (str) {
     sets Modify <t>;
     if {true? Src} {
 	result ::= $Src append-string $str;
-	if $result,0 {$UndoBuffer << $result; sets RedoBuffer ()};
+	if $result,0 {
+            $UndoBuffer << $result;
+            sets RedoBuffer ();
+        };
 	return ($result,1 $result,2)
     };
     return (0 0);
@@ -382,7 +393,10 @@ EditBuffer method line-update (str y) {
     sets Modify <t>;
     if {and {true? Src} {$y >= 0} {$y < [$Src len]}} {
         result ::= $Src line-update $str $y;
-        $UndoBuffer << $result; sets RedoBuffer ();
+        if $result,0 {
+            $UndoBuffer << $result;
+            sets RedoBuffer ();
+        };
         return $result;
     } {
         if {$y >= [$Src len]} {
@@ -403,7 +417,9 @@ EditBuffer method undo () {
                 sets Modify <nil>;
 	    };
 	    result ::= call $Src $o;
-	    $RedoBuffer << $result;
+            if $result,0 {
+                $RedoBuffer << $result;
+            };
 	    
 	    cmd := $o,0;
             sets Modify <t>;
@@ -447,7 +463,9 @@ EditBuffer method redo () {
 	if {! [$RedoBuffer null?]} {
 	    o ::= $RedoBuffer >>;
 	    result ::= call $Src $o;
-	    $UndoBuffer << $result;
+            if $result,0 {
+                $UndoBuffer << $result;
+            };
 	    
 	    cmd := $o,0;
 	    sets Modify <t>;
@@ -526,7 +544,10 @@ EditBuffer method cut-region (sy sx ey ex) {
         };
 	str ::= [$Src copy-region $sy $sx $ey $ex] get 1;
 	result ::= $Src delete-region $sy $sx $ey $ex;
-	if $result,0 {$UndoBuffer << $result};
+	if $result,0 {
+            $UndoBuffer << $result;
+            sets RedoBuffer ();
+        };
 	return ($str $result);
     };
     return ("" (<nil> 0 0));
