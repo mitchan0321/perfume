@@ -271,7 +271,7 @@ CombiWindow method render-status-line (win buff cy cx y x buff-name) {
     };
     
     message ::=
-        "── %v%v[%v%v%v%v%v%v] <%v> %4d,%-3d %v"
+        "── %v%v[%v%v%v%v%v%v] <%v> %4d,%-3d %v %v "
         fmt
             [$buff get-encoding-digest]
             [[$buff includeCR?] ??? "d" "u"]
@@ -284,8 +284,8 @@ CombiWindow method render-status-line (win buff cy cx y x buff-name) {
             $buff-name
             $cy $cx
             $code
+            ["(" . $Mode "/" $KEYBIND_MODE ")"]
     ;;
-    $message append! [" (" . $Mode "/" $KEYBIND_MODE ") "];
     $message append! ["─" repeat [$x - [$message len]]];
     
     curs-print $StatusLineCurs $message $DISPLAY_ENCODING 0 0;
