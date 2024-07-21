@@ -293,27 +293,33 @@ CombiWindow method render-status-line (win buff cy cx y x buff-name) {
 
     b ::= $message split sep: "<" : get 0 : display-width : + 0;
     b2 ::= $message split sep: ">" : get 0 : display-width : + 1;
-    if $Activate {
-        if [get-buffer : protect?] {
+
+    cond
+        {and $Activate {get-buffer : protect?}} {
             apply-color $StatusLineCurs 0 $b $x ACTIVE_STATUS_LINE_PROTECT;
             apply-color $StatusLineCurs 0 0 $b ACTIVE_STATUS_LINE_PROTECT_2;
             if {$b2 < $x} {
                 apply-color $StatusLineCurs 0 $b2 $x ACTIVE_STATUS_LINE_PROTECT_2;
             };
-        } {
+            break;
+        }
+        $Activate {
             apply-color $StatusLineCurs 0 $b $x ACTIVE_STATUS_LINE;
             apply-color $StatusLineCurs 0 0 $b ACTIVE_STATUS_LINE_2;
             if {$b2 < $x} {
                 apply-color $StatusLineCurs 0 $b2 $x ACTIVE_STATUS_LINE_2;
             };
+            break;
         }
-    } {
-        apply-color $StatusLineCurs 0 $b $x INACTIVE_STATUS_LINE;
-        apply-color $StatusLineCurs 0 0 $b INACTIVE_STATUS_LINE_2;
-        if {$b2 < $x} {
-            apply-color $StatusLineCurs 0 $b2 $x INACTIVE_STATUS_LINE_2;
-        };
-    };
+        <t> {
+            apply-color $StatusLineCurs 0 $b $x INACTIVE_STATUS_LINE;
+            apply-color $StatusLineCurs 0 0 $b INACTIVE_STATUS_LINE_2;
+            if {$b2 < $x} {
+                apply-color $StatusLineCurs 0 $b2 $x INACTIVE_STATUS_LINE_2;
+            };
+            break;
+        }
+    ;;
 };
 
 CombiWindow method render-vertical-line () {
