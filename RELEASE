@@ -3776,4 +3776,8 @@
 		PRFM_20240714
 		1.11.0
 
+2024/0721
+	pmacs update:
+		Change status line format.
+
 #eof
