@@ -271,9 +271,7 @@ CombiWindow method render-status-line (win buff cy cx y x buff-name) {
     };
     
     message ::=
-        ### " %v%v[%v%v%v%v%v%v] (%d,%d)  <%v> {%v} %v %v"
-        ### " %v%v[%v%v%v%v%v%v] (%d,%d)  <%v> {%v} "
-        "── %v%v[%v%v%v%v%v%v] %4d,%-3d %v <%v>"
+        "── %v%v[%v%v%v%v%v%v] <%v> %4d,%-3d %v"
         fmt
             [$buff get-encoding-digest]
             [[$buff includeCR?] ??? "d" "u"]
@@ -283,21 +281,17 @@ CombiWindow method render-status-line (win buff cy cx y x buff-name) {
             [[get-region] ??? "#" " "]
             [$FreeCursor ??? "+" " "]
             [[$Parent is-interp-busy] ??? "@" " "]
+            $buff-name
             $cy $cx
             $code
-            ### $Mode
-            $buff-name
-            ### [[$buff get-path] ?? "*no file*"]
     ;;
-    b2 ::= $message display-width;
     $message append! [" (" . $Mode "/" $KEYBIND_MODE ") "];
-    ### $message append! [" (" . $KEYBIND_MODE ") "];
-    ### $message append! ["━" repeat [$x - [$message len]]];
     $message append! ["─" repeat [$x - [$message len]]];
     
     curs-print $StatusLineCurs $message $DISPLAY_ENCODING 0 0;
 
     b ::= $message split sep: "<" : get 0 : display-width : + 0;
+    b2 ::= $message split sep: ">" : get 0 : display-width : + 1;
     if $Activate {
         if [get-buffer : protect?] {
             apply-color $StatusLineCurs 0 $b $x ACTIVE_STATUS_LINE_PROTECT;
