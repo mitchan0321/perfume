@@ -926,7 +926,7 @@ Window method keyin-apply (main window keyin-list) {
         result ::= $window apply-keybind $main $window $k;
         window ::= $main get-current-window;
 
-        cond
+        cond # FALLTHRU
         $cursor-update {
             ### if do brackets-pair in background, uncomment this.
             ### REM {
@@ -1337,7 +1337,7 @@ Window method send-mouse-event () {
     ;;
     if {$button = ""} {return <nil>};
     
-    cond
+    cond # FALLTHRU
         {$event find BUTTON_CTRL}      {$button append! "_CTRL"}
         {$event find BUTTON_ALT}       {$button append! "_ALT"}
     ;;
