@@ -147,7 +147,8 @@ defun diff-heuristic () {
         [$bcost > $acost] {
 	    fixdir := a;
 	    break;
-	};
+	}
+        ;;
 
 	case $fixdir
 	b {
