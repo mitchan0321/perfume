@@ -350,7 +350,7 @@ MONO {
     set-color-name ACTIVE_VERT_LINE_HILIGHT     [WUtil color-pair BLACK   WHITE   ];
     set-color-name ACTIVE_VERT_LINE_PROTECT_HILIGHT [WUtil color-pair BLACK  WHITE];
     set-color-name INACTIVE_EDIT_BUFFER         [WUtil color-pair WHITE   BLACK   ];
-    set-color-name INACTIVE_STATUS_LINE         [WUtil color-pair WHITE   BLACK   ];
+    set-color-name INACTIVE_STATUS_LINE         [WUtil color-pair BLACK   WHITE   ];
     set-color-name INACTIVE_STATUS_LINE_2       [WUtil color-pair WHITE   BLACK   ];
     set-color-name INACTIVE_VERT_LINE           [WUtil color-pair BLACK   WHITE   ];
     set-color-name INACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair BLACK   WHITE   ];
@@ -390,7 +390,7 @@ MONO-GREEN {
     set-color-name ACTIVE_VERT_LINE_HILIGHT     [WUtil color-pair BLACK   GREEN   ];
     set-color-name ACTIVE_VERT_LINE_PROTECT_HILIGHT [WUtil color-pair BLACK  GREEN];
     set-color-name INACTIVE_EDIT_BUFFER         [WUtil color-pair GREEN   BLACK   ];
-    set-color-name INACTIVE_STATUS_LINE         [WUtil color-pair GREEN   BLACK   ];
+    set-color-name INACTIVE_STATUS_LINE         [WUtil color-pair BLACK   GREEN   ];
     set-color-name INACTIVE_STATUS_LINE_2       [WUtil color-pair GREEN   BLACK   ];
     set-color-name INACTIVE_VERT_LINE           [WUtil color-pair BLACK   GREEN   ];
     set-color-name INACTIVE_VERT_LINE_HILIGHT   [WUtil color-pair BLACK   GREEN   ];
