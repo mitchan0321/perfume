@@ -1,0 +1,39 @@
+#!/usr/local/bin/perfumesh
+
+set (k a b a1 b1) (2 4 1 12 4);
+
+loop {
+    # Next approximation
+    cond
+        [$k * $k]      {| p |}
+        [2 * $k : + 1] {| q |}
+        [$k + 1]       {| k |}
+    ;;
+    
+    cond 
+        $a1                      {| a |}
+        $b1                      {| b |}
+        [[$p * $a] + [$q * $a1]] {| a1 |}
+        [[$p * $b] + [$q * $b1]] {| b1 |}
+    ;;
+
+    # Print common digits
+    cond
+        [$a / $b]   {| d |}
+        [$a1 / $b1] {| d1 |}
+    ;;
+    
+    while {$d = $d1} do: {
+        print file: $stdout $d;
+        $stdout flush;
+        cond 
+            [10 * [$a % $b]]   {| a |}
+            [10 * [$a1 % $b1]] {| a1 |}
+        ;;
+        
+        cond
+            [$a / $b]   {| d |}
+            [$a1 / $b1] {| d1 |}
+        ;;
+    };
+};
