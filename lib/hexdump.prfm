@@ -28,18 +28,18 @@ begin {
         set eof <nil>;
         set p 0;
         while {false? eof} do: {
-            [1 .. 16 do: {| i | symbol ["c%d" fmt $i]}] := [1 .. 16 do: {$b get}];
+            (c1 c2 c3 c4 c5 c6 c7 c8 c9 c10 c11 c12 c13 c14 c15 c16) := [1 .. 16 do: {$b get}];
 
 	    d := "";
-	    1 each to: 16 do: {| i |
-                s ::= symbol ["c%d" fmt $i];
-                if {nil? [set $s]} {
-		    $d append! " ";
-	            set $s "  ";
-	            set eof <t>;
+            (c1 c2 c3 c4 c5 c6 c7 c8 c9 c10 c11 c12 c13 c14 c15 c16) each do: {| i |
+                s ::= set $i;
+                if $s {
+		    $d append! [$HexChar get $s];
+		    set $i ["%02x" fmt $s];
                 } {
-		    $d append! [$HexChar get [set $s]];
-		    set $s ["%02x" fmt [set $s]];
+		    $d append! " ";
+	            set $i "  ";
+	            set eof <t>;
                 };
 	    };
             println ["%08d  %v %v %v %v %v %v %v %v  %v %v %v %v %v %v %v %v  %v" fmt
