@@ -42,7 +42,7 @@ begin {
 	            set eof <t>;
                 };
 	    };
-            println ["%08d  %v %v %v %v %v %v %v %v  %v %v %v %v %v %v %v %v  %v" fmt
+            println ["%08d  %v %v %v %v %v %v %v %v  %v %v %v %v %v %v %v %v | %v" fmt
                 $p $c1 $c2 $c3 $c4 $c5 $c6 $c7 $c8 $c9 $c10 $c11 $c12 $c13 $c14 $c15 $c16 $d];
 	    $p ++ 16;
         };
