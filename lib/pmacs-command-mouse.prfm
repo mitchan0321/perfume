@@ -147,7 +147,7 @@ defcommand mouse-buffer-click-link desc: "Mouse click open buffer." {
         $window cursor-move-to $geom $ey $ex;
         $window end-region;
         $main set-last-mouse-event $window $y $x;
-        return NONE;
+        return SELF;
     };
     $window apply-command $main $window "" jump-to-buffer;
     $window end-region;
@@ -168,7 +168,7 @@ defcommand mouse-buffer-click-next-window desc: "Mouse click open buffer at next
         $window cursor-move-to $geom $ey $ex;
         $window end-region;
         $main set-last-mouse-event $window $y $x;
-        return NONE;
+        return SELF;
     };
     $window apply-command $main $window "" buffer-list-open-next-window;
     $window end-region;
@@ -189,7 +189,7 @@ defcommand mouse-buffer-click-previous-window desc: "Mouse click open buffer at 
         $window cursor-move-to $geom $ey $ex;
         $window end-region;
         $main set-last-mouse-event $window $y $x;
-        return NONE;
+        return SELF;
     };
     $window apply-command $main $window "" buffer-list-open-previous-window;
     $window end-region;
@@ -210,7 +210,7 @@ defcommand mouse-dired-click-link desc: "Mouse click open file dired." {
         $window cursor-move-to $geom $ey $ex;
         $window end-region;
         $main set-last-mouse-event $window $y $x;
-        return NONE;
+        return SELF;
     };
     $window apply-command $main $window "" dired-open;
     $window end-region;
@@ -231,7 +231,7 @@ defcommand mouse-dired-click-next-window desc: "Mouse click open file at next wi
         $window cursor-move-to $geom $ey $ex;
         $window end-region;
         $main set-last-mouse-event $window $y $x;
-        return NONE;
+        return SELF;
     };
     $window apply-command $main $window "" dired-open-next-window;
     $window end-region;
@@ -252,7 +252,7 @@ defcommand mouse-dired-click-previous-window desc: "Mouse click open file at pre
         $window cursor-move-to $geom $ey $ex;
         $window end-region;
         $main set-last-mouse-event $window $y $x;
-        return NONE;
+        return SELF;
     };
     $window apply-command $main $window "" dired-open-previous-window;
     $window end-region;
