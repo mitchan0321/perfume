@@ -1606,3 +1606,15 @@ CombiWindow method set-buffer-tab-width () {
         sets DEFAULT_TAB_WIDTH $width;
     };
 };
+
+CombiWindow method apply-mouse-event (main y x) {
+    buff ::= get-buffer;
+    geom ::= get-geom;
+    $geom set! CursorLine $y;
+    $geom set! IndexColumn.SAVE [$geom,ViewColumn + $x];
+    (sy sx) ::= get-source-index $buff $geom;
+    cursor-move-to $geom $sy $sx;
+    $main set-last-mouse-event [self] $sy $sx;
+
+    return ($sy $sx);
+};

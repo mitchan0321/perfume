@@ -1344,9 +1344,23 @@ Window method send-mouse-event () {
     
     if {$button != ""} {
         send-key-event ([symbol $button]);
+        sets MouseEvent ([symbol $button]);
         return $button;
     };
 
     return <nil>;
 };
+
+Window method apply-mouse-event (window) {
+    (ev y x) ::= get-mouse-event;
+    $ev ?? {return (<nil> 0 0)};
+    
+    (sy sx) ::= $window apply-mouse-event [self] $y $x;
+    sets MouseEvent <nil>;
+    sets MouseEvent_y 0;
+    sets MouseEvent_x 0;
+    
+    return ($ev $sy $sx);
+};
+
 }; ### end mouse

@@ -24,17 +24,10 @@ defcommand mouse-smooth-scroll-down desc: "Mouse wheel down." {
 
 defcommand mouse-point desc: "Move cursor to mouse click point." {
     | main window |
-    (ev y x) ::= $main get-mouse-event;
+    (ev y x) ::= $main apply-mouse-event $window;
     $ev ?? {return SELF};
     
-    buff ::= $window get-buffer;
-    geom ::= $window get-geom;
-    $geom set! CursorLine $y;
-    $geom set! IndexColumn.SAVE [$geom,ViewColumn + $x];
-    (sy sx) ::= $window get-source-index $buff $geom;
-    $window cursor-move-to $geom $sy $sx;
     $window end-region;
-    $main set-last-mouse-event $window $y $x;
 
     result ALL;
 };
@@ -44,40 +37,31 @@ defcommand mouse-point-region desc: "Move cursor and select region." {
     
     (lwin ly lx) ::= $main get-last-mouse-event;
     if {eq? $window $lwin} else: {return SELF};
-    (ev y x) ::= $main get-mouse-event;
-    if {and {$ly = $y} {$lx = $x}} then: {return SELF};
-    
-    [$window get-region] ?? {
-	$window end-region;
+
+    if [$window get-region] else: {
+        $window apply-command $main $window "" start-region;
     };
-    $window apply-command $main $window "" start-region;
-    
-    buff ::= $window get-buffer;
-    geom ::= $window get-geom;
-    $geom set! CursorLine $y;
-    $geom set! IndexColumn.SAVE [$geom,ViewColumn + $x];
-    (sy sx) ::= $window get-source-index $buff $geom;
-    $window cursor-move-to $geom $sy $sx;
-    $main set-last-mouse-event <nil> 0 0;
+    (ev y x) ::= $main apply-mouse-event $window;
+    $ev ?? {return SELF};
+
+    if {and {$ly = $y} {$lx = $x}} then: {
+        [$window get-region] ?? {
+            $window end-region;
+        };
+        return SELF
+    };
     
     result ALL;
 };
 
 defcommand mouse-point-region-append desc: "Mouse move region end point." {
     | main window |
-    (ev y x) ::= $main get-mouse-event;
-    $ev ?? {return SELF};
-
     if [$window get-region] else: {
         $window apply-command $main $window "" start-region;
     };
-    
-    buff ::= $window get-buffer;
-    geom ::= $window get-geom;
-    $geom set! CursorLine $y;
-    $geom set! IndexColumn.SAVE [$geom,ViewColumn + $x];
-    (sy sx) ::= $window get-source-index $buff $geom;
-    $window cursor-move-to $geom $sy $sx;
+
+    (ev y x) ::= $main apply-mouse-event $window;
+    $ev ?? {return SELF};
 
     result ALL;
 };
@@ -96,40 +80,28 @@ defcommand mouse-cut-or-paste desc: "Mouse region cut or paste to buffer." {
 
 defcommand mouse-pwiki-click-link desc: "Mouse click open PWiki document." {
     | main window |
+    (ev y x) ::= $main apply-mouse-event $window;
+    $ev ?? {return SELF};
+
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
-    (ev y x) ::= $main get-mouse-event;
-    $geom set! CursorLine $y;
-    $geom set! IndexColumn.SAVE [$geom,ViewColumn + $x];
-    (ey ex) ::= $window get-source-index $buff $geom;
-    sts ::= pwiki-open-link $main $window $buff $geom $ey $ex;
+    sts ::= pwiki-open-link $main $window $buff $geom $y $x;
     if $sts {
         $window end-region;
-        $main set-last-mouse-event <nil> 0 0;
-    } {
-        $window cursor-move-to $geom $ey $ex;
-        $window end-region;
-        $main set-last-mouse-event $window $y $x;
     };
     return ALL;
 };
 
 defcommand mouse-man-click-link desc: "Mouse click open man document." {
     | main window |
+    (ev y x) ::= $main apply-mouse-event $window;
+    $ev ?? {return SELF};
+
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
-    (ev y x) ::= $main get-mouse-event;
-    $geom set! CursorLine $y;
-    $geom set! IndexColumn.SAVE [$geom,ViewColumn + $x];
-    (ey ex) ::= $window get-source-index $buff $geom;
-    sts ::= man-open-link $main $window $buff $geom $ey $ex;
+    sts ::= man-open-link $main $window $buff $geom $y $x;
     if $sts  {
         $window end-region;
-        $main set-last-mouse-event <nil> 0 0;
-    } {
-        $window cursor-move-to $geom $ey $ex;
-        $window end-region;
-        $main set-last-mouse-event $window $y $x;
     };
     result ALL;
 };
@@ -138,20 +110,16 @@ defcommand mouse-buffer-click-link desc: "Mouse click open buffer." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
-    (ev y x) ::= $main get-mouse-event;
-    $geom set! CursorLine $y;
-    $geom set! IndexColumn.SAVE [$geom,ViewColumn + $x];
-    (ey ex) ::= $window get-source-index $buff $geom;
+    (ev ey ex) ::= $main apply-mouse-event $window;
+    $ev ?? {return SELF};
+    
     str ::= cursor-on-search-regex $ey $ex $BUFFER_LINK $buff;
     $str ?? {
-        $window cursor-move-to $geom $ey $ex;
         $window end-region;
-        $main set-last-mouse-event $window $y $x;
         return SELF;
     };
     $window apply-command $main $window "" jump-to-buffer;
     $window end-region;
-    $main set-last-mouse-event <nil> 0 0;
     result ALL;
 };
 
@@ -159,20 +127,16 @@ defcommand mouse-buffer-click-next-window desc: "Mouse click open buffer at next
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
-    (ev y x) ::= $main get-mouse-event;
-    $geom set! CursorLine $y;
-    $geom set! IndexColumn.SAVE [$geom,ViewColumn + $x];
-    (ey ex) ::= $window get-source-index $buff $geom;
+    (ev ey ex) ::= $main apply-mouse-event $window;
+    $ev ?? {return SELF};
+
     str ::= cursor-on-search-regex $ey $ex $BUFFER_LINK $buff;
     $str ?? {
-        $window cursor-move-to $geom $ey $ex;
         $window end-region;
-        $main set-last-mouse-event $window $y $x;
         return SELF;
     };
     $window apply-command $main $window "" buffer-list-open-next-window;
     $window end-region;
-    $main set-last-mouse-event <nil> 0 0;
     result ALL;
 };
 
@@ -180,20 +144,16 @@ defcommand mouse-buffer-click-previous-window desc: "Mouse click open buffer at 
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
-    (ev y x) ::= $main get-mouse-event;
-    $geom set! CursorLine $y;
-    $geom set! IndexColumn.SAVE [$geom,ViewColumn + $x];
-    (ey ex) ::= $window get-source-index $buff $geom;
+    (ev ey ex) ::= $main apply-mouse-event $window;
+    $ev ?? {return SELF};
+
     str ::= cursor-on-search-regex $ey $ex $BUFFER_LINK $buff;
     $str ?? {
-        $window cursor-move-to $geom $ey $ex;
         $window end-region;
-        $main set-last-mouse-event $window $y $x;
         return SELF;
     };
     $window apply-command $main $window "" buffer-list-open-previous-window;
     $window end-region;
-    $main set-last-mouse-event <nil> 0 0;
     result ALL;
 };
 
@@ -201,20 +161,16 @@ defcommand mouse-dired-click-link desc: "Mouse click open file dired." {
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
-    (ev y x) ::= $main get-mouse-event;
-    $geom set! CursorLine $y;
-    $geom set! IndexColumn.SAVE [$geom,ViewColumn + $x];
-    (ey ex) ::= $window get-source-index $buff $geom;
+    (ev ey ex) ::= $main apply-mouse-event $window;
+    $ev ?? {return SELF};
+
     str ::= cursor-on-search-regex $ey $ex $DIRED_FILE_LINK $buff;
     $str ?? {
-        $window cursor-move-to $geom $ey $ex;
         $window end-region;
-        $main set-last-mouse-event $window $y $x;
         return SELF;
     };
     $window apply-command $main $window "" dired-open;
     $window end-region;
-    $main set-last-mouse-event <nil> 0 0;
     result ALL;
 };
 
@@ -222,20 +178,16 @@ defcommand mouse-dired-click-next-window desc: "Mouse click open file at next wi
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
-    (ev y x) ::= $main get-mouse-event;
-    $geom set! CursorLine $y;
-    $geom set! IndexColumn.SAVE [$geom,ViewColumn + $x];
-    (ey ex) ::= $window get-source-index $buff $geom;
+    (ev ey ex) ::= $main apply-mouse-event $window;
+    $ev ?? {return SELF};
+
     str ::= cursor-on-search-regex $ey $ex $DIRED_FILE_LINK $buff;
     $str ?? {
-        $window cursor-move-to $geom $ey $ex;
         $window end-region;
-        $main set-last-mouse-event $window $y $x;
         return SELF;
     };
     $window apply-command $main $window "" dired-open-next-window;
     $window end-region;
-    $main set-last-mouse-event <nil> 0 0;
     result ALL;
 };
 
@@ -243,20 +195,16 @@ defcommand mouse-dired-click-previous-window desc: "Mouse click open file at pre
     | main window |
     buff ::= $window get-buffer;
     geom ::= $window get-geom;
-    (ev y x) ::= $main get-mouse-event;
-    $geom set! CursorLine $y;
-    $geom set! IndexColumn.SAVE [$geom,ViewColumn + $x];
-    (ey ex) ::= $window get-source-index $buff $geom;
+    (ev ey ex) ::= $main apply-mouse-event $window;
+    $ev ?? {return SELF};
+
     str ::= cursor-on-search-regex $ey $ex $DIRED_FILE_LINK $buff;
     $str ?? {
-        $window cursor-move-to $geom $ey $ex;
         $window end-region;
-        $main set-last-mouse-event $window $y $x;
         return SELF;
     };
     $window apply-command $main $window "" dired-open-previous-window;
     $window end-region;
-    $main set-last-mouse-event <nil> 0 0;
     result ALL;
 };
 
