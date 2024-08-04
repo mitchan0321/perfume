@@ -416,6 +416,15 @@ toy_parse_rquote(Bulk *src, wchar_t endc) {
 	    c = bulk_getchar(src);
 	    if (EOF == c) goto parse_error;
 	    switch (c) {
+	    case L't':
+		c = L'\t';
+		break;
+	    case L'r':
+		c = L'\r';
+		break;
+	    case L'n':
+		c = L'\n';
+		break;
 	    case L'\\':
 		c = L'\\';
 		break;
