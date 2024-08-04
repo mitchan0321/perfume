@@ -3784,4 +3784,8 @@
 	pmacs update:
 		Change string leteral regexp at Interp/C/Java/Prfm mode.
 
+2024/08/05
+	parser.c
+		Add RQUOTE parse escape character '\t', '\n' and '\r'.
+
 #eof
