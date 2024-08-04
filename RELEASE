@@ -3776,8 +3776,12 @@
 		PRFM_20240714
 		1.11.0
 
-2024/0721
+2024/07/21
 	pmacs update:
 		Change status line format.
+
+2024/08/04
+	pmacs update:
+		Change string leteral regexp at Interp/C/Java/Prfm mode.
 
 #eof

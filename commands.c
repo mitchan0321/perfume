@@ -778,7 +778,7 @@ cmd_if(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     
 error:
     return new_exception(TE_SYNTAX,
-L"Syntax error at 'if', \n\
+                         L"Syntax error at 'if', \n\
 syntax(1): if cond [then: then-body] [else: else-body]\n\
 syntax(2): if cond [then-body] [else-body]\n\
 	cond:		{cond-block} or value\n\
@@ -2085,7 +2085,7 @@ cmd_file(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
             sts = lstat(fnames, &fstat);
         }
 	if (-1 == sts) {
-	    return new_exception(TE_FILEACCESS, L"file stat can\'t get.", interp); // '
+	    return new_exception(TE_FILEACCESS, L"file stat can\'t get.", interp);
 	}
 	l = result = new_list(NULL);
 	
@@ -3713,7 +3713,7 @@ cmd_coro(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 
     result = new_coroutine(interp, closure);
     if (NULL == result) {
-	return new_exception(TE_COROUTINE, L"Can\'t create co-routine.", interp);
+        return new_exception(TE_COROUTINE, L"Can't create co-routine.", interp);
     }
 
     return result;
