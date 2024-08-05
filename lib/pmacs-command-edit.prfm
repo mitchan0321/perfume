@@ -131,6 +131,7 @@ defcommand start-region desc: "Start region select at cursor point." {
 defcommand exchange-region desc: "Exchange region current to start point." {
     | main window |
     $window exchange-region;
+    result SELF;
 };
 
 defcommand copy-region desc: "Copy selected region characters to copy buffer." {
