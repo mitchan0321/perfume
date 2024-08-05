@@ -287,7 +287,7 @@ CombiWindow method render-status-line (win buff cy cx y x buff-name) {
             $Mode
             $KEYBIND_MODE
     ;;
-    $message append! ["─" repeat [$x - [$message len]]];
+    $message append! ["─" repeat [$x - [$message display-width]]];
     
     curs-print $StatusLineCurs $message $DISPLAY_ENCODING 0 0;
 
