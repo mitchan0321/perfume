@@ -3787,5 +3787,7 @@
 2024/08/05
 	parser.c
 		Add RQUOTE parse escape character '\t', '\n' and '\r'.
+	pmacs update:
+		Fix exchange-region.
 
 #eof
