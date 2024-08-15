@@ -869,6 +869,7 @@ error:
 error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
 }
+
 Toy_Type*
 mth_integer_lror(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *self, *arg;
