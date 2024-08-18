@@ -72,6 +72,7 @@ defcommand all-command-list desc: "Display all editor commands." {
     $buff append-string ["%v <- %v" fmt "Command" "Key bindings"];
     $buff append-string "  Description";
     $buff append-string ["%v" fmt ["-" repeat [38 * 2]]];
+    c := 0;
     msort [$EditorCommand keys :string] : each do: {| i |
         if {"" . $i : at 0 : = "."} {continue};
         binds ::= get-keybind-string $window $i;
@@ -80,8 +81,11 @@ defcommand all-command-list desc: "Display all editor commands." {
         } {
             $buff append-string ["%v" fmt ["[[" . $i "]]"]];
         };
-        $buff append-string ["  " . [get-command-desc $i]];
+        $buff append-string ["  " . [get-command-desc $i]];\
+        $buff append-string "";
+        $c ++;
     };
+    $buff append-string ["Total %v commands." fmt $c];
     $buff no-modify;
     $buff set-protect;
     
@@ -1066,8 +1070,7 @@ defcommand list-config desc: "Display configuration list." {
             [$CONFIG_RO,$i ??? "RO" "  "]
             [$CONFIG_DESC,$i ?? ""]
         ];
-        ### $buff append-string "";
-        ;;
+        $buff append-string "";
     };
     $buff no-modify;
     $buff set-protect;
