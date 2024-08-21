@@ -300,6 +300,29 @@ defcommand bottom-of-buffer desc: "Move cursor to bottom of buffer." {
     result SELF;
 };
 
+defcommand bottom-of-buffer-no-mark desc: "Move cursor to bottom of buffer no mark." {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    (y x) ::= $window get-screen-size;
+    buff-len ::= $buff get-buffer-length;
+
+    $window set-freecursor <nil>;
+    $geom set! ViewLine 0;
+    $geom set! ViewColumn 0;
+    $geom set! CursorLine 0;
+    $geom set! CursorColumn 0;
+    $geom set! IndexColumn.SAVE 0;
+    if {$buff-len < $y} {
+	$geom set! CursorLine $buff-len;
+    } {
+	$geom set! ViewLine [$buff-len - $y : + 1];
+	$geom set! CursorLine [$y - 1];
+    };
+    
+    result SELF;
+};
+
 defcommand fit-to-top desc: "Move current cursor position fit to window top edge and scroll up." {
     | main window |
     $window cursor-fit-to-top [$window get-geom];
