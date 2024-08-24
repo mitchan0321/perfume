@@ -952,13 +952,10 @@ CombiWindow method display-evaluation () {
 	$stderr clear;
 
 	if $update-display {
-            ### apply-command $MainWindow [self] "" bottom-of-buffer;
             cursor-move-to $geom [$buff get-buffer-length] 0;
-	    render;
-	    refresh;
+            $MainWindow render-all;
 	    set-cursor;
 	};
-	### if $update-display {apply-command $MainWindow [self] "" start-region};
     } {
 	show-message "Evaled. See \'*Scratch*\' buffer.";
     };
