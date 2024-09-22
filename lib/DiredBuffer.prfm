@@ -66,7 +66,7 @@ DiredBuffer method update () {
     } catch: {
         append-string ["<<< " . [get-content] " >>>"];
         append-string "";
-        append-string "!!! Sorry, can't get file list. !!!"; #'
+        append-string "!!! Sorry, can't get file list. !!!";
         set-protect;
         sets Modify <nil>;
         return;
@@ -165,7 +165,7 @@ DiredBuffer method update () {
         };
     } catch: {
         append-string "";
-        append-string "!!! Sorry, can't filter, may be bad regex. !!!"; #'
+        append-string "!!! Sorry, can't filter, may be bad regex. !!!";
     };
 
     set-protect;
