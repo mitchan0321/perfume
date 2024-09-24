@@ -24,7 +24,8 @@ new Task : proc move-message {
                 message ::= $message sub 1;
             };
         };
-        SysCall sleep 10;
+        SysCall update-screen;
+        SysCall sleep 50;
     };
     SysCall apply-editor {
         show-message "Done.";
