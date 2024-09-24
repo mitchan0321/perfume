@@ -3801,4 +3801,8 @@
 		PRFM_20240815
 		1.11.1
 
+2024/09/24
+	pmacs update:
+		Add display task start message to *Console* buffer.
+
 #eof
