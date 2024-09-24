@@ -51,11 +51,13 @@ TaskManager method add (task name) {
     $in set-comode;
     $in set-tag STDIN;
     (__in __out __err) ::= $task get-stdio;
-    call $task (set-stdio 
-                [$__in ??? <nil> $in] 
-                [$__out ??? <nil> $Task_stdout] 
-                [$__err ??? <nil> $Task_stdout]
+    call $task (
+        set-stdio
+        [$__in ??? <nil> $in]
+        [$__out ??? <nil> $Task_stdout]
+        [$__err ??? <nil> $Task_stdout]
     );
+    output-console [">>>Task [" . $sname "] start"];
     return $sname;
 };
 
