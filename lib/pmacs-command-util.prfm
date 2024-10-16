@@ -81,7 +81,7 @@ defcommand all-command-list desc: "Display all editor commands." {
         } {
             $buff append-string ["%v" fmt ["[[" . $i "]]"]];
         };
-        $buff append-string ["  " . [get-command-desc $i]];\
+        $buff append-string ["  " . [get-command-desc $i]];
         $buff append-string "";
         $c ++;
     };
