@@ -3805,4 +3805,8 @@
 	pmacs update:
 		Add display task start message to *Console* buffer.
 
+2024/10/30
+	pmacs update:
+		Add keybind [F10] -> buffer-list.
+
 #eof
