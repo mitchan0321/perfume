@@ -4,10 +4,10 @@ defun slist (all: all wide: wide) {
     set l [stack-list];
     println "Number of slot: " [$l car];
 
-    println ["%3v %-1!v %-12v %-12v %-12v %-12v %-1v %6v %-v" fmt
+    println ["%3v %-1!v %-16v %-16v %-16v %-16v %-1v %6v %-v" fmt
 	     "#" "S" "Top" "Barrier" "Safe" "Bottom" "E" "Avail" "Script"];
-    println ["%3v %-1!v %-12v %-12v %-12v %-12v %-1v %6v %-v" fmt
-	     "===" "==" "============" "============" "============" "============" "=" "======" "======"];
+    println ["%3v %-1!v %-16v %-16v %-16v %-16v %-1v %6v %-v" fmt
+	     "===" "==" "================" "================" "================" "================" "=" "======" "======"];
 
     if {! [set? all]} then: {
 	set ll [$l,1 filter {| i | ! [eq? $i,1 FREE]}];
@@ -16,7 +16,7 @@ defun slist (all: all wide: wide) {
     };
 
     $ll each do: {| f |
-	println ["%3d %-1!v %012x %012x %012x %012x %1d %6d %-v" fmt
+	println ["%3d %-1!v %016x %016x %016x %016x %1d %6d %-v" fmt
 		 $f,0
 		 $f,1
 		 $f,2
