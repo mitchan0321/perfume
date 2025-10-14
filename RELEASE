@@ -3809,4 +3809,14 @@
 	pmacs update:
 		Add keybind [F10] -> buffer-list.
 
+2025/09/01
+	lib/String.prfm
+		Add syntax String::replace
+			String replace [:all] 'pattern' {| e | replace-body}
+		The matched pattern is replaced by the result of processing by replace-body, 
+		e is the part of matched string.
+	pmacs update:
+		Add editor command decode-uquoted-encoding is replace some \uXXXX style strings
+		to UTF-8 string.
+
 #eof
