@@ -414,7 +414,7 @@ wchar_t*	toy_get_type_str(Toy_Type *obj);
 wchar_t*	to_string(Toy_Type *obj);
 wchar_t*	to_print(Toy_Type *obj);
 
-#define	list_next(l)		(((l)==NULL) ? NULL : ((GET_TAG((l))==LIST) ? (l)->u.list.nextp : NULL))
+#define list_next(l)		(((l)==NULL) ? NULL : ((GET_TAG((l))==LIST) ? (l)->u.list.nextp : NULL))
 #define list_get_item(l)	(((l)==NULL) ? NULL : ((GET_TAG((l))==LIST) ? (l)->u.list.item : NULL))
 #define list_set_car(l,v)	(((l)==NULL) ? NULL : ((GET_TAG((l))==LIST) ? (l)->u.list.item=v : NULL))
 #define list_set_cdr(l,v)	(((l)==NULL) ? NULL : ((GET_TAG((l))==LIST) ? (l)->u.list.nextp=v : NULL))
