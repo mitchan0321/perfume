@@ -1584,3 +1584,16 @@ defcommand send-to-task desc: "Send input line to Task's common Stream." {
     TaskManager send-to-task $str;
     result SELF;
 };
+
+defcommand decode-uquoted-encoding desc: "Decode unicode quoted encoding (ex: \\uxxxx) in buffe." {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    src ::= $buff get-vector;
+    0 each to: [$src len : - 1] do: {| i |
+        l ::= $src get $i;
+        l ::= $l replace :all '\\\\[uU][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]' {| c | "" uimport! (["0x" . [$c sub 2] : int])};
+        $buff line-update $l $i;
+    };
+    result SELF;
+};
