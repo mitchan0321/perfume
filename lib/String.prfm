@@ -102,7 +102,12 @@ String method replace (all: all pattern replace-string) {
     [$r reverse] each do: {| i |
 	(start end match) := $i;
 	$l << [$remain sub $end];
-	$l << $replace-string;
+        if {block? $replace-string} {
+            $l << [yield $replace-string [$remain sub $start $end]];
+        } {
+            $l << $replace-string;
+        };
+        
 	remain ::= $remain sub 0 $start;
     };
     $l << $remain;
