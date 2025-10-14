@@ -56,7 +56,7 @@ EVAL_STAT = no
 ### If you specified NO_LAZY_CALL=yes, the lazy call mechanism when calling a function is omitted.
 NO_LAZY_CALL = no
 
-### If you use to co-routine library 'coru' set yes, if use 'pcl' set otherwise.
+### If you use to co-routine library 'coru' set yes, if use 'pcl' set no.
 CORU_USE = yes
 
 ### If you use mouse on pmacs text editor.
