@@ -1,0 +1,15 @@
+#
+# Bool util method
+#
+
+Bool method get (args: x) {
+    if [self] {
+        return <t>;
+    } {
+        return <nil>;
+    };
+};
+
+Bool method len () {
+    return 1;
+};
