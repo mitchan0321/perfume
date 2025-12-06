@@ -40,6 +40,7 @@ void def_global() {
     const_gets = new_symbol(L"gets");
     const_puts = new_symbol(L"puts");
     const_atname = new_symbol(L"@name");
+    const_self = new_symbol(L"Self");
     const_atstacktrace = new_symbol(L"@stack-trace");
     const_SIGHUP = new_symbol(L"SIGHUP");
     const_SIGINT = new_symbol(L"SIGINT");

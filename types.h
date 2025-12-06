@@ -377,11 +377,13 @@ Toy_Type*	list_append(Toy_Type *list, Toy_Type *item);
 Toy_Type*	list_next(Toy_Type *list);
 Toy_Type*	list_get_item(Toy_Type *list);
 int		list_length(Toy_Type *list);
+Toy_Type*	list_get(Toy_Type *list, int pos);
 Toy_Type*	new_integer(mpz_t biginteger);
 Toy_Type*	new_integer_si(long int integer);
 Toy_Type*	new_integer_ullsi(unsigned long long integer);
 Toy_Type*	new_integer_d(double val);
 wchar_t*	integer_to_str(Toy_Type *val);
+wchar_t*	integer_to_str_base(Toy_Type *val, int base);
 Toy_Type*	new_real(double real);
 Toy_Type*	new_string_str(wchar_t *string);
 Toy_Type*	new_string_cell(Cell *string);
@@ -415,7 +417,7 @@ wchar_t*	to_string(Toy_Type *obj);
 wchar_t*	to_print(Toy_Type *obj);
 
 #define list_next(l)		(((l)==NULL) ? NULL : ((GET_TAG((l))==LIST) ? (l)->u.list.nextp : NULL))
-#define list_get_item(l)	(((l)==NULL) ? NULL : ((GET_TAG((l))==LIST) ? (l)->u.list.item : NULL))
+#define list_get_item(l)	(((l)==NULL) ? NULL : ((GET_TAG((l))==LIST) ? (l)->u.list.item : l))
 #define list_set_car(l,v)	(((l)==NULL) ? NULL : ((GET_TAG((l))==LIST) ? (l)->u.list.item=v : NULL))
 #define list_set_cdr(l,v)	(((l)==NULL) ? NULL : ((GET_TAG((l))==LIST) ? (l)->u.list.nextp=v : NULL))
 

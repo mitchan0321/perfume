@@ -107,17 +107,22 @@ new_integer_d(double val) {
 
 wchar_t*
 integer_to_str(Toy_Type *val) {
+    return integer_to_str_base(val, 10);
+}
+
+wchar_t*
+integer_to_str_base(Toy_Type *val, int base) {
     char *cbuff;
     int size;
 
     if (GET_TAG(val) != INTEGER) return NULL;
-    size = mpz_sizeinbase(val->u.biginteger, 10);
+    size = mpz_sizeinbase(val->u.biginteger, base);
     if (mpz_cmp_si(val->u.biginteger, 0) < 0) {
 	size ++;
     }
     cbuff = GC_MALLOC(size + 1);
     ALLOC_SAFE(cbuff);
-    mpz_get_str(cbuff, 10, val->u.biginteger);
+    mpz_get_str(cbuff, base, val->u.biginteger);
     cbuff[size] = 0;
 
     return to_wchar(cbuff);
@@ -244,6 +249,7 @@ new_object(wchar_t *name, struct _hash* slots, Toy_Type *delegate_list) {
     o->u.object.slots = slots;
     o->u.object.delegate_list = delegate_list;
     hash_set_t(slots, const_atname, new_symbol(name));
+    hash_set_t(slots, const_self, o);
     return o;
 }
 
