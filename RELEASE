@@ -2741,7 +2741,7 @@
 2022/10/25
 	pmacs update:
 		Fix dired-delete-dir prompt spell miss.
-		Add macOS support from https://github.com/shugo.
+		Add macOS support from [[@https://github.com/shugo]].
 	tag:
 		PRFM_20221025
 		1.6.3
@@ -2749,7 +2749,7 @@
 2022/10/27
 	*
 		Add support another co-routine library 'coru'. If use to coru, try define "CORU_USE = yes" in Makefile.
-		  --> See: https://github.com/geky/coru
+		  --> See: [[@https://github.com/geky/coru]]
 	commands.c
 		Add support __APPLE__ for file stat|rstat command.
 
@@ -3818,5 +3818,33 @@
 	pmacs update:
 		Add editor command decode-uquoted-encoding is replace some \uXXXX style strings
 		to UTF-8 string.
+
+2025/12/06
+	doc/intro.txt
+		Add introduction text.
+	commands.c
+		new command accept object argument. The method deliver to specified class or object.
+		  syntax: new [class-name | object]
+	types.[ch], global.[ch]
+		Add 'Self' instance variable to new any object.
+		Add integer_to_str_base utility function.
+	list.c
+		Add list_get method.
+	methods.c
+		Add Integer::string-base for convert integer to string with specified N-base.
+		Add String::int-base for convert string to integer with specified N-base.
+		Fix List::get if has dot pair.
+		Add String::get like Stiring::at but difficult return <nil> if out of index.
+	parser.c
+		Fix toy_parse_getmacro becomes to nest get macros. (ex) $o,1,2 -> [[$o get 1] get 2]
+	lib/Integer.prfm, Real.prfm, util.prfm
+		Add new file and add new methods Integer::len, Integer::get, Real::len, Real::get.
+	lib/Mode-C.key, Mode-Java.key
+		Fix sigle quote literal hilight regexp.
+	lib/Mode-Text.key
+		Add pwiki link hilight and pwiki-click-link command.
+	pmacs update:
+		Change input-character-code command, if input TAB key then input TAB code to buffer.
+		Change goto command key binding CTRL_G -> Alt_g
 
 #eof
