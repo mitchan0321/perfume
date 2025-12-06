@@ -14,7 +14,7 @@
 #define ishexnumber(x)	(((x>=L'0')&&(x<=L'9'))||((x>=L'a')&&(x<=L'f'))||((x>=L'A')&&(x<=L'F')))
 #endif /* ishexnumber */
 
-static Toy_Type* toy_parse_getmacro(Toy_Type *statement);
+static Toy_Type* toy_parse_getmacro(Toy_Type *statement, int line);
 static Toy_Type* toy_parse_initmacro(Toy_Type *statement);
 static Toy_Type* toy_parse_join_statement(Toy_Type *statement, int line);
 static Toy_Type* toy_parse_setmacro(Toy_Type *statement, int line);
@@ -87,7 +87,7 @@ toy_parse_script(Bulk *src, wchar_t endc) {
 
 	/* apply macros */
 	statement->u.statement_list = 
-	    toy_parse_getmacro(statement->u.statement_list);
+	    toy_parse_getmacro(statement->u.statement_list, bulk_get_line(src));
 
 	statement->u.statement_list = 
 	    toy_parse_initmacro(statement->u.statement_list);
@@ -907,6 +907,72 @@ print_list(Toy_Type *l, int indent) {
 /** end debug **/
 
 static Toy_Type*
+toy_parse_getmacro(Toy_Type *statement, int line) {
+    int i, len, cindex;
+    Toy_Type *item;
+    Toy_Type *l, *result, *getl;
+    
+    result = l = new_list(NULL);
+    
+    while (statement) {
+        if (GET_TAG(statement) != LIST) {
+            list_set_cdr(l, statement);
+            break;
+        }
+        item = list_get_item(statement);
+        if (GET_TAG(item) == LIST) {
+            l = list_append(l, toy_parse_getmacro(item, line));
+        } else {
+            l = list_append(l, item);
+        }
+        statement = list_next(statement);
+    }
+    statement = result;
+    
+    len = list_length(statement);
+    cindex = -1;
+    for (i=0; i<len; i++) {
+        item = list_get(statement, i);
+	if ((GET_TAG(item) == SYMBOL) &&
+            wcscmp(cell_get_addr(item->u.symbol.cell), L",") == 0) {
+            cindex = i;
+            break;
+        }
+    }
+    
+    if (cindex == -1) return statement;         // no comma, return origin
+
+    result = l = new_list(NULL);
+    for (i=0; i<(cindex-1); i++) {
+        item = list_get(statement, i);
+        if (item == NULL) break;
+        l = list_append(l, item);
+    }
+
+    getl = new_list(NULL);
+    if (list_get(statement, cindex-1)) {
+        list_append(getl, list_get(statement, cindex-1));
+    } else {
+        list_append(getl, const_Nil);
+    }
+    list_append(getl, new_symbol(L"get"));
+    if (list_get(statement, cindex+1)) {
+        list_append(getl, list_get(statement, cindex+1));
+    } else {
+        list_append(getl, const_Nil);
+    }
+    l = list_append(l, new_eval(new_script(new_list(new_statement(getl, line)))));
+    
+    for (i=cindex+2; i<len; i++) {
+        item = list_get(statement, i);
+        if (item == NULL) break;
+        l = list_append(l, item);
+    }
+
+    return toy_parse_getmacro(result, line);
+}
+
+/*** old implement
 toy_parse_getmacro(Toy_Type *statement) {
     Toy_Type *l, *result, *cur, *prev;
 
@@ -947,6 +1013,7 @@ toy_parse_getmacro(Toy_Type *statement) {
 
     return result;
 }
+***/
 
 static Toy_Type*
 toy_parse_initmacro(Toy_Type *statement) {
