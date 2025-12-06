@@ -91,3 +91,19 @@ list_length(Toy_Type *list) {
     return length;
 }
 
+Toy_Type*
+list_get(Toy_Type *list, int pos) {
+    int i;
+    
+    if (pos < 0) return NULL;
+    if (! list) return NULL;
+    
+    for (i=0; i<pos; i++) {
+        if (list == NULL) return NULL;
+        if (GET_TAG(list) != LIST) return NULL;
+        list = list->u.list.nextp;
+    }
+    if (list == NULL) return NULL;
+    if (GET_TAG(list) != LIST) return list;
+    return list_get_item(list);
+}
