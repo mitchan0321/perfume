@@ -3,9 +3,11 @@
     # load built-in classes.
     #
     "Object.prfm"
+    "Bool.prfm"
     "List.prfm"
     "String.prfm"
     "Integer.prfm"
+    "Real.prfm"
     "Block.prfm"
     "File.prfm"
     "Dict.prfm"

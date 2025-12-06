@@ -1,0 +1,27 @@
+#
+# Real util method
+#
+
+Real method get (n) {
+    if [inf?] {return <nil>};
+    if [nan?] {return <nil>};
+    
+    s ::= "%1.15e" fmt [self];
+    l ::= $s split sep: ".";
+    i ::= $l get 0 : int;
+    p ::= $l get 1;
+    if {$n >= 1} {return <nil>};
+    if {$n = 0} {return $i};
+    if {$n < -15} {return <nil>};
+    return [$p get [$n neg : - 1] : int];
+};
+
+Real method len () {
+    if [inf?] {return 0};
+    if [nan?] {return 0};
+
+    s ::= "%1.15e" fmt [self];
+    e ::= $s split sep: "e" : get 1;
+    if {$e at 0 : = "+"} {e ::= $e sub 1};
+    return [$e int];
+};

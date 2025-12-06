@@ -24,3 +24,34 @@ Integer method isprime () {
 	<nil>
     ;
 };
+
+Integer method get (n args: base) {
+    if {$base null?} {
+        b := 10;
+    } {
+        b ::= $base car;
+    };
+    
+    s ::= [self] abs : string-base $b;
+    l ::= $s len;
+    p ::= $l - $n : - 1;
+    if {$p < 0} {return <nil>};
+    r ::= $s at $p;
+    if {$r = ""} {return <nil>};
+    return [$r int-base $b];
+};
+
+Integer method len (args: base) {
+    if {$base null?} {
+        b := 10;
+    } {
+        b ::= $base car;
+    };
+    self ::= self;
+    s ::= $self abs;
+    if {$s = 0} {return 0};
+
+    result ::= [0.0 + $s] log10 : / [[0.0 + $b] log10] : int : + 1;
+    if {$self < 0} {result ::= $result * -1};
+    return $result;
+};
