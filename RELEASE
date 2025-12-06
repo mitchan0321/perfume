@@ -3837,8 +3837,9 @@
 		Add String::get like Stiring::at but difficult return <nil> if out of index.
 	parser.c
 		Fix toy_parse_getmacro becomes to nest get macros. (ex) $o,1,2 -> [[$o get 1] get 2]
-	lib/Integer.prfm, Real.prfm, util.prfm
+	lib/Integer.prfm, Real.prfm, Bool.prfm, util.prfm
 		Add new file and add new methods Integer::len, Integer::get, Real::len, Real::get.
+		Add new file and add new methods Bool::len, Bool::get.
 	lib/Mode-C.key, Mode-Java.key
 		Fix sigle quote literal hilight regexp.
 	lib/Mode-Text.key
