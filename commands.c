@@ -609,14 +609,18 @@ cmd_new(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 
     case 1:
 	pname = list_get_item(posargs);
-	if (GET_TAG(pname) != SYMBOL) goto error1;
+	if ((GET_TAG(pname) != SYMBOL) && (GET_TAG(pname) != OBJECT)) goto error1;
 	break;
 
     default:
 	goto error1;
     }
 
-    object = hash_get_t(interp->classes, pname);
+    if (GET_TAG(pname) == SYMBOL) {
+        object = hash_get_t(interp->classes, pname);
+    } else {
+        object = pname;
+    }
     if (NULL == object) {
 	/* auto load class file */
 	Toy_Type *path;
