@@ -687,7 +687,7 @@ defcommand input-character-code desc: "Insert specified unicode code point chara
     | main window |
 
     mini-input-until-enter $main $window
-        prompt: "Input character code: u+"
+        prompt: "Input character code (or press TAB to insert tab): u+"
         enter-proc: {| value |
             try {
                 i ::= ["0x" . $value] int;
@@ -700,6 +700,11 @@ defcommand input-character-code desc: "Insert specified unicode code point chara
                 return ALL;
             };
             $window insert-string ["" uimport! ($i)];
+        }
+        completion-proc: {| value |
+            $window insert-string ["" uimport! (0x9)];
+            $main mini-input-end;
+            return ALL;
         }
     ;;
 
