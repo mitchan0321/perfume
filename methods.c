@@ -1092,6 +1092,28 @@ error2:
 }
 
 Toy_Type*
+mth_integer_strbase(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *self, *b;
+    int ib;
+    
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+    self = SELF(interp);
+    if (GET_TAG(SELF(interp)) != INTEGER) goto error2;
+    b = list_get_item(posargs);
+    if (GET_TAG(b) != INTEGER) goto error;
+    ib = mpz_get_si(b->u.biginteger);
+    if ((ib < 2) || (ib > 62)) goto error;
+    return new_string_str(integer_to_str_base(self, ib));
+    
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'string-base', syntax: Integer string-base base(>=2&&<=62)", interp);
+
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
 mth_real_plus(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *arg;
 
@@ -1911,7 +1933,7 @@ error2:
 
 Toy_Type*
 mth_list_get(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
-    int pos, i;
+    int pos;
     Toy_Type *src, *index;
 
     if (arglen != 1) goto error;
@@ -1921,18 +1943,20 @@ mth_list_get(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
     index = list_get_item(posargs);
     if (GET_TAG(index) != INTEGER) goto error;
     pos = mpz_get_si(index->u.biginteger);
-    if (pos < 0) goto error;
+    if (pos < 0) return const_Nil;
 
     src = SELF(interp);
 
+    /*
     for (i=0; i<pos; i++) {
 	if (NULL == src) return const_Nil;
 	src = list_next(src);
     }
-
+    */
+    src = list_get(src, pos);
     if (NULL == src) return const_Nil;
-
-    return (GET_TAG(src)==LIST) ? (list_get_item(src) ? list_get_item(src) : const_Nil) : src;
+    return src;
+    //return (GET_TAG(src)==LIST) ? (list_get_item(src) ? list_get_item(src) : const_Nil) : src;
 
 error:
     return new_exception(TE_SYNTAX, L"Syntax error at 'get', syntax: List get index", interp);
@@ -3585,6 +3609,38 @@ error2:
 }
 
 Toy_Type*
+mth_string_get(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *self;
+    Toy_Type *result;
+    Toy_Type *at;
+    int iat;
+
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (arglen != 1) goto error;
+    self = SELF(interp);
+    if (GET_TAG(self) != STRING) goto error2;
+
+    result = new_string_str(L"");
+
+    at = list_get_item(posargs);
+    if ((GET_TAG(at) != INTEGER)) goto error;
+    iat = mpz_get_si(at->u.biginteger);
+    
+    if (iat < 0) {
+	iat = cell_get_length(self->u.string) + iat;
+    }
+    if (iat < 0) return const_Nil;
+    if (iat >= cell_get_length(self->u.string)) return const_Nil;
+    cell_add_char(result->u.string, cell_get_addr(self->u.string)[iat]);
+    return result;
+
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'at', syntax: String get index", interp);
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
 mth_string_isalpha(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *self;
     Cell *s;
@@ -3813,6 +3869,34 @@ mth_string_udecode(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int ar
 
 error:
     return new_exception(TE_SYNTAX, L"Syntax error at 'udecode', syntax: String udecode encoding", interp);
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
+mth_string_intbase(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *self, *b;
+    int ib;
+    mpz_t s;
+    
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+    self = SELF(interp);
+    if (GET_TAG(SELF(interp)) != STRING) goto error2;
+    b = list_get_item(posargs);
+    if (GET_TAG(b) != INTEGER) goto error;
+    ib = mpz_get_si(b->u.biginteger);
+    if ((ib < 2) || (ib > 62)) goto error;
+    
+    mpz_init(s);
+    if (-1 == mpz_set_str(s, to_char(cell_get_addr(self->u.string)), ib)) {
+        return new_exception(TE_SYNTAX, L"Bad format.", interp);
+    }
+    return new_integer(s);
+    
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'string-base', syntax: String int-base base(>=2&&<=62)", interp);
+
 error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
 }
@@ -6448,6 +6532,7 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, L"Integer", L"sqrt", 	mth_integer_sqrt, 	NULL);
     toy_add_method(interp, L"Integer", L"neg", 		mth_integer_neg, 	NULL);
     toy_add_method(interp, L"Integer", L"abs", 		mth_integer_abs, 	NULL);
+    toy_add_method(interp, L"Integer", L"string-base",	mth_integer_strbase, 	L"base");
 
     toy_add_method(interp, L"Real", L"+", 		mth_real_plus, 		L"val");
     toy_add_method(interp, L"Real", L"-", 		mth_real_minus, 	L"val");
@@ -6530,12 +6615,14 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, L"String", L"uexport", 	mth_string_uexport, 	NULL);
     toy_add_method(interp, L"String", L"uimport!", 	mth_string_uimport, 	L"val-list");
     toy_add_method(interp, L"String", L"at", 		mth_string_at, 		L"val");
+    toy_add_method(interp, L"String", L"get", 		mth_string_get,		L"val");
     toy_add_method(interp, L"String", L"alphabetic?",	mth_string_isalpha,	NULL);
     toy_add_method(interp, L"String", L"numeric?",	mth_string_isnum,	NULL);
     toy_add_method(interp, L"String", L"alphanumeric?",	mth_string_isalnum,	NULL);
     toy_add_method(interp, L"String", L"display-width",	mth_string_display_width,NULL);
     toy_add_method(interp, L"String", L"udecode",	mth_string_udecode,     L"encoding");
     toy_add_method(interp, L"String", L"uencode",	mth_string_uencode,     L"encoding");
+    toy_add_method(interp, L"String", L"int-base",	mth_string_intbase, 	L"base");
 
     toy_add_method(interp, L"File", L"init", 		mth_file_init, 		L"mode:,mode,file-path");
     toy_add_method(interp, L"File", L"open", 		mth_file_open, 		L"mode:,mode,file-path");
