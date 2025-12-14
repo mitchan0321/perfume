@@ -787,6 +787,7 @@ to_string(Toy_Type *obj) {
     {
 	Toy_Type *l;
 	Cell *c;
+        int isbind = 0;
 
 	l = obj->u.statement.item_list;
 	if (IS_LIST_NULL(l)) {
@@ -795,12 +796,17 @@ to_string(Toy_Type *obj) {
 
 	c = new_cell(L"");
 	do {
+            if (BIND == GET_TAG(list_get_item(l))) isbind =  1;
 	    cell_add_str(c, to_print(list_get_item(l)));
 	    if (list_length(l) > 1) cell_add_char(c, L' ');
 	    l = list_next(l);
 	} while (l);
 
-	cell_add_char(c, L';');
+        if (isbind) {
+            cell_add_char(c, L' ');
+        } else {
+            cell_add_char(c, L';');
+        }
 	return cell_get_addr(c);
     }
 
@@ -1139,7 +1145,7 @@ to_print(Toy_Type *obj) {
 	    }
 	    p++;
 	}
-	cell_add_char(c, L'"');
+	cell_add_char(c, L'"'); // "
 	return cell_get_addr(c);
     }
 	
@@ -1166,6 +1172,7 @@ to_print(Toy_Type *obj) {
     {
 	Toy_Type *l;
 	Cell *c;
+        int isbind = 0;
 
 	l = obj->u.statement.item_list;
 	if (IS_LIST_NULL(l)) {
@@ -1174,12 +1181,17 @@ to_print(Toy_Type *obj) {
 
 	c = new_cell(L"");
 	do {
+            if (BIND == GET_TAG(list_get_item(l))) isbind =  1;
 	    cell_add_str(c, to_print(list_get_item(l)));
 	    if (list_length(l) > 1) cell_add_char(c, L' ');
 	    l = list_next(l);
 	} while (l);
 
-	cell_add_char(c, L';');
+        if (isbind) {
+            cell_add_char(c, L' ');
+        } else {
+            cell_add_char(c, L';');
+        }
 	return cell_get_addr(c);
     }
 
