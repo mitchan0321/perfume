@@ -27,7 +27,7 @@ defcommand mouse-point desc: "Move cursor to mouse click point." {
     (ev y x) ::= $main apply-mouse-event $window;
     $ev ?? {return SELF};
     
-    $window end-region;
+    ### $window end-region;
 
     result ALL;
 };
