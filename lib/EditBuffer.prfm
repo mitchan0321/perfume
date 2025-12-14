@@ -700,5 +700,8 @@ EditBuffer method set-buffer-tab-width (width) {
 };
 
 EditBuffer method get-buffer-tab-width () {
-    return $BufferTabWidth;
+    if $BufferTabWidth {
+        return $BufferTabWidth;
+    };
+    return $DEFAULT_TAB_WIDTH;
 };
