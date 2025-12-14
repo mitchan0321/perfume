@@ -213,9 +213,9 @@ toy_parse_statement(Bulk *src, wchar_t endc) {
 	    l = list_append(l, any);
 	    break;
 	    
-	case L'\"':
+	case L'\"': //"
 	    if (line == 0) {line = bulk_get_line(src);}
-	    any = toy_parse_string(src, L'\"');
+	    any = toy_parse_string(src, L'\"'); //"
 	    if (NULL == any) goto assert;
 	    if (GET_TAG(any) != STRING) goto parse_error;
 	    l = list_append(l, any);
