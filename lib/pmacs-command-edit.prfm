@@ -710,3 +710,27 @@ defcommand input-character-code desc: "Insert specified unicode code point chara
 
     result SELF;
 };
+
+defcommand untabify desc: "Untabify all text in the buffer." {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    v ::= $buff get-vector;
+    tw ::= $buff get-buffer-tab-width;
+    n := 0;
+    $v each do: {| r |
+        result := "";
+        $r split sep: "" : each do: {| c |
+            if {$c = "\t"} {
+                l ::= $result display-width : % $tw;
+                $result append! [" " repeat [$tw - $l]];
+            } {
+                $result append! $c;
+            };
+        };
+        $buff line-update $result $n;
+        $n ++;
+    };
+    
+    result ALL;
+};
