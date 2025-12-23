@@ -169,3 +169,16 @@ cell_cmp(Cell *src, Cell *dest) {
     if (src->length > dest->length) return 1;
     return -1;
 }
+
+int
+cell_truncate(Cell *src, int size) {
+    int tsize;
+    if (size > src->length) return 0;
+    if (size < 0) return 0;
+    
+    tsize = src->length - size;
+    src->length  = tsize;
+    src->data[tsize] = 0;
+
+    return 1;
+}

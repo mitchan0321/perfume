@@ -22,6 +22,7 @@ int	cell_get_length(Cell *p);
 int     cell_eq_str(Cell *s, wchar_t *d);
 Cell*	cell_sub(Cell *c, int start, int end);
 int     cell_cmp(Cell *src, Cell *dest);
+int     cell_truncate(Cell *src, int size);
 
 #define cell_get_addr(p)	(p->data)
 #define cell_get_length(p)	(p->length)
