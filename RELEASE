@@ -3858,4 +3858,20 @@
 		Fix EditBuffer::get-buffer-tab-width if no set TABs return DEFAULT_TAB_WIDTH.
 		Fix mose-point editor command, no reset region mode.
 
+2025/12/23
+	cell.[ch]
+		Add cell_truncate function.
+	methods.c
+		Add commnad String::truncate for truncate N size characters from string.
+	parser.c, types.c
+		Change rquote syntax change, the \ character is no longer an escape character unless it is preceded
+		by an apostrophe character.
+	pmacs update:
+		Update Mode files, Mode-C.key, Mode-Interp.key, Mode-Java.key, Mode-Prfm.key, Mode-Text.key and pmacs.conf
+		  for rquote specification change.
+		Update truncate editor command.
+	tag:
+		PRFM_20231223_K37
+		1.11.2
+
 #eof
