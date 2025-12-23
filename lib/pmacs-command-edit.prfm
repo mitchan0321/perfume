@@ -720,15 +720,17 @@ defcommand untabify desc: "Untabify all text in the buffer." {
     n := 0;
     $v each do: {| r |
         result := "";
+        update := <nil>;
         $r split sep: "" : each do: {| c |
             if {$c = "\t"} {
                 l ::= $result display-width : % $tw;
                 $result append! [" " repeat [$tw - $l]];
+                update := <t>;
             } {
                 $result append! $c;
             };
         };
-        $buff line-update $result $n;
+        if $update {$buff line-update $result $n};
         $n ++;
     };
     
