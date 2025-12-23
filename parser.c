@@ -61,7 +61,6 @@ toy_parse_script(Bulk *src, wchar_t endc) {
 	return new_exception(TE_PARSECLOSE, cell_get_addr(msg), NULL);
     }
 
-//    while (EOF != bulk_is_eof(src)) {
     while (EOF != c) {
 	if (0 == endc) {
 	    if (EOF == c) {
@@ -416,18 +415,9 @@ toy_parse_rquote(Bulk *src, wchar_t endc) {
 	    c = bulk_getchar(src);
 	    if (EOF == c) goto parse_error;
 	    switch (c) {
-	    case L't':
-		c = L'\t';
-		break;
-	    case L'r':
-		c = L'\r';
-		break;
-	    case L'n':
-		c = L'\n';
-		break;
-	    case L'\\':
-		c = L'\\';
-		break;
+//	    case L'\\':
+//		c = L'\\';
+//		break;
 	    case L'\'':
 		c = L'\'';
 		break;
@@ -521,8 +511,8 @@ toy_parse_list(Bulk *src, wchar_t endc) {
 	    l = list_append(l, any);
 	    break;
 	    
-	case L'\"':
-	    any = toy_parse_string(src, L'\"');
+	case L'\"':     // "
+	    any = toy_parse_string(src, L'\"');     // "
 	    if (NULL == any) goto assert;
 	    if (GET_TAG(any) != STRING) goto parse_error;
 	    l = list_append(l, any);
@@ -971,49 +961,6 @@ toy_parse_getmacro(Toy_Type *statement, int line) {
 
     return toy_parse_getmacro(result, line);
 }
-
-/*** old implement
-toy_parse_getmacro(Toy_Type *statement) {
-    Toy_Type *l, *result, *cur, *prev;
-
-    result = l = new_list(NULL);
-    cur = NULL; prev = NULL;
-    while (statement) {
-	cur = list_get_item(statement);
-
-	if ((GET_TAG(cur) == SYMBOL) &&
-	    wcscmp(cell_get_addr(cur->u.symbol.cell), L",") == 0) {
-	    
-	    if (prev != NULL) {
-		statement = list_next(statement);
-		if (IS_LIST_NULL(statement)) {
-		    l = list_append(l, cur);		    
-		} else {
-		    cur = list_get_item(statement);
-		    list_set_car(l, new_getmacro(prev, cur));
-		}
-	    } else {
-		l = list_append(l, cur);
-	    }
-	} else {
-	    if (GET_TAG(cur) == LIST) {
-		l = list_append(l, toy_parse_getmacro(cur));
-	    } else {
-		l = list_append(l, cur);
-	    }
-	}
-
-	statement = list_next(statement);
-	if (GET_TAG(statement) != LIST) {
-	    list_set_cdr(l, statement);
-	    break;
-	}
-	prev = cur;
-    }
-
-    return result;
-}
-***/
 
 static Toy_Type*
 toy_parse_initmacro(Toy_Type *statement) {

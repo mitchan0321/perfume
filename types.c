@@ -1375,9 +1375,9 @@ to_print(Toy_Type *obj) {
 	p = cell_get_addr(obj->u.rquote);
 	while (*p) {
 	    switch (*p) {
-	    case L'\\':
-		cell_add_str(c, L"\\\\");
-		break;
+//	    case L'\\':
+//		cell_add_str(c, L"\\\\");
+//		break;
 	    case L'\'':
 		cell_add_str(c, L"\\\'");
 		break;
