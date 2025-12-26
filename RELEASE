@@ -3851,7 +3851,7 @@
 
 2025/12/14
 	parser.c
-		Change coding style.Change coding style.
+		Change coding style.
 	types.c
 		Change BIND tag to_print, to_string, to no terminate ";" BIND object.
 	pmacs update:
@@ -3874,5 +3874,19 @@
 	tag:
 		PRFM_20251223_K37
 		1.11.2
+
+2025/12/26
+	parser.c, types.c
+		The notation for regular expression strings has completely changed.
+		  - The notation of enclosing a regular expression string in apostrophes (') remains unchanged.
+		  - The backslash (\) no longer represents an escape. That is, if you write a backslash in a 
+		    regular expression string, it will be treated as part of the regular expression.
+		  - To include an apostrophe in a regular expression, write two apostrophes in a row
+		    (e.g., a regular expression that matches "it's" → 'it''s').
+		  - While it is possible to include line breaks in regular expression strings, it is no longer necessary 
+		    to write a backslash (\) at the end of the line. To represent a line break in a regular expression,
+		    use \n as before.
+	pmacs update:
+		Change regular expression define at Mode-*.key and pmacs.conf files.
 
 #eof
