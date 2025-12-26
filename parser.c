@@ -409,27 +409,19 @@ toy_parse_rquote(Bulk *src, wchar_t endc) {
     newcell = str->u.rquote;
 
     c = bulk_getchar(src);
-    while (endc != c) {
+    while (1) {
 	if (EOF == c) goto parse_error;
-	if (L'\\' == c) {
+	if (endc == c) {
 	    c = bulk_getchar(src);
-	    if (EOF == c) goto parse_error;
-	    switch (c) {
-//	    case L'\\':
-//		c = L'\\';
-//		break;
-	    case L'\'':
-		c = L'\'';
-		break;
-            case L'\n': case L'\r':
-                c = 0;
-                break;
-	    default:
-		bulk_ungetchar(src);
-		c = L'\\';
-	    }
-	}
-
+	    if (EOF == c) return str;
+            if (endc != c) {
+                bulk_ungetchar(src);
+                return str;
+            }
+        } else if (('\n' == c) || ('\r' == c)) {
+            c = 0;
+        }
+        
         if (0 != c) {
             if (NULL == cell_add_char(newcell, c)) goto assert;
         }

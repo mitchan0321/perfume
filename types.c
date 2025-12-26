@@ -1374,14 +1374,10 @@ to_print(Toy_Type *obj) {
 	c = new_cell(L"\'");
 	p = cell_get_addr(obj->u.rquote);
 	while (*p) {
-	    switch (*p) {
-//	    case L'\\':
-//		cell_add_str(c, L"\\\\");
-//		break;
-	    case L'\'':
-		cell_add_str(c, L"\\\'");
-		break;
-	    default:
+            if (*p == '\'') {
+		cell_add_str(c, L"\'");
+		cell_add_str(c, L"\'");
+            } else {
 		cell_add_char(c, *p);
 	    }
 	    p++;
