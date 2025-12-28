@@ -202,6 +202,7 @@ Perfumeには所謂他のプログラミング言語のような構文は存在�
 以下の例では、「$i = 10」、「result &lt;t&gt;」、「result &lt;nil&gt;」は全てブロックの最後の文で ";" が省略された例である。
 
 　
+
     if {$i = 10} then: {result &lt;t&gt;} else: {result &lt;nil&gt;};
 
 * 文は命令とそれに続くパラメータのリストである。
