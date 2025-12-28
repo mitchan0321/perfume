@@ -413,18 +413,22 @@ Objectクラスは全てのオブジェクトの親であり、ここで定義�
 
 オブジェクトを文字列として表記可能な情報に変化して返す。
 
+#### Object::method
     Object method メソッド名 (引数リスト) {メソッド本体};
 
 オブジェクトにメソッドを定義する。
 
+#### Object::set!
     Object set! インスタンス変数名 値;
 
 オブジェクト外から、オブジェクトのインスタンス変数に値を設定する。オブジェクト内（メソッド内）では、sets コマンドによりインスタンス変数を設定可能。
 
+#### Object::get
     Object get インスタンス変数名;
 
 オブジェクトに設定されているインスタンス変数の値を取得する。オブジェクト内（メソッド内）では、「$変数名」の参照によりインスタンス変数を参照可能。
 
+#### Object::apply
     Object apply {ブロック};
 
 オブジェクトのスコープでブロックを実行する。メソッドを定義するまでもない処理をオブジェクト内で実行したいときに使用する。
@@ -432,6 +436,7 @@ Objectクラスは全てのオブジェクトの親であり、ここで定義�
 ### Integerクラス
 多倍長整数を扱うクラスである。
 
+#### Integer::演算子
     Integer + 値;
     Integer - 値;
     Integer * 値;
@@ -440,6 +445,7 @@ Objectクラスは全てのオブジェクトの親であり、ここで定義�
 
 これらのメソッドは、整数値に値を、加算、減算、積算、除算、剰余算するという基本的な演算をするものである。
 
+#### Integer::比較演算子
     Integer = 値;
     Integer !₌ 値;
     Integer > 値;
@@ -449,24 +455,30 @@ Objectクラスは全てのオブジェクトの親であり、ここで定義�
 
 これらのメソッドは、整数値と値を比較し、メソッドに応じた条件により真偽値を返すものである。
 
+#### Integer::++ 
     Integer ++ [ 増分 ];
 
 整数の値を1インクリメントする。増分が指定された場合は増分だけ加算される。
 
+#### Integer::-- 
     Integer -- [ 増分 ];
 
 整数の値を1デクリメントする。増分が指定された場合は増分だけ減算される。
 
+#### Integer::each
     Integer each to: 上限値 do: {| i | 処理ブロック};
 
 整数オブジェクトのイテレータ
 
+#### Integer::..
     Integer .. N do: ブロック;
+
 整数のNまでのリストを生成し、do: ブロックでイテレータを実行する。
 
 ### Realクラス
 実数を扱うクラスである。
 
+#### Real::演算子
     Real + 値;
     Real - 値;
     Real * 値;
@@ -475,6 +487,7 @@ Objectクラスは全てのオブジェクトの親であり、ここで定義�
 
 これらのメソッドは、実数に値を、加算、減算、積算、除算、剰余算するという基本的な演算をするものである。
 
+#### Real::=比較演算子
     Real = 値;
     Real !₌ 値;
     Real > 値;
@@ -489,32 +502,39 @@ Objectクラスは全てのオブジェクトの親であり、ここで定義�
 ### Stringクラス
 文字列を扱うクラスである。
 
-    String append!;
+#### String::append!
+    String append! 値 ...;
 
 文字列を追加する。
 
-    String .;
+#### String::.
+    String . 値...;
 
 文字列が追加された新しい文字列を返す。
 
+#### String::split
     String split sep: separator;
 
 文字列を separator で分割しリストで返す。
 separator が指定されない場合は連続した空白文字（スペース、改行、タブ）をひとつのセパレータとして分割する。
 また、separator が "" の場合は1文字単位で分割する。
 
+#### String::=~
     String =~ regexp;
 
 regexpでマッチした部分を返す。
 
+#### String::len
     String len;
 
 文字列の文字長を返す。
 
+#### String::sub
     String sub start end;
 
 start から end までの部分文字列を返す。
 
+#### String::eval
     String eval;
 
 文字列をPerfumeのスクリプトとして評価する。
@@ -522,38 +542,52 @@ start から end までの部分文字列を返す。
 ### Listクラス
 リストを扱うクラスである。
 
+#### List::car
    List car;
 
 リストのcar部を返す。
 
+#### List::cdr
     List cdr;
 
 リストのcdr部を返す。
 
+#### List::len
+    List len;
+
+リストの要素数を返す。
+
+#### List::get
     List get index;
 
 リストのindex番目の要素を返す。
 
+#### List::append!
     List append! val;
 
 リストの最後にvalを追加する。
 
+#### List::each
     List each do: {| i | 処理ブロック};
 
 リストのイテレータ。
 
+#### List::filter
     List filter {| i | 条件式};
 
 リストを条件式で真になった要素のみで再構築する。
 
+#### List::map
     List map {| i | 処理ブロック};
 
 リストの各要素に処理ブロックを適用した要素で再構築する。
 
+#### List:inject
     List inject 初期値 {| 総和値 個別値 | 処理ブロック};
 
 所謂Rubyのinject。
 
+#### List::concat
     List concat [ 値 | リスト ] ...
 
 元のリストに値またはリストの全要素を追加した新しいリストを返す。
@@ -561,26 +595,37 @@ start から end までの部分文字列を返す。
 ### Dictクラス
 辞書を扱うクラスである。
 
+#### Dict::set
     Dict set キー 値;
 
 辞書のキーに対して値を設定する。
 
+#### Dict::set
     Dict set? キー;
 
 辞書のキーに対して値が設定されいてる場合は &lt;t&gt; を返す。
 
+#### Dict::len
+    Dict get キー;
+
+辞書の要素数を返す。
+
+#### Dict::get
     Dict get キー;
 
 辞書のキーに設定されている値を取得する。
 
+#### Dict::each
     Dict each do: {| k v | 処理ブロック};
 
 辞書のイテレータ。k にキー、v にキーに設定されている値が設定される。
 
+#### Dict::keys
     Dict keys;
 
 辞書に設定されているキーのリストを返す。
 
+#### Dict::pairs
     Dict pairs;
 
 辞書に設定されているキーと値のリストを返す。
@@ -588,22 +633,27 @@ start から end までの部分文字列を返す。
 ### Fileクラス
 ファイルの入出力を行うためのクラスである。
 
+#### File::open
     File open ファイルパス mode: i | o | io | a;
 
 ファイルパスをモード(入力、出力、入出力、追記)でオープンする。
 
+#### File::gets
     File gets;
 
 ファイルからテキストを1行入力する。
 
+#### File::puts
     File puts 値;
 
 ファイルに値を1行テキストで出力する。
 
+#### File::close
     File close;
 
 ファイルをクローズする。
 
+#### File::each
     File each do: {| r | ファイル行処理ブロック};
 
 ファイルのイテレータである。
