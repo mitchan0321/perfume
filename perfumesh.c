@@ -22,6 +22,7 @@ int main(int argc, char **argv, char **envp) {
     int i;
     Cell *encc;
     encoder_error_info *ence;
+    int init_sts;
 
     /* detect -D configuration argument */
 
@@ -38,11 +39,34 @@ int main(int argc, char **argv, char **envp) {
     }
 
     interp = new_interp(L"main", STACKSIZE, NULL, argc, argp, envp, dir);
-    b = new_bulk();
-    
-    if ((argc >= 2) && (strcmp(argp[1], "-") != 0)) {
-	/* batch mode */
 
+    init_sts = 0;
+    INIT_ALLOC_HOOK(init_sts);
+    if (0 != init_sts) {
+        // mey be not enough memory occured.
+        ALLOC_OUT("at perfumesh interpriter, memory alloc error occured, force retry interpriter.\n");
+        ALLOC_OUT("Next, follow these steps to verify the problem:\n");
+        ALLOC_OUT("  > show-stack            --- show stack frame level.\n");
+        ALLOC_OUT("  > print [stack-trace]   --- show stack trace, where problem occured.\n");
+        ALLOC_OUT("  > w :wide               --- show stack trace and variables.\n");
+        ALLOC_OUT("  > dict-local : pairs    --- show local variables\n");
+        ALLOC_OUT("\n\n");
+
+        init_sts = 0;
+        INIT_ALLOC_HOOK(init_sts);
+        if (0 != init_sts) {
+            // may be do not reach.
+            ALLOC_OUT("at perfumesh interpriter, memory alloc error occured double fault, exit.\n");
+            exit(1);
+        }
+        goto error_retry;
+    }
+
+    if ((argc >= 2) && (strcmp(argp[1], "-") != 0)) {
+    
+	/* batch mode */
+        
+        b = new_bulk();
 	if (strcmp(argp[1], "-c") == 0) {
 	    if (argc >= 3) {
 
@@ -109,6 +133,9 @@ int main(int argc, char **argv, char **envp) {
 	exit(0);
     }
 
+error_retry:
+
+    b = new_bulk();
     /* interpriter mode */
     while (! feof(stdin)) {
     next_loop:
