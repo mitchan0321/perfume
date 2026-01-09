@@ -35,8 +35,6 @@ Toy_Type *toy_symbol_conv(Toy_Type *atom);
 wchar_t	 *to_string_call(Toy_Interp *interp, Toy_Type *obj);
 void	  def_global();
 
-#define ALLOC_SAFE(x)	if (!x) {printf("alloc failed.\n"); exit(255);}
-
 /* define control code for return, break, continue, redo, retry and goto */
 #define CTRL_RETURN		1
 #define CTRL_BREAK		2
