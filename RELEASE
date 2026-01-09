@@ -3889,4 +3889,28 @@
 	pmacs update:
 		Change regular expression define at Mode-*.key and pmacs.conf files.
 
+2025/12/28
+	pmacs update:
+		Add option to show-message utility function, if set :log option, output message to *Console* buffer only.
+
+2026/01/09
+	README.md
+		Add comment syntax.
+	commands.c
+		Add __force-damage command for ALLOC_SAFE(0) test.
+	eval.c, types.[ch]
+		Change clone object from the parse tree, if it is integer, real or string.
+		Add PG (parser generated) flag to type TAG.
+	fclib.c
+		Fix control character width bug.
+	interp.[ch]
+		Change ALLOC_SAFE, if ALLOC_SAFE(0) called, return to toplevel. Toplevel defined by INIT_ALLOC_HOOK.
+	parser.c
+		Fix call always ALLOC_SAFE if memory allocation failed.
+	perfumesh.c
+		Add memory daiag hook, if memory allocation failed.
+	pmacs update:
+		Add :log option to WUtil::show-message, for output log to *Console* buffer.
+		Add tabify editor command.
+
 #eof
