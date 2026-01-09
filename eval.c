@@ -489,6 +489,12 @@ Toy_Type*
 toy_expand(Toy_Interp* interp, Toy_Type* obj, Toy_Env** env, Toy_Func_Trace_Info *trace_info) {
 
     switch (GET_TAG(obj)) {
+    case INTEGER: case REAL: case STRING:
+        if (IS_PG(obj)) {
+            return toy_clone(obj);
+        }
+        return obj;
+    
     case REF:
 	return toy_resolv_var(interp, obj, 1, trace_info);
 
@@ -532,7 +538,7 @@ toy_expand(Toy_Interp* interp, Toy_Type* obj, Toy_Env** env, Toy_Func_Trace_Info
 	result = toy_eval(interp, new_statement(stl, trace_info->line), env);
 	return result;
     }
-
+    
     default:
 	return obj;
     }
@@ -558,7 +564,7 @@ toy_expand_list(Toy_Interp* interp, Toy_Type* list, Toy_Env** env, Toy_Func_Trac
 	    break;
 	}
 
-	a = toy_expand(interp, list_get_item(sl), env, trace_info);
+	a = toy_expand(interp, toy_clone(list_get_item(sl)), env, trace_info);
 	if (GET_TAG(a) == EXCEPTION) return a;
 
 	nlist = list_append(nlist, a);

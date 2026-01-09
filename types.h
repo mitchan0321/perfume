@@ -79,6 +79,11 @@
 #define SET_NOPRINTABLE(p)	(p->tag|=TAG_NOPRINTABLE)
 #define IS_NOPRINTABLE(p)	(p->tag&TAG_NOPRINTABLE)
 
+#define TAG_ISPG                (0x00000100)
+#define SET_PG(p)               (p->tag|=TAG_ISPG)
+#define CLEAR_PG(p)		(p->tag&=(~TAG_ISPG))
+#define IS_PG(p)                (p->tag&TAG_ISPG)
+
 #define TAG_PARAMNO_MASK	(0x00001C00)
 #define TAG_MAX_PARAMNO		(7)
 #define SET_PARAMNO(p,i)	(p->tag|=((i<<10)&TAG_PARAMNO_MASK))
@@ -209,7 +214,7 @@ typedef struct _toy_coroutine {
  *      +--------+--------+
  *   +0 |    script id    |
  *      +--------+--------+
- *   +2 |@#$***!-|%%%%%%%%|
+ *   +2 |@#$***!?|%%%%%%%%|
  *      +--------+--------+
  *
  *      %: type field
@@ -220,7 +225,7 @@ typedef struct _toy_coroutine {
  *         Number of position parameters (0-6),
  *         if less than 7 and only position parameters.
  *      !: no printable
- *      -: reserved
+ *      ?: is PG (parser generated)
  */
 typedef struct _toy_type {
     u_int32_t tag;

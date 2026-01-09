@@ -625,6 +625,7 @@ toy_clone(Toy_Type *obj) {
 	ALLOC_SAFE(dest);
         memset(dest, 0, sizeof(Toy_Type));
 	dest->tag = obj->tag;
+        CLEAR_PG(dest);
 	mpz_init(dest->u.biginteger);
 	mpz_set(dest->u.biginteger, obj->u.biginteger);
 	break;
@@ -633,6 +634,7 @@ toy_clone(Toy_Type *obj) {
 	ALLOC_SAFE(dest);
         memset(dest, 0, sizeof(Toy_Type));
 	dest->tag = obj->tag;
+        CLEAR_PG(dest);
 	dest->u.real = obj->u.real;
 	break;
     case STRING:
@@ -640,7 +642,7 @@ toy_clone(Toy_Type *obj) {
 	ALLOC_SAFE(dest);
         memset(dest, 0, sizeof(Toy_Type));
 	dest->tag = obj->tag;
-        // dest->u.string = new_cell(cell_get_addr(obj->u.string));
+        CLEAR_PG(dest);
         dest->u.string = cell_clone(obj->u.string);
 	break;
     default:
