@@ -4703,6 +4703,13 @@ error:
 			 L"Syntax error at 'kill', syntax: killpg signal pid", interp);
 }
 
+Toy_Type*
+cmd_forcedamage(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    ALLOC_OUT("at cmd_forcedamage, called ALLOC_SAFE(0).\n");
+    ALLOC_SAFE(0);
+    return const_Nil;
+}
+
 #ifdef EVAL_STAT
 Toy_Type*
 cmd_evalstat(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
@@ -4861,6 +4868,7 @@ int toy_add_commands(Toy_Interp *interp) {
     toy_add_func(interp, L"pid",    	cmd_pid, 		NULL);
     toy_add_func(interp, L"kill",    	cmd_kill, 		L"signal,pid");
     toy_add_func(interp, L"killpg",    	cmd_killpg, 		L"signal,pid");
+    toy_add_func(interp, L"__force-damage",cmd_forcedamage, 	NULL);
 
 #ifdef EVAL_STAT
     toy_add_func(interp, L"eval-stat",	cmd_evalstat, 		NULL);
