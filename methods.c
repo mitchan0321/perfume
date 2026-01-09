@@ -2439,7 +2439,7 @@ mth_list_block(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
 		       new_closure_env(interp), interp->func_stack[interp->cur_func_stack]->script_id);
 
 error:
-    return new_exception(TE_SYNTAX, L"Syntax error at 'block', syntax: List create-block", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'create-block', syntax: List create-block", interp);
 error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
 }
