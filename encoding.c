@@ -1,4 +1,3 @@
-#include <ctype.h>
 #include "toy.h"
 #include "encoding.h"
 
