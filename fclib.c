@@ -89,7 +89,11 @@ int
 fcl_get_width(wchar_t uc) {
     int w, lw;
 
-    w = wcwidth(uc);
+    if ((uc >= 0) && (uc < 0x20)) {
+        w = 1;
+    } else {
+        w = wcwidth(uc);
+    }
     
     if (0 == _fclib_init) return w;
     if (uc >= FCL_MAXNUMCHAR) return w;
