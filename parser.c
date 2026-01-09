@@ -25,13 +25,9 @@ toy_parse_start(Bulk *src) {
     Toy_Type *script;
 
     script = toy_parse_script(src, 0);
-    if (NULL == script) goto assert;
-
+    ALLOC_SAFE(script);
+    
     return script;
-
-assert:
-    /* may be not enough memory */
-    return NULL;
 }
 
 Toy_Type*
@@ -48,8 +44,9 @@ toy_parse_script(Bulk *src, wchar_t endc) {
     ALLOC_SAFE(buff);
 
     script = new_script(NULL);
-    if (NULL == script) goto assert;
-    
+    ALLOC_SAFE(script);
+
+    SET_PG(script);
     l = new_list(NULL);
     script->u.statement_list = l;
 
@@ -79,9 +76,9 @@ toy_parse_script(Bulk *src, wchar_t endc) {
 	}
 	bulk_ungetchar(src);
 
-	statement = toy_parse_statement(src, endc);
-	if (statement == NULL) goto assert;
-
+        statement = toy_parse_statement(src, endc);
+        ALLOC_SAFE(statement);
+        
 	if (GET_TAG(statement) != STATEMENT) goto parse_error;
 
 	/* apply macros */
@@ -117,14 +114,8 @@ toy_parse_script(Bulk *src, wchar_t endc) {
     msg = new_cell(buff);
     return new_exception(TE_PARSECLOSE, cell_get_addr(msg), NULL);
 
-//    return script; 
-
 parse_error:
     return statement;
-
-assert:
-    /* may be not enough memory */
-    return NULL;
 }
 
 Toy_Type*
@@ -141,11 +132,12 @@ toy_parse_statement(Bulk *src, wchar_t endc) {
     ALLOC_SAFE(buff);
 
     l = new_list(NULL);
-    if (NULL == l) goto assert;
+    ALLOC_SAFE(l);
 
     newstatement = new_statement(l, 0);
-    if (NULL == newstatement) goto assert;
+    ALLOC_SAFE(newstatement);
 
+    SET_PG(newstatement);
     while (EOF != (c = bulk_getchar(src))) {
 	if (endc == c) {
 	    bulk_ungetchar(src);
@@ -191,7 +183,7 @@ toy_parse_statement(Bulk *src, wchar_t endc) {
 	case L'(':
 	    if (line == 0) {line = bulk_get_line(src);}
 	    any = toy_parse_list(src, L')');
-	    if (NULL == any) goto assert;
+            ALLOC_SAFE(any);
 	    if (GET_TAG(any) != LIST) goto parse_error;
 	    l = list_append(l, any);
 	    break;
@@ -199,7 +191,7 @@ toy_parse_statement(Bulk *src, wchar_t endc) {
 	case L'{':
 	    if (line == 0) {line = bulk_get_line(src);}
 	    any = toy_parse_block(src, L'}');
-	    if (NULL == any) goto assert;
+            ALLOC_SAFE(any);
 	    if (GET_TAG(any) != BLOCK) goto parse_error;
 	    l = list_append(l, any);
 	    break;
@@ -207,7 +199,7 @@ toy_parse_statement(Bulk *src, wchar_t endc) {
 	case L'[':
 	    if (line == 0) {line = bulk_get_line(src);}
 	    any = toy_parse_eval(src, L']');
-	    if (NULL == any) goto assert;
+            ALLOC_SAFE(any);
 	    if (GET_TAG(any) != EVAL) goto parse_error;
 	    l = list_append(l, any);
 	    break;
@@ -215,7 +207,7 @@ toy_parse_statement(Bulk *src, wchar_t endc) {
 	case L'\"': //"
 	    if (line == 0) {line = bulk_get_line(src);}
 	    any = toy_parse_string(src, L'\"'); //"
-	    if (NULL == any) goto assert;
+            ALLOC_SAFE(any);
 	    if (GET_TAG(any) != STRING) goto parse_error;
 	    l = list_append(l, any);
 	    break;
@@ -223,8 +215,8 @@ toy_parse_statement(Bulk *src, wchar_t endc) {
 	case L'\'':
 	    if (line == 0) {line = bulk_get_line(src);}
 	    any = toy_parse_rquote(src, L'\'');
-	    if (NULL == any) goto assert;
-	    if (GET_TAG(any) != RQUOTE) goto parse_error;
+            ALLOC_SAFE(any);
+            if (GET_TAG(any) != RQUOTE) goto parse_error;
 	    l = list_append(l, any);
 	    break;
 
@@ -271,8 +263,8 @@ toy_parse_statement(Bulk *src, wchar_t endc) {
 	    /* parse symbol */
 	    bulk_ungetchar(src);
 	    any = toy_parse_symbol(src, ENDCHAR);
-	    if (NULL == any) goto assert;
-	    if (GET_TAG(any) != SYMBOL) goto parse_error;
+            ALLOC_SAFE(any);
+            if (GET_TAG(any) != SYMBOL) goto parse_error;
 	    l = list_append(l, toy_symbol_conv(any));
 	}
     }
@@ -296,10 +288,6 @@ parse_end:
 parse_error:
     /* parse error */
     return any;
-
-assert:
-    /* may be not enough memory */
-    return NULL;
 }
 
 Toy_Type*
@@ -308,9 +296,10 @@ toy_parse_symbol(Bulk *src, wchar_t *endc) {
     Cell *newcell;
     int c;
     wchar_t buff[2];
+    Cell *p;
 
     newcell = new_cell(L"");
-    if (NULL == newcell) goto assert;
+    ALLOC_SAFE(newcell);
     
     c = bulk_getchar(src);
     while (1) {
@@ -324,17 +313,17 @@ toy_parse_symbol(Bulk *src, wchar_t *endc) {
 	    goto complite;
 	}
 
-	if (NULL == cell_add_char(newcell, c)) goto assert;
+	p = cell_add_char(newcell, c);
+        ALLOC_SAFE(p);
 
 	c = bulk_getchar(src);
     }
 
 complite:
     symbol = new_symbol(cell_get_addr(newcell));
+    ALLOC_SAFE(symbol);
+    SET_PG(symbol);
     return symbol;
-
-assert:
-    return NULL;
 }
 
 Toy_Type*
@@ -349,8 +338,9 @@ toy_parse_string(Bulk *src, wchar_t endc) {
     ALLOC_SAFE(buff);
 
     str = new_string_str(L"");
-    if (NULL == str) goto assert;
+    ALLOC_SAFE(str);
 
+    SET_PG(str);
     newcell = str->u.string;
 
     c = bulk_getchar(src);
@@ -376,14 +366,13 @@ toy_parse_string(Bulk *src, wchar_t endc) {
 	}
 
 	if (0 != c) {
-	    if (NULL == cell_add_char(newcell, c)) goto assert;
+            Cell *p;
+	    p = cell_add_char(newcell, c);
+            ALLOC_SAFE(p);
 	}
 	c = bulk_getchar(src);
     }
     return str;
-
-assert:
-    return NULL;
 
 parse_error:
     swprintf(buff, 256, L"Imbalanced close string '%lc' at line %d.",
@@ -404,8 +393,9 @@ toy_parse_rquote(Bulk *src, wchar_t endc) {
     ALLOC_SAFE(buff);
 
     str = new_rquote(L"");
-    if (NULL == str) goto assert;
-
+    ALLOC_SAFE(str);
+    
+    SET_PG(str);
     newcell = str->u.rquote;
 
     c = bulk_getchar(src);
@@ -423,14 +413,13 @@ toy_parse_rquote(Bulk *src, wchar_t endc) {
         }
         
         if (0 != c) {
-            if (NULL == cell_add_char(newcell, c)) goto assert;
+            Cell *p;
+            p = cell_add_char(newcell, c);
+            ALLOC_SAFE(p);
         }
 	c = bulk_getchar(src);
     }
     return str;
-
-assert:
-    return NULL;
 
 parse_error:
     swprintf(buff, 256, L"Imbalanced close rquote '%lc' at line %d.",
@@ -452,8 +441,9 @@ toy_parse_list(Bulk *src, wchar_t endc) {
     ALLOC_SAFE(buff);
 
     newlist = new_list(NULL);
-    if (NULL == newlist) goto assert;
-
+    ALLOC_SAFE(newlist);
+    
+    SET_PG(newlist);
     l = newlist;
 
     while (EOF != (c = bulk_getchar(src))) {
@@ -484,35 +474,35 @@ toy_parse_list(Bulk *src, wchar_t endc) {
 
 	case L'(':
 	    any = toy_parse_list(src, L')');
-	    if (NULL == any) goto assert;
-	    if (GET_TAG(any) != LIST) goto parse_error;
+            ALLOC_SAFE(any);
+            if (GET_TAG(any) != LIST) goto parse_error;
 	    l = list_append(l, any);
 	    break;
 
 	case L'{':
 	    any = toy_parse_block(src, L'}');
-	    if (NULL == any) goto assert;
+            ALLOC_SAFE(any);
 	    if (GET_TAG(any) != BLOCK) goto parse_error;
 	    l = list_append(l, any);
 	    break;
 	    
 	case L'[':
 	    any = toy_parse_eval(src, L']');
-	    if (NULL == any) goto assert;
+            ALLOC_SAFE(any);
 	    if (GET_TAG(any) != EVAL) goto parse_error;
 	    l = list_append(l, any);
 	    break;
 	    
 	case L'\"':     // "
 	    any = toy_parse_string(src, L'\"');     // "
-	    if (NULL == any) goto assert;
+            ALLOC_SAFE(any);
 	    if (GET_TAG(any) != STRING) goto parse_error;
 	    l = list_append(l, any);
 	    break;
 
 	case L'\'':
 	    any = toy_parse_rquote(src, L'\'');
-	    if (NULL == any) goto assert;
+            ALLOC_SAFE(any);
 	    if (GET_TAG(any) != RQUOTE) goto parse_error;
 	    l = list_append(l, any);
 	    break;
@@ -530,12 +520,12 @@ toy_parse_list(Bulk *src, wchar_t endc) {
 
 	    bulk_ungetchar(src);
 	    any = toy_parse_symbol(src, ENDCHAR);
-	    if (NULL == any) goto assert;
+            ALLOC_SAFE(any);
 	    if (GET_TAG(any) != SYMBOL) goto parse_error;
 
 	    if (wcscmp(cell_get_addr(any->u.symbol.cell), L".") == 0) {
 		any = toy_parse_list(src, L')');
-		if (NULL == any) goto assert;
+                ALLOC_SAFE(any);
 
 		list_set_cdr(l, toy_symbol_conv(list_get_item(any)));
 		if (NULL == list_get_item(l)) list_set_car(l, new_bool(FALSE));
@@ -556,10 +546,6 @@ parse_end:
 parse_error:
     /* parse error */
     return any;
-
-assert:
-    /* may be not enough memory */
-    return NULL;
 }
 
 Toy_Type*
@@ -568,16 +554,14 @@ toy_parse_block(Bulk *src, wchar_t endc) {
     Toy_Type *newblock;
 
     script = toy_parse_script(src, L'}');
-    if (NULL == script) goto assert;
+    ALLOC_SAFE(script);
     if (GET_TAG(script) != SCRIPT) return script;
 
     newblock = new_block(script);
-    if (NULL == newblock) goto assert;
-
+    ALLOC_SAFE(newblock);
+    
+    SET_PG(newblock);
     return newblock;
-
-assert:
-    return NULL;
 }
 
 Toy_Type*
@@ -586,22 +570,21 @@ toy_parse_eval(Bulk* src, wchar_t endc) {
     Toy_Type *neweval;
 
     script = toy_parse_script(src, L']');
-    if (NULL == script) goto assert;
+    ALLOC_SAFE(script);
     if (GET_TAG(script) != SCRIPT) return script;
 
     neweval = new_eval(script);
-    if (NULL == neweval) goto assert;
-
+    ALLOC_SAFE(neweval);
+    
+    SET_PG(neweval);
     return neweval;
-
-assert:
-    return NULL;
 }
 
 Toy_Type* 
 toy_symbol_conv(Toy_Type *a) {
     wchar_t *addr, *p;
     mpz_t s;
+    Toy_Type *val;
 
     if (NULL == a) return new_bool(FALSE);
     if (GET_TAG(a) != SYMBOL) return a;
@@ -639,7 +622,10 @@ toy_symbol_conv(Toy_Type *a) {
 
     mpz_init(s);
     mpz_set_str(s, to_char(cell_get_addr(a->u.symbol.cell)), 10);
-    return new_integer(s);
+    val = new_integer(s);
+    ALLOC_SAFE(val)
+    SET_PG(val);
+    return val;
 
 non_integer:
 
@@ -672,7 +658,10 @@ non_integer:
 	    return new_real(wcstod(cell_get_addr(a->u.symbol.cell), NULL));
 	}
     } else if (*p == 0) {
-	return new_real(wcstod(cell_get_addr(a->u.symbol.cell), NULL));
+        val = new_real(wcstod(cell_get_addr(a->u.symbol.cell), NULL));
+        ALLOC_SAFE(val);
+        SET_PG(val);
+        return val;
     }
 
 non_real:
@@ -691,7 +680,10 @@ non_real:
 
 	mpz_init(s);
 	mpz_set_str(s, to_char(&(cell_get_addr(a->u.symbol.cell)[2])), 16);
-	return new_integer(s);
+        val = new_integer(s);
+        ALLOC_SAFE(val);
+        SET_PG(val);
+        return val;
     }
 
 non_hex:
@@ -710,7 +702,10 @@ non_hex:
 
 	mpz_init(s);
 	mpz_set_str(s, to_char(&(cell_get_addr(a->u.symbol.cell)[2])), 8);
-	return new_integer(s);
+        val = new_integer(s);
+        ALLOC_SAFE(val);
+        SET_PG(val);
+        return val;
     }
 
 non_octal:
