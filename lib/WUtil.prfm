@@ -304,7 +304,7 @@ defun show-message (
 ) {
     msg ::= $msgl join sep: "";
 
-    if {true? log} {
+    if {set? log} {
         msg ::= "Log: " . $msg;
         try {
             TaskManager output-console [">>>" . $msg];
@@ -313,7 +313,7 @@ defun show-message (
         return;
     };
     
-    if {true? debug} {
+    if {set? debug} {
         msg ::= "Debug: " . $msg;
         try {
             TaskManager output-console [">>>" . $msg];
@@ -321,11 +321,11 @@ defun show-message (
         };
     };
     
-    if {true? MainWindow} {
+    if {defvar? MainWindow} {
 	try {
             [$MainWindow get-minibuffer-window] ?? {throw ErrNoMiniBuffer "No MiniBuffer for debugging."};
             $MainWindow display-window-message "MiniBuffer" $msg;
-            if [true? bell] {
+            if [set? bell] {
                 $MainWindow get-minibuffer-window : 
                     set-color
                         0 0
@@ -339,7 +339,7 @@ defun show-message (
                         MINI_WINDOW 0;
             };
             $MainWindow get-minibuffer-window : refresh;
-            if [true? bell] {
+            if [set? bell] {
                 curs-flash;
             };
             if {set? msec} {sleep $msec};

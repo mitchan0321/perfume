@@ -719,20 +719,87 @@ defcommand untabify desc: "Untabify all text in the buffer." {
     tw ::= $buff get-buffer-tab-width;
     n := 0;
     $v each do: {| r |
-        result := "";
-        update := <nil>;
-        $r split sep: "" : each do: {| c |
-            if {$c = "\t"} {
-                l ::= $result display-width : % $tw;
-                $result append! [" " repeat [$tw - $l]];
-                update := <t>;
-            } {
-                $result append! $c;
-            };
-        };
+        (update result) ::= _untabify $r $tw;
         if $update {$buff line-update $result $n};
         $n ++;
     };
     
     result ALL;
+};
+
+defcommand tabify desc: "Tabify all text in the buffer." {
+    | main window |
+    buff ::= $window get-buffer;
+    geom ::= $window get-geom;
+    tw ::= $buff get-buffer-tab-width;
+    n := 0;
+    twlim ::= [[$tw / 2] <= 2] ??? 2 [$tw / 2];
+
+    show-message "Tabifying... ";
+    $buff get-vector : each do: {| r |
+        (dmy r) ::= _untabify $r $tw;
+        update := <nil>;
+        clist := ("");
+        
+        $r split sep: "" : each do: {| c |
+            $clist last : car : append! $c;
+            if {[_count_list_width $clist] % $tw : = 0} {
+                $clist <<- "";
+            };
+        };
+
+        nlist := ();
+        update := <nil>;
+        $clist each do: {| i |
+            e ::= "" . $i;
+            sp ::= _count_last_space $e;
+            if {$sp >= $twlim} {
+                $e truncate! $sp;
+                $e append! "\t";
+                update := <t>;
+            };
+            $nlist <<- $e;
+        };
+            
+        if $update {
+            result ::= $nlist join sep: "";
+            $buff line-update $result $n;
+        };
+        
+        $n ++;
+    };
+    show-message "Tabifying... Done.";
+    
+    result ALL;
+};
+
+defun _untabify (r tw) {
+    update := <nil>;
+    result := "";
+    $r split sep: "" : each do: {| c |
+        if {$c = "\t"} {
+            l ::= $result display-width : % $tw;
+            $result append! [" " repeat [$tw - $l]];
+            update := <t>;
+        } {
+            $result append! $c;
+        };
+    };
+    return ($update $result);
+};
+    
+defun _count_list_width (l) {
+    $l inject 0 do: {| s i | $s + [$i display-width]};
+};
+
+defun _count_last_space (r) {
+    count := 0;
+    for {set i -1} {$i >= [$r len : neg]} {$i --} do: {
+        if {$r at $i : = " "} {
+            $count ++;
+        } {
+            break;
+        };
+    };
+    return $count;
 };
