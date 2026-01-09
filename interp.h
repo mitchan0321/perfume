@@ -2,9 +2,47 @@
 #define __INTERP__
 
 #include <t_gc.h>
+#include <unistd.h>
+#include <setjmp.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <string.h>
 #include "types.h"
 #include "hash.h"
 
+
+#define _SAFE_OUT_BUF_SIZE (512)
+#define _SAFE_BACKUP_SIZE (128*1024)
+#define ALLOC_OUT(x)   write(2, x, strlen(x));
+#define ALLOC_SAFE(x)  if (! x) _alloc_safe((char*)__FILE__ , (char*)__FUNCTION__ , (int)__LINE__);
+
+#define INIT_ALLOC_HOOK(x) {                        	            	                    \
+    extern jmp_buf *_safe_jmp_buf;                                                          \
+    extern char _safe_out_buf[_SAFE_OUT_BUF_SIZE];                                          \
+    extern char *_safe_backup;                                                              \
+    if (NULL == _safe_jmp_buf) {    	        	        	    	            \
+        _safe_jmp_buf = malloc(sizeof(jmp_buf));                                            \
+        if (NULL == _safe_jmp_buf) {                                                        \
+            ALLOC_OUT("at INIT_ALLOC_HOOK, failed set jumb buffer.\n");                     \
+            exit(255);              	            	                                    \
+        }           	                                                                    \
+    }                                       	                                            \
+    x = setjmp(*_safe_jmp_buf);             	                        	            \
+    if (0 != x) {       	                                	                    \
+        if (_safe_backup == NULL) {       	            	                            \
+            ALLOC_OUT("at INIT_ALLOC_HOOK, no reserved memory, exit.\n");                   \
+            exit(254);                           	                                    \
+        }                                        	                                    \
+        free(_safe_jmp_buf);                                        	                    \
+        _safe_jmp_buf = NULL;               	            	                            \
+        _safe_backup = NULL;               	            	                            \
+        GC_gcollect();               	            	                                    \
+        ALLOC_OUT("at INIT_ALLOC_HOOK, return errored.\n");                                 \
+    }                                                       	                            \
+}
+
+void            _alloc_safe(char *file_name, char *func_name, int line);
 Toy_Interp*	new_interp(wchar_t* name, int stack_size, Toy_Interp* parent,
 			   int argc, char** argv, char** envp, char *dir);
 Toy_Interp*	interp_setup(Toy_Interp* interp, int argc, char** argv, char** envp, char *dir);

@@ -12,6 +12,13 @@
 #include "global.h"
 #include "cstack.h"
 
+// INIT_ALLOC_HOOK / ALLOC_SAFE / ALLOC_OUT defines
+jmp_buf *_safe_jmp_buf = NULL;
+char _safe_out_buf[_SAFE_OUT_BUF_SIZE];
+char *_safe_backup = NULL;
+
+int _gc_init_once = 0;
+
 Toy_Type* cmd_pwd(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen);
 static Toy_Type* parse_env(char* buff, char sep);
 
@@ -44,16 +51,31 @@ free_wrapper(void* ptr, size_t old) {
 }
 #endif /* PROF */
 
+void
+_alloc_safe(char *file_name, char *func_name, int line) {
+    extern jmp_buf *_safe_jmp_buf;
+    extern char _safe_out_buf[_SAFE_OUT_BUF_SIZE];
+    
+    snprintf(_safe_out_buf, _SAFE_OUT_BUF_SIZE, "at _alloc_safe, GC_MALLOC faild in file=%s, function=%s, line=%d\n",
+             file_name, func_name, line);
+    ALLOC_OUT(_safe_out_buf);
+    if (NULL == _safe_jmp_buf) {
+        ALLOC_OUT("at _alloc_safe, no handler defined, exit.\n");
+        exit(255);
+    }
+    ALLOC_OUT("at _alloc_safe, jump to handler.\n");
+    longjmp(*_safe_jmp_buf, 1);
+}
+
 Toy_Interp*
 new_interp(wchar_t* name, int stack_size, Toy_Interp* parent,
 	   int argc, char **argv, char **envp, char *dir) {
 
     Toy_Interp *interp;
     Toy_Type *l, *t;
-    
-    static int gc_init_once = 0;
+    extern int _gc_init_once;
 
-    if (0 == gc_init_once) {
+    if (0 == _gc_init_once) {
 #ifndef PROF
 	mp_set_memory_functions(malloc_wrapper,
 				realloc_wrapper,
@@ -61,11 +83,14 @@ new_interp(wchar_t* name, int stack_size, Toy_Interp* parent,
 #endif /* PROF */
 	GC_INIT();
 	init_cstack();
-	gc_init_once = 1;
+	_gc_init_once = 1;
     }
 
+    // reserve backup memory 128KB, it's released at memory alloc failed.
+    _safe_backup = GC_MALLOC(_SAFE_BACKUP_SIZE);
+    memset(_safe_backup, 0, _SAFE_BACKUP_SIZE);
+    
     interp = GC_MALLOC(sizeof(Toy_Interp));
-    ALLOC_SAFE(interp);
     memset(interp, 0, sizeof(Toy_Interp));
 
     if (NULL == parent) {
@@ -259,6 +284,7 @@ interp_setup(Toy_Interp* interp, int argc, char **argv, char **envp, char *dir) 
         wdir = to_wchar(dir);
         plen = wcslen(wdir) + wcslen(LIB_PATH) + 1;
         p = GC_MALLOC(plen * sizeof(wchar_t*));
+        ALLOC_SAFE(p);
         swprintf(p, plen, L"%ls%ls", wdir, LIB_PATH);
         p[plen-1] = 0;
         hash_set_t(gdict, const_LIB_PATH, new_list(new_string_str(p)));
@@ -310,6 +336,7 @@ interp_setup(Toy_Interp* interp, int argc, char **argv, char **envp, char *dir) 
         wdir = to_wchar(dir);
         plen = wcslen(wdir) + wcslen(SETUP_FILE) + 1;
         p = GC_MALLOC(plen * sizeof(wchar_t*));
+        ALLOC_SAFE(p);
         swprintf(p, plen, L"%ls%ls", wdir, SETUP_FILE);
         p[plen-1] = 0;
         list_append(setupl, new_string_str(p));
