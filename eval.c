@@ -11,27 +11,27 @@
 #include "cstack.h"
 
 static Toy_Type* bind_args(Toy_Interp*, Toy_Type* arglist, struct _toy_argspec* argspec,
-			   Toy_Env**, Hash* args, int fun_paramno, int call_paramno, 
-			   Toy_Func_Trace_Info *trace_info);
+                           Toy_Env**, Hash* args, int fun_paramno, int call_paramno, 
+                           Toy_Func_Trace_Info *trace_info);
 static Toy_Type* eval_sig_handl(Toy_Interp *interp, int code);
 static Toy_Type* toy_yield_bind(Toy_Interp *interp, Toy_Type *bind_var);
 
 /*
 #define SET_RESULT(interp,obj) \
-	hash_set_t(interp->func_stack[interp->cur_func_stack]->localvar,const_Question,obj)
+        hash_set_t(interp->func_stack[interp->cur_func_stack]->localvar,const_Question,obj)
 */
 
-#define SIG_ACTION() 							\
-	if (sig_flag && (! interp->co_calling)				\
-	     && (! interp->signal_mask_enable)) {			\
-		Toy_Type *sig_result;					\
-		int code = sig_flag;					\
-		sig_flag = 0;						\
-		sig_result = eval_sig_handl(interp, code);		\
-		if (sig_result && (! IS_NIL(sig_result))) {		\
-			result = sig_result;				\
-		}							\
-	}
+#define SIG_ACTION()                                                    \
+        if (sig_flag && (! interp->co_calling)                          \
+             && (! interp->signal_mask_enable)) {                       \
+                Toy_Type *sig_result;                                   \
+                int code = sig_flag;                                    \
+                sig_flag = 0;                                           \
+                sig_result = eval_sig_handl(interp, code);              \
+                if (sig_result && (! IS_NIL(sig_result))) {             \
+                        result = sig_result;                            \
+                }                                                       \
+        }
 
 #ifdef EVAL_STAT
 unsigned long long int count_eval_script = 0;
@@ -57,7 +57,7 @@ toy_eval_script(Toy_Interp* interp, Toy_Type *script) {
 #endif /* EVAL_STAT */
 
     if ((((unsigned long)(&baria_dist)) - ((unsigned long)cstack_get_safe_addr())) < (MP_PAGESIZE*8)) {
-	return new_exception(TE_STACKOVERFLOW, L"C stack pointer entered the barrier area.", interp);
+        return new_exception(TE_STACKOVERFLOW, L"C stack pointer entered the barrier area.", interp);
     }
 
     SIG_ACTION();
@@ -74,74 +74,74 @@ toy_eval_script(Toy_Interp* interp, Toy_Type *script) {
 
     script_id = interp->script_id;
     if (GET_SCRIPT_ID(script) > 0) {
-	interp->script_id = GET_SCRIPT_ID(script);
+        interp->script_id = GET_SCRIPT_ID(script);
     }
 
     if (CStack_in_baria) {
-	/* +++ */
-	fwprintf(stderr, L"toy_eval_script: detect SOVF(1)\n");
-	result = new_exception(TE_STACKOVERFLOW, L"C stack overflow.", interp);
-	interp->script_id = script_id;
-	cstack_return();
-	return result;
+        /* +++ */
+        fwprintf(stderr, L"toy_eval_script: detect SOVF(1)\n");
+        result = new_exception(TE_STACKOVERFLOW, L"C stack overflow.", interp);
+        interp->script_id = script_id;
+        cstack_return();
+        return result;
     }
 
     while (l) {
-	result = toy_eval(interp, list_get_item(l), &env);
-	interp->last_status = result;
+        result = toy_eval(interp, list_get_item(l), &env);
+        interp->last_status = result;
 
-	if (CStack_in_baria) {
-	    /* +++ */
-	    fwprintf(stderr, L"toy_eval_script: detect SOVF(2)\n");
-	    result = new_exception(TE_STACKOVERFLOW, L"C stack overflow.", interp);
-	}
+        if (CStack_in_baria) {
+            /* +++ */
+            fwprintf(stderr, L"toy_eval_script: detect SOVF(2)\n");
+            result = new_exception(TE_STACKOVERFLOW, L"C stack overflow.", interp);
+        }
 
-	if (interp->itimer_enable && SigAlrm && (! interp->signal_mask_enable)) {
-	    SigAlrm = 0;
-	    if ((interp->coroid != 0) && cstack_isalive(interp->cstack_id)) {
-		if (interp->co_parent) {
-		    if (interp->co_parent->co_calling) {
+        if (interp->itimer_enable && SigAlrm && (! interp->signal_mask_enable)) {
+            SigAlrm = 0;
+            if ((interp->coroid != 0) && cstack_isalive(interp->cstack_id)) {
+                if (interp->co_parent) {
+                    if (interp->co_parent->co_calling) {
                         interp->co_parent->co_value = new_intr(INTR_ITIMER);
 #ifdef CORU_USE
                         coru_yield();
 #else
                         co_resume();
 #endif /* CORU_USE */
-			SigAlrm = 0;
-		    }
-		}
-	    }
-	}
-	
-	SIG_ACTION();
+                        SigAlrm = 0;
+                    }
+                }
+            }
+        }
+        
+        SIG_ACTION();
 
-	t = GET_TAG(result);
-	if ((t == CONTROL) || (t == EXCEPTION)) {
-	    if ((t == EXCEPTION) &&
-		(wcscmp(TE_NOFUNC, cell_get_addr(result->u.exception.code)) == 0)) {
-		Toy_Type *body;
+        t = GET_TAG(result);
+        if ((t == CONTROL) || (t == EXCEPTION)) {
+            if ((t == EXCEPTION) &&
+                (wcscmp(TE_NOFUNC, cell_get_addr(result->u.exception.code)) == 0)) {
+                Toy_Type *body;
 
-		if (NULL != hash_get_t(interp->funcs, const_unknown)) {
+                if (NULL != hash_get_t(interp->funcs, const_unknown)) {
 
-		    body = new_list(const_unknown);
-		    list_set_cdr(body, list_get_item(l)->u.statement.item_list);
+                    body = new_list(const_unknown);
+                    list_set_cdr(body, list_get_item(l)->u.statement.item_list);
 
-		    result = toy_call(interp, body);
-		    interp->last_status = result;
-		    if (GET_TAG(result) == EXCEPTION) {
-			interp->script_id = script_id;
-			return result;
-		    }
-		}
+                    result = toy_call(interp, body);
+                    interp->last_status = result;
+                    if (GET_TAG(result) == EXCEPTION) {
+                        interp->script_id = script_id;
+                        return result;
+                    }
+                }
 
-	    } else {
-		interp->script_id = script_id;	    
-		if (CStack_in_baria) cstack_return();
-		return result;
-	    }
-	}
+            } else {
+                interp->script_id = script_id;      
+                if (CStack_in_baria) cstack_return();
+                return result;
+            }
+        }
 
-	l = list_next(l);
+        l = list_next(l);
     }
 
     interp->script_id = script_id;
@@ -185,9 +185,9 @@ control_goto:
     ALLOC_SAFE(trace_info);
     trace_info->line = statement->u.statement.trace_info->line;
     if (interp->cur_func_stack >= 0) {
-	trace_info->func_name_caller = interp->func_stack[interp->cur_func_stack]->trace_info->func_name;
+        trace_info->func_name_caller = interp->func_stack[interp->cur_func_stack]->trace_info->func_name;
     } else {
-	trace_info->func_name_caller = new_symbol(L"(unknown)");
+        trace_info->func_name_caller = new_symbol(L"(unknown)");
     }
     trace_info->func_name = list_get_item(l);
     trace_info->object_name = const_Nil;
@@ -197,22 +197,22 @@ control_goto:
     paramno_hint = GET_PARAMNO(statement);
 
     if (interp->trace && (! interp->debug_in)) {
-	wchar_t *buff;
-	char *cbuff;
-	int sts;
+        wchar_t *buff;
+        char *cbuff;
+        int sts;
 
-	buff = GC_MALLOC(512*sizeof(wchar_t));
-	ALLOC_SAFE(buff);
-	swprintf(buff, 512, L"%ls:%d: %ls\n",
-		 get_script_path(interp, interp->script_id),
-		 trace_info->line,
-		 to_string(statement));
-	buff[511] = 0;
-	cbuff = to_char(buff);
-	sts = write(interp->trace_fd, cbuff, strlen(cbuff));
-	if (-1 == sts) {
+        buff = GC_MALLOC(512*sizeof(wchar_t));
+        ALLOC_SAFE(buff);
+        swprintf(buff, 512, L"%ls:%d: %ls\n",
+                 get_script_path(interp, interp->script_id),
+                 trace_info->line,
+                 to_string(statement));
+        buff[511] = 0;
+        cbuff = to_char(buff);
+        sts = write(interp->trace_fd, cbuff, strlen(cbuff));
+        if (-1 == sts) {
             /* 
-	    fprintf(stderr, "Error occured at trace write, error= %s, fd= %d\n", 
+            fprintf(stderr, "Error occured at trace write, error= %s, fd= %d\n", 
                 strerror(errno),
                 interp->trace_fd
             );
@@ -222,231 +222,231 @@ control_goto:
     }
 
     if (IS_LIST_NULL(l)) {
-	ret = const_Nil;
-	goto exit_eval;
+        ret = const_Nil;
+        goto exit_eval;
     }
 
     first = list_get_item(l);
     if (GET_TAG(first) == REF) {
-	first = toy_resolv_var(interp, first, 1, trace_info);
-	if (GET_TAG(first) == EXCEPTION) {
-	    ret = first;
-	    goto exit_eval;
-	}
+        first = toy_resolv_var(interp, first, 1, trace_info);
+        if (GET_TAG(first) == EXCEPTION) {
+            ret = first;
+            goto exit_eval;
+        }
     } else if (GET_TAG(first) == LIST) {
-	first = toy_expand(interp, first, env, trace_info);
+        first = toy_expand(interp, first, env, trace_info);
     } else if ((GET_TAG(first) == INTEGER) || (GET_TAG(first) == STRING)) {
-	first = toy_clone(first);
+        first = toy_clone(first);
     }
     self = first;
 
     if (GET_TAG(first) != SYMBOL && GET_TAG(first) != LIST) {
-	first = toy_expand(interp, first, env, trace_info);
-	if (GET_TAG(first) == EXCEPTION) {
-	    ret = first;
-	    goto exit_eval;
-	}
-	if (GET_TAG(first) == BIND) {
-	    ret = toy_yield_bind(interp, first->u.bind_var);
-	    goto exit_eval;
-	}
-	self = first;
+        first = toy_expand(interp, first, env, trace_info);
+        if (GET_TAG(first) == EXCEPTION) {
+            ret = first;
+            goto exit_eval;
+        }
+        if (GET_TAG(first) == BIND) {
+            ret = toy_yield_bind(interp, first->u.bind_var);
+            goto exit_eval;
+        }
+        self = first;
     }
 
     switch (GET_TAG(first)) {
     case SYMBOL:
-	trace_info->func_name = first;
-	tfirst = toy_resolv_function(interp, first);
+        trace_info->func_name = first;
+        tfirst = toy_resolv_function(interp, first);
 
-	if (NULL == tfirst) {
-	    Cell *msg;
+        if (NULL == tfirst) {
+            Cell *msg;
 
-	    msg = new_cell(L"No such function, '");
-	    cell_add_str(msg, to_string(first));
-	    cell_add_str(msg, L"'.");
+            msg = new_cell(L"No such function, '");
+            cell_add_str(msg, to_string(first));
+            cell_add_str(msg, L"'.");
             ret = new_exception(TE_NOFUNC, cell_get_addr(msg), interp);
-	    goto exit_eval;
-	}
-	first = tfirst;
-	break;
+            goto exit_eval;
+        }
+        first = tfirst;
+        break;
 
     case OBJECT: case FUNC: case NATIVE:
-	break;
+        break;
 
     default:
-	first = toy_resolv_object(interp, first);
-	if (GET_TAG(first) == EXCEPTION) {
-	    ret = first;
-	    goto exit_eval;
-	}
+        first = toy_resolv_object(interp, first);
+        if (GET_TAG(first) == EXCEPTION) {
+            ret = first;
+            goto exit_eval;
+        }
     }
 
     if (GET_TAG(first) == OBJECT) {
 
-	l = list_next(l);
-	method = list_get_item(l);
-	if (method == NULL) {
-	    msg = new_cell(L"No specified method");
+        l = list_next(l);
+        method = list_get_item(l);
+        if (method == NULL) {
+            msg = new_cell(L"No specified method");
             ret = new_exception(TE_NOMETHOD, cell_get_addr(msg), interp);
- 	    goto exit_eval;
-	}
-	if (GET_TAG(method) != SYMBOL) {
-	    method = toy_expand(interp, method, env, trace_info);
-	    if (GET_TAG(method) == EXCEPTION) {
-		ret = first;
-		goto exit_eval;
-	    }
-	}
-	if (GET_TAG(method) != SYMBOL) {
-	    msg = new_cell(L"Method is not a symbol, '");
-	    cell_add_str(msg, to_string(method));
-	    cell_add_str(msg, L"'.");
+            goto exit_eval;
+        }
+        if (GET_TAG(method) != SYMBOL) {
+            method = toy_expand(interp, method, env, trace_info);
+            if (GET_TAG(method) == EXCEPTION) {
+                ret = first;
+                goto exit_eval;
+            }
+        }
+        if (GET_TAG(method) != SYMBOL) {
+            msg = new_cell(L"Method is not a symbol, '");
+            cell_add_str(msg, to_string(method));
+            cell_add_str(msg, L"'.");
             ret = new_exception(TE_BADMETHOD, cell_get_addr(msg), interp);
-	    goto exit_eval;
-	}
-	trace_info->func_name = method;
-	method = search_method(interp, first, method);
-	if (GET_TAG(method) == EXCEPTION) {
-	    ret = method;
-	    goto exit_eval;
-	}
-	obj_env = toy_new_obj_env(interp, first, self);
-	trace_info->object_name = first;
-	first = method;
+            goto exit_eval;
+        }
+        trace_info->func_name = method;
+        method = search_method(interp, first, method);
+        if (GET_TAG(method) == EXCEPTION) {
+            ret = method;
+            goto exit_eval;
+        }
+        obj_env = toy_new_obj_env(interp, first, self);
+        trace_info->object_name = first;
+        first = method;
 
-	if (paramno_hint != TAG_MAX_PARAMNO) {
-	    paramno_hint --;
-	}
+        if (paramno_hint != TAG_MAX_PARAMNO) {
+            paramno_hint --;
+        }
     }
 
     if (interp->debug && (! interp->debug_in)) {
-	Toy_Type *cmd;
+        Toy_Type *cmd;
 
-	interp->debug_in = 1;
+        interp->debug_in = 1;
 
-	cmd = new_list(const_debug_hook);
+        cmd = new_list(const_debug_hook);
 
-	list_append(cmd, new_integer_si(trace_info->line));
+        list_append(cmd, new_integer_si(trace_info->line));
 
-	if (trace_info->object_name) {
-	    list_append(cmd, trace_info->object_name);
-	} else {
-	    list_append(cmd, const_Nil);
-	}
-	
-	if (trace_info->func_name) {
-	    list_append(cmd, trace_info->func_name_caller);
-	} else {
-	    list_append(cmd, const_Nil);
-	}
+        if (trace_info->object_name) {
+            list_append(cmd, trace_info->object_name);
+        } else {
+            list_append(cmd, const_Nil);
+        }
+        
+        if (trace_info->func_name) {
+            list_append(cmd, trace_info->func_name_caller);
+        } else {
+            list_append(cmd, const_Nil);
+        }
 
-	if (trace_info->statement) {
-	    list_append(cmd, trace_info->statement);
-	} else {
-	    list_append(cmd, const_Nil);
-	}
-	list_append(cmd, new_string_str((get_script_path(interp, interp->script_id))));
-	list_append(cmd, new_dict(interp->func_stack[interp->cur_func_stack]->localvar));
-	list_append(cmd, new_integer_si(interp->cur_func_stack));
-	list_append(cmd, interp->func_stack[interp->cur_func_stack]->trace_info->func_name);
+        if (trace_info->statement) {
+            list_append(cmd, trace_info->statement);
+        } else {
+            list_append(cmd, const_Nil);
+        }
+        list_append(cmd, new_string_str((get_script_path(interp, interp->script_id))));
+        list_append(cmd, new_dict(interp->func_stack[interp->cur_func_stack]->localvar));
+        list_append(cmd, new_integer_si(interp->cur_func_stack));
+        list_append(cmd, interp->func_stack[interp->cur_func_stack]->trace_info->func_name);
 
         toy_eval_script(interp, new_script(new_list(new_statement(cmd, trace_info->line))));
-	
-	interp->debug_in = 0;
+        
+        interp->debug_in = 0;
     }
     
     switch (GET_TAG(first)) {
     case NATIVE:
-	l = list_next(l);
-	posargsl = posargs = new_list(NULL);
-	namedargs = new_hash();
-	while (l) {
-	    arg = list_get_item(l);
+        l = list_next(l);
+        posargsl = posargs = new_list(NULL);
+        namedargs = new_hash();
+        while (l) {
+            arg = list_get_item(l);
 
-	    if (GET_TAG(arg) == SYMBOL) {
-		if (IS_SWITCH_SYM(arg)) {
-		    Cell *ckey;
-		    ckey = new_cell(&(cell_get_addr(arg->u.symbol.cell)[1]));
-		    cell_add_str(ckey, L":");
-		    hash_set(namedargs, cell_get_addr(ckey), const_T);
-		} else if (IS_NAMED_SYM(arg)) {
-		    name = arg;
-		    l = list_next(l);
-		    if (NULL == l) {
-			msg = new_cell(L"No given named argument variable, name: '");
-			cell_add_str(msg, cell_get_addr(name->u.symbol.cell));
-			cell_add_str(msg, L"'.");
+            if (GET_TAG(arg) == SYMBOL) {
+                if (IS_SWITCH_SYM(arg)) {
+                    Cell *ckey;
+                    ckey = new_cell(&(cell_get_addr(arg->u.symbol.cell)[1]));
+                    cell_add_str(ckey, L":");
+                    hash_set(namedargs, cell_get_addr(ckey), const_T);
+                } else if (IS_NAMED_SYM(arg)) {
+                    name = arg;
+                    l = list_next(l);
+                    if (NULL == l) {
+                        msg = new_cell(L"No given named argument variable, name: '");
+                        cell_add_str(msg, cell_get_addr(name->u.symbol.cell));
+                        cell_add_str(msg, L"'.");
                         ret = new_exception(TE_NONAMEARG, cell_get_addr(msg), interp);
-			goto exit_eval;
-		    }
-		    arg = toy_expand(interp, list_get_item(l), env, trace_info);
-		    if (GET_TAG(arg) == EXCEPTION) {
-			ret = arg;
-			goto exit_eval;
-		    }
-		    hash_set_t(namedargs, name, arg);
-		} else {
-		    posargs = list_append(posargs, arg);
-		    arglen++;
-		}
-	    } else {
-		arg = toy_expand(interp, arg, env, trace_info);
-		if (GET_TAG(arg) == EXCEPTION) {
-		    ret = arg;
-		    goto exit_eval;
-		}
-		posargs = list_append(posargs, arg);
-		arglen++;
-	    }
+                        goto exit_eval;
+                    }
+                    arg = toy_expand(interp, list_get_item(l), env, trace_info);
+                    if (GET_TAG(arg) == EXCEPTION) {
+                        ret = arg;
+                        goto exit_eval;
+                    }
+                    hash_set_t(namedargs, name, arg);
+                } else {
+                    posargs = list_append(posargs, arg);
+                    arglen++;
+                }
+            } else {
+                arg = toy_expand(interp, arg, env, trace_info);
+                if (GET_TAG(arg) == EXCEPTION) {
+                    ret = arg;
+                    goto exit_eval;
+                }
+                posargs = list_append(posargs, arg);
+                arglen++;
+            }
 
-	    l = list_next(l);
-	}
-	if (NULL != obj_env) {
-	    if (0 == toy_push_obj_env(interp, obj_env)) {
+            l = list_next(l);
+        }
+        if (NULL != obj_env) {
+            if (0 == toy_push_obj_env(interp, obj_env)) {
                 ret = new_exception(TE_STACKOVERFLOW, L"Object satck overflow.", interp);
-		goto exit_eval;
-	    }
+                goto exit_eval;
+            }
             ostack_use = 1;
-	}
+        }
 
         ret = (first->u.native.cfunc)(interp, posargsl, namedargs, arglen);
-	goto exit_eval;
+        goto exit_eval;
 
     case FUNC:
-	if (! local_var) {
-	    local_var = new_hash();
-	}
+        if (! local_var) {
+            local_var = new_hash();
+        }
 
-	ret = bind_args(interp, list_next(l), first->u.func.argspec, env, local_var,
-			GET_PARAMNO(first), paramno_hint, trace_info);
-	if (GET_TAG(ret) == EXCEPTION) {
-	    goto exit_eval;
-	}
+        ret = bind_args(interp, list_next(l), first->u.func.argspec, env, local_var,
+                        GET_PARAMNO(first), paramno_hint, trace_info);
+        if (GET_TAG(ret) == EXCEPTION) {
+            goto exit_eval;
+        }
 
-	if (NULL != obj_env) {
-	    if (0 == toy_push_obj_env(interp, obj_env)) {
+        if (NULL != obj_env) {
+            if (0 == toy_push_obj_env(interp, obj_env)) {
                 ret = new_exception(TE_STACKOVERFLOW, L"Object satck overflow.", interp);
-		goto exit_eval;
-	    }
-	    ostack_use = 1;
-	}
+                goto exit_eval;
+            }
+            ostack_use = 1;
+        }
 
-	script_id = interp->script_id;
-	interp->script_id = GET_SCRIPT_ID(first->u.func.closure->u.closure.block_body);
-	if (0 == toy_push_func_env(interp, local_var,
-				   first->u.func.closure->u.closure.env->func_env, NULL, trace_info)) {
+        script_id = interp->script_id;
+        interp->script_id = GET_SCRIPT_ID(first->u.func.closure->u.closure.block_body);
+        if (0 == toy_push_func_env(interp, local_var,
+                                   first->u.func.closure->u.closure.env->func_env, NULL, trace_info)) {
 
             ret = new_exception(TE_STACKOVERFLOW, L"Function satck overflow.", interp);
-	    goto exit_eval;
-	}
-	lstack_use = 1;
+            goto exit_eval;
+        }
+        lstack_use = 1;
 
-	interp->current_func = first;
+        interp->current_func = first;
         ret = toy_eval_script(interp, first->u.func.closure->u.closure.block_body);
-	if ((GET_TAG(ret) == CONTROL) && (ret->u.control.code == CTRL_RETURN)) {	    
-	    ret = ret->u.control.ret_value;
-	}
-	goto exit_eval;
+        if ((GET_TAG(ret) == CONTROL) && (ret->u.control.code == CTRL_RETURN)) {            
+            ret = ret->u.control.ret_value;
+        }
+        goto exit_eval;
 
     default:
         ret = new_exception(TE_NORUNNABLE, L"No runnable object.", interp);
@@ -455,30 +455,30 @@ control_goto:
 exit_eval:
 
     if (ostack_use) {
-	toy_pop_obj_env(interp);
+        toy_pop_obj_env(interp);
     }
 
     if (lstack_use) {
-	toy_pop_func_env(interp);
+        toy_pop_func_env(interp);
 
-	if ((GET_TAG(ret) == CONTROL) && (ret->u.control.code == CTRL_GOTO)) {
-	    Toy_Type *ctrl_ret;
+        if ((GET_TAG(ret) == CONTROL) && (ret->u.control.code == CTRL_GOTO)) {
+            Toy_Type *ctrl_ret;
 
-	    ctrl_ret = ret->u.control.ret_value;
-	    local_var = list_get_item(ctrl_ret)->u.dict;
+            ctrl_ret = ret->u.control.ret_value;
+            local_var = list_get_item(ctrl_ret)->u.dict;
 
-	    ctrl_ret = list_next(ctrl_ret);
-	    statement = new_statement(list_get_item(ctrl_ret), trace_info->line);
+            ctrl_ret = list_next(ctrl_ret);
+            statement = new_statement(list_get_item(ctrl_ret), trace_info->line);
 
-	    goto control_goto;
-	}
+            goto control_goto;
+        }
     }
 
     /* SET_RESULT(interp, ret); */
 
     if (GET_TAG(ret) == EXCEPTION) {
-	hash_set_t(interp->globals, const_atstacktrace,
-		   list_get_item(list_next(ret->u.exception.msg_list)));
+        hash_set_t(interp->globals, const_atstacktrace,
+                   list_get_item(list_next(ret->u.exception.msg_list)));
     }
 
     if (script_id != -1) interp->script_id = script_id;
@@ -496,51 +496,51 @@ toy_expand(Toy_Interp* interp, Toy_Type* obj, Toy_Env** env, Toy_Func_Trace_Info
         return obj;
     
     case REF:
-	return toy_resolv_var(interp, obj, 1, trace_info);
+        return toy_resolv_var(interp, obj, 1, trace_info);
 
     case LIST:
-	return toy_expand_list(interp, obj, env, trace_info);
+        return toy_expand_list(interp, obj, env, trace_info);
 
     case BLOCK:
-	if (*env == NULL) {
-	    *env = new_closure_env(interp);
-	}
-	return new_closure(obj->u.block_body, *env, interp->script_id);
+        if (*env == NULL) {
+            *env = new_closure_env(interp);
+        }
+        return new_closure(obj->u.block_body, *env, interp->script_id);
 
     case EVAL:
-	return toy_eval_script(interp, obj->u.eval_body);
+        return toy_eval_script(interp, obj->u.eval_body);
 
     case GETMACRO:
     {
-	Toy_Type *st, *stl, *result;
+        Toy_Type *st, *stl, *result;
 
-	if (GET_TAG(obj->u.getmacro.obj) == SYMBOL) {
-	    return new_exception(TE_SYNTAX, L"Bad left item at GETMACRO.", interp);
-	}
-	
-	stl = st = new_list(obj->u.getmacro.obj);
-	st = list_append(st, const_Get);
-	st = list_append(st, obj->u.getmacro.para);
+        if (GET_TAG(obj->u.getmacro.obj) == SYMBOL) {
+            return new_exception(TE_SYNTAX, L"Bad left item at GETMACRO.", interp);
+        }
+        
+        stl = st = new_list(obj->u.getmacro.obj);
+        st = list_append(st, const_Get);
+        st = list_append(st, obj->u.getmacro.para);
 
-	result = toy_eval(interp, new_statement(stl, trace_info->line), env);
-	return result;
+        result = toy_eval(interp, new_statement(stl, trace_info->line), env);
+        return result;
     }
 
     case INITMACRO:
     {
-	Toy_Type *st, *stl, *result;
+        Toy_Type *st, *stl, *result;
 
-	stl = st = new_list(const_new);
-	st = list_append(st, obj->u.initmacro.class);
-	st = list_append(st, const_init);
-	st = list_append(st, obj->u.initmacro.param);
+        stl = st = new_list(const_new);
+        st = list_append(st, obj->u.initmacro.class);
+        st = list_append(st, const_init);
+        st = list_append(st, obj->u.initmacro.param);
 
-	result = toy_eval(interp, new_statement(stl, trace_info->line), env);
-	return result;
+        result = toy_eval(interp, new_statement(stl, trace_info->line), env);
+        return result;
     }
     
     default:
-	return obj;
+        return obj;
     }
 }
 
@@ -553,22 +553,22 @@ toy_expand_list(Toy_Interp* interp, Toy_Type* list, Toy_Env** env, Toy_Func_Trac
 
     sl = list;
     while (sl) {
-	
-	if (GET_TAG(sl) != LIST) {
-	    if (GET_TAG(sl) == SYMBOL) {
-		a = sl;
-	    } else {
-		a = toy_expand(interp, sl, env, trace_info);
-	    }
-	    list_set_cdr(nlist, a);
-	    break;
-	}
+        
+        if (GET_TAG(sl) != LIST) {
+            if (GET_TAG(sl) == SYMBOL) {
+                a = sl;
+            } else {
+                a = toy_expand(interp, sl, env, trace_info);
+            }
+            list_set_cdr(nlist, a);
+            break;
+        }
 
-	a = toy_expand(interp, toy_clone(list_get_item(sl)), env, trace_info);
-	if (GET_TAG(a) == EXCEPTION) return a;
+        a = toy_expand(interp, toy_clone(list_get_item(sl)), env, trace_info);
+        if (GET_TAG(a) == EXCEPTION) return a;
 
-	nlist = list_append(nlist, a);
-	sl = list_next(sl);
+        nlist = list_append(nlist, a);
+        sl = list_next(sl);
     }
     
     return l;
@@ -603,59 +603,59 @@ toy_resolv_var(Toy_Interp* interp, Toy_Type* var, int stack_trace, Toy_Func_Trac
     h = interp->func_stack[interp->cur_func_stack]->localvar;
     val = hash_get_t(h, var);
     if (NULL != val) {
-	if (IS_LAZY(val) && (GET_TAG(val) == CLOSURE)) {
+        if (IS_LAZY(val) && (GET_TAG(val) == CLOSURE)) {
 #ifdef EVAL_STAT
             count_lazy_expand ++;
 #endif /* EVAL_STAT */
-	    val = eval_closure(interp, val, trace_info);
-	    hash_set_t(h, var, val);
-	}
-	return val;
+            val = eval_closure(interp, val, trace_info);
+            hash_set_t(h, var, val);
+        }
+        return val;
     }
 
     upenv = interp->func_stack[interp->cur_func_stack]->upstack;
     while (upenv) {
-	h = upenv->localvar;
-	if (h) {
-	    val = hash_get_t(h, var);
-	    if (NULL != val) {
-		if (IS_LAZY(val) && (GET_TAG(val) == CLOSURE)) {
+        h = upenv->localvar;
+        if (h) {
+            val = hash_get_t(h, var);
+            if (NULL != val) {
+                if (IS_LAZY(val) && (GET_TAG(val) == CLOSURE)) {
 #ifdef EVAL_STAT
                     count_lazy_expand ++;
 #endif /* EVAL_STAT */
-		    val = eval_closure(interp, val, trace_info);
-		    hash_set_t(h, var, val);
-		}
-		return val;
-	    }
-	}
-	upenv = upenv->upstack;
+                    val = eval_closure(interp, val, trace_info);
+                    hash_set_t(h, var, val);
+                }
+                return val;
+            }
+        }
+        upenv = upenv->upstack;
     }
 
     h = (interp->obj_stack[interp->cur_obj_stack])->cur_object_slot;
     val = hash_get_t(h, var);
     if (NULL != val) {
-	if (IS_LAZY(val) && (GET_TAG(val) == CLOSURE)) {
+        if (IS_LAZY(val) && (GET_TAG(val) == CLOSURE)) {
 #ifdef EVAL_STAT
             count_lazy_expand ++;
 #endif /* EVAL_STAT */
-	    val = eval_closure(interp, val, trace_info);
-	    hash_set_t(h, var, val);
-	}
-	return val;
+            val = eval_closure(interp, val, trace_info);
+            hash_set_t(h, var, val);
+        }
+        return val;
     }
 
     h = interp->globals;
     val = hash_get_t(h, var);
     if (NULL != val) {
-	if (IS_LAZY(val) && (GET_TAG(val) == CLOSURE)) {
+        if (IS_LAZY(val) && (GET_TAG(val) == CLOSURE)) {
 #ifdef EVAL_STAT
             count_lazy_expand ++;
 #endif /* EVAL_STAT */
-	    val = eval_closure(interp, val, trace_info);
-	    hash_set_t(h, var, val);
-	}
-	return val;
+            val = eval_closure(interp, val, trace_info);
+            hash_set_t(h, var, val);
+        }
+        return val;
     }
 
     c = new_cell(L"No such variable, '");
@@ -663,9 +663,9 @@ toy_resolv_var(Toy_Interp* interp, Toy_Type* var, int stack_trace, Toy_Func_Trac
     cell_add_str(c, L"'.");
 
     if (stack_trace) {
-	return new_exception(TE_NOVAR, cell_get_addr(c), interp);
+        return new_exception(TE_NOVAR, cell_get_addr(c), interp);
     } else {
-	return new_exception(TE_NOVAR, cell_get_addr(c), NULL);
+        return new_exception(TE_NOVAR, cell_get_addr(c), NULL);
     }
 }
 
@@ -677,19 +677,19 @@ set_closure_var(Toy_Interp *interp, Toy_Type *var, Toy_Type *val) {
 
     upenv = interp->func_stack[interp->cur_func_stack]->upstack;
     while (upenv) {
-	h = upenv->localvar;
-	if (h) {
-	    v = hash_get_t(h, var);
-	    if (NULL != v) {
-		if (NULL != val) {
-		    hash_set_t(h, var, val);
-		    return val;
-		} else {
-		    return v;
-		}
-	    }
-	}
-	upenv = upenv->upstack;
+        h = upenv->localvar;
+        if (h) {
+            v = hash_get_t(h, var);
+            if (NULL != v) {
+                if (NULL != val) {
+                    hash_set_t(h, var, val);
+                    return val;
+                } else {
+                    return v;
+                }
+            }
+        }
+        upenv = upenv->upstack;
     }
 
     return NULL;
@@ -706,40 +706,40 @@ search_method(Toy_Interp *interp, Toy_Type *object, Toy_Type *method) {
 
     switch (GET_TAG(object)) {
     case NATIVE: case FUNC:
-	return object;
+        return object;
 
     case OBJECT:
-	h = object->u.object.slots;
-	m = hash_get_t(h, method);
-	if (m) {
-	    return m;
-	} else {
-	    l = object->u.object.delegate_list;
+        h = object->u.object.slots;
+        m = hash_get_t(h, method);
+        if (m) {
+            return m;
+        } else {
+            l = object->u.object.delegate_list;
 
-	    a = list_get_item(l);
-	    while (a) {
-		if (GET_TAG(a) == SYMBOL) {
-		    ho = hash_get_t(interp->classes, a);
-		    if (NULL == ho) goto error2;
-		} else if (GET_TAG(a) == OBJECT) {
-		    ho = a;
-		} else {
-		    goto error2;
-		}
+            a = list_get_item(l);
+            while (a) {
+                if (GET_TAG(a) == SYMBOL) {
+                    ho = hash_get_t(interp->classes, a);
+                    if (NULL == ho) goto error2;
+                } else if (GET_TAG(a) == OBJECT) {
+                    ho = a;
+                } else {
+                    goto error2;
+                }
 
-		m = search_method(interp, ho, method);
-		if (GET_TAG(m) != EXCEPTION) {
-		    return m;
-		}
-		l = list_next(l);
-		a = list_get_item(l);
-	    }
+                m = search_method(interp, ho, method);
+                if (GET_TAG(m) != EXCEPTION) {
+                    return m;
+                }
+                l = list_next(l);
+                a = list_get_item(l);
+            }
 
-	    goto error;
-	}
+            goto error;
+        }
 
     default:
-	return toy_resolv_object(interp, object);
+        return toy_resolv_object(interp, object);
     }
 
 error:
@@ -781,73 +781,73 @@ error:
 }
 
 #ifdef EVAL_STAT
-    #define PARAM_BIND(n) {					        \
-	val = list_get_item(l);						\
-	var = &(a->array[n]);						\
-	if (GET_TAG(val) == EVAL) {					\
-	    if (*env == NULL) {						\
-		*env = new_closure_env(interp);				\
-	    }								\
-	    val = new_closure(val->u.eval_body, *env, interp->script_id);\
-	    if (GET_TAG(val) == EXCEPTION) {return val;}		\
-	    SET_LAZY(val);						\
+    #define PARAM_BIND(n) {                                             \
+        val = list_get_item(l);                                         \
+        var = &(a->array[n]);                                           \
+        if (GET_TAG(val) == EVAL) {                                     \
+            if (*env == NULL) {                                         \
+                *env = new_closure_env(interp);                         \
+            }                                                           \
+            val = new_closure(val->u.eval_body, *env, interp->script_id);\
+            if (GET_TAG(val) == EXCEPTION) {return val;}                \
+            SET_LAZY(val);                                              \
             count_eval_lazyed ++;                                       \
-	} else {							\
-	    val = toy_expand(interp, val, env, trace_info);		\
-	    if (GET_TAG(val) == EXCEPTION) {return val;}		\
-	    if (IS_LAZY(var)) {                                         \
+        } else {                                                        \
+            val = toy_expand(interp, val, env, trace_info);             \
+            if (GET_TAG(val) == EXCEPTION) {return val;}                \
+            if (IS_LAZY(var)) {                                         \
                 SET_LAZY(val);                                          \
                 count_eval_lazyed ++;                                   \
-            }           				                \
-	}								\
-	hash_set_t(args, var, toy_clone(val));				\
-	l = list_next(l);						\
+            }                                                           \
+        }                                                               \
+        hash_set_t(args, var, toy_clone(val));                          \
+        l = list_next(l);                                               \
     }
 #else
 #ifdef NO_LAZY
-    #define PARAM_BIND(n) {					        \
-	val = list_get_item(l);						\
-	var = &(a->array[n]);						\
-	if (GET_TAG(val) == EVAL) {					\
+    #define PARAM_BIND(n) {                                             \
+        val = list_get_item(l);                                         \
+        var = &(a->array[n]);                                           \
+        if (GET_TAG(val) == EVAL) {                                     \
             val = toy_expand(interp, val, env, trace_info);             \
             if (GET_TAG(val) == EXCEPTION) {return val;}                \
-	} else {							\
-	    val = toy_expand(interp, val, env, trace_info);		\
-	    if (GET_TAG(val) == EXCEPTION) {return val;}		\
-	    if (IS_LAZY(var)) {                                         \
+        } else {                                                        \
+            val = toy_expand(interp, val, env, trace_info);             \
+            if (GET_TAG(val) == EXCEPTION) {return val;}                \
+            if (IS_LAZY(var)) {                                         \
                 SET_LAZY(val);                                          \
-            }           				                \
-	}								\
-	hash_set_t(args, var, toy_clone(val));				\
-	l = list_next(l);						\
+            }                                                           \
+        }                                                               \
+        hash_set_t(args, var, toy_clone(val));                          \
+        l = list_next(l);                                               \
     }
 #else
-    #define PARAM_BIND(n) {					        \
-	val = list_get_item(l);						\
-	var = &(a->array[n]);						\
-	if (GET_TAG(val) == EVAL) {					\
-            if (*env == NULL) {						\
-		*env = new_closure_env(interp);				\
-	    }								\
-	    val = new_closure(val->u.eval_body, *env, interp->script_id);\
-	    if (GET_TAG(val) == EXCEPTION) {return val;}		\
-	    SET_LAZY(val);						\
-	} else {							\
-	    val = toy_expand(interp, val, env, trace_info);		\
-	    if (GET_TAG(val) == EXCEPTION) {return val;}		\
-	    if (IS_LAZY(var)) {                                         \
+    #define PARAM_BIND(n) {                                             \
+        val = list_get_item(l);                                         \
+        var = &(a->array[n]);                                           \
+        if (GET_TAG(val) == EVAL) {                                     \
+            if (*env == NULL) {                                         \
+                *env = new_closure_env(interp);                         \
+            }                                                           \
+            val = new_closure(val->u.eval_body, *env, interp->script_id);\
+            if (GET_TAG(val) == EXCEPTION) {return val;}                \
+            SET_LAZY(val);                                              \
+        } else {                                                        \
+            val = toy_expand(interp, val, env, trace_info);             \
+            if (GET_TAG(val) == EXCEPTION) {return val;}                \
+            if (IS_LAZY(var)) {                                         \
                 SET_LAZY(val);                                          \
-            }           				                \
-	}								\
-	hash_set_t(args, var, toy_clone(val));				\
-	l = list_next(l);						\
+            }                                                           \
+        }                                                               \
+        hash_set_t(args, var, toy_clone(val));                          \
+        l = list_next(l);                                               \
     }
 #endif /* NO_LAZY */
 #endif /* EVAL_STAT */
 
 static Toy_Type*
 bind_args(Toy_Interp *interp, Toy_Type *arglist, struct _toy_argspec *aspec,
-	  Toy_Env **env, Hash *args, int fun_paramno, int call_paramno, Toy_Func_Trace_Info *trace_info) {
+          Toy_Env **env, Hash *args, int fun_paramno, int call_paramno, Toy_Func_Trace_Info *trace_info) {
 
     int argpos, i;
     Toy_Type *l, *val, *var;
@@ -856,123 +856,123 @@ bind_args(Toy_Interp *interp, Toy_Type *arglist, struct _toy_argspec *aspec,
     l = arglist;
 
     if ((aspec->posarg_len == 1) && (hash_get_length(aspec->namedarg) == 0)) {
-	var = array_get(aspec->posarg_array, 0);
-	if (wcscmp(cell_get_addr(var->u.symbol.cell), L"*") == 0) {
-	    Toy_Type *result, *last;
-	    last = result = new_list(NULL);
-	    while (l) {
-		val = toy_expand(interp, list_get_item(l), env, trace_info);
-		if (GET_TAG(val) == EXCEPTION) return val;
-		last = list_append(last, val);
-		l = list_next(l);
-	    }
-	    hash_set_t(args, const_ast, toy_clone(result));
-	    return const_Nil;
-	}
+        var = array_get(aspec->posarg_array, 0);
+        if (wcscmp(cell_get_addr(var->u.symbol.cell), L"*") == 0) {
+            Toy_Type *result, *last;
+            last = result = new_list(NULL);
+            while (l) {
+                val = toy_expand(interp, list_get_item(l), env, trace_info);
+                if (GET_TAG(val) == EXCEPTION) return val;
+                last = list_append(last, val);
+                l = list_next(l);
+            }
+            hash_set_t(args, const_ast, toy_clone(result));
+            return const_Nil;
+        }
     }
 
     if ((fun_paramno < TAG_MAX_PARAMNO) && (call_paramno < TAG_MAX_PARAMNO)
-	&& (fun_paramno == call_paramno)) {
+        && (fun_paramno == call_paramno)) {
 
-	Array *a = aspec->posarg_array;
-	i = 0;
+        Array *a = aspec->posarg_array;
+        i = 0;
 
-	switch (fun_paramno) {
-	case 6:
-	    PARAM_BIND(i);
-	    i ++;
-	case 5:
-	    PARAM_BIND(i);
-	    i ++;
-	case 4:
-	    PARAM_BIND(i);
-	    i ++;
-	case 3:
-	    PARAM_BIND(i);
-	    i ++;
-	case 2:
-	    PARAM_BIND(i);
-	    i ++;
-	case 1:
-	    PARAM_BIND(i);
-	}
+        switch (fun_paramno) {
+        case 6:
+            PARAM_BIND(i);
+            i ++;
+        case 5:
+            PARAM_BIND(i);
+            i ++;
+        case 4:
+            PARAM_BIND(i);
+            i ++;
+        case 3:
+            PARAM_BIND(i);
+            i ++;
+        case 2:
+            PARAM_BIND(i);
+            i ++;
+        case 1:
+            PARAM_BIND(i);
+        }
 
-	return const_Nil;
+        return const_Nil;
     }
 
     argpos = 0;
     while (l) {
-	val = list_get_item(l);
+        val = list_get_item(l);
 
-	if (IS_NAMED_SYM(val)) {
+        if (IS_NAMED_SYM(val)) {
 
-	    var = hash_get_t(aspec->namedarg, val);
-	    if (NULL == var) goto error3;
+            var = hash_get_t(aspec->namedarg, val);
+            if (NULL == var) goto error3;
 
-	    l = list_next(l);
-	    if (NULL == l) goto error4;
+            l = list_next(l);
+            if (NULL == l) goto error4;
 
-	    val = list_get_item(l);
-	    val = toy_expand(interp, val, env, trace_info);
-	    if (GET_TAG(val) == EXCEPTION) return val;
-	    if (IS_LAZY(var)) {
-		SET_LAZY(val);
-	    }
+            val = list_get_item(l);
+            val = toy_expand(interp, val, env, trace_info);
+            if (GET_TAG(val) == EXCEPTION) return val;
+            if (IS_LAZY(var)) {
+                SET_LAZY(val);
+            }
 
-	    hash_set_t(args, var, toy_clone(val));
+            hash_set_t(args, var, toy_clone(val));
 
-	} else if (IS_SWITCH_SYM(val)) {
-	    Cell *cval;
+        } else if (IS_SWITCH_SYM(val)) {
+            Cell *cval;
 
-	    cval = new_cell(&(cell_get_addr(val->u.symbol.cell))[1]);
-	    cell_add_str(cval, L":");
-	    var = hash_get(aspec->namedarg, cell_get_addr(cval));
+            cval = new_cell(&(cell_get_addr(val->u.symbol.cell))[1]);
+            cell_add_str(cval, L":");
+            var = hash_get(aspec->namedarg, cell_get_addr(cval));
 
-	    if (NULL == var) goto error3;
+            if (NULL == var) goto error3;
 
-	    hash_set_t(args, var, toy_clone(const_T));
+            hash_set_t(args, var, toy_clone(const_T));
 
-	} else {
+        } else {
 
-	    var = array_get(aspec->posarg_array, argpos);
+            var = array_get(aspec->posarg_array, argpos);
 
-	    val = toy_expand(interp, val, env, trace_info);
-	    if (GET_TAG(val) == EXCEPTION) return val;
-	    if (var && IS_LAZY(var)) {
-		SET_LAZY(val);
-	    }
+            val = toy_expand(interp, val, env, trace_info);
+            if (GET_TAG(val) == EXCEPTION) return val;
+            if (var && IS_LAZY(var)) {
+                SET_LAZY(val);
+            }
 
-	    if (NULL == var) {
+            if (NULL == var) {
 
-		var = hash_get_t(aspec->namedarg, const_Args);
-		if (NULL == var) goto error1;
+                var = hash_get_t(aspec->namedarg, const_Args);
+                if (NULL == var) goto error1;
 
-		if (IS_LIST_NULL(l)) {
-		    hash_set_t(args, var, new_list(NULL));
-		} else {
-		    
-		    val = toy_expand(interp, l, env, trace_info);
-		    if (GET_TAG(val) == EXCEPTION) return val;
+                if (IS_LIST_NULL(l)) {
+                    hash_set_t(args, var, new_list(NULL));
+                } else {
+                    
+                    val = toy_expand(interp, l, env, trace_info);
+                    if (GET_TAG(val) == EXCEPTION) return val;
 
-		    hash_set_t(args, var, toy_clone(val));
-		}
+                    hash_set_t(args, var, toy_clone(val));
+                }
 
-		return const_Nil;
-	    }
+                return const_Nil;
+            }
 
-	    hash_set_t(args, var, toy_clone(val));
+            hash_set_t(args, var, toy_clone(val));
 
-	    argpos++;
-	}
+            argpos++;
+        }
 
-	l = list_next(l);
+        l = list_next(l);
     }
 
     if (argpos < aspec->posarg_len) goto error2;
 
     var = hash_get_t(aspec->namedarg, const_Args);
     if (NULL != var) {
-	hash_set_t(args, var, new_list(NULL));
+        hash_set_t(args, var, new_list(NULL));
     }
 
     return const_Nil;
@@ -1011,30 +1011,30 @@ eval_closure(Toy_Interp *interp, Toy_Type *closure, Toy_Func_Trace_Info *trace_i
     int func_flag = 0, obj_flag = 0;
 
     if (GET_TAG(closure) != CLOSURE) {
-	// c = new_cell(L"Not a closure, '");
-	// cell_add_str(c, to_string(closure));
-	// c = new_cell(L"'.");
-	// return new_exception(TE_NORUNNABLE, cell_get_addr(c), interp);
-	return new_exception(TE_NORUNNABLE, L"No closure specified.", interp);
+        // c = new_cell(L"Not a closure, '");
+        // cell_add_str(c, to_string(closure));
+        // c = new_cell(L"'.");
+        // return new_exception(TE_NORUNNABLE, cell_get_addr(c), interp);
+        return new_exception(TE_NORUNNABLE, L"No closure specified.", interp);
     }
 
     env = closure->u.closure.env;
 
     if (interp->obj_stack[interp->cur_obj_stack] != env->object_env) {
-	if (0 == toy_push_obj_env(interp, env->object_env)) {
-	    result = new_exception(TE_STACKOVERFLOW, L"Object satck overflow.", interp);
-	    goto error_exit;
-	}
-	obj_flag = 1;
+        if (0 == toy_push_obj_env(interp, env->object_env)) {
+            result = new_exception(TE_STACKOVERFLOW, L"Object satck overflow.", interp);
+            goto error_exit;
+        }
+        obj_flag = 1;
     }
     if (interp->func_stack[interp->cur_func_stack]->localvar != env->func_env->localvar) {
-	if (0 == toy_push_func_env(interp, env->func_env->localvar, env->func_env, env->tobe_bind_val, trace_info)) {
-	    result = new_exception(TE_STACKOVERFLOW, L"Function satck overflow.", interp);
-	    goto error_exit;
-	}
-	func_flag = 1;
+        if (0 == toy_push_func_env(interp, env->func_env->localvar, env->func_env, env->tobe_bind_val, trace_info)) {
+            result = new_exception(TE_STACKOVERFLOW, L"Function satck overflow.", interp);
+            goto error_exit;
+        }
+        func_flag = 1;
     } else {
-	interp->func_stack[interp->cur_func_stack]->tobe_bind_val = env->tobe_bind_val;
+        interp->func_stack[interp->cur_func_stack]->tobe_bind_val = env->tobe_bind_val;
     }
 
     result = toy_eval_script(interp, closure->u.closure.block_body);
@@ -1056,53 +1056,53 @@ toy_call_init(Toy_Interp *interp, Toy_Type *object, Toy_Type *args) {
 
     method = search_method(interp, object, const_Init);
     if (GET_TAG(method) == EXCEPTION) {
-	if (wcscmp(cell_get_addr(method->u.exception.code), TE_NOMETHOD) == 0) {
-	    return const_Nil;
-	}
-	return method;
+        if (wcscmp(cell_get_addr(method->u.exception.code), TE_NOMETHOD) == 0) {
+            return const_Nil;
+        }
+        return method;
     }
     obj_env = toy_new_obj_env(interp, object, object);
     
     if (GET_TAG(args) == LIST) {
-	posargs = args;
+        posargs = args;
     } else {
-	posargs = NULL;
+        posargs = NULL;
     }
     namedargs = new_hash();
 
     switch (GET_TAG(method)) {
     case NATIVE:
-	if (0 == toy_push_obj_env(interp, obj_env)) break;
-	result = (method->u.native.cfunc)(interp, posargs, namedargs, list_length(posargs));
-	toy_pop_obj_env(interp);
-	break;
+        if (0 == toy_push_obj_env(interp, obj_env)) break;
+        result = (method->u.native.cfunc)(interp, posargs, namedargs, list_length(posargs));
+        toy_pop_obj_env(interp);
+        break;
 
     case FUNC:
         {
-	    Hash *local_var;
-	    Toy_Type *r;
-	    Toy_Env *env = NULL;
-	
-	    local_var = new_hash();
-	    r = bind_args(interp, posargs, method->u.func.argspec, &env, local_var,
-			  TAG_MAX_PARAMNO, TAG_MAX_PARAMNO, interp->trace_info);
-	    if (GET_TAG(r) == EXCEPTION) return r;
+            Hash *local_var;
+            Toy_Type *r;
+            Toy_Env *env = NULL;
+        
+            local_var = new_hash();
+            r = bind_args(interp, posargs, method->u.func.argspec, &env, local_var,
+                          TAG_MAX_PARAMNO, TAG_MAX_PARAMNO, interp->trace_info);
+            if (GET_TAG(r) == EXCEPTION) return r;
 
-	    if (0 == toy_push_obj_env(interp, obj_env)) {
-		result = new_exception(TE_STACKOVERFLOW, L"Object satck overflow.", interp);
-		break;
-	    }
-	    if (0 == toy_push_func_env(interp, local_var,
-				       method->u.func.closure->u.closure.env->func_env, NULL, interp->trace_info)) {
-		toy_pop_obj_env(interp);
-		result = new_exception(TE_STACKOVERFLOW, L"Function satck overflow.", interp);
-		break;
-	    }
-	    result = toy_eval_script(interp, method->u.func.closure->u.closure.block_body);
-	    toy_pop_func_env(interp);
-	    toy_pop_obj_env(interp);
-	    break;
-	}
+            if (0 == toy_push_obj_env(interp, obj_env)) {
+                result = new_exception(TE_STACKOVERFLOW, L"Object satck overflow.", interp);
+                break;
+            }
+            if (0 == toy_push_func_env(interp, local_var,
+                                       method->u.func.closure->u.closure.env->func_env, NULL, interp->trace_info)) {
+                toy_pop_obj_env(interp);
+                result = new_exception(TE_STACKOVERFLOW, L"Function satck overflow.", interp);
+                break;
+            }
+            result = toy_eval_script(interp, method->u.func.closure->u.closure.block_body);
+            toy_pop_func_env(interp);
+            toy_pop_obj_env(interp);
+            break;
+        }
     }
 
     return result;
@@ -1113,9 +1113,9 @@ toy_call(Toy_Interp *interp, Toy_Type *list) {
     Toy_Type *result;
 
     result = toy_eval_script(interp, 
-			     new_script(new_list(new_statement(list, 
-				interp->trace_info ? 
-				interp->trace_info->line : 0))));
+                             new_script(new_list(new_statement(list, 
+                                interp->trace_info ? 
+                                interp->trace_info->line : 0))));
     return result;
 }
 
@@ -1132,37 +1132,37 @@ eval_sig_handl(Toy_Interp *interp, int code) {
     hash = (Hash*)trapdic->u.dict;
     switch (code) {
     case SIGHUP:
-	sig = const_SIGHUP;
-	break;
+        sig = const_SIGHUP;
+        break;
     case SIGINT:
-	sig = const_SIGINT;
-	break;
+        sig = const_SIGINT;
+        break;
     case SIGQUIT:
-	sig = const_SIGQUIT;
-	break;
+        sig = const_SIGQUIT;
+        break;
     case SIGPIPE:
-	sig = const_SIGPIPE;
-	break;
+        sig = const_SIGPIPE;
+        break;
 //    case SIGALRM:
-//	sig = const_SIGALRM;
-//	break;
+//      sig = const_SIGALRM;
+//      break;
     case SIGTERM:
-	sig = const_SIGTERM;
-	break;
+        sig = const_SIGTERM;
+        break;
     case SIGURG:
-	sig = const_SIGURG;
-	break;
+        sig = const_SIGURG;
+        break;
     case SIGCHLD:
-	sig = const_SIGCHLD;
-	break;
+        sig = const_SIGCHLD;
+        break;
     case SIGUSR1:
-	sig = const_SIGUSR1;
-	break;
+        sig = const_SIGUSR1;
+        break;
     case SIGUSR2:
-	sig = const_SIGUSR2;
-	break;
+        sig = const_SIGUSR2;
+        break;
     default:
-	return NULL;
+        return NULL;
     }
 
     block = hash_get_t(hash, sig);
@@ -1178,7 +1178,7 @@ to_string_call(Toy_Interp *interp, Toy_Type *obj) {
     Toy_Type *list, *l;
 
     if (! ((GET_TAG(obj) == OBJECT) || IS_NOPRINTABLE(obj))) {
-	return to_string(obj);	
+        return to_string(obj);  
     }
 
     env = NULL;
@@ -1187,8 +1187,8 @@ to_string_call(Toy_Interp *interp, Toy_Type *obj) {
     l = list_append(l, const_string);
 
     result = toy_eval(interp, new_statement(list,
-					    interp->func_stack[interp->cur_func_stack]->trace_info->line),
-		      &env);
+                                            interp->func_stack[interp->cur_func_stack]->trace_info->line),
+                      &env);
     if (GET_TAG(result) != STRING) return to_string(obj);
 
     return cell_get_addr(result->u.string);
@@ -1201,25 +1201,25 @@ toy_yield_bind(Toy_Interp *interp, Toy_Type *bind_var) {
 
     local = interp->func_stack[interp->cur_func_stack]->localvar;
     if (interp->func_stack[interp->cur_func_stack]->tobe_bind_val != NULL) {
-	vl = interp->func_stack[interp->cur_func_stack]->tobe_bind_val;
+        vl = interp->func_stack[interp->cur_func_stack]->tobe_bind_val;
     }
 
     l = result = new_list(NULL);
     while (! IS_LIST_NULL(bind_var)) {
-	item = list_get_item(bind_var);
-	if (GET_TAG(item) != SYMBOL) goto error;
+        item = list_get_item(bind_var);
+        if (GET_TAG(item) != SYMBOL) goto error;
 
-	if (vl && (! IS_LIST_NULL(vl))) {
-	    v = list_get_item(vl);
-	    hash_set_t(local, item, v);
-	    vl = list_next(vl);
-	    l = list_append(l, v);
-	} else {
-	    hash_set_t(local, item, const_Nil);
-	    l = list_append(l, const_Nil);
-	}
-	
-	bind_var = list_next(bind_var);
+        if (vl && (! IS_LIST_NULL(vl))) {
+            v = list_get_item(vl);
+            hash_set_t(local, item, v);
+            vl = list_next(vl);
+            l = list_append(l, v);
+        } else {
+            hash_set_t(local, item, const_Nil);
+            l = list_append(l, const_Nil);
+        }
+        
+        bind_var = list_next(bind_var);
     }
 
     return result;
@@ -1236,11 +1236,11 @@ toy_yield(Toy_Interp *interp, Toy_Type *closure, Toy_Type *args) {
     // Cell *c;
 
     if (GET_TAG(closure) != CLOSURE) {
-	// c = new_cell(L"Not a closure, '");
-	// cell_add_str(c, to_string(closure));
-	// c = new_cell(L"'.");
-	// return new_exception(TE_NORUNNABLE, cell_get_addr(c), interp);
-	return new_exception(TE_NORUNNABLE, L"No closure specified at yield", interp);
+        // c = new_cell(L"Not a closure, '");
+        // cell_add_str(c, to_string(closure));
+        // c = new_cell(L"'.");
+        // return new_exception(TE_NORUNNABLE, cell_get_addr(c), interp);
+        return new_exception(TE_NORUNNABLE, L"No closure specified at yield", interp);
     }
     
     env = closure->u.closure.env;

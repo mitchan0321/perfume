@@ -50,8 +50,8 @@ cell_add_str(Cell *p, const wchar_t *src) {
 
     len = wcslen(src)+1;
     if ((len + p->length) > p->allocsize) {
-	if (NULL == cell_realloc(p, len + p->length))
-	    return NULL;
+        if (NULL == cell_realloc(p, len + p->length))
+            return NULL;
     }
 
     wcsncpy(&p->data[p->length], src, len);
@@ -69,8 +69,8 @@ cell_add_cell(Cell *p, Cell *src) {
 
     len = src->length+1;
     if ((len + p->length) > p->allocsize) {
-	if (NULL == cell_realloc(p, len + p->length))
-	    return NULL;
+        if (NULL == cell_realloc(p, len + p->length))
+            return NULL;
     }
     
     memcpy(&p->data[p->length], src->data, len*sizeof(wchar_t));
@@ -87,8 +87,8 @@ cell_add_char(Cell *p, const wchar_t src) {
 
     len = 2;
     if ((len + p->length) > p->allocsize) {
-	if (NULL == cell_realloc(p, len + p->length))
-	    return NULL;
+        if (NULL == cell_realloc(p, len + p->length))
+            return NULL;
     }
 
     p->data[p->length] = src;
@@ -108,7 +108,7 @@ cell_get_alloc_size(int init_s, int dest_s) {
     int i = init_s;
 
     while (i < dest_s) {
-	i = i*2;
+        i = i*2;
     }
     return i;
 }
@@ -146,11 +146,11 @@ cell_sub(Cell *c, int start, int end) {
     if (start >= l) return d;
 
     if (end > l) {
-	end = l;
+        end = l;
     }
 
     for (i=start; i<end; i++) {
-	cell_add_char(d, p[i]);
+        cell_add_char(d, p[i]);
     }
 
     return d;

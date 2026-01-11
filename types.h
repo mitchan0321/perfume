@@ -19,82 +19,82 @@
 #include "binbulk.h"
 #include "t_gc.h"
 
-#define    BOOL			0	/* bool */
-#define    SYMBOL  		1	/* symbol */
-#define	   REF			2	/* reference (e.g. $XX) */
-#define    LIST	  		3	/* list (e.g. (...)) */
-#define    INTEGER  		4	/* big integer */
-#define    REAL	  		5	/* 64bit real */
-#define    STRING		6	/* string (e.g. "...") */
-#define    SCRIPT		7	/* script is some statements */
-#define    STATEMENT		8	/* statement (e.g. ...;) */
-#define    BLOCK		9	/* block (e.g. {...} */
-#define    EVAL	  		10	/* eval (e.g. [...] */
-#define    NATIVE		11	/* C native code (e.g. <NATIVE>) */
-#define    OBJECT		12	/* a object */
-#define    EXCEPTION		13	/* throwable object */
-#define    CLOSURE		14	/* closure */
-#define    FUNC	  		15	/* function object */
-#define	   CONTROL		16	/* control object (e.g. return, break, or continue) */
-#define    CONTAINER		17	/* C object container */
-#define    GETMACRO		18	/* GET Macro */
-#define    ALIAS		19	/* variable alias */
-#define    RQUOTE		20	/* reguler expresion string (e.g. '...') */
-#define	   INITMACRO		21	/* INIT Macro */
-#define	   BIND			22	/* bind var list (e.g. | ... |) */
-#define	   DICT			23	/* dictionary (as primitive hash) */
-#define	   VECTOR		24	/* vector (as primitive array) */
-#define	   COROUTINE		25	/* coroutine */
-#define	   BULK			26	/* bulk data store */
-#define	   INTR			27	/* interrupt occurred */
-#define    __TYPE_LAST__	28
+#define    BOOL                 0       /* bool */
+#define    SYMBOL               1       /* symbol */
+#define    REF                  2       /* reference (e.g. $XX) */
+#define    LIST                 3       /* list (e.g. (...)) */
+#define    INTEGER              4       /* big integer */
+#define    REAL                 5       /* 64bit real */
+#define    STRING               6       /* string (e.g. "...") */
+#define    SCRIPT               7       /* script is some statements */
+#define    STATEMENT            8       /* statement (e.g. ...;) */
+#define    BLOCK                9       /* block (e.g. {...} */
+#define    EVAL                 10      /* eval (e.g. [...] */
+#define    NATIVE               11      /* C native code (e.g. <NATIVE>) */
+#define    OBJECT               12      /* a object */
+#define    EXCEPTION            13      /* throwable object */
+#define    CLOSURE              14      /* closure */
+#define    FUNC                 15      /* function object */
+#define    CONTROL              16      /* control object (e.g. return, break, or continue) */
+#define    CONTAINER            17      /* C object container */
+#define    GETMACRO             18      /* GET Macro */
+#define    ALIAS                19      /* variable alias */
+#define    RQUOTE               20      /* reguler expresion string (e.g. '...') */
+#define    INITMACRO            21      /* INIT Macro */
+#define    BIND                 22      /* bind var list (e.g. | ... |) */
+#define    DICT                 23      /* dictionary (as primitive hash) */
+#define    VECTOR               24      /* vector (as primitive array) */
+#define    COROUTINE            25      /* coroutine */
+#define    BULK                 26      /* bulk data store */
+#define    INTR                 27      /* interrupt occurred */
+#define    __TYPE_LAST__        28
 
-#define	   FALSE                0	/* BOOL value, FALSE */
-#define	   TRUE                 1	/* BOOL value, TRUE */
+#define    FALSE                0       /* BOOL value, FALSE */
+#define    TRUE                 1       /* BOOL value, TRUE */
 
-#define    S_NIL        	L"<nil>"
-#define    S_T          	L"<t>"
+#define    S_NIL                L"<nil>"
+#define    S_T                  L"<t>"
 
 #define    INTR_ITIMER          0       /* itimer interrupt */
 
-#define TAG_MASK		(0x000000ff)
-#define GET_TAG(p)		((p==NULL) ? -1 : (TAG_MASK & (p->tag)))
-#define IS_LIST_NULL(l)		((l==NULL) ? 1 : ((NULL==l->u.list.item)&&(NULL==l->u.list.nextp)))
-#define IS_NIL(x)		((GET_TAG(x)==BOOL) ? (x->u.tbool.value==FALSE) : 0)
+#define TAG_MASK                (0x000000ff)
+#define GET_TAG(p)              ((p==NULL) ? -1 : (TAG_MASK & (p->tag)))
+#define IS_LIST_NULL(l)         ((l==NULL) ? 1 : ((NULL==l->u.list.item)&&(NULL==l->u.list.nextp)))
+#define IS_NIL(x)               ((GET_TAG(x)==BOOL) ? (x->u.tbool.value==FALSE) : 0)
 
-#define TAG_NAMED_MASK		(0x00008000)
-#define TAG_SWITCH_MASK		(0x00004000)
-#define IS_NAMED_SYM(p)		((p==NULL) ? 0 : (TAG_NAMED_MASK & (p->tag)))
-#define IS_SWITCH_SYM(p)	((p==NULL) ? 0 : (TAG_SWITCH_MASK & (p->tag)))
+#define TAG_NAMED_MASK          (0x00008000)
+#define TAG_SWITCH_MASK         (0x00004000)
+#define IS_NAMED_SYM(p)         ((p==NULL) ? 0 : (TAG_NAMED_MASK & (p->tag)))
+#define IS_SWITCH_SYM(p)        ((p==NULL) ? 0 : (TAG_SWITCH_MASK & (p->tag)))
 
-#define SET_SCRIPT_ID(p,i)	(p->tag|=((i<<16)&0xffff0000))
-#define GET_SCRIPT_ID(p)	(int)((p->tag&0xffff0000)>>16)
+#define SET_SCRIPT_ID(p,i)      (p->tag|=((i<<16)&0xffff0000))
+#define GET_SCRIPT_ID(p)        (int)((p->tag&0xffff0000)>>16)
 
-#define TAG_LAZY_MASK		(0x00002000)
-#define SET_LAZY(p)		(p->tag|=TAG_LAZY_MASK)
-#define CLEAR_LAZY(p)		(p->tag&=(~TAG_LAZY_MASK))
-#define IS_LAZY(p)		(p->tag&TAG_LAZY_MASK)
+#define TAG_LAZY_MASK           (0x00002000)
+#define SET_LAZY(p)             (p->tag|=TAG_LAZY_MASK)
+#define CLEAR_LAZY(p)           (p->tag&=(~TAG_LAZY_MASK))
+#define IS_LAZY(p)              (p->tag&TAG_LAZY_MASK)
 
-#define TAG_NOPRINTABLE		(0x00000200)
-#define SET_NOPRINTABLE(p)	(p->tag|=TAG_NOPRINTABLE)
-#define IS_NOPRINTABLE(p)	(p->tag&TAG_NOPRINTABLE)
+#define TAG_NOPRINTABLE         (0x00000200)
+#define SET_NOPRINTABLE(p)      (p->tag|=TAG_NOPRINTABLE)
+#define IS_NOPRINTABLE(p)       (p->tag&TAG_NOPRINTABLE)
 
 #define TAG_ISPG                (0x00000100)
 #define SET_PG(p)               (p->tag|=TAG_ISPG)
-#define CLEAR_PG(p)		(p->tag&=(~TAG_ISPG))
+#define CLEAR_PG(p)             (p->tag&=(~TAG_ISPG))
 #define IS_PG(p)                (p->tag&TAG_ISPG)
 
-#define TAG_PARAMNO_MASK	(0x00001C00)
-#define TAG_MAX_PARAMNO		(7)
-#define SET_PARAMNO(p,i)	(p->tag|=((i<<10)&TAG_PARAMNO_MASK))
-#define GET_PARAMNO(p)		(int)((p->tag&TAG_PARAMNO_MASK)>>10)
-#define CLEAR_PARAMNO(p)	(p->tag&=(~TAG_PARAMNO_MASK))
+#define TAG_PARAMNO_MASK        (0x00001C00)
+#define TAG_MAX_PARAMNO         (7)
+#define SET_PARAMNO(p,i)        (p->tag|=((i<<10)&TAG_PARAMNO_MASK))
+#define GET_PARAMNO(p)          (int)((p->tag&TAG_PARAMNO_MASK)>>10)
+#define CLEAR_PARAMNO(p)        (p->tag&=(~TAG_PARAMNO_MASK))
 
-#define IS_TOY_OBJECT(p)	((GET_TAG(p)>=BOOL)&&(GET_TAG(p)<__TYPE_LAST__))
-#define SELF_HASH(i)		(i->obj_stack[i->cur_obj_stack]->cur_object_slot)
-#define SELF(i)			(i->obj_stack[i->cur_obj_stack]->self)
-#define SELF_OBJ(i)		(i->obj_stack[i->cur_obj_stack]->cur_object)
-#define GET_FUNC_ENV(p,i)	((((p->cur_func_stack)-i)<0) ? NULL : p->func_stack[(p->cur_func_stack)-i])
+#define IS_TOY_OBJECT(p)        ((GET_TAG(p)>=BOOL)&&(GET_TAG(p)<__TYPE_LAST__))
+#define SELF_HASH(i)            (i->obj_stack[i->cur_obj_stack]->cur_object_slot)
+#define SELF(i)                 (i->obj_stack[i->cur_obj_stack]->self)
+#define SELF_OBJ(i)             (i->obj_stack[i->cur_obj_stack]->cur_object)
+#define GET_FUNC_ENV(p,i)       ((((p->cur_func_stack)-i)<0) ? NULL : p->func_stack[(p->cur_func_stack)-i])
 
 typedef struct _toy_func_trace_info {
     int line;
@@ -231,134 +231,134 @@ typedef struct _toy_type {
     u_int32_t tag;
 
     union _u {
-	/* BOOL */
-	struct _tbool {
-	    int value;
-	} tbool;
+        /* BOOL */
+        struct _tbool {
+            int value;
+        } tbool;
 
-	/* SYMBOL */
-	struct _symbol {
-	    Cell *cell;
-	    unsigned int hash_index;
-	} symbol;
+        /* SYMBOL */
+        struct _symbol {
+            Cell *cell;
+            unsigned int hash_index;
+        } symbol;
 
-	/* REF */
-	struct _ref {
-	    Cell *cell;
-	    unsigned int hash_index;
-	} ref;
+        /* REF */
+        struct _ref {
+            Cell *cell;
+            unsigned int hash_index;
+        } ref;
 
-	/* LIST */
-	struct _list {
-	    struct _toy_type *item;
-	    struct _toy_type *nextp;
-	} list;
+        /* LIST */
+        struct _list {
+            struct _toy_type *item;
+            struct _toy_type *nextp;
+        } list;
 
-	/* INTEGER */
-	mpz_t biginteger;
+        /* INTEGER */
+        mpz_t biginteger;
 
-	/* REAL */
-	double real;
+        /* REAL */
+        double real;
 
-	/* STRING */
-	Cell *string;
+        /* STRING */
+        Cell *string;
 
-	/* SCRIPT */
-	struct _toy_type *statement_list;
-	
-	/* STATEMENT */
-	struct _statement {
-	    struct _toy_type *item_list;
-	    struct _toy_func_trace_info *trace_info;
-	} statement;
-	
-	/* BLOCK */
-	struct _toy_type *block_body;		/* point to _toy_type->script */
+        /* SCRIPT */
+        struct _toy_type *statement_list;
+        
+        /* STATEMENT */
+        struct _statement {
+            struct _toy_type *item_list;
+            struct _toy_func_trace_info *trace_info;
+        } statement;
+        
+        /* BLOCK */
+        struct _toy_type *block_body;           /* point to _toy_type->script */
 
-	/* EVAL */
-	struct _toy_type *eval_body;		/* point to _toy_type->script */
+        /* EVAL */
+        struct _toy_type *eval_body;            /* point to _toy_type->script */
 
-	/* NATIVE */
-	struct _native {
-	    struct _toy_type* (*cfunc)(
-		Toy_Interp* interp,
-		struct _toy_type* posargs,	/* pint to _toy_type->list */
-		struct _hash* namedargs,
-		int arglen
-		);
-	    struct _toy_type *argspec_list;
-	} native;
+        /* NATIVE */
+        struct _native {
+            struct _toy_type* (*cfunc)(
+                Toy_Interp* interp,
+                struct _toy_type* posargs,      /* pint to _toy_type->list */
+                struct _hash* namedargs,
+                int arglen
+                );
+            struct _toy_type *argspec_list;
+        } native;
 
-	/* OBJECT */
-	struct _object {
-	    struct _hash *slots;
-	    struct _toy_type *delegate_list;
-	} object;
+        /* OBJECT */
+        struct _object {
+            struct _hash *slots;
+            struct _toy_type *delegate_list;
+        } object;
 
-	/* EXCEPTION */
-	struct _exception {
-	    Cell *code;
-	    struct _toy_type *msg_list;
-	} exception;
+        /* EXCEPTION */
+        struct _exception {
+            Cell *code;
+            struct _toy_type *msg_list;
+        } exception;
 
-	/* CLOSURE */
-	struct _closure {
-	    struct _toy_type *block_body;	/* point to _toy_type->script */
-	    Toy_Env *env;
-	} closure;
+        /* CLOSURE */
+        struct _closure {
+            struct _toy_type *block_body;       /* point to _toy_type->script */
+            Toy_Env *env;
+        } closure;
 
-	/* FUNC */
-	struct _func {
-	    struct _toy_argspec *argspec;
-	    struct _toy_type *closure;
-	} func;
+        /* FUNC */
+        struct _func {
+            struct _toy_argspec *argspec;
+            struct _toy_type *closure;
+        } func;
 
-	struct _control {
-	    u_int32_t code;
-	    struct _toy_type *ret_value;
-	} control;
+        struct _control {
+            u_int32_t code;
+            struct _toy_type *ret_value;
+        } control;
 
-	/* CONTAINER */
-	struct _container {
-	    void *data;
-	    Cell *desc;
-	} container;
+        /* CONTAINER */
+        struct _container {
+            void *data;
+            Cell *desc;
+        } container;
 
-	/* GET Macro */
-	struct _getmacro {
-	    struct _toy_type *obj;
-	    struct _toy_type *para;
-	} getmacro;
+        /* GET Macro */
+        struct _getmacro {
+            struct _toy_type *obj;
+            struct _toy_type *para;
+        } getmacro;
 
-	/* INIT Macro */
-	struct _initmacro {
-	    struct _toy_type *class;
-	    struct _toy_type *param;
-	} initmacro;
+        /* INIT Macro */
+        struct _initmacro {
+            struct _toy_type *class;
+            struct _toy_type *param;
+        } initmacro;
 
-	/* ALIAS */
-	struct _alias {
-	    struct _hash *slot;
-	    struct _toy_type *key;
-	} alias;
+        /* ALIAS */
+        struct _alias {
+            struct _hash *slot;
+            struct _toy_type *key;
+        } alias;
 
-	/* RQUOTE */
-	Cell *rquote;
+        /* RQUOTE */
+        Cell *rquote;
 
-	/* BIND */
-	struct _toy_type *bind_var;
+        /* BIND */
+        struct _toy_type *bind_var;
 
-	/* DICT */
-	struct _hash *dict;
+        /* DICT */
+        struct _hash *dict;
 
-	/* VECTOR */
-	struct _array *vector;
+        /* VECTOR */
+        struct _array *vector;
 
-	/* COROUTINE */
-	Toy_Coroutine *coroutine;
+        /* COROUTINE */
+        Toy_Coroutine *coroutine;
 
-	/* BULK */
-	struct _binbulk *bulk;
+        /* BULK */
+        struct _binbulk *bulk;
 
         /* INTERUPT */
         int nintr;
@@ -373,60 +373,60 @@ typedef struct _toy_script {
     Toy_Type *script;
 } Toy_Script;
 
-Toy_Type*	new_bool(int val);
-Toy_Type*	new_symbol(wchar_t *atom);
-Toy_Type*	new_ref(wchar_t *ref);
-Toy_Type*	new_list(Toy_Type *item);
-Toy_Type*	new_cons(Toy_Type *car, Toy_Type *cdr);
-Toy_Type*	list_append(Toy_Type *list, Toy_Type *item);
-Toy_Type*	list_next(Toy_Type *list);
-Toy_Type*	list_get_item(Toy_Type *list);
-int		list_length(Toy_Type *list);
-Toy_Type*	list_get(Toy_Type *list, int pos);
-Toy_Type*	new_integer(mpz_t biginteger);
-Toy_Type*	new_integer_si(long int integer);
-Toy_Type*	new_integer_ullsi(unsigned long long integer);
-Toy_Type*	new_integer_d(double val);
-wchar_t*	integer_to_str(Toy_Type *val);
-wchar_t*	integer_to_str_base(Toy_Type *val, int base);
-Toy_Type*	new_real(double real);
-Toy_Type*	new_string_str(wchar_t *string);
-Toy_Type*	new_string_cell(Cell *string);
-Toy_Type*	new_script(Toy_Type *statement_list);
-Toy_Type*	new_statement(Toy_Type *item_list, int line);
-Toy_Type*	new_block(Toy_Type *block_body);
-Toy_Type*	new_eval(Toy_Type *eval_body);
-Toy_Type*	new_native(Toy_Type* (*cfunc)(Toy_Interp*, Toy_Type*, struct _hash*, int arglen),
-			   Toy_Type *argspec_list);
-Toy_Type*	new_object(wchar_t* name, struct _hash* slots, Toy_Type *delegate_list);
-Toy_Type*	new_exception(wchar_t *code, wchar_t *desc, Toy_Interp* interp);
-Toy_Type*	new_closure(Toy_Type *block_body, Toy_Env* env, int script_id);
-Toy_Type*	new_func(Toy_Type *argspec_list, int posarglen, Array *posargarray, Hash *namedarg,
-			 Toy_Type *closure);
-Toy_Type*	new_control(int code, Toy_Type *ret_value);
-Toy_Type*	new_container(void *container, wchar_t *desc);
-Toy_Type*	new_getmacro(Toy_Type *obj, Toy_Type *para);
-Toy_Type*	new_initmacro(Toy_Type *obj, Toy_Type *param);
-Toy_Type*	new_alias(struct _hash *slot, Toy_Type *key);
-Toy_Type*	new_rquote(wchar_t *string);
-Toy_Type*	new_bind(Toy_Type *bind_var);
-Toy_Type*	new_dict(struct _hash *dict);
-Toy_Type*	new_vector(struct _array *vector);
-Toy_Type*	new_binbulk_t(struct _binbulk *bulk);
-Toy_Type*	new_coroutine(Toy_Interp*, Toy_Type*);
+Toy_Type*       new_bool(int val);
+Toy_Type*       new_symbol(wchar_t *atom);
+Toy_Type*       new_ref(wchar_t *ref);
+Toy_Type*       new_list(Toy_Type *item);
+Toy_Type*       new_cons(Toy_Type *car, Toy_Type *cdr);
+Toy_Type*       list_append(Toy_Type *list, Toy_Type *item);
+Toy_Type*       list_next(Toy_Type *list);
+Toy_Type*       list_get_item(Toy_Type *list);
+int             list_length(Toy_Type *list);
+Toy_Type*       list_get(Toy_Type *list, int pos);
+Toy_Type*       new_integer(mpz_t biginteger);
+Toy_Type*       new_integer_si(long int integer);
+Toy_Type*       new_integer_ullsi(unsigned long long integer);
+Toy_Type*       new_integer_d(double val);
+wchar_t*        integer_to_str(Toy_Type *val);
+wchar_t*        integer_to_str_base(Toy_Type *val, int base);
+Toy_Type*       new_real(double real);
+Toy_Type*       new_string_str(wchar_t *string);
+Toy_Type*       new_string_cell(Cell *string);
+Toy_Type*       new_script(Toy_Type *statement_list);
+Toy_Type*       new_statement(Toy_Type *item_list, int line);
+Toy_Type*       new_block(Toy_Type *block_body);
+Toy_Type*       new_eval(Toy_Type *eval_body);
+Toy_Type*       new_native(Toy_Type* (*cfunc)(Toy_Interp*, Toy_Type*, struct _hash*, int arglen),
+                           Toy_Type *argspec_list);
+Toy_Type*       new_object(wchar_t* name, struct _hash* slots, Toy_Type *delegate_list);
+Toy_Type*       new_exception(wchar_t *code, wchar_t *desc, Toy_Interp* interp);
+Toy_Type*       new_closure(Toy_Type *block_body, Toy_Env* env, int script_id);
+Toy_Type*       new_func(Toy_Type *argspec_list, int posarglen, Array *posargarray, Hash *namedarg,
+                         Toy_Type *closure);
+Toy_Type*       new_control(int code, Toy_Type *ret_value);
+Toy_Type*       new_container(void *container, wchar_t *desc);
+Toy_Type*       new_getmacro(Toy_Type *obj, Toy_Type *para);
+Toy_Type*       new_initmacro(Toy_Type *obj, Toy_Type *param);
+Toy_Type*       new_alias(struct _hash *slot, Toy_Type *key);
+Toy_Type*       new_rquote(wchar_t *string);
+Toy_Type*       new_bind(Toy_Type *bind_var);
+Toy_Type*       new_dict(struct _hash *dict);
+Toy_Type*       new_vector(struct _array *vector);
+Toy_Type*       new_binbulk_t(struct _binbulk *bulk);
+Toy_Type*       new_coroutine(Toy_Interp*, Toy_Type*);
 Toy_Type*       new_intr(int nintr);
 
-Toy_Type*	toy_clone(Toy_Type *obj);
-wchar_t*	toy_get_type_str(Toy_Type *obj);
-wchar_t*	to_string(Toy_Type *obj);
-wchar_t*	to_print(Toy_Type *obj);
+Toy_Type*       toy_clone(Toy_Type *obj);
+wchar_t*        toy_get_type_str(Toy_Type *obj);
+wchar_t*        to_string(Toy_Type *obj);
+wchar_t*        to_print(Toy_Type *obj);
 
-#define list_next(l)		(((l)==NULL) ? NULL : ((GET_TAG((l))==LIST) ? (l)->u.list.nextp : NULL))
-#define list_get_item(l)	(((l)==NULL) ? NULL : ((GET_TAG((l))==LIST) ? (l)->u.list.item : l))
-#define list_set_car(l,v)	(((l)==NULL) ? NULL : ((GET_TAG((l))==LIST) ? (l)->u.list.item=v : NULL))
-#define list_set_cdr(l,v)	(((l)==NULL) ? NULL : ((GET_TAG((l))==LIST) ? (l)->u.list.nextp=v : NULL))
+#define list_next(l)            (((l)==NULL) ? NULL : ((GET_TAG((l))==LIST) ? (l)->u.list.nextp : NULL))
+#define list_get_item(l)        (((l)==NULL) ? NULL : ((GET_TAG((l))==LIST) ? (l)->u.list.item : l))
+#define list_set_car(l,v)       (((l)==NULL) ? NULL : ((GET_TAG((l))==LIST) ? (l)->u.list.item=v : NULL))
+#define list_set_cdr(l,v)       (((l)==NULL) ? NULL : ((GET_TAG((l))==LIST) ? (l)->u.list.nextp=v : NULL))
 
-#define wcisspace(c)		((c < 0x80) && isspace(c))
-#define wcisprint(c)		(isprint(c) || (c >= 0x80))
+#define wcisspace(c)            ((c < 0x80) && isspace(c))
+#define wcisprint(c)            (isprint(c) || (c >= 0x80))
 
 #endif /* __TYPES__ */

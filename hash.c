@@ -17,17 +17,7 @@ static struct hash_bucket* hash_add_to_bucket(
 );
 static Hash* hash_rehash(Hash *hash);
 
-#define HASH_MAKE_KEY(k)	(hash_string_key(k))
-
-/*
-int hash_bsize[] = {
-    7, 13, 31, 61, 127, 251, 509, 1021, 2039, 4093, 8191,
-    16381, 32749, 65521, 131071, 262139, 524287, 1048573,
-    2097151, 4194301, 8388607, 16777213, 33554467, 67108879,
-//    134217757, 268435459, 536870923, 1073741827,
-    0
-};
-*/
+#define HASH_MAKE_KEY(k)        (hash_string_key(k))
 
 Hash*
 new_hash() {
@@ -56,9 +46,9 @@ hash_set(Hash *hash, const wchar_t *key, const struct _toy_type *item) {
     if (NULL == hash) return NULL;
 
     if (((hash->items)*2) > (hash->bucket_size)) {
-	if (NULL == hash_rehash(hash)) {
-	    return NULL;
-	}
+        if (NULL == hash_rehash(hash)) {
+            return NULL;
+        }
     }
 
     index = HASH_MAKE_KEY(key);
@@ -74,7 +64,7 @@ hash_set(Hash *hash, const wchar_t *key, const struct _toy_type *item) {
             1
         ))
     {
-	return NULL;
+        return NULL;
     }
 
     return hash;
@@ -89,23 +79,23 @@ hash_set_t(Hash *hash, const struct _toy_type *key, const struct _toy_type *item
     if (NULL == hash) return NULL;
 
     if (((hash->items)*2) > (hash->bucket_size)) {
-	if (NULL == hash_rehash(hash)) {
-	    return NULL;
-	}
+        if (NULL == hash_rehash(hash)) {
+            return NULL;
+        }
     }
 
     t = GET_TAG(key);
     if ((t == SYMBOL) || (t == REF)) {
-	if (SYMBOL == t) {
-	    idx =  key->u.symbol.hash_index;
-	    caddr = key->u.symbol.cell;
-	} else {
-	    idx = key->u.ref.hash_index;
-	    caddr = key->u.ref.cell;
-	}
+        if (SYMBOL == t) {
+            idx =  key->u.symbol.hash_index;
+            caddr = key->u.symbol.cell;
+        } else {
+            idx = key->u.ref.hash_index;
+            caddr = key->u.ref.cell;
+        }
 
-	if (NULL ==
-	    hash_add_to_bucket(
+        if (NULL ==
+            hash_add_to_bucket(
                 hash,
                 hash->bucket,
                 idx,
@@ -116,10 +106,10 @@ hash_set_t(Hash *hash, const struct _toy_type *key, const struct _toy_type *item
                 1
             ))
         {
-	    return NULL;
-	}
+            return NULL;
+        }
 
-	return hash;
+        return hash;
     }
 
     assert(0);
@@ -145,62 +135,62 @@ hash_add_to_bucket(
     index = org_index % bucket_size;
 
     if (hash->bucket == NULL) {
-	int bsize;
+        int bsize;
         struct hash_bucket *lbucket;
 
-	bsize = sizeof(struct hash_bucket) * hash->bucket_size;
+        bsize = sizeof(struct hash_bucket) * hash->bucket_size;
         lbucket = GC_MALLOC(bsize);
-	ALLOC_SAFE(lbucket);
-	memset(lbucket, 0, bsize);
-	hash->bucket = lbucket;
+        ALLOC_SAFE(lbucket);
+        memset(lbucket, 0, bsize);
+        hash->bucket = lbucket;
         bucket = lbucket;
     }
 
     b = &(bucket[index]);
     if (NULL == b->key) {
-	
-	/* new item into new bucket */
+        
+        /* new item into new bucket */
 
-	if (key_re_alloc) {
-	    dest_key = (wchar_t*)GC_MALLOC(key_len*sizeof(wchar_t));
-	    ALLOC_SAFE(dest_key);
-	    wcsncpy(dest_key, key, key_len);
-	    b->key = dest_key;
-	} else {
-	    b->key = (wchar_t*)key;
-	}
+        if (key_re_alloc) {
+            dest_key = (wchar_t*)GC_MALLOC(key_len*sizeof(wchar_t));
+            ALLOC_SAFE(dest_key);
+            wcsncpy(dest_key, key, key_len);
+            b->key = dest_key;
+        } else {
+            b->key = (wchar_t*)key;
+        }
 
-	b->index = org_index;
-	b->item = (struct _toy_type*)item;
-	b->next = 0;
+        b->index = org_index;
+        b->item = (struct _toy_type*)item;
+        b->next = 0;
 
-	hash->items++;
+        hash->items++;
 
-	return bucket;
+        return bucket;
     }
 
     while (1) {
-	if (0 == wcscmp(b->key, key)) {
-	    if (GET_TAG(b->item) == ALIAS) {
+        if (0 == wcscmp(b->key, key)) {
+            if (GET_TAG(b->item) == ALIAS) {
 
-		/* set to alias slot */
+                /* set to alias slot */
 
-		if (NULL == hash_set_t(b->item->u.alias.slot, b->item->u.alias.key, item)) {
-		    return NULL;
-		} else {
-		    return bucket;
-		}
-	    } else {
+                if (NULL == hash_set_t(b->item->u.alias.slot, b->item->u.alias.key, item)) {
+                    return NULL;
+                } else {
+                    return bucket;
+                }
+            } else {
 
-		/* replace item */
+                /* replace item */
 
-		b->item = (struct _toy_type*)item;
-		return bucket;
-	    }
-	}
+                b->item = (struct _toy_type*)item;
+                return bucket;
+            }
+        }
 
         if (! b->next) break;
-	b = b->next;
+        b = b->next;
     }
 
     /* new item add to synonym */
@@ -209,12 +199,12 @@ hash_add_to_bucket(
     ALLOC_SAFE(bs);
 
     if (key_re_alloc) {
-	dest_key = GC_MALLOC(key_len*sizeof(wchar_t));
-	ALLOC_SAFE(dest_key);
-	wcsncpy(dest_key, key, key_len);
-	bs->key = dest_key;
+        dest_key = GC_MALLOC(key_len*sizeof(wchar_t));
+        ALLOC_SAFE(dest_key);
+        wcsncpy(dest_key, key, key_len);
+        bs->key = dest_key;
     } else {
-	bs->key = (wchar_t*)key;
+        bs->key = (wchar_t*)key;
     }
 
     bs->index = org_index;
@@ -232,15 +222,6 @@ static int next_size(int now_size);
 
 static int next_size(int now_size) {
     int i;
-
-    /*
-    for (i=0; hash_bsize[i]!=0; i++) {
-	if (now_size == hash_bsize[i]) {
-	    i++;
-	    return hash_bsize[i];
-	}
-    }
-    */
 
     i = now_size * 2;
     if (i < 0) {
@@ -268,10 +249,10 @@ hash_rehash(Hash *hash) {
 
     for (i=0; i<(hash->bucket_size); i++) {
         b = &(hash->bucket[i]);
-	if (NULL != b->key) {
-	    while (b) {
-		if (NULL ==
-		    hash_add_to_bucket(
+        if (NULL != b->key) {
+            while (b) {
+                if (NULL ==
+                    hash_add_to_bucket(
                         hash,
                         newb,
                         b->index,
@@ -282,11 +263,11 @@ hash_rehash(Hash *hash) {
                         0
                     ))
                 {
-		    return NULL;
-		}
-		b = b->next;
-	    }
-	}
+                    return NULL;
+                }
+                b = b->next;
+            }
+        }
     }
 
     memset(hash->bucket, 0, sizeof(struct hash_bucket) * hash->bucket_size);
@@ -310,14 +291,14 @@ hash_get(Hash *hash, const wchar_t *key) {
     if (NULL == b->key) return NULL;
     
     while (b) {
-	if (0 == wcscmp(b->key, key)) {
-	    if (GET_TAG(b->item) == ALIAS) {
-		return hash_get_t(b->item->u.alias.slot, b->item->u.alias.key);
-	    } else {
-		return b->item;
-	    }
-	}
-	b = b->next;
+        if (0 == wcscmp(b->key, key)) {
+            if (GET_TAG(b->item) == ALIAS) {
+                return hash_get_t(b->item->u.alias.slot, b->item->u.alias.key);
+            } else {
+                return b->item;
+            }
+        }
+        b = b->next;
     }
 
     return NULL;
@@ -339,10 +320,10 @@ hash_get_alias(Hash *hash, const wchar_t *key) {
     if (NULL == b->key) return NULL;
     
     while (b) {
-	if (0 == wcscmp(b->key, key)) {
-	    return b->item;
-	}
-	b = b->next;
+        if (0 == wcscmp(b->key, key)) {
+            return b->item;
+        }
+        b = b->next;
     }
 
     return NULL;
@@ -360,29 +341,29 @@ hash_get_t(Hash *hash, const struct _toy_type *key) {
 
     t = GET_TAG(key);
     if ((t == SYMBOL) || (t == REF)) {
-	if (SYMBOL == t) {
-	    index = key->u.symbol.hash_index % hash->bucket_size;
-	    caddr = key->u.symbol.cell;
-	} else {
-	    index = key->u.ref.hash_index % hash->bucket_size;
-	    caddr = key->u.ref.cell;
-	}
+        if (SYMBOL == t) {
+            index = key->u.symbol.hash_index % hash->bucket_size;
+            caddr = key->u.symbol.cell;
+        } else {
+            index = key->u.ref.hash_index % hash->bucket_size;
+            caddr = key->u.ref.cell;
+        }
 
-	b = &(hash->bucket[index]);
+        b = &(hash->bucket[index]);
         if (NULL == b->key) return NULL;
         
-	while (b) {
-	    if (0 == wcscmp(b->key, cell_get_addr(caddr))) {
-		if (GET_TAG(b->item) == ALIAS) {
-		    return hash_get_t(b->item->u.alias.slot, b->item->u.alias.key);
-		} else {
-		    return b->item;
-		}
-	    }
-	    b = b->next;
-	}
+        while (b) {
+            if (0 == wcscmp(b->key, cell_get_addr(caddr))) {
+                if (GET_TAG(b->item) == ALIAS) {
+                    return hash_get_t(b->item->u.alias.slot, b->item->u.alias.key);
+                } else {
+                    return b->item;
+                }
+            }
+            b = b->next;
+        }
 
-	return NULL;
+        return NULL;
     }
 
     assert(0);
@@ -415,15 +396,15 @@ hash_get_and_unset_t(Hash *hash, const struct _toy_type *key) {
 
     t = GET_TAG(key);
     if ((t == SYMBOL) || (t == REF)) {
-	if (SYMBOL == t) {
-	    index = key->u.symbol.hash_index % hash->bucket_size;
-	    caddr = key->u.symbol.cell;
-	} else {
-	    index = key->u.ref.hash_index % hash->bucket_size;
-	    caddr = key->u.ref.cell;
-	}
+        if (SYMBOL == t) {
+            index = key->u.symbol.hash_index % hash->bucket_size;
+            caddr = key->u.symbol.cell;
+        } else {
+            index = key->u.ref.hash_index % hash->bucket_size;
+            caddr = key->u.ref.cell;
+        }
 
-	return hash_get_and_unset_sub(hash, index, cell_get_addr(caddr));
+        return hash_get_and_unset_sub(hash, index, cell_get_addr(caddr));
     }
 
     assert(0);
@@ -443,7 +424,7 @@ hash_get_and_unset_sub(Hash *hash, unsigned int org_index, const wchar_t *key) {
     
     bb = NULL;
     while (b) {
-	if (0 == wcscmp(b->key, key)) {
+        if (0 == wcscmp(b->key, key)) {
             item = b->item;
             if (bb) {
                 bb->next = b->next;
@@ -472,14 +453,14 @@ hash_get_and_unset_sub(Hash *hash, unsigned int org_index, const wchar_t *key) {
             }
             hash->items--;
             
-	    if (GET_TAG(item) == ALIAS) {
-		return hash_get_t(item->u.alias.slot, item->u.alias.key);
+            if (GET_TAG(item) == ALIAS) {
+                return hash_get_t(item->u.alias.slot, item->u.alias.key);
             } else {
                 return item;
-	    }
+            }
         }
         bb = b;
-	b = b->next;
+        b = b->next;
     }
 
     return NULL;
@@ -510,15 +491,15 @@ hash_is_exists_t(Hash *hash, const struct _toy_type *key) {
 
     t = GET_TAG(key);
     if ((t == SYMBOL) || (t == REF)) {
-	if (SYMBOL == t) {
-	    index = key->u.symbol.hash_index % hash->bucket_size;
-	    caddr = key->u.symbol.cell;
-	} else {
-	    index = key->u.ref.hash_index % hash->bucket_size;
-	    caddr = key->u.ref.cell;
-	}
+        if (SYMBOL == t) {
+            index = key->u.symbol.hash_index % hash->bucket_size;
+            caddr = key->u.symbol.cell;
+        } else {
+            index = key->u.ref.hash_index % hash->bucket_size;
+            caddr = key->u.ref.cell;
+        }
 
-	return hash_is_exists_sub(hash, index, cell_get_addr(caddr));
+        return hash_is_exists_sub(hash, index, cell_get_addr(caddr));
     }
 
     assert(0);
@@ -536,10 +517,10 @@ hash_is_exists_sub(Hash *hash, unsigned int org_index, const wchar_t *key) {
     if (NULL == b->key) return 0;
     
     while (b) {
-	if (0 == wcscmp(b->key, key)) {
-	    return 1;
-	}
-	b = b->next;
+        if (0 == wcscmp(b->key, key)) {
+            return 1;
+        }
+        b = b->next;
     }
 
     return 0;
@@ -593,7 +574,7 @@ hash_get_keys_str(Hash *hash) {
         while (b) {
             sl = list_append(sl, new_string_str(b->key));
             b = b->next;
-	}
+        }
     }
 
     return l;
@@ -631,7 +612,7 @@ hash_get_pairs(Hash *hash) {
             }
             sl = list_append(sl, p);
             b = b->next;
-	}
+        }
     }
 
     return l;
@@ -677,7 +658,7 @@ hash_get_pairs_str(Hash *hash) {
 
 int
 hash_link(Hash *hash, const wchar_t *key,
-	  Hash *to_hash, const wchar_t *to_key)
+          Hash *to_hash, const wchar_t *to_key)
 {
     Toy_Type *o;
     Toy_Type *e;
@@ -691,21 +672,21 @@ hash_link(Hash *hash, const wchar_t *key,
     o = new_alias(to_hash, new_symbol((wchar_t*)to_key));
 
     if (NULL == hash_set(hash, key, o)) {
-	return 0;
+        return 0;
     } else {
-	return 1;
+        return 1;
     }
 }
 
 int
 hash_link_t(Hash *hash, const struct _toy_type *key,
-	    Hash *to_hash, const struct _toy_type *to_key)
+            Hash *to_hash, const struct _toy_type *to_key)
 {
     if (GET_TAG(key) != SYMBOL) return 0;
     if (GET_TAG(to_key) != SYMBOL) return 0;
 
     return hash_link(hash, cell_get_addr(key->u.symbol.cell),
-		     to_hash, cell_get_addr(to_key->u.symbol.cell));
+                     to_hash, cell_get_addr(to_key->u.symbol.cell));
 }
 
 void
@@ -714,8 +695,8 @@ hash_debug_dump(Hash *hash) {
     struct hash_bucket *b;
 
     if (NULL == hash) {
-	printf("hash not created.\n");
-	return;
+        printf("hash not created.\n");
+        return;
     }
 
     printf("\n");
@@ -724,16 +705,16 @@ hash_debug_dump(Hash *hash) {
     printf("hash synonyms: %d\n", hash->synonyms);
 
     for (i=0; i<(hash->bucket_size); i++) {
-	if (NULL == hash->bucket[i].key) {
-	    wprintf(L"bucket[%d] is not used\n", i);
-	} else {
-	    wprintf(L"bucket[%d] dump:\n", i);
-	    b = &(hash->bucket[i]);
-	    while (b) {
-		wprintf(L"  key: \"%ls\"\n", b->key);
-		b = b->next;
-	    }
-	}
+        if (NULL == hash->bucket[i].key) {
+            wprintf(L"bucket[%d] is not used\n", i);
+        } else {
+            wprintf(L"bucket[%d] dump:\n", i);
+            b = &(hash->bucket[i]);
+            while (b) {
+                wprintf(L"  key: \"%ls\"\n", b->key);
+                b = b->next;
+            }
+        }
     }
 
     return;
@@ -756,19 +737,19 @@ hash_string_key(const wchar_t *key) {
      * following reasons:
      *
      * 1. Multiplying by 10 is perfect for keys that are decimal strings, and
-     *	  multiplying by 9 is just about as good.
+     *    multiplying by 9 is just about as good.
      * 2. Times-9 is (shift-left-3) plus (old). This means that each
-     *	  character's bits hang around in the low-order bits of the hash value
-     *	  for ever, plus they spread fairly rapidly up to the high-order bits
-     *	  to fill out the hash value. This seems works well both for decimal
-     *	  and non-decimal strings, but isn't strong against maliciously-chosen
-     *	  keys.
+     *    character's bits hang around in the low-order bits of the hash value
+     *    for ever, plus they spread fairly rapidly up to the high-order bits
+     *    to fill out the hash value. This seems works well both for decimal
+     *    and non-decimal strings, but isn't strong against maliciously-chosen
+     *    keys.
      */
 
     result = 0;
 
     for (c=*string++ ; c ; c=*string++) {
-	result += (result<<3) + c;
+        result += (result<<3) + c;
     }
     return result;
 }

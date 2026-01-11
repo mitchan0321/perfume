@@ -1,43 +1,43 @@
 #ifndef __CONFIG_H__
 #define __CONFIG_H__
 
-#define VERSION			L"@VERSION@"
-#define PREFIX			L"@PREFIX@"
-#define BUILD			L"@BUILD@"
-#define SETUP_FILE		L"/lib/perfume/setup.prfm"
-#define SETUP_FILE2		L"./setup.prfm"
+#define VERSION                 L"@VERSION@"
+#define PREFIX                  L"@PREFIX@"
+#define BUILD                   L"@BUILD@"
+#define SETUP_FILE              L"/lib/perfume/setup.prfm"
+#define SETUP_FILE2             L"./setup.prfm"
 
-#define LIB_PATH		L"/lib/perfume/lib"
-#define MAXPATHLEN		4096
+#define LIB_PATH                L"/lib/perfume/lib"
+#define MAXPATHLEN              4096
 
-#define DEFAULT_FILE_ENCODING	L"UTF-8"
-#define DEFAULT_SCRIPT_ENCODING	L"UTF-8"
-#define DEFAULT_DIRENT_ENCODING	L"UTF-8"
-#define DEFAULT_ERRSTR_ENCODING	L"UTF-8"
+#define DEFAULT_FILE_ENCODING   L"UTF-8"
+#define DEFAULT_SCRIPT_ENCODING L"UTF-8"
+#define DEFAULT_DIRENT_ENCODING L"UTF-8"
+#define DEFAULT_ERRSTR_ENCODING L"UTF-8"
 
 /* for main co-routine stack size */
-#define STACKSIZE		(1024)
+#define STACKSIZE               (1024)
 
 /* for children co-routine stack size */
-#define CO_STACKSIZE		(1024)
+#define CO_STACKSIZE            (1024)
 
 /* maximum number of slot */
-#define STACK_SLOT_MAX		(256)
+#define STACK_SLOT_MAX          (256)
 
 /*
  * This number is co-routines native C stack size.
  * Real allocate size is STACK_SLOT_SIZE * sizeof(u_int64_t) (may be 8)
  */
 // about 256K bytes
-#define STACK_SLOT_SIZE		(32*1024)
+#define STACK_SLOT_SIZE         (32*1024)
 
 // about 512K bytes
-// #define STACK_SLOT_SIZE		(64*1024)
+// #define STACK_SLOT_SIZE              (64*1024)
 
 // about 1024K bytes
-// #define STACK_SLOT_SIZE		(128*1024)
+// #define STACK_SLOT_SIZE              (128*1024)
 
 /* for SIGSEGV signal handler */
-#define SIGASTKSZ		(64*1024)
+#define SIGASTKSZ               (64*1024)
 
 #endif /* __CONFIG_H__ */

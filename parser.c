@@ -11,7 +11,7 @@
 #include "cell.h"
 
 #ifndef ishexnumber
-#define ishexnumber(x)	(((x>=L'0')&&(x<=L'9'))||((x>=L'a')&&(x<=L'f'))||((x>=L'A')&&(x<=L'F')))
+#define ishexnumber(x)  (((x>=L'0')&&(x<=L'9'))||((x>=L'a')&&(x<=L'f'))||((x>=L'A')&&(x<=L'F')))
 #endif /* ishexnumber */
 
 static Toy_Type* toy_parse_getmacro(Toy_Type *statement, int line);
@@ -52,65 +52,65 @@ toy_parse_script(Bulk *src, wchar_t endc) {
 
     c = bulk_getchar(src);
     if ((c == EOF) && (endc != 0)) {
-	swprintf(buff, 256, L"Imbalanced close char '%lc' at line %d.",
-		 endc, bulk_get_line(src));
-	msg = new_cell(buff);
-	return new_exception(TE_PARSECLOSE, cell_get_addr(msg), NULL);
+        swprintf(buff, 256, L"Imbalanced close char '%lc' at line %d.",
+                 endc, bulk_get_line(src));
+        msg = new_cell(buff);
+        return new_exception(TE_PARSECLOSE, cell_get_addr(msg), NULL);
     }
 
     while (EOF != c) {
-	if (0 == endc) {
-	    if (EOF == c) {
-		return script;
-	    }
-	} else {
-	    if (endc == c) {
-		return script;
-	    }
-	    if (EOF == c) {
-		swprintf(buff, 256, L"Imbalanced close char '%lc' at line %d.",
-			 endc, bulk_get_line(src));
-		msg = new_cell(buff);
-		return new_exception(TE_PARSECLOSE, cell_get_addr(msg), NULL);
-	    }
-	}
-	bulk_ungetchar(src);
+        if (0 == endc) {
+            if (EOF == c) {
+                return script;
+            }
+        } else {
+            if (endc == c) {
+                return script;
+            }
+            if (EOF == c) {
+                swprintf(buff, 256, L"Imbalanced close char '%lc' at line %d.",
+                         endc, bulk_get_line(src));
+                msg = new_cell(buff);
+                return new_exception(TE_PARSECLOSE, cell_get_addr(msg), NULL);
+            }
+        }
+        bulk_ungetchar(src);
 
         statement = toy_parse_statement(src, endc);
         ALLOC_SAFE(statement);
         
-	if (GET_TAG(statement) != STATEMENT) goto parse_error;
+        if (GET_TAG(statement) != STATEMENT) goto parse_error;
 
-	/* apply macros */
-	statement->u.statement_list = 
-	    toy_parse_getmacro(statement->u.statement_list, bulk_get_line(src));
+        /* apply macros */
+        statement->u.statement_list = 
+            toy_parse_getmacro(statement->u.statement_list, bulk_get_line(src));
 
-	statement->u.statement_list = 
-	    toy_parse_initmacro(statement->u.statement_list);
+        statement->u.statement_list = 
+            toy_parse_initmacro(statement->u.statement_list);
 
-	statement->u.statement_list = 
-	    toy_parse_setmacro(statement->u.statement_list, bulk_get_line(src));
-	
-	statement->u.statement_list = 
-	    toy_parse_join_statement(statement->u.statement_list, bulk_get_line(src));
+        statement->u.statement_list = 
+            toy_parse_setmacro(statement->u.statement_list, bulk_get_line(src));
+        
+        statement->u.statement_list = 
+            toy_parse_join_statement(statement->u.statement_list, bulk_get_line(src));
 
-	/* apply parameters number */
-	toy_parse_set_paramno(statement);
+        /* apply parameters number */
+        toy_parse_set_paramno(statement);
 
 
-	if (list_length(statement->u.statement_list) > 0) {
-	    l = list_append(l, statement);
-	    list_is_null = 0;
-	}
+        if (list_length(statement->u.statement_list) > 0) {
+            l = list_append(l, statement);
+            list_is_null = 0;
+        }
 
-	c = bulk_getchar(src);
+        c = bulk_getchar(src);
     }
 
     if (endc == 0) return script;
     if (list_is_null) return script;
 
     swprintf(buff, 256, L"Imbalanced close char '%lc' at line %d.",
-	     endc, bulk_get_line(src));
+             endc, bulk_get_line(src));
     msg = new_cell(buff);
     return new_exception(TE_PARSECLOSE, cell_get_addr(msg), NULL);
 
@@ -139,150 +139,150 @@ toy_parse_statement(Bulk *src, wchar_t endc) {
 
     SET_PG(newstatement);
     while (EOF != (c = bulk_getchar(src))) {
-	if (endc == c) {
-	    bulk_ungetchar(src);
-	    if (line == 0) {
-		newstatement->u.statement.trace_info->line = bulk_get_line(src);
-	    } else {
-		newstatement->u.statement.trace_info->line = line;
-	    }
-	    return newstatement;
-	}
-	if (L';' == c) {
-	    if (line == 0) {
-		newstatement->u.statement.trace_info->line = bulk_get_line(src);
-	    } else {
-		newstatement->u.statement.trace_info->line = line;
-	    }
-	    return newstatement;
-	}
+        if (endc == c) {
+            bulk_ungetchar(src);
+            if (line == 0) {
+                newstatement->u.statement.trace_info->line = bulk_get_line(src);
+            } else {
+                newstatement->u.statement.trace_info->line = line;
+            }
+            return newstatement;
+        }
+        if (L';' == c) {
+            if (line == 0) {
+                newstatement->u.statement.trace_info->line = bulk_get_line(src);
+            } else {
+                newstatement->u.statement.trace_info->line = line;
+            }
+            return newstatement;
+        }
 
-	switch (c) {
-	case L' ': case L'\t': case L'\r': case L'\n':
-	    /* skip white space */
-	    break;
+        switch (c) {
+        case L' ': case L'\t': case L'\r': case L'\n':
+            /* skip white space */
+            break;
 
-	case L'#':
-	    /* skip comment */
-	    c = bulk_getchar(src);
-	    while (1) {
-		if (EOF == c) goto parse_end;
-		if (IS_NEWLINE(c)) break;
-		c = bulk_getchar(src);
-	    }
-	    bulk_ungetchar(src);
-	    break;
+        case L'#':
+            /* skip comment */
+            c = bulk_getchar(src);
+            while (1) {
+                if (EOF == c) goto parse_end;
+                if (IS_NEWLINE(c)) break;
+                c = bulk_getchar(src);
+            }
+            bulk_ungetchar(src);
+            break;
 
-	case L')': case L'}': case L']':
-	    swprintf(buff, 256, L"Illegal close char '%lc' at line %d.",
-		     c, bulk_get_line(src));
-	    msg = new_cell(buff);
-	    any = new_exception(TE_PARSEBADCHAR, cell_get_addr(msg), NULL);
-	    goto parse_error;
+        case L')': case L'}': case L']':
+            swprintf(buff, 256, L"Illegal close char '%lc' at line %d.",
+                     c, bulk_get_line(src));
+            msg = new_cell(buff);
+            any = new_exception(TE_PARSEBADCHAR, cell_get_addr(msg), NULL);
+            goto parse_error;
 
-	case L'(':
-	    if (line == 0) {line = bulk_get_line(src);}
-	    any = toy_parse_list(src, L')');
+        case L'(':
+            if (line == 0) {line = bulk_get_line(src);}
+            any = toy_parse_list(src, L')');
             ALLOC_SAFE(any);
-	    if (GET_TAG(any) != LIST) goto parse_error;
-	    l = list_append(l, any);
-	    break;
+            if (GET_TAG(any) != LIST) goto parse_error;
+            l = list_append(l, any);
+            break;
 
-	case L'{':
-	    if (line == 0) {line = bulk_get_line(src);}
-	    any = toy_parse_block(src, L'}');
+        case L'{':
+            if (line == 0) {line = bulk_get_line(src);}
+            any = toy_parse_block(src, L'}');
             ALLOC_SAFE(any);
-	    if (GET_TAG(any) != BLOCK) goto parse_error;
-	    l = list_append(l, any);
-	    break;
-	    
-	case L'[':
-	    if (line == 0) {line = bulk_get_line(src);}
-	    any = toy_parse_eval(src, L']');
+            if (GET_TAG(any) != BLOCK) goto parse_error;
+            l = list_append(l, any);
+            break;
+            
+        case L'[':
+            if (line == 0) {line = bulk_get_line(src);}
+            any = toy_parse_eval(src, L']');
             ALLOC_SAFE(any);
-	    if (GET_TAG(any) != EVAL) goto parse_error;
-	    l = list_append(l, any);
-	    break;
-	    
-	case L'\"': //"
-	    if (line == 0) {line = bulk_get_line(src);}
-	    any = toy_parse_string(src, L'\"'); //"
+            if (GET_TAG(any) != EVAL) goto parse_error;
+            l = list_append(l, any);
+            break;
+            
+        case L'\"': //"
+            if (line == 0) {line = bulk_get_line(src);}
+            any = toy_parse_string(src, L'\"'); //"
             ALLOC_SAFE(any);
-	    if (GET_TAG(any) != STRING) goto parse_error;
-	    l = list_append(l, any);
-	    break;
+            if (GET_TAG(any) != STRING) goto parse_error;
+            l = list_append(l, any);
+            break;
 
-	case L'\'':
-	    if (line == 0) {line = bulk_get_line(src);}
-	    any = toy_parse_rquote(src, L'\'');
+        case L'\'':
+            if (line == 0) {line = bulk_get_line(src);}
+            any = toy_parse_rquote(src, L'\'');
             ALLOC_SAFE(any);
             if (GET_TAG(any) != RQUOTE) goto parse_error;
-	    l = list_append(l, any);
-	    break;
+            l = list_append(l, any);
+            break;
 
-	case L';':
-	    if (line == 0) {line = bulk_get_line(src);}
-	    if (line == 0) {
-		newstatement->u.statement.trace_info->line = bulk_get_line(src);
-	    } else {
-		newstatement->u.statement.trace_info->line = line;
-	    }
-	    return newstatement;
+        case L';':
+            if (line == 0) {line = bulk_get_line(src);}
+            if (line == 0) {
+                newstatement->u.statement.trace_info->line = bulk_get_line(src);
+            } else {
+                newstatement->u.statement.trace_info->line = line;
+            }
+            return newstatement;
 
-	case L',':
-	    if (line == 0) {line = bulk_get_line(src);}
-	    l = list_append(l, new_symbol(L","));
-	    break;
+        case L',':
+            if (line == 0) {line = bulk_get_line(src);}
+            l = list_append(l, new_symbol(L","));
+            break;
 
-	case L'`':
-	    if (line == 0) {line = bulk_get_line(src);}
-	    l = list_append(l, new_symbol(L"`"));
-	    break;
+        case L'`':
+            if (line == 0) {line = bulk_get_line(src);}
+            l = list_append(l, new_symbol(L"`"));
+            break;
 
-	case L'|':
-	    if (line == 0) {line = bulk_get_line(src);}
-	    c_tmp = bulk_getchar(src);
-	    if (wcschr(ENDCHAR, c_tmp) != NULL) {
-		any = toy_parse_list(src, L'|');
-		if (GET_TAG(any) != LIST) goto parse_error;
-		l = list_append(l, new_bind(any));
-		if (line == 0) {
-		    newstatement->u.statement.trace_info->line = bulk_get_line(src);
-		} else {
-		    newstatement->u.statement.trace_info->line = line;
-		}
-		return newstatement;
-	    }
-	    bulk_ungetchar(src);
+        case L'|':
+            if (line == 0) {line = bulk_get_line(src);}
+            c_tmp = bulk_getchar(src);
+            if (wcschr(ENDCHAR, c_tmp) != NULL) {
+                any = toy_parse_list(src, L'|');
+                if (GET_TAG(any) != LIST) goto parse_error;
+                l = list_append(l, new_bind(any));
+                if (line == 0) {
+                    newstatement->u.statement.trace_info->line = bulk_get_line(src);
+                } else {
+                    newstatement->u.statement.trace_info->line = line;
+                }
+                return newstatement;
+            }
+            bulk_ungetchar(src);
 
-	    /* FALL THRU */
+            /* FALL THRU */
 
-	default:
-	    if (line == 0) {line = bulk_get_line(src);}
+        default:
+            if (line == 0) {line = bulk_get_line(src);}
 
-	    /* parse symbol */
-	    bulk_ungetchar(src);
-	    any = toy_parse_symbol(src, ENDCHAR);
+            /* parse symbol */
+            bulk_ungetchar(src);
+            any = toy_parse_symbol(src, ENDCHAR);
             ALLOC_SAFE(any);
             if (GET_TAG(any) != SYMBOL) goto parse_error;
-	    l = list_append(l, toy_symbol_conv(any));
-	}
+            l = list_append(l, toy_symbol_conv(any));
+        }
     }
 
 parse_end:
     if (line == 0) {
-	newstatement->u.statement.trace_info->line = bulk_get_line(src);
+        newstatement->u.statement.trace_info->line = bulk_get_line(src);
     } else {
-	newstatement->u.statement.trace_info->line = line;
+        newstatement->u.statement.trace_info->line = line;
     }
     
     if (0 == endc) {
-	return newstatement;
+        return newstatement;
     } else {
-	swprintf(buff, 256, L"Imbalanced close char '%lc' at line %d.",
-		 endc, bulk_get_line(src));
-	msg = new_cell(buff);
-	return new_exception(TE_PARSECLOSE, cell_get_addr(msg), NULL);
+        swprintf(buff, 256, L"Imbalanced close char '%lc' at line %d.",
+                 endc, bulk_get_line(src));
+        msg = new_cell(buff);
+        return new_exception(TE_PARSECLOSE, cell_get_addr(msg), NULL);
     }
 
 parse_error:
@@ -303,20 +303,20 @@ toy_parse_symbol(Bulk *src, wchar_t *endc) {
     
     c = bulk_getchar(src);
     while (1) {
-	if (EOF == c) {
-	    goto complite;
-	}
+        if (EOF == c) {
+            goto complite;
+        }
 
-	buff[0] = c; buff[1] = 0;
-	if (NULL != wcsstr((const wchar_t*)endc, (const wchar_t*)buff)) {
-	    bulk_ungetchar(src);
-	    goto complite;
-	}
+        buff[0] = c; buff[1] = 0;
+        if (NULL != wcsstr((const wchar_t*)endc, (const wchar_t*)buff)) {
+            bulk_ungetchar(src);
+            goto complite;
+        }
 
-	p = cell_add_char(newcell, c);
+        p = cell_add_char(newcell, c);
         ALLOC_SAFE(p);
 
-	c = bulk_getchar(src);
+        c = bulk_getchar(src);
     }
 
 complite:
@@ -345,38 +345,38 @@ toy_parse_string(Bulk *src, wchar_t endc) {
 
     c = bulk_getchar(src);
     while (endc != c) {
-	if (EOF == c) goto parse_error;
-	if (L'\\' == c) {
-	    c = bulk_getchar(src);
-	    if (EOF == c) goto parse_error;
-	    switch (c) {
-	    case L't':
-		c = L'\t';
-		break;
-	    case L'r':
-		c = L'\r';
-		break;
-	    case L'n':
-		c = L'\n';
-		break;
-	    case L'\n': case L'\r':
-		c = 0;
-		break;
-	    }
-	}
+        if (EOF == c) goto parse_error;
+        if (L'\\' == c) {
+            c = bulk_getchar(src);
+            if (EOF == c) goto parse_error;
+            switch (c) {
+            case L't':
+                c = L'\t';
+                break;
+            case L'r':
+                c = L'\r';
+                break;
+            case L'n':
+                c = L'\n';
+                break;
+            case L'\n': case L'\r':
+                c = 0;
+                break;
+            }
+        }
 
-	if (0 != c) {
+        if (0 != c) {
             Cell *p;
-	    p = cell_add_char(newcell, c);
+            p = cell_add_char(newcell, c);
             ALLOC_SAFE(p);
-	}
-	c = bulk_getchar(src);
+        }
+        c = bulk_getchar(src);
     }
     return str;
 
 parse_error:
     swprintf(buff, 256, L"Imbalanced close string '%lc' at line %d.",
-	     endc, bulk_get_line(src));
+             endc, bulk_get_line(src));
     msg = new_cell(buff);
     return new_exception(TE_PARSESTRING, cell_get_addr(msg), NULL);
 }
@@ -400,10 +400,10 @@ toy_parse_rquote(Bulk *src, wchar_t endc) {
 
     c = bulk_getchar(src);
     while (1) {
-	if (EOF == c) goto parse_error;
-	if (endc == c) {
-	    c = bulk_getchar(src);
-	    if (EOF == c) return str;
+        if (EOF == c) goto parse_error;
+        if (endc == c) {
+            c = bulk_getchar(src);
+            if (EOF == c) return str;
             if (endc != c) {
                 bulk_ungetchar(src);
                 return str;
@@ -417,13 +417,13 @@ toy_parse_rquote(Bulk *src, wchar_t endc) {
             p = cell_add_char(newcell, c);
             ALLOC_SAFE(p);
         }
-	c = bulk_getchar(src);
+        c = bulk_getchar(src);
     }
     return str;
 
 parse_error:
     swprintf(buff, 256, L"Imbalanced close rquote '%lc' at line %d.",
-	     endc, bulk_get_line(src));
+             endc, bulk_get_line(src));
     msg = new_cell(buff);
     return new_exception(TE_PARSESTRING, cell_get_addr(msg), NULL);
 }
@@ -447,99 +447,99 @@ toy_parse_list(Bulk *src, wchar_t endc) {
     l = newlist;
 
     while (EOF != (c = bulk_getchar(src))) {
-	if (endc == c) return newlist;
+        if (endc == c) return newlist;
 
-	switch (c) {
-	case L' ': case L'\t': case L'\r': case L';': case L'\n': 
-	    /* skip white space */
-	    break;
+        switch (c) {
+        case L' ': case L'\t': case L'\r': case L';': case L'\n': 
+            /* skip white space */
+            break;
 
-	case L'#':
-	    /* skip comment */
-	    c = bulk_getchar(src);
-	    while (1) {
-		if (EOF == c) goto parse_end;
-		if (L'\n' == c) break;
-		c = bulk_getchar(src);
-	    }
-	    bulk_ungetchar(src);
-	    break;
+        case L'#':
+            /* skip comment */
+            c = bulk_getchar(src);
+            while (1) {
+                if (EOF == c) goto parse_end;
+                if (L'\n' == c) break;
+                c = bulk_getchar(src);
+            }
+            bulk_ungetchar(src);
+            break;
 
-	case L')': case L'}': case L']':
-	    swprintf(buff, 256, L"Illegal close list char '%lc' at line %d.",
-		     c, bulk_get_line(src));
-	    msg = new_cell(buff);
-	    any = new_exception(TE_PARSEBADCHAR, cell_get_addr(msg), NULL);
-	    goto parse_error;
+        case L')': case L'}': case L']':
+            swprintf(buff, 256, L"Illegal close list char '%lc' at line %d.",
+                     c, bulk_get_line(src));
+            msg = new_cell(buff);
+            any = new_exception(TE_PARSEBADCHAR, cell_get_addr(msg), NULL);
+            goto parse_error;
 
-	case L'(':
-	    any = toy_parse_list(src, L')');
+        case L'(':
+            any = toy_parse_list(src, L')');
             ALLOC_SAFE(any);
             if (GET_TAG(any) != LIST) goto parse_error;
-	    l = list_append(l, any);
-	    break;
+            l = list_append(l, any);
+            break;
 
-	case L'{':
-	    any = toy_parse_block(src, L'}');
+        case L'{':
+            any = toy_parse_block(src, L'}');
             ALLOC_SAFE(any);
-	    if (GET_TAG(any) != BLOCK) goto parse_error;
-	    l = list_append(l, any);
-	    break;
-	    
-	case L'[':
-	    any = toy_parse_eval(src, L']');
+            if (GET_TAG(any) != BLOCK) goto parse_error;
+            l = list_append(l, any);
+            break;
+            
+        case L'[':
+            any = toy_parse_eval(src, L']');
             ALLOC_SAFE(any);
-	    if (GET_TAG(any) != EVAL) goto parse_error;
-	    l = list_append(l, any);
-	    break;
-	    
-	case L'\"':     // "
-	    any = toy_parse_string(src, L'\"');     // "
+            if (GET_TAG(any) != EVAL) goto parse_error;
+            l = list_append(l, any);
+            break;
+            
+        case L'\"':     // "
+            any = toy_parse_string(src, L'\"');     // "
             ALLOC_SAFE(any);
-	    if (GET_TAG(any) != STRING) goto parse_error;
-	    l = list_append(l, any);
-	    break;
+            if (GET_TAG(any) != STRING) goto parse_error;
+            l = list_append(l, any);
+            break;
 
-	case L'\'':
-	    any = toy_parse_rquote(src, L'\'');
+        case L'\'':
+            any = toy_parse_rquote(src, L'\'');
             ALLOC_SAFE(any);
-	    if (GET_TAG(any) != RQUOTE) goto parse_error;
-	    l = list_append(l, any);
-	    break;
+            if (GET_TAG(any) != RQUOTE) goto parse_error;
+            l = list_append(l, any);
+            break;
 
-	case L',':
-	    l = list_append(l, new_symbol(L","));
-	    break;
+        case L',':
+            l = list_append(l, new_symbol(L","));
+            break;
 
-	case L'`':
-	    l = list_append(l, new_symbol(L"`"));
-	    break;
+        case L'`':
+            l = list_append(l, new_symbol(L"`"));
+            break;
 
-	default:
-	    /* parse symbol */
+        default:
+            /* parse symbol */
 
-	    bulk_ungetchar(src);
-	    any = toy_parse_symbol(src, ENDCHAR);
+            bulk_ungetchar(src);
+            any = toy_parse_symbol(src, ENDCHAR);
             ALLOC_SAFE(any);
-	    if (GET_TAG(any) != SYMBOL) goto parse_error;
+            if (GET_TAG(any) != SYMBOL) goto parse_error;
 
-	    if (wcscmp(cell_get_addr(any->u.symbol.cell), L".") == 0) {
-		any = toy_parse_list(src, L')');
+            if (wcscmp(cell_get_addr(any->u.symbol.cell), L".") == 0) {
+                any = toy_parse_list(src, L')');
                 ALLOC_SAFE(any);
 
-		list_set_cdr(l, toy_symbol_conv(list_get_item(any)));
-		if (NULL == list_get_item(l)) list_set_car(l, new_bool(FALSE));
-		bulk_ungetchar(src);
+                list_set_cdr(l, toy_symbol_conv(list_get_item(any)));
+                if (NULL == list_get_item(l)) list_set_car(l, new_bool(FALSE));
+                bulk_ungetchar(src);
 
-	    } else {
-		l = list_append(l, toy_symbol_conv(any));
-	    }
-	}
+            } else {
+                l = list_append(l, toy_symbol_conv(any));
+            }
+        }
     }
 
 parse_end:
     swprintf(buff, 256, L"Imbalanced close list char '%lc' at line %d.",
-	     endc, bulk_get_line(src));
+             endc, bulk_get_line(src));
     msg = new_cell(buff);
     return new_exception(TE_PARSECLOSE, cell_get_addr(msg), NULL);
 
@@ -591,22 +591,22 @@ toy_symbol_conv(Toy_Type *a) {
 
     addr = cell_get_addr(a->u.symbol.cell);
     if (wcscmp(addr, S_NIL) == 0) {
-	return new_bool(FALSE);
+        return new_bool(FALSE);
     }
     if (wcscmp(addr, S_T) == 0) {
-	return new_bool(TRUE);
+        return new_bool(TRUE);
     }
     if (wcscmp(addr, L".") == 0) {
-	return a;
+        return a;
     }
     if (wcscmp(addr, L"..") == 0) {
-	return a;
+        return a;
     }
     if (wcscmp(addr, L"-") == 0) {
-	return a;
+        return a;
     }
     if (addr[0] == L'$') {
-	return new_ref(&addr[1]);
+        return new_ref(&addr[1]);
     }
 
     /* is integer ? */
@@ -616,8 +616,8 @@ toy_symbol_conv(Toy_Type *a) {
 
     if (p[0] == L'-') p++;
     while (*p) {
-	if (! isdigit(*p)) goto non_integer;
-	p++;
+        if (! isdigit(*p)) goto non_integer;
+        p++;
     }
 
     mpz_init(s);
@@ -633,30 +633,30 @@ non_integer:
 
     p = cell_get_addr(a->u.symbol.cell);
     if (! ((p[0] == L'-') || (p[0] == L'.') || (isdigit(p[0]))))
-	return a;
+        return a;
 
     if ((p[0] == L'-') || (p[0] == L'.')) p++;
     while (isdigit(*p)) {
-	p++;
+        p++;
     }
 
     if (*p == L'.') {
-	p++;
-	while (isdigit(*p)) {
-	    p++;
-	}
+        p++;
+        while (isdigit(*p)) {
+            p++;
+        }
     }
 
     if ((*p == L'E') || (*p == L'e')) {
-	p++;
-	if ((*p == L'+') || (*p == L'-') || isdigit(*p)) {
-	    p++;
-	    while (*p) {
-		if (! isdigit(*p)) goto non_real;
-		p++;
-	    }
-	    return new_real(wcstod(cell_get_addr(a->u.symbol.cell), NULL));
-	}
+        p++;
+        if ((*p == L'+') || (*p == L'-') || isdigit(*p)) {
+            p++;
+            while (*p) {
+                if (! isdigit(*p)) goto non_real;
+                p++;
+            }
+            return new_real(wcstod(cell_get_addr(a->u.symbol.cell), NULL));
+        }
     } else if (*p == 0) {
         val = new_real(wcstod(cell_get_addr(a->u.symbol.cell), NULL));
         ALLOC_SAFE(val);
@@ -672,14 +672,14 @@ non_real:
     if (wcslen((const wchar_t*)p) < 3) goto non_hex;
 
     if ((p[0] == L'0') && ((p[1] == L'x') || (p[1] == L'X'))) {
-	p++; p++;
-	while (*p) {
-	    if (! ishexnumber(*p)) goto non_hex;
-	    p++;
-	}
+        p++; p++;
+        while (*p) {
+            if (! ishexnumber(*p)) goto non_hex;
+            p++;
+        }
 
-	mpz_init(s);
-	mpz_set_str(s, to_char(&(cell_get_addr(a->u.symbol.cell)[2])), 16);
+        mpz_init(s);
+        mpz_set_str(s, to_char(&(cell_get_addr(a->u.symbol.cell)[2])), 16);
         val = new_integer(s);
         ALLOC_SAFE(val);
         SET_PG(val);
@@ -694,14 +694,14 @@ non_hex:
     if (wcslen((const wchar_t*)p) < 3) goto non_octal;
 
     if ((p[0] == L'0') && ((p[1] == L'o') || (p[1] == L'O'))) {
-	p++; p++;
-	while (*p) {
-	    if ((*p < '0') || (*p > '7')) goto non_octal;
-	    p++;
-	}
+        p++; p++;
+        while (*p) {
+            if ((*p < '0') || (*p > '7')) goto non_octal;
+            p++;
+        }
 
-	mpz_init(s);
-	mpz_set_str(s, to_char(&(cell_get_addr(a->u.symbol.cell)[2])), 8);
+        mpz_init(s);
+        mpz_set_str(s, to_char(&(cell_get_addr(a->u.symbol.cell)[2])), 8);
         val = new_integer(s);
         ALLOC_SAFE(val);
         SET_PG(val);
@@ -733,10 +733,10 @@ print_script(Toy_Type *script, int indent) {
 
     l = script->u.statement_list;
     do {
-	st = list_get_item(l);
-	print_statement(st, indent);
+        st = list_get_item(l);
+        print_statement(st, indent);
 
-	l = list_next(l);
+        l = list_next(l);
 
     } while (l);
 
@@ -748,14 +748,14 @@ int print_statement(Toy_Type *st, int indent) {
 
     print_indent(indent);
     if (NULL == st) {
-	wprintf(L"statement is nil.\n");
-	return 0;
+        wprintf(L"statement is nil.\n");
+        return 0;
     }
     wprintf(L"--- statement, line=%d\n", st->u.statement.trace_info->line);
     item = st->u.statement.item_list;
     do {
-	print_object(list_get_item(item), indent);
-	item = list_next(item);
+        print_object(list_get_item(item), indent);
+        item = list_next(item);
     } while (item);
 
     return 0;
@@ -764,7 +764,7 @@ int print_statement(Toy_Type *st, int indent) {
 int print_indent(int indent) {
     int i;
     for (i=0; i<(indent*4); i++) {
-	putchar(L' ');
+        putchar(L' ');
     }
     return 1;
 }
@@ -777,85 +777,85 @@ int print_object(Toy_Type *obj, int indent) {
     print_indent(indent);
     
     if (! IS_TOY_OBJECT(obj)) {
-	wprintf(L"not a toy object\n");
-	return 0;
+        wprintf(L"not a toy object\n");
+        return 0;
     }
 
     wprintf(L"type=%ls: ", toy_get_type_str(obj));
 
     switch GET_TAG(obj) {
     case BOOL:
-	if (obj->u.tbool.value == FALSE) {
-	    wprintf(L"nil\n");
-	} else {
-	    wprintf(L"t\n");
-	}
-	break;
+        if (obj->u.tbool.value == FALSE) {
+            wprintf(L"nil\n");
+        } else {
+            wprintf(L"t\n");
+        }
+        break;
 
     case SYMBOL:
-	ocell = obj->u.symbol.cell;
-	wprintf(L"%ls\n", cell_get_addr(ocell));
-	break;
+        ocell = obj->u.symbol.cell;
+        wprintf(L"%ls\n", cell_get_addr(ocell));
+        break;
 
     case REF:
-	ocell = obj->u.ref.cell;
-	wprintf(L"%ls\n", cell_get_addr(ocell));
-	break;
+        ocell = obj->u.ref.cell;
+        wprintf(L"%ls\n", cell_get_addr(ocell));
+        break;
 
     case INTEGER:
-	wprintf(L"%ls\n", to_string(obj));
-	break;
+        wprintf(L"%ls\n", to_string(obj));
+        break;
 
     case REAL:
-	wprintf(L"%ls\n", to_string(obj));
-	break;
+        wprintf(L"%ls\n", to_string(obj));
+        break;
 
     case STRING:
-	ocell = obj->u.string;
-	wprintf(L"\"%ls\"\n", cell_get_addr(ocell));
-	break;
+        ocell = obj->u.string;
+        wprintf(L"\"%ls\"\n", cell_get_addr(ocell));
+        break;
 
     case STATEMENT:
-	wprintf(L"not yet\n");
-	break;
+        wprintf(L"not yet\n");
+        break;
 
     case SCRIPT:
-	wprintf(L"not yet\n");
-	break;
+        wprintf(L"not yet\n");
+        break;
 
     case LIST:
-	wprintf(L"\n");
-	olist = obj;
-	indent++;
-	print_list(olist, indent);
+        wprintf(L"\n");
+        olist = obj;
+        indent++;
+        print_list(olist, indent);
 
-	break;
+        break;
 
     case BLOCK:
-	wprintf(L"\n");
-	script = obj->u.block_body;
-	indent++;
-	print_script(script, indent);
+        wprintf(L"\n");
+        script = obj->u.block_body;
+        indent++;
+        print_script(script, indent);
 
-	break;
-	
+        break;
+        
     case EVAL:
-	wprintf(L"\n");
-	script = obj->u.eval_body;
-	indent++;
-	print_script(script, indent);
+        wprintf(L"\n");
+        script = obj->u.eval_body;
+        indent++;
+        print_script(script, indent);
 
-	break;
-	
+        break;
+        
     case NATIVE:
     case CLOSURE:
     case EXCEPTION:
     case FUNC:
     case OBJECT:
-	break;
+        break;
 
     default:
-	assert(0);
+        assert(0);
     }
 
     return 1;
@@ -864,18 +864,18 @@ int print_object(Toy_Type *obj, int indent) {
 int
 print_list(Toy_Type *l, int indent) {
     if (IS_LIST_NULL(l)) {
-	print_indent(indent);
-	wprintf(L"nil.\n");
-	return 1;
+        print_indent(indent);
+        wprintf(L"nil.\n");
+        return 1;
     }
 
     while (l) {
-	print_object(list_get_item(l), indent);
-	l = list_next(l);
-	if (l && (GET_TAG(l) != LIST)) {
-	    print_object(l, indent);
-	    break;
-	}
+        print_object(list_get_item(l), indent);
+        l = list_next(l);
+        if (l && (GET_TAG(l) != LIST)) {
+            print_object(l, indent);
+            break;
+        }
     }
 
     return 1;
@@ -910,7 +910,7 @@ toy_parse_getmacro(Toy_Type *statement, int line) {
     cindex = -1;
     for (i=0; i<len; i++) {
         item = list_get(statement, i);
-	if ((GET_TAG(item) == SYMBOL) &&
+        if ((GET_TAG(item) == SYMBOL) &&
             wcscmp(cell_get_addr(item->u.symbol.cell), L",") == 0) {
             cindex = i;
             break;
@@ -956,28 +956,28 @@ toy_parse_initmacro(Toy_Type *statement) {
     result = l = new_list(NULL);
     
     while (statement) {
-	cur = list_get_item(statement);
+        cur = list_get_item(statement);
 
-	if ((GET_TAG(cur) == SYMBOL) &&
-	    wcscmp(cell_get_addr(cur->u.symbol.cell), L"`") == 0) {
+        if ((GET_TAG(cur) == SYMBOL) &&
+            wcscmp(cell_get_addr(cur->u.symbol.cell), L"`") == 0) {
 
-	    if (list_length(statement) >= 2) {
+            if (list_length(statement) >= 2) {
 
-		statement = list_next(statement);
-		class = list_get_item(statement);
-		statement = list_next(statement);
-		param = list_get_item(statement);
+                statement = list_next(statement);
+                class = list_get_item(statement);
+                statement = list_next(statement);
+                param = list_get_item(statement);
 
-		l = list_append(l, new_initmacro(class, param));
-	    } else {
+                l = list_append(l, new_initmacro(class, param));
+            } else {
 
-		l = list_append(l, cur);
-	    }
-	} else {
-	    l = list_append(l, cur);
-	}
+                l = list_append(l, cur);
+            }
+        } else {
+            l = list_append(l, cur);
+        }
 
-	statement = list_next(statement);
+        statement = list_next(statement);
     }
 
     return result;
@@ -991,47 +991,47 @@ toy_parse_join_statement(Toy_Type *statement, int line) {
     src = new_list(NULL);
 
     while (statement) {
-	cur = list_get_item(statement);
+        cur = list_get_item(statement);
 
-	if ((GET_TAG(cur) == SYMBOL) &&
-	    wcscmp(cell_get_addr(cur->u.symbol.cell), L"\\") == 0) {
+        if ((GET_TAG(cur) == SYMBOL) &&
+            wcscmp(cell_get_addr(cur->u.symbol.cell), L"\\") == 0) {
 
-	    if (IS_LIST_NULL(result)) {
-		result = src;
+            if (IS_LIST_NULL(result)) {
+                result = src;
 
-	    } else {
+            } else {
 
-		result = new_eval(new_script(new_list(new_statement(result, line))));
-		list_append(src, result);
-		result = src;
-	    }
+                result = new_eval(new_script(new_list(new_statement(result, line))));
+                list_append(src, result);
+                result = src;
+            }
 
-	    src = new_list(NULL);
+            src = new_list(NULL);
 
-	} else if ((GET_TAG(cur) == SYMBOL) &&
-	    wcscmp(cell_get_addr(cur->u.symbol.cell), L":") == 0) {
+        } else if ((GET_TAG(cur) == SYMBOL) &&
+            wcscmp(cell_get_addr(cur->u.symbol.cell), L":") == 0) {
 
-	    src = new_list(new_eval(new_script(new_list(new_statement(src, line)))));
+            src = new_list(new_eval(new_script(new_list(new_statement(src, line)))));
 
-	} else {
+        } else {
 
-	    list_append(src, cur);
-	}
+            list_append(src, cur);
+        }
 
-	statement = list_next(statement);
+        statement = list_next(statement);
     }
 
     if (! IS_LIST_NULL(src)) {
-	if (IS_LIST_NULL(result)) {
+        if (IS_LIST_NULL(result)) {
 
-	    return src;
+            return src;
 
-	} else {
+        } else {
 
-	    result = new_eval(new_script(new_list(new_statement(result, line))));
-	    list_append(src, result);
-	    result = src;
-	}
+            result = new_eval(new_script(new_list(new_statement(result, line))));
+            list_append(src, result);
+            result = src;
+        }
     }
 
     return result;
@@ -1054,21 +1054,21 @@ toy_parse_setmacro(Toy_Type *statement, int line) {
     if (GET_TAG(op) != SYMBOL) return orig;
 
     if (wcscmp(cell_get_addr(op->u.symbol.cell), L":=") == 0) {
-	list_append(result, new_symbol(L"set"));
-	list_append(result, var);
-	while (val) {
-	    list_append(result, list_get_item(val));
-	    val = list_next(val);
-	}
-	return result;
-		    
+        list_append(result, new_symbol(L"set"));
+        list_append(result, var);
+        while (val) {
+            list_append(result, list_get_item(val));
+            val = list_next(val);
+        }
+        return result;
+                    
     } else if (wcscmp(cell_get_addr(op->u.symbol.cell), L"::=") == 0) {
-	list_append(result, new_symbol(L"set"));
-	list_append(result, var);
-	list_append(result, 
-		    new_eval(new_script(new_list(new_statement(toy_parse_join_statement(val, line),
-							       line)))));
-	return result;
+        list_append(result, new_symbol(L"set"));
+        list_append(result, var);
+        list_append(result, 
+                    new_eval(new_script(new_list(new_statement(toy_parse_join_statement(val, line),
+                                                               line)))));
+        return result;
     }
 
     return orig;
@@ -1082,22 +1082,22 @@ toy_parse_set_paramno(Toy_Type *o) {
 
     l = list_next(o->u.statement.item_list);
     while (l) {
-	i = list_get_item(l);
-	if (GET_TAG(i) == SYMBOL) {
-	    if (IS_NAMED_SYM(i) || IS_SWITCH_SYM(i)) {
-		n = TAG_MAX_PARAMNO;
-		break;
-	    }
-	}
-	n ++;
-	l = list_next(l);
+        i = list_get_item(l);
+        if (GET_TAG(i) == SYMBOL) {
+            if (IS_NAMED_SYM(i) || IS_SWITCH_SYM(i)) {
+                n = TAG_MAX_PARAMNO;
+                break;
+            }
+        }
+        n ++;
+        l = list_next(l);
     }
 
     if (n < TAG_MAX_PARAMNO) {
-	CLEAR_PARAMNO(o);
-	SET_PARAMNO(o, n);
+        CLEAR_PARAMNO(o);
+        SET_PARAMNO(o, n);
     } else {
-	SET_PARAMNO(o, TAG_MAX_PARAMNO);
+        SET_PARAMNO(o, TAG_MAX_PARAMNO);
     }
 
     return o;

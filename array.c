@@ -28,7 +28,7 @@ array_append(Array *array, struct _toy_type *item) {
     if (NULL == array) return NULL;
 
     if ((array->cur_size + 1) > array->alloc_size) {
-	if (NULL == array_realloc(array)) return NULL;
+        if (NULL == array_realloc(array)) return NULL;
     }
 
     array->array[array->cur_size] = *item;
@@ -109,7 +109,7 @@ array_realloc(Array* array) {
     memset(new_array, 0, sizeof(struct _toy_type) * alloc_size);
 
     for (i=0; i<array->cur_size; i++) {
-	new_array[i] = orig_array[i];
+        new_array[i] = orig_array[i];
     }
 
     array->alloc_size = alloc_size;
@@ -126,11 +126,11 @@ array_realloc_size(Array* array, int size) {
     if (size < 0) return NULL;
     
     if (size <= array->alloc_size) {
-	array->cur_size = size;
-	for (i=size; i<array->alloc_size; i++) {
-	    memset(&array->array[i], 0, sizeof(struct _toy_type));
-	}
-	return array;
+        array->cur_size = size;
+        for (i=size; i<array->alloc_size; i++) {
+            memset(&array->array[i], 0, sizeof(struct _toy_type));
+        }
+        return array;
     }
 
     new_t = GC_MALLOC(sizeof(struct _toy_type) * ((size>0) ? size : ARRAY_INIT_SIZE));
@@ -138,8 +138,8 @@ array_realloc_size(Array* array, int size) {
     memset(new_t, 0, sizeof(struct _toy_type) * ((size>0) ? size : ARRAY_INIT_SIZE));
 
     for (i=0; i<size; i++) {
-	if (i >= array->cur_size) break;
-	new_t[i] = array->array[i];
+        if (i >= array->cur_size) break;
+        new_t[i] = array->array[i];
     }
     
     array->array = new_t;
@@ -161,7 +161,7 @@ array_insert(Array *array, int pos, struct _toy_type *item) {
     }
 
     if ((array->cur_size + 1) > array->alloc_size) {
-	if (NULL == array_realloc(array)) return NULL;
+        if (NULL == array_realloc(array)) return NULL;
     }
     
     array->cur_size ++;

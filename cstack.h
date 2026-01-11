@@ -25,10 +25,10 @@ void cstack_return();
 int  cstack_isalive(int slot);
 void* cstack_get_safe_addr();
 
-#define SS_INVAL	(-1)
-#define SS_FREE		(0)
-#define SS_USE		(1)
-#define SS_PEND		(2)
+#define SS_INVAL        (-1)
+#define SS_FREE         (0)
+#define SS_USE          (1)
+#define SS_PEND         (2)
 
 #endif /* __CSTACK__ */
 
@@ -53,14 +53,14 @@ static struct _cstack {
     int number_of_slot;
     int slot_size;
     struct _stack_slot {
-	int state;
-	__PTRDIFF_TYPE__ *start_addr;
-	__PTRDIFF_TYPE__ *barrier_addr;
-	__PTRDIFF_TYPE__ *safe_addr;
-	__PTRDIFF_TYPE__ *end_addr;
-	int jmp_buff_enable;
-	sigjmp_buf jmp_buff;
-	wchar_t *memo;
+        int state;
+        __PTRDIFF_TYPE__ *start_addr;
+        __PTRDIFF_TYPE__ *barrier_addr;
+        __PTRDIFF_TYPE__ *safe_addr;
+        __PTRDIFF_TYPE__ *end_addr;
+        int jmp_buff_enable;
+        sigjmp_buf jmp_buff;
+        wchar_t *memo;
     } stack_slot[STACK_SLOT_MAX];
 } CStack;
 

@@ -37,21 +37,21 @@ list_append(Toy_Type *list, Toy_Type *item) {
     if (list == NULL) return NULL;
 
     if (IS_LIST_NULL(list)) {
-	list->u.list.item = item;
-	return list;
+        list->u.list.item = item;
+        return list;
     }
 
     if (NULL == list->u.list.nextp) {
-	list->u.list.nextp = new_list(item);
-	return list->u.list.nextp;
+        list->u.list.nextp = new_list(item);
+        return list->u.list.nextp;
     }
 
     while (list->u.list.nextp) {
-	if (GET_TAG(list->u.list.nextp) != LIST) {
-	    list->u.list.nextp = new_list(item);
-	    return list->u.list.nextp;
-	}
-	list = list->u.list.nextp;
+        if (GET_TAG(list->u.list.nextp) != LIST) {
+            list->u.list.nextp = new_list(item);
+            return list->u.list.nextp;
+        }
+        list = list->u.list.nextp;
     }
     list->u.list.nextp = new_list(item);
 
@@ -83,9 +83,9 @@ list_length(Toy_Type *list) {
     if (IS_LIST_NULL(list)) return 0;
 
     while (list->u.list.nextp) {
-	list = list->u.list.nextp;
-	length++;
-	if (GET_TAG(list) != LIST) return length;
+        list = list->u.list.nextp;
+        length++;
+        if (GET_TAG(list) != LIST) return length;
     }
 
     return length;

@@ -24,31 +24,31 @@ init_cstack() {
 
     CStack.slot_size = STACK_SLOT_SIZE * sizeof(__PTRDIFF_TYPE__);
     for (i = 0 ; i < STACK_SLOT_MAX ; i++) {
-	CStack.stack_slot[i].state = SS_INVAL;
-	CStack.stack_slot[i].start_addr = 0;
-	CStack.stack_slot[i].barrier_addr = 0;
-	CStack.stack_slot[i].safe_addr = 0;
-	CStack.stack_slot[i].end_addr = 0;
-	CStack.stack_slot[i].jmp_buff_enable = 0;
-	memset(CStack.stack_slot[i].jmp_buff, 0, sizeof(jmp_buf));
-	CStack.stack_slot[i].memo = 0;
+        CStack.stack_slot[i].state = SS_INVAL;
+        CStack.stack_slot[i].start_addr = 0;
+        CStack.stack_slot[i].barrier_addr = 0;
+        CStack.stack_slot[i].safe_addr = 0;
+        CStack.stack_slot[i].end_addr = 0;
+        CStack.stack_slot[i].jmp_buff_enable = 0;
+        memset(CStack.stack_slot[i].jmp_buff, 0, sizeof(jmp_buf));
+        CStack.stack_slot[i].memo = 0;
     }
 
     ss.ss_sp = GC_MALLOC(SIGASTKSZ);
     if (NULL == ss.ss_sp) {
-	fprintf(stderr, "Can't alloc altinative stack(1).\n");
-	exit(1);
+        fprintf(stderr, "Can't alloc altinative stack(1).\n");
+        exit(1);
     }
     ss.ss_size = SIGASTKSZ;
     ss.ss_flags = 0;
     if (-1 == sigaltstack(&ss, NULL)) {
-	fprintf(stderr, "Can't set altinative stack(1).\n");
-	exit(1);
+        fprintf(stderr, "Can't set altinative stack(1).\n");
+        exit(1);
     }
 
     if (-1 == sigaction(SIGSEGV, NULL, &oldsig)) {
-	fprintf(stderr, "Can't save sigaction(1).\n");
-	exit(1);
+        fprintf(stderr, "Can't save sigaction(1).\n");
+        exit(1);
     }
 
     sigemptyset(&newsig.sa_mask);
@@ -56,8 +56,8 @@ init_cstack() {
     newsig.sa_sigaction = sig_cstack;
     newsig.sa_flags = SA_SIGINFO | SA_RESTART | SA_ONSTACK;
     if (-1 == sigaction(SIGSEGV, &newsig, NULL)) {
-	fprintf(stderr, "Can't set sigaction(1).\n");
-	exit(1);
+        fprintf(stderr, "Can't set sigaction(1).\n");
+        exit(1);
     }
 
     fin = alloc_slot(0);
@@ -65,8 +65,8 @@ init_cstack() {
     CStack.number_of_slot = fin;
 
     if (-1 == sigaction(SIGSEGV, &oldsig, NULL)) {
-	fprintf(stderr, "Can't restore sigaction.\n");
-	exit(1);
+        fprintf(stderr, "Can't restore sigaction.\n");
+        exit(1);
     }
 
     /* for main interp stack to use */
@@ -75,35 +75,35 @@ init_cstack() {
 
     /* main stack add root to GC */
     GC_add_roots((void*)CStack.stack_slot[0].safe_addr,
-		 (void*)CStack.stack_slot[0].end_addr);
+                 (void*)CStack.stack_slot[0].end_addr);
 
     /* init current coroutine */
     Current_coroutine = 0;
     CStack_in_baria = 0;
 
     if (0 == sigsetjmp(jmp_env, 1)) {
-	cstack_set_jmpbuff(0, &jmp_env);
+        cstack_set_jmpbuff(0, &jmp_env);
     } else {
-	fprintf(stderr, "Catch SIGSEGV at main coroutine, exit.\n");
+        fprintf(stderr, "Catch SIGSEGV at main coroutine, exit.\n");
         exit(1);
     }
 
     /* running signal install */
     ss.ss_sp = GC_MALLOC(SIGASTKSZ);
     if (NULL == ss.ss_sp) {
-	fprintf(stderr, "Can't alloc altinative stack(2).\n");
-	exit(1);
+        fprintf(stderr, "Can't alloc altinative stack(2).\n");
+        exit(1);
     }
     ss.ss_size = SIGASTKSZ;
     ss.ss_flags = 0;
     if (-1 == sigaltstack(&ss, NULL)) {
-	fprintf(stderr, "Can't set altinative stack(2).\n");
-	exit(1);
+        fprintf(stderr, "Can't set altinative stack(2).\n");
+        exit(1);
     }
 
     if (-1 == sigaction(SIGSEGV, NULL, &oldsig)) {
-	fprintf(stderr, "Can't save sigaction(2).\n");
-	exit(1);
+        fprintf(stderr, "Can't save sigaction(2).\n");
+        exit(1);
     }
 
     sigemptyset(&newsig.sa_mask);
@@ -111,8 +111,8 @@ init_cstack() {
     newsig.sa_sigaction = sig_cstack_running_handler;
     newsig.sa_flags = SA_SIGINFO | SA_RESTART | SA_ONSTACK;
     if (-1 == sigaction(SIGSEGV, &newsig, NULL)) {
-	fprintf(stderr, "Can't set sigaction(2).\n");
-	exit(1);
+        fprintf(stderr, "Can't set sigaction(2).\n");
+        exit(1);
     }
 }
 
@@ -129,11 +129,11 @@ alloc_slot(int slot) {
         memset((void*)stack_frame, 0, STACK_SLOT_SIZE * sizeof(__PTRDIFF_TYPE__));
         /* memset((void*)stack_frame, 0, MP_PAGESIZE); */
     } else {
-	if (slot <= 1) {
-	    fprintf(stderr, "Can\'t allocate stack slot, going to exit.\n");
-	    exit(1);
-	}
-	return slot;
+        if (slot <= 1) {
+            fprintf(stderr, "Can\'t allocate stack slot, going to exit.\n");
+            exit(1);
+        }
+        return slot;
     }
 
     CStack.stack_slot[slot].state = SS_FREE;
@@ -148,33 +148,33 @@ alloc_slot(int slot) {
 
 #ifdef __aarch64__
     CStack.stack_slot[slot].end_addr = (__PTRDIFF_TYPE__*)
-	((void*)stack_frame + (STACK_SLOT_SIZE * sizeof(__PTRDIFF_TYPE__)));
+        ((void*)stack_frame + (STACK_SLOT_SIZE * sizeof(__PTRDIFF_TYPE__)));
     mod_align = ((long long int)CStack.stack_slot[slot].end_addr) % ARM64_ALIGN;
     CStack.stack_slot[slot].end_addr = 
         (__PTRDIFF_TYPE__*)((unsigned long long int)CStack.stack_slot[slot].end_addr - mod_align);
 #else
     CStack.stack_slot[slot].end_addr = (__PTRDIFF_TYPE__*)
-	((void*)stack_frame + (STACK_SLOT_SIZE * sizeof(__PTRDIFF_TYPE__)));
+        ((void*)stack_frame + (STACK_SLOT_SIZE * sizeof(__PTRDIFF_TYPE__)));
 #endif /* __aarch64__ */
 
     /* set memory protect barrier */
     if ((__PTRDIFF_TYPE__)(((void*)stack_frame + MP_SPARE)) & MP_ALIGN) {
-	CStack.stack_slot[slot].barrier_addr = (__PTRDIFF_TYPE__*)
-	    (((__PTRDIFF_TYPE__)((void*)stack_frame
-				 + MP_SPARE + MP_PAGESIZE)) & ~MP_ALIGN);
+        CStack.stack_slot[slot].barrier_addr = (__PTRDIFF_TYPE__*)
+            (((__PTRDIFF_TYPE__)((void*)stack_frame
+                                 + MP_SPARE + MP_PAGESIZE)) & ~MP_ALIGN);
     } else {
-	CStack.stack_slot[slot].barrier_addr = (__PTRDIFF_TYPE__*)
-	    ((void*)(stack_frame) + MP_SPARE);
+        CStack.stack_slot[slot].barrier_addr = (__PTRDIFF_TYPE__*)
+            ((void*)(stack_frame) + MP_SPARE);
     }
     CStack.stack_slot[slot].safe_addr = (__PTRDIFF_TYPE__*)
-	((void*)(CStack.stack_slot[slot].barrier_addr) + MP_PAGESIZE);
+        ((void*)(CStack.stack_slot[slot].barrier_addr) + MP_PAGESIZE);
 
     cstack_protect(slot);
 
     /* indicate garbage collection address block to BoehmGC */
 /*
     GC_add_roots((void*)CStack.stack_slot[slot].safe_addr,
-		 (void*)CStack.stack_slot[slot].end_addr);
+                 (void*)CStack.stack_slot[slot].end_addr);
 */
     slot ++;
     if (slot > STACK_SLOT_MAX) return (slot-1);
@@ -196,8 +196,8 @@ sig_cstack(int flag, siginfo_t* siginfo, void* ptr) {
 /*
     fprintf(stderr, "sig: %d\n", siginfo->si_signo);
     if (siginfo->si_code == SEGV_MAPERR) {
-	fprintf(stderr, "MAPERROR, exit\n");
-	exit(1);
+        fprintf(stderr, "MAPERROR, exit\n");
+        exit(1);
     }
 */
     siglongjmp(jmp_env, 1);
@@ -220,16 +220,16 @@ sig_cstack_running_handler(int flag, siginfo_t* siginfo, void* ptr) {
     fprintf(stderr, "si_reason: %d\n", siginfo->_reason._fault._trapno);
 #endif
     if (CStack_in_baria) {
-	fprintf(stderr, "SOVF Double fault detect.\n");
-	exit(1);
+        fprintf(stderr, "SOVF Double fault detect.\n");
+        exit(1);
     }
     CStack_in_baria = 1;
     if (CStack.stack_slot[Current_coroutine].jmp_buff_enable) {
-	cstack_unprotect(Current_coroutine);
+        cstack_unprotect(Current_coroutine);
         //sigreturn(ptr);
-	return;
+        return;
 #if 0
-	siglongjmp(CStack.stack_slot[Current_coroutine].jmp_buff, 1);
+        siglongjmp(CStack.stack_slot[Current_coroutine].jmp_buff, 1);
 #endif
     }
 
@@ -246,13 +246,13 @@ void cstack_return() {
 static void
 cstack_clear(int slot_id) {
     memset((void*)CStack.stack_slot[slot_id].barrier_addr, 0,
-	   CStack.stack_slot[slot_id].end_addr - CStack.stack_slot[slot_id].barrier_addr);
+           CStack.stack_slot[slot_id].end_addr - CStack.stack_slot[slot_id].barrier_addr);
 }
 
 static void
 cstack_clear_all(int slot_id) {
     memset((void*)CStack.stack_slot[slot_id].start_addr, 0,
-	   CStack.stack_slot[slot_id].end_addr - CStack.stack_slot[slot_id].start_addr);
+           CStack.stack_slot[slot_id].end_addr - CStack.stack_slot[slot_id].start_addr);
 }
 
 int
@@ -260,19 +260,19 @@ cstack_get(wchar_t *memo) {
     int i;
 
     for (i = 0 ; i < CStack.number_of_slot ; i++) {
-	if (SS_FREE == CStack.stack_slot[i].state) {
-	    CStack.stack_slot[i].state = SS_USE;
-	    CStack.stack_slot[i].memo = memo;
-	    cstack_unprotect(i);
-	    cstack_clear_all(i);
-	    cstack_protect(i);    
+        if (SS_FREE == CStack.stack_slot[i].state) {
+            CStack.stack_slot[i].state = SS_USE;
+            CStack.stack_slot[i].memo = memo;
+            cstack_unprotect(i);
+            cstack_clear_all(i);
+            cstack_protect(i);    
 
-	    /* indicate garbage collection address block to BoehmGC */
-	    GC_add_roots((void*)CStack.stack_slot[i].safe_addr,
-			 (void*)CStack.stack_slot[i].end_addr);
-	    
-	    return i;
-	}
+            /* indicate garbage collection address block to BoehmGC */
+            GC_add_roots((void*)CStack.stack_slot[i].safe_addr,
+                         (void*)CStack.stack_slot[i].end_addr);
+            
+            return i;
+        }
     }
     
     return -1;
@@ -281,8 +281,8 @@ cstack_get(wchar_t *memo) {
 void
 cstack_release(int slot_id) {
     if ((slot_id >= CStack.number_of_slot) ||
-	(slot_id < 1)) {
-	return;
+        (slot_id < 1)) {
+        return;
     }
     
     CStack.stack_slot[slot_id].state = SS_PEND;
@@ -295,14 +295,14 @@ cstack_release(int slot_id) {
 
     /* indicate garbage collection address block to BoehmGC */
     GC_remove_roots((void*)CStack.stack_slot[slot_id].safe_addr,
-		    (void*)CStack.stack_slot[slot_id].end_addr);
+                    (void*)CStack.stack_slot[slot_id].end_addr);
 }
 
 void
 cstack_release_clear(int slot_id) {
     if ((slot_id >= CStack.number_of_slot) ||
-	(slot_id < 1)) {
-	return;
+        (slot_id < 1)) {
+        return;
     }
     
     cstack_release(slot_id);
@@ -317,7 +317,7 @@ cstack_release_clear(int slot_id) {
     /* indicate garbage collection address block to BoehmGC */
     /* comment out because duplicate with cstack_release.
     GC_remove_roots((void*)CStack.stack_slot[slot_id].safe_addr,
-		    (void*)CStack.stack_slot[slot_id].end_addr);
+                    (void*)CStack.stack_slot[slot_id].end_addr);
     */
 }
 
@@ -331,102 +331,102 @@ cstack_list() {
 
     slist = new_list(NULL);
     for (i = 0 ; i < CStack.number_of_slot ; i++) {
-	elist = new_list(NULL);
-	switch (CStack.stack_slot[i].state) {
-	case SS_FREE:
-	    list_append(elist, new_integer_si(i));
-	    list_append(elist, new_symbol(L"FREE"));
-	    list_append(elist,
-			new_integer_si((__PTRDIFF_TYPE__)
-				       (__PTRDIFF_TYPE__)
-				       CStack.stack_slot[i].start_addr));
-	    list_append(elist,
-			new_integer_si((__PTRDIFF_TYPE__)
-				       (__PTRDIFF_TYPE__)
-				       CStack.stack_slot[i].barrier_addr));
-	    list_append(elist,
-			new_integer_si((__PTRDIFF_TYPE__)
-				       (__PTRDIFF_TYPE__)
-				       CStack.stack_slot[i].safe_addr));
-	    list_append(elist,
-			new_integer_si((__PTRDIFF_TYPE__)
-				       (__PTRDIFF_TYPE__)
-				       CStack.stack_slot[i].end_addr));
-	    list_append(elist,
-			new_integer_si((__PTRDIFF_TYPE__)
-				       (__PTRDIFF_TYPE__)
-				       CStack.stack_slot[i].jmp_buff_enable));
-	    list_append(elist, new_string_str(L""));
-	    list_append(elist,
-			new_integer_si((__PTRDIFF_TYPE__)
-				       (__PTRDIFF_TYPE__)
-				       cstack_get_slot_size(i)));
+        elist = new_list(NULL);
+        switch (CStack.stack_slot[i].state) {
+        case SS_FREE:
+            list_append(elist, new_integer_si(i));
+            list_append(elist, new_symbol(L"FREE"));
+            list_append(elist,
+                        new_integer_si((__PTRDIFF_TYPE__)
+                                       (__PTRDIFF_TYPE__)
+                                       CStack.stack_slot[i].start_addr));
+            list_append(elist,
+                        new_integer_si((__PTRDIFF_TYPE__)
+                                       (__PTRDIFF_TYPE__)
+                                       CStack.stack_slot[i].barrier_addr));
+            list_append(elist,
+                        new_integer_si((__PTRDIFF_TYPE__)
+                                       (__PTRDIFF_TYPE__)
+                                       CStack.stack_slot[i].safe_addr));
+            list_append(elist,
+                        new_integer_si((__PTRDIFF_TYPE__)
+                                       (__PTRDIFF_TYPE__)
+                                       CStack.stack_slot[i].end_addr));
+            list_append(elist,
+                        new_integer_si((__PTRDIFF_TYPE__)
+                                       (__PTRDIFF_TYPE__)
+                                       CStack.stack_slot[i].jmp_buff_enable));
+            list_append(elist, new_string_str(L""));
+            list_append(elist,
+                        new_integer_si((__PTRDIFF_TYPE__)
+                                       (__PTRDIFF_TYPE__)
+                                       cstack_get_slot_size(i)));
 
-	    break;
+            break;
 
-	case SS_USE:
-	    list_append(elist, new_integer_si(i));
-	    list_append(elist, new_symbol(L"USE"));
-	    list_append(elist,
-			new_integer_si((__PTRDIFF_TYPE__)
-				       (__PTRDIFF_TYPE__)
-				       CStack.stack_slot[i].start_addr));
-	    list_append(elist,
-			new_integer_si((__PTRDIFF_TYPE__)
-				       (__PTRDIFF_TYPE__)
-				       CStack.stack_slot[i].barrier_addr));
-	    list_append(elist,
-			new_integer_si((__PTRDIFF_TYPE__)
-				       (__PTRDIFF_TYPE__)
-				       CStack.stack_slot[i].safe_addr));
-	    list_append(elist,
-			new_integer_si((__PTRDIFF_TYPE__)
-				       (__PTRDIFF_TYPE__)
-				       CStack.stack_slot[i].end_addr));
-	    list_append(elist,
-			new_integer_si((__PTRDIFF_TYPE__)
-				       (__PTRDIFF_TYPE__)
-				       CStack.stack_slot[i].jmp_buff_enable));
-	    list_append(elist, new_string_str(CStack.stack_slot[i].memo));
-	    list_append(elist,
-			new_integer_si((__PTRDIFF_TYPE__)
-				       (__PTRDIFF_TYPE__)
-				       cstack_get_slot_size(i)));
+        case SS_USE:
+            list_append(elist, new_integer_si(i));
+            list_append(elist, new_symbol(L"USE"));
+            list_append(elist,
+                        new_integer_si((__PTRDIFF_TYPE__)
+                                       (__PTRDIFF_TYPE__)
+                                       CStack.stack_slot[i].start_addr));
+            list_append(elist,
+                        new_integer_si((__PTRDIFF_TYPE__)
+                                       (__PTRDIFF_TYPE__)
+                                       CStack.stack_slot[i].barrier_addr));
+            list_append(elist,
+                        new_integer_si((__PTRDIFF_TYPE__)
+                                       (__PTRDIFF_TYPE__)
+                                       CStack.stack_slot[i].safe_addr));
+            list_append(elist,
+                        new_integer_si((__PTRDIFF_TYPE__)
+                                       (__PTRDIFF_TYPE__)
+                                       CStack.stack_slot[i].end_addr));
+            list_append(elist,
+                        new_integer_si((__PTRDIFF_TYPE__)
+                                       (__PTRDIFF_TYPE__)
+                                       CStack.stack_slot[i].jmp_buff_enable));
+            list_append(elist, new_string_str(CStack.stack_slot[i].memo));
+            list_append(elist,
+                        new_integer_si((__PTRDIFF_TYPE__)
+                                       (__PTRDIFF_TYPE__)
+                                       cstack_get_slot_size(i)));
 
-	    break;
+            break;
 
-	case SS_PEND:
-	    list_append(elist, new_integer_si(i));
-	    list_append(elist, new_symbol(L"PEND"));
-	    list_append(elist,
-			new_integer_si((__PTRDIFF_TYPE__)
-				       (__PTRDIFF_TYPE__)
-				       CStack.stack_slot[i].start_addr));
-	    list_append(elist,
-			new_integer_si((__PTRDIFF_TYPE__)
-				       (__PTRDIFF_TYPE__)
-				       CStack.stack_slot[i].barrier_addr));
-	    list_append(elist,
-			new_integer_si((__PTRDIFF_TYPE__)
-				       (__PTRDIFF_TYPE__)
-				       CStack.stack_slot[i].safe_addr));
-	    list_append(elist,
-			new_integer_si((__PTRDIFF_TYPE__)
-				       (__PTRDIFF_TYPE__)
-				       CStack.stack_slot[i].end_addr));
-	    list_append(elist,
-			new_integer_si((__PTRDIFF_TYPE__)
-				       (__PTRDIFF_TYPE__)
-				       CStack.stack_slot[i].jmp_buff_enable));
-	    list_append(elist, new_string_str(CStack.stack_slot[i].memo));
-	    list_append(elist,
-			new_integer_si((__PTRDIFF_TYPE__)
-				       (__PTRDIFF_TYPE__)
-				       cstack_get_slot_size(i)));
+        case SS_PEND:
+            list_append(elist, new_integer_si(i));
+            list_append(elist, new_symbol(L"PEND"));
+            list_append(elist,
+                        new_integer_si((__PTRDIFF_TYPE__)
+                                       (__PTRDIFF_TYPE__)
+                                       CStack.stack_slot[i].start_addr));
+            list_append(elist,
+                        new_integer_si((__PTRDIFF_TYPE__)
+                                       (__PTRDIFF_TYPE__)
+                                       CStack.stack_slot[i].barrier_addr));
+            list_append(elist,
+                        new_integer_si((__PTRDIFF_TYPE__)
+                                       (__PTRDIFF_TYPE__)
+                                       CStack.stack_slot[i].safe_addr));
+            list_append(elist,
+                        new_integer_si((__PTRDIFF_TYPE__)
+                                       (__PTRDIFF_TYPE__)
+                                       CStack.stack_slot[i].end_addr));
+            list_append(elist,
+                        new_integer_si((__PTRDIFF_TYPE__)
+                                       (__PTRDIFF_TYPE__)
+                                       CStack.stack_slot[i].jmp_buff_enable));
+            list_append(elist, new_string_str(CStack.stack_slot[i].memo));
+            list_append(elist,
+                        new_integer_si((__PTRDIFF_TYPE__)
+                                       (__PTRDIFF_TYPE__)
+                                       cstack_get_slot_size(i)));
 
-	    break;
-	}
-	list_append(slist, elist);
+            break;
+        }
+        list_append(slist, elist);
     }
     list_append(result, slist);
 
@@ -437,8 +437,8 @@ void*
 cstack_get_start_addr(int slot_id) {
 
     if ((slot_id >= CStack.number_of_slot) ||
-	(slot_id < 0)) {
-	return 0;
+        (slot_id < 0)) {
+        return 0;
     }
 
     return (void*)CStack.stack_slot[slot_id].start_addr;
@@ -448,8 +448,8 @@ void*
 cstack_get_end_addr(int slot_id) {
 
     if ((slot_id >= CStack.number_of_slot) ||
-	(slot_id < 0)) {
-	return 0;
+        (slot_id < 0)) {
+        return 0;
     }
 
     return (void*)CStack.stack_slot[slot_id].end_addr;
@@ -495,9 +495,9 @@ cstack_leave(int old_slot) {
 
 int  cstack_isalive(int slot) {
     if (SS_USE == CStack.stack_slot[slot].state) {
-	return 1;
+        return 1;
     } else {
-	return 0;
+        return 0;
     }
 }
 

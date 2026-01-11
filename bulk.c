@@ -112,7 +112,7 @@ bulk_getchar(Bulk *bulk) {
 
     c = bulk->data[bulk->pos];
     if (IS_NEWLINE(c)) {
-	bulk->line++;
+        bulk->line++;
     }
     bulk->pos++;
 
@@ -125,7 +125,7 @@ bulk_ungetchar(Bulk *bulk) {
     if (NULL == bulk) return EOF;
     if (bulk->pos > 0) bulk->pos--;
     if (IS_NEWLINE(bulk->data[bulk->pos])) {
-	bulk->line--;
+        bulk->line--;
     }
 
     return 1;
@@ -162,8 +162,8 @@ bulk_set_position(Bulk *bulk, int pos) {
     if (EOF == bulk_is_eof(bulk)) return EOF;
 
     if (pos >= bulk->length) {
-	bulk->pos = bulk->length;
-	return EOF;
+        bulk->pos = bulk->length;
+        return EOF;
     }
 
     bulk->pos = pos;

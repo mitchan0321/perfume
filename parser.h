@@ -7,7 +7,7 @@
 #include "cell.h"
 #include "bulk.h"
 
-#define ENDCHAR	(L" \t\r\n(){}[]#;\"\',")
+#define ENDCHAR (L" \t\r\n(){}[]#;\"\',")
 
 Toy_Type* toy_parse_start(Bulk *src);
 Toy_Type* toy_parse_script(Bulk *src, wchar_t endc);

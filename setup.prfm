@@ -77,16 +77,16 @@ defun unknown (*) {
     set __unknown_param__ [$* next];
 
     $LIB_PATH each do: {| __unknown_d__ |
-	try {unset __unknown_f__; alias up: 1 __fname__ __unknown_f__};
-	set __unknown_f__ [$__unknown_d__ . "/" $__unknown_cmd__ ".prfm"];
-	if {and [file exists? $__unknown_f__] [file read? $__unknown_f__]}
-	then: {
-	    uplevel {try {load $__fname__} catch: {}; unset __fname__};
-	    if {! [sid $__unknown_cmd__]} then: {
-		continue;
-	    };
-	    return [call $__unknown_cmd__ $__unknown_param__];
-	};
+        try {unset __unknown_f__; alias up: 1 __fname__ __unknown_f__};
+        set __unknown_f__ [$__unknown_d__ . "/" $__unknown_cmd__ ".prfm"];
+        if {and [file exists? $__unknown_f__] [file read? $__unknown_f__]}
+        then: {
+            uplevel {try {load $__fname__} catch: {}; unset __fname__};
+            if {! [sid $__unknown_cmd__]} then: {
+                continue;
+            };
+            return [call $__unknown_cmd__ $__unknown_param__];
+        };
     };
     throw ErrNoFunction ["No such function, '" . $__unknown_cmd__ "'."];
 };
@@ -97,10 +97,10 @@ defun unknown (*) {
 if {file exists? [$ENV,"HOME" . "/.perfume"]}
 then: {
     try {
-	load [$ENV,"HOME" . "/.perfume"];
+        load [$ENV,"HOME" . "/.perfume"];
     } 
     catch: {| e |
-	println "Error at read '$HOME/.perfume', " [$e cdr] ".";
+        println "Error at read '$HOME/.perfume', " [$e cdr] ".";
     };
 };
 

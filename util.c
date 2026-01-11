@@ -20,12 +20,12 @@ read_size(int fd, char* buff, int size) {
     if (size == 0) return  1;
 
     do {
-	sts = read(fd, &buff[pos], remain);
-	if (-1 == sts) return -1;
-	if ( 0 == sts) return -1;
+        sts = read(fd, &buff[pos], remain);
+        if (-1 == sts) return -1;
+        if ( 0 == sts) return -1;
 
-	pos += sts;
-	remain -= sts;
+        pos += sts;
+        remain -= sts;
 
     } while (remain > 0);
 
@@ -42,12 +42,12 @@ write_size(int fd, char* buff, int size) {
     if (size == 0) return  1;
     
     do {
-	sts = write(fd, &buff[pos], remain);
-	if (-1 == sts) return -1;
-	if ( 0 == sts) return -1;
+        sts = write(fd, &buff[pos], remain);
+        if (-1 == sts) return -1;
+        if ( 0 == sts) return -1;
 
-	pos += sts;
-	remain -= sts;
+        pos += sts;
+        remain -= sts;
 
     } while (remain > 0);
 
@@ -63,7 +63,7 @@ to_wchar(const char *src) {
     dest = GC_MALLOC((len+1)*sizeof(wchar_t));
     ALLOC_SAFE(dest);
     for (i=0; i<=len; i++) {
-	dest[i] = ((wchar_t)src[i]) & 0xff;
+        dest[i] = ((wchar_t)src[i]) & 0xff;
     }
 
     return dest;
@@ -78,7 +78,7 @@ to_char(const wchar_t *src) {
     dest = GC_MALLOC(len+1);
     ALLOC_SAFE(dest);
     for (i=0; i<=len; i++) {
-	dest[i] = (char)src[i];
+        dest[i] = (char)src[i];
     }
 
     return dest;
@@ -111,20 +111,20 @@ encode_dirent(Toy_Interp *interp, wchar_t *name, encoder_error_info **info) {
     iencoder = NENCODE_RAW;
     enc = hash_get_t(interp->globals, const_DEFAULT_DIRENT_ENCODING);
     if (enc) {
-	if (GET_TAG(enc) == SYMBOL) {
-	    iencoder = get_encoding_index(cell_get_addr(enc->u.symbol.cell));
-	    if (-1 == iencoder) {
-		error_info->errorno = EENCODE_BADENCODING;
-		error_info->pos = -1;
-		error_info->message = L"Bad encoder specified.";
-		return 0;
-	    }
-	} else {
-	    error_info->errorno = EENCODE_BADENCODING;
-	    error_info->pos = -1;
-	    error_info->message = L"Bad encoder specified, need symbol.";
-	    return 0;
-	}
+        if (GET_TAG(enc) == SYMBOL) {
+            iencoder = get_encoding_index(cell_get_addr(enc->u.symbol.cell));
+            if (-1 == iencoder) {
+                error_info->errorno = EENCODE_BADENCODING;
+                error_info->pos = -1;
+                error_info->message = L"Bad encoder specified.";
+                return 0;
+            }
+        } else {
+            error_info->errorno = EENCODE_BADENCODING;
+            error_info->pos = -1;
+            error_info->message = L"Bad encoder specified, need symbol.";
+            return 0;
+        }
     }
 
     raw = encode_unicode_to_raw(new_cell(name), iencoder, error_info);
@@ -148,20 +148,20 @@ decode_dirent(Toy_Interp *interp, char *name, encoder_error_info **info) {
     iencoder = NENCODE_RAW;
     enc = hash_get_t(interp->globals, const_DEFAULT_DIRENT_ENCODING);
     if (enc) {
-	if (GET_TAG(enc) == SYMBOL) {
-	    iencoder = get_encoding_index(cell_get_addr(enc->u.symbol.cell));
-	    if (-1 == iencoder) {
-		error_info->errorno = EENCODE_BADENCODING;
-		error_info->pos = -1;
-		error_info->message = L"Bad encoder specified.";
-		return 0;
-	    }
-	} else {
-	    error_info->errorno = EENCODE_BADENCODING;
-	    error_info->pos = -1;
-	    error_info->message = L"Bad encoder specified, need symbol.";
-	    return 0;
-	}
+        if (GET_TAG(enc) == SYMBOL) {
+            iencoder = get_encoding_index(cell_get_addr(enc->u.symbol.cell));
+            if (-1 == iencoder) {
+                error_info->errorno = EENCODE_BADENCODING;
+                error_info->pos = -1;
+                error_info->message = L"Bad encoder specified.";
+                return 0;
+            }
+        } else {
+            error_info->errorno = EENCODE_BADENCODING;
+            error_info->pos = -1;
+            error_info->message = L"Bad encoder specified, need symbol.";
+            return 0;
+        }
     }
 
     unicode = decode_raw_to_unicode(new_cell(to_wchar(name)), iencoder, error_info);

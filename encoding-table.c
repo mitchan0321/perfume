@@ -10,10 +10,10 @@ int jisencoder_setup_done = 0;
 void
 JisEncoder_Setup() {
     if (jisencoder_setup_done == 0) {
-	memset(Unicode_to_JISX0208, 0, sizeof(Unicode_to_JISX0208));
-	memset(JISX0208_to_Unicode, 0, sizeof(JISX0208_to_Unicode));
-#   	include "encoding-set-utoj.h"
-#   	include "encoding-set-jtou.h"
+        memset(Unicode_to_JISX0208, 0, sizeof(Unicode_to_JISX0208));
+        memset(JISX0208_to_Unicode, 0, sizeof(JISX0208_to_Unicode));
+#       include "encoding-set-utoj.h"
+#       include "encoding-set-jtou.h"
     }
     
     jisencoder_setup_done = 1;

@@ -76,10 +76,10 @@ mth_object_method(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     res = cmd_fun(interp, posargs, nameargs, arglen);
 
     if (GET_TAG(res) == EXCEPTION) {
-	err = res;
-	if (cell_eq_str(err->u.exception.code, TE_SYNTAX) == 0) goto error;
+        err = res;
+        if (cell_eq_str(err->u.exception.code, TE_SYNTAX) == 0) goto error;
 
-	return err;
+        return err;
     }
 
     h = SELF_HASH(interp);
@@ -107,10 +107,10 @@ mth_object_get(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     h = SELF_HASH(interp);
     o = hash_get_t(h, var);
     if (NULL == o) {
-	c = new_cell(L"No such variable in slot, '");
-	cell_add_str(c, cell_get_addr(var->u.symbol.cell));
-	cell_add_str(c, L"'.");
-	return new_exception(TE_NOVAR, cell_get_addr(c), interp);
+        c = new_cell(L"No such variable in slot, '");
+        cell_add_str(c, cell_get_addr(var->u.symbol.cell));
+        cell_add_str(c, L"'.");
+        return new_exception(TE_NOVAR, cell_get_addr(c), interp);
     }
     return o;
 
@@ -162,9 +162,9 @@ mth_object_delegate(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int a
 
     var = SELF_OBJ(interp)->u.object.delegate_list;
     if (NULL == var) {
-	return new_list(NULL);
+        return new_list(NULL);
     } else {
-	return var;
+        return var;
     }
     
 error:
@@ -283,8 +283,8 @@ mth_integer_plus(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     arg = list_get_item(posargs);
 
     if (INTEGER != GET_TAG(arg)) {
-	arg = to_int(interp, arg);
-	if (INTEGER != GET_TAG(arg)) return arg;
+        arg = to_int(interp, arg);
+        if (INTEGER != GET_TAG(arg)) return arg;
     }
 
     mpz_init(s);
@@ -312,8 +312,8 @@ mth_integer_minus(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     arg = list_get_item(posargs);
 
     if (INTEGER != GET_TAG(arg)) {
-	arg = to_int(interp, arg);
-	if (INTEGER != GET_TAG(arg)) return arg;
+        arg = to_int(interp, arg);
+        if (INTEGER != GET_TAG(arg)) return arg;
     }
 
     mpz_init(s);
@@ -340,8 +340,8 @@ mth_integer_mul(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     arg = list_get_item(posargs);
 
     if (INTEGER != GET_TAG(arg)) {
-	arg = to_int(interp, arg);
-	if (INTEGER != GET_TAG(arg)) return arg;
+        arg = to_int(interp, arg);
+        if (INTEGER != GET_TAG(arg)) return arg;
     }
 
     mpz_init(s);
@@ -368,12 +368,12 @@ mth_integer_div(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     arg = list_get_item(posargs);
 
     if (INTEGER != GET_TAG(arg)) {
-	arg = to_int(interp, arg);
-	if (INTEGER != GET_TAG(arg)) return arg;
+        arg = to_int(interp, arg);
+        if (INTEGER != GET_TAG(arg)) return arg;
     }
 
     if (0 == mpz_cmp_si(arg->u.biginteger, 0)) {
-	return new_exception(TE_ZERODIV, L"Zero divide.", interp);
+        return new_exception(TE_ZERODIV, L"Zero divide.", interp);
     }
     mpz_init(s);
     mpz_set(s, SELF(interp)->u.biginteger);
@@ -399,12 +399,12 @@ mth_integer_mod(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     arg = list_get_item(posargs);
 
     if (INTEGER != GET_TAG(arg)) {
-	arg = to_int(interp, arg);
-	if (INTEGER != GET_TAG(arg)) return arg;
+        arg = to_int(interp, arg);
+        if (INTEGER != GET_TAG(arg)) return arg;
     }
 
     if (0 == mpz_cmp_si(arg->u.biginteger, 0)) {
-	return new_exception(TE_ZERODIV, L"Zero divide.", interp);
+        return new_exception(TE_ZERODIV, L"Zero divide.", interp);
     }
     mpz_init(s);
     mpz_set(s, SELF(interp)->u.biginteger);
@@ -430,13 +430,13 @@ mth_integer_eq(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     arg = list_get_item(posargs);
 
     if (INTEGER != GET_TAG(arg)) {
-	arg = to_int(interp, arg);
-	if (INTEGER != GET_TAG(arg)) return arg;
+        arg = to_int(interp, arg);
+        if (INTEGER != GET_TAG(arg)) return arg;
     }
 
     if (0 == (mpz_cmp(SELF(interp)->u.biginteger,
-		      arg->u.biginteger))) {
-	return const_T;
+                      arg->u.biginteger))) {
+        return const_T;
     }
     return const_Nil;
     
@@ -458,13 +458,13 @@ mth_integer_neq(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     arg = list_get_item(posargs);
 
     if (INTEGER != GET_TAG(arg)) {
-	arg = to_int(interp, arg);
-	if (INTEGER != GET_TAG(arg)) return arg;
+        arg = to_int(interp, arg);
+        if (INTEGER != GET_TAG(arg)) return arg;
     }
 
     if (0 != (mpz_cmp(SELF(interp)->u.biginteger,
-		      arg->u.biginteger))) {
-	return const_T;
+                      arg->u.biginteger))) {
+        return const_T;
     }
     return const_Nil;
 
@@ -486,15 +486,15 @@ mth_integer_gt(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     arg = list_get_item(posargs);
 
     if (INTEGER != GET_TAG(arg)) {
-	arg = to_int(interp, arg);
-	if (INTEGER != GET_TAG(arg)) return arg;
+        arg = to_int(interp, arg);
+        if (INTEGER != GET_TAG(arg)) return arg;
     }
 
     if (mpz_cmp(SELF(interp)->u.biginteger, arg->u.biginteger) > 0) {
-	return const_T;
+        return const_T;
     }
     return const_Nil;
-	
+        
 error:
     return new_exception(TE_SYNTAX, L"Syntax error at '>', syntax: Integer > number-val", interp);
 
@@ -513,12 +513,12 @@ mth_integer_lt(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     arg = list_get_item(posargs);
 
     if (INTEGER != GET_TAG(arg)) {
-	arg = to_int(interp, arg);
-	if (INTEGER != GET_TAG(arg)) return arg;
+        arg = to_int(interp, arg);
+        if (INTEGER != GET_TAG(arg)) return arg;
     }
 
     if (mpz_cmp(SELF(interp)->u.biginteger, arg->u.biginteger) < 0) {
-	return const_T;
+        return const_T;
     }
     return const_Nil;
     
@@ -540,12 +540,12 @@ mth_integer_ge(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     arg = list_get_item(posargs);
 
     if (INTEGER != GET_TAG(arg)) {
-	arg = to_int(interp, arg);
-	if (INTEGER != GET_TAG(arg)) return arg;
+        arg = to_int(interp, arg);
+        if (INTEGER != GET_TAG(arg)) return arg;
     }
 
     if (mpz_cmp(SELF(interp)->u.biginteger, arg->u.biginteger) >= 0) {
-	return const_T;
+        return const_T;
     }
     return const_Nil;
 
@@ -567,12 +567,12 @@ mth_integer_le(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     arg = list_get_item(posargs);
 
     if (INTEGER != GET_TAG(arg)) {
-	arg = to_int(interp, arg);
-	if (INTEGER != GET_TAG(arg)) return arg;
+        arg = to_int(interp, arg);
+        if (INTEGER != GET_TAG(arg)) return arg;
     }
 
     if (mpz_cmp(SELF(interp)->u.biginteger, arg->u.biginteger) <= 0) {
-	return const_T;
+        return const_T;
     }
     return const_Nil;
 
@@ -594,20 +594,20 @@ mth_integer_inc(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     arg = list_get_item(posargs);
 
     if (arg == NULL) {
-	mpz_add_ui(SELF(interp)->u.biginteger,
-		   SELF(interp)->u.biginteger,
-		   1);
-	return SELF(interp);
+        mpz_add_ui(SELF(interp)->u.biginteger,
+                   SELF(interp)->u.biginteger,
+                   1);
+        return SELF(interp);
     }
 
     if (GET_TAG(arg) != INTEGER) {
-	arg = to_int(interp,arg);
+        arg = to_int(interp,arg);
     }
     if (GET_TAG(arg) == INTEGER) {
-	mpz_add(SELF(interp)->u.biginteger,
-		SELF(interp)->u.biginteger,
-		arg->u.biginteger);
-	return SELF(interp);
+        mpz_add(SELF(interp)->u.biginteger,
+                SELF(interp)->u.biginteger,
+                arg->u.biginteger);
+        return SELF(interp);
     }
     return arg;
 
@@ -629,20 +629,20 @@ mth_integer_dec(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     arg = list_get_item(posargs);
 
     if (arg == NULL) {
-	mpz_sub_ui(SELF(interp)->u.biginteger,
-		   SELF(interp)->u.biginteger,
-		   1);
-	return SELF(interp);
+        mpz_sub_ui(SELF(interp)->u.biginteger,
+                   SELF(interp)->u.biginteger,
+                   1);
+        return SELF(interp);
     }
 
     if (GET_TAG(arg) != INTEGER) {
-	arg = to_int(interp,arg);
+        arg = to_int(interp,arg);
     }
     if (GET_TAG(arg) == INTEGER) {
-	mpz_sub(SELF(interp)->u.biginteger,
-		SELF(interp)->u.biginteger,
-		arg->u.biginteger);
-	return SELF(interp);
+        mpz_sub(SELF(interp)->u.biginteger,
+                SELF(interp)->u.biginteger,
+                arg->u.biginteger);
+        return SELF(interp);
     }
     return arg;
 
@@ -685,38 +685,38 @@ loop:
     if (t == EXCEPTION) return result;
     if (t == CONTROL) {
 
-	switch (result->u.control.code) {
-	case CTRL_RETURN: case CTRL_GOTO:
-	    return result;
-	    break;
+        switch (result->u.control.code) {
+        case CTRL_RETURN: case CTRL_GOTO:
+            return result;
+            break;
 
-	case CTRL_BREAK:
-	    result = result->u.control.ret_value;
-	    goto done;
+        case CTRL_BREAK:
+            result = result->u.control.ret_value;
+            goto done;
 
-	case CTRL_CONTINUE:
-	    result = const_Nil;
-	    goto loop_continue;
-	    break;
+        case CTRL_CONTINUE:
+            result = const_Nil;
+            goto loop_continue;
+            break;
 
-	case CTRL_REDO:
-	    result = const_Nil;
-	    goto loop;
-	    break;
+        case CTRL_REDO:
+            result = const_Nil;
+            goto loop;
+            break;
 
-	case CTRL_RETRY:
-	    result = const_Nil;
-	    goto loop_retry;
-	    break;
-	}
+        case CTRL_RETRY:
+            result = const_Nil;
+            goto loop_retry;
+            break;
+        }
     }
 
 loop_continue:    
     i += step;
     if (step == 1) {
-	if (i <= upto) goto loop;
+        if (i <= upto) goto loop;
     } else {
-	if (i >= upto) goto loop;
+        if (i >= upto) goto loop;
     }
 
 done:
@@ -724,7 +724,7 @@ done:
 
 error:
     return new_exception(TE_SYNTAX, L"Syntax error at 'each', syntax: Integer each to: number do: {| var | block}",
-			 interp);
+                         interp);
 
 error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
@@ -761,38 +761,38 @@ loop_retry:
 
 loop:
     if (f) {
-	result = toy_yield(interp, block, new_list(new_integer_si(i)));
+        result = toy_yield(interp, block, new_list(new_integer_si(i)));
     } else {
-	result = new_integer_si(i);
+        result = new_integer_si(i);
     }
     t = GET_TAG(result);
     if (t == EXCEPTION) return result;
     if (t == CONTROL) {
 
-	switch (result->u.control.code) {
-	case CTRL_RETURN: case CTRL_GOTO:
-	    result = result->u.control.ret_value;
-	    break;
+        switch (result->u.control.code) {
+        case CTRL_RETURN: case CTRL_GOTO:
+            result = result->u.control.ret_value;
+            break;
 
-	case CTRL_BREAK:
-	    result = result->u.control.ret_value;
-	    goto done;
+        case CTRL_BREAK:
+            result = result->u.control.ret_value;
+            goto done;
 
-	case CTRL_CONTINUE:
-	    result = const_Nil;
-	    goto loop_continue;
-	    break;
+        case CTRL_CONTINUE:
+            result = const_Nil;
+            goto loop_continue;
+            break;
 
-	case CTRL_REDO:
-	    result = const_Nil;
-	    goto loop;
-	    break;
+        case CTRL_REDO:
+            result = const_Nil;
+            goto loop;
+            break;
 
-	case CTRL_RETRY:
-	    result = const_Nil;
-	    goto loop_retry;
-	    break;
-	}
+        case CTRL_RETRY:
+            result = const_Nil;
+            goto loop_retry;
+            break;
+        }
     }
 
     l = list_append(l, result);
@@ -800,9 +800,9 @@ loop:
 loop_continue:    
     i += step;
     if (step == 1) {
-	if (i <= upto) goto loop;
+        if (i <= upto) goto loop;
     } else {
-	if (i >= upto) goto loop;
+        if (i >= upto) goto loop;
     }
 
 done:
@@ -810,7 +810,7 @@ done:
 
 error:
     return new_exception(TE_SYNTAX, L"Syntax error at '..', syntax: Integer .. last [do: {| var | block}]",
-			 interp);
+                         interp);
 
 error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
@@ -842,7 +842,7 @@ mth_integer_rol(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     if (GET_TAG(arg) != INTEGER) goto error;
 
     return new_integer_si(mpz_get_si(self->u.biginteger)
-			  << mpz_get_si(arg->u.biginteger));
+                          << mpz_get_si(arg->u.biginteger));
 
 error:
     return new_exception(TE_SYNTAX, L"Syntax error at '<<', syntax: Integer << bit", interp);
@@ -862,7 +862,7 @@ mth_integer_ror(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     if (GET_TAG(arg) != INTEGER) goto error;
 
     return new_integer_si(mpz_get_si(self->u.biginteger)
-			  >> mpz_get_si(arg->u.biginteger));
+                          >> mpz_get_si(arg->u.biginteger));
 
 error:
     return new_exception(TE_SYNTAX, L"Syntax error at '>>', syntax: Integer >> bit", interp);
@@ -882,7 +882,7 @@ mth_integer_lror(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     if (GET_TAG(arg) != INTEGER) goto error;
 
     return new_integer_si((unsigned long int)mpz_get_si(self->u.biginteger)
-			  >> mpz_get_si(arg->u.biginteger));
+                          >> mpz_get_si(arg->u.biginteger));
 
 error:
     return new_exception(TE_SYNTAX, L"Syntax error at '>>>', syntax: Integer >> bit", interp);
@@ -1036,7 +1036,7 @@ mth_integer_sqrt(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     mpz_init(zero);
     mpz_set(s, SELF(interp)->u.biginteger);
     if (mpz_cmp(s, zero) < 0) {
-	return new_exception(TE_ZERODIV, L"Zero divide.", interp);
+        return new_exception(TE_ZERODIV, L"Zero divide.", interp);
     }
     mpz_sqrt(sqrt, s);
 
@@ -1123,8 +1123,8 @@ mth_real_plus(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 
     arg = list_get_item(posargs);
     if (REAL != GET_TAG(arg)) {
-	arg = to_real(interp, arg);
-	if (REAL != GET_TAG(arg)) return arg;
+        arg = to_real(interp, arg);
+        if (REAL != GET_TAG(arg)) return arg;
     }
 
     return new_real(SELF(interp)->u.real + arg->u.real);
@@ -1147,8 +1147,8 @@ mth_real_minus(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
 
     arg = list_get_item(posargs);
     if (REAL != GET_TAG(arg)) {
-	arg = to_real(interp, arg);
-	if (REAL != GET_TAG(arg)) return arg;
+        arg = to_real(interp, arg);
+        if (REAL != GET_TAG(arg)) return arg;
     }
 
     return new_real(SELF(interp)->u.real - arg->u.real);
@@ -1170,8 +1170,8 @@ mth_real_mul(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
 
     arg = list_get_item(posargs);
     if (REAL != GET_TAG(arg)) {
-	arg = to_real(interp, arg);
-	if (REAL != GET_TAG(arg)) return arg;
+        arg = to_real(interp, arg);
+        if (REAL != GET_TAG(arg)) return arg;
     }
 
     return new_real(SELF(interp)->u.real * arg->u.real);
@@ -1193,12 +1193,12 @@ mth_real_div(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
 
     arg = list_get_item(posargs);
     if (REAL != GET_TAG(arg)) {
-	arg = to_real(interp, arg);
-	if (REAL != GET_TAG(arg)) return arg;
+        arg = to_real(interp, arg);
+        if (REAL != GET_TAG(arg)) return arg;
     }
 
     if (arg->u.real == 0.0) {
-	return new_exception(TE_ZERODIV, L"Zero divide.", interp);
+        return new_exception(TE_ZERODIV, L"Zero divide.", interp);
     }
     return new_real(SELF(interp)->u.real / arg->u.real);
 
@@ -1219,12 +1219,12 @@ mth_real_eq(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 
     arg = list_get_item(posargs);
     if (REAL != GET_TAG(arg)) {
-	arg = to_real(interp, arg);
-	if (REAL != GET_TAG(arg)) return arg;
+        arg = to_real(interp, arg);
+        if (REAL != GET_TAG(arg)) return arg;
     }
 
     if (SELF(interp)->u.real == arg->u.real) {
-	return const_T;
+        return const_T;
     }
     return const_Nil;
 
@@ -1245,12 +1245,12 @@ mth_real_neq(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
 
     arg = list_get_item(posargs);
     if (REAL != GET_TAG(arg)) {
-	arg = to_real(interp, arg);
-	if (REAL != GET_TAG(arg)) return arg;
+        arg = to_real(interp, arg);
+        if (REAL != GET_TAG(arg)) return arg;
     }
 
     if (SELF(interp)->u.real != arg->u.real) {
-	return const_T;
+        return const_T;
     }
     return const_Nil;
 
@@ -1271,12 +1271,12 @@ mth_real_gt(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 
     arg = list_get_item(posargs);
     if (REAL != GET_TAG(arg)) {
-	arg = to_real(interp, arg);
-	if (REAL != GET_TAG(arg)) return arg;
+        arg = to_real(interp, arg);
+        if (REAL != GET_TAG(arg)) return arg;
     }
 
     if (SELF(interp)->u.real > arg->u.real) {
-	return const_T;
+        return const_T;
     }
     return const_Nil;
 
@@ -1297,12 +1297,12 @@ mth_real_lt(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 
     arg = list_get_item(posargs);
     if (REAL != GET_TAG(arg)) {
-	arg = to_real(interp, arg);
-	if (REAL != GET_TAG(arg)) return arg;
+        arg = to_real(interp, arg);
+        if (REAL != GET_TAG(arg)) return arg;
     }
 
     if (SELF(interp)->u.real < arg->u.real) {
-	return const_T;
+        return const_T;
     }
     return const_Nil;
 
@@ -1323,12 +1323,12 @@ mth_real_ge(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 
     arg = list_get_item(posargs);
     if (REAL != GET_TAG(arg)) {
-	arg = to_real(interp, arg);
-	if (REAL != GET_TAG(arg)) return arg;
+        arg = to_real(interp, arg);
+        if (REAL != GET_TAG(arg)) return arg;
     }
 
     if (SELF(interp)->u.real >= arg->u.real) {
-	return const_T;
+        return const_T;
     }
     return const_Nil;
 
@@ -1349,12 +1349,12 @@ mth_real_le(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 
     arg = list_get_item(posargs);
     if (REAL != GET_TAG(arg)) {
-	arg = to_real(interp, arg);
-	if (REAL != GET_TAG(arg)) return arg;
+        arg = to_real(interp, arg);
+        if (REAL != GET_TAG(arg)) return arg;
     }
 
     if (SELF(interp)->u.real <= arg->u.real) {
-	return const_T;
+        return const_T;
     }
     return const_Nil;
 
@@ -1372,10 +1372,10 @@ mth_real_tointeger(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int ar
     if (GET_TAG(SELF(interp)) != REAL) goto error2;
 
     if (isinf(SELF(interp)->u.real)) {
-	return new_exception(TE_INFINITY, L"Do not convert infinity value.", interp);
+        return new_exception(TE_INFINITY, L"Do not convert infinity value.", interp);
     }
     if (isnan(SELF(interp)->u.real)) {
-	return new_exception(TE_NAN, L"Do not convert NaN value.", interp);
+        return new_exception(TE_NAN, L"Do not convert NaN value.", interp);
     }
 
     return new_integer_d(SELF(interp)->u.real);
@@ -1393,7 +1393,7 @@ mth_real_sqrt(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     if (GET_TAG(SELF(interp)) != REAL) goto error2;
 
     if (SELF(interp)->u.real < 0.0) {
-	return new_exception(TE_ZERODIV, L"Zero divide.", interp);
+        return new_exception(TE_ZERODIV, L"Zero divide.", interp);
     }
     return new_real(sqrt(SELF(interp)->u.real));
     
@@ -1600,9 +1600,9 @@ mth_real_isinf(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     if (GET_TAG(SELF(interp)) != REAL) goto error2;
 
     if (isinf(SELF(interp)->u.real)) {
-	return const_T;
+        return const_T;
     } else {
-	return const_Nil;
+        return const_Nil;
     }
     
 error:
@@ -1619,9 +1619,9 @@ mth_real_isnan(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     if (GET_TAG(SELF(interp)) != REAL) goto error2;
 
     if (isnan(SELF(interp)->u.real)) {
-	return const_T;
+        return const_T;
     } else {
-	return const_Nil;
+        return const_Nil;
     }
     
 error:
@@ -1642,8 +1642,8 @@ mth_list_last(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     if (GET_TAG(l) != LIST) goto error;
 
     while (l->u.list.nextp) {
-	l = list_next(l);
-	if (GET_TAG(l) != LIST) return l;
+        l = list_next(l);
+        if (GET_TAG(l) != LIST) return l;
     }
     return l;
 
@@ -1703,10 +1703,10 @@ mth_list_append(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
 
     l = SELF(interp);
     while (posargs) {
-	if (! IS_LIST_NULL(posargs)) {
-	    l = list_append(l, list_get_item(posargs));
-	}
-	posargs = list_next(posargs);
+        if (! IS_LIST_NULL(posargs)) {
+            l = list_append(l, list_get_item(posargs));
+        }
+        posargs = list_next(posargs);
     }
 
     return l;
@@ -1726,10 +1726,10 @@ mth_list_add(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
 
     l = result = SELF(interp);
     while (posargs) {
-	if (! IS_LIST_NULL(posargs)) {
-	    l = list_append(l, list_get_item(posargs));
-	}
-	posargs = list_next(posargs);
+        if (! IS_LIST_NULL(posargs)) {
+            l = list_append(l, list_get_item(posargs));
+        }
+        posargs = list_next(posargs);
     }
 
     return result;
@@ -1765,34 +1765,34 @@ loop:
     if (IS_LIST_NULL(l)) goto fin;
     
     if (GET_TAG(l) == LIST) {
-	item = list_get_item(l);
+        item = list_get_item(l);
     } else {
-	item = l;
+        item = l;
     }
     result = toy_yield(interp, block, new_list(item));
     t = GET_TAG(result);
     if (t == EXCEPTION) return result;
     if (t == CONTROL) {
-	switch (result->u.control.code) {
-	case CTRL_RETURN: case CTRL_GOTO:
-	    return result;
-	    break;
-	case CTRL_BREAK:
-	    return result->u.control.ret_value;
-	    break;
-	case CTRL_CONTINUE:
-	    result = const_Nil;
-	    goto loop_continue;
-	    break;
-	case CTRL_REDO:
-	    result = const_Nil;
-	    goto loop;
-	    break;
-	case CTRL_RETRY:
-	    result = const_Nil;
-	    goto loop_retry;
-	    break;
-	}
+        switch (result->u.control.code) {
+        case CTRL_RETURN: case CTRL_GOTO:
+            return result;
+            break;
+        case CTRL_BREAK:
+            return result->u.control.ret_value;
+            break;
+        case CTRL_CONTINUE:
+            result = const_Nil;
+            goto loop_continue;
+            break;
+        case CTRL_REDO:
+            result = const_Nil;
+            goto loop;
+            break;
+        case CTRL_RETRY:
+            result = const_Nil;
+            goto loop_retry;
+            break;
+        }
     }
 
 loop_continue:
@@ -1835,9 +1835,9 @@ mth_list_isnull(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
 
     l = SELF(interp);
     if (IS_LIST_NULL(l)) {
-	return const_T;
+        return const_T;
     } else {
-	return const_Nil;
+        return const_Nil;
     }
 
 error:
@@ -1858,25 +1858,25 @@ mth_list_join(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     if (GET_TAG(self) != LIST) goto error2;
     sep = hash_get_and_unset_t(nameargs, const_sep);
     if (sep == NULL) {
-	sep = new_string_str(L"");
+        sep = new_string_str(L"");
     } else {
-	sep = new_string_str(to_string(sep));
+        sep = new_string_str(to_string(sep));
     }
     psep = cell_get_addr(sep->u.string);
 
     result = new_cell(L"");
 
     while (! IS_LIST_NULL(self)) {
-	cell_add_str(result, to_string_call(interp, list_get_item(self)));
+        cell_add_str(result, to_string_call(interp, list_get_item(self)));
 
-	self = list_next(self);
-	if (self) {
-	    cell_add_str(result, psep);
-	}
-	if (self && GET_TAG(self) != LIST) {
-	    cell_add_str(result, to_string_call(interp, self));
-	    break;
-	}
+        self = list_next(self);
+        if (self) {
+            cell_add_str(result, psep);
+        }
+        if (self && GET_TAG(self) != LIST) {
+            cell_add_str(result, to_string_call(interp, self));
+            break;
+        }
     }
 
     return new_string_cell(result);
@@ -1895,7 +1895,7 @@ mth_list_eval(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     if (arglen > 0) goto error;
 
     result = toy_eval(interp, new_statement(SELF(interp), 
-					    interp->func_stack[interp->cur_func_stack]->trace_info->line), &env);
+                                            interp->func_stack[interp->cur_func_stack]->trace_info->line), &env);
     return result;
 
 error:
@@ -1912,15 +1912,15 @@ mth_list_new_append(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int a
     result = l = new_list(NULL);
     src = SELF(interp);
     while (src) {
-	l = list_append(l, list_get_item(src));
-	src = list_next(src);
+        l = list_append(l, list_get_item(src));
+        src = list_next(src);
     }
 
     while (posargs) {
-	if (! IS_LIST_NULL(posargs)) {
-	    l = list_append(l, list_get_item(posargs));
-	}
-	posargs = list_next(posargs);
+        if (! IS_LIST_NULL(posargs)) {
+            l = list_append(l, list_get_item(posargs));
+        }
+        posargs = list_next(posargs);
     }
 
     return result;
@@ -1949,8 +1949,8 @@ mth_list_get(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
 
     /*
     for (i=0; i<pos; i++) {
-	if (NULL == src) return const_Nil;
-	src = list_next(src);
+        if (NULL == src) return const_Nil;
+        src = list_next(src);
     }
     */
     src = list_get(src, pos);
@@ -1980,17 +1980,17 @@ mth_list_filter(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     l = result = new_list(NULL);
 
     while (! IS_LIST_NULL(self)) {
-	if (GET_TAG(self) == LIST) {
-	    ret = toy_yield(interp, block, new_list(list_get_item(self)));
-	} else {
-	    ret = toy_yield(interp, block, new_list(self));
-	}
-	if (GET_TAG(ret) == EXCEPTION) return ret;
-	if (! IS_NIL(ret)) {
-	    l = list_append(l, list_get_item(self));
-	}
-	self = list_next(self);
-	if (GET_TAG(self) != LIST) break;
+        if (GET_TAG(self) == LIST) {
+            ret = toy_yield(interp, block, new_list(list_get_item(self)));
+        } else {
+            ret = toy_yield(interp, block, new_list(self));
+        }
+        if (GET_TAG(ret) == EXCEPTION) return ret;
+        if (! IS_NIL(ret)) {
+            l = list_append(l, list_get_item(self));
+        }
+        self = list_next(self);
+        if (GET_TAG(self) != LIST) break;
     }
 
     return result;
@@ -2017,20 +2017,20 @@ mth_list_map(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
     l = result = new_list(NULL);
 
     while (! IS_LIST_NULL(self)) {
-	if (GET_TAG(self) == LIST) {
-	    ret = toy_yield(interp, block, new_list(list_get_item(self)));
-	} else {
-	    ret = toy_yield(interp, block, new_list(self));
-	}
-	if (GET_TAG(ret) == EXCEPTION) return ret;
-	if (GET_TAG(ret) == CONTROL) {
-	    l = list_append(l, ret->u.control.ret_value);
-	} else {
-	    l = list_append(l, ret);
-	}
+        if (GET_TAG(self) == LIST) {
+            ret = toy_yield(interp, block, new_list(list_get_item(self)));
+        } else {
+            ret = toy_yield(interp, block, new_list(self));
+        }
+        if (GET_TAG(ret) == EXCEPTION) return ret;
+        if (GET_TAG(ret) == CONTROL) {
+            l = list_append(l, ret->u.control.ret_value);
+        } else {
+            l = list_append(l, ret);
+        }
 
-	self = list_next(self);
-	if (GET_TAG(self) != LIST) break;
+        self = list_next(self);
+        if (GET_TAG(self) != LIST) break;
     }
 
     return result;
@@ -2050,8 +2050,8 @@ mth_list_concat(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     src = SELF(interp);
     l = result = new_list(NULL);
     while (src) {
-	l = list_append(l, list_get_item(src));
-	src = list_next(src);
+        l = list_append(l, list_get_item(src));
+        src = list_next(src);
     }
 
     l = self = result;
@@ -2059,20 +2059,20 @@ mth_list_concat(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     if (GET_TAG(self) != LIST) goto error2;
 
     while (! IS_LIST_NULL(posargs)) {
-	item = list_get_item(posargs);
+        item = list_get_item(posargs);
 
-	if (GET_TAG(item) == LIST) {
-	    Toy_Type *fitem;
-	    fitem = item;
-	    while (! IS_LIST_NULL(fitem)) {
-		l = list_append(l, list_get_item(fitem));
-		fitem = list_next(fitem);
-	    }
-	} else {
-	    l = list_append(l, item);
-	}
+        if (GET_TAG(item) == LIST) {
+            Toy_Type *fitem;
+            fitem = item;
+            while (! IS_LIST_NULL(fitem)) {
+                l = list_append(l, list_get_item(fitem));
+                fitem = list_next(fitem);
+            }
+        } else {
+            l = list_append(l, item);
+        }
 
-	posargs = list_next(posargs);
+        posargs = list_next(posargs);
     }
 
     return self;
@@ -2093,20 +2093,20 @@ mth_list_concat_se(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int ar
     if (GET_TAG(self) != LIST) goto error2;
 
     while (! IS_LIST_NULL(posargs)) {
-	item = list_get_item(posargs);
+        item = list_get_item(posargs);
 
-	if (GET_TAG(item) == LIST) {
-	    Toy_Type *fitem;
-	    fitem = item;
-	    while (! IS_LIST_NULL(fitem)) {
-		l = list_append(l, list_get_item(fitem));
-		fitem = list_next(fitem);
-	    }
-	} else {
-	    l = list_append(l, item);
-	}
+        if (GET_TAG(item) == LIST) {
+            Toy_Type *fitem;
+            fitem = item;
+            while (! IS_LIST_NULL(fitem)) {
+                l = list_append(l, list_get_item(fitem));
+                fitem = list_next(fitem);
+            }
+        } else {
+            l = list_append(l, item);
+        }
 
-	posargs = list_next(posargs);
+        posargs = list_next(posargs);
     }
 
     return self;
@@ -2135,8 +2135,8 @@ mth_list_seek(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 
     i = 0;
     while ((! IS_LIST_NULL(self)) && (i < index)) {
-	self = list_next(self);
-	i++ ;
+        self = list_next(self);
+        i++ ;
     }
 
     if (NULL == self) return new_list(NULL);
@@ -2169,25 +2169,25 @@ mth_list_split(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     result = new_list(NULL);
     i = 0;
     while ((! IS_LIST_NULL(self)) && (i < index)) {
-	if (GET_TAG(self) != LIST) {
-	    lleft = list_append(lleft, self);
-	    break;
-	} else {
-	    lleft = list_append(lleft, list_get_item(self));
-	}
-	self = list_next(self);
-	i++ ;
+        if (GET_TAG(self) != LIST) {
+            lleft = list_append(lleft, self);
+            break;
+        } else {
+            lleft = list_append(lleft, list_get_item(self));
+        }
+        self = list_next(self);
+        i++ ;
     }
     if (GET_TAG(self) == LIST) {
-	while (! IS_LIST_NULL(self)) {
-	    if (GET_TAG(self) != LIST) {
-		lright = list_append(lright, self);
-		break;
-	    } else {
-		lright = list_append(lright, list_get_item(self));
-	    }
-	    self = list_next(self);
-	}
+        while (! IS_LIST_NULL(self)) {
+            if (GET_TAG(self) != LIST) {
+                lright = list_append(lright, self);
+                break;
+            } else {
+                lright = list_append(lright, list_get_item(self));
+            }
+            self = list_next(self);
+        }
     }
 
     list_append(result, left);
@@ -2210,14 +2210,14 @@ mth_list_unshift(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     if (GET_TAG(self) != LIST) goto error2;
 
     if (IS_LIST_NULL(self)) {
-	list_set_car(SELF(interp), list_get_item(posargs));
-	list_set_cdr(SELF(interp), NULL);
+        list_set_car(SELF(interp), list_get_item(posargs));
+        list_set_cdr(SELF(interp), NULL);
     } else {
-	new = new_list(NULL);
-	list_set_car(new, list_get_item(self));
-	list_set_cdr(new, list_next(self));
-	list_set_car(SELF(interp), list_get_item(posargs));
-	list_set_cdr(SELF(interp), new);
+        new = new_list(NULL);
+        list_set_car(new, list_get_item(self));
+        list_set_cdr(new, list_next(self));
+        list_set_car(SELF(interp), list_get_item(posargs));
+        list_set_cdr(SELF(interp), new);
     }
 
     return SELF(interp);
@@ -2260,15 +2260,15 @@ mth_list_push(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     if (GET_TAG(self) != LIST) goto error2;
 
     if (IS_LIST_NULL(self)) {
-	list_set_car(SELF(interp), list_get_item(posargs));
-	list_set_cdr(SELF(interp), NULL);
+        list_set_car(SELF(interp), list_get_item(posargs));
+        list_set_cdr(SELF(interp), NULL);
     } else {
-	while (list_next(self) && (GET_TAG(list_next(self)) == LIST)) {
-	    self = list_next(self);
-	}
-	new = new_list(NULL);
-	list_set_cdr(self, new);
-	list_set_car(new, list_get_item(posargs));
+        while (list_next(self) && (GET_TAG(list_next(self)) == LIST)) {
+            self = list_next(self);
+        }
+        new = new_list(NULL);
+        list_set_cdr(self, new);
+        list_set_car(new, list_get_item(posargs));
     }
 
     return SELF(interp);
@@ -2291,16 +2291,16 @@ mth_list_pop(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
     if (IS_LIST_NULL(self)) return const_Nil;
 
     while (list_next(self) && (GET_TAG(list_next(self)) == LIST)) {
-	b = self;
-	self = list_next(self);
+        b = self;
+        self = list_next(self);
     }
     result = list_get_item(self);
 
     if (b) {
-	list_set_cdr(b, NULL);
+        list_set_cdr(b, NULL);
     } else {
-	list_set_car(SELF(interp), NULL);
-	list_set_cdr(SELF(interp), NULL);
+        list_set_car(SELF(interp), NULL);
+        list_set_cdr(SELF(interp), NULL);
     }
     
     if (result) return result;
@@ -2346,26 +2346,26 @@ loop:
     t = GET_TAG(result);
     if (t == EXCEPTION) return result;
     if (t == CONTROL) {
-	switch (result->u.control.code) {
-	case CTRL_RETURN: case CTRL_GOTO:
-	    return result;
-	    break;
-	case CTRL_BREAK:
-	    return result->u.control.ret_value;
-	    break;
-	case CTRL_CONTINUE:
-	    result = const_Nil;
-	    goto loop_continue;
-	    break;
-	case CTRL_REDO:
-	    result = const_Nil;
-	    goto loop;
-	    break;
-	case CTRL_RETRY:
-	    result = const_Nil;
-	    goto loop_retry;
-	    break;
-	}
+        switch (result->u.control.code) {
+        case CTRL_RETURN: case CTRL_GOTO:
+            return result;
+            break;
+        case CTRL_BREAK:
+            return result->u.control.ret_value;
+            break;
+        case CTRL_CONTINUE:
+            result = const_Nil;
+            goto loop_continue;
+            break;
+        case CTRL_REDO:
+            result = const_Nil;
+            goto loop;
+            break;
+        case CTRL_RETRY:
+            result = const_Nil;
+            goto loop_retry;
+            break;
+        }
     }
 
 loop_continue:
@@ -2377,7 +2377,7 @@ fin:
 
 error:
     return new_exception(TE_SYNTAX,
-	L"Syntax error at 'inject', syntax: List inject init-val do: {| sum-var each-var | block}", interp);
+        L"Syntax error at 'inject', syntax: List inject init-val do: {| sum-var each-var | block}", interp);
 error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
 }
@@ -2434,9 +2434,9 @@ mth_list_block(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     l = SELF(interp);
     if (GET_TAG(l) != LIST) goto error2;
     return new_closure(new_script(new_list(
-				      new_statement(l,
-					interp->func_stack[interp->cur_func_stack]->trace_info->line))),
-		       new_closure_env(interp), interp->func_stack[interp->cur_func_stack]->script_id);
+                                      new_statement(l,
+                                        interp->func_stack[interp->cur_func_stack]->trace_info->line))),
+                       new_closure_env(interp), interp->func_stack[interp->cur_func_stack]->script_id);
 
 error:
     return new_exception(TE_SYNTAX, L"Syntax error at 'create-block', syntax: List create-block", interp);
@@ -2471,8 +2471,8 @@ mth_string_plus(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     s = new_cell(cell_get_addr(SELF(interp)->u.string));
 
     while (list_get_item(posargs)) {
-	cell_add_str(s, to_string_call(interp, list_get_item(posargs)));
-	posargs = list_next(posargs);
+        cell_add_str(s, to_string_call(interp, list_get_item(posargs)));
+        posargs = list_next(posargs);
     }
     
     return new_string_cell(s);
@@ -2497,9 +2497,9 @@ mth_string_equal(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
         dest = new_string_str(to_string_call(interp, list_get_item(posargs)));
     }
     if (cell_cmp(self->u.string, dest->u.string) == 0) {
-	return const_T;
+        return const_T;
     } else {
-	return const_Nil;
+        return const_Nil;
     }
 
 error:
@@ -2522,9 +2522,9 @@ mth_string_gt(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
         dest = new_string_str(to_string_call(interp, list_get_item(posargs)));
     }
     if (cell_cmp(self->u.string, dest->u.string) > 0) {
-	return const_T;
+        return const_T;
     } else {
-	return const_Nil;
+        return const_Nil;
     }
 
 error:
@@ -2547,9 +2547,9 @@ mth_string_lt(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
         dest = new_string_str(to_string_call(interp, list_get_item(posargs)));
     }
     if (cell_cmp(self->u.string, dest->u.string) < 0) {
-	return const_T;
+        return const_T;
     } else {
-	return const_Nil;
+        return const_Nil;
     }
 
 error:
@@ -2572,9 +2572,9 @@ mth_string_ge(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
         dest = new_string_str(to_string_call(interp, list_get_item(posargs)));
     }
     if (cell_cmp(self->u.string, dest->u.string) >= 0) {
-	return const_T;
+        return const_T;
     } else {
-	return const_Nil;
+        return const_Nil;
     }
 
 error:
@@ -2597,9 +2597,9 @@ mth_string_le(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
         dest = new_string_str(to_string_call(interp, list_get_item(posargs)));
     }
     if (cell_cmp(self->u.string, dest->u.string) <= 0) {
-	return const_T;
+        return const_T;
     } else {
-	return const_Nil;
+        return const_Nil;
     }
 
 error:
@@ -2622,9 +2622,9 @@ mth_string_nequal(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
         dest = new_string_str(to_string_call(interp, list_get_item(posargs)));
     }
     if (cell_cmp(self->u.string, dest->u.string) != 0) {
-	return const_T;
+        return const_T;
     } else {
-	return const_Nil;
+        return const_Nil;
     }
 
 error:
@@ -2676,15 +2676,15 @@ mth_string_append(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     o = self->u.string;
 
     while (posargs) {
-	if (! IS_LIST_NULL(posargs)) {
+        if (! IS_LIST_NULL(posargs)) {
             src = list_get_item(posargs);
             if (STRING != GET_TAG(src)) {
                 src = new_string_str(to_string_call(interp, list_get_item(posargs)));
             }
-	    cell_add_cell(o, src->u.string);
-	}
+            cell_add_cell(o, src->u.string);
+        }
 
-	posargs = list_next(posargs);
+        posargs = list_next(posargs);
     }
 
     return self;
@@ -2708,15 +2708,15 @@ mth_string_concat(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     o = cell_clone(self->u.string);
 
     while (posargs) {
-	if (! IS_LIST_NULL(posargs)) {
+        if (! IS_LIST_NULL(posargs)) {
             src = list_get_item(posargs);
             if (STRING != GET_TAG(src)) {
                 src = new_string_str(to_string_call(interp, list_get_item(posargs)));
             }
-	    cell_add_cell(o, src->u.string);
-	}
+            cell_add_cell(o, src->u.string);
+        }
 
-	posargs = list_next(posargs);
+        posargs = list_next(posargs);
     }
 
     return new_string_cell(o);
@@ -2758,7 +2758,7 @@ mth_string_match(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     tpattern = list_get_item(posargs);
     if (GET_TAG(tpattern) != RQUOTE) goto error;
     if (cell_get_length(tpattern->u.rquote) <= 0) {
-	return new_exception(TE_REGEX, L"Null regex pattern.", interp);
+        return new_exception(TE_REGEX, L"Null regex pattern.", interp);
     }
 
     /* parse option */
@@ -2778,12 +2778,12 @@ mth_string_match(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
 
     regex_hash_t = hash_get(interp->globals, const_regex_cache);
     if (NULL == regex_hash_t) {
-	/* onece create regex cache */
-	if (NULL == regex_hash) {
-	    regex_hash = new_hash();
-	}
+        /* onece create regex cache */
+        if (NULL == regex_hash) {
+            regex_hash = new_hash();
+        }
     } else {
-	regex_hash = regex_hash_t->u.dict;
+        regex_hash = regex_hash_t->u.dict;
     }
 
     /* make regex key, string format is: 'regex',[case|nocase],[default|grep|text] */
@@ -2793,9 +2793,9 @@ mth_string_match(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     cell_add_str(key_str, L"\'");
     cell_add_str(key_str, L",");
     if (t_case) {
-	cell_add_str(key_str, L"nocase");
+        cell_add_str(key_str, L"nocase");
     } else {
-	cell_add_str(key_str, L"case");
+        cell_add_str(key_str, L"case");
     }
     cell_add_str(key_str, L",");
     if (t_text) {
@@ -2811,12 +2811,12 @@ mth_string_match(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     /* regex cache search */
     container = hash_get_t(regex_hash, new_symbol(cell_get_addr(key_str)));
     if (NULL == container) {
-	reg = NULL;
+        reg = NULL;
     } else if (GET_TAG(container) != CONTAINER) {
-	reg = NULL;
+        reg = NULL;
     } else {
-	/* cache hit! */
-	reg = (regex_t*)container->u.container.data;
+        /* cache hit! */
+        reg = (regex_t*)container->u.container.data;
     }
     
     /* convert *wchar_t to UTF32-LE char stream data pointer */
@@ -2825,7 +2825,7 @@ mth_string_match(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
 
     option = ONIG_OPTION_NONE;
     if (t_case) {
-	option |= ONIG_OPTION_IGNORECASE;
+        option |= ONIG_OPTION_IGNORECASE;
     }
 
     syntax = ONIG_SYNTAX_DEFAULT;
@@ -2833,24 +2833,24 @@ mth_string_match(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     if (t_text) syntax = ONIG_SYNTAX_ASIS;
 
     if (NULL == reg) {
-	/* no cache then create regex object */
-	r = onig_new(&reg,
-		     pattern,
-		     pattern + (cell_get_length(tpattern->u.rquote) * sizeof(wchar_t)),
-		     option,
-		     ONIG_ENCODING_UTF32_LE,
-		     syntax,
-		     &einfo
-	    );
+        /* no cache then create regex object */
+        r = onig_new(&reg,
+                     pattern,
+                     pattern + (cell_get_length(tpattern->u.rquote) * sizeof(wchar_t)),
+                     option,
+                     ONIG_ENCODING_UTF32_LE,
+                     syntax,
+                     &einfo
+            );
 
-	if (r != ONIG_NORMAL) {
-	    OnigUChar s[ONIG_MAX_ERROR_MESSAGE_LEN];
-	    onig_error_code_to_str(s, r, &einfo);
-	    return new_exception(TE_REGEX, to_wchar((char*)s), interp);
-	}
+        if (r != ONIG_NORMAL) {
+            OnigUChar s[ONIG_MAX_ERROR_MESSAGE_LEN];
+            onig_error_code_to_str(s, r, &einfo);
+            return new_exception(TE_REGEX, to_wchar((char*)s), interp);
+        }
 
-	/* and regex object set to cache */
-	hash_set_t(regex_hash, new_symbol(cell_get_addr(key_str)), new_container(reg, L"REGEX"));
+        /* and regex object set to cache */
+        hash_set_t(regex_hash, new_symbol(cell_get_addr(key_str)), new_container(reg, L"REGEX"));
     }
 
     region = onig_region_new();
@@ -2867,40 +2867,40 @@ next_search:
     soption |= ONIG_OPTION_NOTBOL;
 
     if (r >= 0) {
-	int i, n;
-	Toy_Type *l, *ll;
-	int max;
+        int i, n;
+        Toy_Type *l, *ll;
+        int max;
 
-	max = -1;
-	for (i=0; i<region->num_regs; i++) {
-	    if (! ((region->beg[i] >= 0) && (region->end[i] >= 0))) continue;
+        max = -1;
+        for (i=0; i<region->num_regs; i++) {
+            if (! ((region->beg[i] >= 0) && (region->end[i] >= 0))) continue;
 
-	    ll = l = new_list(NULL);
-	    l = list_append(l, new_integer_si((region->beg[i] + offs)/sizeof(wchar_t)));
-	    l = list_append(l, new_integer_si((region->end[i] + offs)/sizeof(wchar_t)));
-	    l = list_append(l, new_string_cell(cell_sub(self->u.string,
-							(region->beg[i] + offs)/sizeof(wchar_t),
-							(region->end[i] + offs)/sizeof(wchar_t))));
-	    n = region->end[i];
-	    if (n > max) max = n;
-	    resultl = list_append(resultl, ll);
-	}
-	offs += max;
-	onig_region_free(region, 1);
-	region = onig_region_new();
-	str += max;
+            ll = l = new_list(NULL);
+            l = list_append(l, new_integer_si((region->beg[i] + offs)/sizeof(wchar_t)));
+            l = list_append(l, new_integer_si((region->end[i] + offs)/sizeof(wchar_t)));
+            l = list_append(l, new_string_cell(cell_sub(self->u.string,
+                                                        (region->beg[i] + offs)/sizeof(wchar_t),
+                                                        (region->end[i] + offs)/sizeof(wchar_t))));
+            n = region->end[i];
+            if (n > max) max = n;
+            resultl = list_append(resultl, ll);
+        }
+        offs += max;
+        onig_region_free(region, 1);
+        region = onig_region_new();
+        str += max;
 
-	start += max;
-	if ((start < end) && (max > 0) && t_all) goto next_search;
+        start += max;
+        if ((start < end) && (max > 0) && t_all) goto next_search;
 
     } else if (r == ONIG_MISMATCH) {
-	if (IS_LIST_NULL(result)) {
-	    result = const_Nil;
-	}
+        if (IS_LIST_NULL(result)) {
+            result = const_Nil;
+        }
     } else {
-	OnigUChar s[ONIG_MAX_ERROR_MESSAGE_LEN];
-	onig_error_code_to_str(s, r, &einfo);
-	result = new_exception(TE_REGEX, to_wchar((char*)s), interp);
+        OnigUChar s[ONIG_MAX_ERROR_MESSAGE_LEN];
+        onig_error_code_to_str(s, r, &einfo);
+        result = new_exception(TE_REGEX, to_wchar((char*)s), interp);
     }
 
     onig_region_free(region, 1);
@@ -2912,7 +2912,7 @@ next_search:
 
 error:
     return new_exception(TE_SYNTAX,
-	 L"Syntax error at '=~', syntax: String =~ [:nocase] [:all] [:grep | :text] 'pattern'", interp);
+         L"Syntax error at '=~', syntax: String =~ [:nocase] [:all] [:grep | :text] 'pattern'", interp);
 error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
 }
@@ -2933,12 +2933,12 @@ mth_string_sub(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
 
     self = SELF(interp);
     if (arglen == 2) {
-	posargs = list_next(posargs);
-	t = list_get_item(posargs);
-	if (GET_TAG(t) != INTEGER) goto error;
-	end = mpz_get_si(t->u.biginteger);
+        posargs = list_next(posargs);
+        t = list_get_item(posargs);
+        if (GET_TAG(t) != INTEGER) goto error;
+        end = mpz_get_si(t->u.biginteger);
     } else {
-	end = cell_get_length(self->u.string);
+        end = cell_get_length(self->u.string);
     }
 
     if (GET_TAG(self) != STRING) goto error2;
@@ -2978,71 +2978,71 @@ mth_string_split(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
 
     if (NULL == sep) {
 
-	while (*p) {
-	    word = new_cell(L"");
+        while (*p) {
+            word = new_cell(L"");
 
-	    /* skip white space */
-	    while (*p && wcisspace(*p)) {
-		p++;
-	    }
-	    if (! *p) break;
+            /* skip white space */
+            while (*p && wcisspace(*p)) {
+                p++;
+            }
+            if (! *p) break;
 
-	    /* collect word, until white space */
-	    while (*p) {
-		if (! wcisspace(*p)) {
-		    cell_add_char(word, *p);
-		} else {
-		    break;
-		}
-		p++;
-	    }
+            /* collect word, until white space */
+            while (*p) {
+                if (! wcisspace(*p)) {
+                    cell_add_char(word, *p);
+                } else {
+                    break;
+                }
+                p++;
+            }
 
-	    /* end condition */
-	    if (! *p) {
-		if (cell_get_length(word) != 0) {
-		    l = list_append(l, new_string_cell(word));
-		}
-		break;
-	    }
-	    if (cell_get_length(word) == 0) break;
+            /* end condition */
+            if (! *p) {
+                if (cell_get_length(word) != 0) {
+                    l = list_append(l, new_string_cell(word));
+                }
+                break;
+            }
+            if (cell_get_length(word) == 0) break;
 
-	    l = list_append(l, new_string_cell(word));
-	}
+            l = list_append(l, new_string_cell(word));
+        }
 
     } else {
 
-	csep = cell_get_addr(sep->u.string);
-	seplen = wcslen(csep);
-	
-	while (*p) {
-	    word = new_cell(L"");
+        csep = cell_get_addr(sep->u.string);
+        seplen = wcslen(csep);
+        
+        while (*p) {
+            word = new_cell(L"");
 
-	    /* collect word, until separator */
-	    end_f = 0;
-	    while (*p) {
-		if (! is_sub_eq(p, csep)) {
-		    cell_add_char(word, *p);
-		} else {
-		    end_f = 1;
-		    if (0 == seplen) {
-			cell_add_char(word, *p);
-		    }
-		    break;
-		}
-		p++;
-	    }
-	    l = list_append(l, new_string_cell(word));
+            /* collect word, until separator */
+            end_f = 0;
+            while (*p) {
+                if (! is_sub_eq(p, csep)) {
+                    cell_add_char(word, *p);
+                } else {
+                    end_f = 1;
+                    if (0 == seplen) {
+                        cell_add_char(word, *p);
+                    }
+                    break;
+                }
+                p++;
+            }
+            l = list_append(l, new_string_cell(word));
 
-	    /* end condition */
-	    if (! *p) {
-		break;
-	    }
+            /* end condition */
+            if (! *p) {
+                break;
+            }
 
-	    p += ((seplen == 0) ? 1 : seplen);
-	}
-	if ((end_f == 1) && (seplen != 0)) {
-	    l = list_append(l, new_string_str(L""));
-	}
+            p += ((seplen == 0) ? 1 : seplen);
+        }
+        if ((end_f == 1) && (seplen != 0)) {
+            l = list_append(l, new_string_str(L""));
+        }
     }
     
     if (list_length(result) == 0) {
@@ -3062,9 +3062,9 @@ is_sub_eq(wchar_t *src, wchar_t *dest) {
     if (! *dest) return 1;
     
     while (*dest) {
-	if (! *src) return 0;
-	if (*src != *dest) return 0;
-	src++; dest++;
+        if (! *src) return 0;
+        if (*src != *dest) return 0;
+        src++; dest++;
     }
 
     return 1;
@@ -3101,7 +3101,7 @@ mth_string_toreal(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 
     result = toy_symbol_conv(new_symbol(cell_get_addr(SELF(interp)->u.string)));
     if (GET_TAG(result) == INTEGER) {
-	return new_real(mpz_get_d(result->u.biginteger));
+        return new_real(mpz_get_d(result->u.biginteger));
     }
     if (GET_TAG(result) == EXCEPTION) return result;
     if (GET_TAG(result) == REAL) return result;    
@@ -3125,7 +3125,7 @@ mth_string_tonumber(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int a
 
     result = toy_symbol_conv(new_symbol(cell_get_addr(SELF(interp)->u.string)));
     if ((GET_TAG(result) == INTEGER) || (GET_TAG(result) == REAL))
-	return result;
+        return result;
     return const_Nil;
 
 error:
@@ -3157,27 +3157,27 @@ mth_string_format_fill(wchar_t* item, int fill, int trim) {
 
     result = new_cell(L"");
     if ((fill == 0) || (slen >= abs(fill))) {
-	cell_add_str(result, item);
+        cell_add_str(result, item);
     } else if (fill < 0) {
-	/* lef align */
-	cell_add_str(result, item);
-	for (i=0 ; i<(-fill-slen) ; i++) {
-	    cell_add_char(result, L' ');
-	}
+        /* lef align */
+        cell_add_str(result, item);
+        for (i=0 ; i<(-fill-slen) ; i++) {
+            cell_add_char(result, L' ');
+        }
     } else if (fill > 0) {
-	/* right align */
-	for (i=0 ; i<(fill-slen) ; i++) {
-	    cell_add_char(result, L' ');
-	}
-	cell_add_str(result, item);
+        /* right align */
+        for (i=0 ; i<(fill-slen) ; i++) {
+            cell_add_char(result, L' ');
+        }
+        cell_add_str(result, item);
     }
 
     if (fill && trim) {
-	result2 = new_cell(cell_get_addr(result));
-	if (cell_get_length(result2) > abs(fill)) {
-	    cell_get_addr(result2)[abs(fill)] = 0;
-	}
-	return cell_get_addr(result2);
+        result2 = new_cell(cell_get_addr(result));
+        if (cell_get_length(result2) > abs(fill)) {
+            cell_get_addr(result2)[abs(fill)] = 0;
+        }
+        return cell_get_addr(result2);
     }
 
     /* otherwise aling only */
@@ -3222,32 +3222,32 @@ mth_string_format_fill_w(wchar_t* item, int fill, int trim) {
 
     result = new_cell(L"");
     if ((fill == 0) || (slen >= abs(fill))) {
-	cell_add_str(result, item);
+        cell_add_str(result, item);
     } else if (fill < 0) {
-	/* lef align */
-	cell_add_str(result, item);
-	for (i=0 ; i<(-fill-slen) ; i++) {
-	    cell_add_char(result, L' ');
-	}
+        /* lef align */
+        cell_add_str(result, item);
+        for (i=0 ; i<(-fill-slen) ; i++) {
+            cell_add_char(result, L' ');
+        }
     } else if (fill > 0) {
-	/* right align */
-	for (i=0 ; i<(fill-slen) ; i++) {
-	    cell_add_char(result, L' ');
-	}
-	cell_add_str(result, item);
+        /* right align */
+        for (i=0 ; i<(fill-slen) ; i++) {
+            cell_add_char(result, L' ');
+        }
+        cell_add_str(result, item);
     }
 
     if (fill && trim) {
         wchar_t *p = cell_get_addr(result);
-	Cell *result2 = new_cell(L"");
+        Cell *result2 = new_cell(L"");
         while (*p) {
             cell_add_char(result2, *p);
             if (display_width(cell_get_addr(result2)) >= abs(fill)) {
                 break;
             }
             p++;
-	}
-	return cell_get_addr(result2);
+        }
+        return cell_get_addr(result2);
     }
 
     /* otherwise aling only */
@@ -3263,16 +3263,16 @@ mth_string_format_C(Toy_Type *item, Cell *fmt) {
 
     switch (GET_TAG(item)) {
     case INTEGER:
-	/* XXX: fix it for big integer */
-	swprintf(buff, 64, cell_get_addr(fmt),
-		 mpz_get_si(item->u.biginteger));
-	break;
+        /* XXX: fix it for big integer */
+        swprintf(buff, 64, cell_get_addr(fmt),
+                 mpz_get_si(item->u.biginteger));
+        break;
     case REAL:
-	swprintf(buff, 64, cell_get_addr(fmt),
-		 item->u.real);
-	break;
+        swprintf(buff, 64, cell_get_addr(fmt),
+                 item->u.real);
+        break;
     default:
-	return 0;
+        return 0;
     }
 
     return buff;
@@ -3294,118 +3294,118 @@ mth_string_format(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     result = new_string_str(L"");
     c = result->u.string;
     while (*p) {
-	switch (*p) {
-	case L'%':
-	    acc = 0;
-	    neg = 1;
-	    trim = 0;
-	    done = 0;
-	    sacc = new_cell(L"%");
-	    indicate_int = 0;
-	    p++;
-	    if (! *p) {
-		return result;
-	    }
-	    while (*p) {
-		switch (*p) {
-		case L'%':
-		    cell_add_char(c, L'%');
-		    done = 1;
-		    break;
+        switch (*p) {
+        case L'%':
+            acc = 0;
+            neg = 1;
+            trim = 0;
+            done = 0;
+            sacc = new_cell(L"%");
+            indicate_int = 0;
+            p++;
+            if (! *p) {
+                return result;
+            }
+            while (*p) {
+                switch (*p) {
+                case L'%':
+                    cell_add_char(c, L'%');
+                    done = 1;
+                    break;
 
-		case L'-':
-		    neg = -1;
-		    cell_add_char(sacc, *p);
-		    break;
+                case L'-':
+                    neg = -1;
+                    cell_add_char(sacc, *p);
+                    break;
 
-		case L'!':
-		    trim = 1;
-		    break;
-		    
-		case L'0': case L'1': case L'2': case L'3': case L'4':
-		case L'5': case L'6': case L'7': case L'8': case L'9':
-		    acc = acc*10 + (*p-L'0');
-		    cell_add_char(sacc, *p);
-		    break;
+                case L'!':
+                    trim = 1;
+                    break;
+                    
+                case L'0': case L'1': case L'2': case L'3': case L'4':
+                case L'5': case L'6': case L'7': case L'8': case L'9':
+                    acc = acc*10 + (*p-L'0');
+                    cell_add_char(sacc, *p);
+                    break;
 
-		case L'.':
-		    cell_add_char(sacc, *p);
-		    acc = 0;
-		    break;
+                case L'.':
+                    cell_add_char(sacc, *p);
+                    acc = 0;
+                    break;
 
-		case L'v':
-		    item = list_get_item(posargs);
-		    if (NULL == item) {
-			item = const_nullstring;
-		    } else {
-			posargs = list_next(posargs);
-		    }
-		    cell_add_str(c, mth_string_format_fill(to_string_call(interp, item), acc * neg, trim));
-		    done = 1;
-		    break;
+                case L'v':
+                    item = list_get_item(posargs);
+                    if (NULL == item) {
+                        item = const_nullstring;
+                    } else {
+                        posargs = list_next(posargs);
+                    }
+                    cell_add_str(c, mth_string_format_fill(to_string_call(interp, item), acc * neg, trim));
+                    done = 1;
+                    break;
 
-		case L'w':
-		    item = list_get_item(posargs);
-		    if (NULL == item) {
-			item = const_nullstring;
-		    } else {
-			posargs = list_next(posargs);
-		    }
-		    cell_add_str(c, mth_string_format_fill_w(to_string_call(interp, item), acc * neg, trim));
-		    done = 1;
-		    break;
+                case L'w':
+                    item = list_get_item(posargs);
+                    if (NULL == item) {
+                        item = const_nullstring;
+                    } else {
+                        posargs = list_next(posargs);
+                    }
+                    cell_add_str(c, mth_string_format_fill_w(to_string_call(interp, item), acc * neg, trim));
+                    done = 1;
+                    break;
 
-		case L'd':
-		case L'o': case L'u': case L'x': case L'X':
-		    indicate_int = 1;
-		    cell_add_char(sacc, L'l');
-		    cell_add_char(sacc, L'l');
-		    /* fall thru */
+                case L'd':
+                case L'o': case L'u': case L'x': case L'X':
+                    indicate_int = 1;
+                    cell_add_char(sacc, L'l');
+                    cell_add_char(sacc, L'l');
+                    /* fall thru */
 
-		case L'f': case L'F':
-		case L'e': case L'E':
-		case L'g': case L'G':
-		case L'a': case L'A':
-		    cell_add_char(sacc, *p);
+                case L'f': case L'F':
+                case L'e': case L'E':
+                case L'g': case L'G':
+                case L'a': case L'A':
+                    cell_add_char(sacc, *p);
 
-		    item = list_get_item(posargs);
-		    if (NULL == item) {
-			item = const_nullstring;
-		    } else {
-			posargs = list_next(posargs);
-		    }
-		    if ((GET_TAG(item) == INTEGER) && (! indicate_int)) {
-			return new_exception(TE_TYPE, L"Format indicator type error.", interp);
-		    }
-		    if ((GET_TAG(item) == REAL) && indicate_int) {
-			return new_exception(TE_TYPE, L"Format indicator type error.", interp);
-		    }
-		    f = mth_string_format_C(item, sacc);
-		    if (f) {
-			cell_add_str(c, f);
-		    } else {
-			return new_exception(TE_TYPE, L"Format indicator type error.", interp);
-		    }
-		    done = 1;
-		    break;
+                    item = list_get_item(posargs);
+                    if (NULL == item) {
+                        item = const_nullstring;
+                    } else {
+                        posargs = list_next(posargs);
+                    }
+                    if ((GET_TAG(item) == INTEGER) && (! indicate_int)) {
+                        return new_exception(TE_TYPE, L"Format indicator type error.", interp);
+                    }
+                    if ((GET_TAG(item) == REAL) && indicate_int) {
+                        return new_exception(TE_TYPE, L"Format indicator type error.", interp);
+                    }
+                    f = mth_string_format_C(item, sacc);
+                    if (f) {
+                        cell_add_str(c, f);
+                    } else {
+                        return new_exception(TE_TYPE, L"Format indicator type error.", interp);
+                    }
+                    done = 1;
+                    break;
 
-		default:
-		    return new_exception(TE_SYNTAX, L"Bad format indicator.", interp);
-		}
+                default:
+                    return new_exception(TE_SYNTAX, L"Bad format indicator.", interp);
+                }
 
-		if (done) break;
-		p++;
-	    }
-	    break;
+                if (done) break;
+                p++;
+            }
+            break;
 
-	default:
-	    if (*p) {
-		cell_add_char(c, *p);
-	    }
-	}
+        default:
+            if (*p) {
+                cell_add_char(c, *p);
+            }
+        }
 
-	if (! *p) break;
-	p++;
+        if (! *p) break;
+        p++;
     }
     return result;
 
@@ -3429,31 +3429,31 @@ mth_string_clean(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     p = cell_get_addr(SELF(interp)->u.string);
 
     while (*p) {
-	if (wcisspace(*p)) {
-	    p++;
-	} else {
-	    break;
-	}
+        if (wcisspace(*p)) {
+            p++;
+        } else {
+            break;
+        }
     }
 
     len = wcslen(p);
     for (i=len-1; i>=0; i--) {
-	if (wcisspace(p[i])) {
-	    p[i]=0;
-	} else {
-	    break;
-	}
+        if (wcisspace(p[i])) {
+            p[i]=0;
+        } else {
+            break;
+        }
     }
     
     while (*p) {
-	if ((! wcisspace(*p)) || (*p == L' ') || (*p == L'\t')) {
-	    if (wcisprint(*p) || (*p == L'\t')) {
-		cell_add_char(c, *p);
-	    }
-	} else {
-	    cell_add_char(c, L' ');
-	}
-	p++;
+        if ((! wcisspace(*p)) || (*p == L' ') || (*p == L'\t')) {
+            if (wcisprint(*p) || (*p == L'\t')) {
+                cell_add_char(c, *p);
+            }
+        } else {
+            cell_add_char(c, L' ');
+        }
+        p++;
     }
 
     return new_string_cell(c);
@@ -3476,12 +3476,12 @@ mth_string_upper(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     c = new_cell(L"");
     p = cell_get_addr(SELF(interp)->u.string);
     while (*p) {
-	if (islower(*p)) {
-	    cell_add_char(c, toupper(*p));
-	} else {
-	    cell_add_char(c, *p);
-	}
-	p++;
+        if (islower(*p)) {
+            cell_add_char(c, toupper(*p));
+        } else {
+            cell_add_char(c, *p);
+        }
+        p++;
     }
 
     return new_string_cell(c);
@@ -3504,12 +3504,12 @@ mth_string_lower(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     c = new_cell(L"");
     p = cell_get_addr(SELF(interp)->u.string);
     while (*p) {
-	if (isupper(*p)) {
-	    cell_add_char(c, tolower(*p));
-	} else {
-	    cell_add_char(c, *p);
-	}
-	p++;
+        if (isupper(*p)) {
+            cell_add_char(c, tolower(*p));
+        } else {
+            cell_add_char(c, *p);
+        }
+        p++;
     }
 
     return new_string_cell(c);
@@ -3537,7 +3537,7 @@ mth_string_uexport(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int ar
     
     p = cell_get_addr(l->u.string);
     for (i=0; i<cell_get_length(l->u.string); i++) {
-	r = list_append(r, new_integer_si(p[i]));
+        r = list_append(r, new_integer_si(p[i]));
     }
 
     return result;
@@ -3562,10 +3562,10 @@ mth_string_uimport(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int ar
     if (GET_TAG(l) != LIST) goto error;
     
     while (! IS_LIST_NULL(l)) {
-	i = list_get_item(l);
-	if (GET_TAG(i) != INTEGER) goto error;
-	cell_add_char(result->u.string, mpz_get_si(i->u.biginteger));
-	l = list_next(l);
+        i = list_get_item(l);
+        if (GET_TAG(i) != INTEGER) goto error;
+        cell_add_char(result->u.string, mpz_get_si(i->u.biginteger));
+        l = list_next(l);
     }
 
     return result;
@@ -3595,7 +3595,7 @@ mth_string_at(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     iat = mpz_get_si(at->u.biginteger);
     
     if (iat < 0) {
-	iat = cell_get_length(self->u.string) + iat;
+        iat = cell_get_length(self->u.string) + iat;
     }
     if (iat < 0) return result;
     if (iat >= cell_get_length(self->u.string)) return result;
@@ -3627,7 +3627,7 @@ mth_string_get(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     iat = mpz_get_si(at->u.biginteger);
     
     if (iat < 0) {
-	iat = cell_get_length(self->u.string) + iat;
+        iat = cell_get_length(self->u.string) + iat;
     }
     if (iat < 0) return const_Nil;
     if (iat >= cell_get_length(self->u.string)) return const_Nil;
@@ -3947,10 +3947,10 @@ error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
-#define FMODE_INPUT	        (1)
-#define FMODE_OUTPUT	        (2)
-#define FMODE_APPEND	        (3)
-#define FMODE_INOUT	        (4)
+#define FMODE_INPUT             (1)
+#define FMODE_OUTPUT            (2)
+#define FMODE_APPEND            (3)
+#define FMODE_INOUT             (4)
 #define READBUFFER_MAX_DEFAULT  (0)    /* default is no-limit */
 #define READBUFFER_MAX_DEFVALUE (4096) /* default 4096 bytes */
 
@@ -3980,9 +3980,9 @@ file_finalizer(void *obj, void *client_data) {
     o = (Toy_File*)obj;
 
     if (o->fd) {
-	fclose(o->fd);
-	o->fd = NULL;
-	o->path = NULL;
+        fclose(o->fd);
+        o->fd = NULL;
+        o->path = NULL;
     }
 
     return;
@@ -3999,9 +3999,9 @@ new_file() {
     // GC_register_finalizer_ignore_self((void*)o,
     GC_register_finalizer_no_order((void*)o,
                                    file_finalizer,
-				   NULL,
-				   NULL,
-				   NULL);
+                                   NULL,
+                                   NULL,
+                                   NULL);
 
     return o;
 }
@@ -4029,27 +4029,27 @@ mth_file_init(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 
     enc = hash_get_t(interp->globals, const_DEFAULT_FILE_ENCODING);
     if (enc) {
-	if (GET_TAG(enc) == SYMBOL) {
-	    iencoder = get_encoding_index(cell_get_addr(enc->u.symbol.cell));
-	    if (-1 == iencoder) {
-		return new_exception(TE_BADENCODER, L"Bad encoder specified.", interp);
-	    }
-	    f->input_encoding = iencoder;
-	    f->output_encoding = iencoder;
-	} else {
-	    return new_exception(TE_BADENCODER, L"Bad encoder specified, need symbol.", interp);
-	}
+        if (GET_TAG(enc) == SYMBOL) {
+            iencoder = get_encoding_index(cell_get_addr(enc->u.symbol.cell));
+            if (-1 == iencoder) {
+                return new_exception(TE_BADENCODER, L"Bad encoder specified.", interp);
+            }
+            f->input_encoding = iencoder;
+            f->output_encoding = iencoder;
+        } else {
+            return new_exception(TE_BADENCODER, L"Bad encoder specified, need symbol.", interp);
+        }
     }
 
     if ((arglen > 0) && (LIST == GET_TAG(posargs))) {
-	Toy_Type *cmd, *l;
+        Toy_Type *cmd, *l;
 
-	l = cmd = new_list(new_symbol(L"open"));
-	while (posargs) {
-	    list_append(l, list_get_item(posargs));
-	    posargs = list_next(posargs);
-	}
-	return toy_call(interp, cmd);
+        l = cmd = new_list(new_symbol(L"open"));
+        while (posargs) {
+            list_append(l, list_get_item(posargs));
+            posargs = list_next(posargs);
+        }
+        return toy_call(interp, cmd);
     }
 
     return const_T;
@@ -4077,24 +4077,24 @@ mth_file_open(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     mode = hash_get_t(nameargs, const_mode);
 
     if (mode == NULL) {
-	f->mode = FMODE_INPUT;
+        f->mode = FMODE_INPUT;
     } else {
-	if (GET_TAG(mode) != SYMBOL) goto error;
+        if (GET_TAG(mode) != SYMBOL) goto error;
 
-	pmode = cell_get_addr(mode->u.symbol.cell);
-	if (wcscmp(pmode, L"i") == 0) {
-	    f->mode = FMODE_INPUT;
-	    f->newline = 0;
-	} else if (wcscmp(pmode, L"o") == 0) {
-	    f->mode = FMODE_OUTPUT;
-	    f->newline = 1;
-	} else if (wcscmp(pmode, L"a") == 0) {
-	    f->mode = FMODE_APPEND;
-	    f->newline = 1;
-	} else if (wcscmp(pmode, L"io") == 0) {
-	    f->mode = FMODE_INOUT;
-	    f->newline = 1;
-	} else goto error;
+        pmode = cell_get_addr(mode->u.symbol.cell);
+        if (wcscmp(pmode, L"i") == 0) {
+            f->mode = FMODE_INPUT;
+            f->newline = 0;
+        } else if (wcscmp(pmode, L"o") == 0) {
+            f->mode = FMODE_OUTPUT;
+            f->newline = 1;
+        } else if (wcscmp(pmode, L"a") == 0) {
+            f->mode = FMODE_APPEND;
+            f->newline = 1;
+        } else if (wcscmp(pmode, L"io") == 0) {
+            f->mode = FMODE_INOUT;
+            f->newline = 1;
+        } else goto error;
     }
 
     path = list_get_item(posargs);
@@ -4103,29 +4103,29 @@ mth_file_open(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     f->path = path;
 
     if (f->fd) {
-	fclose(f->fd);
-	f->fd = NULL;
+        fclose(f->fd);
+        f->fd = NULL;
     }
 
     cpath = encode_dirent(interp, cell_get_addr(path->u.string), &error_info);
     if (NULL == cpath) {
-	return new_exception(TE_BADENCODER, error_info->message, interp);
+        return new_exception(TE_BADENCODER, error_info->message, interp);
     }
 
     f->fd = fopen(cpath,
-		  (f->mode==FMODE_INPUT)  ? "r"  :
-		  (f->mode==FMODE_OUTPUT) ? "w"  :
-		  (f->mode==FMODE_INOUT)  ? "r+" :
-		   "a");
+                  (f->mode==FMODE_INPUT)  ? "r"  :
+                  (f->mode==FMODE_OUTPUT) ? "w"  :
+                  (f->mode==FMODE_INOUT)  ? "r+" :
+                   "a");
 
     if (NULL == f->fd) {
-	return new_exception(TE_FILENOTOPEN, decode_error(interp, strerror(errno)), interp);
+        return new_exception(TE_FILENOTOPEN, decode_error(interp, strerror(errno)), interp);
     }
 
     flag = fcntl(fileno(f->fd), F_GETFD, 0);
     if (flag >= 0) {
-	flag |= FD_CLOEXEC;
-	fcntl(fileno(f->fd), F_SETFD, flag);
+        flag |= FD_CLOEXEC;
+        fcntl(fileno(f->fd), F_SETFD, flag);
     }
 
     return const_T;
@@ -4151,10 +4151,10 @@ mth_file_close(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     f = container->u.container.data;
 
     if (f->fd) {
-	fclose(f->fd);
-	f->fd = NULL;
-	f->path = NULL;
-	f->mode = 0;
+        fclose(f->fd);
+        f->fd = NULL;
+        f->path = NULL;
+        f->mode = 0;
     }
 
     return const_T;
@@ -4237,10 +4237,10 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     memset(enc_error_info, 0, sizeof(encoder_error_info));
     
     if (hash_get_and_unset_t(nameargs, const_nonewline)) {
-	flag_nonewline = 1;
+        flag_nonewline = 1;
     }
     if (hash_get_and_unset_t(nameargs, const_nocontrol)) {
-	flag_nocontrol = 1;
+        flag_nocontrol = 1;
     }
     if (hash_get_length(nameargs) > 0) goto error;
 
@@ -4250,14 +4250,14 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     f = container->u.container.data;
 
     if (0 == f->newline) {
-	flag_nonewline = 1;
+        flag_nonewline = 1;
     }
 
     if (NULL == f->fd) {
-	return new_exception(TE_FILEACCESS, L"File not open.", interp);
+        return new_exception(TE_FILEACCESS, L"File not open.", interp);
     }
     if ((FMODE_INPUT != f->mode) && (FMODE_INOUT != f->mode)) {
-	return new_exception(TE_FILEACCESS, L"Bad file access mode.", interp);
+        return new_exception(TE_FILEACCESS, L"Bad file access mode.", interp);
     }
 
     if (feof(f->fd)) return const_Nil;
@@ -4361,25 +4361,25 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
                     }
                     clearerr(f->fd);
                 }
-		clearerr(f->fd);
+                clearerr(f->fd);
                 continue;
-	    }
+            }
             
             if (errno == EINTR) {
                 clearerr(f->fd);
                 continue;
             }
-	    
-	    if (cell_get_length(cbuff) == 0) {
-		return const_Nil;
-	    } else {
-		Cell *c = decode_raw_to_unicode(cbuff, f->input_encoding, enc_error_info);
-		if (NULL == c) {
-		    return new_exception(TE_BADENCODEBYTE, enc_error_info->message, interp);
-		}
-		return new_string_cell(c);
-	    }
-	}
+            
+            if (cell_get_length(cbuff) == 0) {
+                return const_Nil;
+            } else {
+                Cell *c = decode_raw_to_unicode(cbuff, f->input_encoding, enc_error_info);
+                if (NULL == c) {
+                    return new_exception(TE_BADENCODEBYTE, enc_error_info->message, interp);
+                }
+                return new_string_cell(c);
+            }
+        }
         
         /*
          * 読み込んだ文字が CR または LF の場合
@@ -4411,21 +4411,21 @@ mth_file_gets(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
                 }
             }
         }
-	
+        
         /*
          * 最終的な文字返却判定を行う。
          * 読んだ文字が LF または (プロパティ)!ignore_cr かつ CR の場合、cbuff をデコードして返す。
          */
-	if (is_encoding_char_equal(f->input_encoding, '\n', c)
+        if (is_encoding_char_equal(f->input_encoding, '\n', c)
             || (is_encoding_char_equal(f->input_encoding, '\r', c) && (f->ignore_cr == 0))) {
-	    Cell *c = decode_raw_to_unicode(cbuff, f->input_encoding, enc_error_info);
+            Cell *c = decode_raw_to_unicode(cbuff, f->input_encoding, enc_error_info);
             if (enc_error_info->errorno != 0) {
                 f->enc_error = 1;
             }
-	    if (NULL == c) {
-		return new_exception(TE_BADENCODEBYTE, enc_error_info->message, interp);
-	    }
-	    return new_string_cell(c);
+            if (NULL == c) {
+                return new_exception(TE_BADENCODEBYTE, enc_error_info->message, interp);
+            }
+            return new_string_cell(c);
         }
 
         /*
@@ -4509,7 +4509,7 @@ mth_file_puts(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     memset(enc_error_info, 0, sizeof(encoder_error_info));
 
     if (hash_get_and_unset_t(nameargs, const_nonewline)) {
-	flag_nonewline = 1;
+        flag_nonewline = 1;
     }
     if (hash_get_length(nameargs) > 0) goto error;
 
@@ -4519,16 +4519,16 @@ mth_file_puts(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     f = container->u.container.data;
 
     if ((f->newline == 1) && (flag_nonewline == 0)) {
-	flag_nonewline = 0;
+        flag_nonewline = 0;
     } else {
-	flag_nonewline = 1;
+        flag_nonewline = 1;
     }
 
     if (NULL == f->fd) {
-	return new_exception(TE_FILEACCESS, L"File not open.", interp);
+        return new_exception(TE_FILEACCESS, L"File not open.", interp);
     }
     if ((FMODE_OUTPUT != f->mode) && (FMODE_APPEND != f->mode) && (FMODE_INOUT != f->mode)) {
-	return new_exception(TE_FILEACCESS, L"Bad file access mode.", interp);
+        return new_exception(TE_FILEACCESS, L"Bad file access mode.", interp);
     }
 
     while (posargs) {
@@ -4537,26 +4537,26 @@ mth_file_puts(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
         } else {
             unicode = new_cell(to_string_call(interp, list_get_item(posargs)));
         }
-	if (flag_nonewline == 0) {
-	    cell_add_char(unicode, L'\n');
-	}
-	raw = encode_unicode_to_raw(unicode, f->output_encoding, enc_error_info);
-	if (NULL == raw) {
-	    return new_exception(TE_BADENCODEBYTE, enc_error_info->message, interp);
-	}
+        if (flag_nonewline == 0) {
+            cell_add_char(unicode, L'\n');
+        }
+        raw = encode_unicode_to_raw(unicode, f->output_encoding, enc_error_info);
+        if (NULL == raw) {
+            return new_exception(TE_BADENCODEBYTE, enc_error_info->message, interp);
+        }
         p = cell_get_addr(raw);
         for (i=0; i<cell_get_length(raw); i++) {
             unsigned char wc;
             wc = p[i];
             c = fwrite(&wc, 1, 1, f->fd);
         }
-	fflush(f->fd);
+        fflush(f->fd);
 
-	if (EOF == c) {
-	    return new_exception(TE_FILEACCESS, decode_error(interp, strerror(errno)), interp);
-	}
+        if (EOF == c) {
+            return new_exception(TE_FILEACCESS, decode_error(interp, strerror(errno)), interp);
+        }
 
-	posargs = list_next(posargs);
+        posargs = list_next(posargs);
     }
 
     return const_T;
@@ -4582,10 +4582,10 @@ mth_file_flush(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     f = container->u.container.data;
 
     if (NULL == f->fd) {
-	return new_exception(TE_FILEACCESS, L"File not open.", interp);
+        return new_exception(TE_FILEACCESS, L"File not open.", interp);
     }
     if ((FMODE_OUTPUT != f->mode) && (FMODE_APPEND != f->mode) && (FMODE_INOUT != f->mode)) {
-	return new_exception(TE_FILEACCESS, L"Bad file access mode.", interp);
+        return new_exception(TE_FILEACCESS, L"Bad file access mode.", interp);
     }
 
     fflush(f->fd);
@@ -4614,13 +4614,13 @@ mth_file_setnewline(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int a
 
     flag = list_get_item(posargs);
     if (IS_NIL(flag)) {
-	f->newline = 0;
-	return const_Nil;
+        f->newline = 0;
+        return const_Nil;
     } else {
-	f->newline = 1;
-	return const_T;
+        f->newline = 1;
+        return const_T;
     }
-	
+        
 error:
     return new_exception(TE_SYNTAX, L"Syntax error at 'set-newline', syntax: File set-newline [<t> | <nil>]", interp);
 error2:
@@ -4643,13 +4643,13 @@ mth_file_setignorecr(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int 
 
     flag = list_get_item(posargs);
     if (IS_NIL(flag)) {
-	f->ignore_cr = 0;
-	return const_Nil;
+        f->ignore_cr = 0;
+        return const_Nil;
     } else {
-	f->ignore_cr = 1;
-	return const_T;
+        f->ignore_cr = 1;
+        return const_T;
     }
-	
+        
 error:
     return new_exception(TE_SYNTAX, L"Syntax error at 'set-ignore-cr', syntax: File set-ignore-cr [<t> | <nil>]", interp);
 error2:
@@ -4675,33 +4675,33 @@ mth_file_stat(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     l = new_list(NULL);
 
     list_append(l, new_cons(new_symbol(L"fd"),
-			    f->fd ? new_integer_si(fileno(f->fd)) : const_Nil));
+                            f->fd ? new_integer_si(fileno(f->fd)) : const_Nil));
     switch (f->mode) {
     case FMODE_INPUT:
-	mode = new_symbol(L"i");
-	break;
+        mode = new_symbol(L"i");
+        break;
     case FMODE_OUTPUT:
-	mode = new_symbol(L"o");
-	break;
+        mode = new_symbol(L"o");
+        break;
     case FMODE_APPEND:
-	mode = new_symbol(L"a");
-	break;
+        mode = new_symbol(L"a");
+        break;
     case FMODE_INOUT:
-	mode = new_symbol(L"io");
-	break;
+        mode = new_symbol(L"io");
+        break;
     default:
-	mode = const_Nil;
+        mode = const_Nil;
     }
     list_append(l, new_cons(new_symbol(L"mode"), mode));
     list_append(l, new_cons(new_symbol(L"path"), f->path ? f->path : const_Nil));
     if (f->fd) {
-	if (feof(f->fd)) {
-	    list_append(l, new_cons(new_symbol(L"eof"), const_T));
-	} else {
-	    list_append(l, new_cons(new_symbol(L"eof"), const_Nil));
-	}
+        if (feof(f->fd)) {
+            list_append(l, new_cons(new_symbol(L"eof"), const_T));
+        } else {
+            list_append(l, new_cons(new_symbol(L"eof"), const_Nil));
+        }
     } else {
-	list_append(l, new_cons(new_symbol(L"eof"), const_Nil));
+        list_append(l, new_cons(new_symbol(L"eof"), const_Nil));
     }
     list_append(l, new_cons(new_symbol(L"newline"), f->newline ? const_T : const_Nil));
     list_append(l, new_cons(new_symbol(L"noblock"), f->noblock ? const_T : const_Nil));
@@ -4740,13 +4740,13 @@ mth_file_iseof(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     f = container->u.container.data;
 
     if (NULL == f->fd) {
-	return new_exception(TE_FILEACCESS, L"File not open.", interp);
+        return new_exception(TE_FILEACCESS, L"File not open.", interp);
     }
 
     if (feof(f->fd)) {
-	return const_T;
+        return const_T;
     } else {
-	return const_Nil;
+        return const_Nil;
     }
 
 
@@ -4771,7 +4771,7 @@ mth_file_getfd(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     f = container->u.container.data;
 
     if (NULL == f->fd) {
-	return new_exception(TE_FILEACCESS, L"File not open.", interp);
+        return new_exception(TE_FILEACCESS, L"File not open.", interp);
     }
 
     return new_integer_si(fileno(f->fd));
@@ -4804,29 +4804,29 @@ mth_file_set(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
     mode = hash_get_t(nameargs, const_mode);
     
     if (NULL == mode) {
-	imode = "r";
-	f->mode = FMODE_INPUT;
+        imode = "r";
+        f->mode = FMODE_INPUT;
     } else if (GET_TAG(mode) != SYMBOL) {
-	goto error;
+        goto error;
     } else if (wcscmp(cell_get_addr(mode->u.symbol.cell), L"i") == 0) {
-	imode = "r";
-	f->mode = FMODE_INPUT;
+        imode = "r";
+        f->mode = FMODE_INPUT;
     } else if (wcscmp(cell_get_addr(mode->u.symbol.cell), L"o") == 0) {
-	imode = "w";
-	f->mode = FMODE_OUTPUT;
+        imode = "w";
+        f->mode = FMODE_OUTPUT;
     } else if (wcscmp(cell_get_addr(mode->u.symbol.cell), L"a") == 0) {
-	imode = "a";
-	f->mode = FMODE_APPEND;
+        imode = "a";
+        f->mode = FMODE_APPEND;
     } else if (wcscmp(cell_get_addr(mode->u.symbol.cell), L"io") == 0) {
-	imode = "r+";
-	f->mode = FMODE_INOUT;
+        imode = "r+";
+        f->mode = FMODE_INOUT;
     } else goto error;
-	
+        
     f->fd = fdopen(mpz_get_si(tfd->u.biginteger), imode);
     f->path = const_Nil;
 
     if (NULL == f->fd) {
-	return new_exception(TE_FILENOTOPEN, decode_error(interp, strerror(errno)), interp);
+        return new_exception(TE_FILENOTOPEN, decode_error(interp, strerror(errno)), interp);
     }
 
     return const_T;
@@ -4853,8 +4853,8 @@ mth_file_isready(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     if (arglen > 0) goto error;
     ttimeout = hash_get_and_unset_t(nameargs, const_timeout);
     if (ttimeout) {
-	if (GET_TAG(ttimeout) != INTEGER) goto error;
-	itimeout = mpz_get_si(ttimeout->u.biginteger);
+        if (GET_TAG(ttimeout) != INTEGER) goto error;
+        itimeout = mpz_get_si(ttimeout->u.biginteger);
     }
     if (hash_get_length(nameargs) > 0) goto error;
 
@@ -4889,17 +4889,17 @@ retry:
     errno = 0;
     switch (f->mode) {
     case FMODE_INPUT:
-    case FMODE_INOUT:	/* XXX: fix me!! */
-	sts = select(fdesc+1, &fds, NULL, NULL, &timeout);
-	break;
+    case FMODE_INOUT:   /* XXX: fix me!! */
+        sts = select(fdesc+1, &fds, NULL, NULL, &timeout);
+        break;
 
     case FMODE_OUTPUT:
     case FMODE_APPEND:
-	sts = select(fdesc+1, NULL, &fds, NULL, &timeout);
-	break;
+        sts = select(fdesc+1, NULL, &fds, NULL, &timeout);
+        break;
 
     default:
-	goto error2;
+        goto error2;
     }
     if ((-1 == sts) && (errno == EINTR)) goto retry;
     
@@ -4958,7 +4958,7 @@ mth_file_setnobuffer(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int 
     f = container->u.container.data;
     fd = f->fd;
     if (EOF == setvbuf(fd, 0, _IOLBF, 0)) {
-	return new_exception(TE_FILEACCESS, L"Buffering mode change error.", interp);
+        return new_exception(TE_FILEACCESS, L"Buffering mode change error.", interp);
     };
 
     return const_T;
@@ -4982,9 +4982,9 @@ mth_file_setnoblock(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int a
 
     flag = list_get_item(posargs);
     if (IS_NIL(flag)) {
-	iflag = 0;	// mark normal (read block)
+        iflag = 0;      // mark normal (read block)
     } else {
-	iflag = 1;	// mark non-block (read non-block)
+        iflag = 1;      // mark non-block (read non-block)
     }
 
     self = SELF_HASH(interp);
@@ -4995,25 +4995,25 @@ mth_file_setnoblock(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int a
 
     val = fcntl(fileno(fd), F_GETFL, 0);
     if (-1 == val) {
-	return new_exception(TE_FILEACCESS, L"fcntl error at F_GETFL.", interp);
+        return new_exception(TE_FILEACCESS, L"fcntl error at F_GETFL.", interp);
     }
     if (iflag) {
-	// set non-block
-	val |= O_NONBLOCK;
+        // set non-block
+        val |= O_NONBLOCK;
     } else {
-	// set block (normal)
-	val &= ~O_NONBLOCK;
+        // set block (normal)
+        val &= ~O_NONBLOCK;
     }
     if (fcntl(fileno(fd), F_SETFL, val) == -1) {
-	return new_exception(TE_FILEACCESS, L"fcntl error at F_SETFL.", interp);
+        return new_exception(TE_FILEACCESS, L"fcntl error at F_SETFL.", interp);
     }
     
     if (iflag) {
-	f->noblock = 1;
-	return const_T;
+        f->noblock = 1;
+        return const_T;
     } else {
-	f->noblock = 0;
-	return const_Nil;
+        f->noblock = 0;
+        return const_Nil;
     }
     
 error:
@@ -5043,7 +5043,7 @@ mth_file_setencoding(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int 
     
     enc_index = get_encoding_index(cell_get_addr(enc->u.symbol.cell));
     if (enc_index == -1) {
-	return new_exception(TE_NOENCODING, L"Encoding not implimentation.", interp);
+        return new_exception(TE_NOENCODING, L"Encoding not implimentation.", interp);
     }
 
     f->input_encoding = enc_index;
@@ -5078,7 +5078,7 @@ mth_file_setinputencoding(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs,
     
     enc_index = get_encoding_index(cell_get_addr(enc->u.symbol.cell));
     if (enc_index == -1) {
-	return new_exception(TE_NOENCODING, L"Encoding not implimentation.", interp);
+        return new_exception(TE_NOENCODING, L"Encoding not implimentation.", interp);
     }
 
     f->input_encoding = enc_index;
@@ -5112,7 +5112,7 @@ mth_file_setoutputencoding(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs
     
     enc_index = get_encoding_index(cell_get_addr(enc->u.symbol.cell));
     if (enc_index == -1) {
-	return new_exception(TE_NOENCODING, L"Encoding not implimentation.", interp);
+        return new_exception(TE_NOENCODING, L"Encoding not implimentation.", interp);
     }
 
     f->output_encoding = enc_index;
@@ -5216,9 +5216,9 @@ mth_file_setrawio(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 
     flag = list_get_item(posargs);
     if (IS_NIL(flag)) {
-	iflag = 0;	// set bufferd io
+        iflag = 0;      // set bufferd io
     } else {
-	iflag = 1;	// set raw io
+        iflag = 1;      // set raw io
     }
 
     self = SELF_HASH(interp);
@@ -5227,11 +5227,11 @@ mth_file_setrawio(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     f = container->u.container.data;
 
     if (iflag) {
-	f->raw_io = 1;
-	return const_T;
+        f->raw_io = 1;
+        return const_T;
     } else {
-	f->raw_io = 0;
-	return const_Nil;
+        f->raw_io = 0;
+        return const_Nil;
     }
     
 error:
@@ -5275,7 +5275,7 @@ mth_file_seek(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     f = container->u.container.data;
 
     if (NULL == f->fd) {
-	return new_exception(TE_FILEACCESS, L"File not open.", interp);
+        return new_exception(TE_FILEACCESS, L"File not open.", interp);
     }
     if (! ((pos == 0) && (whence == SEEK_CUR))) {
         sts = fseek(f->fd, pos, whence);
@@ -5323,10 +5323,10 @@ mth_file_getb(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     f = container->u.container.data;
 
     if (NULL == f->fd) {
-	return new_exception(TE_FILEACCESS, L"File not open.", interp);
+        return new_exception(TE_FILEACCESS, L"File not open.", interp);
     }
     if ((FMODE_INPUT != f->mode) && (FMODE_INOUT != f->mode)) {
-	return new_exception(TE_FILEACCESS, L"Bad file access mode.", interp);
+        return new_exception(TE_FILEACCESS, L"Bad file access mode.", interp);
     }
     
     rbuff = GC_MALLOC(readsize);
@@ -5389,10 +5389,10 @@ mth_file_putb(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     f = container->u.container.data;
 
     if (NULL == f->fd) {
-	return new_exception(TE_FILEACCESS, L"File not open.", interp);
+        return new_exception(TE_FILEACCESS, L"File not open.", interp);
     }
     if ((FMODE_OUTPUT != f->mode) && (FMODE_APPEND != f->mode) && (FMODE_INOUT != f->mode)) {
-	return new_exception(TE_FILEACCESS, L"Bad file access mode.", interp);
+        return new_exception(TE_FILEACCESS, L"Bad file access mode.", interp);
     }
     
     buffsize = list_length(item);
@@ -5456,7 +5456,7 @@ mth_dict_get(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
 
     result = hash_get(o->u.dict, key);
     if (result) {
-	return result;
+        return result;
     }
 
     return const_Nil;
@@ -5482,7 +5482,7 @@ mth_dict_isset(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
 
     result = hash_get(o->u.dict, key);
     if (result) {
-	return const_T;
+        return const_T;
     }
 
     return const_Nil;
@@ -5547,7 +5547,7 @@ mth_dict_unset(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
 
     result = hash_get_and_unset(o->u.dict, key);
     if (result) {
-	return result;
+        return result;
     }
 
     return const_Nil;
@@ -5573,7 +5573,7 @@ mth_dict_keys(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     if (GET_TAG(o) != DICT) goto error2;
 
     if (string_flag && (! IS_NIL(string_flag))) {
-	return hash_get_keys_str(o->u.dict);
+        return hash_get_keys_str(o->u.dict);
     }
     return hash_get_keys(o->u.dict);
 
@@ -5598,7 +5598,7 @@ mth_dict_pairs(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     if (GET_TAG(o) != DICT) goto error2;
     
     if (string_flag && (! IS_NIL(string_flag))) {
-	return hash_get_pairs_str(o->u.dict);
+        return hash_get_pairs_str(o->u.dict);
     }
     return hash_get_pairs(o->u.dict);
 
@@ -5651,7 +5651,7 @@ mth_vector_set(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     if (GET_TAG(o) != VECTOR) goto error2;
 
     if (! array_set(o->u.vector, toy_clone(item), mpz_get_si(index->u.biginteger))) {
-	return new_exception(TE_ARRAYBOUNDARY, L"Array boundary error.", interp);
+        return new_exception(TE_ARRAYBOUNDARY, L"Array boundary error.", interp);
     }
 
     return item;
@@ -5679,7 +5679,7 @@ mth_vector_get(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
 
     item = array_get(o->u.vector, mpz_get_si(index->u.biginteger));
     if (! item) {
-	return new_exception(TE_ARRAYBOUNDARY, L"Array boundary error.", interp);
+        return new_exception(TE_ARRAYBOUNDARY, L"Array boundary error.", interp);
     }
 
     return item;
@@ -5747,7 +5747,7 @@ mth_vector_list(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     index = array_get_size(o->u.vector);
     l = result = new_list(NULL);
     for (i=0; i<index; i++) {
-	l = list_append(l, array_get(o->u.vector, i));
+        l = list_append(l, array_get(o->u.vector, i));
     }
 
     return result;
@@ -5783,30 +5783,30 @@ loop_retry:
 loop:
     if (pos >= array_get_size(o->u.vector)) goto fin;
     result = toy_yield(interp, block,
-		       new_list(array_get(o->u.vector, pos)));
+                       new_list(array_get(o->u.vector, pos)));
     t = GET_TAG(result);
     if (t == EXCEPTION) return result;
     if (t == CONTROL) {
-	switch (result->u.control.code) {
-	case CTRL_RETURN: case CTRL_GOTO:
-	    return result;
-	    break;
-	case CTRL_BREAK:
-	    return result->u.control.ret_value;
-	    break;
-	case CTRL_CONTINUE:
-	    result = const_Nil;
-	    goto loop_continue;
-	    break;
-	case CTRL_REDO:
-	    result = const_Nil;
-	    goto loop;
-	    break;
-	case CTRL_RETRY:
-	    result = const_Nil;
-	    goto loop_retry;
-	    break;
-	}
+        switch (result->u.control.code) {
+        case CTRL_RETURN: case CTRL_GOTO:
+            return result;
+            break;
+        case CTRL_BREAK:
+            return result->u.control.ret_value;
+            break;
+        case CTRL_CONTINUE:
+            result = const_Nil;
+            goto loop_continue;
+            break;
+        case CTRL_REDO:
+            result = const_Nil;
+            goto loop;
+            break;
+        case CTRL_RETRY:
+            result = const_Nil;
+            goto loop_retry;
+            break;
+        }
     }
 
 loop_continue:
@@ -5847,7 +5847,7 @@ mth_vector_swap(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     idx2 = mpz_get_si(index2->u.biginteger);
     
     if (! array_swap(o->u.vector, idx1, idx2)) {
-	return new_exception(TE_ARRAYBOUNDARY, L"Array boundary error.", interp);
+        return new_exception(TE_ARRAYBOUNDARY, L"Array boundary error.", interp);
     }
 
     return const_T;
@@ -5876,7 +5876,7 @@ mth_vector_resize(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     size = mpz_get_si(new_size->u.biginteger);
     
     if (NULL == array_resize(o->u.vector, size)) {
-	return new_exception(TE_ARRAYBOUNDARY, L"Bad array size specified.", interp);
+        return new_exception(TE_ARRAYBOUNDARY, L"Bad array size specified.", interp);
     }
 
     return const_T;
@@ -5908,7 +5908,7 @@ mth_vector_insert(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     val = list_get_item(posargs);
     
     if (NULL == array_insert(o->u.vector, idx, val)) {
-	return new_exception(TE_ARRAYBOUNDARY, L"Bad insert index.", interp);
+        return new_exception(TE_ARRAYBOUNDARY, L"Bad insert index.", interp);
     }
 
     return val;
@@ -5937,7 +5937,7 @@ mth_vector_delete(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 
    
     if (NULL == (val = array_delete(o->u.vector, idx))) {
-	return new_exception(TE_ARRAYBOUNDARY, L"Bad delete index.", interp);
+        return new_exception(TE_ARRAYBOUNDARY, L"Bad delete index.", interp);
     }
 
     return val;
@@ -5962,22 +5962,22 @@ mth_coro_next(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 
     co = self->u.coroutine;
     if (0 == co->coro_id) {
-	return new_exception(TE_COOUTOFLIFE, L"Co-routine out of life.", interp);
+        return new_exception(TE_COOUTOFLIFE, L"Co-routine out of life.", interp);
     }
     if (! co->interp) {
-	return new_exception(TE_COOUTOFLIFE, L"Co-routine out of life.", interp);
+        return new_exception(TE_COOUTOFLIFE, L"Co-routine out of life.", interp);
     }
     if (! cstack_isalive(co->interp->cstack_id)) {
-	return new_exception(TE_COOUTOFLIFE, L"Co-routine out of life.", interp);
+        return new_exception(TE_COOUTOFLIFE, L"Co-routine out of life.", interp);
     };
 
     interp->co_value = const_Nil;
     switch (co->state) {
     case CO_STS_INIT:
-	co->state = CO_STS_RUN;
-	/* fall thru */
+        co->state = CO_STS_RUN;
+        /* fall thru */
     case CO_STS_RUN:
-	interp->co_calling = 1;
+        interp->co_calling = 1;
         co->interp->co_parent = interp;
         restore_co_id = cstack_enter(co->interp->cstack_id);
 #ifdef CORU_USE
@@ -5985,16 +5985,16 @@ mth_coro_next(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
 #else
         co_call(co->coro_id);
 #endif /* CORU_USE */
-	cstack_leave(restore_co_id);
-	interp->co_calling = 0;
-	break;
+        cstack_leave(restore_co_id);
+        interp->co_calling = 0;
+        break;
 
     default:
-	return new_exception(TE_COOUTOFLIFE, L"Co-routine out of life.", interp);
+        return new_exception(TE_COOUTOFLIFE, L"Co-routine out of life.", interp);
     }
 
     if (interp->co_value) {
-	return interp->co_value;
+        return interp->co_value;
     }
 
     return const_Nil;
@@ -6020,7 +6020,7 @@ mth_coro_release(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     co->state = CO_STS_DONE;
 
     if (0 == co->coro_id) {
-	return new_exception(TE_COOUTOFLIFE, L"Co-routine is already done.", interp);
+        return new_exception(TE_COOUTOFLIFE, L"Co-routine is already done.", interp);
     }
 #ifdef CORU_USE
     coru_destroy(co->coro_id);
@@ -6059,11 +6059,11 @@ mth_coro_stat(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     
     switch (co->state) {
     case CO_STS_INIT:
-	return new_symbol(L"INIT");
+        return new_symbol(L"INIT");
     case CO_STS_RUN:
-	return new_symbol(L"RUN");
+        return new_symbol(L"RUN");
     default:
-	return new_symbol(L"DONE");
+        return new_symbol(L"DONE");
     }
     
 error:
@@ -6089,7 +6089,7 @@ mth_coro_eval(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     if (GET_TAG(body) != CLOSURE) goto error;
 
     if (CO_STS_DONE == co->state) {
-	return new_exception(TE_COOUTOFLIFE, L"Co-routine out of life.", interp);
+        return new_exception(TE_COOUTOFLIFE, L"Co-routine out of life.", interp);
     }
     
     return toy_eval_script(co->interp, body->u.closure.block_body);
@@ -6140,14 +6140,14 @@ mth_bulk_append(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     c = list_get_item(posargs);
     
     if (GET_TAG(c) == LIST) {
-	while (! IS_LIST_NULL(c)) {
-	    Toy_Type *i;
-	    i = list_get_item(c);
-	    if (GET_TAG(i) != INTEGER) goto error;
-	    binbulk_add_char(bulk, (wchar_t)mpz_get_si(i->u.biginteger));
-	    c = list_next(c);
-	}
-	return const_T;
+        while (! IS_LIST_NULL(c)) {
+            Toy_Type *i;
+            i = list_get_item(c);
+            if (GET_TAG(i) != INTEGER) goto error;
+            binbulk_add_char(bulk, (wchar_t)mpz_get_si(i->u.biginteger));
+            c = list_next(c);
+        }
+        return const_T;
     }
     
     if (GET_TAG(c) != INTEGER) goto error;
@@ -6178,7 +6178,7 @@ mth_bulk_get(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
     if (hash_get_length(nameargs) > 0) goto error;
     
     if ((v = binbulk_get_char(bulk)) == -1) {
-	return const_Nil;
+        return const_Nil;
     }
     return new_integer_si((int)v);
 
@@ -6207,7 +6207,7 @@ mth_bulk_set(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) 
     v = (wchar_t)mpz_get_si(c->u.biginteger);
 
     if (binbulk_set_char(bulk, v) == -1) {
-	return const_Nil;
+        return const_Nil;
     }
     return const_T;
 
@@ -6236,7 +6236,7 @@ mth_bulk_seek(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     v = mpz_get_si(c->u.biginteger);
 
     if ((v = binbulk_seek(bulk, v)) == -1) {
-	return const_Nil;
+        return const_Nil;
     }
 
     return new_integer_si(v);
@@ -6335,7 +6335,7 @@ mth_bulk_truncate(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     v = mpz_get_si(c->u.biginteger);
 
     if ((v = binbulk_truncate(bulk, v)) == -1) {
-	return const_Nil;
+        return const_Nil;
     }
     return new_integer_si(v);
 
@@ -6364,10 +6364,10 @@ mth_bulk_read(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen)
     fd = mpz_get_si(c->u.biginteger);
 
     if ((size = binbulk_read(bulk, fd)) == -1) {
-	if (errno != 0) {
-	    return new_exception(TE_FILEACCESS, decode_error(interp, strerror(errno)), interp);
-	}
-	return new_exception(TE_FILEACCESS, L"Bad file type.", interp);	
+        if (errno != 0) {
+            return new_exception(TE_FILEACCESS, decode_error(interp, strerror(errno)), interp);
+        }
+        return new_exception(TE_FILEACCESS, L"Bad file type.", interp); 
     }
     return new_integer_si(size);
 
@@ -6406,10 +6406,10 @@ mth_bulk_write(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen
     to = mpz_get_si(c->u.biginteger);
 
     if ((size = binbulk_write(bulk, fd, from, to)) == -1) {
-	if (errno != 0) {
-	    return new_exception(TE_FILEACCESS, decode_error(interp, strerror(errno)), interp);
-	}
-	return new_exception(TE_FILEACCESS, L"Bad file type or bad parameter specified.", interp);	
+        if (errno != 0) {
+            return new_exception(TE_FILEACCESS, decode_error(interp, strerror(errno)), interp);
+        }
+        return new_exception(TE_FILEACCESS, L"Bad file type or bad parameter specified.", interp);      
     }
     return new_integer_si(size);
 
@@ -6441,11 +6441,11 @@ mth_bulk_base64encode(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int
     sts = const_Nil;
     binbulk_seek(bulk, 0);
     while (! binbulk_is_eof(bulk)) {
-	b64str = binbulk_base64_encode(bulk, 57);
-	b64obj = new_string_cell(b64str);
-	arg = new_list(b64obj);
-	sts = toy_yield(interp, body, arg);
-	if (GET_TAG(sts) == EXCEPTION) return  sts;
+        b64str = binbulk_base64_encode(bulk, 57);
+        b64obj = new_string_cell(b64str);
+        arg = new_list(b64obj);
+        sts = toy_yield(interp, body, arg);
+        if (GET_TAG(sts) == EXCEPTION) return  sts;
     }
     
     return sts;
@@ -6476,7 +6476,7 @@ mth_bulk_base64decode(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int
 
     sts = binbulk_base64_decode(bulk, b64str->u.string);
     if (! sts) {
-	return new_exception(TE_SYNTAX, L"Bad base64 string.", interp);
+        return new_exception(TE_SYNTAX, L"Bad base64 string.", interp);
     }
     
     return const_T;
@@ -6516,215 +6516,215 @@ error2:
 
 int
 toy_add_methods(Toy_Interp* interp) {
-    toy_add_method(interp, L"Object", L"hash", 		mth_object_hash,	NULL);
-    toy_add_method(interp, L"Object", L"vars", 		mth_object_vars,	NULL);
-    toy_add_method(interp, L"Object", L"method",	mth_object_method,	L"method-name,argspec,body");
-    toy_add_method(interp, L"Object", L"var?", 		mth_object_get, 	L"var");
-    toy_add_method(interp, L"Object", L"get", 		mth_object_get, 	L"var");
-    toy_add_method(interp, L"Object", L"set!",		mth_object_set, 	L"var,val");
-    toy_add_method(interp, L"Object", L"type?", 	mth_object_type, 	NULL);
-    toy_add_method(interp, L"Object", L"delegate?", 	mth_object_delegate,	NULL);
+    toy_add_method(interp, L"Object", L"hash",          mth_object_hash,        NULL);
+    toy_add_method(interp, L"Object", L"vars",          mth_object_vars,        NULL);
+    toy_add_method(interp, L"Object", L"method",        mth_object_method,      L"method-name,argspec,body");
+    toy_add_method(interp, L"Object", L"var?",          mth_object_get,         L"var");
+    toy_add_method(interp, L"Object", L"get",           mth_object_get,         L"var");
+    toy_add_method(interp, L"Object", L"set!",          mth_object_set,         L"var,val");
+    toy_add_method(interp, L"Object", L"type?",         mth_object_type,        NULL);
+    toy_add_method(interp, L"Object", L"delegate?",     mth_object_delegate,    NULL);
 #if 0 // replace to command eq?
-    toy_add_method(interp, L"Object", L"eq", 		mth_object_eq, 		L"val");
+    toy_add_method(interp, L"Object", L"eq",            mth_object_eq,          L"val");
 #endif
-    toy_add_method(interp, L"Object", L"string", 	mth_object_tostring, 	NULL);
-    toy_add_method(interp, L"Object", L"literal", 	mth_object_toliteral, 	NULL);
-    toy_add_method(interp, L"Object", L"method?",	mth_object_getmethod,	L"name");
-    toy_add_method(interp, L"Object", L"apply", 	mth_object_apply, 	L"body");
+    toy_add_method(interp, L"Object", L"string",        mth_object_tostring,    NULL);
+    toy_add_method(interp, L"Object", L"literal",       mth_object_toliteral,   NULL);
+    toy_add_method(interp, L"Object", L"method?",       mth_object_getmethod,   L"name");
+    toy_add_method(interp, L"Object", L"apply",         mth_object_apply,       L"body");
 
-    toy_add_method(interp, L"Integer", L"+", 		mth_integer_plus, 	L"val");
-    toy_add_method(interp, L"Integer", L"-", 		mth_integer_minus, 	L"val");
-    toy_add_method(interp, L"Integer", L"*", 		mth_integer_mul, 	L"val");
-    toy_add_method(interp, L"Integer", L"/", 		mth_integer_div, 	L"val");
-    toy_add_method(interp, L"Integer", L"%", 		mth_integer_mod, 	L"val");
-    toy_add_method(interp, L"Integer", L"=", 		mth_integer_eq, 	L"val");
-    toy_add_method(interp, L"Integer", L"!=", 		mth_integer_neq, 	L"val");
-    toy_add_method(interp, L"Integer", L">", 		mth_integer_gt, 	L"val");
-    toy_add_method(interp, L"Integer", L"<", 		mth_integer_lt, 	L"val");
-    toy_add_method(interp, L"Integer", L">=", 		mth_integer_ge, 	L"val");
-    toy_add_method(interp, L"Integer", L"<=", 		mth_integer_le,	 	L"val");
-    toy_add_method(interp, L"Integer", L"++", 		mth_integer_inc, 	L"incr-val");
-    toy_add_method(interp, L"Integer", L"--", 		mth_integer_dec,	L"decr-val");
-    toy_add_method(interp, L"Integer", L"each", 	mth_integer_each, 	L"to:,val,do:,body");
-    toy_add_method(interp, L"Integer", L"..", 		mth_integer_list, 	L"do:,body");
-    toy_add_method(interp, L"Integer", L"real", 	mth_integer_toreal,	NULL);
-    toy_add_method(interp, L"Integer", L"<<", 		mth_integer_rol,	L"val");
-    toy_add_method(interp, L"Integer", L">>", 		mth_integer_ror, 	L"val");
-    toy_add_method(interp, L"Integer", L">>>", 		mth_integer_lror, 	L"val");
-    toy_add_method(interp, L"Integer", L"||", 		mth_integer_or, 	L"val");
-    toy_add_method(interp, L"Integer", L"&&", 		mth_integer_and, 	L"val");
-    toy_add_method(interp, L"Integer", L"^^", 		mth_integer_xor, 	L"val");
-    toy_add_method(interp, L"Integer", L"~~", 		mth_integer_not, 	NULL);
-    toy_add_method(interp, L"Integer", L"^", 		mth_integer_power, 	NULL);
-    toy_add_method(interp, L"Integer", L"nextprime", 	mth_integer_nextprime,	NULL);
-    toy_add_method(interp, L"Integer", L"sqrt", 	mth_integer_sqrt, 	NULL);
-    toy_add_method(interp, L"Integer", L"neg", 		mth_integer_neg, 	NULL);
-    toy_add_method(interp, L"Integer", L"abs", 		mth_integer_abs, 	NULL);
-    toy_add_method(interp, L"Integer", L"string-base",	mth_integer_strbase, 	L"base");
+    toy_add_method(interp, L"Integer", L"+",            mth_integer_plus,       L"val");
+    toy_add_method(interp, L"Integer", L"-",            mth_integer_minus,      L"val");
+    toy_add_method(interp, L"Integer", L"*",            mth_integer_mul,        L"val");
+    toy_add_method(interp, L"Integer", L"/",            mth_integer_div,        L"val");
+    toy_add_method(interp, L"Integer", L"%",            mth_integer_mod,        L"val");
+    toy_add_method(interp, L"Integer", L"=",            mth_integer_eq,         L"val");
+    toy_add_method(interp, L"Integer", L"!=",           mth_integer_neq,        L"val");
+    toy_add_method(interp, L"Integer", L">",            mth_integer_gt,         L"val");
+    toy_add_method(interp, L"Integer", L"<",            mth_integer_lt,         L"val");
+    toy_add_method(interp, L"Integer", L">=",           mth_integer_ge,         L"val");
+    toy_add_method(interp, L"Integer", L"<=",           mth_integer_le,         L"val");
+    toy_add_method(interp, L"Integer", L"++",           mth_integer_inc,        L"incr-val");
+    toy_add_method(interp, L"Integer", L"--",           mth_integer_dec,        L"decr-val");
+    toy_add_method(interp, L"Integer", L"each",         mth_integer_each,       L"to:,val,do:,body");
+    toy_add_method(interp, L"Integer", L"..",           mth_integer_list,       L"do:,body");
+    toy_add_method(interp, L"Integer", L"real",         mth_integer_toreal,     NULL);
+    toy_add_method(interp, L"Integer", L"<<",           mth_integer_rol,        L"val");
+    toy_add_method(interp, L"Integer", L">>",           mth_integer_ror,        L"val");
+    toy_add_method(interp, L"Integer", L">>>",          mth_integer_lror,       L"val");
+    toy_add_method(interp, L"Integer", L"||",           mth_integer_or,         L"val");
+    toy_add_method(interp, L"Integer", L"&&",           mth_integer_and,        L"val");
+    toy_add_method(interp, L"Integer", L"^^",           mth_integer_xor,        L"val");
+    toy_add_method(interp, L"Integer", L"~~",           mth_integer_not,        NULL);
+    toy_add_method(interp, L"Integer", L"^",            mth_integer_power,      NULL);
+    toy_add_method(interp, L"Integer", L"nextprime",    mth_integer_nextprime,  NULL);
+    toy_add_method(interp, L"Integer", L"sqrt",         mth_integer_sqrt,       NULL);
+    toy_add_method(interp, L"Integer", L"neg",          mth_integer_neg,        NULL);
+    toy_add_method(interp, L"Integer", L"abs",          mth_integer_abs,        NULL);
+    toy_add_method(interp, L"Integer", L"string-base",  mth_integer_strbase,    L"base");
 
-    toy_add_method(interp, L"Real", L"+", 		mth_real_plus, 		L"val");
-    toy_add_method(interp, L"Real", L"-", 		mth_real_minus, 	L"val");
-    toy_add_method(interp, L"Real", L"*", 		mth_real_mul, 		L"val");
-    toy_add_method(interp, L"Real", L"/", 		mth_real_div, 		L"val");
-    toy_add_method(interp, L"Real", L"=", 		mth_real_eq, 		L"val");
-    toy_add_method(interp, L"Real", L"!=", 		mth_real_neq, 		L"val");
-    toy_add_method(interp, L"Real", L">", 		mth_real_gt, 		L"val");
-    toy_add_method(interp, L"Real", L"<", 		mth_real_lt, 		L"val");
-    toy_add_method(interp, L"Real", L">=", 		mth_real_ge, 		L"val");
-    toy_add_method(interp, L"Real", L"<=", 		mth_real_le, 		L"val");
-    toy_add_method(interp, L"Real", L"int", 		mth_real_tointeger, 	NULL);
-    toy_add_method(interp, L"Real", L"sqrt", 		mth_real_sqrt, 		NULL);
-    toy_add_method(interp, L"Real", L"sin", 		mth_real_sin, 		NULL);
-    toy_add_method(interp, L"Real", L"cos", 		mth_real_cos, 		NULL);
-    toy_add_method(interp, L"Real", L"tan", 		mth_real_tan, 		NULL);
-    toy_add_method(interp, L"Real", L"asin", 		mth_real_asin, 		NULL);
-    toy_add_method(interp, L"Real", L"acos", 		mth_real_acos, 		NULL);
-    toy_add_method(interp, L"Real", L"atan", 		mth_real_atan, 		NULL);
-    toy_add_method(interp, L"Real", L"log", 		mth_real_log, 		NULL);
-    toy_add_method(interp, L"Real", L"log10", 		mth_real_log10, 	NULL);
-    toy_add_method(interp, L"Real", L"exp", 		mth_real_exp, 		NULL);
-    toy_add_method(interp, L"Real", L"exp10", 		mth_real_exp10, 	NULL);
-    toy_add_method(interp, L"Real", L"pow", 		mth_real_pow, 		L"val");
-    toy_add_method(interp, L"Real", L"neg", 		mth_real_neg, 		NULL);
-    toy_add_method(interp, L"Real", L"abs", 		mth_real_abs, 		NULL);
-    toy_add_method(interp, L"Real", L"inf?", 		mth_real_isinf, 	NULL);
-    toy_add_method(interp, L"Real", L"nan?", 		mth_real_isnan, 	NULL);
+    toy_add_method(interp, L"Real", L"+",               mth_real_plus,          L"val");
+    toy_add_method(interp, L"Real", L"-",               mth_real_minus,         L"val");
+    toy_add_method(interp, L"Real", L"*",               mth_real_mul,           L"val");
+    toy_add_method(interp, L"Real", L"/",               mth_real_div,           L"val");
+    toy_add_method(interp, L"Real", L"=",               mth_real_eq,            L"val");
+    toy_add_method(interp, L"Real", L"!=",              mth_real_neq,           L"val");
+    toy_add_method(interp, L"Real", L">",               mth_real_gt,            L"val");
+    toy_add_method(interp, L"Real", L"<",               mth_real_lt,            L"val");
+    toy_add_method(interp, L"Real", L">=",              mth_real_ge,            L"val");
+    toy_add_method(interp, L"Real", L"<=",              mth_real_le,            L"val");
+    toy_add_method(interp, L"Real", L"int",             mth_real_tointeger,     NULL);
+    toy_add_method(interp, L"Real", L"sqrt",            mth_real_sqrt,          NULL);
+    toy_add_method(interp, L"Real", L"sin",             mth_real_sin,           NULL);
+    toy_add_method(interp, L"Real", L"cos",             mth_real_cos,           NULL);
+    toy_add_method(interp, L"Real", L"tan",             mth_real_tan,           NULL);
+    toy_add_method(interp, L"Real", L"asin",            mth_real_asin,          NULL);
+    toy_add_method(interp, L"Real", L"acos",            mth_real_acos,          NULL);
+    toy_add_method(interp, L"Real", L"atan",            mth_real_atan,          NULL);
+    toy_add_method(interp, L"Real", L"log",             mth_real_log,           NULL);
+    toy_add_method(interp, L"Real", L"log10",           mth_real_log10,         NULL);
+    toy_add_method(interp, L"Real", L"exp",             mth_real_exp,           NULL);
+    toy_add_method(interp, L"Real", L"exp10",           mth_real_exp10,         NULL);
+    toy_add_method(interp, L"Real", L"pow",             mth_real_pow,           L"val");
+    toy_add_method(interp, L"Real", L"neg",             mth_real_neg,           NULL);
+    toy_add_method(interp, L"Real", L"abs",             mth_real_abs,           NULL);
+    toy_add_method(interp, L"Real", L"inf?",            mth_real_isinf,         NULL);
+    toy_add_method(interp, L"Real", L"nan?",            mth_real_isnan,         NULL);
 
-    toy_add_method(interp, L"List", L"last", 		mth_list_last, 		NULL);
-    toy_add_method(interp, L"List", L"item", 		mth_list_item, 		NULL);
-    toy_add_method(interp, L"List", L"car", 		mth_list_item, 		NULL);
-    toy_add_method(interp, L"List", L"cdr", 		mth_list_cdr, 		NULL);
-    toy_add_method(interp, L"List", L"next", 		mth_list_cdr, 		NULL);
-    toy_add_method(interp, L"List", L"append!", 	mth_list_append, 	L"val");
-    toy_add_method(interp, L"List", L"add", 		mth_list_add, 		L"val");
-    toy_add_method(interp, L"List", L"each", 		mth_list_each, 		L"do:,body");
-    toy_add_method(interp, L"List", L"len", 		mth_list_len, 		NULL);
-    toy_add_method(interp, L"List", L"null?", 		mth_list_isnull, 	NULL);
-    toy_add_method(interp, L"List", L"join", 		mth_list_join, 		L"sep:,val");
-    toy_add_method(interp, L"List", L"eval", 		mth_list_eval, 		NULL);
-    toy_add_method(interp, L"List", L".", 		mth_list_new_append, 	L"val");
-    toy_add_method(interp, L"List", L"get", 		mth_list_get, 		L"val");
-    toy_add_method(interp, L"List", L"filter", 		mth_list_filter, 	L"body");
-    toy_add_method(interp, L"List", L"map", 		mth_list_map, 		L"body");
-    toy_add_method(interp, L"List", L"concat", 		mth_list_concat, 	L"body");
-    toy_add_method(interp, L"List", L"concat!",		mth_list_concat_se, 	L"body");
-    toy_add_method(interp, L"List", L"seek", 		mth_list_seek, 		L"val");
-    toy_add_method(interp, L"List", L"split", 		mth_list_split, 	L"val");
-    toy_add_method(interp, L"List", L"<<", 		mth_list_unshift, 	L"val");
-    toy_add_method(interp, L"List", L">>", 		mth_list_shift, 	NULL);
-    toy_add_method(interp, L"List", L"<<-", 		mth_list_push, 		L"val");
-    toy_add_method(interp, L"List", L"->>", 		mth_list_pop, 		NULL);
-    toy_add_method(interp, L"List", L"inject", 		mth_list_inject, 	L"val,do:,body");
-    toy_add_method(interp, L"List", L"set-car!", 	mth_list_setcar, 	L"val");
-    toy_add_method(interp, L"List", L"set-cdr!", 	mth_list_setcdr, 	L"val");
-    toy_add_method(interp, L"List", L"create-block", 	mth_list_block, 	NULL);
+    toy_add_method(interp, L"List", L"last",            mth_list_last,          NULL);
+    toy_add_method(interp, L"List", L"item",            mth_list_item,          NULL);
+    toy_add_method(interp, L"List", L"car",             mth_list_item,          NULL);
+    toy_add_method(interp, L"List", L"cdr",             mth_list_cdr,           NULL);
+    toy_add_method(interp, L"List", L"next",            mth_list_cdr,           NULL);
+    toy_add_method(interp, L"List", L"append!",         mth_list_append,        L"val");
+    toy_add_method(interp, L"List", L"add",             mth_list_add,           L"val");
+    toy_add_method(interp, L"List", L"each",            mth_list_each,          L"do:,body");
+    toy_add_method(interp, L"List", L"len",             mth_list_len,           NULL);
+    toy_add_method(interp, L"List", L"null?",           mth_list_isnull,        NULL);
+    toy_add_method(interp, L"List", L"join",            mth_list_join,          L"sep:,val");
+    toy_add_method(interp, L"List", L"eval",            mth_list_eval,          NULL);
+    toy_add_method(interp, L"List", L".",               mth_list_new_append,    L"val");
+    toy_add_method(interp, L"List", L"get",             mth_list_get,           L"val");
+    toy_add_method(interp, L"List", L"filter",          mth_list_filter,        L"body");
+    toy_add_method(interp, L"List", L"map",             mth_list_map,           L"body");
+    toy_add_method(interp, L"List", L"concat",          mth_list_concat,        L"body");
+    toy_add_method(interp, L"List", L"concat!",         mth_list_concat_se,     L"body");
+    toy_add_method(interp, L"List", L"seek",            mth_list_seek,          L"val");
+    toy_add_method(interp, L"List", L"split",           mth_list_split,         L"val");
+    toy_add_method(interp, L"List", L"<<",              mth_list_unshift,       L"val");
+    toy_add_method(interp, L"List", L">>",              mth_list_shift,         NULL);
+    toy_add_method(interp, L"List", L"<<-",             mth_list_push,          L"val");
+    toy_add_method(interp, L"List", L"->>",             mth_list_pop,           NULL);
+    toy_add_method(interp, L"List", L"inject",          mth_list_inject,        L"val,do:,body");
+    toy_add_method(interp, L"List", L"set-car!",        mth_list_setcar,        L"val");
+    toy_add_method(interp, L"List", L"set-cdr!",        mth_list_setcdr,        L"val");
+    toy_add_method(interp, L"List", L"create-block",    mth_list_block,         NULL);
 
-    toy_add_method(interp, L"String", L"len", 		mth_string_len, 	NULL);
-    toy_add_method(interp, L"String", L"=", 		mth_string_equal, 	L"val");
-    toy_add_method(interp, L"String", L"!=", 		mth_string_nequal, 	L"val");
-    toy_add_method(interp, L"String", L"eval", 		mth_string_eval, 	NULL);
-    toy_add_method(interp, L"String", L"append!", 	mth_string_append, 	L"val");
-    toy_add_method(interp, L"String", L".", 		mth_string_concat, 	L"val");
-    toy_add_method(interp, L"String", L"=~", 		mth_string_match, 	L"reg-exp");
-    toy_add_method(interp, L"String", L"sub", 		mth_string_sub, 	L"val,val");
-    toy_add_method(interp, L"String", L">", 		mth_string_gt, 		L"val");
-    toy_add_method(interp, L"String", L"<", 		mth_string_lt, 		L"val");
-    toy_add_method(interp, L"String", L">=", 		mth_string_ge, 		L"val");
-    toy_add_method(interp, L"String", L"<=", 		mth_string_le, 		L"val");
-    toy_add_method(interp, L"String", L"split", 	mth_string_split, 	L"sep:,val");
-    toy_add_method(interp, L"String", L"int", 		mth_string_toint, 	NULL);
-    toy_add_method(interp, L"String", L"real", 		mth_string_toreal, 	NULL);
-    toy_add_method(interp, L"String", L"number", 	mth_string_tonumber, 	NULL);
-    toy_add_method(interp, L"String", L"rquote", 	mth_string_torquote, 	NULL);
-    toy_add_method(interp, L"String", L"fmt", 		mth_string_format, 	L"val-list");
-    toy_add_method(interp, L"String", L"clean", 	mth_string_clean, 	NULL);
-    toy_add_method(interp, L"String", L"upper", 	mth_string_upper, 	NULL);
-    toy_add_method(interp, L"String", L"lower", 	mth_string_lower, 	NULL);
-    toy_add_method(interp, L"String", L"uexport", 	mth_string_uexport, 	NULL);
-    toy_add_method(interp, L"String", L"uimport!", 	mth_string_uimport, 	L"val-list");
-    toy_add_method(interp, L"String", L"at", 		mth_string_at, 		L"val");
-    toy_add_method(interp, L"String", L"get", 		mth_string_get,		L"val");
-    toy_add_method(interp, L"String", L"alphabetic?",	mth_string_isalpha,	NULL);
-    toy_add_method(interp, L"String", L"numeric?",	mth_string_isnum,	NULL);
-    toy_add_method(interp, L"String", L"alphanumeric?",	mth_string_isalnum,	NULL);
-    toy_add_method(interp, L"String", L"display-width",	mth_string_display_width,NULL);
-    toy_add_method(interp, L"String", L"udecode",	mth_string_udecode,     L"encoding");
-    toy_add_method(interp, L"String", L"uencode",	mth_string_uencode,     L"encoding");
-    toy_add_method(interp, L"String", L"int-base",	mth_string_intbase, 	L"base");
-    toy_add_method(interp, L"String", L"truncate!",	mth_string_truncate, 	L"size");
+    toy_add_method(interp, L"String", L"len",           mth_string_len,         NULL);
+    toy_add_method(interp, L"String", L"=",             mth_string_equal,       L"val");
+    toy_add_method(interp, L"String", L"!=",            mth_string_nequal,      L"val");
+    toy_add_method(interp, L"String", L"eval",          mth_string_eval,        NULL);
+    toy_add_method(interp, L"String", L"append!",       mth_string_append,      L"val");
+    toy_add_method(interp, L"String", L".",             mth_string_concat,      L"val");
+    toy_add_method(interp, L"String", L"=~",            mth_string_match,       L"reg-exp");
+    toy_add_method(interp, L"String", L"sub",           mth_string_sub,         L"val,val");
+    toy_add_method(interp, L"String", L">",             mth_string_gt,          L"val");
+    toy_add_method(interp, L"String", L"<",             mth_string_lt,          L"val");
+    toy_add_method(interp, L"String", L">=",            mth_string_ge,          L"val");
+    toy_add_method(interp, L"String", L"<=",            mth_string_le,          L"val");
+    toy_add_method(interp, L"String", L"split",         mth_string_split,       L"sep:,val");
+    toy_add_method(interp, L"String", L"int",           mth_string_toint,       NULL);
+    toy_add_method(interp, L"String", L"real",          mth_string_toreal,      NULL);
+    toy_add_method(interp, L"String", L"number",        mth_string_tonumber,    NULL);
+    toy_add_method(interp, L"String", L"rquote",        mth_string_torquote,    NULL);
+    toy_add_method(interp, L"String", L"fmt",           mth_string_format,      L"val-list");
+    toy_add_method(interp, L"String", L"clean",         mth_string_clean,       NULL);
+    toy_add_method(interp, L"String", L"upper",         mth_string_upper,       NULL);
+    toy_add_method(interp, L"String", L"lower",         mth_string_lower,       NULL);
+    toy_add_method(interp, L"String", L"uexport",       mth_string_uexport,     NULL);
+    toy_add_method(interp, L"String", L"uimport!",      mth_string_uimport,     L"val-list");
+    toy_add_method(interp, L"String", L"at",            mth_string_at,          L"val");
+    toy_add_method(interp, L"String", L"get",           mth_string_get,         L"val");
+    toy_add_method(interp, L"String", L"alphabetic?",   mth_string_isalpha,     NULL);
+    toy_add_method(interp, L"String", L"numeric?",      mth_string_isnum,       NULL);
+    toy_add_method(interp, L"String", L"alphanumeric?", mth_string_isalnum,     NULL);
+    toy_add_method(interp, L"String", L"display-width", mth_string_display_width,NULL);
+    toy_add_method(interp, L"String", L"udecode",       mth_string_udecode,     L"encoding");
+    toy_add_method(interp, L"String", L"uencode",       mth_string_uencode,     L"encoding");
+    toy_add_method(interp, L"String", L"int-base",      mth_string_intbase,     L"base");
+    toy_add_method(interp, L"String", L"truncate!",     mth_string_truncate,    L"size");
 
-    toy_add_method(interp, L"File", L"init", 		mth_file_init, 		L"mode:,mode,file-path");
-    toy_add_method(interp, L"File", L"open", 		mth_file_open, 		L"mode:,mode,file-path");
-    toy_add_method(interp, L"File", L"close", 		mth_file_close, 	NULL);
-    toy_add_method(interp, L"File", L"gets", 		mth_file_gets, 		L":nonewline,:nocontrol");
-    toy_add_method(interp, L"File", L"puts", 		mth_file_puts, 		L":nonewline,val-list");
-    toy_add_method(interp, L"File", L"flush", 		mth_file_flush, 	NULL);
-    toy_add_method(interp, L"File", L"stat", 		mth_file_stat, 		NULL);
-    toy_add_method(interp, L"File", L"set-newline", 	mth_file_setnewline, 	L"val");
-    toy_add_method(interp, L"File", L"set-ignore-cr", 	mth_file_setignorecr, 	L"val");
-    toy_add_method(interp, L"File", L"eof?", 		mth_file_iseof, 	NULL);
-    toy_add_method(interp, L"File", L"fd?", 		mth_file_getfd, 	NULL);
-    toy_add_method(interp, L"File", L"set!", 		mth_file_set, 		L"val");
-    toy_add_method(interp, L"File", L"ready?", 		mth_file_isready, 	NULL);
-    toy_add_method(interp, L"File", L"clear", 		mth_file_clear, 	NULL);
-    toy_add_method(interp, L"File", L"set-nobuffer", 	mth_file_setnobuffer, 	NULL);
-    toy_add_method(interp, L"File", L"set-noblock", 	mth_file_setnoblock, 	L"val");
-    toy_add_method(interp, L"File", L"set-encoding", 	mth_file_setencoding, 	L"val");
-    toy_add_method(interp, L"File", L"set-input-encoding", 	mth_file_setinputencoding,	L"val");
-    toy_add_method(interp, L"File", L"set-output-encoding", 	mth_file_setoutputencoding,	L"val");
-    toy_add_method(interp, L"File", L"set-readbuffer-max", 	mth_file_setreadbuffer_max,	L"val");
-    toy_add_method(interp, L"File", L"set-tag", 	mth_file_settag,	L"val");
-    toy_add_method(interp, L"File", L"get-tag", 	mth_file_gettag,	NULL);
-    toy_add_method(interp, L"File", L"set-rawio", 	mth_file_setrawio,	L"val");
-    toy_add_method(interp, L"File", L"seek", 		mth_file_seek,		L"whence,val");
-    toy_add_method(interp, L"File", L"getb", 		mth_file_getb,		L"val");
-    toy_add_method(interp, L"File", L"putb", 		mth_file_putb,		L"val");
+    toy_add_method(interp, L"File", L"init",            mth_file_init,          L"mode:,mode,file-path");
+    toy_add_method(interp, L"File", L"open",            mth_file_open,          L"mode:,mode,file-path");
+    toy_add_method(interp, L"File", L"close",           mth_file_close,         NULL);
+    toy_add_method(interp, L"File", L"gets",            mth_file_gets,          L":nonewline,:nocontrol");
+    toy_add_method(interp, L"File", L"puts",            mth_file_puts,          L":nonewline,val-list");
+    toy_add_method(interp, L"File", L"flush",           mth_file_flush,         NULL);
+    toy_add_method(interp, L"File", L"stat",            mth_file_stat,          NULL);
+    toy_add_method(interp, L"File", L"set-newline",     mth_file_setnewline,    L"val");
+    toy_add_method(interp, L"File", L"set-ignore-cr",   mth_file_setignorecr,   L"val");
+    toy_add_method(interp, L"File", L"eof?",            mth_file_iseof,         NULL);
+    toy_add_method(interp, L"File", L"fd?",             mth_file_getfd,         NULL);
+    toy_add_method(interp, L"File", L"set!",            mth_file_set,           L"val");
+    toy_add_method(interp, L"File", L"ready?",          mth_file_isready,       NULL);
+    toy_add_method(interp, L"File", L"clear",           mth_file_clear,         NULL);
+    toy_add_method(interp, L"File", L"set-nobuffer",    mth_file_setnobuffer,   NULL);
+    toy_add_method(interp, L"File", L"set-noblock",     mth_file_setnoblock,    L"val");
+    toy_add_method(interp, L"File", L"set-encoding",    mth_file_setencoding,   L"val");
+    toy_add_method(interp, L"File", L"set-input-encoding",      mth_file_setinputencoding,      L"val");
+    toy_add_method(interp, L"File", L"set-output-encoding",     mth_file_setoutputencoding,     L"val");
+    toy_add_method(interp, L"File", L"set-readbuffer-max",      mth_file_setreadbuffer_max,     L"val");
+    toy_add_method(interp, L"File", L"set-tag",         mth_file_settag,        L"val");
+    toy_add_method(interp, L"File", L"get-tag",         mth_file_gettag,        NULL);
+    toy_add_method(interp, L"File", L"set-rawio",       mth_file_setrawio,      L"val");
+    toy_add_method(interp, L"File", L"seek",            mth_file_seek,          L"whence,val");
+    toy_add_method(interp, L"File", L"getb",            mth_file_getb,          L"val");
+    toy_add_method(interp, L"File", L"putb",            mth_file_putb,          L"val");
 
-    toy_add_method(interp, L"Block", L"eval", 		mth_block_eval, 	NULL);
+    toy_add_method(interp, L"Block", L"eval",           mth_block_eval,         NULL);
 
-    toy_add_method(interp, L"Dict", L"set", 		mth_dict_set, 		L"var,val");
-    toy_add_method(interp, L"Dict", L"get", 		mth_dict_get, 		L"var");
-    toy_add_method(interp, L"Dict", L"set?", 		mth_dict_isset, 	L"val");
-    toy_add_method(interp, L"Dict", L"len", 		mth_dict_len, 		NULL);
-    toy_add_method(interp, L"Dict", L"stat",		mth_dict_stat, 		NULL);
-    toy_add_method(interp, L"Dict", L"unset", 		mth_dict_unset, 	L"val");
-    toy_add_method(interp, L"Dict", L"keys", 		mth_dict_keys, 		NULL);
-    toy_add_method(interp, L"Dict", L"pairs", 		mth_dict_pairs, 	NULL);
+    toy_add_method(interp, L"Dict", L"set",             mth_dict_set,           L"var,val");
+    toy_add_method(interp, L"Dict", L"get",             mth_dict_get,           L"var");
+    toy_add_method(interp, L"Dict", L"set?",            mth_dict_isset,         L"val");
+    toy_add_method(interp, L"Dict", L"len",             mth_dict_len,           NULL);
+    toy_add_method(interp, L"Dict", L"stat",            mth_dict_stat,          NULL);
+    toy_add_method(interp, L"Dict", L"unset",           mth_dict_unset,         L"val");
+    toy_add_method(interp, L"Dict", L"keys",            mth_dict_keys,          NULL);
+    toy_add_method(interp, L"Dict", L"pairs",           mth_dict_pairs,         NULL);
 
-    toy_add_method(interp, L"Vector", L"append!", 	mth_vector_append, 	L"val");
-    toy_add_method(interp, L"Vector", L"set", 		mth_vector_set, 	L"val,val");
-    toy_add_method(interp, L"Vector", L"get", 		mth_vector_get, 	L"val,val");
-    toy_add_method(interp, L"Vector", L"len", 		mth_vector_len, 	NULL);
-    toy_add_method(interp, L"Vector", L"last", 		mth_vector_last,	NULL);
-    toy_add_method(interp, L"Vector", L"list", 		mth_vector_list, 	NULL);
-    toy_add_method(interp, L"Vector", L"each", 		mth_vector_each, 	L"do:,body");
-    toy_add_method(interp, L"Vector", L"swap", 		mth_vector_swap, 	L"val,val");
-    toy_add_method(interp, L"Vector", L"resize",	mth_vector_resize, 	L"val");
-    toy_add_method(interp, L"Vector", L"insert!",	mth_vector_insert, 	L"val,val");
-    toy_add_method(interp, L"Vector", L"delete!",	mth_vector_delete, 	L"val");
+    toy_add_method(interp, L"Vector", L"append!",       mth_vector_append,      L"val");
+    toy_add_method(interp, L"Vector", L"set",           mth_vector_set,         L"val,val");
+    toy_add_method(interp, L"Vector", L"get",           mth_vector_get,         L"val,val");
+    toy_add_method(interp, L"Vector", L"len",           mth_vector_len,         NULL);
+    toy_add_method(interp, L"Vector", L"last",          mth_vector_last,        NULL);
+    toy_add_method(interp, L"Vector", L"list",          mth_vector_list,        NULL);
+    toy_add_method(interp, L"Vector", L"each",          mth_vector_each,        L"do:,body");
+    toy_add_method(interp, L"Vector", L"swap",          mth_vector_swap,        L"val,val");
+    toy_add_method(interp, L"Vector", L"resize",        mth_vector_resize,      L"val");
+    toy_add_method(interp, L"Vector", L"insert!",       mth_vector_insert,      L"val,val");
+    toy_add_method(interp, L"Vector", L"delete!",       mth_vector_delete,      L"val");
 
-    toy_add_method(interp, L"Coro", L"next", 		mth_coro_next, 		NULL);
-    toy_add_method(interp, L"Coro", L"release", 	mth_coro_release, 	NULL);
-    toy_add_method(interp, L"Coro", L"stat", 		mth_coro_stat, 		NULL);
-    toy_add_method(interp, L"Coro", L"eval", 		mth_coro_eval, 		L"body");
-    toy_add_method(interp, L"Coro", L"get-stacktrace",	mth_coro_get_stacktrace,NULL);
+    toy_add_method(interp, L"Coro", L"next",            mth_coro_next,          NULL);
+    toy_add_method(interp, L"Coro", L"release",         mth_coro_release,       NULL);
+    toy_add_method(interp, L"Coro", L"stat",            mth_coro_stat,          NULL);
+    toy_add_method(interp, L"Coro", L"eval",            mth_coro_eval,          L"body");
+    toy_add_method(interp, L"Coro", L"get-stacktrace",  mth_coro_get_stacktrace,NULL);
 
-    toy_add_method(interp, L"Bulk", L"append", 		mth_bulk_append,	L"val");
-    toy_add_method(interp, L"Bulk", L"get", 		mth_bulk_get,		NULL);
-    toy_add_method(interp, L"Bulk", L"set", 		mth_bulk_set,		L"val");
-    toy_add_method(interp, L"Bulk", L"seek", 		mth_bulk_seek,		L"val");
-    toy_add_method(interp, L"Bulk", L"position",	mth_bulk_position,	NULL);
-    toy_add_method(interp, L"Bulk", L"len", 		mth_bulk_len,		NULL);
-    toy_add_method(interp, L"Bulk", L"capacity", 	mth_bulk_capacity,	NULL);
-    toy_add_method(interp, L"Bulk", L"truncate", 	mth_bulk_truncate,	L"val");
-    toy_add_method(interp, L"Bulk", L"read", 		mth_bulk_read,		L"val");
-    toy_add_method(interp, L"Bulk", L"write", 		mth_bulk_write,		L"val");
-    toy_add_method(interp, L"Bulk", L"base64encode",	mth_bulk_base64encode,	L"body");
-    toy_add_method(interp, L"Bulk", L"base64decode",	mth_bulk_base64decode,	L"body");
+    toy_add_method(interp, L"Bulk", L"append",          mth_bulk_append,        L"val");
+    toy_add_method(interp, L"Bulk", L"get",             mth_bulk_get,           NULL);
+    toy_add_method(interp, L"Bulk", L"set",             mth_bulk_set,           L"val");
+    toy_add_method(interp, L"Bulk", L"seek",            mth_bulk_seek,          L"val");
+    toy_add_method(interp, L"Bulk", L"position",        mth_bulk_position,      NULL);
+    toy_add_method(interp, L"Bulk", L"len",             mth_bulk_len,           NULL);
+    toy_add_method(interp, L"Bulk", L"capacity",        mth_bulk_capacity,      NULL);
+    toy_add_method(interp, L"Bulk", L"truncate",        mth_bulk_truncate,      L"val");
+    toy_add_method(interp, L"Bulk", L"read",            mth_bulk_read,          L"val");
+    toy_add_method(interp, L"Bulk", L"write",           mth_bulk_write,         L"val");
+    toy_add_method(interp, L"Bulk", L"base64encode",    mth_bulk_base64encode,  L"body");
+    toy_add_method(interp, L"Bulk", L"base64decode",    mth_bulk_base64decode,  L"body");
 
-    toy_add_method(interp, L"Container", L"desc",	mth_container_desc,	NULL);
+    toy_add_method(interp, L"Container", L"desc",       mth_container_desc,     NULL);
 
-    toy_add_method(interp, L"Intr", L"get",     	mth_intr_get,   	NULL);
+    toy_add_method(interp, L"Intr", L"get",             mth_intr_get,           NULL);
 
     return 0;
 }

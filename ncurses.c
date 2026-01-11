@@ -23,7 +23,7 @@
 Toy_Type*
 func_curses_init(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     WINDOW *wmain;
-	
+        
     if (hash_get_length(nameargs) > 0) goto error;
     if (arglen > 0) goto error;
 
@@ -210,7 +210,7 @@ func_curses_getscreensize(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs,
     container = list_get_item(posargs);
     if (GET_TAG(container) != CONTAINER) goto error;
     if (wcscmp(cell_get_addr(container->u.container.desc), L"CURSES") != 0) {
-	return new_exception(TE_CURSES, L"Curses error at 'curs-get-screen-size', Bad descriptor.", interp);
+        return new_exception(TE_CURSES, L"Curses error at 'curs-get-screen-size', Bad descriptor.", interp);
     }
     w = container->u.container.data;
 
@@ -251,7 +251,7 @@ func_curses_createwindow(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, 
     container = list_get_item(posargs);
     if (GET_TAG(container) != CONTAINER) goto error;
     if (wcscmp(cell_get_addr(container->u.container.desc), L"CURSES") != 0) {
-	return new_exception(TE_CURSES, L"Curses error at 'curs-create-window', Bad descriptor.", interp);
+        return new_exception(TE_CURSES, L"Curses error at 'curs-create-window', Bad descriptor.", interp);
     }
     w = container->u.container.data;
     posargs = list_next(posargs);
@@ -280,7 +280,7 @@ func_curses_createwindow(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, 
     if (-1 == px) px = 0;
     wsub = subwin(w, nline, ncol, y + py, x + px);
     if (NULL == wsub) {
-	return new_exception(TE_CURSES, L"Curses error at 'curs-create-window', May be bad parameter.", interp);
+        return new_exception(TE_CURSES, L"Curses error at 'curs-create-window', May be bad parameter.", interp);
     }
     notimeout(wsub, FALSE);
     intrflush(wsub, FALSE);
@@ -305,7 +305,7 @@ func_curses_newwindow(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int
     container = list_get_item(posargs);
     if (GET_TAG(container) != CONTAINER) goto error;
     if (wcscmp(cell_get_addr(container->u.container.desc), L"CURSES") != 0) {
-	return new_exception(TE_CURSES, L"Curses error at 'curs-new-window', Bad descriptor.", interp);
+        return new_exception(TE_CURSES, L"Curses error at 'curs-new-window', Bad descriptor.", interp);
     }
     w = container->u.container.data;
     posargs = list_next(posargs);
@@ -334,7 +334,7 @@ func_curses_newwindow(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int
     if (-1 == px) px = 0;
     wsub = newwin(nline, ncol, y + py, x + px);
     if (NULL == wsub) {
-	return new_exception(TE_CURSES, L"Curses error at 'curs-new-window', May be bad parameter.", interp);
+        return new_exception(TE_CURSES, L"Curses error at 'curs-new-window', May be bad parameter.", interp);
     }
     notimeout(wsub, FALSE);
     intrflush(wsub, FALSE);
@@ -360,7 +360,7 @@ func_curses_clear(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     container = list_get_item(posargs);
     if (GET_TAG(container) != CONTAINER) goto error;
     if (wcscmp(cell_get_addr(container->u.container.desc), L"CURSES") != 0) {
-	return new_exception(TE_CURSES, L"Curses error at 'curs-clear', Bad descriptor.", interp);
+        return new_exception(TE_CURSES, L"Curses error at 'curs-clear', Bad descriptor.", interp);
     }
     w = container->u.container.data;
     posargs = list_next(posargs);
@@ -398,7 +398,7 @@ func_curses_wipe(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     container = list_get_item(posargs);
     if (GET_TAG(container) != CONTAINER) goto error;
     if (wcscmp(cell_get_addr(container->u.container.desc), L"CURSES") != 0) {
-	return new_exception(TE_CURSES, L"Curses error at 'curs-clear', Bad descriptor.", interp);
+        return new_exception(TE_CURSES, L"Curses error at 'curs-clear', Bad descriptor.", interp);
     }
     w = container->u.container.data;
     posargs = list_next(posargs);
@@ -438,7 +438,7 @@ func_curses_print(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     container = list_get_item(posargs);
     if (GET_TAG(container) != CONTAINER) goto error;
     if (wcscmp(cell_get_addr(container->u.container.desc), L"CURSES") != 0) {
-	return new_exception(TE_CURSES, L"Curses error at 'curs-print', Bad descriptor.", interp);
+        return new_exception(TE_CURSES, L"Curses error at 'curs-print', Bad descriptor.", interp);
     }
     w = container->u.container.data;
     posargs = list_next(posargs);
@@ -452,21 +452,21 @@ func_curses_print(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     posargs = list_next(posargs);
     
     if (arglen == 5) {
-	arg = list_get_item(posargs);
-	if (GET_TAG(arg) != INTEGER) goto error;
-	y = mpz_get_si(arg->u.biginteger);
-	posargs = list_next(posargs);
+        arg = list_get_item(posargs);
+        if (GET_TAG(arg) != INTEGER) goto error;
+        y = mpz_get_si(arg->u.biginteger);
+        posargs = list_next(posargs);
 
-	arg = list_get_item(posargs);
-	if (GET_TAG(arg) != INTEGER) goto error;
-	x = mpz_get_si(arg->u.biginteger);
+        arg = list_get_item(posargs);
+        if (GET_TAG(arg) != INTEGER) goto error;
+        x = mpz_get_si(arg->u.biginteger);
 
-	wmove(w, y, x);
+        wmove(w, y, x);
     }
 
     iencoder = get_encoding_index(cell_get_addr(enc->u.string));
     if (-1 == iencoder) {
-	return new_exception(TE_BADENCODER, L"Bad encoder specified.", interp);
+        return new_exception(TE_BADENCODER, L"Bad encoder specified.", interp);
     }
     enc_error_info = GC_MALLOC(sizeof(encoder_error_info));
     ALLOC_SAFE(enc_error_info);
@@ -474,7 +474,7 @@ func_curses_print(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 
     c = encode_unicode_to_raw(message->u.string, iencoder, enc_error_info);
     if (NULL == c) {
-	return new_exception(TE_BADENCODEBYTE, enc_error_info->message, interp);
+        return new_exception(TE_BADENCODEBYTE, enc_error_info->message, interp);
     }
     wprintw(w, "%s", to_char(cell_get_addr(c)));
 
@@ -495,7 +495,7 @@ func_curses_refresh(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int a
     container = list_get_item(posargs);
     if (GET_TAG(container) != CONTAINER) goto error;
     if (wcscmp(cell_get_addr(container->u.container.desc), L"CURSES") != 0) {
-	return new_exception(TE_CURSES, L"Curses error at 'curs-refresh', Bad descriptor.", interp);
+        return new_exception(TE_CURSES, L"Curses error at 'curs-refresh', Bad descriptor.", interp);
     }
     w = container->u.container.data;
     posargs = list_next(posargs);
@@ -519,7 +519,7 @@ func_curses_color(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     container = list_get_item(posargs);
     if (GET_TAG(container) != CONTAINER) goto error;
     if (wcscmp(cell_get_addr(container->u.container.desc), L"CURSES") != 0) {
-	return new_exception(TE_CURSES, L"Curses error at 'curs-color', Bad descriptor.", interp);
+        return new_exception(TE_CURSES, L"Curses error at 'curs-color', Bad descriptor.", interp);
     }
     w = container->u.container.data;
     posargs = list_next(posargs);
@@ -551,7 +551,7 @@ func_curses_color(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 
 
     if ((x >= 0) && (y >= 0)) {
-	wmove(w, y, x);
+        wmove(w, y, x);
     }
     wchgat(w, len, attr, color, NULL);
 
@@ -641,14 +641,14 @@ func_curses_render_line(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, i
     encoder_error_info *enc_error_info;
     Cell *codep;
     Cell *result;
-	
+        
     if (hash_get_length(nameargs) > 0) goto error;
     if (arglen != 7) goto error;
 
     container = list_get_item(posargs);
     if (GET_TAG(container) != CONTAINER) goto error;
     if (wcscmp(cell_get_addr(container->u.container.desc), L"CURSES") != 0) {
-	return new_exception(TE_CURSES, L"Curses error at 'curs-render-line', Bad descriptor.", interp);
+        return new_exception(TE_CURSES, L"Curses error at 'curs-render-line', Bad descriptor.", interp);
     }
     w = container->u.container.data;
     posargs = list_next(posargs);
@@ -688,7 +688,7 @@ func_curses_render_line(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, i
     
     iencoder = get_encoding_index(cell_get_addr(encoding->u.string));
     if (-1 == iencoder) {
-	return new_exception(TE_BADENCODER, L"Bad encoder specified.", interp);
+        return new_exception(TE_BADENCODER, L"Bad encoder specified.", interp);
     }
     
     slen = cell_get_length(disp_string->u.string);
@@ -698,28 +698,28 @@ func_curses_render_line(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, i
     ALLOC_SAFE(enc_error_info);
     p = cell_get_addr(disp_string->u.string);
     for (i=0; i<slen; i++) {
-	if ((p[i] < 0x20) || (p[i] == 0x7f)) {
-	    /* control character encoding */
-	    if (p[i] != 0x7f) {
-		cp = control_character_font[p[i]];
-		rendaring_data[i].display_width = 1;
-	    } else {
-		cp = control_character_font[32];
-		rendaring_data[i].display_width = 1;
-	    }
-	    codep = new_cell(NULL);
-	    cell_add_char(codep, cp[0]);
-	    result = encode_unicode_to_raw(codep, iencoder, enc_error_info);
-	    if (NULL == result) {
-		return new_exception(TE_BADENCODEBYTE, enc_error_info->message, interp);
-	    }
-	    rendaring_data[i].display_char = cell_get_addr(result);
-	} else if (p[i] < 0x7f) {
-	    /* ASCII character encoding */
-	    codep = new_cell(NULL);
-	    cell_add_char(codep, p[i]);
-	    rendaring_data[i].display_char = cell_get_addr(codep);
-	    rendaring_data[i].display_width = 1;
+        if ((p[i] < 0x20) || (p[i] == 0x7f)) {
+            /* control character encoding */
+            if (p[i] != 0x7f) {
+                cp = control_character_font[p[i]];
+                rendaring_data[i].display_width = 1;
+            } else {
+                cp = control_character_font[32];
+                rendaring_data[i].display_width = 1;
+            }
+            codep = new_cell(NULL);
+            cell_add_char(codep, cp[0]);
+            result = encode_unicode_to_raw(codep, iencoder, enc_error_info);
+            if (NULL == result) {
+                return new_exception(TE_BADENCODEBYTE, enc_error_info->message, interp);
+            }
+            rendaring_data[i].display_char = cell_get_addr(result);
+        } else if (p[i] < 0x7f) {
+            /* ASCII character encoding */
+            codep = new_cell(NULL);
+            cell_add_char(codep, p[i]);
+            rendaring_data[i].display_char = cell_get_addr(codep);
+            rendaring_data[i].display_width = 1;
         } else {
             int w;
             w = (int)fcl_get_width((wchar_t)p[i]);
@@ -765,21 +765,21 @@ func_curses_render_line(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, i
 
     rendaring_data[0].display_position = 0;
     for (i=1; i<slen; i++) {
-	if (p[i-1] == 0x09) {
-	    rendaring_data[i].display_position = 
-		((rendaring_data[i-1].display_position + tab_width) / tab_width) * tab_width;
-	} else {
-	    rendaring_data[i].display_position = 
-		rendaring_data[i-1].display_position + rendaring_data[i-1].display_width;
-	}
+        if (p[i-1] == 0x09) {
+            rendaring_data[i].display_position = 
+                ((rendaring_data[i-1].display_position + tab_width) / tab_width) * tab_width;
+        } else {
+            rendaring_data[i].display_position = 
+                rendaring_data[i-1].display_position + rendaring_data[i-1].display_width;
+        }
     }
     win_size_x -= offset_x;
     for (i=0; i<slen; i++) {
-	if (((rendaring_data[i].display_position - view_x) >= 0) &&
-	    ((rendaring_data[i].display_position - view_x + rendaring_data[i].display_width) <= (win_size_x))) {
-	    wmove(w, window_y, rendaring_data[i].display_position - view_x + offset_x);
-	    wprintw(w, "%s", to_char(rendaring_data[i].display_char));
-	}
+        if (((rendaring_data[i].display_position - view_x) >= 0) &&
+            ((rendaring_data[i].display_position - view_x + rendaring_data[i].display_width) <= (win_size_x))) {
+            wmove(w, window_y, rendaring_data[i].display_position - view_x + offset_x);
+            wprintw(w, "%s", to_char(rendaring_data[i].display_char));
+        }
     }
     
     return const_T;
@@ -799,7 +799,7 @@ func_curses_box(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argle
     container = list_get_item(posargs);
     if (GET_TAG(container) != CONTAINER) goto error;
     if (wcscmp(cell_get_addr(container->u.container.desc), L"CURSES") != 0) {
-	return new_exception(TE_CURSES, L"Curses error at 'curs-box', Bad descriptor.", interp);
+        return new_exception(TE_CURSES, L"Curses error at 'curs-box', Bad descriptor.", interp);
     }
     w = container->u.container.data;
 
@@ -824,7 +824,7 @@ func_curses_setcolor(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int 
     container = list_get_item(posargs);
     if (GET_TAG(container) != CONTAINER) goto error;
     if (wcscmp(cell_get_addr(container->u.container.desc), L"CURSES") != 0) {
-	return new_exception(TE_CURSES, L"Curses error at 'curs-set-color', Bad descriptor.", interp);
+        return new_exception(TE_CURSES, L"Curses error at 'curs-set-color', Bad descriptor.", interp);
     }
     w = container->u.container.data;
     posargs = list_next(posargs);
@@ -855,7 +855,7 @@ func_curses_setbgcolor(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, in
     container = list_get_item(posargs);
     if (GET_TAG(container) != CONTAINER) goto error;
     if (wcscmp(cell_get_addr(container->u.container.desc), L"CURSES") != 0) {
-	return new_exception(TE_CURSES, L"Curses error at 'curs-set-bgcolor', Bad descriptor.", interp);
+        return new_exception(TE_CURSES, L"Curses error at 'curs-set-bgcolor', Bad descriptor.", interp);
     }
     w = container->u.container.data;
     posargs = list_next(posargs);
@@ -896,7 +896,7 @@ func_curses_setoverlay(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, in
     ocontainer = list_get_item(posargs);
     if (GET_TAG(ocontainer) != CONTAINER) goto error;
     if (wcscmp(cell_get_addr(ocontainer->u.container.desc), L"CURSES") != 0) {
-	return new_exception(TE_CURSES, L"Curses error at 'curs-set-overlay', Bad descriptor.", interp);
+        return new_exception(TE_CURSES, L"Curses error at 'curs-set-overlay', Bad descriptor.", interp);
     }
     ow = ocontainer->u.container.data;
     posargs = list_next(posargs);
@@ -904,7 +904,7 @@ func_curses_setoverlay(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, in
     dcontainer = list_get_item(posargs);
     if (GET_TAG(dcontainer) != CONTAINER) goto error;
     if (wcscmp(cell_get_addr(dcontainer->u.container.desc), L"CURSES") != 0) {
-	return new_exception(TE_CURSES, L"Curses error at 'curs-set-overlay', Bad descriptor.", interp);
+        return new_exception(TE_CURSES, L"Curses error at 'curs-set-overlay', Bad descriptor.", interp);
     }
     dw = dcontainer->u.container.data;
     posargs = list_next(posargs);
@@ -929,7 +929,7 @@ func_curses_destroywindow(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs,
     container = list_get_item(posargs);
     if (GET_TAG(container) != CONTAINER) goto error;
     if (wcscmp(cell_get_addr(container->u.container.desc), L"CURSES") != 0) {
-	return new_exception(TE_CURSES, L"Curses error at 'curs-destroy-window', Bad descriptor.", interp);
+        return new_exception(TE_CURSES, L"Curses error at 'curs-destroy-window', Bad descriptor.", interp);
     }
     w = container->u.container.data;
     posargs = list_next(posargs);
@@ -957,7 +957,7 @@ func_curses_move(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int argl
     container = list_get_item(posargs);
     if (GET_TAG(container) != CONTAINER) goto error;
     if (wcscmp(cell_get_addr(container->u.container.desc), L"CURSES") != 0) {
-	return new_exception(TE_CURSES, L"Curses error at 'curs-move', Bad descriptor.", interp);
+        return new_exception(TE_CURSES, L"Curses error at 'curs-move', Bad descriptor.", interp);
     }
     w = container->u.container.data;
     posargs = list_next(posargs);
@@ -993,7 +993,7 @@ func_curses_get_cursor(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, in
     container = list_get_item(posargs);
     if (GET_TAG(container) != CONTAINER) goto error;
     if (wcscmp(cell_get_addr(container->u.container.desc), L"CURSES") != 0) {
-	return new_exception(TE_CURSES, L"Curses error at 'curs-move', Bad descriptor.", interp);
+        return new_exception(TE_CURSES, L"Curses error at 'curs-move', Bad descriptor.", interp);
     }
     w = container->u.container.data;
 
@@ -1031,7 +1031,7 @@ func_curses_add_color(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int
     bg = mpz_get_si(arg->u.biginteger);
     posargs = list_next(posargs);
 
-    init_pair(pair, fg,	bg);
+    init_pair(pair, fg, bg);
 
     return const_T;
 
@@ -1047,53 +1047,53 @@ key_conv(int in) {
 
     if (ctrlkey_defs[0] == NULL) {
         /* initialize at onece */
-	ctrlkey_defs[0]  = new_symbol(L"CTRL_SP");
-	ctrlkey_defs[1]  = new_symbol(L"CTRL_A");
-	ctrlkey_defs[2]  = new_symbol(L"CTRL_B");
-	ctrlkey_defs[3]  = new_symbol(L"CTRL_C");
-	ctrlkey_defs[4]  = new_symbol(L"CTRL_D");
-	ctrlkey_defs[5]  = new_symbol(L"CTRL_E");
-	ctrlkey_defs[6]  = new_symbol(L"CTRL_F");
-	ctrlkey_defs[7]  = new_symbol(L"CTRL_G");
-	ctrlkey_defs[8]  = new_symbol(L"CTRL_H");
-	ctrlkey_defs[9]  = new_symbol(L"CTRL_I");
-	ctrlkey_defs[10] = new_symbol(L"CTRL_J");
-	ctrlkey_defs[11] = new_symbol(L"CTRL_K");
-	ctrlkey_defs[12] = new_symbol(L"CTRL_L");
-	ctrlkey_defs[13] = new_symbol(L"CTRL_M");
-	ctrlkey_defs[14] = new_symbol(L"CTRL_N");
-	ctrlkey_defs[15] = new_symbol(L"CTRL_O");
-	ctrlkey_defs[16] = new_symbol(L"CTRL_P");
-	ctrlkey_defs[17] = new_symbol(L"CTRL_Q");
-	ctrlkey_defs[18] = new_symbol(L"CTRL_R");
-	ctrlkey_defs[19] = new_symbol(L"CTRL_S");
-	ctrlkey_defs[20] = new_symbol(L"CTRL_T");
-	ctrlkey_defs[21] = new_symbol(L"CTRL_U");
-	ctrlkey_defs[22] = new_symbol(L"CTRL_V");
-	ctrlkey_defs[23] = new_symbol(L"CTRL_W");
-	ctrlkey_defs[24] = new_symbol(L"CTRL_X");
-	ctrlkey_defs[25] = new_symbol(L"CTRL_Y");
-	ctrlkey_defs[26] = new_symbol(L"CTRL_Z");
-	ctrlkey_defs[27] = new_symbol(L"KEY_ESC");
-	ctrlkey_defs[28] = new_symbol(L"KEY_FS");
-	ctrlkey_defs[29] = new_symbol(L"KEY_GS");
-	ctrlkey_defs[30] = new_symbol(L"KEY_RS");
-	ctrlkey_defs[31] = new_symbol(L"KEY_US");
-	ctrlkey_defs[32] = new_symbol(L"KEY_DEL");
+        ctrlkey_defs[0]  = new_symbol(L"CTRL_SP");
+        ctrlkey_defs[1]  = new_symbol(L"CTRL_A");
+        ctrlkey_defs[2]  = new_symbol(L"CTRL_B");
+        ctrlkey_defs[3]  = new_symbol(L"CTRL_C");
+        ctrlkey_defs[4]  = new_symbol(L"CTRL_D");
+        ctrlkey_defs[5]  = new_symbol(L"CTRL_E");
+        ctrlkey_defs[6]  = new_symbol(L"CTRL_F");
+        ctrlkey_defs[7]  = new_symbol(L"CTRL_G");
+        ctrlkey_defs[8]  = new_symbol(L"CTRL_H");
+        ctrlkey_defs[9]  = new_symbol(L"CTRL_I");
+        ctrlkey_defs[10] = new_symbol(L"CTRL_J");
+        ctrlkey_defs[11] = new_symbol(L"CTRL_K");
+        ctrlkey_defs[12] = new_symbol(L"CTRL_L");
+        ctrlkey_defs[13] = new_symbol(L"CTRL_M");
+        ctrlkey_defs[14] = new_symbol(L"CTRL_N");
+        ctrlkey_defs[15] = new_symbol(L"CTRL_O");
+        ctrlkey_defs[16] = new_symbol(L"CTRL_P");
+        ctrlkey_defs[17] = new_symbol(L"CTRL_Q");
+        ctrlkey_defs[18] = new_symbol(L"CTRL_R");
+        ctrlkey_defs[19] = new_symbol(L"CTRL_S");
+        ctrlkey_defs[20] = new_symbol(L"CTRL_T");
+        ctrlkey_defs[21] = new_symbol(L"CTRL_U");
+        ctrlkey_defs[22] = new_symbol(L"CTRL_V");
+        ctrlkey_defs[23] = new_symbol(L"CTRL_W");
+        ctrlkey_defs[24] = new_symbol(L"CTRL_X");
+        ctrlkey_defs[25] = new_symbol(L"CTRL_Y");
+        ctrlkey_defs[26] = new_symbol(L"CTRL_Z");
+        ctrlkey_defs[27] = new_symbol(L"KEY_ESC");
+        ctrlkey_defs[28] = new_symbol(L"KEY_FS");
+        ctrlkey_defs[29] = new_symbol(L"KEY_GS");
+        ctrlkey_defs[30] = new_symbol(L"KEY_RS");
+        ctrlkey_defs[31] = new_symbol(L"KEY_US");
+        ctrlkey_defs[32] = new_symbol(L"KEY_DEL");
     }
     
     if (in > 256) {
-	// detect function key input
-	if ((in >= KEY_F(0)) && (in <= KEY_F(63))) {
-	    swprintf(buff, 32, L"KEY_F%d", in - KEY_F(0));	    
-	} else {
-	    swprintf(buff, 32, L"%s", keyname(in));
-	}
-	return new_symbol(buff);
+        // detect function key input
+        if ((in >= KEY_F(0)) && (in <= KEY_F(63))) {
+            swprintf(buff, 32, L"KEY_F%d", in - KEY_F(0));          
+        } else {
+            swprintf(buff, 32, L"%s", keyname(in));
+        }
+        return new_symbol(buff);
     }
 
     if ((in >= 0) && (in < 0x20)) {
-	return ctrlkey_defs[in];
+        return ctrlkey_defs[in];
     }
     if (in == 0x7f) {
         return ctrlkey_defs[32];
@@ -1169,7 +1169,7 @@ func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     container = list_get_item(posargs);
     if (GET_TAG(container) != CONTAINER) goto error;
     if (wcscmp(cell_get_addr(container->u.container.desc), L"CURSES") != 0) {
-	return new_exception(TE_CURSES, L"Curses error at 'curs-keyin', Bad descriptor.", interp);
+        return new_exception(TE_CURSES, L"Curses error at 'curs-keyin', Bad descriptor.", interp);
     }
     w = container->u.container.data;
     posargs = list_next(posargs);
@@ -1185,7 +1185,7 @@ func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 
     iencoder = get_encoding_index(cell_get_addr(encoding->u.string));
     if (-1 == iencoder) {
-	return new_exception(TE_BADENCODER, L"Bad encoder specified.", interp);
+        return new_exception(TE_BADENCODER, L"Bad encoder specified.", interp);
     }
 
     enc_error_info = GC_MALLOC(sizeof(encoder_error_info));
@@ -1223,13 +1223,13 @@ func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
 
     cur_in = -1;
     if (pending_key != -1) {
-	in = pending_key;
-	pending_key = -1;
+        in = pending_key;
+        pending_key = -1;
     } else {
-	in = wgetch(w);
+        in = wgetch(w);
     }
     if (in == -1) {
-	goto valid_return;
+        goto valid_return;
     }
     cur_in = in;
     
@@ -1237,85 +1237,85 @@ func_curses_keyin(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arg
     // detect function character.
     //
     if (in >= 256 || in == 27) {
-	//
-	// KEY_RESIZE onece occured.
-	//
-	if (in == KEY_RESIZE) {
-	    wtimeout(w, 500);
-	    in = wgetch(w);
-	    while (in == KEY_RESIZE) {
-		in = wgetch(w);
-	    }
-	    if (in == -1) {
-		pending_key = -1;
-	    } else {
-		pending_key = in;
-	    }
-	    inlist = list_append(inlist, key_conv(KEY_RESIZE));
+        //
+        // KEY_RESIZE onece occured.
+        //
+        if (in == KEY_RESIZE) {
+            wtimeout(w, 500);
+            in = wgetch(w);
+            while (in == KEY_RESIZE) {
+                in = wgetch(w);
+            }
+            if (in == -1) {
+                pending_key = -1;
+            } else {
+                pending_key = in;
+            }
+            inlist = list_append(inlist, key_conv(KEY_RESIZE));
             cur_in = -1;
-	    
+            
             goto valid_return;
-	}
-	
-	// if function key, return to caller soon.
-	inlist = list_append(inlist, key_conv(in));
+        }
         
-	wtimeout(w, itimeout / 4);
-	in = wgetch(w);
-	while (in != ERR) {
-	    if (in >= 256) {
-		pending_key = in;
+        // if function key, return to caller soon.
+        inlist = list_append(inlist, key_conv(in));
+        
+        wtimeout(w, itimeout / 4);
+        in = wgetch(w);
+        while (in != ERR) {
+            if (in >= 256) {
+                pending_key = in;
                 goto valid_return;
-    	    }
-	    if (in < 0x20) {
-		pending_key = in;
-		break;
-	    }
-	    cell_add_char(incell, in);
-	    cur_in = in;
-	    in = wgetch(w);
-	}
-	if (cell_get_length(incell) > 0) {
-	    inlist = list_append(inlist, new_string_cell(incell));
-	}
+            }
+            if (in < 0x20) {
+                pending_key = in;
+                break;
+            }
+            cell_add_char(incell, in);
+            cur_in = in;
+            in = wgetch(w);
+        }
+        if (cell_get_length(incell) > 0) {
+            inlist = list_append(inlist, new_string_cell(incell));
+        }
         
         goto valid_return;
-	
+        
     } else {
-	//
-	// detect character input
-	//
-	if (((in >= 0) && (in < 0x20)) || (in == 0x7f)) {
-	    // detect control caracter, return to caller soon.
-	    inlist = list_append(inlist, key_conv(in));
-	    cur_in = in;
+        //
+        // detect character input
+        //
+        if (((in >= 0) && (in < 0x20)) || (in == 0x7f)) {
+            // detect control caracter, return to caller soon.
+            inlist = list_append(inlist, key_conv(in));
+            cur_in = in;
             goto valid_return;
-	}
-	
-	// assemble sequential character string.
-	cell_add_char(incell, in);
-	cur_in = in;
-	
-	// read remain character
-	wtimeout(w, itimeout / 4);
-	in = wgetch(w);
-	while (in != -1) {
-	    if (((in >= 0) && (in < 0x20)) || (in >= 256))  {
-		pending_key = in;
-		in = -1;
-		break;
-	    } {
-		cell_add_char(incell, in);
-	        cur_in = in;
-	    }
-	    in = wgetch(w);
-	}
-	// decode encoding
-	dstr = decode_raw_to_unicode(incell, iencoder, enc_error_info);
-	if (NULL == dstr) {
-	    return new_exception(TE_BADENCODEBYTE, enc_error_info->message, interp);
-	}
-	inlist = list_append(inlist, new_string_cell(dstr));
+        }
+        
+        // assemble sequential character string.
+        cell_add_char(incell, in);
+        cur_in = in;
+        
+        // read remain character
+        wtimeout(w, itimeout / 4);
+        in = wgetch(w);
+        while (in != -1) {
+            if (((in >= 0) && (in < 0x20)) || (in >= 256))  {
+                pending_key = in;
+                in = -1;
+                break;
+            } {
+                cell_add_char(incell, in);
+                cur_in = in;
+            }
+            in = wgetch(w);
+        }
+        // decode encoding
+        dstr = decode_raw_to_unicode(incell, iencoder, enc_error_info);
+        if (NULL == dstr) {
+            return new_exception(TE_BADENCODEBYTE, enc_error_info->message, interp);
+        }
+        inlist = list_append(inlist, new_string_cell(dstr));
     }
 
 valid_return:
@@ -1331,8 +1331,8 @@ valid_return:
         }
         no_input_count = 0;
     } else {
-	no_input_count ++;
-	if (no_input_count >= 5) {
+        no_input_count ++;
+        if (no_input_count >= 5) {
             time_on_repeat = 0.0;
             on_repeat = 0;
         } else if (on_repeat) {
@@ -1383,7 +1383,7 @@ func_curses_pos_to_index(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, 
 
     slen = cell_get_length(disp_string->u.string);
     if (slen <= 0) {
-	return new_integer_si(0);
+        return new_integer_si(0);
     }
     slen ++;
     rendaring_data = GC_MALLOC(sizeof(Render_Encode) * (slen+1));
@@ -1395,17 +1395,17 @@ func_curses_pos_to_index(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, 
     p[slen-1] = -1;
 
     for (i=0; i<slen; i++) {
-	if (p[i] == -1) {
-	    /* string last character (dummy data) */
-	    rendaring_data[i].display_width = 1;
-	}
-	else if ((p[i] < 0x20) || (p[i] == 0x7f)) {
-	    /* control character encoding */
-	    rendaring_data[i].display_width = 1;
-	}
-	else if (p[i] < 0x7f) {
-	    /* ASCII character encoding */
-	    rendaring_data[i].display_width = 1;
+        if (p[i] == -1) {
+            /* string last character (dummy data) */
+            rendaring_data[i].display_width = 1;
+        }
+        else if ((p[i] < 0x20) || (p[i] == 0x7f)) {
+            /* control character encoding */
+            rendaring_data[i].display_width = 1;
+        }
+        else if (p[i] < 0x7f) {
+            /* ASCII character encoding */
+            rendaring_data[i].display_width = 1;
         } else {
             int w;
             w = (int)fcl_get_width((wchar_t)p[i]);
@@ -1428,18 +1428,18 @@ func_curses_pos_to_index(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, 
 
     rendaring_data[0].display_position = 0;
     for (i=1; i<slen; i++) {
-	if (p[i-1] == 0x09) {
-	    rendaring_data[i].display_position = 
-		((rendaring_data[i-1].display_position + tab_width) / tab_width) * tab_width;
-	} else {
-	    rendaring_data[i].display_position = 
-		rendaring_data[i-1].display_position + rendaring_data[i-1].display_width;
-	}
+        if (p[i-1] == 0x09) {
+            rendaring_data[i].display_position = 
+                ((rendaring_data[i-1].display_position + tab_width) / tab_width) * tab_width;
+        } else {
+            rendaring_data[i].display_position = 
+                rendaring_data[i-1].display_position + rendaring_data[i-1].display_width;
+        }
     }
     for (i=slen-1; i>=0; i--) {
-	if (rendaring_data[i].display_position <= pos) {
-	    return new_integer_si(i);
-	}
+        if (rendaring_data[i].display_position <= pos) {
+            return new_integer_si(i);
+        }
     }
     return new_integer_si(0);
 
@@ -1478,7 +1478,7 @@ func_curses_index_to_pos(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, 
 
     slen = cell_get_length(disp_string->u.string);
     if (slen <= 0) {
-	return new_integer_si(0);
+        return new_integer_si(0);
     }
     slen ++;
     rendaring_data = GC_MALLOC(sizeof(Render_Encode) * (slen+1));
@@ -1490,17 +1490,17 @@ func_curses_index_to_pos(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, 
     p[slen-1] = -1;
 
     for (i=0; i<slen; i++) {
-	if (p[i] == -1) {
-	    /* string last character (dummy data) */
-	    rendaring_data[i].display_width = 1;
-	}
-	else if ((p[i] < 0x20) || (p[i] == 0x7f)) {
-	    /* control character encoding */
-	    rendaring_data[i].display_width = 1;
-	}
-	else if (p[i] < 0x7f) {
-	    /* ASCII character encoding */
-	    rendaring_data[i].display_width = 1;
+        if (p[i] == -1) {
+            /* string last character (dummy data) */
+            rendaring_data[i].display_width = 1;
+        }
+        else if ((p[i] < 0x20) || (p[i] == 0x7f)) {
+            /* control character encoding */
+            rendaring_data[i].display_width = 1;
+        }
+        else if (p[i] < 0x7f) {
+            /* ASCII character encoding */
+            rendaring_data[i].display_width = 1;
         } else {
             int w;
             w = (int)fcl_get_width((wchar_t)p[i]);
@@ -1523,22 +1523,22 @@ func_curses_index_to_pos(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, 
 
     rendaring_data[0].display_position = 0;
     for (i=1; i<slen; i++) {
-	if (p[i-1] == 0x09) {
-	    rendaring_data[i].display_position = 
-		((rendaring_data[i-1].display_position + tab_width) / tab_width) * tab_width;
-	} else {
-	    rendaring_data[i].display_position = 
-		rendaring_data[i-1].display_position + rendaring_data[i-1].display_width;
-	}
+        if (p[i-1] == 0x09) {
+            rendaring_data[i].display_position = 
+                ((rendaring_data[i-1].display_position + tab_width) / tab_width) * tab_width;
+        } else {
+            rendaring_data[i].display_position = 
+                rendaring_data[i-1].display_position + rendaring_data[i-1].display_width;
+        }
     }
     if (slen == 0) {
-	return new_integer_si(0);
+        return new_integer_si(0);
     }
     if (index < 0) {
-	return new_integer_si(0);
+        return new_integer_si(0);
     }
     if (index >= slen) {
-	return new_integer_si(rendaring_data[slen-1].display_position);
+        return new_integer_si(rendaring_data[slen-1].display_position);
     }
     return new_integer_si(rendaring_data[index].display_position);
 
@@ -1697,40 +1697,40 @@ error:
 
 int
 toy_add_func_ncurses(Toy_Interp* interp) {
-    toy_add_func(interp, L"curs-init",		func_curses_init,		NULL);
+    toy_add_func(interp, L"curs-init",          func_curses_init,               NULL);
 #ifdef MOUSE
-    toy_add_func(interp, L"curs-mouse-on",	func_curses_mouse_on,		NULL);
-    toy_add_func(interp, L"curs-mouse-off",	func_curses_mouse_off,		NULL);
-    toy_add_func(interp, L"curs-get-mouse",	func_curses_get_mouse,		NULL);
-    toy_add_func(interp, L"curs-get-event-window",func_curses_get_event_window,	L"curs-list,screen-y,screen-x");
+    toy_add_func(interp, L"curs-mouse-on",      func_curses_mouse_on,           NULL);
+    toy_add_func(interp, L"curs-mouse-off",     func_curses_mouse_off,          NULL);
+    toy_add_func(interp, L"curs-get-mouse",     func_curses_get_mouse,          NULL);
+    toy_add_func(interp, L"curs-get-event-window",func_curses_get_event_window, L"curs-list,screen-y,screen-x");
 #endif /* MOUSE */
-    toy_add_func(interp, L"curs-mouse?",	func_curses_ismouse,		NULL);
-    toy_add_func(interp, L"curs-get-screen-size",func_curses_getscreensize,	L"window");
-    toy_add_func(interp, L"curs-terminate",	func_curses_terminate,		NULL);
-    toy_add_func(interp, L"curs-create-window",	func_curses_createwindow,	L"window,y,x,line,column");
-    toy_add_func(interp, L"curs-new-window",	func_curses_newwindow,		L"window,y,x,line,column");
-    toy_add_func(interp, L"curs-clear",		func_curses_clear,		L"window");
-    toy_add_func(interp, L"curs-wipe",		func_curses_wipe,		L"window");
-    toy_add_func(interp, L"curs-print",		func_curses_print,		L"window,message,encoding,y,x");
-    toy_add_func(interp, L"curs-refresh",	func_curses_refresh,		L"window");
-    toy_add_func(interp, L"curs-color",		func_curses_color,		L"window,y,x,len,color,attr");
-    toy_add_func(interp, L"curs-render-line",	func_curses_render_line,	L"window,window-y,view-x,offset-x,string,tab-width,encoding");
-    toy_add_func(interp, L"curs-box",		func_curses_box,		L"window");
-    toy_add_func(interp, L"curs-set-color",	func_curses_setcolor,		L"window,color-pair");
-    toy_add_func(interp, L"curs-set-bgcolor",	func_curses_setbgcolor,		L"window,color-number");
-    toy_add_func(interp, L"curs-set-overlay",	func_curses_setoverlay,		L"over-window,dest-window");
-    toy_add_func(interp, L"curs-destroy-window",func_curses_destroywindow,	L"window");
-    toy_add_func(interp, L"curs-move",		func_curses_move,		L"window,y,x");
-    toy_add_func(interp, L"curs-get-cursor",	func_curses_get_cursor,		L"window");
-    toy_add_func(interp, L"curs-add-color",	func_curses_add_color,		L"pair,fg-color,bg-color");
-    toy_add_func(interp, L"curs-keyin",		func_curses_keyin,		L"window,timeout,encoding");
-    toy_add_func(interp, L"curs-pos-to-index",	func_curses_pos_to_index,	L"string,pos,tab-width");
-    toy_add_func(interp, L"curs-index-to-pos",	func_curses_index_to_pos,	L"string,index,tab-width");
-    toy_add_func(interp, L"curs-flash",		func_curses_flash,		NULL);
-    toy_add_func(interp, L"curs-col",		func_curses_col,		L"string");
-    toy_add_func(interp, L"curs-set",		func_curses_set,		L"integer");
-    toy_add_func(interp, L"load-font-calib",	func_load_font_calib,		L"path-to-fcab");
-    toy_add_func(interp, L"reset-font-calib",	func_reset_font_calib,		NULL);
+    toy_add_func(interp, L"curs-mouse?",        func_curses_ismouse,            NULL);
+    toy_add_func(interp, L"curs-get-screen-size",func_curses_getscreensize,     L"window");
+    toy_add_func(interp, L"curs-terminate",     func_curses_terminate,          NULL);
+    toy_add_func(interp, L"curs-create-window", func_curses_createwindow,       L"window,y,x,line,column");
+    toy_add_func(interp, L"curs-new-window",    func_curses_newwindow,          L"window,y,x,line,column");
+    toy_add_func(interp, L"curs-clear",         func_curses_clear,              L"window");
+    toy_add_func(interp, L"curs-wipe",          func_curses_wipe,               L"window");
+    toy_add_func(interp, L"curs-print",         func_curses_print,              L"window,message,encoding,y,x");
+    toy_add_func(interp, L"curs-refresh",       func_curses_refresh,            L"window");
+    toy_add_func(interp, L"curs-color",         func_curses_color,              L"window,y,x,len,color,attr");
+    toy_add_func(interp, L"curs-render-line",   func_curses_render_line,        L"window,window-y,view-x,offset-x,string,tab-width,encoding");
+    toy_add_func(interp, L"curs-box",           func_curses_box,                L"window");
+    toy_add_func(interp, L"curs-set-color",     func_curses_setcolor,           L"window,color-pair");
+    toy_add_func(interp, L"curs-set-bgcolor",   func_curses_setbgcolor,         L"window,color-number");
+    toy_add_func(interp, L"curs-set-overlay",   func_curses_setoverlay,         L"over-window,dest-window");
+    toy_add_func(interp, L"curs-destroy-window",func_curses_destroywindow,      L"window");
+    toy_add_func(interp, L"curs-move",          func_curses_move,               L"window,y,x");
+    toy_add_func(interp, L"curs-get-cursor",    func_curses_get_cursor,         L"window");
+    toy_add_func(interp, L"curs-add-color",     func_curses_add_color,          L"pair,fg-color,bg-color");
+    toy_add_func(interp, L"curs-keyin",         func_curses_keyin,              L"window,timeout,encoding");
+    toy_add_func(interp, L"curs-pos-to-index",  func_curses_pos_to_index,       L"string,pos,tab-width");
+    toy_add_func(interp, L"curs-index-to-pos",  func_curses_index_to_pos,       L"string,index,tab-width");
+    toy_add_func(interp, L"curs-flash",         func_curses_flash,              NULL);
+    toy_add_func(interp, L"curs-col",           func_curses_col,                L"string");
+    toy_add_func(interp, L"curs-set",           func_curses_set,                L"integer");
+    toy_add_func(interp, L"load-font-calib",    func_load_font_calib,           L"path-to-fcab");
+    toy_add_func(interp, L"reset-font-calib",   func_reset_font_calib,          NULL);
     return 0;
 }
 
