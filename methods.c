@@ -3901,8 +3901,39 @@ error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
 }
 
+
 Toy_Type*
 mth_string_truncate(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    Toy_Type *self, *b;
+    int is, sts;
+    Cell *ss;
+    
+    if (arglen != 1) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+    self = toy_clone(SELF(interp));
+    if (GET_TAG(SELF(interp)) != STRING) goto error2;
+    b = list_get_item(posargs);
+    if (GET_TAG(b) != INTEGER) goto error;
+    is = mpz_get_si(b->u.biginteger);
+    ss = self->u.string;
+    if (is > cell_get_length(ss)) {
+        return new_exception(TE_SYNTAX, L"Syntax error at 'truncate', bad truncate number", interp);
+    }
+    sts = cell_truncate(ss, is);
+    if (sts == 0) {
+        return new_exception(TE_SYNTAX, L"Syntax error at 'truncate!', bad truncate number", interp);
+    }
+    return self;
+    
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'truncate', syntax: String truncate num", interp);
+
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
+mth_string_truncateb(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     Toy_Type *self, *b;
     int is, sts;
     Cell *ss;
@@ -3915,15 +3946,17 @@ mth_string_truncate(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int a
     if (GET_TAG(b) != INTEGER) goto error;
     is = mpz_get_si(b->u.biginteger);
     ss = self->u.string;
+    if (is > cell_get_length(ss)) {
+        return new_exception(TE_SYNTAX, L"Syntax error at 'truncate!', bad truncate number", interp);
+    }
     sts = cell_truncate(ss, is);
     if (sts == 0) {
-        return const_Nil;
-    } else {
-        return const_T;
+        return new_exception(TE_SYNTAX, L"Syntax error at 'truncate!', bad truncate number", interp);
     }
+    return self;
     
 error:
-    return new_exception(TE_SYNTAX, L"Syntax error at 'truncate!', syntax: String truncate!", interp);
+    return new_exception(TE_SYNTAX, L"Syntax error at 'truncate!', syntax: String truncate! num", interp);
 
 error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
@@ -6651,7 +6684,8 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, L"String", L"udecode",       mth_string_udecode,     L"encoding");
     toy_add_method(interp, L"String", L"uencode",       mth_string_uencode,     L"encoding");
     toy_add_method(interp, L"String", L"int-base",      mth_string_intbase,     L"base");
-    toy_add_method(interp, L"String", L"truncate!",     mth_string_truncate,    L"size");
+    toy_add_method(interp, L"String", L"truncate",      mth_string_truncate,    L"size");
+    toy_add_method(interp, L"String", L"truncate!",     mth_string_truncateb,   L"size");
 
     toy_add_method(interp, L"File", L"init",            mth_file_init,          L"mode:,mode,file-path");
     toy_add_method(interp, L"File", L"open",            mth_file_open,          L"mode:,mode,file-path");
