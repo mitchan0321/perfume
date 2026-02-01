@@ -3853,7 +3853,7 @@
 	parser.c
 		Change coding style.
 	types.c
-		Change BIND tag to_print, to_string, to no terminate ";" BIND object.
+		Change BIND tag's functions to_print and to_string are to no print terminater ";".
 	pmacs update:
 		Add untabify editor command.
 		Fix EditBuffer::get-buffer-tab-width if no set TABs return DEFAULT_TAB_WIDTH.
@@ -3863,7 +3863,7 @@
 	cell.[ch]
 		Add cell_truncate function.
 	methods.c
-		Add commnad String::truncate for truncate N size characters from string.
+		Add commnad String::truncate! for truncate N size characters from string.
 	parser.c, types.c
 		Change rquote syntax change, the \ character is no longer an escape character unless it is preceded
 		by an apostrophe character.
@@ -3912,5 +3912,16 @@
 	pmacs update:
 		Add :log option to WUtil::show-message, for output log to *Console* buffer.
 		Add tabify editor command.
+
+2026/02/01
+	methods.c
+		Add String::truncate method, like the String::truncate! but no side effect.
+	README.md
+		Fix inject sample code.
+	doc/manual.odt, manual.pdf
+		Update 1.12.0.
+	tag:
+		PRFM_20260201
+		1.12.0
 
 #eof
