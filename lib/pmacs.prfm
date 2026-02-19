@@ -27,195 +27,227 @@ defun pmacs (trace: t) {
     set-locale "";
     
     if {true? t} {
-        if {defvar? _TRACE_FILE} {
-            setvar _TRACE_FILE `File ("./trace.pmacs" mode: o);
-        } {
-            defvar _TRACE_FILE `File ("./trace.pmacs" mode: o);
-        };
-	trace 1 out: [$_TRACE_FILE fd?];
+        pmacs-set-trace;
     };
 
-    fun (modules) {
-	$modules each do: {| m |
-	    try  {
-                begin :rebase local: [dict ((__module_file__ . $m))] {
-                    load-class :force $__module_file__;
-                }
-            } catch: {| e | println ["Module load error at '" . $m "', error=" $e]};
-	};
-    } : $modules;
-
-    defvar stdin_orig  $stdin;
-    defvar stdout_orig $stdout;
-    defvar stderr_orig $stderr;
-    reset-stdio;
+    pmacs-load-modules $modules;
+    pmacs-init-stdio;
 
     try {
-        WUtil init;
-	BufferManager init;
-	TaskManager init;
-	curs ::= curs-init;
-	defvar MainWindow [new Window init: ($curs)];
-	init-color-DB;
-	$MainWindow create-minibuffer-window <nil>;
-	$MainWindow create-full-window;
-        $MainWindow set-input $stdin_orig;
-        if {curs-mouse?} {
-            mouse-off;
-        };
+        pmacs-init-main-window;
 
         if {[$ARGV len] <= 3} {
-            buff ::= new EditBuffer;
-            path := <nil>;
-            $LIB_PATH each do: {| i |
-                if {file exists? [$i . "/" $LOGO_PATH]} {
-                    path ::= $i . "/" $LOGO_PATH;
-                    break;
-                };
-            };
-            if $path {
-                (result err) ::= $buff load-content $path :init-only;
-                f := <nil>;
-                try {
-                    f ::= new File init: ($path mode: i);
-                    (y x) ::= $MainWindow get-screen-size;
-                    $y -- 2;
-                    $x -- 1;
-                    marginx ::= $x - $LOGO_WIDTH : / 2;
-                    if {$marginx < 0} {
-                        marginxs := "";
-                    } {
-                        marginxs ::= " " repeat $marginx;
-                    };
-                    marginy ::= $y - $LOGO_LINE : / 3;
-                    if {$marginy < 0} {
-                        marginy := 0;
-                    };
-                    0 each to: $marginy do: {
-                        $buff append-string "";
-                    };
-                    $f each do: {| r |
-                        $buff append-string [$marginxs . $r];
-                    };
-                    0 each to: [$marginy * 2] do: {
-                        $buff append-string "";
-                    };
-                }
-                catch: {| e |
-                    show-message :bell ["Can't read logo file, " . [$e cdr]];
-                }
-                fin: {
-                    $f close;
-                }
-                ;;
-                
-                if $result {
-                    $MainWindow bind-buffer "Window#1" $buff;
-                    $MainWindow apply {render-all; refresh};
-                    key := ();
-                    timeout := 10000;
-                    while {$key null?} do: {
-                        (repeat-time key) ::= curs-keyin [$MainWindow get-current-window : get-curs] $INPUT_TIMEOUT $INPUT_ENCODING;
-                        $timeout -- $INPUT_TIMEOUT;
-                        if {$timeout < 0} {break};
-                    };
-                    $MainWindow unbind-buffer;
-                };
-            };
+            pmacs-show-logo;
         };
 
-        try {defvar PINTERP_LOCAL [dict]};
-        try {
-            defvar PINTERP [new];
-            $PINTERP method set (i) {sets Interp $i};
-            $PINTERP method eval (i) {$Interp eval $i};
-            $PINTERP method next () {$Interp next};
-            $PINTERP method release () {$Interp release};
-            $PINTERP method stat () {$Interp stat};
-        };
-        c ::= coro {pinterp $MainWindow};
-        $c eval {defvar CO-MODE <t>};
-        $c eval {enable-itimer};
-        $PINTERP set $c;
-        
-        body := {| main window |
-            if {eq? [$PINTERP stat] DONE} {
-                try {$PINTERP release} catch: {};
-                c ::= coro {pinterp $MainWindow};
-                $c eval {defvar CO-MODE <t>};
-                $c eval {enable-itimer};
-                $PINTERP set $c;
-            };
-            
-            buff := <nil>;
-            if $window {
-                if {eq? CombiWindow [$window get @name]} {buff ::= $window get-buffer};
-            };
-            if $buff {
-                if {eq? ScratchBuffer [$buff get @name]} {
-                    if {$window method? display-evaluation} {
-                        $window display-evaluation;
-                    };
-                };
-            };
-            
-            $MainWindow add-background job-id: "50-PINTERP-WATCHDOG" $body;
-            result NONE;
-        };
-        yield $body $MainWindow <nil>;
+        pmacs-create-interp;
+        pmacs-load-args-files;
 
-        files ::= $ARGV clone;
-        $files >>;
-        if {and {! [$files null?]} {$files,0 = "-c"}} {
-            $files >>; $files >>;
-        };
-        [$files reverse] each do: {| f |
-            open-file $f;
-            $MainWindow apply {render-all; refresh};
-        };
-        if $files,0 {
-            target-buff ::= BufferManager get-buffer [$files,0 split sep: "/" : last : car];
-            $MainWindow bind-buffer "Window#1" $target-buff;
-            result ALL;
-        };
-	$MainWindow render-all;
+        $MainWindow render-all;
 	$MainWindow refresh;
 
-        try {
-            f := $STARTUP_FILE;
-            if {and {file exists? $f} {! [file dir? $f]} {file read? $f}} {
-                begin :rebase local: [dict ((__user_conf__ . $f))] {
-                    load $__user_conf__;
-                };
-            };
-        } catch: {| e |
-            println ["User configuration file load error at '" . $f "', error=" $e];
-        };
+        pmacs-load-startup-file;
 
-        set-itimer $INTERP_ITIMER_INTERVAL;
+        # enter the main event loop
 	$MainWindow key-event-loop;
     }
     fin: {
-	curs-terminate;
-	setvar stdin  $stdin_orig;
-	setvar stdout $stdout_orig;
-	setvar stderr $stderr_orig;
-        undef stdin_orig;
-        undef stdout_orig;
-        undef stderr_orig;
-        $PINTERP release;
-        undef PINTERP;
-        undef PINTERP_LOCAL;
-        undef MainWindow;
-        undef PMACS;
-        WUtil term;
+        pmacs-terminate;
     }
     catch: {| e |
 	__error_info__ ::= "ERROR: <%v># %v\n\n%v" fmt [$e car] [$e cdr] $@stack-trace;
     }
-    ;
+    ;;
 
     if {set? __error_info__} then: {println file: $stderr $__error_info__};
+};
+
+defun pmacs-set-trace () {
+    if {defvar? _TRACE_FILE} {
+        setvar _TRACE_FILE `File ("./trace.pmacs" mode: o);
+    } {
+        defvar _TRACE_FILE `File ("./trace.pmacs" mode: o);
+    };
+    trace 1 out: [$_TRACE_FILE fd?];
+};
+
+defun pmacs-load-modules (modules) {
+    $modules each do: {| m |
+        try  {
+            begin :rebase local: [dict ((__module_file__ . $m))] {
+                load-class :force $__module_file__;
+            }
+        } catch: {| e | println ["Module load error at '" . $m "', error=" $e]};
+    };
+};
+
+defun pmacs-init-stdio () {
+    defvar stdin_orig  $stdin;
+    defvar stdout_orig $stdout;
+    defvar stderr_orig $stderr;
+    reset-stdio;
+};
+
+defun pmacs-init-main-window () {
+    WUtil init;
+    BufferManager init;
+    TaskManager init;
+    curs ::= curs-init;
+    defvar MainWindow [new Window init: ($curs)];
+    init-color-DB;
+    $MainWindow create-minibuffer-window <nil>;
+    $MainWindow create-full-window;
+    $MainWindow set-input $stdin_orig;
+    if {curs-mouse?} {
+        mouse-off;
+    };
+};
+
+defun pmacs-show-logo () {
+    buff ::= new EditBuffer;
+    path := <nil>;
+    $LIB_PATH each do: {| i |
+        if {file exists? [$i . "/" $LOGO_PATH]} {
+            path ::= $i . "/" $LOGO_PATH;
+            break;
+        };
+    };
+    if $path {
+        (result err) ::= $buff load-content $path :init-only;
+        f := <nil>;
+        try {
+            f ::= new File init: ($path mode: i);
+            (y x) ::= $MainWindow get-screen-size;
+            $y -- 2;
+            $x -- 1;
+            marginx ::= $x - $LOGO_WIDTH : / 2;
+            if {$marginx < 0} {
+                marginxs := "";
+            } {
+                marginxs ::= " " repeat $marginx;
+            };
+            marginy ::= $y - $LOGO_LINE : / 3;
+            if {$marginy < 0} {
+                marginy := 0;
+            };
+            0 each to: $marginy do: {
+                $buff append-string "";
+            };
+            $f each do: {| r |
+                $buff append-string [$marginxs . $r];
+            };
+            0 each to: [$marginy * 2] do: {
+                $buff append-string "";
+            };
+        }
+        catch: {| e |
+            show-message :bell ["Can't read logo file, " . [$e cdr]];
+        }
+        fin: {
+            $f close;
+        }
+        ;;
+        
+        if $result {
+            $MainWindow bind-buffer "Window#1" $buff;
+            $MainWindow apply {render-all; refresh};
+            key := ();
+            timeout := 10000;
+            while {$key null?} do: {
+                (repeat-time key) ::= curs-keyin [$MainWindow get-current-window : get-curs] $INPUT_TIMEOUT $INPUT_ENCODING;
+                $timeout -- $INPUT_TIMEOUT;
+                if {$timeout < 0} {break};
+            };
+            $MainWindow unbind-buffer;
+        };
+    };
+};
+
+defun pmacs-create-interp () {
+    try {defvar PINTERP_LOCAL [dict]};
+    try {
+        defvar PINTERP [new];
+        $PINTERP method set (i) {sets Interp $i};
+        $PINTERP method eval (i) {$Interp eval $i};
+        $PINTERP method next () {$Interp next};
+        $PINTERP method release () {$Interp release};
+        $PINTERP method stat () {$Interp stat};
+    };
+    c ::= coro {pinterp $MainWindow};
+    $c eval {defvar CO-MODE <t>};
+    $c eval {enable-itimer};
+    $PINTERP set $c;
+    
+    body := {| main window |
+        if {eq? [$PINTERP stat] DONE} {
+            try {$PINTERP release} catch: {};
+            c ::= coro {pinterp $MainWindow};
+            $c eval {defvar CO-MODE <t>};
+            $c eval {enable-itimer};
+            $PINTERP set $c;
+        };
+        
+        buff := <nil>;
+        if $window {
+            if {eq? CombiWindow [$window get @name]} {buff ::= $window get-buffer};
+        };
+        if $buff {
+            if {eq? ScratchBuffer [$buff get @name]} {
+                if {$window method? display-evaluation} {
+                    $window display-evaluation;
+                };
+            };
+        };
+        
+        $MainWindow add-background job-id: "50-PINTERP-WATCHDOG" $body;
+        result NONE;
+    };
+    yield $body $MainWindow <nil>;
+};
+
+defun pmacs-load-args-files () {
+    files ::= $ARGV clone;
+    $files >>;
+    if {and {! [$files null?]} {$files,0 = "-c"}} {
+        $files >>; $files >>;
+    };
+    [$files reverse] each do: {| f |
+        open-file $f;
+        $MainWindow apply {render-all; refresh};
+    };
+    if $files,0 {
+        target-buff ::= BufferManager get-buffer [$files,0 split sep: "/" : last : car];
+        $MainWindow bind-buffer "Window#1" $target-buff;
+    };
+};
+
+defun pmacs-load-startup-file () {
+    try {
+        f := $STARTUP_FILE;
+        if {and {file exists? $f} {! [file dir? $f]} {file read? $f}} {
+            begin :rebase local: [dict ((__user_conf__ . $f))] {
+                load $__user_conf__;
+            };
+        };
+    } catch: {| e |
+        println ["User configuration file load error at '" . $f "', error=" $e];
+    };
+};
+
+defun pmacs-terminate () {
+    curs-terminate;
+    setvar stdin  $stdin_orig;
+    setvar stdout $stdout_orig;
+    setvar stderr $stderr_orig;
+    undef stdin_orig;
+    undef stdout_orig;
+    undef stderr_orig;
+    $PINTERP release;
+    undef PINTERP;
+    undef PINTERP_LOCAL;
+    undef MainWindow;
+    undef PMACS;
+    WUtil term;
 };
 
 defun debug-message (msg wait: msec) {
