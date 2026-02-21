@@ -1592,7 +1592,7 @@ defcommand decode-uquoted-encoding desc: "Decode unicode quoted encoding (ex: \\
     src ::= $buff get-vector;
     0 each to: [$src len : - 1] do: {| i |
         l ::= $src get $i;
-        l ::= $l replace :all '\\\\[uU][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]' {| c | "" uimport! (["0x" . [$c sub 2] : int])};
+        l ::= $l replace :all '\\[uU][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]' {| c | "" uimport! (["0x" . [$c sub 2] : int])};
         $buff line-update $l $i;
     };
     result SELF;
