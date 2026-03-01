@@ -10,16 +10,19 @@ new Task : proc terminal-shadow-detector {
                     vec ::= $buff get-vector;
                     i ::= [$vec len] - 1;
                     s := "";
-                    if {$i >= 0} {
-                        s ::= $vec get $i;
-                        if {or {$s =~ '[Pp]assword.*:'}
-                               {$s =~ '[Pp]assphrase.*:' }} {
-                            if {$priv_i != $i} {
-                                $w apply-command $MainWindow $w "" terminal-send-password;
-                            };
-                            setc priv_i $i;
+                    if {$i < 0} {break};
+                    
+                    s ::= $vec get $i;
+                    if {or
+                        {$s =~ '[Pp]assword.*:'}
+                        {$s =~ '[Pp]assphrase.*:'}
+                    } {
+                        if {$priv_i != $i} {
+                            $w apply-command $MainWindow $w "" terminal-send-password;
                         };
+                        setc priv_i $i;
                     };
+                    break;
                 };
             };
         };
