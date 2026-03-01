@@ -4,7 +4,7 @@ ScratchBuffer method init () {
     base-constructor;
     init-constructor;
     
-    sets Src [vector (
+    sets Src `BufferVector(
 	"Welcome to Perfume/Pmacs world !!"
 	"  <<< Pmacsの使い方 >>>"
         "    1. クイックスタートメニューはこちら --> [[00quick-start]]"
@@ -25,8 +25,8 @@ ScratchBuffer method init () {
         "  <<< その他情報 >>>"
         "    こちらのURLをご覧ください --> [[@https://github.com/mitchan0321/perfume/wiki]]"
 	""
-    )];
-    
+    );
+
     [self] set-content [$DEFAULT_PWIKI_DIR . "/"];
 };
 
