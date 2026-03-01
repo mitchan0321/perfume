@@ -1,0 +1,27 @@
+new Task : proc terminal-shadow-detector {
+    priv_i := -1;
+    loop do: {
+        SysCall apply-editor {
+            if {$MainWindow mini-input?} {break};
+            
+            $MainWindow get-window-list : each do: {| w |
+                buff ::= $w get-buffer;
+                if [$buff get-buffer-name : = "*Terminal*"] {
+                    vec ::= $buff get-vector;
+                    i ::= [$vec len] - 1;
+                    s := "";
+                    if {$i >= 0} {
+                        s ::= $vec get $i;
+                        if {$s =~ '[Pp]assword.*:'} {
+                            if {$priv_i != $i} {
+                                $w apply-command $MainWindow $w "" terminal-send-password;
+                            };
+                            setc priv_i $i;
+                        };
+                    };
+                };
+            };
+        };
+        SysCall sleep 200;
+    };
+};
