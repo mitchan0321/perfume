@@ -1431,7 +1431,7 @@ CombiWindow method set-word-hilight-ml (buff geom start end) {
     if {$bend > $len} {bend := $len};
     target-src := "";
     sum-len := 0;
-    len-index ::= vector;
+    len-index ::= new BufferVector;
     $buff buffer-select $bstart $bend {| src |
         $target-src append! [$src . "\n"];
         $len-index append! $sum-len;
