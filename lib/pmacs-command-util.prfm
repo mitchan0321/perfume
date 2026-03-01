@@ -1585,6 +1585,24 @@ defcommand send-to-task desc: "Send input line to Task's common Stream." {
     result SELF;
 };
 
+defcommand terminal-send-password desc: "Enter and send password to shell terminal." {
+    | main window |
+    mini ::= $main get-minibuffer-window;
+    $mini set-shadow-mode;
+
+    result := "";
+    mini-input-until-enter $main $window
+        prompt: ""
+        enter-proc: {| value |
+            stream ::= get-terminal-task-stdin;
+            if $stream {
+                $stream puts $value;
+            };
+        }
+    ;;
+    result ALL;
+};
+
 defcommand decode-uquoted-encoding desc: "Decode unicode quoted encoding (ex: \\uxxxx) in buffe." {
     | main window |
     buff ::= $window get-buffer;
