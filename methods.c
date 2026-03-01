@@ -817,6 +817,20 @@ error2:
 }
 
 Toy_Type*
+mth_integer_toint(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    if (arglen != 0) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (GET_TAG(SELF(interp)) != INTEGER) goto error2;
+
+    return SELF(interp);
+    
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'int', syntax: Integer int", interp);
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
 mth_integer_toreal(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
     if (arglen != 0) goto error;
     if (hash_get_length(nameargs) > 0) goto error;
@@ -1361,6 +1375,20 @@ mth_real_le(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
 error:
     return new_exception(TE_SYNTAX, L"Syntax error at '<=', syntax: Real <= number-val", interp);
 
+error2:
+    return new_exception(TE_TYPE, L"Type error.", interp);
+}
+
+Toy_Type*
+mth_real_toreal(Toy_Interp *interp, Toy_Type *posargs, Hash *nameargs, int arglen) {
+    if (arglen != 0) goto error;
+    if (hash_get_length(nameargs) > 0) goto error;
+    if (GET_TAG(SELF(interp)) != REAL) goto error2;
+
+    return SELF(interp);
+    
+error:
+    return new_exception(TE_SYNTAX, L"Syntax error at 'real', syntax: Real real", interp);
 error2:
     return new_exception(TE_TYPE, L"Type error.", interp);
 }
@@ -6580,6 +6608,7 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, L"Integer", L"--",           mth_integer_dec,        L"decr-val");
     toy_add_method(interp, L"Integer", L"each",         mth_integer_each,       L"to:,val,do:,body");
     toy_add_method(interp, L"Integer", L"..",           mth_integer_list,       L"do:,body");
+    toy_add_method(interp, L"Integer", L"int",          mth_integer_toint,      NULL);
     toy_add_method(interp, L"Integer", L"real",         mth_integer_toreal,     NULL);
     toy_add_method(interp, L"Integer", L"<<",           mth_integer_rol,        L"val");
     toy_add_method(interp, L"Integer", L">>",           mth_integer_ror,        L"val");
@@ -6605,6 +6634,7 @@ toy_add_methods(Toy_Interp* interp) {
     toy_add_method(interp, L"Real", L"<",               mth_real_lt,            L"val");
     toy_add_method(interp, L"Real", L">=",              mth_real_ge,            L"val");
     toy_add_method(interp, L"Real", L"<=",              mth_real_le,            L"val");
+    toy_add_method(interp, L"Real", L"real",            mth_real_toreal,        NULL);
     toy_add_method(interp, L"Real", L"int",             mth_real_tointeger,     NULL);
     toy_add_method(interp, L"Real", L"sqrt",            mth_real_sqrt,          NULL);
     toy_add_method(interp, L"Real", L"sin",             mth_real_sin,           NULL);
