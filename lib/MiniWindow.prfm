@@ -15,14 +15,24 @@ MiniWindow method init (main y x line column) {
     sets PromptMessage "";
     sets InputValue "";
     sets InputIndex 0;
+    sets ShadowInputMode <nil>;
 };
 
 MiniWindow method activate () {
-    set-window-color-default $MiniCurs ACTIVE_MINI_WINDOW;
+    if $ShadowInputMode {
+        set-window-color-default $MiniCurs SHADOW_MINI_WINDOW;
+    } {
+        set-window-color-default $MiniCurs ACTIVE_MINI_WINDOW;
+    };
 };
+
+MiniWindow method set-shadow-mode () {
+    sets ShadowInputMode <t>;
+};    
 
 MiniWindow method diactivate () {
     set-window-color-default $MiniCurs MINI_WINDOW;
+    sets ShadowInputMode <nil>;
 };
 
 MiniWindow method refresh () {
