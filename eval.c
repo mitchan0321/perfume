@@ -311,6 +311,12 @@ control_goto:
             goto exit_eval;
         }
         obj_env = toy_new_obj_env(interp, first, self);
+        {
+            Toy_Type *prim = hash_get_t(obj_env->cur_object_slot, const_atprimitive);
+            if (prim) {
+                obj_env->self = prim;
+            }
+        }
         trace_info->object_name = first;
         first = method;
 
