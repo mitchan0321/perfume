@@ -2,6 +2,7 @@
 ###   exsample:
 load-tasklet console-adjuster;  # run *Console* buffer adjuster.
 load-tasklet console-cleaner;   # run *Console* buffer clean.
+load-tasklet terminal-shadow-detector;   # run *Terminal* window entering password detector.
 #load-tasklet pmacs-server;      # run pmacs-server (default no start for your computer security).
 
 ### start mouse functions
