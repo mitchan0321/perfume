@@ -1,3 +1,4 @@
+
 class EditBuffer BufferBase;
 
 EditBuffer method init () {
@@ -6,7 +7,7 @@ EditBuffer method init () {
 };
 
 EditBuffer method init-constructor () {
-    sets Src [vector];
+    sets Src [new BufferVector];
     sets File <nil>;
     sets BufferName "*no named*";
     sets Modify <nil>;
@@ -46,7 +47,7 @@ EditBuffer method load-content (path init-only: init-flag buffer-name: buff-name
     sets EncError <nil>;
 
     sets NewFile <nil>;
-    sets Src [vector];
+    sets Src [new BufferVector];
     if {[$path sub 0 1] = "/"} {path ::= path-adjust $path};
     if {and {! [set? buff-name]} {$path len : > 0}} {
         buff-name ::= $path split sep: "/" : last : car;
@@ -149,7 +150,7 @@ EditBuffer method reload-content () {
     if {and {file exists? $path} {! [regular-file? $path]}} {
         throw ErrFileSpec "Not regular file.";
     };
-    sets Src [vector];
+    sets Src [new BufferVector];
     $f open $path mode: i;
     $f each do: {| r |
         $Src append! $r;
@@ -284,7 +285,7 @@ EditBuffer method modified-by-another-process () {
 };
 
 EditBuffer method clear-all () {
-    sets Src [vector];
+    sets Src [new BufferVector];
 };
 
 EditBuffer method unregist-buffer () {
