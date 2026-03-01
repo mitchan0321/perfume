@@ -3930,4 +3930,24 @@
 		Change pmacs-default.key file, coding style changed.
 		Change pmacs.prfm file, code structure.
 
+2026/03/01
+	eval.c
+		Add if exist '@primitive' object instance variable, set it to object environment structure value 'self'.
+		  Then the object is inherit from wrapper class, to legal native method call.
+	methods.c
+		Add methods, Integer::int, Real::real.
+	setup.prfm
+		Add Integer::init, Real::init, String::init, RQuote::init for create the classes instance.
+	pmacs update.
+		Add BufferVector class, migration from Vector extendet class.
+		Add MiniWindow::set-shadow-mode for maskd password enter future.
+		Change ScratchBuffer.prfm, WUtil.prfm, CombiWindow.prfm, EditBuffer.prfm,
+		  new instance create Vector -> BufferVector.
+		Delete Vector method extension from WUtil.prfm.
+		Add terminal-send-password for *Terminal* buffer enter masked password.
+		Add Color pair name is SHADOW_MINI_WINDOW.
+		Add pmacs.conf RESERVED_WORD config to \binteger\b regex.
+		Change pmacs.prfm, for function structuering.
+		Add Taslet/terminal-shadow-detector, for detect password prompt and forward to termina-send-password command.
+
 #eof
