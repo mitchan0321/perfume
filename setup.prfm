@@ -104,6 +104,34 @@ then: {
     };
 };
 
+Integer method init (i) {
+    if {integer? $i} else: {
+        throw ErrBadType "Type error."
+    };
+    sets @primitive $i;
+};
+
+Real method init (i) {
+    if {real? $i} else: {
+        throw ErrBadType "Type error."
+    };
+    sets @primitive $i;
+};
+
+String method init (i) {
+    if {string? $i} else: {
+        throw ErrBadType "Type error."
+    };
+    sets @primitive $i;
+};
+
+RQuote method init (i) {
+    if {rquote? $i} else: {
+        throw ErrBadType "Type error."
+    };
+    sets @primitive $i;
+};
+
 true;
 
 #eof
