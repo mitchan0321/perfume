@@ -12,7 +12,8 @@ new Task : proc terminal-shadow-detector {
                     s := "";
                     if {$i >= 0} {
                         s ::= $vec get $i;
-                        if {$s =~ '[Pp]assword.*:'} {
+                        if {or {$s =~ '[Pp]assword.*:'}
+                               {$s =~ '[Pp]assphrase.*:' }} {
                             if {$priv_i != $i} {
                                 $w apply-command $MainWindow $w "" terminal-send-password;
                             };
