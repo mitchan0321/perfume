@@ -100,6 +100,7 @@ extern Toy_Type *const_timeout;
 extern Toy_Type *const_debug_hook;
 extern Toy_Type *const_ast;
 extern Toy_Type *const_default;
+extern Toy_Type *const_atprimitive;
 extern wchar_t  *const_regex_cache;
 #ifdef PROF
 extern void *GC_stackbottom;
@@ -203,6 +204,7 @@ Toy_Type *const_timeout;
 Toy_Type *const_debug_hook;
 Toy_Type *const_ast;
 Toy_Type *const_default;
+Toy_Type *const_atprimitive;
 wchar_t  *const_regex_cache;
 int PageSize;
 #ifdef PROF

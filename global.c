@@ -98,6 +98,7 @@ void def_global() {
     const_debug_hook = new_symbol(L"debug-hook");
     const_ast = new_symbol(L"*");
     const_default = new_symbol(L"default:");
+    const_atprimitive = new_symbol(L"@primitive");
     const_regex_cache = L"@REGEX_CACHE";
     PageSize = sysconf(_SC_PAGESIZE);
 }
