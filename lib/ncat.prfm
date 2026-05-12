@@ -1,17 +1,17 @@
 load-func standard-io-command-templ;
 
 defun ncat (fmt: fmt
-	    native-value: nv
-	    args: files) {
+            native-value: nv
+            args: files) {
 
     if {set? fmt} else: {fmt := "%5d"};
 
     standard-io-command-templ
-	native-value: <nil>
-	files: $files
-	driver: [fun (file file-name native-value) {
-	    ncat-sub $file $fmt;
-	}];
+        native-value: <nil>
+        files: $files
+        driver: [fun (file file-name native-value) {
+            ncat-sub $file $fmt;
+        }];
 };
 
 defun ncat-sub (file fmt) {
@@ -19,6 +19,6 @@ defun ncat-sub (file fmt) {
     set i 1;
     $file each do: {| r |
         println [$fmt fmt $i] ": " $r;
-	$i ++;
+        $i ++;
     };
 };

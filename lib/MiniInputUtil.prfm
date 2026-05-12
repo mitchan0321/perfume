@@ -257,8 +257,8 @@ defun mini-input-file-chooser
             } {
                 fname ::= show-files-in-window $main $window $value;
             };
-	    $window apply-command $main $window "" top-of-buffer;
-	    $main mini-input-value-override $fname [$fname len];
+            $window apply-command $main $window "" top-of-buffer;
+            $main mini-input-value-override $fname [$fname len];
             return $status;
         };
         if {eq? $in-key KEY_DOWN} {

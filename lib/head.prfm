@@ -2,21 +2,21 @@
 load-func standard-io-command-templ;
 
 defun head (num
-	    native-value: nv
-	    args: files) {
+            native-value: nv
+            args: files) {
 
     standard-io-command-templ
-	native-value: <nil>
-	files: $files
-	driver: [fun (file file-name native-value) {
-	    head-sub $file $num;
-	}];
+        native-value: <nil>
+        files: $files
+        driver: [fun (file file-name native-value) {
+            head-sub $file $num;
+        }];
 };
 
 defun head-sub (file n) {
     0 each to: [$n - 1] do: {
-	read file: $file a;
-	if [nil? $a] then: {break};
-	println $a;
+        read file: $file a;
+        if [nil? $a] then: {break};
+        println $a;
     };
 };

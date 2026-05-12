@@ -16,7 +16,7 @@ Block method << (file) {
 Block method <<< (string) {
     s ::= new Stream;
     [$string split sep: "\n"] each do: {| r |
-	$s puts $r;
+        $s puts $r;
     };
     $s close;
     pipe in: $s [self];

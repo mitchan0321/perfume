@@ -7,26 +7,26 @@ defun memoiz (fun) {
 
     if [$fundict set? $fun]
     else: {
-	throw (ErrNoSuchFunction . ["No Such Function, \"" . $fun "\""]);
+        throw (ErrNoSuchFunction . ["No Such Function, \"" . $fun "\""]);
     };
 
     if {["" . [type? $fundict,$fun]] != "FUNC"}
     then: {
-	throw (ErrNoFunction . ["Not a function, \"" . $fun "\""]);
+        throw (ErrNoFunction . ["Not a function, \"" . $fun "\""]);
     };
 
     $fundict set $fname_orig $fundict,$fun;
 
     set d [dict];
     defun $fun (args: arg) {
-	if [$d set? $arg]
-	then: {
-	    return $d,$arg;
-	}
-	else: {
-	    set result [call $fname_orig $arg];
-	    $d set $arg $result;
-	    return $result;
-	};
+        if [$d set? $arg]
+        then: {
+            return $d,$arg;
+        }
+        else: {
+            set result [call $fname_orig $arg];
+            $d set $arg $result;
+            return $result;
+        };
     };
 };

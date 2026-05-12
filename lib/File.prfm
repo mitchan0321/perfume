@@ -3,9 +3,9 @@
 #
 File method each (do: body) {
     while {! [eof?]} do: {
-	s ::= gets;
-	if [nil? $s] then: {break};
-	yield $body $s;
+        s ::= gets;
+        if [nil? $s] then: {break};
+        yield $body $s;
     };
 };
 

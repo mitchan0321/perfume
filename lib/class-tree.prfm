@@ -13,6 +13,6 @@ defun class-tree (class indent: ind) {
     if {"Object" = $class} then: {return;};
 
     [$class delegate?] each do: {| i |
-	class-tree $i indent: [$ind + 1];
+        class-tree $i indent: [$ind + 1];
     };
 };

@@ -99,7 +99,7 @@ defcommand all-command-list desc: "Display all editor commands." {
 defun display-key-binding-list (buff name key-map desc) {
     l := ();
     $key-map each do: {| k v |
-	if {nil? $v} {continue};
+        if {nil? $v} {continue};
         if {"" . $v : at 0 : = "."} {continue};
         if [$desc set? $k] {
             s ::= $desc get $k;
@@ -113,7 +113,7 @@ defun display-key-binding-list (buff name key-map desc) {
     };
     $buff append-string $name;
     msort $l : each do: {| i |
-	$buff append-string ["" . [$i sub 17 38] [$i sub 59]];
+        $buff append-string ["" . [$i sub 17 38] [$i sub 59]];
     };
 };
 
@@ -205,13 +205,13 @@ defcommand execute-command desc: "Execute Perfume language command next display 
     mini-input-until-enter $main $window
         prompt: "Perfume command: "
         enter-proc: {| value |
-	    try {
-	        result ::= $value eval;
-	        show-message ["Command result: " . [$result string]];
+            try {
+                result ::= $value eval;
+                show-message ["Command result: " . [$result string]];
             } catch: {| e |
-		show-message :bell ["<" . [$e car ] "># " [$e cdr]];
-	    };
-	}
+                show-message :bell ["<" . [$e car ] "># " [$e cdr]];
+            };
+        }
     ;;
 
     result ALL;
@@ -227,24 +227,24 @@ defcommand execute-editor-command desc: "Execute editor command." {
         prompt: "Editor command: "
         enter-proc: {| value |
             $main set-last-command $value;
-	    $window apply-command $main $window "" [symbol $value];
+            $window apply-command $main $window "" [symbol $value];
             $main key-record [symbol $value] <nil>;
-	}
+        }
         edit-proc: {| value |
             try {
                 setvar EditorCommandList [msort [$EditorCommand keys :string : filter {| i | $i =~ [$value rquote]}]];
             } catch: {
                 setvar EditorCommandList ();
             };
-	    $EditorCommandList ?? {setvar EditorCommandList ()};
-	}
+            $EditorCommandList ?? {setvar EditorCommandList ()};
+        }
         completion-proc: {| value |
-	    i ::= $EditorCommandList find $value;
-	    if $i {$i ++} {i := 0};
-	    c ::= $EditorCommandList get $i;
-	    $c ?? {c ::= $EditorCommandList get 0};
-	    $c ?? {c := $value};
-	    $main mini-input-value-override $c [$c len];
+            i ::= $EditorCommandList find $value;
+            if $i {$i ++} {i := 0};
+            c ::= $EditorCommandList get $i;
+            $c ?? {c ::= $EditorCommandList get 0};
+            $c ?? {c := $value};
+            $main mini-input-value-override $c [$c len];
         }
     ;;
 
@@ -266,7 +266,7 @@ defcommand trace-editor-command desc: "Trace editor command and output trace res
             $f puts  "***";
             $f puts ["*** Editor command: " . $value];
             err := <nil>;
-	    try {
+            try {
                 trace {$window apply-command $main $window "" [symbol $value]} out: [$f fd?];
             } catch: {| err |};
             if $err {
@@ -278,23 +278,23 @@ defcommand trace-editor-command desc: "Trace editor command and output trace res
             $f close;
             f := <nil>;
             show-message ["Wrote tracefile to: " . [pwd] "/" "pmacs-trace.txt"];
-	}
+        }
         edit-proc: {| value |
             try {
                 setvar EditorCommandList [msort [$EditorCommand keys :string : filter {| i | $i =~ [$value rquote]}]];
             } catch: {
                 setvar EditorCommandList ();
             };
-	    $EditorCommandList ?? {setvar EditorCommandList ()};
-	}
+            $EditorCommandList ?? {setvar EditorCommandList ()};
+        }
         completion-proc: {| value |
-	    i ::= $EditorCommandList find $value;
-	    if $i {$i ++} {i := 0};
-	    c ::= $EditorCommandList get $i;
-	    $c ?? {c ::= $EditorCommandList get 0};
-	    $c ?? {c := $value};
-	    $main mini-input-value-override $c [$c len];
-	}
+            i ::= $EditorCommandList find $value;
+            if $i {$i ++} {i := 0};
+            c ::= $EditorCommandList get $i;
+            $c ?? {c ::= $EditorCommandList get 0};
+            $c ?? {c := $value};
+            $main mini-input-value-override $c [$c len];
+        }
     ;;
     
     result ALL;
@@ -308,7 +308,7 @@ defcommand eval-region desc: "Eval selected region and output result to *Scratch
     $window mark;
 
     if [$window get-region] {
-	### eval region
+        ### eval region
         (sy sx) ::= $window end-region;
         (ey ex) ::= $window get-source-index $buff $geom;
         str ::= $window get-region-string $sy $sx $ey $ex;

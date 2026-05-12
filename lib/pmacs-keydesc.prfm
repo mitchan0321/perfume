@@ -302,10 +302,10 @@ setkeydesc CTRL_W           "#-CTRL Ctrl+W";
 setkeydesc CTRL_X           "#-CTRL Ctrl+X";
 setkeydesc CTRL_Y           "#-CTRL Ctrl+Y";
 setkeydesc CTRL_Z           "#-CTRL Ctrl+Z";
-setkeydesc KEY_GS           "#-CTRL Ctrl+]";	# Control + ]
-setkeydesc KEY_US           "#-CTRL Ctrl+/";	# Control + /
-setkeydesc KEY_FS           "#-CTRL Ctrl+\\";	# Control + \
-setkeydesc KEY_RS           "#-CTRL Ctrl+???";	# Control + ???
+setkeydesc KEY_GS           "#-CTRL Ctrl+]";    # Control + ]
+setkeydesc KEY_US           "#-CTRL Ctrl+/";    # Control + /
+setkeydesc KEY_FS           "#-CTRL Ctrl+\\";   # Control + \
+setkeydesc KEY_RS           "#-CTRL Ctrl+???";  # Control + ???
 
 ### Press Alphabetic Key
 setkeydesc " "              "!-ALPHA [SPACE]";

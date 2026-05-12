@@ -13,24 +13,24 @@ defun telnet (host enc: enc port: port) {
     imessage := "";
     try {
         loop do: {
-	    if {$stdin ready?} {
+            if {$stdin ready?} {
                 try {
                     omessage ::= $stdin gets;
                 } catch: {
                     println "\nBad encoding input from stdin.";
                     continue;
                 };
-	        if [nil? $omessage] then: {
-		    println "\nTelnet client exit.";
-		    return;
+                if [nil? $omessage] then: {
+                    println "\nTelnet client exit.";
+                    return;
                 };
-		$server puts [$omessage uencode [symbol ["" . $enc "/F"]]];
+                $server puts [$omessage uencode [symbol ["" . $enc "/F"]]];
                 $server flush;
             };
             
-	    if {$server ready? timeout: 10} {
-	        message ::= $server gets;
-	        if [nil? $message] then: {
+            if {$server ready? timeout: 10} {
+                message ::= $server gets;
+                if [nil? $message] then: {
                     if {$imessage != ""} {
                         try {
                             o ::= $imessage udecode [symbol ["" . $enc "/F"]];
@@ -57,12 +57,12 @@ defun telnet (host enc: enc port: port) {
                 $stdout puts :nonewline $o;
                 $stdout flush;
                 imessage := "";
-	    };
-	};
+            };
+        };
     } catch: {| e |
         println "Error occured: #<" [$e car] "> " [$e cdr];
     } fin: {
-	$server close;
+        $server close;
     };
 };
 

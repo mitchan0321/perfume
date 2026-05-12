@@ -13,8 +13,8 @@ BufferManager method regist-buffer (buff name) {
     name ::= $name replace :all '>' ")";
     name-orig := $name;
     while {$BufferList set? $name} do: {
-	$i ++;
-	name ::= $name-orig . "[" $i "]";
+        $i ++;
+        name ::= $name-orig . "[" $i "]";
     };
     $buff set-buffer-name $name;
     $BufferList set $name $buff;
@@ -64,11 +64,11 @@ BufferManager method get-buffer-list-split-order-by-newer () {
 BufferManager method get-buffer (name) {
     buff ::= $BufferList get $name;
     $buff ?? {
-	buff ::= $BufferList get "*Scratch*";
-	$buff ?? {
-	    buff ::= new ScratchBuffer;
-	    regist-buffer $buff "*Scratch*";
-	};
+        buff ::= $BufferList get "*Scratch*";
+        $buff ?? {
+            buff ::= new ScratchBuffer;
+            regist-buffer $buff "*Scratch*";
+        };
     };
     return $buff;
 };
@@ -81,7 +81,7 @@ BufferManager method find-buffer (name) {
 BufferManager method get-buffer-by-path (path) {
     buff := <nil>;
     $BufferList each do: {| name buffer |
-	$buffer ?? {continue};
+        $buffer ?? {continue};
         if {$path = [$buffer get-path]} {
             buff := $buffer;
             break;
@@ -93,16 +93,16 @@ BufferManager method get-buffer-by-path (path) {
 BufferManager method get-buffer-create (name) {
     buff ::= $BufferList get $name;
     $buff ?? {
-	buff ::= new EditBuffer;
+        buff ::= new EditBuffer;
     };
     return $buff;
 };
 
 BufferManager method get-next-buffer (buff) {
     if {[$BufferList len] = 0} {
-	buff ::= new ScratchBuffer;
-	regist-buffer $buff "*Scratch*";
-	return $buff;
+        buff ::= new ScratchBuffer;
+        regist-buffer $buff "*Scratch*";
+        return $buff;
     };
     l ::= buffer-order-list;
     i ::= $l find [$buff get-buffer-name];
@@ -116,9 +116,9 @@ BufferManager method get-next-buffer (buff) {
 
 BufferManager method get-previous-buffer (buff) {
     if {[$BufferList len] = 0} {
-	buff ::= new ScratchBuffer;
-	regist-buffer $buff "*Scratch*";
-	return $buff;
+        buff ::= new ScratchBuffer;
+        regist-buffer $buff "*Scratch*";
+        return $buff;
     };
     l ::= buffer-order-list : reverse;
     i ::= $l find [$buff get-buffer-name];
@@ -133,41 +133,41 @@ BufferManager method get-previous-buffer (buff) {
 BufferManager method set-buffer-geom (window-name buffer-name) {
 
     [$BufferGeom set? ($window-name $buffer-name)] ?? {
-	geom := <nil>;
-	$BufferGeom each do: {| k v |
-	    (w b g) := $v;
-	    if {$b = $buffer-name} {
-		geom ::= $g clone;
-		break;
-	    };
-	};
-	if $geom {
-	    $BufferGeom set
-		($window-name $buffer-name)
-		($window-name $buffer-name $geom);
-	    return;
-	};
+        geom := <nil>;
+        $BufferGeom each do: {| k v |
+            (w b g) := $v;
+            if {$b = $buffer-name} {
+                geom ::= $g clone;
+                break;
+            };
+        };
+        if $geom {
+            $BufferGeom set
+                ($window-name $buffer-name)
+                ($window-name $buffer-name $geom);
+            return;
+        };
 
-	$BufferGeom set
-	    ($window-name $buffer-name)
-	    ($window-name $buffer-name [new BufferGeom]);
-	return;
+        $BufferGeom set
+            ($window-name $buffer-name)
+            ($window-name $buffer-name [new BufferGeom]);
+        return;
     };
 };
 
 BufferManager method get-buffer-geom (window-name buffer-name) {
     geom ::= $BufferGeom get ($window-name $buffer-name);
     if $geom {
-	return $geom,2;
+        return $geom,2;
     };
 
     $BufferGeom each do: {| k v |
-	(w b g) := $v;
-	if {$b = $buffer-name} {
-	    geom ::= $g clone;
-	    ### debug-message ["*** geom clone: " . $buffer-name ", " $window-name ", " [$geom string]];
-	    return $geom;
-	};
+        (w b g) := $v;
+        if {$b = $buffer-name} {
+            geom ::= $g clone;
+            ### debug-message ["*** geom clone: " . $buffer-name ", " $window-name ", " [$geom string]];
+            return $geom;
+        };
     };
 
     return [new BufferGeom];

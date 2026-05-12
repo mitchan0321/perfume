@@ -4,31 +4,31 @@ defun pinterp (window) {
     ### $stdin puts "sysinfo";
     $window set-interp-idle;
     loop do: {
-	$stdin each do: {| exec-command |
-	    exec-command ::= "" . $exec-command;
-	    if {[$exec-command clean] = ""} {continue};
-	    unset e;
-	    unset result;
+        $stdin each do: {| exec-command |
+            exec-command ::= "" . $exec-command;
+            if {[$exec-command clean] = ""} {continue};
+            unset e;
+            unset result;
 
-	    try {
+            try {
                 $window set-interp-busy;
-		result ::= begin {
-		    unset exec-command;
-		    alias up: 1 exec-command exec-command;
-		    result ([$exec-command eval]);
-		} local: $PINTERP_LOCAL :rebase;
-	    } catch: {| e |
-		result ::= "EXCEPTION: <" . [$e car] "># " [$e cdr];
+                result ::= begin {
+                    unset exec-command;
+                    alias up: 1 exec-command exec-command;
+                    result ([$exec-command eval]);
+                } local: $PINTERP_LOCAL :rebase;
+            } catch: {| e |
+                result ::= "EXCEPTION: <" . [$e car] "># " [$e cdr];
                 ### println file: $stderr $@stack-trace;
-	    } fin: {
+            } fin: {
                 $window set-interp-idle;
-	    };
-	    if {set? e} {
-		$stderr puts $result;
-	    } {
-		$stdout puts ["Result[" . [type? [$result car]] "]=> " [$result car]];
-	    };
-	};
-	$stdin clear;
+            };
+            if {set? e} {
+                $stderr puts $result;
+            } {
+                $stdout puts ["Result[" . [type? [$result car]] "]=> " [$result car]];
+            };
+        };
+        $stdin clear;
     };
 };

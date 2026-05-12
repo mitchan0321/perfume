@@ -3,14 +3,14 @@
 #
 defun load-func (s force: force) {
     if {! [set? force]} then: {
-	if [dict-func : set? $s] then: {return <nil>};
+        if [dict-func : set? $s] then: {return <nil>};
     };
 
     dict-func : unset $s;
     $LIB_PATH each do: {| f |
-	try {unset p; alias up: 1 __fname__ p};
-	set p [$f . "/" $s ".prfm"];
-	uplevel {
+        try {unset p; alias up: 1 __fname__ p};
+        set p [$f . "/" $s ".prfm"];
+        uplevel {
             try {begin :rebase local: [dict-local] {load $__fname__}}
             catch: {| __error__ |
                 if {eq? [$__error__ car] ErrFileNotOpen} {continue};
@@ -18,22 +18,22 @@ defun load-func (s force: force) {
             }; 
             unset __fname__
         };
-	if [dict-func : set? $s] then: {return <t>};
+        if [dict-func : set? $s] then: {return <t>};
     };
     throw ErrNoFunction ["No such function, '" . $s "'."];
 };
 
 defun load-class (s force: force) {
     if {! [set? force]} then: {
-	if [dict-class : set? $s] then: {return <nil>};
+        if [dict-class : set? $s] then: {return <nil>};
     };
     if {$@BUILT-IN-CLASSES set? $s} then: {return <nil>};
     
     dict-class : unset $s;
     $LIB_PATH each do: {| f |
-	try {unset p; alias up: 1 __fname__ p};
-	set p [$f . "/" $s ".prfm"];
-	uplevel {
+        try {unset p; alias up: 1 __fname__ p};
+        set p [$f . "/" $s ".prfm"];
+        uplevel {
             try {begin :rebase local: [dict-local] {load $__fname__}}
             catch: {| __error__ |
                 if {eq? [$__error__ car] ErrFileNotOpen} {continue};
@@ -41,16 +41,16 @@ defun load-class (s force: force) {
             };
             unset __fname__
         };
-	if [dict-class : set? $s] then: {return <t>};
+        if [dict-class : set? $s] then: {return <t>};
     };
     throw ErrNoClass ["No such class, '" . $s "'."];
 };
 
 defun load-tasklet (s) {
     $LIB_PATH each do: {| f |
-	try {unset p; alias up: 1 __fname__ p};
-	set p [$f . "/" $s ".prfm"];
-	uplevel {
+        try {unset p; alias up: 1 __fname__ p};
+        set p [$f . "/" $s ".prfm"];
+        uplevel {
             try {
                 begin :rebase local: [dict-local] {load $__fname__};
                 return <t>;
@@ -71,7 +71,7 @@ defun load-tasklet (s) {
 defun for (init cond incr do: body) {
     $init eval;
     while {$cond eval} do: {
-	try {
+        try {
             $body eval
         }
         fin: {
@@ -86,7 +86,7 @@ defun for (init cond incr do: body) {
 #
 defun apply-constructor () {
     [[self] delegate?] each do: {| i |
-	apply-constructor-sub $i;
+        apply-constructor-sub $i;
     };
 };
 
@@ -99,10 +99,10 @@ defun apply-constructor-sub (o) {
     if {$l null?} then: {return};
 
     $l each do: {| i |
-	apply-constructor-sub $i;
-	try {
-	    [$i var? init];
-	}
+        apply-constructor-sub $i;
+        try {
+            [$i var? init];
+        }
         catch: {};
     };
 };
@@ -131,79 +131,79 @@ begin {
         if [$expr null?] then: {throw ErrSyntax $help};
 
         lstack := ();
-    	$expr each do: {| item |
+        $expr each do: {| item |
             case [type? $item]
-	    SYMBOL {
-	        cond
-	    	[$2opsyms find $item] {
-		    if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
-		    i2 ::= $lstack >>;
-		    if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
-		    i1 ::= $lstack >>;
-		    $lstack << [$i1 $item $i2];
-		    break;
+            SYMBOL {
+                cond
+                [$2opsyms find $item] {
+                    if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
+                    i2 ::= $lstack >>;
+                    if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
+                    i1 ::= $lstack >>;
+                    $lstack << [$i1 $item $i2];
+                    break;
                 }
-	    
-	        [eq? $item pop] {
-		    if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
-		    $lstack >>;
-		    break;
-	        }
-	    
-	        [eq? $item exchg] {
-		    if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
-		    i2 ::= $lstack >>;
-		    if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
-		    i1 ::= $lstack >>;
-		    $lstack << $i2;
-		    $lstack << $i1;
-		    break;
-	        }
-	    
-	        [eq? $item dup] {
-		     if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
-		     i1 ::= $lstack >>;
-		     $lstack << $i1;
-		     $lstack << $i1;
-		     break;
-	        }
+            
+                [eq? $item pop] {
+                    if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
+                    $lstack >>;
+                    break;
+                }
+            
+                [eq? $item exchg] {
+                    if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
+                    i2 ::= $lstack >>;
+                    if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
+                    i1 ::= $lstack >>;
+                    $lstack << $i2;
+                    $lstack << $i1;
+                    break;
+                }
+            
+                [eq? $item dup] {
+                     if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
+                     i1 ::= $lstack >>;
+                     $lstack << $i1;
+                     $lstack << $i1;
+                     break;
+                }
 
-	        [eq? $item if] {
-	       	    if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
-		    c ::= $lstack >>;
-	            if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
-		    fv ::= $lstack >>;
-	            if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
-		    tv ::= $lstack >>;
-		    if $c {$lstack << $tv} {$lstack << $fv};
-		    break;
-	        }
+                [eq? $item if] {
+                    if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
+                    c ::= $lstack >>;
+                    if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
+                    fv ::= $lstack >>;
+                    if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
+                    tv ::= $lstack >>;
+                    if $c {$lstack << $tv} {$lstack << $fv};
+                    break;
+                }
 
-	        [eq? $item list] {
-	            return $lstack;
+                [eq? $item list] {
+                    return $lstack;
                 }
-		
-	        [eq? $item top] {
-	            return [$lstack >>];
+                
+                [eq? $item top] {
+                    return [$lstack >>];
                 }
-	    
-	        <t> {
-		    if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
-	            i1 ::= $lstack >>;
-		    $lstack << [$i1 $item];
-	    	}
-	    	;
-	    }
-	
-	    LIST {
-	        $lstack << [call expr $item];
-	    }
-	
-	    default: {
-	        $lstack << $item;
-	    }
-	    ;
-	
+            
+                <t> {
+                    if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
+                    i1 ::= $lstack >>;
+                    $lstack << [$i1 $item];
+                }
+                ;
+            }
+        
+            LIST {
+                $lstack << [call expr $item];
+            }
+        
+            default: {
+                $lstack << $item;
+            }
+            ;
+        
         };
 
         if [$lstack null?] {throw ErrStackUnderflow "No stack data."};
@@ -219,28 +219,28 @@ load-func :force pipe;
 defun >@ (body) {
     result := <nil>;
     $stdin each do: {| i |
-	dict-closure $body : set _ $i;
-	result ::= yield $body;
+        dict-closure $body : set _ $i;
+        result ::= yield $body;
     };
     $stdout puts $result;
 };
 
 defun >@> (body) {
     $stdin each do: {| i |
-	dict-closure $body : set _ $i;
-	$stdout puts [yield $body];
+        dict-closure $body : set _ $i;
+        $stdout puts [yield $body];
     };
 };
 
 List method @> (args: body) {
     if [$body null?]
     then: {
-	[self] each do: {| i |
-	    $stdout puts $i;
-	};
+        [self] each do: {| i |
+            $stdout puts $i;
+        };
     }
     else: {
-	b ::= $body car;
+        b ::= $body car;
         [self] each do: {| i |
             dict-closure $b : set _ $i;
             $stdout puts [yield $b];

@@ -37,9 +37,9 @@ defcommand kill-buffer desc: "Kill the current buffer. If the buffer is modified
         mini-input-fully-yes-or-no $main $window
             prompt: "This buffer is modified, really kill? [yes or ESC]: "
             yes-proc: {
-		$main unbind-buffer;
-		return ALL;
-	    }
+                $main unbind-buffer;
+                return ALL;
+            }
         ;;
         return ALL;
     };
@@ -84,19 +84,19 @@ defcommand buffer-list desc: "Display all buffers list." {
     $buff append-string [$format expand : fmt "-" "-" "-" "-" "-" "-" "-----------" "------" "----" "------------"];
     shortcut-ind := 1;
     $l each do: {| buff-name |
-	display-buffer ::= BufferManager get-buffer $buff-name;
-	$buff append-string [
-	    $format expand : fmt
+        display-buffer ::= BufferManager get-buffer $buff-name;
+        $buff append-string [
+            $format expand : fmt
             [[$shortcut-ind <= 10] ??? [$shortcut-ind % 10] " "]
             [$display-buffer get-encoding-digest]
-	    [[$display-buffer includeCR?] ??? "d" "u"]
-	    [[$display-buffer modify?]  ??? "*" " "]
-	    [[$display-buffer protect?] ??? "%" " "]
-	    [[$display-buffer newfile?] ??? "?" " "]
-	    ["<" . $buff-name ">"]
-	    [$display-buffer get-buffer-length]
+            [[$display-buffer includeCR?] ??? "d" "u"]
+            [[$display-buffer modify?]  ??? "*" " "]
+            [[$display-buffer protect?] ??? "%" " "]
+            [[$display-buffer newfile?] ??? "?" " "]
+            ["<" . $buff-name ">"]
+            [$display-buffer get-buffer-length]
             [{$display-buffer get-buffer-mode} ?? "-"]
-	    [$display-buffer get-content]
+            [$display-buffer get-content]
         ];
         $shortcut-ind ++;
     };
@@ -112,20 +112,20 @@ defcommand jump-to-buffer desc: "Switch to specified the buffer in buffer list."
     (line col) ::= $window get-source-index $buff $geom;
     r ::= $buff get-buffer-line $line;
     $r ?? {
-	show-message "No buffer name specified.";
-	return SELF;
+        show-message "No buffer name specified.";
+        return SELF;
     };
     l ::= $r =~ $BUFFER_LINK;
     if {nil? $l} {
-	show-message "No buffer name specified.";
-	return SELF;
+        show-message "No buffer name specified.";
+        return SELF;
     };
 
     s ::= $l car : get 2;
     target-buff ::= BufferManager find-buffer $s;
     $target-buff ?? {
-	show-message "No buffer name specified.";
-	return SELF;
+        show-message "No buffer name specified.";
+        return SELF;
     };
     $main bind-buffer [$window get-window-name] $target-buff;
     result SELF;
@@ -299,32 +299,32 @@ defcommand buffer-list-delete desc: "Delete the selected buffer in buffer list."
     (line col) ::= $window get-source-index $buff $geom;
     r ::= $buff get-buffer-line $line;
     $r ?? {
-	show-message :bell "No buffer name specified.";
-	return SELF;
+        show-message :bell "No buffer name specified.";
+        return SELF;
     };
     l ::= $r =~ $BUFFER_LINK;
     if {nil? $l} {
-	show-message :bell "No buffer name specified.";
-	return SELF;
+        show-message :bell "No buffer name specified.";
+        return SELF;
     };
 
     s ::= $l car : get 2;
     target-buff ::= BufferManager find-buffer $s;
     $target-buff ?? {
-	show-message :bell "No buffer name specified.";
-	return SELF;
+        show-message :bell "No buffer name specified.";
+        return SELF;
     };
 
     if [$target-buff modify?] {
         mini-input-fully-yes-or-no $main $window
             prompt: "This buffer is modified, really kill? [yes or ESC]: "
             yes-proc: {
-		$main delete-buffer $target-buff;
+                $main delete-buffer $target-buff;
                 $window apply-command $main $window "" buffer-list;
-		return ALL;
+                return ALL;
             }
         ;;
-	return ALL;
+        return ALL;
     };
     $main delete-buffer $target-buff;
     $window apply-command $main $window "" buffer-list;
@@ -339,20 +339,20 @@ defcommand buffer-list-save desc: "Save the selected buffer in buffer list." {
     (line col) ::= $window get-source-index $buff $geom;
     r ::= $buff get-buffer-line $line;
     $r ?? {
-	show-message :bell "No buffer name specified.";
-	return SELF;
+        show-message :bell "No buffer name specified.";
+        return SELF;
     };
     l ::= $r =~ $BUFFER_LINK;
     if {nil? $l} {
-	show-message :bell "No buffer name specified.";
-	return SELF;
+        show-message :bell "No buffer name specified.";
+        return SELF;
     };
 
     s ::= $l car : get 2;
     target-buff ::= BufferManager find-buffer $s;
     $target-buff ?? {
-	show-message :bell "No buffer name specified.";
-	return SELF;
+        show-message :bell "No buffer name specified.";
+        return SELF;
     };
 
     if [$target-buff modify?] {
@@ -361,7 +361,7 @@ defcommand buffer-list-save desc: "Save the selected buffer in buffer list." {
         };
         save-buffer $main $window $target-buff;
     } {
-	show-message "Buffer not modified.";
+        show-message "Buffer not modified.";
     };
 
     result ALL;
@@ -394,13 +394,13 @@ defcommand buffer-list-store-buffer desc: "Store current buffer list line buffer
     (line col) ::= $window get-source-index $buff $geom;
     r ::= $buff get-buffer-line $line;
     $r ?? {
-	show-message "No buffer name specified.";
-	return SELF;
+        show-message "No buffer name specified.";
+        return SELF;
     };
     l ::= $r =~ $BUFFER_LINK;
     if {nil? $l} {
-	show-message "No buffer name specified.";
-	return SELF;
+        show-message "No buffer name specified.";
+        return SELF;
     };
 
     s ::= $l car : get 2;
@@ -417,13 +417,13 @@ defcommand buffer-list-open-next-window desc: "Open current buffer on next windo
     (line col) ::= $window get-source-index $buff $geom;
     r ::= $buff get-buffer-line $line;
     $r ?? {
-	show-message "No buffer name specified.";
-	return SELF;
+        show-message "No buffer name specified.";
+        return SELF;
     };
     l ::= $r =~ $BUFFER_LINK;
     if {nil? $l} {
-	show-message "No buffer name specified.";
-	return SELF;
+        show-message "No buffer name specified.";
+        return SELF;
     };
     buff-name ::= $l car : get 2;
     cwin ::= $main get-current-window;
@@ -448,13 +448,13 @@ defcommand buffer-list-open-previous-window desc: "Open current buffer on previo
     (line col) ::= $window get-source-index $buff $geom;
     r ::= $buff get-buffer-line $line;
     $r ?? {
-	show-message "No buffer name specified.";
-	return SELF;
+        show-message "No buffer name specified.";
+        return SELF;
     };
     l ::= $r =~ $BUFFER_LINK;
     if {nil? $l} {
-	show-message "No buffer name specified.";
-	return SELF;
+        show-message "No buffer name specified.";
+        return SELF;
     };
     buff-name ::= $l car : get 2;
     cwin ::= $main get-current-window;

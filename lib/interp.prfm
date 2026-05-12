@@ -12,61 +12,61 @@ defun interp () {
 
 defun interp-co () {
     if {defvar? INTERACTIVE} else: {defvar INTERACTIVE <t>};
-    set __local_var [dict];	# for eval local environment
+    set __local_var [dict];     # for eval local environment
 
     $stdin clear;
     $SYSQUEUE add-queue $stdin {
-	
+        
         if [set? __cont__] then: {
-	    r ::= $stdin gets;
-	    if {nil? $r} then: {r := ""; $stdin clear; println};
-	    set __cbuff $r;
-	    $__buff append! "\n";
-	    $__buff append! $__cbuff;
+            r ::= $stdin gets;
+            if {nil? $r} then: {r := ""; $stdin clear; println};
+            set __cbuff $r;
+            $__buff append! "\n";
+            $__buff append! $__cbuff;
         } else: {
-	    r ::= $stdin gets;
-	    if {nil? $r} then: {r := ""; $stdin clear; println};
-	    set __buff $r;
+            r ::= $stdin gets;
+            if {nil? $r} then: {r := ""; $stdin clear; println};
+            set __buff $r;
         };
 
-	if {$stdin eof?} then: {$stdin clear; println};
+        if {$stdin eof?} then: {$stdin clear; println};
 
         try {
-	    set __result [
-		    begin {
-			    if {! [exists? __buff]}
-			    then: {
-				    alias up: 1 __buff __buff;
-			    };
-			    result ([$__buff eval]);
-		    } local: $__local_var :rebase;
-	    ];
-	    $stdin clear;
+            set __result [
+                    begin {
+                            if {! [exists? __buff]}
+                            then: {
+                                    alias up: 1 __buff __buff;
+                            };
+                            result ([$__buff eval]);
+                    } local: $__local_var :rebase;
+            ];
+            $stdin clear;
 
-	    if [control? [$__result car]] {
-		println "return control=> " [$__result car];
-	    } {
-		set __result [$__result car];
-	        println "result[" [type? $__result] "]=> "
-		    [if [[["" . $__result] len] > 512]
-		         then: {[["" . $__result] sub 0 512] . " ..."}
-		         else: {"" . $__result}];
-	    };
-	    unset __cont__;
+            if [control? [$__result car]] {
+                println "return control=> " [$__result car];
+            } {
+                set __result [$__result car];
+                println "result[" [type? $__result] "]=> "
+                    [if [[["" . $__result] len] > 512]
+                         then: {[["" . $__result] sub 0 512] . " ..."}
+                         else: {"" . $__result}];
+            };
+            unset __cont__;
 
         } catch: {| __exp |
             case [$__exp car]
-	        WarnParseClose {
-		    set __cont__ <t>;
-	        }
-		WarnParseString {
-		    set __cont__ <t>;
-	        }
-	        default: {
-		    println "EXCEPTION: <" [$__exp car] "># " [$__exp cdr];
-		    println $@stack-trace;
-		    unset __cont__;
-	        }
+                WarnParseClose {
+                    set __cont__ <t>;
+                }
+                WarnParseString {
+                    set __cont__ <t>;
+                }
+                default: {
+                    println "EXCEPTION: <" [$__exp car] "># " [$__exp cdr];
+                    println $@stack-trace;
+                    unset __cont__;
+                }
             ;;
         };
 
@@ -79,13 +79,13 @@ defun interp-co () {
 
 defun interp-prompt (prompt: p) {
     if [set? p] else: {
-	if [defvar? PROMPT]
+        if [defvar? PROMPT]
         then: {
-	    set p $PROMPT;
+            set p $PROMPT;
         }
-	else: {
-	    set p "$> ";
-	};
+        else: {
+            set p "$> ";
+        };
     };
     print file: $stderr $p;
     $stderr flush;

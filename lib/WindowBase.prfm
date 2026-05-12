@@ -19,7 +19,7 @@ WindowBase method set-buffer (buff) {
 
 WindowBase method get-buffer () {
     $Buffer ?? {
-	sets Buffer [BufferManager get-buffer "*Scratch*"];
+        sets Buffer [BufferManager get-buffer "*Scratch*"];
     };
     return $Buffer;
 };

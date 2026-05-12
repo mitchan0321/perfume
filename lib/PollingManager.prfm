@@ -20,27 +20,27 @@ PollingManager method add-event-queue (q) {
 
 PollingManager method event-loop () {
     loop do: {
-	e := $ExitConditionBlock;
+        e := $ExitConditionBlock;
         if {block? $e} {e ::= yield $e};
         if $e {break};
 
-	w := $WaitBlock;
+        w := $WaitBlock;
         if {block? $w} {w ::= yield $w};
         if {nil? $w} {continue};
 
-	eval-queue;
+        eval-queue;
     };
 };
 
 PollingManager method eval-queue () {
     $EventQueue each do: {| item |
-	(cond body) := $item;
+        (cond body) := $item;
         if {block? $cond} {
             c ::= yield $cond;
             if $c {
-		yield $body;
-		break;
-	    };
+                yield $body;
+                break;
+            };
         };
     };
 };

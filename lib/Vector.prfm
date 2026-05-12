@@ -12,6 +12,6 @@ Vector method literal () {
 Vector method fill (val) {
     v ::= self;
     0 each to: [$v len : - 1] do: {| i |
-	$v set $i $val;
+        $v set $i $val;
     };
 };

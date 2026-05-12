@@ -5,15 +5,15 @@ defun primea (n) {
     set cand 5;
 
     while {true} do: {
-	if {[$prime last] > $n} then: {return $prime};
+        if {[$prime last] > $n} then: {return $prime};
 
-	$cand ++ 2;
-	$prime each do: {| i |
-	    if {[$i * 2] > $cand} then: {break};
-	    if {[$cand % $i] = 0} then: {$cand ++ 2; retry};
-	};
+        $cand ++ 2;
+        $prime each do: {| i |
+            if {[$i * 2] > $cand} then: {break};
+            if {[$cand % $i] = 0} then: {$cand ++ 2; retry};
+        };
 
         #found prime
-	$prime append! $cand;
+        $prime append! $cand;
     };
 };

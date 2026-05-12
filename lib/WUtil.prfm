@@ -24,10 +24,10 @@ WUtil method init () {
     defun exit () {$MainWindow exit-event-loop};
 
     if {! [defvar? CopyBuffer]} {
-	defvar CopyBuffer "";
+        defvar CopyBuffer "";
     };
     if {! [defvar? SearchString]} {
-	defvar SearchString "";
+        defvar SearchString "";
     };
 };
 
@@ -40,19 +40,19 @@ WUtil method term () {
 
 WUtil method color-pair (fg bg) {
     if {sets? ColorPair} else: {
-	sets ColorPair [dict];
-	$ColorPair set count 0;
+        sets ColorPair [dict];
+        $ColorPair set count 0;
     };
     if {sets? ColorName} else: {
-	sets ColorName [dict];
-	$ColorName set BLACK   0;
-	$ColorName set RED     1;
-	$ColorName set GREEN   2;
-	$ColorName set YELLOW  3;
-	$ColorName set BLUE    4;
-	$ColorName set MAGENTA 5;
-	$ColorName set CYAN    6;
-	$ColorName set WHITE   7;
+        sets ColorName [dict];
+        $ColorName set BLACK   0;
+        $ColorName set RED     1;
+        $ColorName set GREEN   2;
+        $ColorName set YELLOW  3;
+        $ColorName set BLUE    4;
+        $ColorName set MAGENTA 5;
+        $ColorName set CYAN    6;
+        $ColorName set WHITE   7;
     };
 
     if {$ColorName set? $fg} else: {throw ErrNoSuchColorName "No such foreground color name."};
@@ -60,16 +60,16 @@ WUtil method color-pair (fg bg) {
 
     if {$ColorPair set? ($ColorName,$fg $ColorName,$bg)}
     then: {
-	return [$ColorPair get ($ColorName,$fg $ColorName,$bg)];
+        return [$ColorPair get ($ColorName,$fg $ColorName,$bg)];
     }
     else: {
-	p ::= $ColorPair get count;
-	p ::= $p + 1;
-	curs-add-color $p $ColorName,$fg $ColorName,$bg;
-	$ColorPair set ($ColorName,$fg $ColorName,$bg) $p;
-	$ColorPair set $p ($ColorName,$fg $ColorName,$bg);
-	$ColorPair set count $p;
-	return $p;
+        p ::= $ColorPair get count;
+        p ::= $p + 1;
+        curs-add-color $p $ColorName,$fg $ColorName,$bg;
+        $ColorPair set ($ColorName,$fg $ColorName,$bg) $p;
+        $ColorPair set $p ($ColorName,$fg $ColorName,$bg);
+        $ColorPair set count $p;
+        return $p;
     };
 };
 
@@ -77,7 +77,7 @@ WUtil method get-bgcolor (name) {
     n ::= $ColorDB get $name;
     $n ?? {throw ErrNoSuchColor ["WUtil::get-bgcolor: No such color DB name, " . $name]};
     try {
-	(fg bg) ::= $ColorPair get $n;
+        (fg bg) ::= $ColorPair get $n;
     }
     catch: {throw ErrNoSuchColor ["WUtil::get-bgcolor: No color pair no, " . $n]};
     return $bg;
@@ -87,7 +87,7 @@ WUtil method get-fgcolor (name) {
     n ::= $ColorDB get $name;
     $n ?? {throw ErrNoSuchColor ["WUtil::get-fgcolor: No such color DB name, " . $name]};
     try {
-	(fg bg) ::= $ColorPair get $n;
+        (fg bg) ::= $ColorPair get $n;
     }
     catch: {throw ErrNoSuchColor ["WUtil::get-fgcolor: No color pair no, " . $n]};
     return $fg;
@@ -96,13 +96,13 @@ WUtil method get-fgcolor (name) {
 defun init-config () {
     if {defvar? PMACS_INIT}
     else: {
-	$LIB_PATH each do: {| i |
-	    if {file exists? [$i . "/pmacs.conf"]} {
-	        load :notrace [$i . "/pmacs.conf"];
-		break;
-	    };
-	};
-	defvar PMACS_INIT <t>;
+        $LIB_PATH each do: {| i |
+            if {file exists? [$i . "/pmacs.conf"]} {
+                load :notrace [$i . "/pmacs.conf"];
+                break;
+            };
+        };
+        defvar PMACS_INIT <t>;
     };
 };
 
@@ -142,18 +142,18 @@ defun init-color-DB () {
         };
     };
     if [defvar? AttrDB] else: {
-	defvar AttrDB [dict];
+        defvar AttrDB [dict];
     };
     
     if [defvar? ColorDB] else: {
-	defvar ColorDB [dict];
+        defvar ColorDB [dict];
     };
 
     $LIB_PATH each do: {| i |
-	if {file exists? [$i . "/pmacs-theme.prfm"]} {
-	    load :notrace [$i . "/pmacs-theme.prfm"];
-	    break;
-	};
+        if {file exists? [$i . "/pmacs-theme.prfm"]} {
+            load :notrace [$i . "/pmacs-theme.prfm"];
+            break;
+        };
     };
     read-user-conf-file "theme.conf";
 };
@@ -186,18 +186,18 @@ defun apply-color (curs y x len color-name) {
 defun init-command-DB () {
     if {defvar? EditorCommand}
     else: {
-	defvar EditorCommand [dict];
+        defvar EditorCommand [dict];
     };
     if {defvar? EditorCommandDesc}
     else: {
-	defvar EditorCommandDesc [dict];
+        defvar EditorCommandDesc [dict];
     };
 
     $LIB_PATH each do: {| i |
-	if {file exists? [$i . "/pmacs-command.prfm"]} {
-	    load [$i . "/pmacs-command.prfm"];
-	    break;
-	};
+        if {file exists? [$i . "/pmacs-command.prfm"]} {
+            load [$i . "/pmacs-command.prfm"];
+            break;
+        };
     };
 };
 
@@ -322,7 +322,7 @@ defun show-message (
     };
     
     if {defvar? MainWindow} {
-	try {
+        try {
             [$MainWindow get-minibuffer-window] ?? {throw ErrNoMiniBuffer "No MiniBuffer for debugging."};
             $MainWindow display-window-message "MiniBuffer" $msg;
             if [set? bell] {
@@ -343,7 +343,7 @@ defun show-message (
                 curs-flash;
             };
             if {set? msec} {sleep $msec};
-	} catch: {};
+        } catch: {};
     } {
         println file: $stderr $msg;
     };
@@ -353,12 +353,12 @@ defun path-adjust (path) {
     l ::= $path split sep: "/";
     r := ();
     $l each do: {| i |
-	cond
-	    {$i = ".."} {if {[$r len] > 1} {$r ->>}; break}
-	    {$i = "."}  {break}
-	    {$i = ""}   {if {[$r len] > 1} {break}}
-	    <t>         {$r <<- $i}
-	;
+        cond
+            {$i = ".."} {if {[$r len] > 1} {$r ->>}; break}
+            {$i = "."}  {break}
+            {$i = ""}   {if {[$r len] > 1} {break}}
+            <t>         {$r <<- $i}
+        ;
     };
     if {and {[$r len] = 1} {[$r get 0] = ""}} {return "/"};
     return [$r join sep: "/"];
@@ -383,83 +383,83 @@ defun show-files-in-window (main window dir) {
 
     if {file dir? $dir} {
 
-	### display directory
+        ### display directory
 
-	dir ::= path-adjust $dir;
-	if {$dir != "/"} {dir ::= $dir . "/"};
-	$buff append-string ["<<< In directory: %v >>>" fmt $dir];
-	$buff append-string "";
+        dir ::= path-adjust $dir;
+        if {$dir != "/"} {dir ::= $dir . "/"};
+        $buff append-string ["<<< In directory: %v >>>" fmt $dir];
+        $buff append-string "";
 
-	try {
-	    l ::= msort [file list $dir];
-	    while {! [$l null?]} do: {
-		v1 ::= $l >>;
-		if {and $v1 {file dir? [$dir . $v1]}} {$v1 append! "/"};
-		v2 ::= $l >>;
-		if {and $v2 {file dir? [$dir . $v2]}} {$v2 append! "/"};
-		# v3 ::= $l >>;
-		# if {and $v3 {file dir? [$dir . $v3]}} {$v3 append! "/"};		
-		# v4 ::= $l >>;
-		# if {and $v4 {file dir? [$dir . $v4]}} {$v4 append! "/"};
-		# $buff append-string ["%-20v\t%-20v\t%-20v\t%-20v" fmt [$v1 ?? ""] [$v2 ?? ""] [$v3 ?? ""] [$v4 ?? ""]];
-		$buff append-string ["%-40w%-40w" fmt [$v1 ?? ""] [$v2 ?? ""]];
-	    };
-	} catch: {| e |
-	    $buff append-string ["Can't read directory. <" [$e car] "># " [$e cdr]];
-	};
+        try {
+            l ::= msort [file list $dir];
+            while {! [$l null?]} do: {
+                v1 ::= $l >>;
+                if {and $v1 {file dir? [$dir . $v1]}} {$v1 append! "/"};
+                v2 ::= $l >>;
+                if {and $v2 {file dir? [$dir . $v2]}} {$v2 append! "/"};
+                # v3 ::= $l >>;
+                # if {and $v3 {file dir? [$dir . $v3]}} {$v3 append! "/"};
+                # v4 ::= $l >>;
+                # if {and $v4 {file dir? [$dir . $v4]}} {$v4 append! "/"};
+                # $buff append-string ["%-20v\t%-20v\t%-20v\t%-20v" fmt [$v1 ?? ""] [$v2 ?? ""] [$v3 ?? ""] [$v4 ?? ""]];
+                $buff append-string ["%-40w%-40w" fmt [$v1 ?? ""] [$v2 ?? ""]];
+            };
+        } catch: {| e |
+            $buff append-string ["Can't read directory. <" [$e car] "># " [$e cdr]];
+        };
     } {
 
-	### display files and mathchies
+        ### display files and mathchies
 
-	flist ::= path-adjust $dir : split sep: "/";
-	fname ::= $flist ->>;
+        flist ::= path-adjust $dir : split sep: "/";
+        fname ::= $flist ->>;
 
-	try {
-	    dir ::= $flist join sep: "/";
-	    if {$dir != "/"} {dir ::= $dir . "/"};
-	    $buff append-string ["<<< In directory matchies: %v >>>" fmt $dir];
-	    $buff append-string "";
-	
-	    l ::= file list $dir : filter {| i |
+        try {
+            dir ::= $flist join sep: "/";
+            if {$dir != "/"} {dir ::= $dir . "/"};
+            $buff append-string ["<<< In directory matchies: %v >>>" fmt $dir];
+            $buff append-string "";
+        
+            l ::= file list $dir : filter {| i |
                 ### $i =~ ["^" . $fname : rquote];
-	        ### $i =~ :text [$fname rquote];
+                ### $i =~ :text [$fname rquote];
                 [$i sub 0 [$fname len]] = $fname;
-	    };
-	    l ::= msort $l;
-	    src-list ::= $l clone;
-	    file-count ::= $l len;
-	    if {$file-count >= 1} {
-		while {! [$l null?]} do: {
-		    v1 ::= $l >>;
-		    if {and $v1 {file dir? [$dir . $v1]}} {$v1 append! "/"};
-		    v2 ::= $l >>;
-		    if {and $v2 {file dir? [$dir . $v2]}} {$v2 append! "/"};
-		    # v3 ::= $l >>;
-		    # if {and $v3 {file dir? [$dir . $v3]}} {$v3 append! "/"};		
-		    # v4 ::= $l >>;
-		    # if {and $v4 {file dir? [$dir . $v4]}} {$v4 append! "/"};
-		    # $buff append-string ["%-20v\t%-20v\t%-20v\t%-20v" fmt [$v1 ?? ""] [$v2 ?? ""] [$v3 ?? ""] [$v4 ?? ""]];
-		    $buff append-string ["%-40w%-40w" fmt [$v1 ?? ""] [$v2 ?? ""]];
-		};
-		if {$file-count = 1} {
-		    $buff append-string "--";
-		    $buff append-string "File match solo complete.";
-		    fname := $v1;
-		} { 
-		    $buff append-string "--";
-		    $buff append-string ["%v files match." fmt $file-count];
-		    fname ::= path-longest-match $src-list $fname;
-		};
-	    } {
-		$buff append-string "--";
-		$buff append-string "No file match.";
-	    };
+            };
+            l ::= msort $l;
+            src-list ::= $l clone;
+            file-count ::= $l len;
+            if {$file-count >= 1} {
+                while {! [$l null?]} do: {
+                    v1 ::= $l >>;
+                    if {and $v1 {file dir? [$dir . $v1]}} {$v1 append! "/"};
+                    v2 ::= $l >>;
+                    if {and $v2 {file dir? [$dir . $v2]}} {$v2 append! "/"};
+                    # v3 ::= $l >>;
+                    # if {and $v3 {file dir? [$dir . $v3]}} {$v3 append! "/"};
+                    # v4 ::= $l >>;
+                    # if {and $v4 {file dir? [$dir . $v4]}} {$v4 append! "/"};
+                    # $buff append-string ["%-20v\t%-20v\t%-20v\t%-20v" fmt [$v1 ?? ""] [$v2 ?? ""] [$v3 ?? ""] [$v4 ?? ""]];
+                    $buff append-string ["%-40w%-40w" fmt [$v1 ?? ""] [$v2 ?? ""]];
+                };
+                if {$file-count = 1} {
+                    $buff append-string "--";
+                    $buff append-string "File match solo complete.";
+                    fname := $v1;
+                } { 
+                    $buff append-string "--";
+                    $buff append-string ["%v files match." fmt $file-count];
+                    fname ::= path-longest-match $src-list $fname;
+                };
+            } {
+                $buff append-string "--";
+                $buff append-string "No file match.";
+            };
 
-	    dir ::= $dir . $fname;
+            dir ::= $dir . $fname;
 
-	} catch: {| e |
-	    $buff append-string ["Can't read directory. <" [$e car] "># " [$e cdr]];
-	};
+        } catch: {| e |
+            $buff append-string ["Can't read directory. <" [$e car] "># " [$e cdr]];
+        };
     };
 
     $buff no-modify;
@@ -475,19 +475,19 @@ defun path-longest-match (list fname) {
     from ::= $fname len;
     to ::= $list map {| i | $i len} : min : - 1;
     $from each to: $to do: {| i |
-	m ::= $list car : at $i;
-	match := <t>;
-	[$list cdr] each do: {| x |
-	    if {$m != [$x at $i]} {
-	        match := <nil>;
-		break;
-	    };
-	};
-	if $match {
+        m ::= $list car : at $i;
+        match := <t>;
+        [$list cdr] each do: {| x |
+            if {$m != [$x at $i]} {
+                match := <nil>;
+                break;
+            };
+        };
+        if $match {
             $result append! $m
         } {
-	    break;
-	};
+            break;
+        };
     };
     
     return $result;
@@ -763,7 +763,7 @@ defun unsetconf (key) {
 
 defun mouse-on () {
     if [curs-mouse?] {
-    	curs-mouse-on;
+        curs-mouse-on;
     };
 };
 

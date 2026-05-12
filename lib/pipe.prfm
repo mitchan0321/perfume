@@ -13,18 +13,18 @@ defun pipe (in: in out: out append: append args: blocks) {
     # if in: is list, recurcive call
     #
     if {set? in} then: {
-	s := <nil>;
-	if {list? $in} then: {
-	    $in each do: {| i |
-		l := (in: $i);
-		if {set? out} then: {
-		    $l concat! (out: $out);
-		};
-		$l concat! $blocks;
-		s ::= call pipe $l;
-	    };
-	    return $s;
-	};
+        s := <nil>;
+        if {list? $in} then: {
+            $in each do: {| i |
+                l := (in: $i);
+                if {set? out} then: {
+                    $l concat! (out: $out);
+                };
+                $l concat! $blocks;
+                s ::= call pipe $l;
+            };
+            return $s;
+        };
     };
     
     #
@@ -33,26 +33,26 @@ defun pipe (in: in out: out append: append args: blocks) {
     infile := "-";
     if {set? in}
     then: {
-	case [type? $in]
-	    OBJECT {
-	        if {or [$in instance? Stream] [$in instance? File]} else: {
-		    throw ErrSyntax $syntax;
-		};
-	    }
-	    STRING {
-		in := `File($in mode: i);
-		$flist append! $in;
-	    }
-	    default: {throw ErrSyntax $syntax}
-	;
-	 
-	d ::= dict [$in stat];
+        case [type? $in]
+            OBJECT {
+                if {or [$in instance? Stream] [$in instance? File]} else: {
+                    throw ErrSyntax $syntax;
+                };
+            }
+            STRING {
+                in := `File($in mode: i);
+                $flist append! $in;
+            }
+            default: {throw ErrSyntax $syntax}
+        ;
+         
+        d ::= dict [$in stat];
         n := $d,path;
-	if [nil? $n] then: {n := "-"};
+        if [nil? $n] then: {n := "-"};
         infile := $n;
     }
     else: {
-	set in $stdin;
+        set in $stdin;
     };
 
     #
@@ -61,33 +61,33 @@ defun pipe (in: in out: out append: append args: blocks) {
     outfile := "-";
     if {set? out}
     then: {
-	case [type? $out]
-	    OBJECT {
-	        if {or [$out instance? Stream] [$out instance? File]} else: {
-		    throw ErrSyntax $syntax;
-		};
-		if {$out instance? Stream} then: {
-		    $out set-nolimit;
-		}
-	    }
-	    STRING {
-		if {true? append} then: {
-		    out := `File($out mode: a);
-		} else: {
-		    out := `File($out mode: o);
-	        };
-		$flist append! $out;
-	    }
-	    default: {throw ErrSyntax $syntax}
-	;
-	
-	d ::= dict [$out stat];
+        case [type? $out]
+            OBJECT {
+                if {or [$out instance? Stream] [$out instance? File]} else: {
+                    throw ErrSyntax $syntax;
+                };
+                if {$out instance? Stream} then: {
+                    $out set-nolimit;
+                }
+            }
+            STRING {
+                if {true? append} then: {
+                    out := `File($out mode: a);
+                } else: {
+                    out := `File($out mode: o);
+                };
+                $flist append! $out;
+            }
+            default: {throw ErrSyntax $syntax}
+        ;
+        
+        d ::= dict [$out stat];
         n := $d,path;
-	if [nil? $n] then: {n := "-"};
+        if [nil? $n] then: {n := "-"};
         outfile := $n;
     }
     else: {
-	set out $stdout;
+        set out $stdout;
     };
 
 
@@ -96,33 +96,33 @@ defun pipe (in: in out: out append: append args: blocks) {
     #
     $blocks each do: {| b |
         if {! [block? $b]} then: {
-	    throw ErrSyntax $syntax;
-	}
+            throw ErrSyntax $syntax;
+        }
     };
     
     len ::= $blocks len;
     if {$len = 0} then: {
-	throw ErrSyntax $syntax;
+        throw ErrSyntax $syntax;
     };
     
     blist := ();
     i := 1;
 
     $blocks each do: {| b |
-	if {$i = $len}
-	then: {
-	    pipe := $out;
-	}
-	else: {
-	    pipe ::= new Stream init: (["pipe#" . $i]);
-	    $pipe set-comode;
-	};
+        if {$i = $len}
+        then: {
+            pipe := $out;
+        }
+        else: {
+            pipe ::= new Stream init: (["pipe#" . $i]);
+            $pipe set-comode;
+        };
         p ::= new PipeWrapper init: ($in $pipe $b);
-	$p set-infile  $infile;
-	$p set-outfile $outfile;
-	$blist append! $p;
-	$i ++;
-	in := $pipe;
+        $p set-infile  $infile;
+        $p set-outfile $outfile;
+        $blist append! $p;
+        $i ++;
+        in := $pipe;
     };
     
     #
@@ -137,7 +137,7 @@ defun pipe (in: in out: out append: append args: blocks) {
         pipe-dispatch $blist;
     }
     catch: {| e |
-	throw $e;
+        throw $e;
     }
 
     #
@@ -145,14 +145,14 @@ defun pipe (in: in out: out append: append args: blocks) {
     #
     fin: {
         pipe-release $blist $flist;
-	$stdin clear;
-	$stdout flush;
+        $stdin clear;
+        $stdout flush;
 
-	if {false? CO-MODE} then: {try {loop {(rpid sts) ::= wait -1}} catch: {}};
-	if {block? $old-trap}
-	    then: {trap SIGPIPE $old-trap}
-	    else: {trap SIGPIPE}
-	;
+        if {false? CO-MODE} then: {try {loop {(rpid sts) ::= wait -1}} catch: {}};
+        if {block? $old-trap}
+            then: {trap SIGPIPE $old-trap}
+            else: {trap SIGPIPE}
+        ;
     };
 
     return [$blist last : item : get-result];
@@ -160,41 +160,41 @@ defun pipe (in: in out: out append: append args: blocks) {
 
 defun pipe-dispatch (blist) {
     loop {
-	if {pipe-check-done-cond $blist} then: {return};
-	
-	$blist each do: {| b |
-	    s ::= $b stat?;
-	    if {eq? $s DONE} then: {continue};
+        if {pipe-check-done-cond $blist} then: {return};
+        
+        $blist each do: {| b |
+            s ::= $b stat?;
+            if {eq? $s DONE} then: {continue};
 
-	    if {true? PIPEDEBUG} then: {println file: $stderr "*** " $b};
-	    $b run;
-	
-	    s ::= $b stat?;
-	    if {and [or [eq? $s @READ] [eq? $s @WRITE]] [true? CO-MODE]} then: {
+            if {true? PIPEDEBUG} then: {println file: $stderr "*** " $b};
+            $b run;
+        
+            s ::= $b stat?;
+            if {and [or [eq? $s @READ] [eq? $s @WRITE]] [true? CO-MODE]} then: {
                 pause (SLEEP 0);
             };
-	    if {eq? $s @READ} then: {
-		if {true? CO-MODE} {
+            if {eq? $s @READ} then: {
+                if {true? CO-MODE} {
                     pause (SLEEP 0);
                 } {
                     retry;
                 };
-	    };
+            };
         };
     };
 };
 
 defun pipe-check-done-cond (blist) {
     $blist each do: {| b |
-	if {eq? [$b stat?] ERROR} then: {
-	    throw ErrPipeBody ["" . [$b get-body] "-> " [$b get-error]]
-	};
+        if {eq? [$b stat?] ERROR} then: {
+            throw ErrPipeBody ["" . [$b get-body] "-> " [$b get-error]]
+        };
     };
 
     if {eq? [$blist last : item : stat?] DONE} then: {return <t>};
     
     $blist each do: {| b |
-	if {eq? [$b stat?] DONE} else: {return <nil>};
+        if {eq? [$b stat?] DONE} else: {return <nil>};
     };
 
     # all co-routines are done.
@@ -203,9 +203,9 @@ defun pipe-check-done-cond (blist) {
 
 defun pipe-release (blist flist) {
     $blist each do: {| b |
-	$b release;
+        $b release;
     };
     $flist each do: {| f |
-	$f close;
+        $f close;
     };
 };

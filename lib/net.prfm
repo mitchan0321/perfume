@@ -5,23 +5,23 @@
 #
 defun resolv-host (host) {
     try {
-	set a [[[resolv-in-addr $host] split sep: "."] map {| i | $i int}];
+        set a [[[resolv-in-addr $host] split sep: "."] map {| i | $i int}];
 
-	if [[$a len] != 4] then: {
-	    throw ErrBadAddrSpec "Bad inet address spec.";
-	};
+        if [[$a len] != 4] then: {
+            throw ErrBadAddrSpec "Bad inet address spec.";
+        };
 
-	$a each do: {| i |
-	    if [$i > 255] then: {
-		throw ErrBadAddrSpec "Bad inet address spec.";
-	    };
-	};
+        $a each do: {| i |
+            if [$i > 255] then: {
+                throw ErrBadAddrSpec "Bad inet address spec.";
+            };
+        };
 
-	return [([$a,0 << 24] [$a,1 << 16] [$a,2 << 8] $a,3)
-		inject 0 do: {| s i | $s + $i}];
+        return [([$a,0 << 24] [$a,1 << 16] [$a,2 << 8] $a,3)
+                inject 0 do: {| s i | $s + $i}];
 
     } catch: {| e |
-	throw $e;
+        throw $e;
     };
 };
 

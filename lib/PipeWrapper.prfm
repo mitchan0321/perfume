@@ -30,33 +30,33 @@ PipeWrapper method run () {
     if {sets? coro} else: {
         sets Locals [dict [dict-closure $body : pairs]];
         sets coro [coro {begin local: $Locals $body}];
-	$coro eval {
-	    setvar stdin $in;
-	    setvar stdout $out;
-	    setvar stderr $out;
-	    setvar INFILE $infile;
-	    setvar OUTFILE $outfile;
-	    if {defvar? CO-MODE} else: {defvar CO-MODE <t>};
-	    enable-itimer;
-	};
+        $coro eval {
+            setvar stdin $in;
+            setvar stdout $out;
+            setvar stderr $out;
+            setvar INFILE $infile;
+            setvar OUTFILE $outfile;
+            if {defvar? CO-MODE} else: {defvar CO-MODE <t>};
+            enable-itimer;
+        };
     };
 
     sets stat RUN;
     try {
-	sets stat [$coro next];
-	if {eq? [$coro stat] DONE} then: {
-	    sets stat DONE;
-	};
+        sets stat [$coro next];
+        if {eq? [$coro stat] DONE} then: {
+            sets stat DONE;
+        };
     }
     catch: {| e |
-	sets stat ERROR;
-	sets error ["<" . [$e car] "># " [$e cdr]];
+        sets stat ERROR;
+        sets error ["<" . [$e car] "># " [$e cdr]];
     };
     
     if {or [eq? $stat DONE] [eq? $stat ERROR]} then: {
-	$out flush;
-	if {eq? $out,@name Stream} then: {$out close;};
-	if {eq? $in,@name  Stream} then: {$in  close;};
+        $out flush;
+        if {eq? $out,@name Stream} then: {$out close;};
+        if {eq? $in,@name  Stream} then: {$in  close;};
     };
 };
 
@@ -72,7 +72,7 @@ PipeWrapper method string () {
 
 PipeWrapper method release () {
     if {sets? coro} then: {
-	$coro release;
+        $coro release;
     };
     if [true? @term-hook] then: {$@term-hook};
 };
@@ -107,15 +107,15 @@ PipeWrapper method out-setup () {
     s ::= self;
     
     $o method puts (*) {
-	r ::= call $f $*;
+        r ::= call $f $*;
 
-	if {[$* len] = 1} then: {
-	    $s set-result [$* item];
-	} else: {
-	    $s set-result $*;
+        if {[$* len] = 1} then: {
+            $s set-result [$* item];
+        } else: {
+            $s set-result $*;
         };
 
-	return $r;
+        return $r;
     };
 
     sets out $o;

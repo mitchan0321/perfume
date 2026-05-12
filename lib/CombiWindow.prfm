@@ -39,14 +39,14 @@ CombiWindow method init (main y x line column) {
             curs-new-window
             $curs
             $y                  $x
-            1 	     		$column
+            1                   $column
         ];
     } {
         sets StatusLineCurs [
             curs-new-window
             $curs
             [$y + $line : - 1]  $x
-            1 	     		$column
+            1                   $column
         ];
     };
     
@@ -56,7 +56,7 @@ CombiWindow method init (main y x line column) {
             curs-new-window
             $curs
             [$y + $top_offset]  $x                      ### Left side Vertical Line
-            [$line - 1] 	1
+            [$line - 1]         1
         ];
     }
     RIGHT {
@@ -72,7 +72,7 @@ CombiWindow method init (main y x line column) {
             curs-new-window
             $curs
             [$y + $top_offset]  $x                      ### Left side Vertical Line
-            [$line - 1] 	1
+            [$line - 1]         1
         ];
     }
     ;;
@@ -127,7 +127,7 @@ CombiWindow method active? () {
 CombiWindow method refresh () {
     curs-set 0;
     curs-refresh $StatusLineCurs;
-    curs-refresh $VerticalLineCurs;	    
+    curs-refresh $VerticalLineCurs;    
     curs-refresh $BufferCurs;
 };
 
@@ -142,13 +142,13 @@ CombiWindow method display (msg) {
 
 CombiWindow method clear () {
     curs-clear $StatusLineCurs;
-    curs-clear $VerticalLineCurs;	    
+    curs-clear $VerticalLineCurs;    
     curs-clear $BufferCurs;
 };
 
 CombiWindow method wipe () {
     curs-wipe $StatusLineCurs;
-    curs-wipe $VerticalLineCurs;	    
+    curs-wipe $VerticalLineCurs;    
     curs-wipe $BufferCurs;
 };
 
@@ -171,12 +171,12 @@ CombiWindow method render () {
     (cy cx) ::= get-source-index $buff $geom;
 
     if {$cy > [$buff get-buffer-length]} {
-	$geom set! ViewLine 0;
-	$geom set! CursorLine [$buff get-buffer-length];
-	$geom set! ViewColumn 0;
-	$geom set! CursorColumn 0;
-	$geom set! IndexColumn.SAVE 0;
-	(cy cx) ::= get-source-index $buff $geom;
+        $geom set! ViewLine 0;
+        $geom set! CursorLine [$buff get-buffer-length];
+        $geom set! ViewColumn 0;
+        $geom set! CursorColumn 0;
+        $geom set! IndexColumn.SAVE 0;
+        (cy cx) ::= get-source-index $buff $geom;
     };
 
     render-status-line $win $buff $cy $cx $y $x $buff-name;
@@ -184,10 +184,10 @@ CombiWindow method render () {
 
     i := 0;
     $buff buffer-select $geom,ViewLine [$geom,ViewLine + $y : - 1] {
-	| src |
+        | src |
         try {
             curs-render-line
-	        $BufferCurs
+                $BufferCurs
                 $i $geom,ViewColumn 0 $src
                 $DEFAULT_TAB_WIDTH $DISPLAY_ENCODING
             ;
@@ -196,7 +196,7 @@ CombiWindow method render () {
             show-message :bell ["Error at curs-render-line, <" . [$e car] ">."];
             break;
         };
-	$i ++;
+        $i ++;
     };
 
     set-eof-mark $geom $buff $y $x;
@@ -213,15 +213,15 @@ CombiWindow method render () {
 
 CombiWindow method set-eof-mark (geom buff y x) {
     if {[$geom,ViewLine + $y : - 1] >= [$buff get-buffer-length]} {
-	if {[[$buff get-buffer-length] - $geom,ViewLine] < $y} {
-	    curs-render-line
-		$BufferCurs
-		[[$buff get-buffer-length] - $geom,ViewLine] 0 0
-		"[eof]"
-		$DEFAULT_TAB_WIDTH $DISPLAY_ENCODING
+        if {[[$buff get-buffer-length] - $geom,ViewLine] < $y} {
+            curs-render-line
+                $BufferCurs
+                [[$buff get-buffer-length] - $geom,ViewLine] 0 0
+                "[eof]"
+                $DEFAULT_TAB_WIDTH $DISPLAY_ENCODING
             ;
-	    apply-color $BufferCurs [[$buff get-buffer-length] - $geom,ViewLine] 0 5 EOF_MARK;
-	};
+            apply-color $BufferCurs [[$buff get-buffer-length] - $geom,ViewLine] 0 5 EOF_MARK;
+        };
     };
 };
 
@@ -244,15 +244,15 @@ CombiWindow method geom-trimming () {
     buff ::= get-buffer;
     (l c) ::= curs-get-screen-size $BufferCurs;
     if {! $FreeCursor} {
-	(cy cx) ::= get-source-index $buff $geom;
-	(line col) ::= get-cursor-index $buff $cy $cx;
-	new-col ::= $col - $geom,ViewColumn;
-	if {$new-col < 0} {
-	    $geom set! ViewColumn $col;
-	    $geom set! CursorColumn 0;
-	} {
-	    $geom set! CursorColumn $new-col;
-	};
+        (cy cx) ::= get-source-index $buff $geom;
+        (line col) ::= get-cursor-index $buff $cy $cx;
+        new-col ::= $col - $geom,ViewColumn;
+        if {$new-col < 0} {
+            $geom set! ViewColumn $col;
+            $geom set! CursorColumn 0;
+        } {
+            $geom set! CursorColumn $new-col;
+        };
     };
 
     fit-to-cursor $geom $l $c;
@@ -336,43 +336,43 @@ CombiWindow method render-vertical-line () {
     if {$len = 0} {
         lines := $y;
     } {
-	lines ::= $y * $y : / $len;
-	if {$lines < 0}  {lines := 0};
-	if {$lines > $y} {lines := $y};
+        lines ::= $y * $y : / $len;
+        if {$lines < 0}  {lines := 0};
+        if {$lines > $y} {lines := $y};
     };
 
     if {$len = 0} {
         start := 0;
     } {
-	start ::= $y * $geom,ViewLine : / $len;
-	if {$start < 0}   {start := 0};
-	if {$start >= $y} {start := [$y - 1]};
+        start ::= $y * $geom,ViewLine : / $len;
+        if {$start < 0}   {start := 0};
+        if {$start >= $y} {start := [$y - 1]};
     };
 
     0 each to: [$y - 1] do: {| i |
-	curs-print $VerticalLineCurs " " $DISPLAY_ENCODING $i 0;
-	if $Activate {
+        curs-print $VerticalLineCurs " " $DISPLAY_ENCODING $i 0;
+        if $Activate {
             if {$buff protect?} {
                 apply-color $VerticalLineCurs $i 0 1 ACTIVE_VERT_LINE_PROTECT_HILIGHT;
             } {
                 apply-color $VerticalLineCurs $i 0 1 ACTIVE_VERT_LINE_HILIGHT;
             }
-	} {
+        } {
             apply-color $VerticalLineCurs $i 0 1 INACTIVE_VERT_LINE_HILIGHT;
-	};
+        };
     };
     
     0 each to: $lines do: {| i |
-	curs-print $VerticalLineCurs $VERT_BAR_CHAR $DISPLAY_ENCODING [$i + $start] 0;
-	if $Activate {
+        curs-print $VerticalLineCurs $VERT_BAR_CHAR $DISPLAY_ENCODING [$i + $start] 0;
+        if $Activate {
             if {$buff protect?} {
                 apply-color $VerticalLineCurs [$i + $start] 0 1 ACTIVE_VERT_LINE_PROTECT_HILIGHT;
             } {
                 apply-color $VerticalLineCurs [$i + $start] 0 1 ACTIVE_VERT_LINE_HILIGHT;
             }
-	} {
+        } {
             apply-color $VerticalLineCurs [$i + $start] 0 1 INACTIVE_VERT_LINE_HILIGHT;
-	};
+        };
     };
 };
 
@@ -410,11 +410,11 @@ CombiWindow method move-down () {
     acc ::= 1 * $KEY_REPEAT_ACCEL;
     set line [$geom,CursorLine + $acc];
     if {$line >= $y} {
-#	set line [$line - $acc];
-#	new-y ::= $geom,ViewLine + $acc;
-	set line [$y - 1];
-	new-y ::= $geom,ViewLine + $acc;
-	if {$new-y > [[$buff get-buffer-length] - $y : + 1]} {
+#       set line [$line - $acc];
+#       new-y ::= $geom,ViewLine + $acc;
+        set line [$y - 1];
+        new-y ::= $geom,ViewLine + $acc;
+        if {$new-y > [[$buff get-buffer-length] - $y : + 1]} {
             new-y ::= [$buff get-buffer-length] - $y : + 1;
         };
         if {$new-y < 0} {
@@ -432,10 +432,10 @@ CombiWindow method move-up () {
     acc ::= 1 * $KEY_REPEAT_ACCEL;
     set line [$geom,CursorLine - $acc];
     if {$line < 0} {
-	set line 0;
-	new-y ::= $geom,ViewLine - $acc;
-	if {$new-y < 0} {new-y := 0};
-	$geom set! ViewLine $new-y;
+        set line 0;
+        new-y ::= $geom,ViewLine - $acc;
+        if {$new-y < 0} {new-y := 0};
+        $geom set! ViewLine $new-y;
     };
     $geom set! CursorLine $line;
 };
@@ -458,12 +458,12 @@ CombiWindow method move-screen-bottom () {
 
 CombiWindow method free-cursor-turn-off (geom buff) {
     if $FreeCursor {
-	sets FreeCursor <nil>;
-	$geom set! IndexColumn.SAVE  [$geom,CursorColumn + $geom,ViewColumn];
-	(cy cx) ::= get-source-index $buff $geom;
-	(line col) ::= get-cursor-index $buff $cy $cx;
-	$geom set! CursorColumn [$col - $geom,ViewColumn];
-	$geom set! IndexColumn.SAVE $col;
+        sets FreeCursor <nil>;
+        $geom set! IndexColumn.SAVE  [$geom,CursorColumn + $geom,ViewColumn];
+        (cy cx) ::= get-source-index $buff $geom;
+        (line col) ::= get-cursor-index $buff $cy $cx;
+        $geom set! CursorColumn [$col - $geom,ViewColumn];
+        $geom set! IndexColumn.SAVE $col;
     };
 };
 
@@ -475,12 +475,12 @@ CombiWindow method move-right () {
 
     r ::= $buff get-buffer-line $cy;
     if $r {
-	if {$cx >= [$r len]} {
+        if {$cx >= [$r len]} {
             cx := 0;
-	    cy ::= $cy + 1;
-	} {
-	    cx ::= $cx + 1;
-	};
+            cy ::= $cy + 1;
+        } {
+            cx ::= $cx + 1;
+        };
     };
     (line col) ::= get-cursor-index $buff $cy $cx;
     
@@ -498,12 +498,12 @@ CombiWindow method move-left () {
     (cy cx) ::= get-source-index $buff $geom;
 
     if {$cx > 0} {
-	cx ::= $cx - 1;
+        cx ::= $cx - 1;
     } {
-	if {$cy > 0} {
-	    cy ::= $cy - 1;
-	    cx ::= $buff get-buffer-line $cy : len;
-	};
+        if {$cy > 0} {
+            cy ::= $cy - 1;
+            cx ::= $buff get-buffer-line $cy : len;
+        };
     };
     (line col) ::= get-cursor-index $buff $cy $cx;
 
@@ -561,14 +561,14 @@ CombiWindow method backdelete-character () {
 
 CombiWindow method fit-to-cursor (geom l c center: center) {
     if {$geom,CursorLine >= $l} {
-	y ::= $geom,CursorLine - $l : + 1 : + $geom,ViewLine;
-	if {$y < 0} {y := 0};
-	$geom set! ViewLine $y;
-	$geom set! CursorLine [$l - 1];
+        y ::= $geom,CursorLine - $l : + 1 : + $geom,ViewLine;
+        if {$y < 0} {y := 0};
+        $geom set! ViewLine $y;
+        $geom set! CursorLine [$l - 1];
     };
     if {$geom,CursorLine < 0} {
-	$geom set! ViewLine [$geom,ViewLine + $geom,CursorLine];
-	$geom set! CursorLine 0;
+        $geom set! ViewLine [$geom,ViewLine + $geom,CursorLine];
+        $geom set! CursorLine 0;
     };
     
     if {set? center} {
@@ -585,14 +585,14 @@ CombiWindow method fit-to-cursor (geom l c center: center) {
     };
     
     if {$geom,CursorColumn >= $c} {
-	x ::= $geom,CursorColumn - $c : + 1 : + $geom,ViewColumn;
-	if {$x < 0} {x := 0};
-	$geom set! ViewColumn $x;
-	$geom set! CursorColumn [$c - 1];
+        x ::= $geom,CursorColumn - $c : + 1 : + $geom,ViewColumn;
+        if {$x < 0} {x := 0};
+        $geom set! ViewColumn $x;
+        $geom set! CursorColumn [$c - 1];
     };
     if {$geom,CursorColumn < 0} {
-	$geom set! ViewColumn [$geom,ViewColumn + $geom,CursorColumn];
-	$geom set! CursorColumn 0;
+        $geom set! ViewColumn [$geom,ViewColumn + $geom,CursorColumn];
+        $geom set! CursorColumn 0;
     };
 };
 
@@ -602,16 +602,16 @@ CombiWindow method load-keybind () {
     };
     
     $LIB_PATH each do: {| i |
-	if {file exists? [$i . "/" $DEFAULT_KEYBINDFILE]} {
-	    try {
-	        load :notrace [$i . "/" $DEFAULT_KEYBINDFILE]
-	    } catch: {| e |
-		### throw ErrConfiguration ["Error at key-bind file: " . $DEFAULT_KEYBINDFILE ", <" [$e car] "># " [$e cdr]];
-		show-message :bell ["Error at key-bind file: " . $DEFAULT_KEYBINDFILE ", <" [$e car] "># " [$e cdr]];
-		return;
-	    };
-	    break;
-	};
+        if {file exists? [$i . "/" $DEFAULT_KEYBINDFILE]} {
+            try {
+                load :notrace [$i . "/" $DEFAULT_KEYBINDFILE]
+            } catch: {| e |
+                ### throw ErrConfiguration ["Error at key-bind file: " . $DEFAULT_KEYBINDFILE ", <" [$e car] "># " [$e cdr]];
+                show-message :bell ["Error at key-bind file: " . $DEFAULT_KEYBINDFILE ", <" [$e car] "># " [$e cdr]];
+                return;
+            };
+            break;
+        };
     };
 };
 
@@ -667,24 +667,24 @@ CombiWindow method load-keybind-override (mode) {
             show-message :bell ["No such mode: " . $mode];
             result ALL;
         };
-	return <nil>;
+        return <nil>;
     };
     
     $LIB_PATH each do: {| i |
-	if {file exists? [$i . "/" $key-path]} {
-	    try {
-	        load :notrace [$i . "/" $key-path];
-	    } catch: {| e |
+        if {file exists? [$i . "/" $key-path]} {
+            try {
+                load :notrace [$i . "/" $key-path];
+            } catch: {| e |
                 $Parent add-background after: 200 {
                     show-message :bell ["Error at mode file: " . $key-path ", <" [$e car] "># " [$e cdr]];
                     result ALL;
                 };
-		return <nil>;
+                return <nil>;
             };
             ### read user config mode key file.
             read-user-conf-file $key-path;
-	    return <t>;
-	};
+            return <t>;
+        };
     };
     $Parent add-background after: 200 {
         show-message :bell ["No such mode file: " . $key-path];
@@ -749,10 +749,10 @@ CombiWindow method apply-keybind (main window key) {
     n ::= $main get-repeat-times;
     
     if {and [string? $key] [! [get-buffer : protect?]] $default-map} {
-	command ::= $map get KEY_INPUT_CHAR;
-	body ::= get-command $command;
-	if {block? $body} {
-	    try {
+        command ::= $map get KEY_INPUT_CHAR;
+        body ::= get-command $command;
+        if {block? $body} {
+            try {
                 $main set-last-command $command;
                 $main set-last-character $key;
                 if {$n = 0} {
@@ -761,19 +761,19 @@ CombiWindow method apply-keybind (main window key) {
                 } {
                     result ::= do-repeat $main $window $n;
                 };
-	    }
-	    catch: {| e |
-		show-message :bell ["Error happend at editor command: " . $command ", <" [$e car] "># " [$e cdr]];
-		return <nil>;
-	    };
-	    return $result;
+            }
+            catch: {| e |
+                show-message :bell ["Error happend at editor command: " . $command ", <" [$e car] "># " [$e cdr]];
+                return <nil>;
+            };
+            return $result;
         };
         if $command {
             show-message :bell ["Incorrect command at: " . $command];
         } {
             show-message :bell "No binding key.";
         };
-	return <nil>;
+        return <nil>;
     };
 
     if {and {string? $key} {[$key len] > 1}} {
@@ -784,11 +784,11 @@ CombiWindow method apply-keybind (main window key) {
     command ::= $map get $key;
     if {eq? <nil> $command} {
         show-message :bell ["No binding key: " . [$map-name . [[$map-name = ""] ??? "" " "] $key]];
-	return <nil>;
+        return <nil>;
     };
     body ::= get-command $command;
     if {block? $body} {
-	try {
+        try {
             $main set-last-command $command;
             if {$n = 0} {
                 $main key-record $command <nil>;
@@ -796,15 +796,15 @@ CombiWindow method apply-keybind (main window key) {
             } {
                 result ::= do-repeat $main $window $n;
             };
-	}
-	catch: {| e |
-	    show-message :bell ["Error happend at editor command: " . $command ", <" [$e car] "># " [$e cdr]];
-	    return <nil>;
-	};
-	return $result;
+        }
+        catch: {| e |
+            show-message :bell ["Error happend at editor command: " . $command ", <" [$e car] "># " [$e cdr]];
+            return <nil>;
+        };
+        return $result;
     } {
-	show-message :bell ["Editor command not defined: " . $command];
-	return <nil>;
+        show-message :bell ["Editor command not defined: " . $command];
+        return <nil>;
     };
     show-message :bell ["Incorrect command at: " . $command ", key map: " $map-name " " $key];
     return <nil>;
@@ -858,21 +858,21 @@ CombiWindow method get-key-desc () {
 CombiWindow method apply-command (main window key command) {
     body ::= get-command $command;
     if {block? $body} {
-	try {
-	    if {eq? $command insert-character} {
-		result ::= yield $body $main $window $key;
-	    } {
-		result ::= yield $body $main $window;
-	    };
-	}
-	catch: {| e |
-	    show-message :bell ["Error happend at editor command: " . $command ", <" [$e car] "># " [$e cdr]];
-	    return <nil>;
-	};
-	return $result;
+        try {
+            if {eq? $command insert-character} {
+                result ::= yield $body $main $window $key;
+            } {
+                result ::= yield $body $main $window;
+            };
+        }
+        catch: {| e |
+            show-message :bell ["Error happend at editor command: " . $command ", <" [$e car] "># " [$e cdr]];
+            return <nil>;
+        };
+        return $result;
     } {
-	show-message :bell ["Editor command not defined: " . $command];
-	return <nil>;
+        show-message :bell ["Editor command not defined: " . $command];
+        return <nil>;
     };
     show-message :bell ["Incorrect command at: " . $command];
     return <nil>;
@@ -909,10 +909,10 @@ CombiWindow method display-evaluation () {
                 try {sts ::= $PINTERP next} catch: {};
             };
         };
-	update-display := <nil>;
+        update-display := <nil>;
 
-	$stdout close;
-	$stdout each do: {| r |
+        $stdout close;
+        $stdout each do: {| r |
             r ::= $r string;
             if {or [$r =~ '^Result\[FUNC\]=> '] [$r =~ '^Result\[CLOSURE\]=> ']} {
                 r ::= [$r sub 0 80] . " ...";
@@ -938,26 +938,26 @@ CombiWindow method display-evaluation () {
                     $buff append-string $r2;
                 };
             };
-	    update-display := <t>;
-	};
-	$stdout clear;
+            update-display := <t>;
+        };
+        $stdout clear;
         
-	$stderr close;
-	$stderr each do: {| r | r ::= $r string;
+        $stderr close;
+        $stderr each do: {| r | r ::= $r string;
             $r split sep: "\n" : each do: {| r3 |
                 $buff append-string ["ERR> " . $r3];
             };
             update-display := <t>;
-	};
-	$stderr clear;
+        };
+        $stderr clear;
 
-	if $update-display {
+        if $update-display {
             cursor-move-to $geom [$buff get-buffer-length] 0;
             $MainWindow render-all;
-	    set-cursor;
-	};
+            set-cursor;
+        };
     } {
-	show-message "Evaled. See \'*Scratch*\' buffer.";
+        show-message "Evaled. See \'*Scratch*\' buffer.";
     };
 };
 
@@ -998,7 +998,7 @@ CombiWindow method get-region () {
     if {[$buff get-buffer-length] < $y} {y ::= $buff get-buffer-length};
     src ::= $buff get-buffer-line $y;
     if $src {
-	if {[$src len] < $x} {x ::= $src len};
+        if {[$src len] < $x} {x ::= $src len};
     } {
         x := 0;
     };
@@ -1022,7 +1022,7 @@ CombiWindow method cut-region (sy sx ey ex) {
     setvar CopyBuffer [$ret get 0];
     result ::= $ret get 1;
     if $result,0 {
-	return ($result,2 $result,3);
+        return ($result,2 $result,3);
     };
     return (0 0);
 };
@@ -1040,7 +1040,7 @@ CombiWindow method delete-region (sy sx ey ex) {
     ret ::= $buff cut-region $sy $sx $ey $ex;
     result ::= $ret get 1;
     if $result,0 {
-	return ($result,2 $result,3);
+        return ($result,2 $result,3);
     };
     return (0 0);
 };
@@ -1069,7 +1069,7 @@ CombiWindow method start-search () {
 CombiWindow method cancel-search (str) {
     geom ::= get-geom;
     if $SearchSave {
-	$geom restore-geom $SearchSave;
+        $geom restore-geom $SearchSave;
     };
     setvar SearchString $str;
     sets SearchSave <nil>;
@@ -1080,7 +1080,7 @@ CombiWindow method cancel-search (str) {
 CombiWindow method reset-search () {
     geom ::= get-geom;
     if $SearchSave {
-	$geom restore-geom $SearchSave;
+        $geom restore-geom $SearchSave;
     };
     sets SearchResult ();
     sets SearchHilight <nil>;
@@ -1116,31 +1116,31 @@ CombiWindow method move-to-next-search () {
 
     elem := <nil>; ### $elem is search and move target element
     if {$l null?} {
-	l ::= $SearchResult filter {| i | [$i car] > $end};
-	elem ::= $l car;
+        l ::= $SearchResult filter {| i | [$i car] > $end};
+        elem ::= $l car;
     } {
         elem := <nil>;
-	$l each do: {| i |
-	    if {[$i car] = $y} {
-		if {[$i cdr : car : car] > $x} {
-		    elem := $i;
-		    break;
-		};
-	    };
-	    if {[$i car] > $y} {
-	        elem := $i;
-		break;
-	    };
-	};
-	$elem ?? {
-	    l ::= $SearchResult filter {| i | [$i car] > $end};
-	    elem ::= $l car;
-	};
+        $l each do: {| i |
+            if {[$i car] = $y} {
+                if {[$i cdr : car : car] > $x} {
+                    elem := $i;
+                    break;
+                };
+            };
+            if {[$i car] > $y} {
+                elem := $i;
+                break;
+            };
+        };
+        $elem ?? {
+            l ::= $SearchResult filter {| i | [$i car] > $end};
+            elem ::= $l car;
+        };
     };
     if $elem {
-	ey ::= $elem car;
-	ex ::= $elem cdr : car : car;
-	cursor-move-to-fit-center $geom $ey $ex;
+        ey ::= $elem car;
+        ex ::= $elem cdr : car : car;
+        cursor-move-to-fit-center $geom $ey $ex;
     };
 
     ### search result hilight
@@ -1162,30 +1162,30 @@ CombiWindow method stay-search () {
 
     elem := <nil>; ### $elem is search and move target element
     if {$l null?} {
-	l ::= $SearchResult filter {| i | [$i car] > $end};
-	elem ::= $l car;
+        l ::= $SearchResult filter {| i | [$i car] > $end};
+        elem ::= $l car;
     } {
         elem := <nil>;
-	$l each do: {| i |
-	    if {[$i car] = $y} {
-		if {[$i cdr : car : car] >= $x} {
-		    elem := $i;
-		    break;
-		};
-	    };
-	    if {[$i car] > $y} {
-	        elem := $i;
-		break;
-	    };
-	};
-	$elem ?? {
-	    l ::= $SearchResult filter {| i | [$i car] > $end};
-	    elem ::= $l car;
-	};
+        $l each do: {| i |
+            if {[$i car] = $y} {
+                if {[$i cdr : car : car] >= $x} {
+                    elem := $i;
+                    break;
+                };
+            };
+            if {[$i car] > $y} {
+                elem := $i;
+                break;
+            };
+        };
+        $elem ?? {
+            l ::= $SearchResult filter {| i | [$i car] > $end};
+            elem ::= $l car;
+        };
     };
     if $elem {
-	ey ::= $elem car;
-	ex ::= $elem cdr : car : car;
+        ey ::= $elem car;
+        ex ::= $elem cdr : car : car;
         # cursor-move-to $geom $ey $ex;
     };
 
@@ -1208,31 +1208,31 @@ CombiWindow method move-to-previous-search () {
 
     elem := <nil>; ### $elem is search and move target element
     if {$l null?} {
-	l ::= $SearchResult filter {| i | [$i car] < $start};
-	elem ::= $l last : car;
+        l ::= $SearchResult filter {| i | [$i car] < $start};
+        elem ::= $l last : car;
     } {
         elem := <nil>;
-	$l each do: {| i |
-	    if {[$i car] = $y} {
-		if {[$i cdr : car : car] < $x} {
-		    elem := $i;
-		    break;
-		};
-	    };
-	    if {[$i car] < $y} {
-	        elem := $i;
-		break;
-	    };
-	};
-	$elem ?? {
-	    l ::= $SearchResult filter {| i | [$i car] < $start};
-	    elem ::= $l last : car;
-	};
+        $l each do: {| i |
+            if {[$i car] = $y} {
+                if {[$i cdr : car : car] < $x} {
+                    elem := $i;
+                    break;
+                };
+            };
+            if {[$i car] < $y} {
+                elem := $i;
+                break;
+            };
+        };
+        $elem ?? {
+            l ::= $SearchResult filter {| i | [$i car] < $start};
+            elem ::= $l last : car;
+        };
     };
     if $elem {
-	ey ::= $elem car;
-	ex ::= $elem cdr : car : car;
-	cursor-move-to-fit-center $geom $ey $ex;
+        ey ::= $elem car;
+        ex ::= $elem cdr : car : car;
+        cursor-move-to-fit-center $geom $ey $ex;
     };
 
     ### search result hilight
@@ -1298,17 +1298,17 @@ CombiWindow method cursor-fit-to-bottom (geom) {
 CombiWindow method set-region-hilight (buff geom y x) {
     region ::= get-region;
     if {and $region $Activate} {
-	(sy sx) := $region;
-	(ey ex) ::= get-source-index $buff $geom;
-	if {$sy > $ey} {
-	    (sy ey sx ex) := ($ey $sy $ex $sx);
-	};
-	i := 0;
-	line := $geom,ViewLine;
-	$buff buffer-select $geom,ViewLine [$geom,ViewLine + $y : - 1] {
-	    | src |
-	    in-region := <nil>;
-	    cond
+        (sy sx) := $region;
+        (ey ex) ::= get-source-index $buff $geom;
+        if {$sy > $ey} {
+            (sy ey sx ex) := ($ey $sy $ex $sx);
+        };
+        i := 0;
+        line := $geom,ViewLine;
+        $buff buffer-select $geom,ViewLine [$geom,ViewLine + $y : - 1] {
+            | src |
+            in-region := <nil>;
+            cond
                 {and {$line = $sy} {$line = $ey}} {
                     start-col ::= curs-index-to-pos $src $sx $DEFAULT_TAB_WIDTH;
                     end-col ::= curs-index-to-pos $src $ex $DEFAULT_TAB_WIDTH;
@@ -1335,19 +1335,19 @@ CombiWindow method set-region-hilight (buff geom y x) {
                 }
             ;;
 
-	    if $in-region {
-		start-col ::= $start-col - $geom,ViewColumn;
-		end-col ::= $end-col - $geom,ViewColumn;
-		if {$start-col > $end-col} {
-		    (start-col end-col) := ($end-col $start-col);
-		};
-		if {$start-col < 0} {start-col := 0};
-		if {$start-col >= $x} {start-col := $x};
-		if {$end-col < 0} {start-col := 0};
-		if {$end-col >= $x} {end-col := $x};
-		if {[$end-col - $start-col] > 0} {
-		    apply-color $BufferCurs $i $start-col [$end-col - $start-col] REGION_HILIGHT;
-		} {
+            if $in-region {
+                start-col ::= $start-col - $geom,ViewColumn;
+                end-col ::= $end-col - $geom,ViewColumn;
+                if {$start-col > $end-col} {
+                    (start-col end-col) := ($end-col $start-col);
+                };
+                if {$start-col < 0} {start-col := 0};
+                if {$start-col >= $x} {start-col := $x};
+                if {$end-col < 0} {start-col := 0};
+                if {$end-col >= $x} {end-col := $x};
+                if {[$end-col - $start-col] > 0} {
+                    apply-color $BufferCurs $i $start-col [$end-col - $start-col] REGION_HILIGHT;
+                } {
                     if {[$src len] = 0} {
                         apply-color $BufferCurs $i $start-col 1 REGION_HILIGHT;
                     };
@@ -1355,11 +1355,11 @@ CombiWindow method set-region-hilight (buff geom y x) {
                 if {[$end-col - $start-col] < 0} {
                     apply-color $BufferCurs $i $start-col 1 REGION_HILIGHT;
                 };
-	    };
+            };
 
-	    $i ++;
-	    $line ++;
-	};
+            $i ++;
+            $line ++;
+        };
     };
 };
 
@@ -1372,26 +1372,26 @@ CombiWindow method set-search-hilight (buff geom) {
     (scr-y scr-x) ::= get-screen-size;
     (idx-y idx-x) ::= get-source-index $buff $geom;
     $list each do: {| e |
-	py ::= $e car;
-	pxs ::= $e cdr : car : car;
-	pxe ::= $e cdr : car : cdr : car;
-	y ::= $py - $geom,ViewLine;
+        py ::= $e car;
+        pxs ::= $e cdr : car : car;
+        pxe ::= $e cdr : car : cdr : car;
+        y ::= $py - $geom,ViewLine;
 
-	src ::= $buff get-buffer-line $py;
-	start-x ::= curs-index-to-pos $src $pxs $DEFAULT_TAB_WIDTH : - $geom,ViewColumn;
-	if {$start-x < 0} {start-x := 0};
-	end-x ::= curs-index-to-pos $src $pxe $DEFAULT_TAB_WIDTH : - $geom,ViewColumn;
-	if {$end-x <= 0} {continue};
-	len ::= $end-x - $start-x;
-	if {$start-x > $scr-x} {continue};
-	if {$end-x >= $scr-x} {end-x := $scr-x};
-	if {$len <= 0} {continue};
+        src ::= $buff get-buffer-line $py;
+        start-x ::= curs-index-to-pos $src $pxs $DEFAULT_TAB_WIDTH : - $geom,ViewColumn;
+        if {$start-x < 0} {start-x := 0};
+        end-x ::= curs-index-to-pos $src $pxe $DEFAULT_TAB_WIDTH : - $geom,ViewColumn;
+        if {$end-x <= 0} {continue};
+        len ::= $end-x - $start-x;
+        if {$start-x > $scr-x} {continue};
+        if {$end-x >= $scr-x} {end-x := $scr-x};
+        if {$len <= 0} {continue};
 
-	if {and {$idx-y = $py} {$idx-x = $pxs}} {
-	    apply-color $BufferCurs $y $start-x $len SEARCH_CURRENT_HILIGHT;
-	} {
+        if {and {$idx-y = $py} {$idx-x = $pxs}} {
+            apply-color $BufferCurs $y $start-x $len SEARCH_CURRENT_HILIGHT;
+        } {
             apply-color $BufferCurs $y $start-x $len SEARCH_HILIGHT;
-	};
+        };
     };
 };
 
@@ -1399,20 +1399,20 @@ CombiWindow method set-word-hilight (buff geom start end) {
     if {nil? $HILIGHT_REGEXP} {return};
 
     $HILIGHT_REGEXP each do: {| i |
-	regex ::= $i car;
-	color ::= $i cdr : car;
-	result := ();
-	last := $result;
-	line := $start;
-	$buff buffer-select $start $end {| src |
-	    l ::= $src =~ :all $regex;
-	    if $l {
-		$l each do: {| m |
-		    $last append! ($line $m);
-		};
-	    };
-	    line ::= $line + 1;
-	};
+        regex ::= $i car;
+        color ::= $i cdr : car;
+        result := ();
+        last := $result;
+        line := $start;
+        $buff buffer-select $start $end {| src |
+            l ::= $src =~ :all $regex;
+            if $l {
+                $l each do: {| m |
+                    $last append! ($line $m);
+                };
+            };
+            line ::= $line + 1;
+        };
         try {
             set-word-hilight-color $geom $buff $result $color;
         } catch: {| e |
@@ -1440,8 +1440,8 @@ CombiWindow method set-word-hilight-ml (buff geom start end) {
     if {[$len-index len] <= 0} {return};
 
     $HILIGHT_REGEXP_ML each do: {| i |
-	regex ::= $i car;
-	color ::= $i cdr : car;
+        regex ::= $i car;
+        color ::= $i cdr : car;
         l ::= $target-src =~ :all $regex;
         if $l {
             result := ();
@@ -1514,22 +1514,22 @@ CombiWindow method set-word-hilight-color (geom buff list color) {
     (scr-y scr-x) ::= get-screen-size;
 
     $list each do: {| e |
-	py ::= $e car;
-	pxs ::= $e cdr : car : car;
-	pxe ::= $e cdr : car : cdr : car;
-	y ::= $py - $geom,ViewLine;
+        py ::= $e car;
+        pxs ::= $e cdr : car : car;
+        pxe ::= $e cdr : car : cdr : car;
+        y ::= $py - $geom,ViewLine;
         if {$y < 0} {continue};
         if {$y >= $scr-y} {continue};
 
-	src ::= $buff get-buffer-line $py;
-	start-x ::= curs-index-to-pos $src $pxs $DEFAULT_TAB_WIDTH : - $geom,ViewColumn;
-	if {$start-x < 0} {start-x := 0};
-	end-x ::= curs-index-to-pos $src $pxe $DEFAULT_TAB_WIDTH : - $geom,ViewColumn;
-	if {$end-x <= 0} {continue};
-	len ::= $end-x - $start-x;
-	if {$start-x > $scr-x} {continue};
-	if {$end-x >= $scr-x} {end-x := $scr-x};
-	if {$len <= 0} {continue};
+        src ::= $buff get-buffer-line $py;
+        start-x ::= curs-index-to-pos $src $pxs $DEFAULT_TAB_WIDTH : - $geom,ViewColumn;
+        if {$start-x < 0} {start-x := 0};
+        end-x ::= curs-index-to-pos $src $pxe $DEFAULT_TAB_WIDTH : - $geom,ViewColumn;
+        if {$end-x <= 0} {continue};
+        len ::= $end-x - $start-x;
+        if {$start-x > $scr-x} {continue};
+        if {$end-x >= $scr-x} {end-x := $scr-x};
+        if {$len <= 0} {continue};
 
         apply-color $BufferCurs $y $start-x $len $color;
     };

@@ -4,7 +4,7 @@
 List method clone () {
     set result ();
     [self] each do: {| l |
-	$result append! $l;
+        $result append! $l;
     };
     return $result;
 };
@@ -38,8 +38,8 @@ List method delete (pos) {
 List method find (obj) {
     set i 0;
     [self] each do: {| f |
-	if [eq? $f $obj] then: {return $i};
-	$i ++;
+        if [eq? $f $obj] then: {return $i};
+        $i ++;
     };
     return <nil>;
 };
@@ -48,8 +48,8 @@ List method find* (obj) {
     set i 0;
     set result ();
     [self] each do: {| f |
-	if [eq? $f $obj] then: {$result append! $i};
-	set i [$i + 1];
+        if [eq? $f $obj] then: {$result append! $i};
+        set i [$i + 1];
     };
     return $result;
 };
@@ -75,7 +75,7 @@ List method max () {
     max ::= $l car;
     if [$l cdr] else: {return $max};
     $l cdr : each do: {| i |
-	if {$i > $max} {max := $i};
+        if {$i > $max} {max := $i};
     };
 
     return $max;
@@ -88,7 +88,7 @@ List method min () {
     min ::= $l car;
     if [$l cdr] else: {return $min};
     $l cdr : each do: {| i |
-	if {$i < $min} {min := $i};
+        if {$i < $min} {min := $i};
     };
 
     return $min;
@@ -102,14 +102,14 @@ List method permutations (n do: body) {
 
 List method permutations-sub (n sum body) {
     if [$n <= 0] {
-	return ([yield $body $sum]);
+        return ([yield $body $sum]);
     };
 
     c := 0;
     s := ();
     each do: {| i |
-	s ::= [delete $c] permutations-sub [$n - 1] [$sum . $i] $body;
-	if [control? [$s car]] {break};
+        s ::= [delete $c] permutations-sub [$n - 1] [$sum . $i] $body;
+        if [control? [$s car]] {break};
         $c ++;
     };
 
@@ -124,15 +124,15 @@ List method combinations (n do: body) {
 
 List method combinations-sub (n sum body) {
     if [$n <= 0] {
-	return ([yield $body $sum]);
+        return ([yield $body $sum]);
     };
 
     l ::= self;
     s := ();
     each do: {| i |
         l ::= $l delete 0;
-	s ::= $l combinations-sub [$n - 1] [$sum . $i] $body;
-	if [control? [$s car]] {break};
+        s ::= $l combinations-sub [$n - 1] [$sum . $i] $body;
+        if [control? [$s car]] {break};
     };
 
     return ([$s car]);

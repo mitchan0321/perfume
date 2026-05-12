@@ -10,15 +10,15 @@ defcommand open-file desc: "Open specified file. If occured file decode error, s
         init-value: [$cbuff get-content-dir]
         prompt: "Open file: "
         enter-proc: {| value |
-	    if {[$value len] = 0} {
-		show-message :bell "No file name specified.";
-		return ALL;
-	    };
+            if {[$value len] = 0} {
+                show-message :bell "No file name specified.";
+                return ALL;
+            };
             path ::= path-adjust [
-		{[$value sub 0 1] = "/"} ???
-		    $value
-		    [get-current-buffer-dir $window : . $value]
-	    ];
+                {[$value sub 0 1] = "/"} ???
+                    $value
+                    [get-current-buffer-dir $window : . $value]
+            ];
             (stat path message) ::= get-path-condition $path;
             case $stat
                 DIRECTORY {
@@ -39,16 +39,16 @@ defcommand open-file desc: "Open specified file. If occured file decode error, s
             
             buff ::= BufferManager get-buffer-by-path $path;
             if $buff {
-		$MainWindow bind-buffer [$window get-window-name] $buff;
-		return ALL;
+                $MainWindow bind-buffer [$window get-window-name] $buff;
+                return ALL;
             };
-	    buff ::= new EditBuffer;
-	    (result err) ::= $buff load-content $path;
+            buff ::= new EditBuffer;
+            (result err) ::= $buff load-content $path;
             if {$buff enc-error?} {
                 show-message :bell "File decode error occured!! Try ALT-e and specify another encoding for re-load.";
             };
-	    $MainWindow bind-buffer [$window get-window-name] $buff;
-	    $result ?? {show-message :bell ["Open Failed, path: " . $value " ("  $err ")"]};
+            $MainWindow bind-buffer [$window get-window-name] $buff;
+            $result ?? {show-message :bell ["Open Failed, path: " . $value " ("  $err ")"]};
             return ALL;
         }
     ;;
@@ -64,15 +64,15 @@ defcommand view-file desc: "Open specified file by protect mode." {
         init-value: [$cbuff get-content-dir]
         prompt: "View file: "
         enter-proc: {| value |
-	    if {[$value len] = 0} {
-		show-message :bell "No file name specified.";
-		return ALL;
-	    };
+            if {[$value len] = 0} {
+                show-message :bell "No file name specified.";
+                return ALL;
+            };
             path ::= path-adjust [
-		{[$value sub 0 1] = "/"} ???
-		    $value
-		    [get-current-buffer-dir $window : . $value]
-	    ];
+                {[$value sub 0 1] = "/"} ???
+                    $value
+                    [get-current-buffer-dir $window : . $value]
+            ];
             (stat path message) ::= get-path-condition $path;
             case $stat
                 DIRECTORY {
@@ -87,22 +87,22 @@ defcommand view-file desc: "Open specified file by protect mode." {
                     return ALL;
                 }
             ;;
-	    buff ::= BufferManager get-buffer-by-path $path;
+            buff ::= BufferManager get-buffer-by-path $path;
             if $buff {
                 $buff set-protect;
-		$MainWindow bind-buffer [$window get-window-name] $buff;
-		return ALL;
+                $MainWindow bind-buffer [$window get-window-name] $buff;
+                return ALL;
             };
-	    buff ::= new EditBuffer;
-	    (result err) ::= $buff load-content $path;
+            buff ::= new EditBuffer;
+            (result err) ::= $buff load-content $path;
             if {$buff enc-error?} {
                 show-message :bell "File decode error occured!! Try ALT-e and specify another encoding for re-load.";
             };
             $buff set-protect;
-	    $MainWindow bind-buffer [$window get-window-name] $buff;
-	    $result ?? {show-message :bell ["Open Failed, path: " . $value " ("  $err ")"]};
+            $MainWindow bind-buffer [$window get-window-name] $buff;
+            $result ?? {show-message :bell ["Open Failed, path: " . $value " ("  $err ")"]};
             return ALL;
-	}
+        }
     ;;
     
     result SELF;
@@ -116,16 +116,16 @@ defcommand read-file desc: "Open specified file and insert file data to current 
         init-value: [$cbuff get-content-dir]
         prompt: "Read file: "
         enter-proc: {| value |
-	    if {[$value len] = 0} {
-		show-message :bell "No file name specified.";
-		return ALL;
-	    };
+            if {[$value len] = 0} {
+                show-message :bell "No file name specified.";
+                return ALL;
+            };
             path ::= path-adjust [
-		{[$value sub 0 1] = "/"} ???
-		    $value
-		    [get-current-buffer-dir $window : . $value]
-	    ];
-	    buff ::= $window get-buffer;
+                {[$value sub 0 1] = "/"} ???
+                    $value
+                    [get-current-buffer-dir $window : . $value]
+            ];
+            buff ::= $window get-buffer;
             geom ::= $window get-geom;
             $buff ?? {
                 show-message :bell "No buffer.";
@@ -183,41 +183,41 @@ defun save-buffer (main window buff) {
         mini-input-file-chooser $main $window
             init-value: [$buff get-content-dir]
             prompt: "Save file name: "
-	    enter-proc: {| value |
-		path ::= path-adjust [
+            enter-proc: {| value |
+                path ::= path-adjust [
                     {[$value sub 0 1] = "/"} ???
                         $value
                         [get-current-buffer-dir $window : . $value]
                 ];
 
-		if [file exists? $path] {
-		    mini-input-fully-yes-or-no $main $window 
+                if [file exists? $path] {
+                    mini-input-fully-yes-or-no $main $window 
                         prompt: "File already exist, overwrite? [yes or ESC]: "
                         no-proc: {
-			    show-message "Canceled.";
-			    return ALL;
+                            show-message "Canceled.";
+                            return ALL;
                         }
                         yes-proc: {
-			    (result err) ::= $buff save-content path: $path;
-			    if $result {
-				show-message "Save Done.";
-			    } {
-				show-message :bell ["Save Failed, path: " . $path " (" $err ")"];
-			    };
-			    $main bind-buffer [$window get-window-name] $buff;
-			    return ALL;
-			}
+                            (result err) ::= $buff save-content path: $path;
+                            if $result {
+                                show-message "Save Done.";
+                            } {
+                                show-message :bell ["Save Failed, path: " . $path " (" $err ")"];
+                            };
+                            $main bind-buffer [$window get-window-name] $buff;
+                            return ALL;
+                        }
                     ;;
-		} {
-		    (result err) ::= $buff save-content path: $path;
-		    if $result {
-			show-message "Save Done.";
-		    } {
-			show-message :bell ["Save Failed, path: " . $path " (" $err ")"];
-		    };
+                } {
+                    (result err) ::= $buff save-content path: $path;
+                    if $result {
+                        show-message "Save Done.";
+                    } {
+                        show-message :bell ["Save Failed, path: " . $path " (" $err ")"];
+                    };
                     $main bind-buffer [$window get-window-name] $buff;
-		    return ALL;
-		};
+                    return ALL;
+                };
             }
         ;;
 
@@ -275,20 +275,20 @@ defcommand save-buffer-as desc: "Save current buffer to specified file." {
         init-value: [$cbuff get-content-dir]
         prompt: "Save file name: "
         enter-proc: {| value |
-	    path ::= path-adjust [
+            path ::= path-adjust [
                 {[$value sub 0 1] = "/"} ???
-		    $value
+                    $value
                     [get-current-buffer-dir $window : . $value]
             ];
 
-	    if [file exists? $path] {
+            if [file exists? $path] {
                 mini-input-fully-yes-or-no $main $window
                     prompt: "File already exist, overwrite? [yes or ESC]: "
                     no-proc: {
                         show-message "Canceled.";
                         return ALL;
                     }
-		    yes-proc: {
+                    yes-proc: {
                         (result err) ::= $__buff_in_clojure__ save-content path: $path;
                         if $result {
                             show-message "Save Done.";
@@ -297,18 +297,18 @@ defcommand save-buffer-as desc: "Save current buffer to specified file." {
                         };
                         $MainWindow bind-buffer [$window get-window-name] $__buff_in_clojure__;
                         return ALL;
-		    }
+                    }
                 ;;
-	    } {
-		(result err) ::= $__buff_in_clojure__ save-content path: $path;
-		if $result {
+            } {
+                (result err) ::= $__buff_in_clojure__ save-content path: $path;
+                if $result {
                     show-message "Save Done.";
                 } {
                     show-message :bell ["Save Failed, path: " . $path " (" $err ")"];
-		};
-		$MainWindow bind-buffer [$window get-window-name] $__buff_in_clojure__;
-		return ALL;
-	    };
+                };
+                $MainWindow bind-buffer [$window get-window-name] $__buff_in_clojure__;
+                return ALL;
+            };
         }
     ;;
     
@@ -320,9 +320,9 @@ defcommand exit desc: "Exit pmacs editor. If you have an unsaved buffer, pmacs w
     l ::= BufferManager get-buffer-list : filter {| i | "*" != [$i at 0]};
     do_exit := <t>;
     $l each do: {| buff-name |
-	buffer ::= BufferManager get-buffer $buff-name;
+        buffer ::= BufferManager get-buffer $buff-name;
         if {$buffer modify?} {
-	    do_exit := <nil>;
+            do_exit := <nil>;
         };
     };
     if $do_exit {

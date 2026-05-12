@@ -1,31 +1,31 @@
 defun standard-io-command-templ (native-value: nv
-				 files: file-list
-				 driver: drv) {
+                                 files: file-list
+                                 driver: drv) {
 
     if [$file-list null?] 
     then: {
-	$drv $stdin $INFILE $nv;
+        $drv $stdin $INFILE $nv;
     }
     else: {
-	$file-list each do: {| n |
-	    try {
+        $file-list each do: {| n |
+            try {
                 f := `File($n mode: i);
                 if {defvar? STDIO_FILE_ENCODING} {
                     $f set-encoding $STDIO_FILE_ENCODING;
                 };
                 $f set-readbuffer-max 4096;
                 $f set-ignore-cr <t>;
-		$drv $f $n $nv;
-	    }
-	    catch: {| e |
-		println file: $stderr [$e cdr];
-	    }
-	    fin: {
-		if [set? f] then: {
-		    $f close;
-		    unset f;
-		};
-	    };
-	};
+                $drv $f $n $nv;
+            }
+            catch: {| e |
+                println file: $stderr [$e cdr];
+            }
+            fin: {
+                if [set? f] then: {
+                    $f close;
+                    unset f;
+                };
+            };
+        };
     };
 };

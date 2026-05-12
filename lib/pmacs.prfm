@@ -46,18 +46,18 @@ defun pmacs (trace: t) {
         pmacs-load-args-files;
 
         $MainWindow render-all;
-	$MainWindow refresh;
+        $MainWindow refresh;
 
         pmacs-load-startup-file;
 
         # enter the main event loop
-	$MainWindow key-event-loop;
+        $MainWindow key-event-loop;
     }
     fin: {
         pmacs-terminate;
     }
     catch: {| e |
-	__error_info__ ::= "ERROR: <%v># %v\n\n%v" fmt [$e car] [$e cdr] $@stack-trace;
+        __error_info__ ::= "ERROR: <%v># %v\n\n%v" fmt [$e car] [$e cdr] $@stack-trace;
     }
     ;;
 
@@ -254,9 +254,9 @@ defun pmacs-terminate () {
 
 defun debug-message (msg wait: msec) {
     if $MainWindow {
-	[$MainWindow get-minibuffer-window] ?? {throw ErrNoMiniBuffer "No MiniBuffer for debugging."};
-	$MainWindow display-window-message "MiniBuffer" ["DEBUG: %-80v" fmt $msg];
-	$MainWindow get-minibuffer-window : refresh;
-	if {set? msec} {sleep $msec};
+        [$MainWindow get-minibuffer-window] ?? {throw ErrNoMiniBuffer "No MiniBuffer for debugging."};
+        $MainWindow display-window-message "MiniBuffer" ["DEBUG: %-80v" fmt $msg];
+        $MainWindow get-minibuffer-window : refresh;
+        if {set? msec} {sleep $msec};
     };
 };

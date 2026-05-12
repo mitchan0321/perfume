@@ -154,26 +154,26 @@ Window method create-split-vertical-window-sub (ndivs win-name) {
     if {$c < $MIN_WINDOW_WIDTH} {c := $MIN_WINDOW_WIDTH};
     w := 0;
     1 each to: $ndivs do: {| win-ord |
-	if {$win-ord != $ndivs}
-	then: {
-	    win ::= new CombiWindow init: (
+        if {$win-ord != $ndivs}
+        then: {
+            win ::= new CombiWindow init: (
                 [self]
                 0   $w
                 $l  [[$c >= [$c-orig - $w]] ??? [$c-orig - $w] $c]
             );
-	}
-	else: {
-	    win ::= new CombiWindow init: (
+        }
+        else: {
+            win ::= new CombiWindow init: (
                 [self]
                 0  $w
                 $l [$c-orig - [$c * [$ndivs - 1]]]
             );
-	};
+        };
         $win set-window-name $win-name;
         $WindowList <<- $win;
         win-name ::= next-window-name $win-name;
-	
-	w ::= $w + $c;
+        
+        w ::= $w + $c;
         if {[$c-orig - $w] < $MIN_WINDOW_WIDTH} {break};
     };
 
@@ -184,7 +184,7 @@ Window method create-split-vertical-window-sub (ndivs win-name) {
     $WindowList each do: {| w |
         buff ::= $buff-list >>;
         $buff ?? {buff ::= $w get-buffer};
-	$MainWindow bind-buffer [$w get-window-name] $buff;
+        $MainWindow bind-buffer [$w get-window-name] $buff;
     };
     $WindowList car : activate;
 };
@@ -215,26 +215,26 @@ Window method create-split-horizontal-window-sub (ndivs win-name) {
     if {$l > $l-orig} {l := $l-orig};
     w := 0;
     1 each to: $ndivs do: {| win-ord |
-	if {$win-ord != $ndivs}
-	then: {
-	    win ::= new CombiWindow init: (
+        if {$win-ord != $ndivs}
+        then: {
+            win ::= new CombiWindow init: (
                 [self]
                 $w                                              0
                 [[$l >= [$l-orig - $w]] ??? [$l-orig - $w] $l]  $c
             );
-	}
-	else: {
-	    win ::= new CombiWindow init: (
+        }
+        else: {
+            win ::= new CombiWindow init: (
                 [self]
                 $w                              0
                 [$l-orig - [$l * [$ndivs - 1]]] $c
             );
-	};
+        };
         $win set-window-name $win-name;
         $WindowList <<- $win;
         win-name ::= next-window-name $win-name;
-	
-	w ::= $w + $l;
+        
+        w ::= $w + $l;
         if {[$l-orig - $w] < $MIN_WINDOW_HEIGHT} {break};
     };
 
@@ -245,7 +245,7 @@ Window method create-split-horizontal-window-sub (ndivs win-name) {
     $WindowList each do: {| w |
         buff ::= $buff-list >>;
         $buff ?? {buff ::= $w get-buffer};
-	$MainWindow bind-buffer [$w get-window-name] $buff;
+        $MainWindow bind-buffer [$w get-window-name] $buff;
     };
     $WindowList car : activate;
 };
@@ -301,7 +301,7 @@ Window method create-split-cross-window-sub (win-name) {
     $WindowList each do: {| w |
         buff ::= $buff-list >>;
         $buff ?? {buff ::= $w get-buffer};
-	$MainWindow bind-buffer [$w get-window-name] $buff;
+        $MainWindow bind-buffer [$w get-window-name] $buff;
     };
     $WindowList car : activate;
 };
@@ -383,7 +383,7 @@ Window method create-split-tridivide1-window-sub (win-name) {
     $WindowList each do: {| w |
         buff ::= $buff-list >>;
         $buff ?? {buff ::= $w get-buffer};
-	$MainWindow bind-buffer [$w get-window-name] $buff;
+        $MainWindow bind-buffer [$w get-window-name] $buff;
     };
     $WindowList car : activate;
 };
@@ -421,7 +421,7 @@ Window method create-split-tridivide2-window-sub (win-name) {
     $WindowList each do: {| w |
         buff ::= $buff-list >>;
         $buff ?? {buff ::= $w get-buffer};
-	$MainWindow bind-buffer [$w get-window-name] $buff;
+        $MainWindow bind-buffer [$w get-window-name] $buff;
     };
     $WindowList car : activate;
 };
@@ -459,7 +459,7 @@ Window method create-split-tridivide3-window-sub (win-name) {
     $WindowList each do: {| w |
         buff ::= $buff-list >>;
         $buff ?? {buff ::= $w get-buffer};
-	$MainWindow bind-buffer [$w get-window-name] $buff;
+        $MainWindow bind-buffer [$w get-window-name] $buff;
     };
     $WindowList car : activate;
 };
@@ -497,7 +497,7 @@ Window method create-split-tridivide4-window-sub (win-name) {
     $WindowList each do: {| w |
         buff ::= $buff-list >>;
         $buff ?? {buff ::= $w get-buffer};
-	$MainWindow bind-buffer [$w get-window-name] $buff;
+        $MainWindow bind-buffer [$w get-window-name] $buff;
     };
     $WindowList car : activate;
 };
@@ -553,23 +553,23 @@ Window method previous-window-name (win) {
 Window method get-window-by-name (window-name) {
     window := <nil>;
     $WindowList each do: {| i |
-	if {[$i get-window-name] = $window-name} {
-	    window := $i;
-	    break;
-	};
+        if {[$i get-window-name] = $window-name} {
+            window := $i;
+            break;
+        };
     };
     return $window;
 };
 
 Window method refresh () {
     if $MiniInput {
-	try {$WindowList each do: {| w | $w refresh}} catch: {};
-	get-current-window : apply {set-cursor; refresh};
-	$MiniWindow refresh;
+        try {$WindowList each do: {| w | $w refresh}} catch: {};
+        get-current-window : apply {set-cursor; refresh};
+        $MiniWindow refresh;
     } {
-	$MiniWindow refresh;
-	try {$WindowList each do: {| w | $w refresh}} catch: {};
-	get-current-window : apply {set-cursor; refresh};
+        $MiniWindow refresh;
+        try {$WindowList each do: {| w | $w refresh}} catch: {};
+        get-current-window : apply {set-cursor; refresh};
     };
 };
 
@@ -580,21 +580,21 @@ Window method refresh-without-mini-window () {
 
 Window method display-window-message (win msg) {
     $WindowList . $MiniWindow : each do: {| i |
-	if {[$i get-window-name] = $win} {
-	    $i display $msg;
-	    refresh;
-	    return;
-	};
+        if {[$i get-window-name] = $win} {
+            $i display $msg;
+            refresh;
+            return;
+        };
     };
     ##### throw ErrNoSuchWindow ["No such window name '" . $win "'"];
 };
 
 Window method clear-window (win) {
     $WindowList . $MiniWindow : each do: {| i |
-	if {[$i get-window-name] = $win} {
-	    $i clear;
-	    return;
-	};
+        if {[$i get-window-name] = $win} {
+            $i clear;
+            return;
+        };
     };
 };
 
@@ -635,9 +635,9 @@ Window method roll-to-window (window-name) {
 
     if {$n = 0} else: {
         1 each to: $n do: {
-	    win ::= $WindowList >>;
-	    $WindowList <<- $win;
-	};
+            win ::= $WindowList >>;
+            $WindowList <<- $win;
+        };
     };
     try {$WindowList cdr : each do: {| i | $i diactivate}} catch: {};
     $WindowList car : activate;
@@ -663,10 +663,10 @@ Window method previous-buffer () {
 Window method bind-buffer (window-name buffer) {
     window := <nil>;
     $WindowList each do: {| i |
-	if {[$i get-window-name] = $window-name} {
-	    window := $i;
-	    break;
-	};
+        if {[$i get-window-name] = $window-name} {
+            window := $i;
+            break;
+        };
     };
     $window ?? {return};
 
@@ -676,7 +676,7 @@ Window method bind-buffer (window-name buffer) {
     # Save window buffer geometory
     orig-buff ::= $window get-buffer;
     if $orig-buff {
-	BufferManager set-buffer-geom $window-name [$orig-buff get-buffer-name];
+        BufferManager set-buffer-geom $window-name [$orig-buff get-buffer-name];
     };
 
     # Restore window buffer geometory
@@ -707,9 +707,9 @@ Window method unbind-buffer () {
     $BufferBinding unset $win-name;
 
     $WindowList each do: {| i |
-	if {[$i get-buffer : get-buffer-name] = $kill-buff-name} {
+        if {[$i get-buffer : get-buffer-name] = $kill-buff-name} {
             ### bind-buffer [$i get-window-name] $next-buff;
-	    bind-buffer [$i get-window-name] [
+            bind-buffer [$i get-window-name] [
                 ### l ::= BufferManager get-buffer-list-split-order-by-newer;
                 l ::= BufferManager get-buffer-list-order-by-newer;
                 if {$l null?} {
@@ -718,7 +718,7 @@ Window method unbind-buffer () {
                     BufferManager get-buffer [$l car];
                 };
             ];
-	};
+        };
     };
 };
 
@@ -727,9 +727,9 @@ Window method delete-buffer (kill-buff) {
     $kill-buff unregist-buffer;
 
     $WindowList each do: {| i |
-	if {[$i get-buffer : get-buffer-name] = $kill-buff-name} {
+        if {[$i get-buffer : get-buffer-name] = $kill-buff-name} {
             ### bind-buffer [$i get-window-name] $next-buff;
-	    bind-buffer [$i get-window-name] [
+            bind-buffer [$i get-window-name] [
                 l ::= BufferManager get-buffer-list-split-order-by-newer;
                 if {$l null?} {
                     BufferManager get-buffer <nil>;
@@ -737,23 +737,23 @@ Window method delete-buffer (kill-buff) {
                     BufferManager get-buffer [$l car];
                 };
             ];
-	};
+        };
     };
 };
 
 Window method render-all () {
     $WindowList each do: {| i |
-	$i render;
+        $i render;
     };
 };
 
 Window method render (window-name) {
     window := <nil>;
     $WindowList each do: {| i |
-	if {[$i get-window-name] = $window-name} {
-	    window := $i;
-	    break;
-	};
+        if {[$i get-window-name] = $window-name} {
+            window := $i;
+            break;
+        };
     };
     $window ?? {return};
     
@@ -802,9 +802,9 @@ Window method key-event-loop () {
     main ::= self;
     
     while {true} do: {
-	if $EventLoopDone {break};
+        if $EventLoopDone {break};
 
-	window ::= $main get-current-window;
+        window ::= $main get-current-window;
         keyin-list ::= keyin-proc $window;
         keyin-apply $main $window $keyin-list;
     };
@@ -840,7 +840,7 @@ Window method keyin-proc (window) {
             ];
         };
        
-	if {curs-mouse?} { 
+        if {curs-mouse?} { 
             ###
             ### mouse escape?
             ###
@@ -886,7 +886,7 @@ Window method keyin-apply (main window keyin-list) {
                 {eq? $result ALL} {
                     update := <t>;
                 }
-		;;
+                ;;
             } catch: {| e |
                 show-message :bell ["Error at background: <" . [$e car] "># " [$e cdr]];
             };
@@ -916,7 +916,7 @@ Window method keyin-apply (main window keyin-list) {
             window ::= $main get-current-window;
             continue;
         };
-		
+                
         if {input-ready?} {
             cursor-update := <nil>;
             setconf SMART_INDENT_CANCEL <t>;
@@ -987,9 +987,9 @@ Window method mini-input-start (init-value prompt: p index: index) {
     };
     
     if {set? p} {
-	$MiniWindow mini-input-start $p $init-value index: $index;
+        $MiniWindow mini-input-start $p $init-value index: $index;
     } {
-	$MiniWindow mini-input-start "" $init-value index: $index;
+        $MiniWindow mini-input-start "" $init-value index: $index;
     };
     $MiniWindow activate;
 };
@@ -1006,13 +1006,13 @@ Window method get-window-list-without-current () {
 Window method mini-input-callback (in-key value) {
     result := SELF;
     if {! [$MiniInputCallback null?]} {
-	try {
-	    result ::= yield $MiniInputCallback,1 $MainWindow $MiniInputCallback,0 $in-key $value;
-	}
-	catch: {| e |
-	    show-message :bell ["Error happend at mini window input callback, <" . [$e car] "># " [$e cdr]];
+        try {
+            result ::= yield $MiniInputCallback,1 $MainWindow $MiniInputCallback,0 $in-key $value;
+        }
+        catch: {| e |
+            show-message :bell ["Error happend at mini window input callback, <" . [$e car] "># " [$e cdr]];
             result := <nil>;
-	};
+        };
     };
 
     return $result;
@@ -1022,7 +1022,7 @@ Window method mini-input-end () {
     sets MiniInput <nil>;
     sets MiniInputCallback ();
     if {list? $MiniInputSave} {
-	bind-buffer $MiniInputSave,0 $MiniInputSave,1;
+        bind-buffer $MiniInputSave,0 $MiniInputSave,1;
     };
     sets MiniInputSave <nil>;
     $MiniWindow diactivate;
@@ -1072,13 +1072,13 @@ Window method exit-event-loop () {
 
 Window method add-background (body job-id: id after: msec) {
     if {! [set? id]} {
-	int-id ::= $Background get @id : + 1;
-	$Background set @id $int-id ;
-	id ::= "%010d" fmt $int-id;
+        int-id ::= $Background get @id : + 1;
+        $Background set @id $int-id ;
+        id ::= "%010d" fmt $int-id;
     };
 
     if {block? $body} {
-	$Background set $id $body;
+        $Background set $id $body;
     };
     
     if {and {set? msec} {integer? $msec}} {
@@ -1124,7 +1124,7 @@ Window method exec-background () {
         }
         catch: {| e |
             show-message :bell ["Error happend at background: " . $command ", <" [$e car] "># " [$e cdr]];
-	    return <nil>;
+            return <nil>;
         };
         return $result;
     };
@@ -1134,7 +1134,7 @@ Window method exec-background () {
 
 Window method background-exists? () {
     if {[$Background len] > 1} {
-	return <t>;
+        return <t>;
     };
     return <nil>;
 };
@@ -1155,10 +1155,10 @@ Window method is-interp-busy () {
 
 Window method read-keymaps () {
     $LIB_PATH each do: {| i |
-	if {file exists? [$i . "/pmacs.keymap"]} {
-	    try {load :notrace [$i . "/pmacs.keymap"]} catch: {};
-	    break;
-	};
+        if {file exists? [$i . "/pmacs.keymap"]} {
+            try {load :notrace [$i . "/pmacs.keymap"]} catch: {};
+            break;
+        };
     };
 };
 

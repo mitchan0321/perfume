@@ -3,6 +3,6 @@
 #
 defun object-member (name) {
     [lsort [[$name vars] map {| c | "" . $c}]] each do: {| i |
-	println $i ": " [$name var? [symbol $i]];
+        println $i ": " [$name var? [symbol $i]];
     };
 };

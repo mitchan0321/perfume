@@ -5,8 +5,8 @@ defun prime (n) {
     set p $result;
     set i [$result last : car];
     while {$i < $n} do: {
-	i ::= $i nextprime;
-	p ::= $p append! $i;
+        i ::= $i nextprime;
+        p ::= $p append! $i;
     };
     return $result;
 };

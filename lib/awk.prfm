@@ -1,57 +1,57 @@
 load-func standard-io-command-templ;
 
 defun awk (body
-	   sep: sep
-	   args: files) {
+           sep: sep
+           args: files) {
 
     if {! [set? sep]} {set sep <nil>};
     
     standard-io-command-templ
-	native-value: <nil>
-	files: $files
-	driver: [fun (file file-name native-value) {
-	    awk-sub $body $sep $file $file-name;
-	}];
+        native-value: <nil>
+        files: $files
+        driver: [fun (file file-name native-value) {
+            awk-sub $body $sep $file $file-name;
+        }];
 };
 
 defun awk-sub (body sep file file-name) {
     begin local: [dict-closure $body] {
-	@FILENAME := $file-name;
+        @FILENAME := $file-name;
     };
     try {
         cnt := 0;
         $file each do: {| r |
-	    cnt ::= $cnt + 1;
-	    if $sep
-	    then: {
-		l ::= $r split sep: $sep;
-	    }
-	    else: {
-		l ::= $r split;
-	    }
-	    ;
+            cnt ::= $cnt + 1;
+            if $sep
+            then: {
+                l ::= $r split sep: $sep;
+            }
+            else: {
+                l ::= $r split;
+            }
+            ;
 
-	    begin local: [dict-closure $body] {
-		@NF ::= $l len;
-		@NR := $cnt;
-		set [symbol "0"] $r;
-		set n 1;
-		$l each  do: {| i |
-		    set [symbol [$n string]] $i;
-		    $n ++;
+            begin local: [dict-closure $body] {
+                @NF ::= $l len;
+                @NR := $cnt;
+                set [symbol "0"] $r;
+                set n 1;
+                $l each  do: {| i |
+                    set [symbol [$n string]] $i;
+                    $n ++;
                 };
                 if {$n <= 9} {
                     $n each to: 9 do: {| i |
                         set [symbol [$i string]] "";
                     };
                 };
-	        $body eval;
-		set n 1;
-		$l each  do: {| i |
-		    unset [symbol [$n string]];
-		    $n ++;
+                $body eval;
+                set n 1;
+                $l each  do: {| i |
+                    unset [symbol [$n string]];
+                    $n ++;
                 };
-	    };
-	};
+            };
+        };
     };
 };

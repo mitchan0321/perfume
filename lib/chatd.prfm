@@ -6,63 +6,63 @@ defun chatd () {
     lfd ::= socket-server $CHAT-PORT;
 
     try {
-	println "Listening file descriptor: " $lfd;
-	client-list ::= dict;
-	client-addr ::= dict;
+        println "Listening file descriptor: " $lfd;
+        client-list ::= dict;
+        client-addr ::= dict;
     
-	loop do: {
+        loop do: {
 
-	    # check listen port for connect request from client
+            # check listen port for connect request from client
 
-	    (ifds ofds efds) ::= select ($lfd) () () 0;
+            (ifds ofds efds) ::= select ($lfd) () () 0;
 
-	    if [$ifds null?] else: {
+            if [$ifds null?] else: {
 
-	        # proseed client connect request
+                # proseed client connect request
 
-		(fd addr port) ::= accept $lfd;
-		f ::= new File;
-		$f set! $fd mode: io;
-		$f set-encoding UTF-8;
-		$f set-newline <t>;
+                (fd addr port) ::= accept $lfd;
+                f ::= new File;
+                $f set! $fd mode: io;
+                $f set-encoding UTF-8;
+                $f set-newline <t>;
                 $f set-ignore-cr <t>;
-		$client-list set $fd $f;
-		$client-addr set $fd ["%v:%v" fmt [host-address-string $addr] $port];
-		println "Connect client from " $client-addr,$fd;
-	    };
+                $client-list set $fd $f;
+                $client-addr set $fd ["%v:%v" fmt [host-address-string $addr] $port];
+                println "Connect client from " $client-addr,$fd;
+            };
 
-	    # message exchange
+            # message exchange
 
-	    (ifds dmy dmy) ::= select [$client-list keys :string : map {| k | $k int}] () () 100;
+            (ifds dmy dmy) ::= select [$client-list keys :string : map {| k | $k int}] () () 100;
 
-	    $ifds each do: {| c-in |
-		message ::= $client-list,$c-in gets;
+            $ifds each do: {| c-in |
+                message ::= $client-list,$c-in gets;
 
-		if [or [$client-list,$c-in eof?] [nil? $message]] then: {
-		
-		    # disconnect from client
+                if [or [$client-list,$c-in eof?] [nil? $message]] then: {
+                
+                    # disconnect from client
 
-		    println "Disconnect client from " $client-addr,$c-in;
-		    $client-list,$c-in close;
-		    $client-list unset $c-in;
-		    $client-addr unset $c-in;
-		    continue;
-		};
+                    println "Disconnect client from " $client-addr,$c-in;
+                    $client-list,$c-in close;
+                    $client-list unset $c-in;
+                    $client-addr unset $c-in;
+                    continue;
+                };
 
-		# message delivery another client
+                # message delivery another client
 
-		message ::= $message clean;
-		(dmy ofds dmy) ::= select () [$client-list keys :string : map {| k | $k int}] () 0;
-		$ofds each do: {| c-out |
-		    if {$c-out = $c-in} then: {continue};
-		    $client-list,$c-out puts [$message . "\r"];
+                message ::= $message clean;
+                (dmy ofds dmy) ::= select () [$client-list keys :string : map {| k | $k int}] () 0;
+                $ofds each do: {| c-out |
+                    if {$c-out = $c-in} then: {continue};
+                    $client-list,$c-out puts [$message . "\r"];
                     $client-list,$c-out flush;
-		    println "Message delivery [" $message "] to " $client-addr,$c-out;
-		};
-	    };
-	};
+                    println "Message delivery [" $message "] to " $client-addr,$c-out;
+                };
+            };
+        };
     }
     fin: {
-	close $lfd
+        close $lfd
     };
 };

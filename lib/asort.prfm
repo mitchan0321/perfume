@@ -20,14 +20,14 @@ defun quick-asort (a left right cmp gtr) {
     set pivot [yield $gtr $a,[[$i + $j] / 2]];
 
     loop {
-	while {$pivot $cmp [yield $gtr $a,$i]} do: {$i ++};
-	while {[yield $gtr $a,$j] $cmp $pivot} do: {$j --};
-	if {$i >= $j} then: {break};
+        while {$pivot $cmp [yield $gtr $a,$i]} do: {$i ++};
+        while {[yield $gtr $a,$j] $cmp $pivot} do: {$j --};
+        if {$i >= $j} then: {break};
 
-	$a swap $i $j;
+        $a swap $i $j;
 
-	$i ++;
-	$j --;
+        $i ++;
+        $j --;
     };
 
     if {$left < [$i - 1]}  then: {quick-asort $a $left [$i - 1] $cmp $gtr};

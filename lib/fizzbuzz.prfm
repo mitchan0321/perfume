@@ -2,7 +2,7 @@
 
 defun fizzbuzz () {
     1 .. 100 do: {
-	| i |
+        | i |
         cond
             {[$i % 15] = 0} {break "FizzBuzz"}
             {[$i % 3] = 0}  {break "Fizz"}

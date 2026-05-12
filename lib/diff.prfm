@@ -1,9 +1,9 @@
 defun diff (bpath
-	    apath
+            apath
             display-graph: disp
-	    heuristic: heuristic
-	    costbase: costbase
-	   )
+            heuristic: heuristic
+            costbase: costbase
+           )
 
 {
     b-src ::= vector(-1);     # before file id array and append never match mark every source
@@ -104,7 +104,7 @@ defun diff-heuristic () {
             $broot ++;
             $aroot ++;
             $path append! (s $a-src,$aroot);
-	    if [[$bmax - $broot] >= [$amax - $aroot]] {basedir := b} {basedir := a};
+            if [[$bmax - $broot] >= [$amax - $aroot]] {basedir := b} {basedir := a};
             acost := -1;
             bcost := -1;
             continue;
@@ -121,49 +121,49 @@ defun diff-heuristic () {
         bcost-avail := <nil>;
         acost-avail := <nil>;
 
-	# adjust direction
-	fixdir := $basedir;
-	cond
+        # adjust direction
+        fixdir := $basedir;
+        cond
         [or [$bcost = $acost] [and [$bcost <= -1] [$acost <= -1]]] {
             # if same cost (or -1), keep previous direction.
-	    if [$bcost = -1] {
-	        bcost-avail := <nil>;
-		acost-avail := <nil>;
-	    }
-	    break;
+            if [$bcost = -1] {
+                bcost-avail := <nil>;
+                acost-avail := <nil>;
+            }
+            break;
         }
         [$acost <= -1] {
-	    fixdir := b;
-	    break;
-	}
+            fixdir := b;
+            break;
+        }
         [$bcost <= -1] {
-	    fixdir := a;
-	    break;
-	}
+            fixdir := a;
+            break;
+        }
         [$bcost < $acost] {
-	    fixdir := b;
-	    break;
-	}
+            fixdir := b;
+            break;
+        }
         [$bcost > $acost] {
-	    fixdir := a;
-	    break;
-	}
+            fixdir := a;
+            break;
+        }
         ;;
 
-	case $fixdir
-	b {
+        case $fixdir
+        b {
             $broot ++;
             $path append! (b $b-src,$broot);
             acost-avail := <nil>;
-	    bcost-avail := <t>;
-	    $bcost --;
-	}
-	a {
+            bcost-avail := <t>;
+            $bcost --;
+        }
+        a {
             $aroot ++;
             $path append! (a $a-src,$aroot);
             acost-avail := <t>;
-	    bcost-avail := <nil>;
-	    $acost --;
+            bcost-avail := <nil>;
+            $acost --;
         };
     };
 
@@ -179,37 +179,37 @@ defun diff-cost-base () {
         $costarray set ($bmax $a) [$amax - $a];
     };
     $bmax each to: 0 do: {| b |
-    	$costarray set ($b $amax) [$bmax - $b];
+        $costarray set ($b $amax) [$bmax - $b];
     };
 
     if {! [or [$amax = 0] [$bmax = 0]]} {
         [$amax - 1] each to: 0 do: {| a |
             [$bmax - 1] each to: 0 do: {| b |
                 if [$b-src,[$b + 1] = $a-src,[$a + 1]] {
-	            $costarray set ($b $a) $costarray,([$b + 1] [$a + 1]);
+                    $costarray set ($b $a) $costarray,([$b + 1] [$a + 1]);
                 } {
                     a1 := $costarray,($b [$a + 1]);
                     b1 := $costarray,([$b + 1] $a);
-	            if [or [nil? $a1] [nil? $b1]] {break};
-		
+                    if [or [nil? $a1] [nil? $b1]] {break};
+                
                     if [$a1 < $b1] {
-		        $costarray set ($b $a) [$a1 + 1];
-		    } {
-		        $costarray set ($b $a) [$b1 + 1];
-		    };
-	        };
-	    };
-	};
+                        $costarray set ($b $a) [$a1 + 1];
+                    } {
+                        $costarray set ($b $a) [$b1 + 1];
+                    };
+                };
+            };
+        };
     };
 
     if [set? disp] {
         println "# Cost array is:";
-    	0 each to: $bmax do: {| b |
+        0 each to: $bmax do: {| b |
             print "# ";
             0 each to: $amax do: {| a |
-	        print ["%4d" fmt $costarray,($b $a)];
-	    };
-	    println;
+                print ["%4d" fmt $costarray,($b $a)];
+            };
+            println;
         };
     };
 
@@ -230,26 +230,26 @@ defun diff-cost-base () {
             continue;
         };
 
-	if [$b-src,[$broot + 1] = $a-src,[$aroot + 1]] {
+        if [$b-src,[$broot + 1] = $a-src,[$aroot + 1]] {
             # has slant ($broot, $aroot), move slant
             $broot ++;
             $aroot ++;
             $path append! (s $a-src,$aroot);
             continue;
         };
-	
-	a1 := $costarray,($broot [$aroot + 1]);
-	b1 := $costarray,([$broot + 1] $aroot);
+        
+        a1 := $costarray,($broot [$aroot + 1]);
+        b1 := $costarray,([$broot + 1] $aroot);
 
-	if [$b1 <= $a1] {
-	    # if down move cost less than or equel, then move down
-	    $broot ++;
-	    $path append! (b $b-src,$broot);
-	} {
-	    # if right move cost less than, then move right
-	    $aroot ++;
-	    $path append! (a $a-src,$aroot);
-	};
+        if [$b1 <= $a1] {
+            # if down move cost less than or equel, then move down
+            $broot ++;
+            $path append! (b $b-src,$broot);
+        } {
+            # if right move cost less than, then move right
+            $aroot ++;
+            $path append! (a $a-src,$aroot);
+        };
     };
 
     goto diff-display;

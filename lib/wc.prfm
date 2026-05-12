@@ -2,16 +2,16 @@
 load-func standard-io-command-templ;
 
 defun wc (native-value: nv
-	  args: files) {
+          args: files) {
 
     nv ::= if [true? nv] <t> <nil>;
 
     standard-io-command-templ
-	native-value: $nv
-	files: $files
-	driver: [fun (file file-name native-value) {
-	    wc-sub $file $file-name $native-value;
-	}];
+        native-value: $nv
+        files: $files
+        driver: [fun (file file-name native-value) {
+            wc-sub $file $file-name $native-value;
+        }];
 };
 
 defun wc-sub (file name nv) {
@@ -21,9 +21,9 @@ defun wc-sub (file name nv) {
     };
 
     if $nv then: {
-	$stdout puts $i;
+        $stdout puts $i;
     } else: {
-	println ["%6d: %v" fmt $i $name];
+        println ["%6d: %v" fmt $i $name];
     };
 
     return $i;

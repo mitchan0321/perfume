@@ -3,9 +3,9 @@
 defun prime-co () {
     coro {
         prime := 2;
-	while {true} do: {
-	    pause $prime;
-	    prime ::= $prime nextprime;
-	};
+        while {true} do: {
+            pause $prime;
+            prime ::= $prime nextprime;
+        };
     };
 };

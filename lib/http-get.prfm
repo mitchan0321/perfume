@@ -7,83 +7,83 @@ defun http-get (host location port: port) {
     fd ::= connect [resolv-host $host] $port;
 
     try {
-	in ::= new File;
-	$in set! $fd mode: i;
-	$in set-nobuffer;
-	$in set-newline <t>;
+        in ::= new File;
+        $in set! $fd mode: i;
+        $in set-nobuffer;
+        $in set-newline <t>;
 
-	out ::= new File;
-	$out set! $fd mode: o;
-	$out set-nobuffer;
-	$out set-newline <t>;
-	
-	#
-	# send request
-	#
-	$out puts ["GET " . "http://" $host $location " HTTP/1.0\r"];
-	REM {
-	$out puts ["GET " . "http://" $host $location " HTTP/1.1\r"];
+        out ::= new File;
+        $out set! $fd mode: o;
+        $out set-nobuffer;
+        $out set-newline <t>;
+        
+        #
+        # send request
+        #
+        $out puts ["GET " . "http://" $host $location " HTTP/1.0\r"];
+        REM {
+        $out puts ["GET " . "http://" $host $location " HTTP/1.1\r"];
         $out puts "Accept: image/gif, image/jpeg, */*\r";
-	$out puts "Accept-Language: ja\r";
-	$out puts "Accept-Encoding: \r";
-	$out puts "User-Agent: Perfume 0.9.0 (http-get)\r";
+        $out puts "Accept-Language: ja\r";
+        $out puts "Accept-Encoding: \r";
+        $out puts "User-Agent: Perfume 0.9.0 (http-get)\r";
         $out puts "Host: localhost\r";
         $out puts "Connection: Keep-Alive\r";
-	};
-	$out puts "\r";
+        };
+        $out puts "\r";
 
-	if [$in ready? timeout: 5000] then: {
-	    #
-	    # get status line
-	    #
-	    status ::= [$in gets] clean;
-	    println [$status clean];
-	    status_code ::= [[$status split] get 1] int;
-	    
-	    #
-	    # get header
-	    #
-	    $in each do: {| r |
-		println [$r clean];
-		if {[$r split : len] = 0} then: {break};
-		l ::= $r split sep: ":";
-		$header set [[$l >>] lower] [[$l join sep: ":"] clean];
-	    };
-	    len := $header,"content-length";
+        if [$in ready? timeout: 5000] then: {
+            #
+            # get status line
+            #
+            status ::= [$in gets] clean;
+            println [$status clean];
+            status_code ::= [[$status split] get 1] int;
+            
+            #
+            # get header
+            #
+            $in each do: {| r |
+                println [$r clean];
+                if {[$r split : len] = 0} then: {break};
+                l ::= $r split sep: ":";
+                $header set [[$l >>] lower] [[$l join sep: ":"] clean];
+            };
+            len := $header,"content-length";
 
-	    #
-	    # get body
-	    #
-	    if $len
-	    then: {
-		# get body when Content-Length specified
-	        count := 0;
-		len ::= $len int;
-		$in each do: {| r |
-		    $count ++ [$r len];
-		    println [$r clean];
-		    if [$count >= $len] then: {break};
-		};
-	    }
+            #
+            # get body
+            #
+            if $len
+            then: {
+                # get body when Content-Length specified
+                count := 0;
+                len ::= $len int;
+                $in each do: {| r |
+                    $count ++ [$r len];
+                    println [$r clean];
+                    if [$count >= $len] then: {break};
+                };
+            }
 
-	    else: {
-		# get body when Content-Length not specified
-		$in each do: {| r |
-		    println [$r clean];
-		};
-	    }
-	    ;
-	    
-	};
+            else: {
+                # get body when Content-Length not specified
+                $in each do: {| r |
+                    println [$r clean];
+                };
+            }
+            ;
+            
+        };
     }
 
     fin: {
-	if {set? in} then: {$in close};
-	if {set? out} then: {$out close};
+        if {set? in} then: {$in close};
+        if {set? out} then: {$out close};
     }
     
     catch: {| e |
-	throw $e;
+        throw $e;
     }
     ;
 

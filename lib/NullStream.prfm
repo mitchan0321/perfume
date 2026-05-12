@@ -77,11 +77,11 @@ NullStream method flush () {
 
 NullStream method stat () {
     return (
-	    (fd . <nil>) (mode . io) (path . <nil>) (eof . <t>)
-	    (limit . 0) (count . 0) (newline . <t>)
-	    (itemlimit . 0) (itemcount . 0)
+            (fd . <nil>) (mode . io) (path . <nil>) (eof . <t>)
+            (limit . 0) (count . 0) (newline . <t>)
+            (itemlimit . 0) (itemcount . 0)
             (comode . <t>) (tag . $tag)
-	   );
+           );
 };
 
 NullStream method each (do: body) {

@@ -10,30 +10,30 @@ defun chat (host) {
 
     try {
         loop do: {
-	    if {$stdin eof?} {
-		println "Chat client exit.";
-		return;
-	    };
-	    if {$stdin ready? timeout: 100} {
-	        message ::= $stdin gets;
-	        if [or [$stdin eof?] [nil? $message]] then: {
-		    println "Chat client exit.";
-		    return;
-		};
-		$server puts [$message . "\r"];
+            if {$stdin eof?} {
+                println "Chat client exit.";
+                return;
+            };
+            if {$stdin ready? timeout: 100} {
+                message ::= $stdin gets;
+                if [or [$stdin eof?] [nil? $message]] then: {
+                    println "Chat client exit.";
+                    return;
+                };
+                $server puts [$message . "\r"];
                 $server flush;
-	    };
-	    if {$server ready?} {
-	        message ::= $server gets;
-	        if [or [$server eof?] [nil? $message]] then: {
-		    println "Chat server down.";
-		    return;
-		};
-		println [$message clean];
-	    };
-	};
+            };
+            if {$server ready?} {
+                message ::= $server gets;
+                if [or [$server eof?] [nil? $message]] then: {
+                    println "Chat server down.";
+                    return;
+                };
+                println [$message clean];
+            };
+        };
     }
     fin: {
-	$server close;
+        $server close;
     };
 };

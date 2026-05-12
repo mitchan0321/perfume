@@ -4,15 +4,15 @@ defun make-proxy (p) {
     make-proxy-sub $p $h;
     o ::= new;
     $h each do: {| method |
-	local ::= dict;
-	$local set parent $p;
-	$local set object $o;
-	$local set method $method;
-	begin local: $local {
-	    $object method $method (*) {
-		$parent apply {call $method $*};
-	    };
-	};
+        local ::= dict;
+        $local set parent $p;
+        $local set object $o;
+        $local set method $method;
+        begin local: $local {
+            $object method $method (*) {
+                $parent apply {call $method $*};
+            };
+        };
     };
 
     return $o;
@@ -23,16 +23,16 @@ defun make-proxy-sub (o h) {
     
     [$o vars] each do: {| m |
 
-	case [type? [$o var? $m]]
-	NATIVE {
-	    if {$h set? $m} else: {$h set $m <t>};
-	}
-	FUNC {
-	    if {$h set? $m} else: {$h set $m <t>};
-	};
+        case [type? [$o var? $m]]
+        NATIVE {
+            if {$h set? $m} else: {$h set $m <t>};
+        }
+        FUNC {
+            if {$h set? $m} else: {$h set $m <t>};
+        };
     };
 
     [$o delegate?] each do: {| c |
-	make-proxy-sub $c $h;
+        make-proxy-sub $c $h;
     };
 };

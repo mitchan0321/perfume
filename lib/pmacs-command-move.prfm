@@ -291,10 +291,10 @@ defcommand bottom-of-buffer desc: "Move cursor to bottom of buffer." {
     $geom set! CursorColumn 0;
     $geom set! IndexColumn.SAVE 0;
     if {$buff-len < $y} {
-	$geom set! CursorLine $buff-len;
+        $geom set! CursorLine $buff-len;
     } {
-	$geom set! ViewLine [$buff-len - $y : + 1];
-	$geom set! CursorLine [$y - 1];
+        $geom set! ViewLine [$buff-len - $y : + 1];
+        $geom set! CursorLine [$y - 1];
     };
     
     result SELF;
@@ -314,10 +314,10 @@ defcommand bottom-of-buffer-no-mark desc: "Move cursor to bottom of buffer no ma
     $geom set! CursorColumn 0;
     $geom set! IndexColumn.SAVE 0;
     if {$buff-len < $y} {
-	$geom set! CursorLine $buff-len;
+        $geom set! CursorLine $buff-len;
     } {
-	$geom set! ViewLine [$buff-len - $y : + 1];
-	$geom set! CursorLine [$y - 1];
+        $geom set! ViewLine [$buff-len - $y : + 1];
+        $geom set! CursorLine [$y - 1];
     };
     
     result SELF;
@@ -592,8 +592,8 @@ defcommand move-next-paragraph desc: "Move cursor to next paragraph." {
         p ::= curs-pos-to-index $src $col $DEFAULT_TAB_WIDTH;
         if {and [[$src len] > 0] [[$src at $p] != " "] [[$src at $p] != "\t"] [[$src at $p] != ""]} {
             find := <t>;
-	    break;
-	};
+            break;
+        };
     };
     if $find {
         p ::= curs-pos-to-index $src $col $DEFAULT_TAB_WIDTH;
@@ -615,8 +615,8 @@ defcommand move-previous-paragraph desc: "Move cursor to previous paragraph." {
         p ::= curs-pos-to-index $src $col $DEFAULT_TAB_WIDTH;
         if {and [[$src len] > 0] [[$src at $p] != " "] [[$src at $p] != "\t"] [[$src at $p] != ""]} {
             find := <t>;
-	    break;
-	};
+            break;
+        };
     };
     if $find {
         p ::= curs-pos-to-index $src $col $DEFAULT_TAB_WIDTH;

@@ -54,13 +54,13 @@ defun search-sub (main window dir) {
         init-value: $str
         prompt: [search-prompt $dir $SEARCH_MODE [$__buff_in_clojure__ get-search-count]]
         cancel-proc: {
-	    $window cancel-search [$window get-search-string];
-	    show-message "Canceled.";
-	    return ALL;
+            $window cancel-search [$window get-search-string];
+            show-message "Canceled.";
+            return ALL;
         }
         enter-proc: {| value |
-	    $window end-search $value;
-	    show-message "Search complite.";
+            $window end-search $value;
+            show-message "Search complite.";
             return ALL;
         }
         keyin-proc: {| value in-key |
@@ -161,7 +161,7 @@ defun search-sub (main window dir) {
                 return ALL;
             };
             if {or {eq? $in-key CTRL_H} {eq? $in-key KEY_DC}
-	           {eq? $in-key KEY_BACKSPACE} {eq? $in-key kDC5}} {
+                   {eq? $in-key KEY_BACKSPACE} {eq? $in-key kDC5}} {
                 $window reset-search;
                 $window set-search-result [$__buff_in_clojure__ search $value];
                 $MainWindow set-mini-input-prompt [search-prompt $dir $SEARCH_MODE [$__buff_in_clojure__ get-search-count]];
@@ -219,15 +219,15 @@ defun search-word-sub (main window dir) {
         init-value: ""
         prompt: [search-word-prompt $dir $SEARCH_MODE $SearchString]
         cancel-proc: {
-	    $window cancel-search [$window get-search-string];
-	    show-message "Canceled.";
-	    return ALL;
+            $window cancel-search [$window get-search-string];
+            show-message "Canceled.";
+            return ALL;
         }
         enter-proc: {| value |
             if {$value != ""} {
                 setvar SearchString $value
             };
-	    sts ::= $dir ??? {
+            sts ::= $dir ??? {
                 $window apply-command $main $window "" search-next;
             } {
                 $window apply-command $main $window "" search-previous;

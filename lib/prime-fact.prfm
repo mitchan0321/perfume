@@ -12,8 +12,8 @@ defun prime-fact (n) {
 defun prime-fact-sub (n s) {
 
     if {$n isprime} then: {
-	add-fact $n $s;
-	return;
+        add-fact $n $s;
+        return;
     };
 
     from := 2;

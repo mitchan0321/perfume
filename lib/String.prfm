@@ -49,24 +49,24 @@ String method expand () {
     
     remain := [self];
     [$r reverse] each do: {| i |
-	(start end match) := $i;
-	$l << [$remain sub $end];
+        (start end match) := $i;
+        $l << [$remain sub $end];
         vl ::= $match sub 2 [$match len : - 1] : split sep: ":";
-	var ::= symbol [$vl get 0];
+        var ::= symbol [$vl get 0];
         fmt ::= $vl get 1;
-	try {
-	    el ::= (ref $var) create-block;
+        try {
+            el ::= (ref $var) create-block;
             if {nil? $fmt} {
                 $l << [uplevel $el];
             } {
                 $l << [$fmt fmt [uplevel $el]];
             };
-	}
-	catch: {
-	    throw ErrNoSuchVariable> ["No such variable, '" . $var "'."];
-	};
+        }
+        catch: {
+            throw ErrNoSuchVariable> ["No such variable, '" . $var "'."];
+        };
 
-	remain ::= $remain sub 0 $start;
+        remain ::= $remain sub 0 $start;
     };
     $l << $remain;
 
@@ -87,10 +87,10 @@ String method replace (all: all pattern replace-string) {
     l := ();
 
     pattern ::= case [type? $pattern]
-		RQUOTE   {result $pattern}
-		default: {result [["" . $pattern] rquote]}
+                RQUOTE   {result $pattern}
+                default: {result [["" . $pattern] rquote]}
     ;
-	
+        
     if {true? all}
     then: {r ::= [self] =~ :all $pattern}
     else: {r ::= [self] =~ $pattern}
@@ -100,15 +100,15 @@ String method replace (all: all pattern replace-string) {
     
     remain := [self];
     [$r reverse] each do: {| i |
-	(start end match) := $i;
-	$l << [$remain sub $end];
+        (start end match) := $i;
+        $l << [$remain sub $end];
         if {block? $replace-string} {
             $l << [yield $replace-string [$remain sub $start $end]];
         } {
             $l << $replace-string;
         };
         
-	remain ::= $remain sub 0 $start;
+        remain ::= $remain sub 0 $start;
     };
     $l << $remain;
 
@@ -125,10 +125,10 @@ String method replace-return-times (all: all pattern replace-string) {
     count := 0;
 
     pattern ::= case [type? $pattern]
-		RQUOTE   {result $pattern}
-		default: {result [["" . $pattern] rquote]}
+                RQUOTE   {result $pattern}
+                default: {result [["" . $pattern] rquote]}
     ;
-	
+        
     if {true? all}
     then: {r ::= [self] =~ :all $pattern}
     else: {r ::= [self] =~ $pattern}
@@ -138,10 +138,10 @@ String method replace-return-times (all: all pattern replace-string) {
     
     remain := [self];
     [$r reverse] each do: {| i |
-	(start end match) := $i;
-	$l << [$remain sub $end];
-	$l << $replace-string;
-	remain ::= $remain sub 0 $start;
+        (start end match) := $i;
+        $l << [$remain sub $end];
+        $l << $replace-string;
+        remain ::= $remain sub 0 $start;
         $count ++;
     };
     $l << $remain;
@@ -159,10 +159,10 @@ String method replace-return-times-with-start (pattern replace-string at) {
     count := 0;
 
     pattern ::= case [type? $pattern]
-		RQUOTE   {result $pattern}
-		default: {result [["" . $pattern] rquote]}
+                RQUOTE   {result $pattern}
+                default: {result [["" . $pattern] rquote]}
     ;
-	
+        
     r ::= [self] =~ :all $pattern;
 
     if {nil? $r} then: {return ([self] $count)};
@@ -170,10 +170,10 @@ String method replace-return-times-with-start (pattern replace-string at) {
     
     remain := [self];
     $r each do: {| i |
-	(start end match) := $i;
-	$l << [$remain sub $end];
-	$l << $replace-string;
-	remain ::= $remain sub 0 $start;
+        (start end match) := $i;
+        $l << [$remain sub $end];
+        $l << $replace-string;
+        remain ::= $remain sub 0 $start;
         $count ++;
         break;  ### only first search result
     };
@@ -192,7 +192,7 @@ String method repeat (times) {
     if {$times = 0} {return $result};
     self ::= self;
     1 each to: $times do: {
-	$result append! $self;
+        $result append! $self;
     };
     return $result;
 };

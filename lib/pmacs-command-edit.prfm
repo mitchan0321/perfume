@@ -79,8 +79,8 @@ defcommand undo-buffer desc: "Undo buffer." {
     if [$buff undo-empty?] {$buff no-modify};
     $new-y ?? {
         ###$buff no-modify;
-	show-message :bell "Undo buffer is empty.";
-	return SELF;
+        show-message :bell "Undo buffer is empty.";
+        return SELF;
     };
     (line col) ::= $window get-cursor-index $buff $new-y $new-x;
     $window set-freecursor <nil>;
@@ -99,8 +99,8 @@ defcommand redo-buffer desc: "Redo buffer." {
     geom ::= $window get-geom;
     (new-y new-x) ::= $buff redo;
     $new-y ?? {
-	show-message :bell "Redo buffer is empty.";
-	return SELF;
+        show-message :bell "Redo buffer is empty.";
+        return SELF;
     };
     (line col) ::= $window get-cursor-index $buff $new-y $new-x;
     $window set-freecursor <nil>;
@@ -117,9 +117,9 @@ defcommand start-region desc: "Start region select at cursor point." {
     | main window |
     buff ::= $window get-buffer;
     if [$window get-region] {
-	show-message "End region.";
-	$window end-region;
-	return SELF;
+        show-message "End region.";
+        $window end-region;
+        return SELF;
     };
     geom ::= $window get-geom;
     (cy cx) ::= $window get-source-index $buff $geom;
@@ -138,9 +138,9 @@ defcommand copy-region desc: "Copy selected region characters to copy buffer." {
     | main window |
     buff ::= $window get-buffer;
     [$window get-region] ?? {
-	show-message :bell "Not start region. Press Ctrl+[SPACE] to start region.";
-	$window end-region;
-	return SELF;
+        show-message :bell "Not start region. Press Ctrl+[SPACE] to start region.";
+        $window end-region;
+        return SELF;
     };
     geom ::= $window get-geom;
     (sy sx) ::= $window end-region;
@@ -154,9 +154,9 @@ defcommand cut-region desc: "Delete selected region characters from current buff
     | main window |
     buff ::= $window get-buffer;
     [$window get-region] ?? {
-	show-message :bell "Not start region. Press Ctrl+[SPACE] to start region.";
-	$window end-region;
-	return SELF;
+        show-message :bell "Not start region. Press Ctrl+[SPACE] to start region.";
+        $window end-region;
+        return SELF;
     };
     geom ::= $window get-geom;
     (sy sx) ::= $window end-region;
@@ -261,8 +261,8 @@ defcommand paste-buffer desc: "Paste characters from copy buffer into current bu
     buff ::= $window get-buffer;
     str ::= $window get-copy-buffer;
     if {$str = ""} {
-	show-message :bell "Copy buffer is empty.";
-	return SELF;
+        show-message :bell "Copy buffer is empty.";
+        return SELF;
     };
     $window mark;
     geom ::= $window get-geom;
@@ -437,8 +437,8 @@ defun get-indent-level (str) {
 
     str ::= $str . "x";
     0 each to: [$str len : - 1] do: {| i |
-	c ::= $str at $i;
-	if {! [or [$c = " "] [$c = "\t"]]} {break};
+        c ::= $str at $i;
+        if {! [or [$c = " "] [$c = "\t"]]} {break};
     };
     return [curs-index-to-pos $str $i $DEFAULT_TAB_WIDTH];
 };
@@ -451,15 +451,15 @@ defun get-next-indent-count (str) {
     if {[[$str clean] at -1] = ":"} {return 1};
     
     [$str len : - 1] each to: 0 do: {| i |
-	c ::= $str at $i;
-	case $c
-	  "(" {$kakko-maru ++}
-	  "{" {$kakko-nami ++}
-	  "[" {$kakko-kaku ++}
-	  ")" {$kakko-maru --}
-	  "}" {$kakko-nami --}
-	  "]" {$kakko-kaku --}
-	;
+        c ::= $str at $i;
+        case $c
+          "(" {$kakko-maru ++}
+          "{" {$kakko-nami ++}
+          "[" {$kakko-kaku ++}
+          ")" {$kakko-maru --}
+          "}" {$kakko-nami --}
+          "]" {$kakko-kaku --}
+        ;
         if {or {$kakko-maru > 0} {$kakko-nami > 0} {$kakko-kaku > 0 }} {break};
     };
 
@@ -479,15 +479,15 @@ defun get-next-indent-count-backward (str) {
     if {[[$str clean] at -1] = ":"} {return -1};
 
     0 each to: [$str len : - 1] do: {| i |
-	c ::= $str at $i;
-	case $c
-	  "(" {$kakko-maru ++}
-	  "{" {$kakko-nami ++}
-	  "[" {$kakko-kaku ++}
-	  ")" {$kakko-maru --}
-	  "}" {$kakko-nami --}
-	  "]" {$kakko-kaku --}
-	;
+        c ::= $str at $i;
+        case $c
+          "(" {$kakko-maru ++}
+          "{" {$kakko-nami ++}
+          "[" {$kakko-kaku ++}
+          ")" {$kakko-maru --}
+          "}" {$kakko-nami --}
+          "]" {$kakko-kaku --}
+        ;
         if {or {$kakko-maru < 0} {$kakko-nami < 0} {$kakko-kaku < 0 }} {break};
     };
 
@@ -523,14 +523,14 @@ defcommand replace-buffer desc: "Replace regex string to specified string at cur
     mini-input-until-enter $main $window
         prompt: "Replace string: "
         enter-proc: {| value |
-	    froms := $value;
+            froms := $value;
             mini-input-until-enter $main $window
                 prompt: ["Replace string [" . $froms "] to: "]
                 enter-proc: {| value |
                     count ::= [$window get-buffer] replace-buffer $froms $value;
                     show-message ["Replace [" . $froms "] to [" $value "] " $count " times completed."];
                     return ALL;
-	        }
+                }
             ;;
         }
     ;;
@@ -548,7 +548,7 @@ defcommand replace-region desc: "Replace regex string to specified string at cur
     mini-input-until-enter $main $window 
         prompt: "Region replace string: "
         enter-proc: {| value |
-	    froms := $value;
+            froms := $value;
             mini-input-until-enter $main $window
                 prompt: ["Region replace string [" . $froms "] to: "]
                 enter-proc: {| value |
@@ -562,7 +562,7 @@ defcommand replace-region desc: "Replace regex string to specified string at cur
                     count ::= [$window get-buffer] replace-region $froms $value $sy $ey;
                     show-message ["Region replace [" . $froms "] to [" $value "] " $count " times completed in region (" $sy "," $ey ")."];
                     return ALL;
-	        }
+                }
             ;;
         }
     ;;
@@ -576,7 +576,7 @@ defcommand replace-buffer-with-query desc: "Replace regex string to specified st
     mini-input-until-enter $main $window
         prompt: "Query replace string: "
         enter-proc: {| value |
-	    froms := $value;
+            froms := $value;
             mini-input-until-enter $main $window
                 prompt: ["Query replace string [" . $froms "] to: "]
                 enter-proc: {| value |
@@ -654,7 +654,7 @@ defcommand replace-buffer-with-query desc: "Replace regex string to specified st
                     ;;
                     
                     result ALL;
-	        }
+                }
             ;;
         }
     ;;
@@ -669,15 +669,15 @@ defcommand show-character-code desc: "Display cursors point character code at mi
     (cy cx) ::= $window get-source-index $buff $geom;
     s ::= $buff get-buffer-line $cy;
     $s ?? {
-	show-message "No character.";
-	return SELF;
+        show-message "No character.";
+        return SELF;
     };
     c ::= $s sub $cx [$cx + 1];
     if {$c != ""} {
-	i ::= $c uexport : car;
-	show-message ["Code: %v[u+%06x]" fmt $i $i];
+        i ::= $c uexport : car;
+        show-message ["Code: %v[u+%06x]" fmt $i $i];
     } {
-	show-message "No character."
+        show-message "No character."
     };
     
     result SELF;

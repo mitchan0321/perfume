@@ -81,14 +81,14 @@ defun exec (
     };
 
     if {true? PipeObject} then: {
-	$PipeObject set-term-hook [fun () {$IN close; $OUT close; $ERR close}];
+        $PipeObject set-term-hook [fun () {$IN close; $OUT close; $ERR close}];
     };
 
     status := 255;
     try {
-	poll ::= new PollingManager;
+        poll ::= new PollingManager;
 
-	$poll set-exit-condition-block {
+        $poll set-exit-condition-block {
             sts := <nil>;
             try {
                 sts ::= or [$ttin eof?] [$IN eof?] [$ERR eof?];
@@ -100,9 +100,9 @@ defun exec (
                 sts := <t>;
             };
             result $sts;
-	};
+        };
         
-	$poll set-wait-block {
+        $poll set-wait-block {
             if [$ttin eof?] {
                 $OUT close;
                 yield $vbody "[exec] $stdin closed, delivery close to OUT.";
@@ -125,40 +125,40 @@ defun exec (
             };
             result $sts;
         };
-	
-	$poll add-event-queue (
-	    {and [$ttin ready?] [$OUT ready?]} {
+        
+        $poll add-event-queue (
+            {and [$ttin ready?] [$OUT ready?]} {
                 i ::= $ttin gets;
                 
-		if $i {
-		    $OUT puts $i;
-		    $OUT flush;
-		} {
-		    $OUT close;
-		};
-	    }
-	);
-	
-	$poll add-event-queue (
-	    {$IN ready?} {
-		i := <nil>;
+                if $i {
+                    $OUT puts $i;
+                    $OUT flush;
+                } {
+                    $OUT close;
+                };
+            }
+        );
+        
+        $poll add-event-queue (
+            {$IN ready?} {
+                i := <nil>;
                 i ::= $IN gets;
-		if $i {
+                if $i {
                     if {dict [$IN stat] : get early-exit} {
                         $stdout puts :nonewline $i;
                     } {
                         $stdout puts $i;
                     };
-		    $stdout flush;
-		};
-	    }
-	);
-	
-	$poll add-event-queue (
-	    {$ERR ready?} {
-		i := <nil>;
+                    $stdout flush;
+                };
+            }
+        );
+        
+        $poll add-event-queue (
+            {$ERR ready?} {
+                i := <nil>;
                 i ::= $ERR gets;
-		if $i {
+                if $i {
                     if {dict [$ERR stat] : get early-exit} {
                         if {set? errout} {
                             $errout puts :nonewline $i;
@@ -177,17 +177,17 @@ defun exec (
                     } {
                         $stderr flush;
                     }
-		};
-	    }
-	);
-	
-	$poll event-loop;
+                };
+            }
+        );
+        
+        $poll event-loop;
     }
     
     fin: {
-	try {$OUT close} catch: {};
-	try {$IN  close} catch: {};
-	try {$ERR close} catch: {};
+        try {$OUT close} catch: {};
+        try {$IN  close} catch: {};
+        try {$ERR close} catch: {};
         if {true? bg} {
             status := 0;
         } {

@@ -7,9 +7,9 @@ SysQueue method init () {
 };
 
 SysQueue method add-queue (
-    o 			# object
-    e 			# event block
-    once: once		# if event once none <nil>
+    o                   # object
+    e                   # event block
+    once: once          # if event once none <nil>
 ) {
     if {set? once} else: {set once 0};
     $queue_add_req append! ($o $e $once);
@@ -24,7 +24,7 @@ SysQueue method enter-loop () {
     sets __in_loop__ <t>;
 
     try {
-	enter-loop-sub;
+        enter-loop-sub;
     } catch: {retry};
 
     unsets __in_loop__;
@@ -32,21 +32,21 @@ SysQueue method enter-loop () {
 
 SysQueue method enter-loop-sub () {
     while {true} do: {
-	$queue concat! $queue_add_req;
-	sets queue_add_req ();
+        $queue concat! $queue_add_req;
+        sets queue_add_req ();
 
-	$queue each do: {| f |
-	    set o $f,0;
-	    set e $f,1;
-	    set once $f,2;
+        $queue each do: {| f |
+            set o $f,0;
+            set e $f,1;
+            set once $f,2;
 
-	    if {$o ready? timeout: 1000}
-	    then: {
-	        try {
-		    set sts [$e eval];
-		} catch: {};
-	    };
-	};
+            if {$o ready? timeout: 1000}
+            then: {
+                try {
+                    set sts [$e eval];
+                } catch: {};
+            };
+        };
     };
 };
 

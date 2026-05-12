@@ -119,11 +119,11 @@ Task method run () {
         return;
     };
     if {eq? $State Z} {
-	# Zap from other process.
+        # Zap from other process.
         sets State X;
-	sets ExitStatus (ZAP 0);
+        sets ExitStatus (ZAP 0);
         terminate;
-	return;
+        return;
     };
     sets State R;
     b ::= time-of-day :msec;

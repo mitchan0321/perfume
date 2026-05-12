@@ -3,9 +3,9 @@
 #
 defun list-all () {
     [lsort [[info class] map {| i | "" . $i}]] each do: {| c |
-	println $c;
-	[lsort [[[symbol $c] vars] map {| i | "" . $i}]] each do: {| m |
-	    println "\t" $m
-	};
+        println $c;
+        [lsort [[[symbol $c] vars] map {| i | "" . $i}]] each do: {| m |
+            println "\t" $m
+        };
     };
 };
