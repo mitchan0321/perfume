@@ -21,6 +21,7 @@ defun hanoiui (n) {
 };
 
 defun display-hanoi (n l m r) {
+    exec clear;
     result := ();
     fmt ::= "%2v%${n}v%v%-${n}v%2v" expand;
     [$n - 1] each to: 0 do: {| i |

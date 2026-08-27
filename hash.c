@@ -753,3 +753,56 @@ hash_string_key(const wchar_t *key) {
     }
     return result;
 }
+
+/*
+ * Tcl hash_string_key の代替(2)
+ * FNV-1a	高速	良
+ * シンプルなXORと素数の乗算。実装が非常に容易で、識別子のばらつきに優れます。 
+ */
+unsigned int
+hash_string_key_fnv1a(const wchar_t *key) {
+    unsigned int hash = 2166136261U; // 32bit FNV offset basis
+    const wchar_t *string = key;
+
+    for (int c = *string++; c; c = *string++) {
+        // wchar_t をバイト単位に分解して混ぜ込むことでUnicodeにも対応
+        hash ^= (c & 0xFF);
+        hash *= 16777619U; // 32bit FNV prime
+        
+        if (c > 0xFF) {
+            hash ^= ((c >> 8) & 0xFF);
+            hash *= 16777619U;
+            #if SIZEOF_WCHAR_T == 4
+            hash ^= ((c >> 16) & 0xFF);
+            hash *= 16777619U;
+            hash ^= ((c >> 24) & 0xFF);
+            hash *= 16777619U;
+            #endif
+        }
+    }
+    return hash;
+}
+
+/*
+ * Tcl hash_string_key の代替(1)
+ * DJB2 (djb2a)		極めて高速	中〜良	
+ * hash * 33 ^ c を使用。Tclの関数と同等に軽量で、より高い拡散性を持ちます。
+ */
+unsigned int
+hash_string_key_djb2a(const wchar_t *key) {
+    register unsigned int hash = 5381;
+    register int c;
+
+    for (c = *key++; c; c = *key++) {
+        // (hash * 33) ^ c  => ((hash << 5) + hash) ^ c
+        hash = ((hash << 5) + hash) ^ (unsigned int)c;
+    }
+    return hash;
+}
+
+/* 辞書サイズへのマッピング:
+ * 得られた32bitまたは64bitのハッシュ値をハッシュテーブルの配列サイズ（$N$）に収める際、
+ * 単に hash % N とすると上位ビットの情報が捨てられてしまいます。
+ * テーブルサイズを2の冪乗（例: $N = 2^k$）にして hash & (N - 1) を使うか、
+ * ハッシュ値の上位ビットを混和させてから縮約することをお勧めします。
+ */
